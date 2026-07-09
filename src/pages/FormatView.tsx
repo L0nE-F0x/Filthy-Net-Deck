@@ -44,52 +44,86 @@ export function FormatView() {
         <BoModeToggle mode={mode} onChange={setMode} />
       </div>
 
+      {deckList.length < 8 && (
+        <div className="panel border border-fair/40 text-sm text-fair">
+          Only {deckList.length} deck(s) in this feed. Tap Refresh, or reinstall the latest app —
+          each format should ship with 8 full lists for Bo1 and Bo3.
+        </div>
+      )}
+
       <section>
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-          Today’s 8 · {mode.toUpperCase()}
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-1">
+          All {deckList.length || 8} decks · {mode.toUpperCase()}
         </h3>
-        <div className="format-grid">
-          {deckList.map((deck) => (
-            <article
-              key={deck.id}
-              className="panel deck-card"
-              onClick={() => openDeck(deck.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") openDeck(deck.id);
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-gold-400">#{deck.rank}</span>
-                <TierBadge tier={deck.tier} />
-              </div>
-              <h3 className="flex items-center gap-2 flex-wrap">
-                {deck.name}
-                <ColorPips colors={deck.colors} />
-              </h3>
-              <p className="line-clamp-3">{deck.description}</p>
-              {deck.metaShare != null && (
-                <p className="text-xs text-gold-300 m-0 mt-2">{deck.metaShare}% meta share</p>
-              )}
-              <button
-                type="button"
-                className="btn btn-primary btn-sm mt-3"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openDeck(deck.id);
+        <p className="text-xs text-muted m-0 mb-3">
+          Click any card for the full mainboard, sideboard, matchups, and Arena import.
+        </p>
+        <div className="flex flex-col gap-3">
+          {deckList.map((deck) => {
+            const mainCount = deck.mainboard.reduce((n, x) => n + x.count, 0);
+            const sbCount = deck.sideboard.reduce((n, x) => n + x.count, 0);
+            const preview = deck.mainboard.slice(0, 6);
+            return (
+              <article
+                key={deck.id}
+                className="panel deck-card"
+                onClick={() => openDeck(deck.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") openDeck(deck.id);
                 }}
+                role="button"
+                tabIndex={0}
               >
-                Open deck
-              </button>
-            </article>
-          ))}
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-sm font-bold text-gold-400">#{deck.rank ?? "—"}</span>
+                      <TierBadge tier={deck.tier} />
+                      <ColorPips colors={deck.colors} />
+                      {deck.metaShare != null && (
+                        <span className="text-xs text-muted">{deck.metaShare}% meta</span>
+                      )}
+                      <span className="text-xs text-muted">
+                        {mainCount} main
+                        {sbCount > 0 ? ` · ${sbCount} SB` : ""}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold m-0">{deck.name}</h3>
+                    <p className="text-sm text-muted mt-1 mb-2 leading-relaxed">{deck.description}</p>
+                    <div className="card-list selectable text-[11px] opacity-90">
+                      {preview.map((card) => (
+                        <div key={card.name} className="card-list-row border-0 py-0">
+                          <span className="count">{card.count}</span>
+                          <span>{card.name}</span>
+                        </div>
+                      ))}
+                      {deck.mainboard.length > 6 && (
+                        <div className="text-muted pt-1">
+                          +{deck.mainboard.length - 6} more cards in full list…
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-primary shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeck(deck.id);
+                    }}
+                  >
+                    Full decklist
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
       <section className="panel">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-          Tier board
+          Tier board (quick jump)
         </h3>
         <div className="flex flex-col gap-4">
           {fmt.tiers.map((t) => (
@@ -98,18 +132,37 @@ export function FormatView() {
                 <TierBadge tier={t.tier} />
               </div>
               <div className="flex flex-wrap gap-2">
-                {t.archetypes.map((a) => (
-                  <span
-                    key={a}
-                    className="text-sm px-2.5 py-1 rounded-lg bg-ink-800 border border-ink-600/50"
-                  >
-                    {a}
-                  </span>
-                ))}
+                {t.archetypes.map((a) => {
+                  const match = deckList.find(
+                    (d) => d.archetype === a || d.name === a,
+                  );
+                  return (
+                    <button
+                      key={a}
+                      type="button"
+                      className="text-sm px-2.5 py-1 rounded-lg bg-ink-800 border border-ink-600/50 hover:border-gold-500/40 cursor-pointer"
+                      onClick={() => match && openDeck(match.id)}
+                      disabled={!match}
+                      title={match ? "Open full decklist" : "No list for this mode"}
+                    >
+                      {a}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
+        {fmt.metaShareTop && fmt.metaShareTop.length > 0 && (
+          <div className="mt-5 pt-4 border-t border-ink-600/40 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {fmt.metaShareTop.map((m) => (
+              <div key={m.name}>
+                <div className="text-base font-semibold text-gold-300">{m.pct}%</div>
+                <div className="text-xs text-muted">{m.name}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {related.length > 0 && (

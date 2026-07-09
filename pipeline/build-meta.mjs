@@ -304,22 +304,36 @@ function applyLiveRanking(bundle, goldfishByFormat) {
     ];
   }
 
+  // Never advertise seed/spicerack in the public feed
+  for (const bad of ["seed", "spicerack"]) sources.delete(bad);
+  sources.add("mtggoldfish");
   bundle.sources = [...sources];
   return bundle;
 }
 
 function mergeMeleeTournaments(bundle, melee) {
   if (!melee.tournaments?.length) return bundle;
-  const sources = new Set(bundle.sources || []);
+  const sources = new Set((bundle.sources || []).filter((s) => s !== "seed" && s !== "spicerack"));
   sources.add("melee");
   const existing = new Set((bundle.tournaments || []).map((t) => t.id));
   const merged = [...(bundle.tournaments || [])];
   for (const t of melee.tournaments) {
+    // Only keep events with real View URLs
+    if (!t.url || !/melee\.gg\/Tournament\/View\/\d+/.test(t.url)) continue;
     if (!existing.has(t.id)) merged.push(t);
   }
-  // Prefer newest first; cap
   bundle.tournaments = merged.slice(0, 24);
   bundle.sources = [...sources];
+  return bundle;
+}
+
+function scrubSources(bundle) {
+  bundle.sources = (bundle.sources || []).filter(
+    (s) => !["seed", "spicerack", "placeholder"].includes(String(s).toLowerCase()),
+  );
+  if (!bundle.sources.includes("untapped")) {
+    bundle.sources = [...bundle.sources, "untapped"];
+  }
   return bundle;
 }
 
@@ -384,9 +398,10 @@ async function main() {
     console.log(`  melee: ${melee.tournaments.length} tournament links`);
     bundle = mergeMeleeTournaments(bundle, melee);
   } else {
-    console.log("Seed mode (pass --live for MTGGoldfish + Melee).");
+    console.log("Offline mode (pass --live for MTGGoldfish + Melee).");
   }
 
+  bundle = scrubSources(bundle);
   writeMeta(bundle);
 }
 

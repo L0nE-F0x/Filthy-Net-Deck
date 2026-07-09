@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T15:05:32.917Z",
+  "generatedAt": "2026-07-09T15:39:40.290Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -8,73 +8,73 @@
       "shortLabel": "STD",
       "featured": true,
       "bo1DeckIds": [
-        "standard-bo1-r2-izzet-prowess",
-        "standard-bo1-r3-domain-control",
-        "standard-bo1-r6-azorius-control",
-        "standard-bo1-r1-dimir-midrange",
-        "standard-bo1-r7-mono-red-aggro",
-        "standard-bo1-r4-boros-aggro",
-        "standard-bo1-r5-golgari-midrange",
-        "standard-bo1-r8-esper-pixie"
+        "standard-bo1-r1-selesnya-ouroboroid",
+        "standard-bo1-r2-jeskai-lessons",
+        "standard-bo1-r3-izzet-prowess",
+        "standard-bo1-r4-4c-control",
+        "standard-bo1-r5-izzet-spellementals",
+        "standard-bo1-r6-dimir-excruciator",
+        "standard-bo1-r7-mono-green-landfall",
+        "standard-bo1-r8-selesnya-gearhulk"
       ],
       "bo3DeckIds": [
-        "standard-bo3-r2-izzet-prowess",
-        "standard-bo3-r3-domain-control",
-        "standard-bo3-r6-azorius-control",
-        "standard-bo3-r1-dimir-midrange",
-        "standard-bo3-r7-mono-red-aggro",
-        "standard-bo3-r4-boros-aggro",
-        "standard-bo3-r5-golgari-midrange",
-        "standard-bo3-r8-esper-pixie"
+        "standard-bo3-r1-selesnya-ouroboroid",
+        "standard-bo3-r2-jeskai-lessons",
+        "standard-bo3-r3-izzet-prowess",
+        "standard-bo3-r4-4c-control",
+        "standard-bo3-r5-izzet-spellementals",
+        "standard-bo3-r6-dimir-excruciator",
+        "standard-bo3-r7-mono-green-landfall",
+        "standard-bo3-r8-selesnya-gearhulk"
       ],
       "bo1": {
-        "deckId": "standard-bo1-r2-izzet-prowess"
+        "deckId": "standard-bo1-r1-selesnya-ouroboroid"
       },
       "bo3": {
-        "deckId": "standard-bo3-r2-izzet-prowess"
+        "deckId": "standard-bo3-r1-selesnya-ouroboroid"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
-            "Izzet Prowess",
-            "Domain Control",
-            "Azorius Control"
+            "Selesnya Ouroboroid",
+            "Jeskai Lessons",
+            "Izzet Prowess"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Dimir Midrange",
-            "Mono-Red Aggro",
-            "Boros Aggro"
+            "4c Control",
+            "Izzet Spellementals",
+            "Dimir Excruciator"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
-            "Golgari Midrange",
-            "Esper Pixie"
+            "Mono-Green Landfall",
+            "Selesnya Gearhulk"
           ]
         }
       ],
-      "metaNotes": "Eight daily Standard lists ranked by meta share and recent results. Bo1 leans tempo/aggro; Bo3 deepens midrange and control.",
+      "metaNotes": "July 2026 Standard (Marvel Super Heroes era). Ranked from MTGGoldfish meta % + recent Challenge/League results. Cross-check ladder trends on Untapped.gg. Eight full lists below — open any rank for the complete deck.",
       "metaShareTop": [
+        {
+          "name": "Selesnya Ouroboroid",
+          "pct": 12
+        },
+        {
+          "name": "Jeskai Lessons",
+          "pct": 11
+        },
         {
           "name": "Izzet Prowess",
           "pct": 10
         },
         {
-          "name": "Domain Control",
+          "name": "4c Control",
           "pct": 9
-        },
-        {
-          "name": "Azorius Control",
-          "pct": 9
-        },
-        {
-          "name": "Dimir Midrange",
-          "pct": 7
         }
       ]
     },
@@ -605,121 +605,133 @@
     }
   ],
   "decks": {
-    "standard-bo1-r1-dimir-midrange": {
-      "id": "standard-bo1-r1-dimir-midrange",
-      "name": "Dimir Midrange",
+    "standard-bo1-r1-selesnya-ouroboroid": {
+      "id": "standard-bo1-r1-selesnya-ouroboroid",
+      "name": "Selesnya Ouroboroid",
       "format": "standard",
       "mode": "bo1",
-      "rank": 4,
-      "tier": 2,
+      "rank": 1,
+      "tier": 1,
       "colors": [
-        "U",
-        "B"
+        "W",
+        "G"
       ],
-      "archetype": "Dimir Midrange",
-      "description": "Disruption + efficient threats. Best overall Bo3 shell and strong Bo1 with slight tweaks. Daily rank #1 for BO1.",
+      "archetype": "Selesnya Ouroboroid",
+      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #1 for BO1.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Deep-Cavern Bat"
+          "name": "Badgermole Cub"
         },
         {
           "count": 4,
-          "name": "Preacher of the Schism"
+          "name": "Llanowar Elves"
         },
         {
           "count": 3,
-          "name": "Sheoldred, the Apocalypse"
+          "name": "Brightglass Gearhulk"
         },
         {
           "count": 3,
-          "name": "Tishana's Tidebinder"
+          "name": "Pawpatch Recruit"
         },
         {
           "count": 2,
-          "name": "Aclazotz, Deepest Betrayal"
-        },
-        {
-          "count": 4,
-          "name": "Go for the Throat"
+          "name": "Overlord of the Hauntwoods"
         },
         {
           "count": 3,
-          "name": "Cut Down"
+          "name": "Practiced Offense"
         },
         {
           "count": 3,
-          "name": "Negate"
+          "name": "Get Lost"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Sheltered by Ghosts"
         },
         {
           "count": 2,
-          "name": "Duress"
+          "name": "Scrapshooter"
         },
         {
           "count": 2,
-          "name": "Gix's Command"
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "Collector's Cage"
         },
         {
           "count": 4,
-          "name": "Darkslick Shores"
+          "name": "Brushland"
         },
         {
           "count": 4,
-          "name": "Underground River"
-        },
-        {
-          "count": 4,
-          "name": "Restless Reef"
+          "name": "Razorverge Thicket"
         },
         {
           "count": 3,
-          "name": "Gloomlake Verge"
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 3,
+          "name": "Restless Prairie"
         },
         {
           "count": 4,
-          "name": "Island"
+          "name": "Forest"
         },
         {
-          "count": 5,
-          "name": "Swamp"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers"
+          "count": 4,
+          "name": "Plains"
         },
         {
           "count": 2,
-          "name": "The End"
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 2,
+          "name": "Eiganjo, Seat of the Empire"
+        },
+        {
+          "count": 2,
+          "name": "Lush Portico"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
         }
       ],
       "sideboard": [],
       "matchups": [
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Boros Aggro",
+          "vs": "4c Control",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Deep-Cavern Bat\n4 Preacher of the Schism\n3 Sheoldred, the Apocalypse\n3 Tishana's Tidebinder\n2 Aclazotz, Deepest Betrayal\n4 Go for the Throat\n3 Cut Down\n3 Negate\n2 Three Steps Ahead\n2 Duress\n2 Gix's Command\n4 Darkslick Shores\n4 Underground River\n4 Restless Reef\n3 Gloomlake Verge\n4 Island\n5 Swamp\n2 Undercity Sewers\n2 The End",
+      "arenaImport": "Deck\n4 Badgermole Cub\n4 Llanowar Elves\n3 Brightglass Gearhulk\n3 Pawpatch Recruit\n2 Overlord of the Hauntwoods\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Scrapshooter\n2 Beza, the Bounding Spring\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n2 Starting Town",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -730,146 +742,154 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 7
+      "metaShare": 12
     },
-    "standard-bo3-r1-dimir-midrange": {
-      "id": "standard-bo3-r1-dimir-midrange",
-      "name": "Dimir Midrange",
+    "standard-bo3-r1-selesnya-ouroboroid": {
+      "id": "standard-bo3-r1-selesnya-ouroboroid",
+      "name": "Selesnya Ouroboroid",
       "format": "standard",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 1,
+      "tier": 1,
       "colors": [
-        "U",
-        "B"
+        "W",
+        "G"
       ],
-      "archetype": "Dimir Midrange",
-      "description": "Disruption + efficient threats. Best overall Bo3 shell and strong Bo1 with slight tweaks. Daily rank #1 for BO3.",
+      "archetype": "Selesnya Ouroboroid",
+      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #1 for BO3.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Deep-Cavern Bat"
+          "name": "Badgermole Cub"
         },
         {
           "count": 4,
-          "name": "Preacher of the Schism"
+          "name": "Llanowar Elves"
         },
         {
           "count": 3,
-          "name": "Sheoldred, the Apocalypse"
+          "name": "Brightglass Gearhulk"
         },
         {
           "count": 3,
-          "name": "Tishana's Tidebinder"
+          "name": "Pawpatch Recruit"
         },
         {
           "count": 2,
-          "name": "Aclazotz, Deepest Betrayal"
-        },
-        {
-          "count": 4,
-          "name": "Go for the Throat"
+          "name": "Overlord of the Hauntwoods"
         },
         {
           "count": 3,
-          "name": "Cut Down"
+          "name": "Practiced Offense"
         },
         {
           "count": 3,
-          "name": "Negate"
+          "name": "Get Lost"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Sheltered by Ghosts"
         },
         {
           "count": 2,
-          "name": "Duress"
+          "name": "Scrapshooter"
         },
         {
           "count": 2,
-          "name": "Gix's Command"
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "Collector's Cage"
         },
         {
           "count": 4,
-          "name": "Darkslick Shores"
+          "name": "Brushland"
         },
         {
           "count": 4,
-          "name": "Underground River"
-        },
-        {
-          "count": 4,
-          "name": "Restless Reef"
+          "name": "Razorverge Thicket"
         },
         {
           "count": 3,
-          "name": "Gloomlake Verge"
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 3,
+          "name": "Restless Prairie"
         },
         {
           "count": 4,
-          "name": "Island"
+          "name": "Forest"
         },
         {
-          "count": 5,
-          "name": "Swamp"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers"
+          "count": 4,
+          "name": "Plains"
         },
         {
           "count": 2,
-          "name": "The End"
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 2,
+          "name": "Eiganjo, Seat of the Empire"
+        },
+        {
+          "count": 2,
+          "name": "Lush Portico"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
         }
       ],
       "sideboard": [
+        {
+          "count": 2,
+          "name": "Rest in Peace"
+        },
+        {
+          "count": 2,
+          "name": "Destroy Evil"
+        },
+        {
+          "count": 2,
+          "name": "Authority of the Consuls"
+        },
         {
           "count": 2,
           "name": "Ghost Vacuum"
         },
         {
           "count": 2,
-          "name": "Anoint with Affliction"
-        },
-        {
-          "count": 2,
-          "name": "Disdainful Stroke"
-        },
-        {
-          "count": 2,
           "name": "Negate"
         },
         {
           "count": 2,
-          "name": "Gix's Command"
+          "name": "Beza, the Bounding Spring"
         },
         {
           "count": 2,
           "name": "Tishana's Tidebinder"
         },
         {
-          "count": 2,
-          "name": "Duress"
-        },
-        {
           "count": 1,
-          "name": "Aclazotz, Deepest Betrayal"
+          "name": "Overlord of the Mistmoors"
         }
       ],
       "matchups": [
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Boros Aggro",
+          "vs": "4c Control",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
@@ -885,7 +905,7 @@
             "2 slow card draw",
             "1 expensive threat"
           ],
-          "notes": "Against fast decks with Dimir Midrange: prioritize life and board."
+          "notes": "Against fast decks with Selesnya Ouroboroid: prioritize life and board."
         },
         {
           "vs": "Control",
@@ -900,11 +920,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Deep-Cavern Bat\n4 Preacher of the Schism\n3 Sheoldred, the Apocalypse\n3 Tishana's Tidebinder\n2 Aclazotz, Deepest Betrayal\n4 Go for the Throat\n3 Cut Down\n3 Negate\n2 Three Steps Ahead\n2 Duress\n2 Gix's Command\n4 Darkslick Shores\n4 Underground River\n4 Restless Reef\n3 Gloomlake Verge\n4 Island\n5 Swamp\n2 Undercity Sewers\n2 The End\n\nSideboard\n2 Ghost Vacuum\n2 Anoint with Affliction\n2 Disdainful Stroke\n2 Negate\n2 Gix's Command\n2 Tishana's Tidebinder\n2 Duress\n1 Aclazotz, Deepest Betrayal",
+      "arenaImport": "Deck\n4 Badgermole Cub\n4 Llanowar Elves\n3 Brightglass Gearhulk\n3 Pawpatch Recruit\n2 Overlord of the Hauntwoods\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Scrapshooter\n2 Beza, the Bounding Spring\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n2 Starting Town\n\nSideboard\n2 Rest in Peace\n2 Destroy Evil\n2 Authority of the Consuls\n2 Ghost Vacuum\n2 Negate\n2 Beza, the Bounding Spring\n2 Tishana's Tidebinder\n1 Overlord of the Mistmoors",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -915,21 +939,391 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 7
+      "metaShare": 12
     },
-    "standard-bo1-r2-izzet-prowess": {
-      "id": "standard-bo1-r2-izzet-prowess",
+    "standard-bo1-r2-jeskai-lessons": {
+      "id": "standard-bo1-r2-jeskai-lessons",
+      "name": "Jeskai Lessons",
+      "format": "standard",
+      "mode": "bo1",
+      "rank": 2,
+      "tier": 1,
+      "colors": [
+        "W",
+        "U",
+        "R"
+      ],
+      "archetype": "Jeskai Lessons",
+      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #2 for BO1.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Consider"
+        },
+        {
+          "count": 4,
+          "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 3,
+          "name": "Torch the Tower"
+        },
+        {
+          "count": 3,
+          "name": "Lightning Strike"
+        },
+        {
+          "count": 2,
+          "name": "Get Lost"
+        },
+        {
+          "count": 3,
+          "name": "Stock Up"
+        },
+        {
+          "count": 3,
+          "name": "Accumulate Wisdom"
+        },
+        {
+          "count": 2,
+          "name": "Jeskai Revelation"
+        },
+        {
+          "count": 2,
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 2,
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "The Wandering Emperor"
+        },
+        {
+          "count": 1,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 3,
+          "name": "Shivan Reef"
+        },
+        {
+          "count": 3,
+          "name": "Adarkar Wastes"
+        },
+        {
+          "count": 2,
+          "name": "Battlefield Forge"
+        },
+        {
+          "count": 2,
+          "name": "Thundering Falls"
+        },
+        {
+          "count": 2,
+          "name": "Meticulous Archive"
+        },
+        {
+          "count": 2,
+          "name": "Restless Spire"
+        },
+        {
+          "count": 3,
+          "name": "Island"
+        },
+        {
+          "count": 2,
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
+        }
+      ],
+      "sideboard": [],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "4c Control",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [],
+      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Torch the Tower\n3 Lightning Strike\n2 Get Lost\n3 Stock Up\n3 Accumulate Wisdom\n2 Jeskai Revelation\n2 Tablet of Discovery\n2 Three Steps Ahead\n2 The Wandering Emperor\n1 Beza, the Bounding Spring\n4 Spirebluff Canal\n3 Shivan Reef\n3 Adarkar Wastes\n2 Battlefield Forge\n2 Thundering Falls\n2 Meticulous Archive\n2 Restless Spire\n3 Island\n2 Mountain\n2 Plains\n2 Starting Town\n1 Otawara, Soaring City",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 11
+    },
+    "standard-bo3-r2-jeskai-lessons": {
+      "id": "standard-bo3-r2-jeskai-lessons",
+      "name": "Jeskai Lessons",
+      "format": "standard",
+      "mode": "bo3",
+      "rank": 2,
+      "tier": 1,
+      "colors": [
+        "W",
+        "U",
+        "R"
+      ],
+      "archetype": "Jeskai Lessons",
+      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #2 for BO3.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Consider"
+        },
+        {
+          "count": 4,
+          "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 3,
+          "name": "Torch the Tower"
+        },
+        {
+          "count": 3,
+          "name": "Lightning Strike"
+        },
+        {
+          "count": 2,
+          "name": "Get Lost"
+        },
+        {
+          "count": 3,
+          "name": "Stock Up"
+        },
+        {
+          "count": 3,
+          "name": "Accumulate Wisdom"
+        },
+        {
+          "count": 2,
+          "name": "Jeskai Revelation"
+        },
+        {
+          "count": 2,
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 2,
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "The Wandering Emperor"
+        },
+        {
+          "count": 1,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 3,
+          "name": "Shivan Reef"
+        },
+        {
+          "count": 3,
+          "name": "Adarkar Wastes"
+        },
+        {
+          "count": 2,
+          "name": "Battlefield Forge"
+        },
+        {
+          "count": 2,
+          "name": "Thundering Falls"
+        },
+        {
+          "count": 2,
+          "name": "Meticulous Archive"
+        },
+        {
+          "count": 2,
+          "name": "Restless Spire"
+        },
+        {
+          "count": 3,
+          "name": "Island"
+        },
+        {
+          "count": 2,
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Negate"
+        },
+        {
+          "count": 2,
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Get Lost"
+        },
+        {
+          "count": 2,
+          "name": "Temporary Lockdown"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "Rest in Peace"
+        },
+        {
+          "count": 1,
+          "name": "Beza, the Bounding Spring"
+        }
+      ],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "4c Control",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [
+        {
+          "vs": "Aggro",
+          "in": [
+            "2 early removal",
+            "1 sweeper"
+          ],
+          "out": [
+            "2 slow card draw",
+            "1 expensive threat"
+          ],
+          "notes": "Against fast decks with Jeskai Lessons: prioritize life and board."
+        },
+        {
+          "vs": "Control",
+          "in": [
+            "2 permission",
+            "1 threat density"
+          ],
+          "out": [
+            "2 situational creature hate",
+            "1 life-gain"
+          ],
+          "notes": "Post-board becomes a stack war — protect your haymakers."
+        }
+      ],
+      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Torch the Tower\n3 Lightning Strike\n2 Get Lost\n3 Stock Up\n3 Accumulate Wisdom\n2 Jeskai Revelation\n2 Tablet of Discovery\n2 Three Steps Ahead\n2 The Wandering Emperor\n1 Beza, the Bounding Spring\n4 Spirebluff Canal\n3 Shivan Reef\n3 Adarkar Wastes\n2 Battlefield Forge\n2 Thundering Falls\n2 Meticulous Archive\n2 Restless Spire\n3 Island\n2 Mountain\n2 Plains\n2 Starting Town\n1 Otawara, Soaring City\n\nSideboard\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Get Lost\n2 Temporary Lockdown\n2 Tishana's Tidebinder\n2 Rest in Peace\n1 Beza, the Bounding Spring",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 11
+    },
+    "standard-bo1-r3-izzet-prowess": {
+      "id": "standard-bo1-r3-izzet-prowess",
       "name": "Izzet Prowess",
       "format": "standard",
       "mode": "bo1",
-      "rank": 1,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Bo1 ladder king: cantrips, prowess threats, and lethal reach. Daily rank #2 for BO1.",
+      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #3 for BO1.",
       "mainboard": [
         {
           "count": 4,
@@ -944,12 +1338,20 @@
           "name": "Stormcatch Mentor"
         },
         {
+          "count": 2,
+          "name": "Astrologian's Planisphere"
+        },
+        {
           "count": 4,
           "name": "Consider"
         },
         {
           "count": 4,
           "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
@@ -960,16 +1362,12 @@
           "name": "Lightning Strike"
         },
         {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 2,
-          "name": "Stock Up"
-        },
-        {
           "count": 2,
           "name": "Torch the Tower"
+        },
+        {
+          "count": 2,
+          "name": "Flow State"
         },
         {
           "count": 2,
@@ -988,11 +1386,15 @@
           "name": "Shivan Reef"
         },
         {
+          "count": 3,
+          "name": "Restless Spire"
+        },
+        {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 6,
+          "count": 5,
           "name": "Mountain"
         },
         {
@@ -1000,34 +1402,38 @@
           "name": "Thundering Falls"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
       "sideboard": [],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Boros Aggro",
+          "vs": "4c Control",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n4 Consider\n4 Opt\n4 Play with Fire\n3 Lightning Strike\n3 Sleight of Hand\n2 Stock Up\n2 Torch the Tower\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n4 Island\n6 Mountain\n2 Thundering Falls\n3 Restless Spire",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -1040,19 +1446,19 @@
       ],
       "metaShare": 10
     },
-    "standard-bo3-r2-izzet-prowess": {
-      "id": "standard-bo3-r2-izzet-prowess",
+    "standard-bo3-r3-izzet-prowess": {
+      "id": "standard-bo3-r3-izzet-prowess",
       "name": "Izzet Prowess",
       "format": "standard",
       "mode": "bo3",
-      "rank": 1,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Bo1 ladder king: cantrips, prowess threats, and lethal reach. Daily rank #2 for BO3.",
+      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #3 for BO3.",
       "mainboard": [
         {
           "count": 4,
@@ -1067,12 +1473,20 @@
           "name": "Stormcatch Mentor"
         },
         {
+          "count": 2,
+          "name": "Astrologian's Planisphere"
+        },
+        {
           "count": 4,
           "name": "Consider"
         },
         {
           "count": 4,
           "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
@@ -1083,16 +1497,12 @@
           "name": "Lightning Strike"
         },
         {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 2,
-          "name": "Stock Up"
-        },
-        {
           "count": 2,
           "name": "Torch the Tower"
+        },
+        {
+          "count": 2,
+          "name": "Flow State"
         },
         {
           "count": 2,
@@ -1111,11 +1521,15 @@
           "name": "Shivan Reef"
         },
         {
+          "count": 3,
+          "name": "Restless Spire"
+        },
+        {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 6,
+          "count": 5,
           "name": "Mountain"
         },
         {
@@ -1123,24 +1537,57 @@
           "name": "Thundering Falls"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
-      "sideboard": [],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Negate"
+        },
+        {
+          "count": 2,
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Brotherhood's End"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "Into the Flood Maw"
+        },
+        {
+          "count": 2,
+          "name": "Stock Up"
+        },
+        {
+          "count": 1,
+          "name": "Screaming Nemesis"
+        }
+      ],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Boros Aggro",
+          "vs": "4c Control",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
@@ -1171,11 +1618,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n4 Consider\n4 Opt\n4 Play with Fire\n3 Lightning Strike\n3 Sleight of Hand\n2 Stock Up\n2 Torch the Tower\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n4 Island\n6 Mountain\n2 Thundering Falls\n3 Restless Spire",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City\n\nSideboard\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Into the Flood Maw\n2 Stock Up\n1 Screaming Nemesis",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -1188,78 +1639,77 @@
       ],
       "metaShare": 10
     },
-    "standard-bo1-r3-domain-control": {
-      "id": "standard-bo1-r3-domain-control",
-      "name": "Domain Control",
+    "standard-bo1-r4-4c-control": {
+      "id": "standard-bo1-r4-4c-control",
+      "name": "4c Control",
       "format": "standard",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "W",
         "U",
         "B",
-        "R",
-        "G"
+        "R"
       ],
-      "archetype": "Domain Control",
-      "description": "Overlord value and domain payoff — grinds midrange into dust. Daily rank #3 for BO1.",
+      "archetype": "4c Control",
+      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #4 for BO1.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Leyline Binding"
-        },
-        {
-          "count": 3,
-          "name": "Herigast, Erupting Nullkite"
-        },
-        {
-          "count": 2,
-          "name": "Atraxa, Grand Unifier"
-        },
-        {
-          "count": 3,
-          "name": "Up the Beanstalk"
+          "name": "Consider"
         },
         {
           "count": 3,
           "name": "Stock Up"
         },
         {
-          "count": 2,
+          "count": 3,
           "name": "Three Steps Ahead"
-        },
-        {
-          "count": 2,
-          "name": "Get Lost"
         },
         {
           "count": 2,
           "name": "Negate"
         },
         {
-          "count": 4,
-          "name": "Commercial District"
-        },
-        {
-          "count": 4,
-          "name": "Hedge Maze"
-        },
-        {
           "count": 3,
-          "name": "Lush Portico"
+          "name": "Get Lost"
         },
         {
-          "count": 3,
+          "count": 2,
+          "name": "Torch the Tower"
+        },
+        {
+          "count": 2,
+          "name": "Inevitable Defeat"
+        },
+        {
+          "count": 2,
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 2,
+          "name": "Temporary Lockdown"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "The Wandering Emperor"
+        },
+        {
+          "count": 1,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 1,
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
           "name": "Meticulous Archive"
-        },
-        {
-          "count": 2,
-          "name": "Shadowy Backstreet"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers"
         },
         {
           "count": 2,
@@ -1267,27 +1717,15 @@
         },
         {
           "count": 2,
+          "name": "Undercity Sewers"
+        },
+        {
+          "count": 2,
           "name": "Raucous Theater"
         },
         {
           "count": 2,
-          "name": "Island"
-        },
-        {
-          "count": 2,
-          "name": "Plains"
-        },
-        {
-          "count": 2,
-          "name": "Forest"
-        },
-        {
-          "count": 2,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Mountain"
+          "name": "Shadowy Backstreet"
         },
         {
           "count": 2,
@@ -1299,33 +1737,65 @@
         },
         {
           "count": 2,
-          "name": "Temporary Lockdown"
+          "name": "Starting Town"
+        },
+        {
+          "count": 3,
+          "name": "Island"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Swamp"
+        },
+        {
+          "count": 2,
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Restless Anchorage"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
+        },
+        {
+          "count": 1,
+          "name": "Eiganjo, Seat of the Empire"
         }
       ],
       "sideboard": [],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Boros Aggro",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Leyline Binding\n3 Herigast, Erupting Nullkite\n2 Atraxa, Grand Unifier\n3 Up the Beanstalk\n3 Stock Up\n2 Three Steps Ahead\n2 Get Lost\n2 Negate\n4 Commercial District\n4 Hedge Maze\n3 Lush Portico\n3 Meticulous Archive\n2 Shadowy Backstreet\n2 Undercity Sewers\n2 Thundering Falls\n2 Raucous Theater\n2 Island\n2 Plains\n2 Forest\n2 Swamp\n1 Mountain\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Temporary Lockdown",
+      "arenaImport": "Deck\n4 Consider\n3 Stock Up\n3 Three Steps Ahead\n2 Negate\n3 Get Lost\n2 Torch the Tower\n2 Inevitable Defeat\n2 Tablet of Discovery\n2 Temporary Lockdown\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n1 Tishana's Tidebinder\n1 Deadly Cover-Up\n2 Meticulous Archive\n2 Thundering Falls\n2 Undercity Sewers\n2 Raucous Theater\n2 Shadowy Backstreet\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Starting Town\n3 Island\n2 Plains\n2 Swamp\n2 Mountain\n2 Restless Anchorage\n1 Otawara, Soaring City\n1 Eiganjo, Seat of the Empire",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -1338,78 +1808,77 @@
       ],
       "metaShare": 9
     },
-    "standard-bo3-r3-domain-control": {
-      "id": "standard-bo3-r3-domain-control",
-      "name": "Domain Control",
+    "standard-bo3-r4-4c-control": {
+      "id": "standard-bo3-r4-4c-control",
+      "name": "4c Control",
       "format": "standard",
       "mode": "bo3",
-      "rank": 2,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "W",
         "U",
         "B",
-        "R",
-        "G"
+        "R"
       ],
-      "archetype": "Domain Control",
-      "description": "Overlord value and domain payoff — grinds midrange into dust. Daily rank #3 for BO3.",
+      "archetype": "4c Control",
+      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #4 for BO3.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Leyline Binding"
-        },
-        {
-          "count": 3,
-          "name": "Herigast, Erupting Nullkite"
-        },
-        {
-          "count": 2,
-          "name": "Atraxa, Grand Unifier"
-        },
-        {
-          "count": 3,
-          "name": "Up the Beanstalk"
+          "name": "Consider"
         },
         {
           "count": 3,
           "name": "Stock Up"
         },
         {
-          "count": 2,
+          "count": 3,
           "name": "Three Steps Ahead"
-        },
-        {
-          "count": 2,
-          "name": "Get Lost"
         },
         {
           "count": 2,
           "name": "Negate"
         },
         {
-          "count": 4,
-          "name": "Commercial District"
-        },
-        {
-          "count": 4,
-          "name": "Hedge Maze"
-        },
-        {
           "count": 3,
-          "name": "Lush Portico"
+          "name": "Get Lost"
         },
         {
-          "count": 3,
+          "count": 2,
+          "name": "Torch the Tower"
+        },
+        {
+          "count": 2,
+          "name": "Inevitable Defeat"
+        },
+        {
+          "count": 2,
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 2,
+          "name": "Temporary Lockdown"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "The Wandering Emperor"
+        },
+        {
+          "count": 1,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 1,
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
           "name": "Meticulous Archive"
-        },
-        {
-          "count": 2,
-          "name": "Shadowy Backstreet"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers"
         },
         {
           "count": 2,
@@ -1417,27 +1886,15 @@
         },
         {
           "count": 2,
+          "name": "Undercity Sewers"
+        },
+        {
+          "count": 2,
           "name": "Raucous Theater"
         },
         {
           "count": 2,
-          "name": "Island"
-        },
-        {
-          "count": 2,
-          "name": "Plains"
-        },
-        {
-          "count": 2,
-          "name": "Forest"
-        },
-        {
-          "count": 2,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Mountain"
+          "name": "Shadowy Backstreet"
         },
         {
           "count": 2,
@@ -1449,867 +1906,49 @@
         },
         {
           "count": 2,
-          "name": "Temporary Lockdown"
-        }
-      ],
-      "sideboard": [
+          "name": "Starting Town"
+        },
         {
-          "count": 2,
-          "name": "Negate"
+          "count": 3,
+          "name": "Island"
         },
         {
           "count": 2,
-          "name": "Rest in Peace"
+          "name": "Plains"
         },
         {
           "count": 2,
-          "name": "Duress"
+          "name": "Swamp"
         },
         {
           "count": 2,
-          "name": "Get Lost"
+          "name": "Mountain"
         },
         {
           "count": 2,
-          "name": "Disdainful Stroke"
-        },
-        {
-          "count": 2,
-          "name": "Beza, the Bounding Spring"
-        },
-        {
-          "count": 2,
-          "name": "Tishana's Tidebinder"
+          "name": "Restless Anchorage"
         },
         {
           "count": 1,
-          "name": "Atraxa, Grand Unifier"
-        }
-      ],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Boros Aggro",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [
-        {
-          "vs": "Aggro",
-          "in": [
-            "2 early removal",
-            "1 sweeper"
-          ],
-          "out": [
-            "2 slow card draw",
-            "1 expensive threat"
-          ],
-          "notes": "Against fast decks with Domain Control: prioritize life and board."
-        },
-        {
-          "vs": "Control",
-          "in": [
-            "2 permission",
-            "1 threat density"
-          ],
-          "out": [
-            "2 situational creature hate",
-            "1 life-gain"
-          ],
-          "notes": "Post-board becomes a stack war — protect your haymakers."
-        }
-      ],
-      "arenaImport": "Deck\n4 Leyline Binding\n3 Herigast, Erupting Nullkite\n2 Atraxa, Grand Unifier\n3 Up the Beanstalk\n3 Stock Up\n2 Three Steps Ahead\n2 Get Lost\n2 Negate\n4 Commercial District\n4 Hedge Maze\n3 Lush Portico\n3 Meticulous Archive\n2 Shadowy Backstreet\n2 Undercity Sewers\n2 Thundering Falls\n2 Raucous Theater\n2 Island\n2 Plains\n2 Forest\n2 Swamp\n1 Mountain\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Temporary Lockdown\n\nSideboard\n2 Negate\n2 Rest in Peace\n2 Duress\n2 Get Lost\n2 Disdainful Stroke\n2 Beza, the Bounding Spring\n2 Tishana's Tidebinder\n1 Atraxa, Grand Unifier",
-      "sources": [
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
-        }
-      ],
-      "metaShare": 9
-    },
-    "standard-bo1-r4-boros-aggro": {
-      "id": "standard-bo1-r4-boros-aggro",
-      "name": "Boros Aggro",
-      "format": "standard",
-      "mode": "bo1",
-      "rank": 6,
-      "tier": 2,
-      "colors": [
-        "W",
-        "R"
-      ],
-      "archetype": "Boros Aggro",
-      "description": "Fast curve, reach, and Initiative-style pressure for BO1 queues. Daily rank #4 for BO1.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "Heartfire Hero"
-        },
-        {
-          "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
-          "count": 4,
-          "name": "Slickshot Show-Off"
-        },
-        {
-          "count": 3,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 4,
-          "name": "Play with Fire"
-        },
-        {
-          "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 3,
-          "name": "Burst Lightning"
-        },
-        {
-          "count": 2,
-          "name": "Get Lost"
-        },
-        {
-          "count": 2,
-          "name": "Sheltered by Ghosts"
-        },
-        {
-          "count": 4,
-          "name": "Inspiring Vantage"
-        },
-        {
-          "count": 4,
-          "name": "Sacred Foundry"
-        },
-        {
-          "count": 3,
-          "name": "Battlefield Forge"
-        },
-        {
-          "count": 4,
-          "name": "Mountain"
-        },
-        {
-          "count": 4,
-          "name": "Plains"
-        },
-        {
-          "count": 3,
-          "name": "Restless Bivouac"
-        },
-        {
-          "count": 3,
-          "name": "Rockface Village"
-        },
-        {
-          "count": 2,
-          "name": "Sundown Pass"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Domain Control",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Heartfire Hero\n4 Monastery Swiftspear\n4 Slickshot Show-Off\n3 Emberheart Challenger\n4 Play with Fire\n3 Lightning Strike\n3 Burst Lightning\n2 Get Lost\n2 Sheltered by Ghosts\n4 Inspiring Vantage\n4 Sacred Foundry\n3 Battlefield Forge\n4 Mountain\n4 Plains\n3 Restless Bivouac\n3 Rockface Village\n2 Sundown Pass",
-      "sources": [
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
-        },
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        }
-      ],
-      "metaShare": 10
-    },
-    "standard-bo3-r4-boros-aggro": {
-      "id": "standard-bo3-r4-boros-aggro",
-      "name": "Boros Aggro",
-      "format": "standard",
-      "mode": "bo3",
-      "rank": 6,
-      "tier": 2,
-      "colors": [
-        "W",
-        "R"
-      ],
-      "archetype": "Boros Aggro",
-      "description": "Fast curve, reach, and Initiative-style pressure for BO1 queues. Daily rank #4 for BO3.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "Heartfire Hero"
-        },
-        {
-          "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
-          "count": 4,
-          "name": "Slickshot Show-Off"
-        },
-        {
-          "count": 3,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 4,
-          "name": "Play with Fire"
-        },
-        {
-          "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 3,
-          "name": "Burst Lightning"
-        },
-        {
-          "count": 2,
-          "name": "Get Lost"
-        },
-        {
-          "count": 2,
-          "name": "Sheltered by Ghosts"
-        },
-        {
-          "count": 4,
-          "name": "Inspiring Vantage"
-        },
-        {
-          "count": 4,
-          "name": "Sacred Foundry"
-        },
-        {
-          "count": 3,
-          "name": "Battlefield Forge"
-        },
-        {
-          "count": 4,
-          "name": "Mountain"
-        },
-        {
-          "count": 4,
-          "name": "Plains"
-        },
-        {
-          "count": 3,
-          "name": "Restless Bivouac"
-        },
-        {
-          "count": 3,
-          "name": "Rockface Village"
-        },
-        {
-          "count": 2,
-          "name": "Sundown Pass"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Domain Control",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [
-        {
-          "vs": "Aggro",
-          "in": [
-            "2 early removal",
-            "1 sweeper"
-          ],
-          "out": [
-            "2 slow card draw",
-            "1 expensive threat"
-          ],
-          "notes": "Against fast decks with Boros Aggro: prioritize life and board."
-        },
-        {
-          "vs": "Control",
-          "in": [
-            "2 permission",
-            "1 threat density"
-          ],
-          "out": [
-            "2 situational creature hate",
-            "1 life-gain"
-          ],
-          "notes": "Post-board becomes a stack war — protect your haymakers."
-        }
-      ],
-      "arenaImport": "Deck\n4 Heartfire Hero\n4 Monastery Swiftspear\n4 Slickshot Show-Off\n3 Emberheart Challenger\n4 Play with Fire\n3 Lightning Strike\n3 Burst Lightning\n2 Get Lost\n2 Sheltered by Ghosts\n4 Inspiring Vantage\n4 Sacred Foundry\n3 Battlefield Forge\n4 Mountain\n4 Plains\n3 Restless Bivouac\n3 Rockface Village\n2 Sundown Pass",
-      "sources": [
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
-        },
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        }
-      ],
-      "metaShare": 9.4
-    },
-    "standard-bo1-r5-golgari-midrange": {
-      "id": "standard-bo1-r5-golgari-midrange",
-      "name": "Golgari Midrange",
-      "format": "standard",
-      "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
-      "colors": [
-        "B",
-        "G"
-      ],
-      "archetype": "Golgari Midrange",
-      "description": "Value creatures and grind engines for fair Standard mirrors. Daily rank #5 for BO1.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "Llanowar Elves"
-        },
-        {
-          "count": 4,
-          "name": "Deep-Cavern Bat"
-        },
-        {
-          "count": 3,
-          "name": "Preacher of the Schism"
-        },
-        {
-          "count": 3,
-          "name": "Glissa Sunslayer"
-        },
-        {
-          "count": 2,
-          "name": "Sheoldred, the Apocalypse"
-        },
-        {
-          "count": 3,
-          "name": "Go for the Throat"
-        },
-        {
-          "count": 3,
-          "name": "Cut Down"
-        },
-        {
-          "count": 2,
-          "name": "Duress"
-        },
-        {
-          "count": 2,
-          "name": "Gix's Command"
-        },
-        {
-          "count": 2,
-          "name": "The End"
-        },
-        {
-          "count": 4,
-          "name": "Blooming Marsh"
-        },
-        {
-          "count": 4,
-          "name": "Llanowar Wastes"
-        },
-        {
-          "count": 3,
-          "name": "Restless Cottage"
-        },
-        {
-          "count": 3,
-          "name": "Wastewood Verge"
-        },
-        {
-          "count": 4,
-          "name": "Forest"
-        },
-        {
-          "count": 5,
-          "name": "Swamp"
-        },
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 3,
-          "name": "Scrapshooter"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Domain Control",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Llanowar Elves\n4 Deep-Cavern Bat\n3 Preacher of the Schism\n3 Glissa Sunslayer\n2 Sheoldred, the Apocalypse\n3 Go for the Throat\n3 Cut Down\n2 Duress\n2 Gix's Command\n2 The End\n4 Blooming Marsh\n4 Llanowar Wastes\n3 Restless Cottage\n3 Wastewood Verge\n4 Forest\n5 Swamp\n2 Boseiju, Who Endures\n3 Scrapshooter",
-      "sources": [
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
-        },
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        }
-      ],
-      "metaShare": 8.1
-    },
-    "standard-bo3-r5-golgari-midrange": {
-      "id": "standard-bo3-r5-golgari-midrange",
-      "name": "Golgari Midrange",
-      "format": "standard",
-      "mode": "bo3",
-      "rank": 7,
-      "tier": 3,
-      "colors": [
-        "B",
-        "G"
-      ],
-      "archetype": "Golgari Midrange",
-      "description": "Value creatures and grind engines for fair Standard mirrors. Daily rank #5 for BO3.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "Llanowar Elves"
-        },
-        {
-          "count": 4,
-          "name": "Deep-Cavern Bat"
-        },
-        {
-          "count": 3,
-          "name": "Preacher of the Schism"
-        },
-        {
-          "count": 3,
-          "name": "Glissa Sunslayer"
-        },
-        {
-          "count": 2,
-          "name": "Sheoldred, the Apocalypse"
-        },
-        {
-          "count": 3,
-          "name": "Go for the Throat"
-        },
-        {
-          "count": 3,
-          "name": "Cut Down"
-        },
-        {
-          "count": 2,
-          "name": "Duress"
-        },
-        {
-          "count": 2,
-          "name": "Gix's Command"
-        },
-        {
-          "count": 2,
-          "name": "The End"
-        },
-        {
-          "count": 4,
-          "name": "Blooming Marsh"
-        },
-        {
-          "count": 4,
-          "name": "Llanowar Wastes"
-        },
-        {
-          "count": 3,
-          "name": "Restless Cottage"
-        },
-        {
-          "count": 3,
-          "name": "Wastewood Verge"
-        },
-        {
-          "count": 4,
-          "name": "Forest"
-        },
-        {
-          "count": 5,
-          "name": "Swamp"
-        },
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 3,
-          "name": "Scrapshooter"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Domain Control",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [
-        {
-          "vs": "Aggro",
-          "in": [
-            "2 early removal",
-            "1 sweeper"
-          ],
-          "out": [
-            "2 slow card draw",
-            "1 expensive threat"
-          ],
-          "notes": "Against fast decks with Golgari Midrange: prioritize life and board."
-        },
-        {
-          "vs": "Control",
-          "in": [
-            "2 permission",
-            "1 threat density"
-          ],
-          "out": [
-            "2 situational creature hate",
-            "1 life-gain"
-          ],
-          "notes": "Post-board becomes a stack war — protect your haymakers."
-        }
-      ],
-      "arenaImport": "Deck\n4 Llanowar Elves\n4 Deep-Cavern Bat\n3 Preacher of the Schism\n3 Glissa Sunslayer\n2 Sheoldred, the Apocalypse\n3 Go for the Throat\n3 Cut Down\n2 Duress\n2 Gix's Command\n2 The End\n4 Blooming Marsh\n4 Llanowar Wastes\n3 Restless Cottage\n3 Wastewood Verge\n4 Forest\n5 Swamp\n2 Boseiju, Who Endures\n3 Scrapshooter",
-      "sources": [
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
-        },
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        }
-      ],
-      "metaShare": 8.9
-    },
-    "standard-bo1-r6-azorius-control": {
-      "id": "standard-bo1-r6-azorius-control",
-      "name": "Azorius Control",
-      "format": "standard",
-      "mode": "bo1",
-      "rank": 3,
-      "tier": 1,
-      "colors": [
-        "W",
-        "U"
-      ],
-      "archetype": "Azorius Control",
-      "description": "Permission, sweepers, and hard-to-answer endgames. Daily rank #6 for BO1.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "No More Lies"
-        },
-        {
-          "count": 3,
-          "name": "Three Steps Ahead"
-        },
-        {
-          "count": 3,
-          "name": "Get Lost"
-        },
-        {
-          "count": 2,
-          "name": "Temporary Lockdown"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up"
-        },
-        {
-          "count": 2,
-          "name": "Beza, the Bounding Spring"
-        },
-        {
-          "count": 2,
-          "name": "The Wandering Emperor"
-        },
-        {
-          "count": 3,
-          "name": "Deduce"
-        },
-        {
-          "count": 2,
-          "name": "Horned Loch-Whale"
-        },
-        {
-          "count": 4,
-          "name": "Adarkar Wastes"
-        },
-        {
-          "count": 4,
-          "name": "Seachrome Coast"
-        },
-        {
-          "count": 4,
-          "name": "Restless Anchorage"
-        },
-        {
-          "count": 3,
-          "name": "Floodfarm Verge"
-        },
-        {
-          "count": 4,
-          "name": "Island"
-        },
-        {
-          "count": 4,
-          "name": "Plains"
-        },
-        {
-          "count": 2,
-          "name": "Meticulous Archive"
-        },
-        {
-          "count": 3,
-          "name": "Consider"
-        },
-        {
-          "count": 2,
-          "name": "Tishana's Tidebinder"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Dimir Midrange",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Domain Control",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [],
-      "arenaImport": "Deck\n4 No More Lies\n3 Three Steps Ahead\n3 Get Lost\n2 Temporary Lockdown\n3 Stock Up\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n3 Deduce\n2 Horned Loch-Whale\n4 Adarkar Wastes\n4 Seachrome Coast\n4 Restless Anchorage\n3 Floodfarm Verge\n4 Island\n4 Plains\n2 Meticulous Archive\n3 Consider\n2 Tishana's Tidebinder",
-      "sources": [
-        {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
-        }
-      ],
-      "metaShare": 9
-    },
-    "standard-bo3-r6-azorius-control": {
-      "id": "standard-bo3-r6-azorius-control",
-      "name": "Azorius Control",
-      "format": "standard",
-      "mode": "bo3",
-      "rank": 3,
-      "tier": 1,
-      "colors": [
-        "W",
-        "U"
-      ],
-      "archetype": "Azorius Control",
-      "description": "Permission, sweepers, and hard-to-answer endgames. Daily rank #6 for BO3.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "No More Lies"
-        },
-        {
-          "count": 3,
-          "name": "Three Steps Ahead"
-        },
-        {
-          "count": 3,
-          "name": "Get Lost"
-        },
-        {
-          "count": 2,
-          "name": "Temporary Lockdown"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up"
-        },
-        {
-          "count": 2,
-          "name": "Beza, the Bounding Spring"
-        },
-        {
-          "count": 2,
-          "name": "The Wandering Emperor"
-        },
-        {
-          "count": 3,
-          "name": "Deduce"
-        },
-        {
-          "count": 2,
-          "name": "Horned Loch-Whale"
-        },
-        {
-          "count": 4,
-          "name": "Adarkar Wastes"
-        },
-        {
-          "count": 4,
-          "name": "Seachrome Coast"
-        },
-        {
-          "count": 4,
-          "name": "Restless Anchorage"
-        },
-        {
-          "count": 3,
-          "name": "Floodfarm Verge"
-        },
-        {
-          "count": 4,
-          "name": "Island"
-        },
-        {
-          "count": 4,
-          "name": "Plains"
-        },
-        {
-          "count": 2,
-          "name": "Meticulous Archive"
-        },
-        {
-          "count": 3,
-          "name": "Consider"
+          "name": "Otawara, Soaring City"
         },
         {
-          "count": 2,
-          "name": "Tishana's Tidebinder"
+          "count": 1,
+          "name": "Eiganjo, Seat of the Empire"
         }
       ],
       "sideboard": [
+        {
+          "count": 2,
+          "name": "Duress"
+        },
         {
           "count": 2,
           "name": "Negate"
         },
         {
           "count": 2,
-          "name": "Rest in Peace"
-        },
-        {
-          "count": 2,
           "name": "Disdainful Stroke"
-        },
-        {
-          "count": 2,
-          "name": "Beza, the Bounding Spring"
-        },
-        {
-          "count": 2,
-          "name": "Get Lost"
         },
         {
           "count": 2,
@@ -2317,26 +1956,34 @@
         },
         {
           "count": 2,
+          "name": "Rest in Peace"
+        },
+        {
+          "count": 2,
           "name": "Tishana's Tidebinder"
         },
         {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
           "count": 1,
-          "name": "The Wandering Emperor"
+          "name": "Deadly Cover-Up"
         }
       ],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
@@ -2352,7 +1999,7 @@
             "2 slow card draw",
             "1 expensive threat"
           ],
-          "notes": "Against fast decks with Azorius Control: prioritize life and board."
+          "notes": "Against fast decks with 4c Control: prioritize life and board."
         },
         {
           "vs": "Control",
@@ -2367,11 +2014,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 No More Lies\n3 Three Steps Ahead\n3 Get Lost\n2 Temporary Lockdown\n3 Stock Up\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n3 Deduce\n2 Horned Loch-Whale\n4 Adarkar Wastes\n4 Seachrome Coast\n4 Restless Anchorage\n3 Floodfarm Verge\n4 Island\n4 Plains\n2 Meticulous Archive\n3 Consider\n2 Tishana's Tidebinder\n\nSideboard\n2 Negate\n2 Rest in Peace\n2 Disdainful Stroke\n2 Beza, the Bounding Spring\n2 Get Lost\n2 Ghost Vacuum\n2 Tishana's Tidebinder\n1 The Wandering Emperor",
+      "arenaImport": "Deck\n4 Consider\n3 Stock Up\n3 Three Steps Ahead\n2 Negate\n3 Get Lost\n2 Torch the Tower\n2 Inevitable Defeat\n2 Tablet of Discovery\n2 Temporary Lockdown\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n1 Tishana's Tidebinder\n1 Deadly Cover-Up\n2 Meticulous Archive\n2 Thundering Falls\n2 Undercity Sewers\n2 Raucous Theater\n2 Shadowy Backstreet\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Starting Town\n3 Island\n2 Plains\n2 Swamp\n2 Mountain\n2 Restless Anchorage\n1 Otawara, Soaring City\n1 Eiganjo, Seat of the Empire\n\nSideboard\n2 Duress\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Rest in Peace\n2 Tishana's Tidebinder\n2 Beza, the Bounding Spring\n1 Deadly Cover-Up",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -2384,92 +2035,133 @@
       ],
       "metaShare": 9
     },
-    "standard-bo1-r7-mono-red-aggro": {
-      "id": "standard-bo1-r7-mono-red-aggro",
-      "name": "Mono-Red Aggro",
+    "standard-bo1-r5-izzet-spellementals": {
+      "id": "standard-bo1-r5-izzet-spellementals",
+      "name": "Izzet Spellementals",
       "format": "standard",
       "mode": "bo1",
       "rank": 5,
       "tier": 2,
       "colors": [
+        "U",
         "R"
       ],
-      "archetype": "Mono-Red Aggro",
-      "description": "Pure speed — punish slow hands on the Bo1 ladder. Daily rank #7 for BO1.",
+      "archetype": "Izzet Spellementals",
+      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #5 for BO1.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Monastery Swiftspear"
+          "name": "Consider"
         },
         {
           "count": 4,
-          "name": "Heartfire Hero"
+          "name": "Opt"
         },
         {
-          "count": 4,
-          "name": "Slickshot Show-Off"
+          "count": 3,
+          "name": "Sleight of Hand"
         },
         {
-          "count": 4,
+          "count": 3,
           "name": "Play with Fire"
         },
         {
-          "count": 4,
+          "count": 3,
           "name": "Lightning Strike"
         },
         {
-          "count": 3,
-          "name": "Burst Lightning"
+          "count": 2,
+          "name": "Torch the Tower"
         },
         {
           "count": 3,
-          "name": "Witchstalker Frenzy"
+          "name": "Stock Up"
+        },
+        {
+          "count": 3,
+          "name": "Eddymurk Crab"
         },
         {
           "count": 2,
-          "name": "Screaming Nemesis"
+          "name": "Namor the Sub-Mariner"
         },
         {
-          "count": 20,
+          "count": 2,
+          "name": "Slickshot Show-Off"
+        },
+        {
+          "count": 2,
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "Into the Flood Maw"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 4,
+          "name": "Shivan Reef"
+        },
+        {
+          "count": 3,
+          "name": "Restless Spire"
+        },
+        {
+          "count": 4,
+          "name": "Island"
+        },
+        {
+          "count": 5,
           "name": "Mountain"
         },
         {
-          "count": 4,
-          "name": "Rockface Village"
+          "count": 2,
+          "name": "Thundering Falls"
         },
         {
-          "count": 4,
-          "name": "Den of the Bugbear"
+          "count": 2,
+          "name": "Starting Town"
         },
         {
-          "count": 4,
-          "name": "Emberheart Challenger"
+          "count": 1,
+          "name": "Otawara, Soaring City"
+        },
+        {
+          "count": 2,
+          "name": "Stormcatch Mentor"
         }
       ],
       "sideboard": [],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Monastery Swiftspear\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Play with Fire\n4 Lightning Strike\n3 Burst Lightning\n3 Witchstalker Frenzy\n2 Screaming Nemesis\n20 Mountain\n4 Rockface Village\n4 Den of the Bugbear\n4 Emberheart Challenger",
+      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -2480,84 +2172,154 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 1
+      "metaShare": 8
     },
-    "standard-bo3-r7-mono-red-aggro": {
-      "id": "standard-bo3-r7-mono-red-aggro",
-      "name": "Mono-Red Aggro",
+    "standard-bo3-r5-izzet-spellementals": {
+      "id": "standard-bo3-r5-izzet-spellementals",
+      "name": "Izzet Spellementals",
       "format": "standard",
       "mode": "bo3",
       "rank": 5,
       "tier": 2,
       "colors": [
+        "U",
         "R"
       ],
-      "archetype": "Mono-Red Aggro",
-      "description": "Pure speed — punish slow hands on the Bo1 ladder. Daily rank #7 for BO3.",
+      "archetype": "Izzet Spellementals",
+      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #5 for BO3.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Monastery Swiftspear"
+          "name": "Consider"
         },
         {
           "count": 4,
-          "name": "Heartfire Hero"
+          "name": "Opt"
         },
         {
-          "count": 4,
-          "name": "Slickshot Show-Off"
+          "count": 3,
+          "name": "Sleight of Hand"
         },
         {
-          "count": 4,
+          "count": 3,
           "name": "Play with Fire"
         },
         {
-          "count": 4,
+          "count": 3,
           "name": "Lightning Strike"
         },
         {
-          "count": 3,
-          "name": "Burst Lightning"
+          "count": 2,
+          "name": "Torch the Tower"
         },
         {
           "count": 3,
-          "name": "Witchstalker Frenzy"
+          "name": "Stock Up"
+        },
+        {
+          "count": 3,
+          "name": "Eddymurk Crab"
+        },
+        {
+          "count": 2,
+          "name": "Namor the Sub-Mariner"
+        },
+        {
+          "count": 2,
+          "name": "Slickshot Show-Off"
+        },
+        {
+          "count": 2,
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "Into the Flood Maw"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 4,
+          "name": "Shivan Reef"
+        },
+        {
+          "count": 3,
+          "name": "Restless Spire"
+        },
+        {
+          "count": 4,
+          "name": "Island"
+        },
+        {
+          "count": 5,
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Thundering Falls"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
+        },
+        {
+          "count": 2,
+          "name": "Stormcatch Mentor"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Negate"
+        },
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Brotherhood's End"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 2,
+          "name": "Into the Flood Maw"
         },
         {
           "count": 2,
           "name": "Screaming Nemesis"
         },
         {
-          "count": 20,
-          "name": "Mountain"
-        },
-        {
-          "count": 4,
-          "name": "Rockface Village"
-        },
-        {
-          "count": 4,
-          "name": "Den of the Bugbear"
-        },
-        {
-          "count": 4,
-          "name": "Emberheart Challenger"
+          "count": 1,
+          "name": "Stock Up"
         }
       ],
-      "sideboard": [],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
@@ -2573,7 +2335,7 @@
             "2 slow card draw",
             "1 expensive threat"
           ],
-          "notes": "Against fast decks with Mono-Red Aggro: prioritize life and board."
+          "notes": "Against fast decks with Izzet Spellementals: prioritize life and board."
         },
         {
           "vs": "Control",
@@ -2588,11 +2350,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Monastery Swiftspear\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Play with Fire\n4 Lightning Strike\n3 Burst Lightning\n3 Witchstalker Frenzy\n2 Screaming Nemesis\n20 Mountain\n4 Rockface Village\n4 Den of the Bugbear\n4 Emberheart Challenger",
+      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor\n\nSideboard\n2 Negate\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Disdainful Stroke\n2 Into the Flood Maw\n2 Screaming Nemesis\n1 Stock Up",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -2603,42 +2369,33 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 1
+      "metaShare": 8
     },
-    "standard-bo1-r8-esper-pixie": {
-      "id": "standard-bo1-r8-esper-pixie",
-      "name": "Esper Pixie",
+    "standard-bo1-r6-dimir-excruciator": {
+      "id": "standard-bo1-r6-dimir-excruciator",
+      "name": "Dimir Excruciator",
       "format": "standard",
       "mode": "bo1",
-      "rank": 8,
-      "tier": 3,
+      "rank": 6,
+      "tier": 2,
       "colors": [
-        "W",
         "U",
         "B"
       ],
-      "archetype": "Esper Pixie",
-      "description": "Bounce and cheap interaction — tricky and resilient. Daily rank #8 for BO1.",
+      "archetype": "Dimir Excruciator",
+      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #6 for BO1.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Hopeless Nightmare"
-        },
-        {
-          "count": 4,
-          "name": "This Town Ain't Big Enough"
-        },
-        {
-          "count": 4,
-          "name": "Stormchaser's Talent"
+          "name": "Consider"
         },
         {
           "count": 3,
-          "name": "Fear of Isolation"
+          "name": "Opt"
         },
         {
           "count": 3,
-          "name": "Deep-Cavern Bat"
+          "name": "Cut Down"
         },
         {
           "count": 3,
@@ -2646,34 +2403,58 @@
         },
         {
           "count": 2,
-          "name": "Get Lost"
+          "name": "Duress"
+        },
+        {
+          "count": 3,
+          "name": "Stock Up"
         },
         {
           "count": 2,
-          "name": "No More Lies"
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 3,
+          "name": "Deep-Cavern Bat"
         },
         {
           "count": 2,
-          "name": "Kaito, Bane of Nightmares"
+          "name": "Deceit"
+        },
+        {
+          "count": 2,
+          "name": "Superior Spider-Man"
+        },
+        {
+          "count": 2,
+          "name": "Requiting Hex"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "Preacher of the Schism"
+        },
+        {
+          "count": 1,
+          "name": "Sheoldred, the Apocalypse"
         },
         {
           "count": 4,
           "name": "Darkslick Shores"
         },
         {
-          "count": 3,
-          "name": "Seachrome Coast"
+          "count": 4,
+          "name": "Underground River"
         },
         {
           "count": 3,
-          "name": "Caves of Koilos"
+          "name": "Gloomlake Verge"
         },
         {
           "count": 3,
-          "name": "Restless Anchorage"
-        },
-        {
-          "count": 2,
           "name": "Restless Reef"
         },
         {
@@ -2681,100 +2462,87 @@
           "name": "Island"
         },
         {
-          "count": 3,
+          "count": 4,
           "name": "Swamp"
         },
         {
           "count": 2,
-          "name": "Plains"
+          "name": "Undercity Sewers"
         },
         {
           "count": 2,
-          "name": "Floodfarm Verge"
+          "name": "Starting Town"
         },
         {
-          "count": 2,
-          "name": "Gloomlake Verge"
-        },
-        {
-          "count": 2,
-          "name": "Shadowy Backstreet"
-        },
-        {
-          "count": 2,
-          "name": "Stock Up"
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
       "sideboard": [],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Hopeless Nightmare\n4 This Town Ain't Big Enough\n4 Stormchaser's Talent\n3 Fear of Isolation\n3 Deep-Cavern Bat\n3 Go for the Throat\n2 Get Lost\n2 No More Lies\n2 Kaito, Bane of Nightmares\n4 Darkslick Shores\n3 Seachrome Coast\n3 Caves of Koilos\n3 Restless Anchorage\n2 Restless Reef\n3 Island\n3 Swamp\n2 Plains\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Shadowy Backstreet\n2 Stock Up",
+      "arenaImport": "Deck\n4 Consider\n3 Opt\n3 Cut Down\n3 Go for the Throat\n2 Duress\n3 Stock Up\n2 Three Steps Ahead\n3 Deep-Cavern Bat\n2 Deceit\n2 Superior Spider-Man\n2 Requiting Hex\n2 Tishana's Tidebinder\n2 Preacher of the Schism\n1 Sheoldred, the Apocalypse\n4 Darkslick Shores\n4 Underground River\n3 Gloomlake Verge\n3 Restless Reef\n3 Island\n4 Swamp\n2 Undercity Sewers\n2 Starting Town\n1 Otawara, Soaring City",
       "sources": [
         {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.1
+      "metaShare": 7
     },
-    "standard-bo3-r8-esper-pixie": {
-      "id": "standard-bo3-r8-esper-pixie",
-      "name": "Esper Pixie",
+    "standard-bo3-r6-dimir-excruciator": {
+      "id": "standard-bo3-r6-dimir-excruciator",
+      "name": "Dimir Excruciator",
       "format": "standard",
       "mode": "bo3",
-      "rank": 8,
-      "tier": 3,
+      "rank": 6,
+      "tier": 2,
       "colors": [
-        "W",
         "U",
         "B"
       ],
-      "archetype": "Esper Pixie",
-      "description": "Bounce and cheap interaction — tricky and resilient. Daily rank #8 for BO3.",
+      "archetype": "Dimir Excruciator",
+      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #6 for BO3.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Hopeless Nightmare"
-        },
-        {
-          "count": 4,
-          "name": "This Town Ain't Big Enough"
-        },
-        {
-          "count": 4,
-          "name": "Stormchaser's Talent"
+          "name": "Consider"
         },
         {
           "count": 3,
-          "name": "Fear of Isolation"
+          "name": "Opt"
         },
         {
           "count": 3,
-          "name": "Deep-Cavern Bat"
+          "name": "Cut Down"
         },
         {
           "count": 3,
@@ -2782,34 +2550,58 @@
         },
         {
           "count": 2,
-          "name": "Get Lost"
+          "name": "Duress"
+        },
+        {
+          "count": 3,
+          "name": "Stock Up"
         },
         {
           "count": 2,
-          "name": "No More Lies"
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 3,
+          "name": "Deep-Cavern Bat"
         },
         {
           "count": 2,
-          "name": "Kaito, Bane of Nightmares"
+          "name": "Deceit"
+        },
+        {
+          "count": 2,
+          "name": "Superior Spider-Man"
+        },
+        {
+          "count": 2,
+          "name": "Requiting Hex"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "Preacher of the Schism"
+        },
+        {
+          "count": 1,
+          "name": "Sheoldred, the Apocalypse"
         },
         {
           "count": 4,
           "name": "Darkslick Shores"
         },
         {
-          "count": 3,
-          "name": "Seachrome Coast"
+          "count": 4,
+          "name": "Underground River"
         },
         {
           "count": 3,
-          "name": "Caves of Koilos"
+          "name": "Gloomlake Verge"
         },
         {
           "count": 3,
-          "name": "Restless Anchorage"
-        },
-        {
-          "count": 2,
           "name": "Restless Reef"
         },
         {
@@ -2817,44 +2609,69 @@
           "name": "Island"
         },
         {
-          "count": 3,
+          "count": 4,
           "name": "Swamp"
         },
         {
           "count": 2,
-          "name": "Plains"
+          "name": "Undercity Sewers"
         },
         {
           "count": 2,
-          "name": "Floodfarm Verge"
+          "name": "Starting Town"
         },
         {
-          "count": 2,
-          "name": "Gloomlake Verge"
-        },
-        {
-          "count": 2,
-          "name": "Shadowy Backstreet"
-        },
-        {
-          "count": 2,
-          "name": "Stock Up"
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
-      "sideboard": [],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Anoint with Affliction"
+        },
+        {
+          "count": 2,
+          "name": "Negate"
+        },
+        {
+          "count": 2,
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 2,
+          "name": "Duress"
+        },
+        {
+          "count": 2,
+          "name": "Tishana's Tidebinder"
+        },
+        {
+          "count": 2,
+          "name": "The End"
+        },
+        {
+          "count": 1,
+          "name": "Sheoldred, the Apocalypse"
+        }
+      ],
       "matchups": [
         {
-          "vs": "Dimir Midrange",
+          "vs": "Selesnya Ouroboroid",
           "favor": "favored",
           "notes": "Keep interaction for their key turns; you are favored if you curve out."
         },
         {
-          "vs": "Izzet Prowess",
+          "vs": "Jeskai Lessons",
           "favor": "even",
           "notes": "Skill-intensive mirror of plans — pilot edge decides."
         },
         {
-          "vs": "Domain Control",
+          "vs": "Izzet Prowess",
           "favor": "unfavored",
           "notes": "Mulligan for hate pieces; they can run away if unanswered."
         }
@@ -2870,7 +2687,7 @@
             "2 slow card draw",
             "1 expensive threat"
           ],
-          "notes": "Against fast decks with Esper Pixie: prioritize life and board."
+          "notes": "Against fast decks with Dimir Excruciator: prioritize life and board."
         },
         {
           "vs": "Control",
@@ -2885,22 +2702,656 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Hopeless Nightmare\n4 This Town Ain't Big Enough\n4 Stormchaser's Talent\n3 Fear of Isolation\n3 Deep-Cavern Bat\n3 Go for the Throat\n2 Get Lost\n2 No More Lies\n2 Kaito, Bane of Nightmares\n4 Darkslick Shores\n3 Seachrome Coast\n3 Caves of Koilos\n3 Restless Anchorage\n2 Restless Reef\n3 Island\n3 Swamp\n2 Plains\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Shadowy Backstreet\n2 Stock Up",
+      "arenaImport": "Deck\n4 Consider\n3 Opt\n3 Cut Down\n3 Go for the Throat\n2 Duress\n3 Stock Up\n2 Three Steps Ahead\n3 Deep-Cavern Bat\n2 Deceit\n2 Superior Spider-Man\n2 Requiting Hex\n2 Tishana's Tidebinder\n2 Preacher of the Schism\n1 Sheoldred, the Apocalypse\n4 Darkslick Shores\n4 Underground River\n3 Gloomlake Verge\n3 Restless Reef\n3 Island\n4 Swamp\n2 Undercity Sewers\n2 Starting Town\n1 Otawara, Soaring City\n\nSideboard\n2 Ghost Vacuum\n2 Anoint with Affliction\n2 Negate\n2 Disdainful Stroke\n2 Duress\n2 Tishana's Tidebinder\n2 The End\n1 Sheoldred, the Apocalypse",
       "sources": [
         {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.1
+      "metaShare": 7
+    },
+    "standard-bo1-r7-mono-green-landfall": {
+      "id": "standard-bo1-r7-mono-green-landfall",
+      "name": "Mono-Green Landfall",
+      "format": "standard",
+      "mode": "bo1",
+      "rank": 7,
+      "tier": 3,
+      "colors": [
+        "G"
+      ],
+      "archetype": "Mono-Green Landfall",
+      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #7 for BO1.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 3,
+          "name": "Icetill Explorer"
+        },
+        {
+          "count": 3,
+          "name": "Pawpatch Recruit"
+        },
+        {
+          "count": 3,
+          "name": "Earthbender Ascension"
+        },
+        {
+          "count": 2,
+          "name": "Scrapshooter"
+        },
+        {
+          "count": 2,
+          "name": "Overlord of the Hauntwoods"
+        },
+        {
+          "count": 2,
+          "name": "Frenzied Baloth"
+        },
+        {
+          "count": 2,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 3,
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 18,
+          "name": "Forest"
+        },
+        {
+          "count": 3,
+          "name": "Lair of the Hydra"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 3,
+          "name": "Restless Ridgeline"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 2,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 2,
+          "name": "Snakeskin Veil"
+        }
+      ],
+      "sideboard": [],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Jeskai Lessons",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [],
+      "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n3 Icetill Explorer\n3 Pawpatch Recruit\n3 Earthbender Ascension\n2 Scrapshooter\n2 Overlord of the Hauntwoods\n2 Frenzied Baloth\n2 Keen-Eyed Curator\n3 Practiced Offense\n18 Forest\n3 Lair of the Hydra\n2 Boseiju, Who Endures\n3 Restless Ridgeline\n2 Starting Town\n2 Bushwhack\n2 Snakeskin Veil",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 6
+    },
+    "standard-bo3-r7-mono-green-landfall": {
+      "id": "standard-bo3-r7-mono-green-landfall",
+      "name": "Mono-Green Landfall",
+      "format": "standard",
+      "mode": "bo3",
+      "rank": 7,
+      "tier": 3,
+      "colors": [
+        "G"
+      ],
+      "archetype": "Mono-Green Landfall",
+      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #7 for BO3.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 3,
+          "name": "Icetill Explorer"
+        },
+        {
+          "count": 3,
+          "name": "Pawpatch Recruit"
+        },
+        {
+          "count": 3,
+          "name": "Earthbender Ascension"
+        },
+        {
+          "count": 2,
+          "name": "Scrapshooter"
+        },
+        {
+          "count": 2,
+          "name": "Overlord of the Hauntwoods"
+        },
+        {
+          "count": 2,
+          "name": "Frenzied Baloth"
+        },
+        {
+          "count": 2,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 3,
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 18,
+          "name": "Forest"
+        },
+        {
+          "count": 3,
+          "name": "Lair of the Hydra"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 3,
+          "name": "Restless Ridgeline"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 2,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 2,
+          "name": "Snakeskin Veil"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Pick Your Poison"
+        },
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Scrapshooter"
+        },
+        {
+          "count": 2,
+          "name": "Tranquil Frillback"
+        },
+        {
+          "count": 2,
+          "name": "Obstinate Baloth"
+        },
+        {
+          "count": 2,
+          "name": "Tear Asunder"
+        },
+        {
+          "count": 2,
+          "name": "Hunter's Talent"
+        },
+        {
+          "count": 1,
+          "name": "Overlord of the Hauntwoods"
+        }
+      ],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Jeskai Lessons",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [
+        {
+          "vs": "Aggro",
+          "in": [
+            "2 early removal",
+            "1 sweeper"
+          ],
+          "out": [
+            "2 slow card draw",
+            "1 expensive threat"
+          ],
+          "notes": "Against fast decks with Mono-Green Landfall: prioritize life and board."
+        },
+        {
+          "vs": "Control",
+          "in": [
+            "2 permission",
+            "1 threat density"
+          ],
+          "out": [
+            "2 situational creature hate",
+            "1 life-gain"
+          ],
+          "notes": "Post-board becomes a stack war — protect your haymakers."
+        }
+      ],
+      "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n3 Icetill Explorer\n3 Pawpatch Recruit\n3 Earthbender Ascension\n2 Scrapshooter\n2 Overlord of the Hauntwoods\n2 Frenzied Baloth\n2 Keen-Eyed Curator\n3 Practiced Offense\n18 Forest\n3 Lair of the Hydra\n2 Boseiju, Who Endures\n3 Restless Ridgeline\n2 Starting Town\n2 Bushwhack\n2 Snakeskin Veil\n\nSideboard\n2 Pick Your Poison\n2 Ghost Vacuum\n2 Scrapshooter\n2 Tranquil Frillback\n2 Obstinate Baloth\n2 Tear Asunder\n2 Hunter's Talent\n1 Overlord of the Hauntwoods",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 6
+    },
+    "standard-bo1-r8-selesnya-gearhulk": {
+      "id": "standard-bo1-r8-selesnya-gearhulk",
+      "name": "Selesnya Gearhulk",
+      "format": "standard",
+      "mode": "bo1",
+      "rank": 8,
+      "tier": 3,
+      "colors": [
+        "W",
+        "G"
+      ],
+      "archetype": "Selesnya Gearhulk",
+      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO1.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 4,
+          "name": "Brightglass Gearhulk"
+        },
+        {
+          "count": 3,
+          "name": "Pawpatch Recruit"
+        },
+        {
+          "count": 3,
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 3,
+          "name": "Get Lost"
+        },
+        {
+          "count": 2,
+          "name": "Sheltered by Ghosts"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "Overlord of the Mistmoors"
+        },
+        {
+          "count": 2,
+          "name": "Collector's Cage"
+        },
+        {
+          "count": 4,
+          "name": "Brushland"
+        },
+        {
+          "count": 4,
+          "name": "Razorverge Thicket"
+        },
+        {
+          "count": 3,
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 3,
+          "name": "Restless Prairie"
+        },
+        {
+          "count": 4,
+          "name": "Forest"
+        },
+        {
+          "count": 4,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 2,
+          "name": "Eiganjo, Seat of the Empire"
+        },
+        {
+          "count": 2,
+          "name": "Lush Portico"
+        },
+        {
+          "count": 1,
+          "name": "Starting Town"
+        }
+      ],
+      "sideboard": [],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Jeskai Lessons",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [],
+      "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n4 Brightglass Gearhulk\n3 Pawpatch Recruit\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Beza, the Bounding Spring\n2 Overlord of the Mistmoors\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n1 Starting Town",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 5
+    },
+    "standard-bo3-r8-selesnya-gearhulk": {
+      "id": "standard-bo3-r8-selesnya-gearhulk",
+      "name": "Selesnya Gearhulk",
+      "format": "standard",
+      "mode": "bo3",
+      "rank": 8,
+      "tier": 3,
+      "colors": [
+        "W",
+        "G"
+      ],
+      "archetype": "Selesnya Gearhulk",
+      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO3.",
+      "mainboard": [
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 4,
+          "name": "Brightglass Gearhulk"
+        },
+        {
+          "count": 3,
+          "name": "Pawpatch Recruit"
+        },
+        {
+          "count": 3,
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 3,
+          "name": "Get Lost"
+        },
+        {
+          "count": 2,
+          "name": "Sheltered by Ghosts"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "Overlord of the Mistmoors"
+        },
+        {
+          "count": 2,
+          "name": "Collector's Cage"
+        },
+        {
+          "count": 4,
+          "name": "Brushland"
+        },
+        {
+          "count": 4,
+          "name": "Razorverge Thicket"
+        },
+        {
+          "count": 3,
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 3,
+          "name": "Restless Prairie"
+        },
+        {
+          "count": 4,
+          "name": "Forest"
+        },
+        {
+          "count": 4,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 2,
+          "name": "Eiganjo, Seat of the Empire"
+        },
+        {
+          "count": 2,
+          "name": "Lush Portico"
+        },
+        {
+          "count": 1,
+          "name": "Starting Town"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Rest in Peace"
+        },
+        {
+          "count": 2,
+          "name": "Destroy Evil"
+        },
+        {
+          "count": 2,
+          "name": "Authority of the Consuls"
+        },
+        {
+          "count": 2,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 2,
+          "name": "Negate"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring"
+        },
+        {
+          "count": 2,
+          "name": "Elspeth's Smite"
+        },
+        {
+          "count": 1,
+          "name": "Overlord of the Hauntwoods"
+        }
+      ],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Jeskai Lessons",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [
+        {
+          "vs": "Aggro",
+          "in": [
+            "2 early removal",
+            "1 sweeper"
+          ],
+          "out": [
+            "2 slow card draw",
+            "1 expensive threat"
+          ],
+          "notes": "Against fast decks with Selesnya Gearhulk: prioritize life and board."
+        },
+        {
+          "vs": "Control",
+          "in": [
+            "2 permission",
+            "1 threat density"
+          ],
+          "out": [
+            "2 situational creature hate",
+            "1 life-gain"
+          ],
+          "notes": "Post-board becomes a stack war — protect your haymakers."
+        }
+      ],
+      "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n4 Brightglass Gearhulk\n3 Pawpatch Recruit\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Beza, the Bounding Spring\n2 Overlord of the Mistmoors\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n1 Starting Town\n\nSideboard\n2 Rest in Peace\n2 Destroy Evil\n2 Authority of the Consuls\n2 Ghost Vacuum\n2 Negate\n2 Beza, the Bounding Spring\n2 Elspeth's Smite\n1 Overlord of the Hauntwoods",
+      "sources": [
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
+      "metaShare": 5
     },
     "alchemy-bo1-r1-azorius-tempo": {
       "id": "alchemy-bo1-r1-azorius-tempo",
@@ -3012,11 +3463,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3160,11 +3615,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3300,11 +3759,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3498,11 +3961,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3621,11 +4088,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3769,11 +4240,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -3892,11 +4367,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4040,11 +4519,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4159,11 +4642,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4303,11 +4790,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4426,11 +4917,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4574,11 +5069,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4672,11 +5171,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4795,11 +5298,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -4918,11 +5425,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5066,11 +5577,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5214,11 +5729,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5387,11 +5906,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5530,8 +6053,12 @@
       "arenaImport": "Deck\n4 Ragavan, Nimble Pilferer\n4 Deathrite Shaman\n3 Bloodtithe Harvester\n3 Fable of the Mirror-Breaker\n2 Sheoldred, the Apocalypse\n4 Thoughtseize\n3 Fatal Push\n2 Abrade\n2 Kolaghan's Command\n2 Wrenn and Six\n4 Blood Crypt\n4 Overgrown Tomb\n3 Stomping Ground\n3 Blackcleave Cliffs\n2 Blooming Marsh\n2 Takenuma, Abandoned Mire\n1 Boseiju, Who Endures\n2 Swamp\n1 Mountain\n1 Forest\n2 Glorybringer\n2 Ziatora's Proving Ground\n2 Copperline Gorge",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5732,8 +6259,12 @@
       "arenaImport": "Deck\n4 Ragavan, Nimble Pilferer\n4 Deathrite Shaman\n3 Bloodtithe Harvester\n3 Fable of the Mirror-Breaker\n2 Sheoldred, the Apocalypse\n4 Thoughtseize\n3 Fatal Push\n2 Abrade\n2 Kolaghan's Command\n2 Wrenn and Six\n4 Blood Crypt\n4 Overgrown Tomb\n3 Stomping Ground\n3 Blackcleave Cliffs\n2 Blooming Marsh\n2 Takenuma, Abandoned Mire\n1 Boseiju, Who Endures\n2 Swamp\n1 Mountain\n1 Forest\n2 Glorybringer\n2 Ziatora's Proving Ground\n2 Copperline Gorge\n\nSideboard\n2 Duress\n2 Haywire Mite\n2 Unlicensed Hearse\n2 Culling Ritual\n2 Klothys, God of Destiny\n2 Extinction Event\n1 Glorybringer\n2 Pithing Needle",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -5864,11 +6395,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6020,11 +6555,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6150,11 +6689,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6305,11 +6848,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6427,11 +6974,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6574,11 +7125,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6701,11 +7256,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6853,11 +7412,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -6984,11 +7547,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7140,11 +7707,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7267,11 +7838,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7419,11 +7994,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7545,8 +8124,12 @@
       "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Bonecrusher Giant\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n4 Fatal Push\n3 Dreadbore\n4 Blood Crypt\n4 Blackcleave Cliffs\n3 Haunted Ridge\n4 Swamp\n3 Mountain\n2 Castle Locthwain\n2 Takenuma, Abandoned Mire\n2 Graveyard Trespasser\n2 Duress\n2 Extinction Event\n2 Den of the Bugbear\n2 Blightstep Pathway",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7697,8 +8280,12 @@
       "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Bonecrusher Giant\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n4 Fatal Push\n3 Dreadbore\n4 Blood Crypt\n4 Blackcleave Cliffs\n3 Haunted Ridge\n4 Swamp\n3 Mountain\n2 Castle Locthwain\n2 Takenuma, Abandoned Mire\n2 Graveyard Trespasser\n2 Duress\n2 Extinction Event\n2 Den of the Bugbear\n2 Blightstep Pathway",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -7828,8 +8415,12 @@
       "arenaImport": "Deck\n4 Memory Deluge\n3 Supreme Verdict\n2 Farewell\n4 No More Lies\n3 Dovin's Veto\n3 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Hengegate Pathway\n3 Deserted Beach\n4 Island\n3 Plains\n2 Shark Typhoon\n2 Get Lost\n2 Otawara, Soaring City\n2 Eiganjo, Seat of the Empire\n2 Hall of Storm Giants\n2 Field of Ruin\n2 Strict Proctor\n2 Change the Equation\n1 Absorb",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8017,8 +8608,12 @@
       "arenaImport": "Deck\n4 Memory Deluge\n3 Supreme Verdict\n2 Farewell\n4 No More Lies\n3 Dovin's Veto\n3 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Hengegate Pathway\n3 Deserted Beach\n4 Island\n3 Plains\n2 Shark Typhoon\n2 Get Lost\n2 Otawara, Soaring City\n2 Eiganjo, Seat of the Empire\n2 Hall of Storm Giants\n2 Field of Ruin\n2 Strict Proctor\n2 Change the Equation\n1 Absorb\n\nSideboard\n2 Rest in Peace\n2 Dovin's Veto\n2 Mystical Dispute\n2 Narset, Parter of Veils\n2 Aether Gust\n1 Farewell\n2 Elspeth Conquers Death\n2 Summary Dismissal",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8144,8 +8739,12 @@
       "arenaImport": "Deck\n4 Arclight Phoenix\n4 Consider\n4 Opt\n4 Lightning Axe\n3 Fiery Impulse\n3 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents\n4 Island\n3 Mountain\n3 Expressive Iteration\n2 Piecie of Mind\n2 Ledger Shredder\n2 Stormcarved Coast\n2 Otawara, Soaring City\n2 Thing in the Ice\n2 Picklock Prankster\n2 Fiery Islet\n2 Temporal Trespass",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8296,8 +8895,12 @@
       "arenaImport": "Deck\n4 Arclight Phoenix\n4 Consider\n4 Opt\n4 Lightning Axe\n3 Fiery Impulse\n3 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents\n4 Island\n3 Mountain\n3 Expressive Iteration\n2 Piecie of Mind\n2 Ledger Shredder\n2 Stormcarved Coast\n2 Otawara, Soaring City\n2 Thing in the Ice\n2 Picklock Prankster\n2 Fiery Islet\n2 Temporal Trespass",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8424,11 +9027,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8576,11 +9183,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8707,11 +9318,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8863,11 +9478,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -8989,11 +9608,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9140,11 +9763,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9267,11 +9894,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9419,11 +10050,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9549,8 +10184,12 @@
       "arenaImport": "Deck\n4 Thoughtseize\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n3 Memory Deluge\n3 Drown in the Loch\n4 Watery Grave\n4 Darkslick Shores\n3 Clearwater Pathway\n3 Island\n3 Swamp\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Narset, Parter of Veils\n2 Shark Typhoon\n2 Extinction Event\n2 Negate\n2 Censor\n2 Consider\n2 Field of Ruin\n2 Hall of Storm Giants",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9705,8 +10344,12 @@
       "arenaImport": "Deck\n4 Thoughtseize\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n3 Memory Deluge\n3 Drown in the Loch\n4 Watery Grave\n4 Darkslick Shores\n3 Clearwater Pathway\n3 Island\n3 Swamp\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Narset, Parter of Veils\n2 Shark Typhoon\n2 Extinction Event\n2 Negate\n2 Censor\n2 Consider\n2 Field of Ruin\n2 Hall of Storm Giants",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -9840,8 +10483,12 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Entomb\n4 Reanimate\n3 Animate Dead\n3 Thoughtseize\n3 Brainstorm\n2 Show and Tell\n2 Atraxa, Grand Unifier\n2 Archon of Cruelty\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n3 Swamp\n2 Demonic Tutor\n2 Fatal Push\n2 Daze\n1 Griselbrand\n2 Ponder\n2 Otawara, Soaring City",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10000,8 +10647,12 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Entomb\n4 Reanimate\n3 Animate Dead\n3 Thoughtseize\n3 Brainstorm\n2 Show and Tell\n2 Atraxa, Grand Unifier\n2 Archon of Cruelty\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n3 Swamp\n2 Demonic Tutor\n2 Fatal Push\n2 Daze\n1 Griselbrand\n2 Ponder\n2 Otawara, Soaring City",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10145,11 +10796,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10347,11 +11002,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10476,8 +11135,12 @@
       "arenaImport": "Deck\n4 Show and Tell\n4 Brainstorm\n4 Ponder\n3 Force of Will\n2 Omniscience\n2 Emrakul, the Aeons Torn\n4 Flooded Strand\n4 Misty Rainforest\n4 Island\n3 Tropical Island\n2 Otawara, Soaring City\n2 Force of Negation\n2 Daze\n2 Veil of Summer\n2 Dress Down\n2 Swords to Plowshares\n2 Atraxa, Grand Unifier\n2 Flusterstorm\n2 Spell Pierce\n2 Lotus Petal",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10631,8 +11294,12 @@
       "arenaImport": "Deck\n4 Show and Tell\n4 Brainstorm\n4 Ponder\n3 Force of Will\n2 Omniscience\n2 Emrakul, the Aeons Torn\n4 Flooded Strand\n4 Misty Rainforest\n4 Island\n3 Tropical Island\n2 Otawara, Soaring City\n2 Force of Negation\n2 Daze\n2 Veil of Summer\n2 Dress Down\n2 Swords to Plowshares\n2 Atraxa, Grand Unifier\n2 Flusterstorm\n2 Spell Pierce\n2 Lotus Petal",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10768,11 +11435,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -10929,11 +11600,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11055,11 +11730,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11206,11 +11885,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11337,8 +12020,12 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Brainstorm\n4 Ponder\n3 Tendrils of Agony\n3 Burning Wish\n4 Polluted Delta\n4 Bloodstained Mire\n3 Underground Sea\n2 Volcanic Island\n2 Swamp\n2 Island\n2 Lion's Eye Diamond\n2 Lotus Petal\n2 Chrome Mox\n2 Mishra's Bauble\n2 Thoughtseize\n2 Duress\n2 Cabal Ritual\n2 Past in Flames\n2 Infernal Tutor",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11494,8 +12181,12 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Brainstorm\n4 Ponder\n3 Tendrils of Agony\n3 Burning Wish\n4 Polluted Delta\n4 Bloodstained Mire\n3 Underground Sea\n2 Volcanic Island\n2 Swamp\n2 Island\n2 Lion's Eye Diamond\n2 Lotus Petal\n2 Chrome Mox\n2 Mishra's Bauble\n2 Thoughtseize\n2 Duress\n2 Cabal Ritual\n2 Past in Flames\n2 Infernal Tutor",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11625,8 +12316,12 @@
       "arenaImport": "Deck\n4 Orcish Bowmasters\n4 Ragavan, Nimble Pilferer\n4 Thoughtseize\n4 Fatal Push\n3 Force of Will\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n2 Swamp\n2 Sheoldred, the Apocalypse\n2 Murderous Cut\n2 Daze\n2 Brainstorm\n2 Ponder\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Brazen Borrower\n2 Psychic Frog",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11781,8 +12476,12 @@
       "arenaImport": "Deck\n4 Orcish Bowmasters\n4 Ragavan, Nimble Pilferer\n4 Thoughtseize\n4 Fatal Push\n3 Force of Will\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n2 Swamp\n2 Sheoldred, the Apocalypse\n2 Murderous Cut\n2 Daze\n2 Brainstorm\n2 Ponder\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Brazen Borrower\n2 Psychic Frog",
       "sources": [
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -11928,11 +12627,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12099,11 +12802,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12268,11 +12975,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12463,11 +13174,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12611,11 +13326,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12784,11 +13503,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -12916,11 +13639,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13073,11 +13800,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13202,11 +13933,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13356,11 +14091,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13480,11 +14219,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13629,11 +14372,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13750,11 +14497,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -13896,11 +14647,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14019,11 +14774,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14167,11 +14926,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14286,11 +15049,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14430,11 +15197,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14558,11 +15329,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14711,11 +15486,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -14835,11 +15614,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15017,11 +15800,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15133,11 +15920,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15274,11 +16065,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15381,11 +16176,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15513,11 +16312,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15612,11 +16415,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15736,11 +16543,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15844,11 +16655,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -15977,11 +16792,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16085,11 +16904,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16218,11 +17041,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16337,11 +17164,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16481,11 +17312,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16631,11 +17466,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16806,11 +17645,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -16930,11 +17773,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17112,11 +17959,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17246,11 +18097,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17405,11 +18260,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17517,11 +18376,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17654,11 +18517,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17766,11 +18633,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -17903,11 +18774,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18011,11 +18886,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18144,11 +19023,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18263,11 +19146,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18407,11 +19294,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18519,11 +19410,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18656,11 +19551,15 @@
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame"
+          "url": "https://www.mtggoldfish.com/metagame/standard"
         },
         {
-          "name": "Melee.gg",
-          "url": "https://melee.gg/"
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
         },
         {
           "name": "Scryfall",
@@ -18673,125 +19572,183 @@
   },
   "tournaments": [
     {
-      "id": "t-melee-1",
-      "name": "Regional Championship — Standard",
+      "id": "gf-65107",
+      "name": "Standard Challenge 32 2026-07-09",
       "format": "standard",
-      "platform": "paper",
-      "date": "2026-07-08",
-      "url": "https://melee.gg/Tournament/Search",
-      "players": 320,
+      "platform": "mtgo",
+      "date": "2026-07-09",
+      "url": "https://www.mtggoldfish.com/tournament/65107",
+      "players": 32,
       "topDecks": [
         {
           "place": 1,
-          "archetype": "Dimir Midrange"
+          "pilot": "MTGHolic",
+          "archetype": "Jeskai Lessons"
         },
         {
           "place": 2,
-          "archetype": "Izzet Prowess"
+          "pilot": "komattaman",
+          "archetype": "4c Gearhulk"
         },
         {
           "place": 3,
-          "archetype": "Domain Control"
+          "pilot": "duanceyao",
+          "archetype": "Dimir Excruciator"
         },
         {
           "place": 4,
-          "archetype": "Boros Aggro"
+          "pilot": "kaikas",
+          "archetype": "Izzet Spells"
+        },
+        {
+          "place": 5,
+          "pilot": "Americanmisfit5",
+          "archetype": "4c Control"
+        },
+        {
+          "place": 8,
+          "pilot": "MalcolmS",
+          "archetype": "Selesnya Ouroboroid"
         }
       ],
-      "notes": "Melee.gg paper RC — Dimir and Izzet dominated Top 8.",
-      "source": "melee"
+      "notes": "Source: MTGGoldfish tournament coverage.",
+      "source": "mtggoldfish"
     },
     {
-      "id": "t-mtgo-1",
-      "name": "Standard Challenge",
+      "id": "gf-65088",
+      "name": "Standard Challenge 32 2026-07-07",
       "format": "standard",
       "platform": "mtgo",
       "date": "2026-07-07",
-      "url": "https://www.mtggoldfish.com/tournament",
-      "players": 189,
+      "url": "https://www.mtggoldfish.com/tournament/65088",
+      "players": 32,
       "topDecks": [
         {
           "place": 1,
-          "archetype": "Dimir Midrange"
+          "pilot": "Univerce",
+          "archetype": "4c Gearhulk"
         },
         {
           "place": 2,
-          "archetype": "Domain Control"
+          "pilot": "PedraStone",
+          "archetype": "Selesnya Ouroboroid"
         },
         {
           "place": 3,
+          "pilot": "MisterTwin",
+          "archetype": "Izzet Spellementals"
+        },
+        {
+          "place": 6,
+          "pilot": "makaaaa",
           "archetype": "Izzet Prowess"
         }
       ],
       "source": "mtggoldfish"
     },
     {
-      "id": "t-mtga-1",
-      "name": "Arena Direct — Traditional Standard",
+      "id": "gf-65051",
+      "name": "Standard Challenge 32 2026-07-06",
       "format": "standard",
-      "platform": "mtga",
-      "date": "2026-07-06",
-      "url": "https://magic.wizards.com/en/mtgarena",
-      "players": 512,
-      "topDecks": [
-        {
-          "place": 1,
-          "archetype": "Dimir Midrange"
-        },
-        {
-          "place": 2,
-          "archetype": "Boros Aggro"
-        },
-        {
-          "place": 3,
-          "archetype": "Azorius Control"
-        }
-      ],
-      "source": "wizards"
-    },
-    {
-      "id": "t-melee-2",
-      "name": "Pioneer RCQ",
-      "format": "pioneer",
-      "platform": "paper",
-      "date": "2026-07-05",
-      "url": "https://melee.gg/Tournament/Search",
-      "players": 128,
-      "topDecks": [
-        {
-          "place": 1,
-          "archetype": "Rakdos Midrange"
-        },
-        {
-          "place": 2,
-          "archetype": "Azorius Control"
-        },
-        {
-          "place": 3,
-          "archetype": "Izzet Phoenix"
-        }
-      ],
-      "source": "melee"
-    },
-    {
-      "id": "t-hist-1",
-      "name": "Historic Challenge",
-      "format": "historic",
       "platform": "mtgo",
-      "date": "2026-07-04",
-      "url": "https://www.mtggoldfish.com/tournament",
-      "players": 142,
+      "date": "2026-07-06",
+      "url": "https://www.mtggoldfish.com/tournament/65051",
+      "players": 32,
       "topDecks": [
         {
           "place": 1,
-          "archetype": "Jeskai Control"
+          "pilot": "jtl005",
+          "archetype": "Izzet Lessons"
         },
         {
           "place": 2,
-          "archetype": "Jund Midrange"
+          "pilot": "yunyu1234",
+          "archetype": "Selesnya Ouroboroid"
+        },
+        {
+          "place": 7,
+          "pilot": "Mikebrav",
+          "archetype": "Izzet Prowess"
+        },
+        {
+          "place": 8,
+          "pilot": "MisterTwin",
+          "archetype": "4c Control"
         }
       ],
       "source": "mtggoldfish"
+    },
+    {
+      "id": "gf-65039",
+      "name": "Jaffer's Marvel Super Heroes Mosh Pit",
+      "format": "standard",
+      "platform": "paper",
+      "date": "2026-07-05",
+      "url": "https://www.mtggoldfish.com/tournament/65039",
+      "players": 28,
+      "topDecks": [
+        {
+          "place": 1,
+          "pilot": "Nithin Muthukumar",
+          "archetype": "Golgari Midrange"
+        },
+        {
+          "place": 2,
+          "pilot": "Jorge Rubalcava",
+          "archetype": "Dimir Excruciator"
+        },
+        {
+          "place": 3,
+          "pilot": "ryan counts",
+          "archetype": "Azorius Control"
+        },
+        {
+          "place": 4,
+          "pilot": "Angel Rafael Hidalgo Pimentel",
+          "archetype": "Izzet Aggro"
+        }
+      ],
+      "notes": "Paper event listed on MTGGoldfish.",
+      "source": "mtggoldfish"
+    },
+    {
+      "id": "untapped-std-meta",
+      "name": "Untapped.gg — Standard constructed meta",
+      "format": "standard",
+      "platform": "mtga",
+      "date": "2026-07-09",
+      "url": "https://mtga.untapped.gg/constructed/standard/meta",
+      "topDecks": [
+        {
+          "place": 1,
+          "archetype": "Selesnya Ouroboroid"
+        },
+        {
+          "place": 2,
+          "archetype": "Jeskai Lessons"
+        },
+        {
+          "place": 3,
+          "archetype": "Izzet Prowess"
+        },
+        {
+          "place": 4,
+          "archetype": "4c Control"
+        }
+      ],
+      "notes": "Arena ladder / Mythic meta tracker — open for live Bo1 trends.",
+      "source": "untapped"
+    },
+    {
+      "id": "melee-search",
+      "name": "Melee.gg — find live / recent events",
+      "format": "standard",
+      "platform": "paper",
+      "date": "2026-07-09",
+      "url": "https://melee.gg/Tournament/Search",
+      "topDecks": [],
+      "notes": "Paper RCQs and organized play. Browse current events on Melee.",
+      "source": "melee"
     },
     {
       "id": "melee-10",
@@ -19008,27 +19965,14 @@
       "topDecks": [],
       "notes": "Org: GoblinCredible Gaming · Format: Standard · Status: Ended",
       "source": "melee"
-    },
-    {
-      "id": "melee-58",
-      "name": "FARPAS 150!",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-04-05",
-      "url": "https://melee.gg/Tournament/View/58",
-      "players": 108,
-      "topDecks": [],
-      "notes": "Org: Farpas de Mana · Format: Standard · Status: Ended",
-      "source": "melee"
     }
   ],
   "sources": [
-    "seed",
-    "scryfall",
     "mtggoldfish",
+    "untapped",
     "melee",
-    "wizards"
+    "scryfall"
   ],
-  "version": "0.2.0",
+  "version": "0.3.0",
   "decksPerFormat": 8
 }

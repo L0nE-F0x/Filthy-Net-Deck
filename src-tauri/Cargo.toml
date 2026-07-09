@@ -1,6 +1,6 @@
 [package]
 name = "ban-basic-island"
-version = "0.1.0"
+version = "0.3.0"
 description = "Ban Basic Island — MTG Arena meta companion"
 authors = ["you"]
 edition = "2021"

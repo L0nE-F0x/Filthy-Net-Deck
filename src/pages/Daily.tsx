@@ -98,8 +98,8 @@ export function Daily() {
         <div>
           <p className="eyebrow">Daily picks · {meta.date}</p>
           <p className="text-sm text-muted m-0 max-w-xl">
-            <strong className="text-foam">8 decks × 8 formats</strong> every day. Standard first.
-            Toggle Bo1 / Bo3 anytime.
+            <strong className="text-foam">8 full decklists × 8 formats</strong> every day. Open any
+            rank for the complete list + Arena import. Standard first.
           </p>
         </div>
         <BoModeToggle mode={mode} onChange={setMode} />
