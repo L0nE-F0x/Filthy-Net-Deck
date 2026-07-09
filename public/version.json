@@ -1,0 +1,5 @@
+{
+  "version": "0.7.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.0.exe",
+  "notes": "Multi-source meta (magic.gg, MTGO, Goldfish, Melee, Untapped). In-app update banner + installer download. SmartScreen: More info → Run anyway (unsigned indie build)."
+}

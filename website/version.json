@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.6.0.exe",
-  "notes": "Current public installer. SmartScreen: More info → Run anyway (unsigned indie build). Multi-source meta pipeline shipping in app/meta feed; next installer bump when we cut a new NSIS build."
+  "version": "0.7.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.0.exe",
+  "notes": "Multi-source meta (magic.gg, MTGO, Goldfish, Melee, Untapped). In-app update banner + installer download. SmartScreen: More info → Run anyway (unsigned indie build)."
 }
