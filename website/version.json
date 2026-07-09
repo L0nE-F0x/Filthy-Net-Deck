@@ -1,5 +1,5 @@
 {
   "version": "0.6.0",
   "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.6.0.exe",
-  "notes": "Rebrand to Filthy Net Deck, new site aesthetic, Scryfall CDN card art fix, Netlify/GitHub URLs updated."
+  "notes": "Current public installer. SmartScreen: More info → Run anyway (unsigned indie build). Multi-source meta pipeline shipping in app/meta feed; next installer bump when we cut a new NSIS build."
 }

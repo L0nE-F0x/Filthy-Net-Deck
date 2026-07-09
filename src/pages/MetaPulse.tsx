@@ -19,6 +19,8 @@ const SOURCE_LINKS: Record<string, string> = {
   mtggoldfish: "https://www.mtggoldfish.com/metagame/standard",
   untapped: "https://mtga.untapped.gg/constructed/standard/meta",
   melee: "https://melee.gg/Tournament/Search",
+  "magic.gg": "https://magic.gg/decklists",
+  mtgo: "https://www.mtgo.com/decklists",
   scryfall: "https://scryfall.com",
   wizards: "https://magic.wizards.com/en/mtgarena",
 };
@@ -67,7 +69,11 @@ export function MetaPulse() {
                 ? "MTGGoldfish"
                 : s === "untapped"
                   ? "Untapped.gg"
-                  : s;
+                  : s === "magic.gg"
+                    ? "magic.gg"
+                    : s === "mtgo"
+                      ? "MTGO"
+                      : s;
             if (href) {
               return (
                 <a

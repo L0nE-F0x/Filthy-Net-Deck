@@ -71,7 +71,11 @@ interface AppState {
   filterColor: string | null;
   showFavoritesOnly: boolean;
   metaDiff: { previousDate: string | null; changes: MetaChange[] };
-  updateAvailable: { version: string; downloadUrl?: string } | null;
+  updateAvailable: {
+    version: string;
+    downloadUrl?: string;
+    notes?: string;
+  } | null;
   viewerUrl: string | null;
 
   setPage: (p: Page) => void;
@@ -89,6 +93,7 @@ interface AppState {
   setFilterColor: (c: string | null) => void;
   setShowFavoritesOnly: (v: boolean) => void;
   checkForUpdates: () => Promise<void>;
+  dismissUpdate: () => void;
   openViewer: (url: string) => void;
   closeViewer: () => void;
 }
@@ -172,12 +177,15 @@ export const useAppStore = create<AppState>((set, get) => {
           updateAvailable: {
             version: remote.version,
             downloadUrl: remote.downloadUrl,
+            notes: remote.notes,
           },
         });
       } else {
         set({ updateAvailable: null });
       }
     },
+
+    dismissUpdate: () => set({ updateAvailable: null }),
 
     refreshMeta: async () => {
       set({ loading: true, error: null });

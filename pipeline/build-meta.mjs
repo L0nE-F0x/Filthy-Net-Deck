@@ -5,9 +5,12 @@
  *   8 formats × 8 decks × Bo1/Bo3
  *
  * Sources (server-side only — never from the desktop client):
+ *   - magic.gg/decklists (official Arena ranked + championship posts)
+ *   - MTGO mtgo.com/decklist/* (embedded JSON challenges)
+ *   - MTGGoldfish metagame ranks + deck exports (when not CF-blocked)
+ *   - Melee.gg tournament search (paper / RCQ intel)
+ *   - Untapped.gg Arena ladder meta links
  *   - Seed archetypes (always; guarantees 8×8 completeness)
- *   - MTGGoldfish public metagame HTML (optional live boost)
- *   - Melee.gg public tournament search / event pages (optional paper signal)
  *
  * Note: Spicerack.gg tournament software has shut down; we do not call it.
  *
@@ -20,6 +23,15 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { applyAuthoritativeLists } from "./fetch-goldfish-lists.mjs";
+import { collectMagicGgLists } from "./sources/magic-gg.mjs";
+import { collectMtgo } from "./sources/mtgo.mjs";
+import { collectUntapped } from "./sources/untapped.mjs";
+import { collectMelee } from "./sources/melee.mjs";
+import {
+  assignListsToBundle,
+  mergeSourceTags,
+  mergeTournamentFeeds,
+} from "./sources/aggregate.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -28,7 +40,7 @@ const today = new Date().toISOString().slice(0, 10);
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const BOT_NOTE =
-  "FilthyNetDeck/0.6 (+https://github.com/L0nE-F0x/Filthy-Net-Deck; daily meta aggregation)";
+  "FilthyNetDeck/0.7 (+https://github.com/L0nE-F0x/Filthy-Net-Deck; daily meta aggregation)";
 
 function loadSeedExport() {
   const candidates = [
@@ -106,103 +118,6 @@ async function fetchGoldfishMetagame(formatPath) {
   } catch (e) {
     console.warn("[goldfish]", formatPath, e.message);
     return { url, archetypes: [], error: String(e.message) };
-  }
-}
-
-function mapMeleeFormat(formatString = "") {
-  const f = formatString.toLowerCase();
-  if (f.includes("alchemy")) return "alchemy";
-  if (f.includes("historic brawl")) return "historic_brawl";
-  if (f.includes("standard brawl") || (f.includes("brawl") && f.includes("standard")))
-    return "standard_brawl";
-  if (f.includes("historic")) return "historic";
-  if (f.includes("pioneer") || f.includes("explorer")) return "pioneer";
-  if (
-    f.includes("timeless") ||
-    f.includes("legacy") ||
-    f.includes("vintage") ||
-    f.includes("modern")
-  )
-    return "timeless";
-  if (f.includes("brawl")) return "brawl";
-  return "standard";
-}
-
-function mapMeleePlatform(gameDescription = "", name = "") {
-  const s = `${gameDescription} ${name}`.toLowerCase();
-  if (s.includes("arena") || s.includes("mtga")) return "mtga";
-  if (s.includes("mtgo") || s.includes("magic online")) return "mtgo";
-  return "paper";
-}
-
-/**
- * Melee.gg — major paper / RCQ / Arena Championship tournament platform.
- * Public DataTables endpoint: POST /Tournament/SearchResults
- */
-async function fetchMeleeTournaments() {
-  const url = "https://melee.gg/Tournament/SearchResults";
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "User-Agent": UA,
-        Accept: "application/json, text/javascript, */*; q=0.01",
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "X-Requested-With": "XMLHttpRequest",
-        Referer: "https://melee.gg/Tournament/Search",
-      },
-      body: "draw=1&start=0&length=40",
-    });
-    if (!res.ok) throw new Error(`SearchResults → ${res.status}`);
-    const text = await res.text();
-    let rows;
-    try {
-      rows = JSON.parse(text);
-    } catch {
-      throw new Error("SearchResults not JSON");
-    }
-    if (!Array.isArray(rows)) {
-      // DataTables shape: { data: [...] }
-      rows = rows.data || rows.results || [];
-    }
-    const tournaments = [];
-    for (const row of rows) {
-      if (!row?.id || !row?.name) continue;
-      // Prefer recent / ended competitive events
-      const status = String(row.status || "").toLowerCase();
-      if (status && status !== "ended" && status !== "complete" && status !== "in progress") {
-        // still include in-progress large events
-      }
-      if (/alpha test|test tournament/i.test(row.name) && (row.enrolledPlayerCount || 0) < 50) {
-        continue;
-      }
-      const date = row.startDate
-        ? String(row.startDate).slice(0, 10)
-        : today;
-      tournaments.push({
-        id: `melee-${row.id}`,
-        name: row.name,
-        format: mapMeleeFormat(row.formatString || row.name),
-        platform: mapMeleePlatform(row.gameDescription || "", row.name),
-        date,
-        url: `https://melee.gg/Tournament/View/${row.id}`,
-        players: row.enrolledPlayerCount || undefined,
-        topDecks: [],
-        notes: [
-          row.organizationName ? `Org: ${row.organizationName}` : null,
-          row.formatString ? `Format: ${row.formatString}` : null,
-          row.status ? `Status: ${row.status}` : null,
-        ]
-          .filter(Boolean)
-          .join(" · "),
-        source: "melee",
-      });
-      if (tournaments.length >= 20) break;
-    }
-    return { url: "https://melee.gg/Tournament/Search", tournaments };
-  } catch (e) {
-    console.warn("[melee]", e.message);
-    return { url: "https://melee.gg/Tournament/Search", tournaments: [], error: String(e.message) };
   }
 }
 
@@ -326,22 +241,6 @@ function applyLiveRanking(bundle, goldfishByFormat) {
   return bundle;
 }
 
-function mergeMeleeTournaments(bundle, melee) {
-  if (!melee.tournaments?.length) return bundle;
-  const sources = new Set((bundle.sources || []).filter((s) => s !== "seed" && s !== "spicerack"));
-  sources.add("melee");
-  const existing = new Set((bundle.tournaments || []).map((t) => t.id));
-  const merged = [...(bundle.tournaments || [])];
-  for (const t of melee.tournaments) {
-    // Only keep events with real View URLs
-    if (!t.url || !/melee\.gg\/Tournament\/View\/\d+/.test(t.url)) continue;
-    if (!existing.has(t.id)) merged.push(t);
-  }
-  bundle.tournaments = merged.slice(0, 24);
-  bundle.sources = [...sources];
-  return bundle;
-}
-
 function scrubSources(bundle) {
   bundle.sources = (bundle.sources || []).filter(
     (s) => !["seed", "spicerack", "placeholder"].includes(String(s).toLowerCase()),
@@ -402,7 +301,31 @@ async function main() {
   }
 
   if (live) {
-    console.log("Live mode: MTGGoldfish metagame + Melee + authoritative deck exports …");
+    console.log(
+      "Live mode: magic.gg + MTGO + Goldfish + Melee + Untapped …",
+    );
+    const allLists = [];
+    const feedBags = [];
+
+    // 1) Official magic.gg
+    try {
+      const magic = await collectMagicGgLists();
+      feedBags.push(magic);
+      allLists.push(...(magic.lists || []));
+    } catch (e) {
+      console.warn("  magic.gg failed", e.message);
+    }
+
+    // 2) MTGO official challenges
+    try {
+      const mtgo = await collectMtgo();
+      feedBags.push(mtgo);
+      allLists.push(...(mtgo.lists || []));
+    } catch (e) {
+      console.warn("  mtgo failed", e.message);
+    }
+
+    // 3) Goldfish metagame ranks
     const goldfishByFormat = {};
     for (const [fmtId, path] of Object.entries(GOLDFISH_FORMATS)) {
       goldfishByFormat[fmtId] = await fetchGoldfishMetagame(path);
@@ -413,21 +336,67 @@ async function main() {
     }
     bundle = applyLiveRanking(bundle, goldfishByFormat);
 
-    const melee = await fetchMeleeTournaments();
-    console.log(`  melee: ${melee.tournaments.length} tournament links`);
-    bundle = mergeMeleeTournaments(bundle, melee);
-
-    console.log("  Downloading Goldfish deck exports (authoritative 60s) …");
+    // 4) Goldfish full deck exports
+    console.log("  Goldfish deck exports…");
     bundle = await applyAuthoritativeLists(bundle);
+
+    // 5) Melee events (recent competitive filter)
+    try {
+      const melee = await collectMelee();
+      feedBags.push(melee);
+      allLists.push(...(melee.lists || []));
+    } catch (e) {
+      console.warn("  melee failed", e.message);
+    }
+
+    // 6) Untapped ladder links
+    try {
+      const untapped = await collectUntapped();
+      feedBags.push(untapped);
+      allLists.push(...(untapped.lists || []));
+    } catch (e) {
+      console.warn("  untapped failed", e.message);
+    }
+
+    // Merge tournament feeds + free lists onto decks
+    bundle = mergeTournamentFeeds(bundle, feedBags);
+    const assigned = assignListsToBundle(bundle, allLists);
+    console.log(
+      `  Assigned ${assigned} lists from magic.gg/MTGO/Melee pool onto decks (pool=${allLists.length})`,
+    );
+
+    bundle = mergeSourceTags(bundle, [
+      "mtggoldfish",
+      "magic.gg",
+      "mtgo",
+      "melee",
+      "untapped",
+      "scryfall",
+    ]);
+
+    const auth = Object.values(bundle.decks || {}).filter(
+      (d) => d.listQuality === "authoritative",
+    ).length;
+    const fail = Object.values(bundle.decks || {}).filter(
+      (d) => d.listQuality !== "authoritative",
+    ).length;
+
     bundle.pipeline = {
       ...(bundle.pipeline || {}),
       ranLive: true,
+      authoritativeLists: auth,
+      failedLists: fail,
+      freeListsIngested: allLists.length,
       sourcesDetail: [
-        "mtggoldfish-metagame-html",
+        "magic.gg-decklists",
+        "mtgo-embedded-json",
+        "mtggoldfish-metagame",
         "mtggoldfish-deck-export",
         "melee-searchresults",
+        "untapped-meta-links",
       ],
-      listPolicy: "prefer-goldfish-export-never-invent-when-available",
+      listPolicy:
+        "multi-source: magic.gg > mtgo embedded JSON > goldfish export > tagged fallback only",
     };
   } else {
     console.log("Offline mode (pass --live for multi-source aggregation).");

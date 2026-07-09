@@ -61,9 +61,14 @@ export default function App() {
   const favorites = useAppStore((s) => s.favorites);
   const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
 
+  const checkForUpdates = useAppStore((s) => s.checkForUpdates);
+
   useEffect(() => {
     if (!meta && !loading) {
       void refreshMeta();
+    } else {
+      // Still check app version even if meta already loaded
+      void checkForUpdates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

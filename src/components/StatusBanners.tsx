@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { APP_VERSION } from "../version";
+import { downloadInstaller } from "../services/openExternal";
 
 function isStaleDate(metaDate: string): boolean {
   const today = new Date().toISOString().slice(0, 10);
@@ -11,6 +12,7 @@ export function StatusBanners() {
   const meta = useAppStore((s) => s.meta);
   const feedStatus = useAppStore((s) => s.feedStatus);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
+  const dismissUpdate = useAppStore((s) => s.dismissUpdate);
   const metaDiff = useAppStore((s) => s.metaDiff);
   const loading = useAppStore((s) => s.loading);
 
@@ -80,16 +82,41 @@ export function StatusBanners() {
   if (updateAvailable) {
     banners.push({
       key: "update",
-      className: "banner banner-gold",
+      className: "banner banner-gold banner-update",
       body: (
         <>
-          <strong>Update available</strong> — v{updateAvailable.version} (you have v{APP_VERSION}).{" "}
+          <strong>New version available</strong> — v{updateAvailable.version} is out (you have v
+          {APP_VERSION}
+          ).{" "}
+          {updateAvailable.notes ? (
+            <span className="text-muted">{updateAvailable.notes} </span>
+          ) : null}
           {updateAvailable.downloadUrl ? (
-            <a href={updateAvailable.downloadUrl} target="_blank" rel="noopener noreferrer">
-              Download
-            </a>
+            <>
+              <button
+                type="button"
+                className="update-dl"
+                onClick={() => {
+                  void downloadInstaller(updateAvailable.downloadUrl!);
+                }}
+              >
+                Download installer
+              </button>
+              <span className="text-muted">
+                {" "}
+                — runs your browser/download folder; open the NSIS setup to upgrade.
+              </span>
+              <button
+                type="button"
+                className="update-dismiss"
+                onClick={() => dismissUpdate()}
+                title="Dismiss until next launch"
+              >
+                Later
+              </button>
+            </>
           ) : (
-            <span>Check the website downloads page.</span>
+            <span>Open Settings → Check for updates.</span>
           )}
         </>
       ),

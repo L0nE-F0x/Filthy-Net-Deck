@@ -4,6 +4,8 @@ export interface RemoteVersion {
   version: string;
   downloadUrl?: string;
   notes?: string;
+  /** Optional mandatory flag for future hard-force updates */
+  mandatory?: boolean;
 }
 
 export async function fetchRemoteVersion(

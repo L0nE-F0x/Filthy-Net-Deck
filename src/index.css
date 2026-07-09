@@ -553,6 +553,46 @@ select,
   background: color-mix(in srgb, var(--color-gold-500) 14%, transparent);
   border-color: color-mix(in srgb, var(--color-gold-500) 35%, transparent);
 }
+.banner-update {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #b8f000 16%, transparent),
+    color-mix(in srgb, var(--color-gold-500) 14%, transparent)
+  );
+  border-color: color-mix(in srgb, #b8f000 40%, transparent);
+  font-size: 0.82rem;
+}
+.banner-update .update-dl {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: #b8f000;
+  color: #0a0b08 !important;
+  font-weight: 700;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+.banner-update .update-dl:hover {
+  filter: brightness(1.08);
+}
+.banner-update .update-dismiss {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.85;
+}
+.banner-update .update-dismiss:hover {
+  opacity: 1;
+}
 .skeleton-banner { min-height: 2.2rem; }
 .skel {
   height: 0.55rem;

@@ -3,6 +3,7 @@ import { useAppStore } from "../store/useAppStore";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { DEFAULT_META_URL } from "../services/metaFeed";
 import { APP_VERSION } from "../version";
+import { downloadInstaller } from "../services/openExternal";
 
 export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
@@ -41,8 +42,12 @@ export function Settings() {
           <strong className="text-foam">Refresh does not scrape tournament sites from your PC.</strong>{" "}
           It re-downloads the published meta file from Netlify (
           <code className="text-[10px]">/meta/latest.json</code>
-          ). That file is built offline by our multi-source pipeline (MTGGoldfish metagame + deck
-          exports, Melee events). Pipeline freshness = how often CI/you run{" "}
+          ). That file is built by the multi-source pipeline:{" "}
+          <strong className="text-foam">magic.gg</strong>,{" "}
+          <strong className="text-foam">MTGO</strong> challenges,{" "}
+          <strong className="text-foam">MTGGoldfish</strong> metagame + exports,{" "}
+          <strong className="text-foam">Melee.gg</strong>,{" "}
+          <strong className="text-foam">Untapped.gg</strong>. Pipeline freshness = CI daily job /{" "}
           <code className="text-[10px]">npm run meta</code>.
         </p>
         {meta?.pipeline && (
@@ -151,14 +156,15 @@ export function Settings() {
             Check for updates
           </button>
           {updateAvailable?.downloadUrl && (
-            <a
+            <button
+              type="button"
               className="btn btn-primary btn-sm"
-              href={updateAvailable.downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => {
+                void downloadInstaller(updateAvailable.downloadUrl!);
+              }}
             >
               Download v{updateAvailable.version} installer
-            </a>
+            </button>
           )}
         </div>
         {updateAvailable && (
