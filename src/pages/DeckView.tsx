@@ -8,9 +8,8 @@ import { SourceFooter } from "../components/SourceFooter";
 import { ManaCurve, ColorPie } from "../components/ManaCurve";
 import { IconBack, IconCopy, IconStar } from "../components/NavIcons";
 import { copyToClipboard } from "../services/arenaImport";
-import { scryfallImageUrl } from "../services/scryfall";
 import { validateDeckNames } from "../services/scryfallValidate";
-import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
+import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 
 export function DeckView() {
   const meta = useAppStore((s) => s.meta);
@@ -20,7 +19,6 @@ export function DeckView() {
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
   const favorites = useAppStore((s) => s.favorites);
   const [toast, setToast] = useState<string | null>(null);
-  const [imgError, setImgError] = useState(false);
   const [unknown, setUnknown] = useState<string[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
 
@@ -29,7 +27,6 @@ export function DeckView() {
   const fav = deck ? favorites.includes(deck.id) : false;
 
   useEffect(() => {
-    setImgError(false);
     setUnknown([]);
     if (!deck) return;
     let cancelled = false;
@@ -207,15 +204,9 @@ export function DeckView() {
         </div>
 
         <aside className="flex flex-col gap-3">
-          {previewCard && !imgError && (
+          {previewCard && (
             <div className="panel p-2 overflow-hidden">
-              <img
-                src={scryfallImageUrl(previewCard, "normal")}
-                alt={previewCard}
-                className="w-full rounded-lg"
-                loading="lazy"
-                onError={() => setImgError(true)}
-              />
+              <CardArt name={previewCard} size="normal" className="w-full card-art-large" />
               <p className="text-[11px] text-muted text-center m-0 mt-2">{previewCard}</p>
             </div>
           )}

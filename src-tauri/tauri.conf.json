@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Ban Basic Island",
-  "version": "0.5.0",
-  "identifier": "com.banbasicisland.desktop",
+  "productName": "Filthy Net Deck",
+  "version": "0.6.0",
+  "identifier": "com.filthynetdeck.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Ban Basic Island — MTG Arena Companion",
+        "title": "Filthy Net Deck — MTG Arena Companion",
         "width": 1280,
         "height": 860,
         "minWidth": 960,
@@ -24,7 +24,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://*.netlify.app https://banbasicisland.netlify.app; img-src 'self' data: asset: https://asset.localhost https://*.scryfall.io https://cards.scryfall.io https://*.netlify.app; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      "csp": "default-src 'self'; connect-src 'self' https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://*.netlify.app https://filthy-net-deck.netlify.app; img-src 'self' data: blob: asset: https://asset.localhost https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://c1.scryfall.com https://c2.scryfall.com https://*.netlify.app; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src https://www.mtggoldfish.com https://melee.gg https://mtga.untapped.gg https://*.netlify.app"
     }
   },
   "bundle": {
@@ -47,7 +47,7 @@
       "minimumSystemVersion": "10.15",
       "signingIdentity": "-"
     },
-    "shortDescription": "Daily MTG Arena meta decks and tournament intel",
-    "longDescription": "Ban Basic Island is a desktop companion for Magic: The Gathering Arena. Get eight curated decks every day — one per constructed format — with Bo1/Bo3 options, tier lists, matchups, sideboard guides, and meta tournament pulse."
+    "shortDescription": "Daily MTG Arena meta decks — filthy netdecks, zero shame",
+    "longDescription": "Filthy Net Deck is a desktop companion for Magic: The Gathering Arena. Eight ranked decks per constructed format every day, Bo1/Bo3, tiers, matchups, sideboard guides, and tournament pulse — so you can netdeck with confidence."
   }
 }

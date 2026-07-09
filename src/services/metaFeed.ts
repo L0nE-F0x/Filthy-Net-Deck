@@ -3,7 +3,7 @@ import { seedMeta } from "../data/seedMeta";
 import { normalizeMetaBundle } from "./deckHelpers";
 
 /** Primary feed URL — override via localStorage `bbi.metaUrl` for testing. */
-export const DEFAULT_META_URL = "https://banbasicisland.netlify.app/meta/latest.json";
+export const DEFAULT_META_URL = "https://filthy-net-deck.netlify.app/meta/latest.json";
 
 export type MetaFetchSource = "network" | "offline" | "cache";
 

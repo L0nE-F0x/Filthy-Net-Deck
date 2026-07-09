@@ -1,5 +1,5 @@
 /**
- * Ban Basic Island — daily meta pipeline (Phase 2)
+ * Filthy Net Deck — daily meta pipeline
  *
  * Produces website/meta/latest.json and public/meta/latest.json with:
  *   8 formats × 8 decks × Bo1/Bo3
@@ -27,7 +27,7 @@ const today = new Date().toISOString().slice(0, 10);
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const BOT_NOTE =
-  "BanBasicIsland/0.2 (+https://github.com/L0nE-F0x/Ban-Basic-Island; daily meta aggregation)";
+  "FilthyNetDeck/0.6 (+https://github.com/L0nE-F0x/Filthy-Net-Deck; daily meta aggregation)";
 
 function loadSeedExport() {
   const candidates = [

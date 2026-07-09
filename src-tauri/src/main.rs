@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    ban_basic_island_lib::run()
+    filthy_net_deck_lib::run()
 }

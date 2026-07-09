@@ -565,7 +565,7 @@ function buildSeed(): MetaBundle {
     decks,
     tournaments,
     sources: ["mtggoldfish", "untapped", "melee", "scryfall"],
-    version: "0.4.0",
+    version: "0.6.0",
     decksPerFormat: 8,
   };
 }

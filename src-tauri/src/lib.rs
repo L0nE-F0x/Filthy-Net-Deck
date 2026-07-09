@@ -24,7 +24,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
             let show_i =
-                MenuItem::with_id(app, "show", "Open Ban Basic Island", true, None::<&str>)?;
+                MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;
             let sep = PredefinedMenuItem::separator(app)?;
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_i, &sep, &quit_i])?;
@@ -34,10 +34,10 @@ pub fn run() {
                 .expect("app icon missing — run `npx tauri icon`")
                 .clone();
 
-            let _tray = TrayIconBuilder::with_id("bbi-tray")
+            let _tray = TrayIconBuilder::with_id("fnd-tray")
                 .icon(icon)
                 .menu(&menu)
-                .tooltip("Ban Basic Island — MTG Arena companion")
+                .tooltip("Filthy Net Deck — MTG Arena companion")
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => show_main_window(app),
@@ -82,5 +82,5 @@ pub fn run() {
             _ => {}
         })
         .run(tauri::generate_context!())
-        .expect("error while running Ban Basic Island");
+        .expect("error while running Filthy Net Deck");
 }

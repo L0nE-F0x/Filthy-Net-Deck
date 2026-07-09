@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
-  "downloadUrl": "https://banbasicisland.netlify.app/downloads/Ban-Basic-Island-Setup-0.5.0.exe",
-  "notes": "Format button fix, distinct Bo1/Bo3 ranking, card art strips, meta share/tier/color charts, intel brief analysis, richer Format dashboard."
+  "version": "0.6.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.6.0.exe",
+  "notes": "Rebrand to Filthy Net Deck, new site aesthetic, Scryfall CDN card art fix, Netlify/GitHub URLs updated."
 }

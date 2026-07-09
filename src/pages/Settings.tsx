@@ -132,10 +132,11 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-2">About Ban Basic Island</h3>
+        <h3 className="text-sm font-semibold m-0 mb-2">About Filthy Net Deck</h3>
         <p className="text-sm text-muted m-0 leading-relaxed">
-          Desktop companion for <em>Magic: The Gathering Arena</em> — eight ranked decks per format,
-          Bo1/Bo3, tiers, matchups, queue favorites, and tournament pulse.
+          Netdeck without the guilt (or with all of it). Daily meta for{" "}
+          <em>Magic: The Gathering Arena</em> — eight ranked decks per format, Bo1/Bo3, tiers,
+          matchups, queue favorites, and tournament pulse.
         </p>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
           Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of

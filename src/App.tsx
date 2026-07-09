@@ -35,7 +35,7 @@ function pageTitle(page: Page): string {
     case "settings":
       return "Settings";
     default:
-      return "Ban Basic Island";
+      return "Filthy Net Deck";
   }
 }
 
@@ -85,7 +85,7 @@ export default function App() {
         <div className="brand">
           <img src="/app-icon.png" alt="" width={36} height={36} />
           <div>
-            <strong>Ban Basic Island</strong>
+            <strong>Filthy Net Deck</strong>
             <small>MTG Arena · v{APP_VERSION}</small>
           </div>
         </div>

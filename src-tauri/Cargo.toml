@@ -1,12 +1,12 @@
 [package]
-name = "ban-basic-island"
-version = "0.5.0"
-description = "Ban Basic Island — MTG Arena meta companion"
+name = "filthy-net-deck"
+version = "0.6.0"
+description = "Filthy Net Deck — MTG Arena meta companion"
 authors = ["you"]
 edition = "2021"
 
 [lib]
-name = "ban_basic_island_lib"
+name = "filthy_net_deck_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

@@ -7,7 +7,7 @@ export interface RemoteVersion {
 }
 
 export async function fetchRemoteVersion(
-  baseUrl = "https://banbasicisland.netlify.app",
+  baseUrl = "https://filthy-net-deck.netlify.app",
 ): Promise<RemoteVersion | null> {
   try {
     const res = await fetch(`${baseUrl}/version.json`, { cache: "no-cache" });

@@ -20,8 +20,10 @@
         { "url": "https://api.scryfall.com/**" },
         { "url": "https://*.scryfall.io/**" },
         { "url": "https://cards.scryfall.io/**" },
+        { "url": "https://c1.scryfall.com/**" },
+        { "url": "https://c2.scryfall.com/**" },
         { "url": "https://*.netlify.app/**" },
-        { "url": "https://banbasicisland.netlify.app/**" }
+        { "url": "https://filthy-net-deck.netlify.app/**" }
       ]
     }
   ]
