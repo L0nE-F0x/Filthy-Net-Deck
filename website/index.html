@@ -3,29 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Filthy Net Deck — MTG Arena Companion for Windows &amp; Mac</title>
+    <title>Filthy Net Deck — MTG Arena Meta Companion</title>
     <meta
       name="description"
-      content="Filthy Net Deck is a free desktop companion for Magic: The Gathering Arena. Eight ranked decks per format every day, Bo1/Bo3, tiers, matchups, and tournament pulse. Netdeck with pride."
+      content="Filthy Net Deck is a free desktop companion for Magic: The Gathering Arena. Eight ranked decks per format every day, Bo1/Bo3, tiers, matchups, card art, and tournament pulse."
     />
-    <meta name="theme-color" content="#0c0d0a" />
-    <meta property="og:title" content="Filthy Net Deck — MTG Arena Companion" />
+    <meta name="theme-color" content="#070806" />
+    <meta property="og:title" content="Filthy Net Deck — Netdeck dirty. Climb clean." />
     <meta
       property="og:description"
-      content="Daily meta decks for Arena. Standard-first. Bo1 &amp; Bo3. Zero shame."
+      content="Daily Arena meta. Eight decks per format. Bo1 & Bo3. Zero shame."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="assets/app-icon.png" />
     <meta property="og:url" content="https://filthy-net-deck.netlify.app/" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/app-icon.png" />
+    <link rel="preconnect" href="https://cards.scryfall.io" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="bg-grime" aria-hidden="true"></div>
-    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="fx-root" aria-hidden="true">
+      <div class="fx-orb fx-orb-a"></div>
+      <div class="fx-orb fx-orb-b"></div>
+      <div class="fx-orb fx-orb-c"></div>
+      <div class="fx-grid"></div>
+      <div class="fx-noise"></div>
+    </div>
 
-    <header class="nav">
+    <header class="nav" id="nav">
       <a class="brand" href="#top">
         <img src="assets/app-icon.png" alt="" width="40" height="40" />
         <span>
@@ -35,25 +41,28 @@
       </a>
       <nav class="nav-links">
         <a href="#features">Features</a>
+        <a href="#meta">Live meta</a>
         <a href="#formats">Formats</a>
-        <a href="#how">How it works</a>
         <a href="#download" class="nav-cta">Download</a>
       </nav>
     </header>
 
     <main id="top">
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Windows &amp; Mac · Free · Built for Arena ladder</p>
+      <!-- HERO -->
+      <section class="hero reveal">
+        <div class="hero-copy reveal-child">
+          <p class="eyebrow">
+            <span class="dot-live"></span>
+            Windows · Free · Built for Arena ladder
+          </p>
           <h1>
             Netdeck dirty.<br />
             <span class="grad">Climb clean.</span>
           </h1>
           <p class="lede">
-            <strong>Filthy Net Deck</strong> is your installable MTG Arena meta desk —
-            <strong>eight ranked decks per constructed format every day</strong>, Standard first,
-            Bo1 and Bo3, matchups, sideboards, and tournament pulse. Stop tab-hopping. Start
-            queueing.
+            Your installable MTG Arena meta desk —
+            <strong>eight ranked decks per constructed format, every day</strong>. Standard first.
+            Bo1 and Bo3. Matchups, sideboards, card art, tournament pulse.
           </p>
           <div class="hero-actions">
             <a
@@ -62,170 +71,332 @@
               download
             >
               Download for Windows
-              <span class="btn-meta">v0.6.0 · NSIS installer</span>
+              <span class="btn-meta">v0.6.0 · ~4&nbsp;MB installer</span>
             </a>
             <a
               class="btn btn-ghost"
-              href="https://github.com/L0nE-F0x/Filthy-Net-Deck/releases"
+              href="https://github.com/L0nE-F0x/Filthy-Net-Deck"
               target="_blank"
               rel="noopener noreferrer"
             >
-              GitHub releases
-              <span class="btn-meta">Mac builds when available</span>
+              View on GitHub
+              <span class="btn-meta">Open source · L0nE-F0x</span>
             </a>
           </div>
           <ul class="trust-row">
-            <li>Native Windows installer</li>
-            <li>8 decks × 8 formats</li>
-            <li>Bo1 &amp; Bo3 ranking</li>
-            <li>Scryfall card art</li>
+            <li>Native installer</li>
+            <li>8 × 8 daily decks</li>
+            <li>Bo1 / Bo3 ranking</li>
+            <li>Scryfall art</li>
           </ul>
         </div>
-        <div class="hero-card" aria-hidden="true">
-          <div class="fake-app">
-            <div class="fake-sidebar">
-              <div class="fake-brand"></div>
-              <div class="fake-nav on"></div>
-              <div class="fake-nav"></div>
-              <div class="fake-nav"></div>
+
+        <!-- Accurate app chrome mock -->
+        <div class="hero-stage reveal-child delay-1" aria-hidden="true">
+          <div class="mock-glow"></div>
+          <div class="mock-window">
+            <div class="mock-titlebar">
+              <div class="mock-dots"><i></i><i></i><i></i></div>
+              <span>Filthy Net Deck — MTG Arena Companion</span>
             </div>
-            <div class="fake-main">
-              <div class="fake-top">
-                <span>Daily decks</span>
-                <span class="pill">Bo1</span>
-              </div>
-              <div class="fake-hero">
-                <span class="tag">#1 · Standard</span>
-                <strong>Izzet Prowess</strong>
-                <em>Tier 1 · filthy ladder pick</em>
-              </div>
-              <div class="fake-grid">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="mock-body">
+              <aside class="mock-side">
+                <div class="mock-brand">
+                  <img src="assets/app-icon.png" alt="" />
+                  <div>
+                    <strong>Filthy Net Deck</strong>
+                    <small>MTG Arena · v0.6.0</small>
+                  </div>
+                </div>
+                <button class="mock-nav on" type="button">
+                  <span class="mock-ico">▣</span> Daily
+                </button>
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">↗</span> Meta Pulse
+                </button>
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">⚙</span> Settings
+                </button>
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">☰</span> My queue
+                </button>
+                <p class="mock-legal">Not affiliated with Wizards of the Coast.</p>
+              </aside>
+              <div class="mock-main">
+                <header class="mock-top">
+                  <div>
+                    <h2>Format</h2>
+                    <p><span class="live-dot"></span> Meta live · Standard</p>
+                  </div>
+                  <div class="mock-mode">
+                    <span class="on">Bo1</span>
+                    <span>Bo3</span>
+                  </div>
+                </header>
+                <div class="mock-banner">Live feed — meta loaded from the network.</div>
+                <div class="mock-hero-panel">
+                  <div class="mock-hero-text">
+                    <div class="mock-tags">
+                      <em>#1 · BO1 PICK</em>
+                      <b>TIER 1</b>
+                      <i class="pip u"></i>
+                      <i class="pip r"></i>
+                    </div>
+                    <strong>Izzet Prowess</strong>
+                    <span>Premier Bo1 ladder shell · Slickshot + cantrips + reach</span>
+                    <div class="mock-btns">
+                      <span class="mb primary">Open full decklist</span>
+                      <span class="mb">★ Queue</span>
+                    </div>
+                  </div>
+                  <div class="mock-cards">
+                    <img
+                      class="mc mc-1"
+                      src="https://cards.scryfall.io/normal/front/8/5/85d2e0d3-4e7f-4c8b-9c3e-0e8f8c8e8e8e.jpg"
+                      alt=""
+                      data-card="Slickshot Show-Off"
+                      onerror="this.onerror=null;window.__fndCard(this)"
+                    />
+                    <img
+                      class="mc mc-2"
+                      src=""
+                      alt=""
+                      data-card="Monastery Swiftspear"
+                      onerror="this.onerror=null;window.__fndCard(this)"
+                    />
+                    <img
+                      class="mc mc-3"
+                      src=""
+                      alt=""
+                      data-card="Consider"
+                      onerror="this.onerror=null;window.__fndCard(this)"
+                    />
+                  </div>
+                </div>
+                <div class="mock-charts">
+                  <div class="mock-chart">
+                    <h4>Meta share · Bo1</h4>
+                    <div class="bar"><i style="--w: 92%"></i><span>Izzet Prowess</span><b>13.7%</b></div>
+                    <div class="bar"><i style="--w: 78%"></i><span>Izzet Spellementals</span><b>10.1%</b></div>
+                    <div class="bar"><i style="--w: 86%"></i><span>Selesnya Ouroboroid</span><b>12.9%</b></div>
+                    <div class="bar"><i style="--w: 52%"></i><span>Mono-Green Landfall</span><b>6.9%</b></div>
+                  </div>
+                  <div class="mock-chart slim">
+                    <h4>Tier mix</h4>
+                    <div class="donut"></div>
+                    <ul>
+                      <li><i class="t1"></i> Tier 1 · 3</li>
+                      <li><i class="t2"></i> Tier 2 · 3</li>
+                      <li><i class="t3"></i> Tier 3 · 2</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="features" class="section">
-        <h2>Everything you need to stay filthy-current</h2>
-        <p class="section-lede">
-          Meta share, card art, matchups, and Arena import — one native app instead of twelve
-          browser tabs.
-        </p>
-        <div class="feature-grid">
-          <article>
-            <h3>8 × 8 daily</h3>
-            <p>
-              Eight ranked lists for Standard, Alchemy, Historic, Pioneer, Timeless, and the Brawl
-              modes — refreshed every day.
-            </p>
+      <!-- STATS STRIP -->
+      <section class="stats reveal">
+        <div class="stat reveal-child">
+          <strong>8</strong>
+          <span>formats covered daily</span>
+        </div>
+        <div class="stat reveal-child delay-1">
+          <strong>8</strong>
+          <span>ranked decks each</span>
+        </div>
+        <div class="stat reveal-child delay-2">
+          <strong>2</strong>
+          <span>modes · Bo1 &amp; Bo3</span>
+        </div>
+        <div class="stat reveal-child delay-3">
+          <strong>0</strong>
+          <span>shame required</span>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section id="features" class="section features">
+        <div class="section-head reveal">
+          <p class="eyebrow">Features</p>
+          <h2>Everything you need to stay filthy-current</h2>
+          <p class="section-lede">
+            Meta share, card art, matchups, and Arena import — one native app instead of a dozen
+            tabs.
+          </p>
+        </div>
+        <div class="feature-bento">
+          <article class="fb fb-wide reveal">
+            <div class="fb-copy">
+              <h3>Standard-first daily board</h3>
+              <p>
+                Eight full lists for Standard with Bo1 ladder order and Bo3 event order. Open any
+                rank for the complete deck, curve, and import string.
+              </p>
+            </div>
+            <div class="fb-visual fb-decks">
+              <div class="mini-deck">
+                <span>#1</span>
+                <strong>Izzet Prowess</strong>
+                <em>13.7%</em>
+              </div>
+              <div class="mini-deck">
+                <span>#2</span>
+                <strong>Izzet Spellementals</strong>
+                <em>10.1%</em>
+              </div>
+              <div class="mini-deck">
+                <span>#3</span>
+                <strong>Selesnya Ouroboroid</strong>
+                <em>12.9%</em>
+              </div>
+            </div>
           </article>
-          <article>
-            <h3>Standard first</h3>
-            <p>
-              Ladder-focused hero view, meta share charts, and Bo1-leaning order when you need
-              speed.
-            </p>
+          <article class="fb reveal delay-1">
+            <div class="fb-icon">★</div>
+            <h3>My queue</h3>
+            <p>Star decks for the day. Jump back without hunting the list.</p>
           </article>
-          <article>
-            <h3>Bo1 &amp; Bo3</h3>
-            <p>
-              Separate rankings: tempo for Bo1, post-board depth for Bo3. Sideboard guides where we
-              have them.
-            </p>
+          <article class="fb reveal delay-2">
+            <div class="fb-icon">⇄</div>
+            <h3>Bo1 / Bo3</h3>
+            <p>Separate rankings — tempo for ladder, interaction for events.</p>
           </article>
-          <article>
+          <article class="fb reveal delay-1">
+            <div class="fb-icon">◈</div>
             <h3>Visual intel</h3>
-            <p>
-              Scryfall card art, mana curves, meta bars, tier mix, color pressure, and a short
-              intel brief per format.
-            </p>
+            <p>Mana curves, meta bars, tier mix, color pressure, matchup lean.</p>
           </article>
-          <article>
+          <article class="fb reveal delay-2">
+            <div class="fb-icon">↗</div>
             <h3>Meta Pulse</h3>
-            <p>
-              Paper (Melee), MTGO Challenges (Goldfish), and Arena ladder context (Untapped) —
-              verified links only.
-            </p>
+            <p>Goldfish Challenges, Melee events, Untapped ladder — verified links.</p>
           </article>
-          <article>
-            <h3>Copy to Arena</h3>
-            <p>One click copies an import string. Paste in MTG Arena and queue.</p>
+          <article class="fb fb-wide reveal">
+            <div class="fb-copy">
+              <h3>Copy straight into Arena</h3>
+              <p>
+                Sticky import bar on every deck. One click, paste in MTG Arena, queue. Scryfall art
+                for the cards that resolve.
+              </p>
+            </div>
+            <div class="fb-visual fb-import">
+              <code>Deck<br />4 Slickshot Show-Off<br />4 Monastery Swiftspear<br />4 Consider<br />…</code>
+              <span class="copy-pill">Copy Arena import</span>
+            </div>
           </article>
         </div>
       </section>
 
-      <section id="formats" class="section alt">
-        <h2>Constructed coverage</h2>
-        <div class="format-chips">
-          <span class="chip gold">Standard</span>
-          <span class="chip">Alchemy</span>
-          <span class="chip">Historic</span>
-          <span class="chip">Pioneer</span>
-          <span class="chip">Timeless</span>
-          <span class="chip">Brawl</span>
-          <span class="chip">Standard Brawl</span>
-          <span class="chip">Historic Brawl</span>
+      <!-- LIVE META -->
+      <section id="meta" class="section meta-sec">
+        <div class="section-head reveal">
+          <p class="eyebrow">Live meta</p>
+          <h2>Built around today’s Standard</h2>
+          <p class="section-lede">
+            Rankings lean on public tournament and ladder signals — then ship as a daily JSON feed
+            the app pulls on launch.
+          </p>
+        </div>
+        <div class="meta-showcase reveal">
+          <div class="meta-panel">
+            <header>
+              <span>Standard · Bo1</span>
+              <span class="chip-live">Live</span>
+            </header>
+            <div class="meta-list" id="meta-list">
+              <!-- filled by script from /meta/latest.json when available -->
+              <div class="meta-row">
+                <b>#1</b><span>Izzet Prowess</span><i style="--p: 92%"></i><em>13.7%</em>
+              </div>
+              <div class="meta-row">
+                <b>#2</b><span>Izzet Spellementals</span><i style="--p: 70%"></i><em>10.1%</em>
+              </div>
+              <div class="meta-row">
+                <b>#3</b><span>Selesnya Ouroboroid</span><i style="--p: 86%"></i><em>12.9%</em>
+              </div>
+              <div class="meta-row">
+                <b>#4</b><span>Mono-Green Landfall</span><i style="--p: 48%"></i><em>6.9%</em>
+              </div>
+              <div class="meta-row">
+                <b>#5</b><span>Jeskai Lessons</span><i style="--p: 86%"></i><em>12.9%</em>
+              </div>
+            </div>
+          </div>
+          <div class="meta-art-stack">
+            <img data-card="Slickshot Show-Off" alt="Slickshot Show-Off" class="stack-card s1" />
+            <img data-card="Monastery Swiftspear" alt="Monastery Swiftspear" class="stack-card s2" />
+            <img data-card="Lightning Strike" alt="Lightning Strike" class="stack-card s3" />
+          </div>
         </div>
       </section>
 
-      <section id="how" class="section">
-        <h2>How it works</h2>
-        <ol class="steps">
-          <li>
-            <strong>Daily meta bundle</strong>
-            <span>JSON feed ranks eight decks per format for Bo1 and Bo3.</span>
-          </li>
-          <li>
-            <strong>Scryfall card art</strong>
-            <span>Images resolve to Scryfall CDN URLs for reliable in-app previews.</span>
-          </li>
-          <li>
-            <strong>Tournament signals</strong>
-            <span>MTGGoldfish, Melee.gg, Untapped.gg — attributed, never scraped from the desktop client.</span>
-          </li>
-        </ol>
+      <!-- FORMATS -->
+      <section id="formats" class="section formats-sec">
+        <div class="section-head reveal">
+          <p class="eyebrow">Coverage</p>
+          <h2>Every constructed mode that matters</h2>
+        </div>
+        <div class="format-orbit reveal">
+          <button type="button" class="fchip featured">Standard</button>
+          <button type="button" class="fchip">Alchemy</button>
+          <button type="button" class="fchip">Historic</button>
+          <button type="button" class="fchip">Pioneer</button>
+          <button type="button" class="fchip">Timeless</button>
+          <button type="button" class="fchip">Brawl</button>
+          <button type="button" class="fchip">Standard Brawl</button>
+          <button type="button" class="fchip">Historic Brawl</button>
+        </div>
       </section>
 
-      <section id="download" class="section download">
-        <h2>Download Filthy Net Deck</h2>
-        <p class="section-lede">Free. Installable. No account required.</p>
-        <div class="download-row">
-          <a
-            class="btn btn-primary"
-            href="downloads/Filthy-Net-Deck-Setup-0.6.0.exe"
-            download
-          >
-            Windows installer
-            <span class="btn-meta">.exe · v0.6.0</span>
-          </a>
-          <a
-            class="btn btn-ghost"
-            href="https://github.com/L0nE-F0x/Filthy-Net-Deck"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Source on GitHub
-            <span class="btn-meta">L0nE-F0x/Filthy-Net-Deck</span>
-          </a>
+      <!-- DOWNLOAD -->
+      <section id="download" class="section download reveal">
+        <div class="download-card">
+          <div class="download-glow" aria-hidden="true"></div>
+          <p class="eyebrow">Get the app</p>
+          <h2>Install Filthy Net Deck</h2>
+          <p class="section-lede center">
+            Free. Native. No account. Point it at the daily meta feed and queue.
+          </p>
+          <div class="download-row">
+            <a
+              class="btn btn-primary btn-lg"
+              href="downloads/Filthy-Net-Deck-Setup-0.6.0.exe"
+              download
+            >
+              Download for Windows
+              <span class="btn-meta">v0.6.0 · NSIS · current user install</span>
+            </a>
+            <a
+              class="btn btn-ghost btn-lg"
+              href="https://github.com/L0nE-F0x/Filthy-Net-Deck"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source &amp; releases
+              <span class="btn-meta">github.com/L0nE-F0x/Filthy-Net-Deck</span>
+            </a>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <p>
-        <strong>Filthy Net Deck</strong> is a fan-made companion and is
-        <strong>not affiliated with Wizards of the Coast</strong>. Magic: The Gathering and Magic:
-        The Gathering Arena are trademarks of Wizards of the Coast LLC.
-      </p>
-      <p class="muted">
-        Card data via Scryfall. Meta sources include MTGGoldfish, Melee.gg, and Untapped.gg —
-        always attributed in-app.
-      </p>
+    <footer class="footer reveal">
+      <div class="footer-inner">
+        <div class="brand footer-brand">
+          <img src="assets/app-icon.png" alt="" width="32" height="32" />
+          <strong>Filthy Net Deck</strong>
+        </div>
+        <p>
+          Fan-made companion — <strong>not affiliated with Wizards of the Coast</strong>. Magic:
+          The Gathering and MTG Arena are trademarks of Wizards of the Coast LLC. Card images via
+          Scryfall.
+        </p>
+      </div>
     </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>
