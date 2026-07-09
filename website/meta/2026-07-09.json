@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T15:39:40.290Z",
+  "generatedAt": "2026-07-09T16:13:14.307Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -19973,6 +19973,6 @@
     "melee",
     "scryfall"
   ],
-  "version": "0.3.0",
+  "version": "0.4.0",
   "decksPerFormat": 8
 }

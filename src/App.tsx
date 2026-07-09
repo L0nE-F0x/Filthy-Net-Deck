@@ -6,8 +6,11 @@ import { DeckView } from "./pages/DeckView";
 import { MetaPulse } from "./pages/MetaPulse";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
-import { IconDaily, IconMeta, IconSettings } from "./components/NavIcons";
+import { StatusBanners } from "./components/StatusBanners";
+import { ResultViewer } from "./components/ResultViewer";
+import { IconDaily, IconMeta, IconSettings, IconQueue } from "./components/NavIcons";
 import type { Page } from "./types/meta";
+import { APP_VERSION } from "./version";
 
 const NAV: {
   id: Page;
@@ -36,6 +39,13 @@ function pageTitle(page: Page): string {
   }
 }
 
+function feedLabel(status: string | null): string {
+  if (status === "live") return "live";
+  if (status === "cached") return "cached";
+  if (status === "offline") return "offline pack";
+  return "—";
+}
+
 export default function App() {
   const page = useAppStore((s) => s.page);
   const setPage = useAppStore((s) => s.setPage);
@@ -46,8 +56,10 @@ export default function App() {
   const loading = useAppStore((s) => s.loading);
   const error = useAppStore((s) => s.error);
   const clearError = useAppStore((s) => s.clearError);
-  const metaSource = useAppStore((s) => s.metaSource);
+  const feedStatus = useAppStore((s) => s.feedStatus);
   const lastRefresh = useAppStore((s) => s.lastRefresh);
+  const favorites = useAppStore((s) => s.favorites);
+  const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
 
   useEffect(() => {
     if (!meta && !loading) {
@@ -74,7 +86,7 @@ export default function App() {
           <img src="/app-icon.png" alt="" width={36} height={36} />
           <div>
             <strong>Ban Basic Island</strong>
-            <small>MTG Arena companion</small>
+            <small>MTG Arena · v{APP_VERSION}</small>
           </div>
         </div>
         {NAV.map((item) => {
@@ -93,6 +105,20 @@ export default function App() {
             </button>
           );
         })}
+        <button
+          type="button"
+          className="nav-btn"
+          onClick={() => {
+            setShowFavoritesOnly(true);
+            setPage("daily");
+          }}
+        >
+          <IconQueue />
+          My queue
+          {favorites.length > 0 && (
+            <span className="ml-auto text-[10px] text-gold-400">{favorites.length}</span>
+          )}
+        </button>
         <div className="mt-auto pt-4 px-1">
           <p className="text-[10px] text-muted leading-relaxed m-0">
             Not affiliated with Wizards of the Coast.
@@ -105,11 +131,16 @@ export default function App() {
           <div>
             <h1>{pageTitle(page)}</h1>
             <p className="meta-line">
-              {meta
-                ? `Meta ${meta.date} · ${metaSource ?? "—"}`
-                : loading
-                  ? "Loading meta…"
-                  : "No meta loaded"}
+              {meta ? (
+                <>
+                  <span className={`feed-dot ${feedStatus ?? ""}`} />
+                  Meta {meta.date} · {feedLabel(feedStatus)}
+                </>
+              ) : loading ? (
+                "Loading meta…"
+              ) : (
+                "No meta loaded"
+              )}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -127,8 +158,10 @@ export default function App() {
           </div>
         </header>
 
+        <StatusBanners />
+
         {error && (
-          <div className="mx-6 mt-3 px-3 py-2 rounded-lg bg-poor/10 border border-poor/30 text-sm text-poor flex justify-between gap-2">
+          <div className="mx-5 mt-2 px-3 py-2 rounded-lg bg-poor/10 border border-poor/30 text-sm text-poor flex justify-between gap-2">
             <span>{error}</span>
             <button type="button" className="btn btn-ghost btn-sm" onClick={clearError}>
               Dismiss
@@ -144,6 +177,8 @@ export default function App() {
           {page === "settings" && <Settings />}
         </main>
       </div>
+
+      <ResultViewer />
     </div>
   );
 }

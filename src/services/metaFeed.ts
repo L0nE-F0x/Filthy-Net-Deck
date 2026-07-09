@@ -5,6 +5,8 @@ import { normalizeMetaBundle } from "./deckHelpers";
 /** Primary feed URL — override via localStorage `bbi.metaUrl` for testing. */
 export const DEFAULT_META_URL = "https://banbasicisland.netlify.app/meta/latest.json";
 
+export type MetaFetchSource = "network" | "offline" | "cache";
+
 const LOCAL_SEED_PATH = "/meta/latest.json";
 
 function getMetaUrl(): string {
@@ -54,6 +56,6 @@ export async function fetchMetaBundle(): Promise<{
     /* fall through */
   }
 
-  // 3) Built-in seed (always works offline)
+  // 3) Built-in offline pack (always works without network)
   return { bundle: normalizeMetaBundle(seedMeta), from: "seed" };
 }

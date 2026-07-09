@@ -1,5 +1,6 @@
 import { useAppStore } from "../store/useAppStore";
 import type { TournamentPlatform } from "../types/meta";
+import { canShowResultsLink } from "../services/links";
 
 function platformClass(p: TournamentPlatform): string {
   return `platform-chip platform-${p}`;
@@ -11,7 +12,6 @@ function platformLabel(p: TournamentPlatform): string {
   return "Paper";
 }
 
-/** Hide internal/legacy labels from the UI */
 const HIDDEN_SOURCES = new Set(["seed", "spicerack", "placeholder"]);
 
 const SOURCE_LINKS: Record<string, string> = {
@@ -25,23 +25,31 @@ const SOURCE_LINKS: Record<string, string> = {
 export function MetaPulse() {
   const meta = useAppStore((s) => s.meta);
   const openFormat = useAppStore((s) => s.openFormat);
+  const openViewer = useAppStore((s) => s.openViewer);
 
   if (!meta) {
-    return <div className="empty-state loading-pulse">Loading meta pulse…</div>;
+    return (
+      <div className="empty-state">
+        <div className="skel skel-line w-64" style={{ margin: "0 auto" }} />
+        <p className="mt-3 loading-pulse">Loading meta pulse…</p>
+      </div>
+    );
   }
 
   const sources = (meta.sources || []).filter(
     (s) => !HIDDEN_SOURCES.has(s.toLowerCase()),
   );
-  const sorted = [...meta.tournaments].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...meta.tournaments]
+    .filter((t) => canShowResultsLink(t.url))
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
-    <div className="flex flex-col gap-5 max-w-4xl">
+    <div className="flex flex-col gap-4 max-w-4xl">
       <div>
         <p className="eyebrow">Meta pulse</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament intel</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Recent paper, MTGO, and Arena results informing today’s ranked decks. Snapshot as of{" "}
+          Paper, MTGO, and Arena signals. Only verified https links are shown. Snapshot{" "}
           {meta.date}.
         </p>
       </div>
@@ -53,7 +61,12 @@ export function MetaPulse() {
         <div className="flex flex-wrap gap-2">
           {sources.map((s) => {
             const href = SOURCE_LINKS[s.toLowerCase()];
-            const label = s === "mtggoldfish" ? "MTGGoldfish" : s === "untapped" ? "Untapped.gg" : s;
+            const label =
+              s === "mtggoldfish"
+                ? "MTGGoldfish"
+                : s === "untapped"
+                  ? "Untapped.gg"
+                  : s;
             if (href) {
               return (
                 <a
@@ -78,17 +91,14 @@ export function MetaPulse() {
           })}
         </div>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
-          Live daily pipeline pulls public tournament lists from{" "}
-          <strong className="text-foam">MTGGoldfish</strong>, event discovery from{" "}
-          <strong className="text-foam">Melee.gg</strong>, and Arena ladder context via{" "}
-          <strong className="text-foam">Untapped.gg</strong>. Card images via Scryfall. Results
-          buttons open real pages only.
+          Pipeline: MTGGoldfish metagame + events, Melee.gg tournament search, Untapped.gg Arena
+          meta, Scryfall cards. Broken or unknown hosts are hidden automatically.
         </p>
       </section>
 
       <section className="flex flex-col gap-3">
         {sorted.length === 0 && (
-          <div className="empty-state">No tournaments in this feed. Tap Refresh.</div>
+          <div className="empty-state">No verified tournament links in this feed.</div>
         )}
         {sorted.map((t) => (
           <article key={t.id} className="panel">
@@ -117,13 +127,20 @@ export function MetaPulse() {
                     Format
                   </button>
                 )}
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => openViewer(t.url)}
+                >
+                  View in app
+                </button>
                 <a
                   href={t.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-ghost btn-sm"
                 >
-                  Results
+                  Browser
                 </a>
               </div>
             </div>
