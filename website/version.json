@@ -1,5 +1,5 @@
-﻿{
-  "version": "0.7.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.1.exe",
-  "notes": "Fix update check CORS; strip illegal Standard cards (e.g. Monastery Swiftspear); multi-source MTGO/magic.gg assignment fixes."
+{
+  "version": "0.7.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.2.exe",
+  "notes": "UX: Decks format switcher, Events opens browser, Queue nav. Accuracy: color-matched list assignment (no more Dimir lists on 4c Control)."
 }
