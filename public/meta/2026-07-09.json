@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T16:37:55.978Z",
+  "generatedAt": "2026-07-09T16:49:24.821Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -1323,59 +1323,59 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
+      "description": "Current Standard (July 2026) prowess — Slickshot Show-Off, Stormchaser's Talent, Flow State, Eddymurk Crab. No rotated one-drops. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
           "name": "Slickshot Show-Off"
         },
         {
-          "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
           "count": 3,
-          "name": "Stormcatch Mentor"
+          "name": "Eddymurk Crab"
         },
         {
           "count": 2,
-          "name": "Astrologian's Planisphere"
+          "name": "Drake Hatcher"
+        },
+        {
+          "count": 2,
+          "name": "Colorstorm Stallion"
         },
         {
           "count": 4,
-          "name": "Consider"
+          "name": "Stormchaser's Talent"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
           "name": "Opt"
         },
         {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Boomerang Basics"
         },
         {
           "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 2,
           "name": "Flow State"
         },
         {
-          "count": 2,
-          "name": "Into the Flood Maw"
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 2,
-          "name": "This Town Ain't Big Enough"
+          "name": "Wild Ride"
+        },
+        {
+          "count": 2,
+          "name": "Bounce Off"
+        },
+        {
+          "count": 2,
+          "name": "Secret Identity"
         },
         {
           "count": 4,
@@ -1383,27 +1383,23 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 4,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Multiversal Passage"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
-          "name": "Mountain"
-        },
-        {
           "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
+          "name": "Mountain"
         }
       ],
       "sideboard": [],
@@ -1425,7 +1421,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n2 Drake Hatcher\n2 Colorstorm Stallion\n4 Stormchaser's Talent\n4 Sleight of Hand\n4 Opt\n4 Boomerang Basics\n3 Flow State\n4 Burst Lightning\n2 Wild Ride\n2 Bounce Off\n2 Secret Identity\n4 Spirebluff Canal\n4 Steam Vents\n4 Riverpyre Verge\n2 Multiversal Passage\n4 Island\n2 Mountain",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -1458,59 +1454,59 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
+      "description": "Current Standard (July 2026) prowess — Slickshot Show-Off, Stormchaser's Talent, Flow State, Eddymurk Crab. No rotated one-drops. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
           "name": "Slickshot Show-Off"
         },
         {
-          "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
           "count": 3,
-          "name": "Stormcatch Mentor"
+          "name": "Eddymurk Crab"
         },
         {
           "count": 2,
-          "name": "Astrologian's Planisphere"
+          "name": "Drake Hatcher"
+        },
+        {
+          "count": 2,
+          "name": "Colorstorm Stallion"
         },
         {
           "count": 4,
-          "name": "Consider"
+          "name": "Stormchaser's Talent"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
           "name": "Opt"
         },
         {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Boomerang Basics"
         },
         {
           "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 2,
           "name": "Flow State"
         },
         {
-          "count": 2,
-          "name": "Into the Flood Maw"
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 2,
-          "name": "This Town Ain't Big Enough"
+          "name": "Wild Ride"
+        },
+        {
+          "count": 2,
+          "name": "Bounce Off"
+        },
+        {
+          "count": 2,
+          "name": "Secret Identity"
         },
         {
           "count": 4,
@@ -1518,37 +1514,29 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 4,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Multiversal Passage"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
-          "name": "Mountain"
-        },
-        {
           "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
+          "name": "Mountain"
         }
       ],
       "sideboard": [
         {
-          "count": 2,
-          "name": "Negate"
-        },
-        {
-          "count": 2,
-          "name": "Disdainful Stroke"
+          "count": 3,
+          "name": "Spell Pierce"
         },
         {
           "count": 2,
@@ -1556,23 +1544,27 @@
         },
         {
           "count": 2,
-          "name": "Brotherhood's End"
+          "name": "Soul-Guide Lantern"
         },
         {
           "count": 2,
-          "name": "Tishana's Tidebinder"
+          "name": "Get Out"
         },
         {
           "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Slagstorm"
         },
         {
           "count": 2,
-          "name": "Stock Up"
+          "name": "Broadside Barrage"
         },
         {
           "count": 1,
-          "name": "Screaming Nemesis"
+          "name": "Ral, Crackling Wit"
+        },
+        {
+          "count": 1,
+          "name": "Annul"
         }
       ],
       "matchups": [
@@ -1618,7 +1610,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City\n\nSideboard\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Into the Flood Maw\n2 Stock Up\n1 Screaming Nemesis",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n2 Drake Hatcher\n2 Colorstorm Stallion\n4 Stormchaser's Talent\n4 Sleight of Hand\n4 Opt\n4 Boomerang Basics\n3 Flow State\n4 Burst Lightning\n2 Wild Ride\n2 Bounce Off\n2 Secret Identity\n4 Spirebluff Canal\n4 Steam Vents\n4 Riverpyre Verge\n2 Multiversal Passage\n4 Island\n2 Mountain\n\nSideboard\n3 Spell Pierce\n2 Ghost Vacuum\n2 Soul-Guide Lantern\n2 Get Out\n2 Slagstorm\n2 Broadside Barrage\n1 Ral, Crackling Wit\n1 Annul",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -2047,35 +2039,11 @@
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
+      "description": "Namor + Eddymurk Crab + spell density — Standard spells-matter midrange (not legacy prowess one-drops). Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Consider"
-        },
-        {
-          "count": 4,
-          "name": "Opt"
-        },
-        {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 3,
-          "name": "Play with Fire"
-        },
-        {
-          "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up"
+          "name": "Slickshot Show-Off"
         },
         {
           "count": 3,
@@ -2087,15 +2055,47 @@
         },
         {
           "count": 2,
-          "name": "Slickshot Show-Off"
+          "name": "Colorstorm Stallion"
+        },
+        {
+          "count": 4,
+          "name": "Stormchaser's Talent"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Boomerang Basics"
+        },
+        {
+          "count": 3,
+          "name": "Flow State"
+        },
+        {
+          "count": 3,
+          "name": "Burst Lightning"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Wild Ride"
         },
         {
           "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Bounce Off"
+        },
+        {
+          "count": 2,
+          "name": "Secret Identity"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
         },
         {
           "count": 4,
@@ -2103,35 +2103,23 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 4,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Multiversal Passage"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
+          "count": 2,
           "name": "Mountain"
-        },
-        {
-          "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 2,
-          "name": "Starting Town"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
-        },
-        {
-          "count": 2,
-          "name": "Stormcatch Mentor"
         }
       ],
       "sideboard": [],
@@ -2153,7 +2141,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Colorstorm Stallion\n4 Stormchaser's Talent\n4 Sleight of Hand\n4 Opt\n3 Boomerang Basics\n3 Flow State\n3 Burst Lightning\n2 Wild Ride\n2 Bounce Off\n2 Secret Identity\n2 Spell Pierce\n4 Spirebluff Canal\n4 Steam Vents\n4 Riverpyre Verge\n2 Multiversal Passage\n4 Island\n2 Mountain",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -2186,35 +2174,11 @@
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
+      "description": "Namor + Eddymurk Crab + spell density — Standard spells-matter midrange (not legacy prowess one-drops). Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
-          "name": "Consider"
-        },
-        {
-          "count": 4,
-          "name": "Opt"
-        },
-        {
-          "count": 3,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 3,
-          "name": "Play with Fire"
-        },
-        {
-          "count": 3,
-          "name": "Lightning Strike"
-        },
-        {
-          "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up"
+          "name": "Slickshot Show-Off"
         },
         {
           "count": 3,
@@ -2226,15 +2190,47 @@
         },
         {
           "count": 2,
-          "name": "Slickshot Show-Off"
+          "name": "Colorstorm Stallion"
+        },
+        {
+          "count": 4,
+          "name": "Stormchaser's Talent"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Opt"
+        },
+        {
+          "count": 3,
+          "name": "Boomerang Basics"
+        },
+        {
+          "count": 3,
+          "name": "Flow State"
+        },
+        {
+          "count": 3,
+          "name": "Burst Lightning"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Wild Ride"
         },
         {
           "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Bounce Off"
+        },
+        {
+          "count": 2,
+          "name": "Secret Identity"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
         },
         {
           "count": 4,
@@ -2242,69 +2238,57 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
+          "count": 4,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Multiversal Passage"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
+          "count": 2,
           "name": "Mountain"
-        },
-        {
-          "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 2,
-          "name": "Starting Town"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
-        },
-        {
-          "count": 2,
-          "name": "Stormcatch Mentor"
         }
       ],
       "sideboard": [
-        {
-          "count": 2,
-          "name": "Negate"
-        },
         {
           "count": 2,
           "name": "Ghost Vacuum"
         },
         {
           "count": 2,
-          "name": "Brotherhood's End"
+          "name": "Soul-Guide Lantern"
         },
         {
           "count": 2,
-          "name": "Tishana's Tidebinder"
+          "name": "Get Out"
         },
         {
           "count": 2,
-          "name": "Disdainful Stroke"
+          "name": "Slagstorm"
         },
         {
           "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Broadside Barrage"
         },
         {
           "count": 2,
-          "name": "Screaming Nemesis"
+          "name": "Spell Pierce"
+        },
+        {
+          "count": 2,
+          "name": "Annul"
         },
         {
           "count": 1,
-          "name": "Stock Up"
+          "name": "Ral, Crackling Wit"
         }
       ],
       "matchups": [
@@ -2350,7 +2334,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor\n\nSideboard\n2 Negate\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Disdainful Stroke\n2 Into the Flood Maw\n2 Screaming Nemesis\n1 Stock Up",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Colorstorm Stallion\n4 Stormchaser's Talent\n4 Sleight of Hand\n4 Opt\n3 Boomerang Basics\n3 Flow State\n3 Burst Lightning\n2 Wild Ride\n2 Bounce Off\n2 Secret Identity\n2 Spell Pierce\n4 Spirebluff Canal\n4 Steam Vents\n4 Riverpyre Verge\n2 Multiversal Passage\n4 Island\n2 Mountain\n\nSideboard\n2 Ghost Vacuum\n2 Soul-Guide Lantern\n2 Get Out\n2 Slagstorm\n2 Broadside Barrage\n2 Spell Pierce\n2 Annul\n1 Ral, Crackling Wit",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -4548,15 +4532,19 @@
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spell-heavy tempo for digital-only tools. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
+      "description": "Spell-heavy tempo for Alchemy. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
           "name": "Slickshot Show-Off"
         },
         {
+          "count": 3,
+          "name": "Eddymurk Crab"
+        },
+        {
           "count": 4,
-          "name": "Consider"
+          "name": "Stormchaser's Talent"
         },
         {
           "count": 4,
@@ -4564,19 +4552,23 @@
         },
         {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 3,
-          "name": "Lightning Strike"
+          "name": "Boomerang Basics"
         },
         {
           "count": 3,
-          "name": "Stock Up"
+          "name": "Flow State"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Bounce Off"
         },
         {
           "count": 4,
@@ -4584,39 +4576,31 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
+        },
+        {
+          "count": 3,
+          "name": "Riverpyre Verge"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
+          "count": 4,
           "name": "Mountain"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
-        },
-        {
-          "count": 3,
-          "name": "Monastery Swiftspear"
+          "count": 2,
+          "name": "Drake Hatcher"
         },
         {
           "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 3,
-          "name": "Stormcatch Mentor"
+          "name": "Wild Ride"
         },
         {
           "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Spell Pierce"
         }
       ],
       "sideboard": [],
@@ -4638,7 +4622,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Consider\n4 Opt\n4 Play with Fire\n3 Lightning Strike\n3 Stock Up\n2 Three Steps Ahead\n4 Spirebluff Canal\n4 Shivan Reef\n4 Island\n5 Mountain\n3 Restless Spire\n3 Monastery Swiftspear\n2 Torch the Tower\n3 Stormcatch Mentor\n2 Thundering Falls\n2 Into the Flood Maw",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n4 Stormchaser's Talent\n4 Opt\n4 Sleight of Hand\n4 Burst Lightning\n3 Boomerang Basics\n3 Flow State\n2 Bounce Off\n4 Spirebluff Canal\n4 Steam Vents\n3 Riverpyre Verge\n4 Island\n4 Mountain\n2 Drake Hatcher\n2 Wild Ride\n2 Spell Pierce",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -4671,15 +4655,19 @@
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spell-heavy tempo for digital-only tools. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
+      "description": "Spell-heavy tempo for Alchemy. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
           "name": "Slickshot Show-Off"
         },
         {
+          "count": 3,
+          "name": "Eddymurk Crab"
+        },
+        {
           "count": 4,
-          "name": "Consider"
+          "name": "Stormchaser's Talent"
         },
         {
           "count": 4,
@@ -4687,19 +4675,23 @@
         },
         {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 3,
-          "name": "Lightning Strike"
+          "name": "Boomerang Basics"
         },
         {
           "count": 3,
-          "name": "Stock Up"
+          "name": "Flow State"
         },
         {
           "count": 2,
-          "name": "Three Steps Ahead"
+          "name": "Bounce Off"
         },
         {
           "count": 4,
@@ -4707,39 +4699,31 @@
         },
         {
           "count": 4,
-          "name": "Shivan Reef"
+          "name": "Steam Vents"
+        },
+        {
+          "count": 3,
+          "name": "Riverpyre Verge"
         },
         {
           "count": 4,
           "name": "Island"
         },
         {
-          "count": 5,
+          "count": 4,
           "name": "Mountain"
         },
         {
-          "count": 3,
-          "name": "Restless Spire"
-        },
-        {
-          "count": 3,
-          "name": "Monastery Swiftspear"
+          "count": 2,
+          "name": "Drake Hatcher"
         },
         {
           "count": 2,
-          "name": "Torch the Tower"
-        },
-        {
-          "count": 3,
-          "name": "Stormcatch Mentor"
+          "name": "Wild Ride"
         },
         {
           "count": 2,
-          "name": "Thundering Falls"
-        },
-        {
-          "count": 2,
-          "name": "Into the Flood Maw"
+          "name": "Spell Pierce"
         }
       ],
       "sideboard": [],
@@ -4786,7 +4770,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Consider\n4 Opt\n4 Play with Fire\n3 Lightning Strike\n3 Stock Up\n2 Three Steps Ahead\n4 Spirebluff Canal\n4 Shivan Reef\n4 Island\n5 Mountain\n3 Restless Spire\n3 Monastery Swiftspear\n2 Torch the Tower\n3 Stormcatch Mentor\n2 Thundering Falls\n2 Into the Flood Maw",
+      "arenaImport": "Deck\n4 Slickshot Show-Off\n3 Eddymurk Crab\n4 Stormchaser's Talent\n4 Opt\n4 Sleight of Hand\n4 Burst Lightning\n3 Boomerang Basics\n3 Flow State\n2 Bounce Off\n4 Spirebluff Canal\n4 Steam Vents\n3 Riverpyre Verge\n4 Island\n4 Mountain\n2 Drake Hatcher\n2 Wild Ride\n2 Spell Pierce",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -5101,10 +5085,6 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
-          "count": 4,
           "name": "Heartfire Hero"
         },
         {
@@ -5113,7 +5093,11 @@
         },
         {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Emberheart Challenger"
+        },
+        {
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 4,
@@ -5121,7 +5105,7 @@
         },
         {
           "count": 3,
-          "name": "Burst Lightning"
+          "name": "Screaming Nemesis"
         },
         {
           "count": 20,
@@ -5129,15 +5113,7 @@
         },
         {
           "count": 4,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 4,
           "name": "Rockface Village"
-        },
-        {
-          "count": 3,
-          "name": "Screaming Nemesis"
         },
         {
           "count": 3,
@@ -5146,6 +5122,14 @@
         {
           "count": 3,
           "name": "Den of the Bugbear"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Wild Ride"
         }
       ],
       "sideboard": [],
@@ -5167,7 +5151,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Monastery Swiftspear\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Play with Fire\n4 Lightning Strike\n3 Burst Lightning\n20 Mountain\n4 Emberheart Challenger\n4 Rockface Village\n3 Screaming Nemesis\n3 Witchstalker Frenzy\n3 Den of the Bugbear",
+      "arenaImport": "Deck\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Emberheart Challenger\n4 Burst Lightning\n4 Lightning Strike\n3 Screaming Nemesis\n20 Mountain\n4 Rockface Village\n3 Witchstalker Frenzy\n3 Den of the Bugbear\n3 Sleight of Hand\n4 Wild Ride",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -5203,10 +5187,6 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Monastery Swiftspear"
-        },
-        {
-          "count": 4,
           "name": "Heartfire Hero"
         },
         {
@@ -5215,7 +5195,11 @@
         },
         {
           "count": 4,
-          "name": "Play with Fire"
+          "name": "Emberheart Challenger"
+        },
+        {
+          "count": 4,
+          "name": "Burst Lightning"
         },
         {
           "count": 4,
@@ -5223,7 +5207,7 @@
         },
         {
           "count": 3,
-          "name": "Burst Lightning"
+          "name": "Screaming Nemesis"
         },
         {
           "count": 20,
@@ -5231,15 +5215,7 @@
         },
         {
           "count": 4,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 4,
           "name": "Rockface Village"
-        },
-        {
-          "count": 3,
-          "name": "Screaming Nemesis"
         },
         {
           "count": 3,
@@ -5248,6 +5224,14 @@
         {
           "count": 3,
           "name": "Den of the Bugbear"
+        },
+        {
+          "count": 3,
+          "name": "Sleight of Hand"
+        },
+        {
+          "count": 4,
+          "name": "Wild Ride"
         }
       ],
       "sideboard": [],
@@ -5294,7 +5278,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Monastery Swiftspear\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Play with Fire\n4 Lightning Strike\n3 Burst Lightning\n20 Mountain\n4 Emberheart Challenger\n4 Rockface Village\n3 Screaming Nemesis\n3 Witchstalker Frenzy\n3 Den of the Bugbear",
+      "arenaImport": "Deck\n4 Heartfire Hero\n4 Slickshot Show-Off\n4 Emberheart Challenger\n4 Burst Lightning\n4 Lightning Strike\n3 Screaming Nemesis\n20 Mountain\n4 Rockface Village\n3 Witchstalker Frenzy\n3 Den of the Bugbear\n3 Sleight of Hand\n4 Wild Ride",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -19757,6 +19741,6 @@
     "melee",
     "scryfall"
   ],
-  "version": "0.6.0",
+  "version": "0.6.1",
   "decksPerFormat": 8
 }
