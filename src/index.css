@@ -609,6 +609,43 @@ select,
   100% { background-position: -100% 0; }
 }
 
+.format-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.format-chip {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 80%, transparent);
+  color: var(--color-foam, #e8ebe0);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.format-chip:hover {
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+}
+.format-chip.active {
+  background: color-mix(in srgb, #b8f000 18%, transparent);
+  border-color: color-mix(in srgb, #b8f000 55%, transparent);
+  color: #b8f000;
+}
+.badge-verified {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #3dd68c 18%, transparent);
+  color: #3dd68c;
+  border: 1px solid color-mix(in srgb, #3dd68c 35%, transparent);
+}
 .filter-bar {
   display: flex;
   flex-wrap: wrap;

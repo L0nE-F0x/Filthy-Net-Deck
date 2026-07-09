@@ -131,7 +131,7 @@ export function StatusBanners() {
       body: (
         <>
           <strong>Meta moved</strong> — {n} format/mode change{n === 1 ? "" : "s"} since{" "}
-          {metaDiff.previousDate}. See Daily → Meta movement.
+          {metaDiff.previousDate}. See Decks for movement notes.
         </>
       ),
     });

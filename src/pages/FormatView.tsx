@@ -1,5 +1,4 @@
 import { useAppStore } from "../store/useAppStore";
-import { BoModeToggle } from "../components/BoModeToggle";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { IconBack, IconStar } from "../components/NavIcons";
@@ -12,31 +11,27 @@ import {
 } from "../components/MetaCharts";
 import { decksForMode } from "../services/deckHelpers";
 import { canShowResultsLink } from "../services/links";
+import { openExternal } from "../services/openExternal";
 
 export function FormatView() {
   const meta = useAppStore((s) => s.meta);
   const mode = useAppStore((s) => s.mode);
-  const setMode = useAppStore((s) => s.setMode);
   const formatId = useAppStore((s) => s.selectedFormatId);
   const setPage = useAppStore((s) => s.setPage);
   const openDeck = useAppStore((s) => s.openDeck);
   const favorites = useAppStore((s) => s.favorites);
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
-  const openViewer = useAppStore((s) => s.openViewer);
 
   const fmt = meta?.formats.find((f) => f.id === formatId);
   if (!meta || !fmt) {
     return (
       <div className="empty-state">
         <p>Format not found{formatId ? ` (${formatId})` : ""}.</p>
-        <p className="text-xs text-muted">
-          The Format button needs a known constructed id (e.g. standard).
-        </p>
         <button type="button" className="btn btn-ghost mt-3" onClick={() => setPage("daily")}>
-          Back to Daily
+          Back to Decks
         </button>
         <button type="button" className="btn btn-ghost mt-2" onClick={() => setPage("meta")}>
-          Back to Meta Pulse
+          Back to Events
         </button>
       </div>
     );
@@ -57,17 +52,16 @@ export function FormatView() {
         <div>
           <div className="flex flex-wrap gap-2 mb-2">
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("daily")}>
-              <IconBack className="w-4 h-4" /> Daily
+              <IconBack className="w-4 h-4" /> Decks
             </button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("meta")}>
-              Meta Pulse
+              Events
             </button>
           </div>
           <p className="eyebrow">{fmt.featured ? "Featured format" : "Constructed"}</p>
           <h2 className="text-2xl font-semibold m-0 tracking-tight">{fmt.name}</h2>
           <p className="text-sm text-muted mt-2 mb-0 leading-relaxed max-w-2xl">{fmt.metaNotes}</p>
         </div>
-        <BoModeToggle mode={mode} onChange={setMode} />
       </div>
 
       {hero && (
@@ -212,23 +206,13 @@ export function FormatView() {
                     {t.source ? ` · ${t.source}` : ""}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => openViewer(t.url)}
-                  >
-                    View
-                  </button>
-                  <a
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-ghost btn-sm"
-                  >
-                    Browser
-                  </a>
-                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => void openExternal(t.url)}
+                >
+                  Open
+                </button>
               </li>
             ))}
           </ul>

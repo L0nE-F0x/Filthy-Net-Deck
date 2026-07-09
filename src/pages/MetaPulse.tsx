@@ -2,13 +2,14 @@ import { useAppStore } from "../store/useAppStore";
 import type { TournamentPlatform } from "../types/meta";
 import { canShowResultsLink } from "../services/links";
 import { resolveFormatId } from "../services/formatResolve";
+import { openExternal } from "../services/openExternal";
 
 function platformClass(p: TournamentPlatform): string {
   return `platform-chip platform-${p}`;
 }
 
 function platformLabel(p: TournamentPlatform): string {
-  if (p === "mtga") return "MTGA";
+  if (p === "mtga") return "Arena";
   if (p === "mtgo") return "MTGO";
   return "Paper";
 }
@@ -27,14 +28,14 @@ const SOURCE_LINKS: Record<string, string> = {
 
 export function MetaPulse() {
   const meta = useAppStore((s) => s.meta);
-  const openFormat = useAppStore((s) => s.openFormat);
-  const openViewer = useAppStore((s) => s.openViewer);
+  const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
+  const setPage = useAppStore((s) => s.setPage);
 
   if (!meta) {
     return (
       <div className="empty-state">
         <div className="skel skel-line w-64" style={{ margin: "0 auto" }} />
-        <p className="mt-3 loading-pulse">Loading meta pulse…</p>
+        <p className="mt-3 loading-pulse">Loading events…</p>
       </div>
     );
   }
@@ -49,11 +50,11 @@ export function MetaPulse() {
   return (
     <div className="flex flex-col gap-4 max-w-4xl">
       <div>
-        <p className="eyebrow">Meta pulse</p>
-        <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament intel</h2>
+        <p className="eyebrow">Events</p>
+        <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament results</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Paper, MTGO, and Arena signals. <strong className="text-foam">Format</strong> opens that
-          format’s 8-deck dashboard. Snapshot {meta.date}.
+          Recent paper, MTGO, and Arena events. <strong className="text-foam">Open</strong> loads
+          the official page in your browser. Snapshot {meta.date}.
         </p>
       </div>
 
@@ -76,15 +77,14 @@ export function MetaPulse() {
                       : s;
             if (href) {
               return (
-                <a
+                <button
                   key={s}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs px-2.5 py-1 rounded-lg bg-ink-800 border border-ink-600/50 capitalize hover:border-gold-500/40 text-foam no-underline"
+                  type="button"
+                  className="text-xs px-2.5 py-1 rounded-lg bg-ink-800 border border-ink-600/50 capitalize hover:border-gold-500/40 text-foam cursor-pointer"
+                  onClick={() => void openExternal(href)}
                 >
                   {label}
-                </a>
+                </button>
               );
             }
             return (
@@ -128,30 +128,21 @@ export function MetaPulse() {
                     <button
                       type="button"
                       className="btn btn-ghost btn-sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openFormat(fid);
+                      onClick={() => {
+                        setDailyFormatId(fid);
+                        setPage("daily");
                       }}
                     >
-                      Format
+                      See decks
                     </button>
                   )}
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
-                    onClick={() => openViewer(t.url)}
+                    onClick={() => void openExternal(t.url)}
                   >
-                    View in app
+                    Open
                   </button>
-                  <a
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-ghost btn-sm"
-                  >
-                    Browser
-                  </a>
                 </div>
               </div>
               {t.notes && <p className="text-sm text-muted m-0 mb-3 leading-relaxed">{t.notes}</p>}

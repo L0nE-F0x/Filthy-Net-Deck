@@ -60,6 +60,8 @@ interface AppState {
   page: Page;
   mode: PlayMode;
   selectedFormatId: FormatId | null;
+  /** Format shown on the Decks (Daily) home hero/list */
+  dailyFormatId: FormatId | null;
   selectedDeckId: string | null;
   meta: MetaBundle | null;
   metaSource: "network" | "seed" | "cache" | null;
@@ -79,10 +81,10 @@ interface AppState {
     downloadUrl?: string;
     notes?: string;
   } | null;
-  viewerUrl: string | null;
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
+  setDailyFormatId: (id: FormatId | null) => void;
   openFormat: (id: FormatId | string) => void;
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
@@ -97,8 +99,6 @@ interface AppState {
   setShowFavoritesOnly: (v: boolean) => void;
   checkForUpdates: () => Promise<VersionCheckResult>;
   dismissUpdate: () => void;
-  openViewer: (url: string) => void;
-  closeViewer: () => void;
 }
 
 function mapFeedStatus(from: "network" | "seed" | "cache"): FeedStatus {
@@ -113,6 +113,7 @@ export const useAppStore = create<AppState>((set, get) => {
     page: "daily",
     mode: prefs.defaultMode,
     selectedFormatId: null,
+    dailyFormatId: null,
     selectedDeckId: null,
     meta: null,
     metaSource: null,
@@ -128,14 +129,15 @@ export const useAppStore = create<AppState>((set, get) => {
     showFavoritesOnly: false,
     metaDiff: { previousDate: null, changes: [] },
     updateAvailable: null,
-    viewerUrl: null,
 
-    setPage: (page) => set({ page, ...(page === "daily" ? {} : {}) }),
+    setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
+    setDailyFormatId: (dailyFormatId) => set({ dailyFormatId }),
     openFormat: (id) => {
       const resolved = resolveFormatId(String(id)) ?? (id as FormatId);
       set({
         selectedFormatId: resolved,
+        dailyFormatId: resolved,
         page: "format",
         selectedDeckId: null,
         showFavoritesOnly: false,
@@ -169,9 +171,6 @@ export const useAppStore = create<AppState>((set, get) => {
     setFilterTier: (filterTier) => set({ filterTier }),
     setFilterColor: (filterColor) => set({ filterColor }),
     setShowFavoritesOnly: (showFavoritesOnly) => set({ showFavoritesOnly }),
-
-    openViewer: (url) => set({ viewerUrl: url }),
-    closeViewer: () => set({ viewerUrl: null }),
 
     checkForUpdates: async () => {
       const result = await checkRemoteVersion();

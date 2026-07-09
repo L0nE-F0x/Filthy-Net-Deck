@@ -1,11 +1,13 @@
 /**
  * Merge authoritative lists from multiple sources onto the meta bundle.
- * Priority: magic.gg > mtgo > goldfish export > melee (if lists) > keep fallback tagged.
+ * Priority: mtgo > goldfish export > magic.gg > melee > fallback.
  */
 import { applyListToDeck, fuzzyArchetype } from "./common.mjs";
+import {
+  colorCompatibility,
+  inferColorsFromCards,
+} from "./archetypeGuess.mjs";
 
-// MTGO embedded JSON is the most reliable full-list source.
-// magic.gg HTML parsing is secondary (can mis-split card names).
 const SOURCE_PRIORITY = {
   mtgo: 100,
   mtggoldfish: 90,
@@ -22,7 +24,6 @@ export function isSaneList(list) {
   for (const c of list.mainboard) {
     const name = String(c.name || "").trim();
     if (!name || name.length < 2) return false;
-    // Parser bug: "Thornspire Verge 4 Stomping Ground 4 Forest…"
     if (name.length > 45) return false;
     if (/\s\d{1,2}\s+[A-Z]/.test(name)) return false;
     if ((name.match(/\s/g) || []).length > 7) return false;
@@ -45,9 +46,19 @@ export function mergeTournamentFeeds(bundle, feeds) {
   return bundle;
 }
 
+function nameScore(deck, list) {
+  if (!list.name) return 0;
+  // Ignore weak generic MTGO placeholders
+  if (/^mtgo deck/i.test(list.name)) return 0;
+  return Math.max(
+    fuzzyArchetype(deck.name, list.name),
+    fuzzyArchetype(deck.archetype || "", list.name),
+  );
+}
+
 /**
- * Assign free lists onto matching decks by archetype name + format.
- * Only overwrites if new source has higher priority OR current is fallback.
+ * Assign free lists onto matching decks by archetype name + format + colors.
+ * Never overwrites a good seed with a poorly matched "authoritative" list.
  */
 export function assignListsToBundle(bundle, lists) {
   let applied = 0;
@@ -64,7 +75,6 @@ export function assignListsToBundle(bundle, lists) {
 
     for (const modeKey of ["bo1DeckIds", "bo3DeckIds"]) {
       const ids = fmt[modeKey] || [];
-      // unused lists pool copy
       const available = [...pool];
 
       for (const id of ids) {
@@ -74,31 +84,38 @@ export function assignListsToBundle(bundle, lists) {
         const curPri =
           deck.listQuality === "authoritative"
             ? SOURCE_PRIORITY[deck.sources?.[0]?.name?.toLowerCase?.()] ||
-              (deck.listNote?.includes("magic.gg")
+              (deck.listNote?.includes("MTGO")
                 ? 100
-                : deck.listNote?.includes("MTGO")
+                : deck.listNote?.includes("Goldfish")
                   ? 90
-                  : deck.listNote?.includes("Goldfish")
-                    ? 80
+                  : deck.listNote?.includes("magic.gg")
+                    ? 70
                     : 50)
             : 0;
 
-        // Best fuzzy match remaining list
         let best = null;
         let bestScore = 0;
         let bestIdx = -1;
+
         for (let i = 0; i < available.length; i++) {
           const L = available[i];
           if (!isSaneList(L)) continue;
-          // Name match if list has a name, else weak first-fit
-          const score = L.name
-            ? Math.max(
-                fuzzyArchetype(deck.name, L.name),
-                fuzzyArchetype(deck.archetype || "", L.name),
-              )
-            : 0.25;
+
+          const nScore = nameScore(deck, L);
+          const listColors =
+            L.colors || inferColorsFromCards(L.mainboard || []);
+          const cScore = colorCompatibility(deck.colors || [], listColors);
+
+          // Hard reject color mismatch (e.g. UB Dimir on 4c Control)
+          if (cScore < 0.4) continue;
+          // Require real name match for named lists
+          if (L.name && nScore < 0.55) continue;
+          // Unnamed lists only if colors fit well
+          if (!L.name && cScore < 0.7) continue;
+
           const pri = SOURCE_PRIORITY[L.source] || 10;
-          const combined = score * 10 + pri * 0.01;
+          // Name dominates; colors break ties; source is a light boost
+          const combined = nScore * 10 + cScore * 3 + pri * 0.01;
           if (combined > bestScore) {
             bestScore = combined;
             best = L;
@@ -108,10 +125,9 @@ export function assignListsToBundle(bundle, lists) {
 
         if (!best) continue;
         const pri = SOURCE_PRIORITY[best.source] || 10;
-        if (deck.listQuality === "authoritative" && pri <= curPri && bestScore < 0.85)
+        // Don't replace a better/equal authoritative list with a weak match
+        if (deck.listQuality === "authoritative" && pri <= curPri && bestScore < 8)
           continue;
-        // Require a real name match — never slap random MTGO lists onto wrong shells
-        if (best.name && bestScore < 0.45) continue;
 
         if (
           applyListToDeck(deck, best, {
@@ -125,25 +141,7 @@ export function assignListsToBundle(bundle, lists) {
           available.splice(bestIdx, 1);
         }
       }
-
-      // Second pass: only assign leftover lists with no archetype name (anonymous blocks)
-      for (const id of ids) {
-        const deck = bundle.decks[id];
-        if (!deck || deck.listQuality === "authoritative") continue;
-        let nextIdx = available.findIndex((L) => isSaneList(L) && !L.name);
-        if (nextIdx < 0) break;
-        const next = available.splice(nextIdx, 1)[0];
-        if (
-          applyListToDeck(deck, next, {
-            source: next.source,
-            sourceLabel: next.sourceLabel || next.source,
-            url: next.url,
-            note: `${next.note || next.source} · assigned by rank order`,
-          })
-        ) {
-          applied++;
-        }
-      }
+      // No anonymous first-fit pass — better to keep seed than wrong 60.
     }
   }
 

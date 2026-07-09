@@ -7,7 +7,6 @@ import { MetaPulse } from "./pages/MetaPulse";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { StatusBanners } from "./components/StatusBanners";
-import { ResultViewer } from "./components/ResultViewer";
 import { IconDaily, IconMeta, IconSettings, IconQueue } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
@@ -17,21 +16,22 @@ const NAV: {
   label: string;
   icon: (p: { className?: string }) => ReactNode;
 }[] = [
-  { id: "daily", label: "Daily", icon: IconDaily },
-  { id: "meta", label: "Meta Pulse", icon: IconMeta },
+  { id: "daily", label: "Decks", icon: IconDaily },
+  { id: "meta", label: "Events", icon: IconMeta },
   { id: "settings", label: "Settings", icon: IconSettings },
 ];
 
-function pageTitle(page: Page): string {
+function pageTitle(page: Page, queueMode: boolean): string {
+  if (page === "daily" && queueMode) return "Queue";
   switch (page) {
     case "daily":
-      return "Daily decks";
+      return "Decks";
     case "format":
       return "Format";
     case "deck":
       return "Deck";
     case "meta":
-      return "Meta Pulse";
+      return "Events";
     case "settings":
       return "Settings";
     default:
@@ -59,15 +59,14 @@ export default function App() {
   const feedStatus = useAppStore((s) => s.feedStatus);
   const lastRefresh = useAppStore((s) => s.lastRefresh);
   const favorites = useAppStore((s) => s.favorites);
+  const showFavoritesOnly = useAppStore((s) => s.showFavoritesOnly);
   const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
-
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
 
   useEffect(() => {
     if (!meta && !loading) {
       void refreshMeta();
     } else {
-      // Still check app version even if meta already loaded
       void checkForUpdates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,14 +95,19 @@ export default function App() {
         </div>
         {NAV.map((item) => {
           const active =
-            page === item.id ||
-            (item.id === "daily" && (page === "format" || page === "deck"));
+            (item.id === "daily" &&
+              (page === "daily" || page === "format" || page === "deck") &&
+              !showFavoritesOnly) ||
+            (item.id !== "daily" && page === item.id);
           return (
             <button
               key={item.id}
               type="button"
               className={`nav-btn${active ? " active" : ""}`}
-              onClick={() => setPage(item.id)}
+              onClick={() => {
+                if (item.id === "daily") setShowFavoritesOnly(false);
+                setPage(item.id);
+              }}
             >
               <item.icon />
               {item.label}
@@ -112,14 +116,14 @@ export default function App() {
         })}
         <button
           type="button"
-          className="nav-btn"
+          className={`nav-btn${page === "daily" && showFavoritesOnly ? " active" : ""}`}
           onClick={() => {
             setShowFavoritesOnly(true);
             setPage("daily");
           }}
         >
           <IconQueue />
-          My queue
+          Queue
           {favorites.length > 0 && (
             <span className="ml-auto text-[10px] text-gold-400">{favorites.length}</span>
           )}
@@ -134,7 +138,7 @@ export default function App() {
       <div className="main-pane">
         <header className="topbar">
           <div>
-            <h1>{pageTitle(page)}</h1>
+            <h1>{pageTitle(page, showFavoritesOnly)}</h1>
             <p className="meta-line">
               {meta ? (
                 <>
@@ -182,8 +186,6 @@ export default function App() {
           {page === "settings" && <Settings />}
         </main>
       </div>
-
-      <ResultViewer />
     </div>
   );
 }

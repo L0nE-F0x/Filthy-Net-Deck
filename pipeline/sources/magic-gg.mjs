@@ -3,6 +3,7 @@
  * https://magic.gg/decklists
  */
 import { getText, sleep } from "./common.mjs";
+import { guessArchetype, inferColorsFromCards } from "./archetypeGuess.mjs";
 
 function mapFormatFromSlug(slug = "") {
   if (/historic/i.test(slug)) return "historic";
@@ -120,16 +121,21 @@ export async function fetchMagicGgArticleDecks(articleUrl, format = "standard") 
       finalizeDeck(cur, decks);
     }
 
-    return decks.slice(0, 32).map((d, i) => ({
-      ...d,
-      name: guessMagicGgName(d.mainboard, i),
-      source: "magic.gg",
-      sourceLabel: "magic.gg official",
-      url: articleUrl,
-      note: `magic.gg ranked/official post · list #${i + 1}`,
-      format,
-      listQuality: "authoritative",
-    }));
+    return decks.slice(0, 32).map((d, i) => {
+      const colors = inferColorsFromCards(d.mainboard);
+      const name = guessArchetype(d.mainboard) || undefined;
+      return {
+        ...d,
+        name,
+        colors,
+        source: "magic.gg",
+        sourceLabel: "magic.gg official",
+        url: articleUrl,
+        note: `magic.gg ranked/official post · list #${i + 1}${name ? ` · ${name}` : ""}`,
+        format,
+        listQuality: "authoritative",
+      };
+    });
   } catch (e) {
     console.warn("[magic.gg]", e.message);
     return [];
@@ -141,27 +147,6 @@ function finalizeDeck(cur, decks) {
   if (mainN >= 55 && mainN <= 70) {
     decks.push({ mainboard: [...cur], sideboard: [], mainCount: mainN });
   }
-}
-
-function guessMagicGgName(mainboard = [], i = 0) {
-  const names = mainboard.map((c) => c.name.toLowerCase()).join(" | ");
-  const has = (re) => re.test(names);
-  if (has(/badgermole|brightglass|ouroboroid/)) return "Selesnya Ouroboroid";
-  if (has(/fear of missing out|cori-steel|emberheart/) && has(/island|steam|spirebluff|riverpyre/))
-    return "Izzet Prowess";
-  if (has(/stock up|temporary lockdown|day of judgment|sunfall|beza/))
-    return "Azorius Control";
-  if (has(/accumulate wisdom|tablet of discovery|jeskai revelation/))
-    return "Jeskai Lessons";
-  if (has(/kaito|enduring curiosity/) && has(/swamp|island|watery|gloomlake/))
-    return "Dimir Midrange";
-  if (has(/domain|up the beanstalk|herd migration|leyline binding/))
-    return "Domain";
-  if (has(/monstrous rage|slickshot/) && !has(/island/)) return "Mono-Red Aggro";
-  if (has(/bushwhack|overprotect|questing druid|llanowar/)) return "Mono-Green";
-  if (has(/patchwork beastie|wildfire wickerfolk|break out|tersa/))
-    return "Gruul Aggro";
-  return `magic.gg Standard #${i + 1}`;
 }
 
 export async function collectMagicGgLists() {

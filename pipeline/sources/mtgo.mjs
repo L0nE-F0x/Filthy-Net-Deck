@@ -7,6 +7,7 @@
  *   window.MTGO.decklists.data = { decklists: [ { player, main_deck: [...] } ] }
  */
 import { getText, sleep } from "./common.mjs";
+import { guessArchetype, inferColorsFromCards } from "./archetypeGuess.mjs";
 
 function mapMtgoFormat(slugOrFormat = "") {
   const s = String(slugOrFormat).toLowerCase();
@@ -155,43 +156,6 @@ function cardsFromMainDeck(mainDeck = []) {
   return { mainboard, sideboard, mainCount };
 }
 
-/** Heuristic archetype label from card names */
-function guessArchetype(mainboard = []) {
-  const names = mainboard.map((c) => c.name.toLowerCase()).join(" | ");
-  const has = (re) => re.test(names);
-  if (has(/badgermole|brightglass|ouroboroid|practiced offense/))
-    return "Selesnya Ouroboroid";
-  if (has(/fear of missing out|cori-steel cutter|monastery|prowess|emberheart/) && has(/island|steam vents|spirebluff|riverpyre/))
-    return "Izzet Prowess";
-  if (has(/stock up|temporary lockdown|beza|fountainport|day of judgment|sunfall/))
-    return "Azorius Control";
-  if (has(/accumulate wisdom|jeskai revelation|tablet of discovery|deep-cavern bat/) && has(/island|mountain|plains/))
-    return "Jeskai Lessons";
-  if (has(/kaito|enduring curiosity|shoal|tin street|ghost vacuum/) && has(/swamp|island/))
-    return "Dimir Midrange";
-  if (has(/domain|up the beanstalk|herd migration|leyline binding|atraxa/))
-    return "Domain";
-  if (has(/monstrous rage|slickshot|emberheart|scorching shot/) && !has(/island/))
-    return "Mono-Red Aggro";
-  if (has(/scavenging ooze|llanowar|questing druid|bushwhack|overprotect/))
-    return "Mono-Green";
-  if (has(/reanimator|zombify|valgavoth|atractodea|pitiless carnage/))
-    return "Reanimator";
-  if (has(/omniscience|show and tell|abuelo/)) return "Omniscience";
-  // color pair fallback
-  const colors = new Set();
-  for (const c of mainboard) {
-    // rough land signals
-    const n = c.name.toLowerCase();
-    if (/plains|sacred foundry|hallowed|floodfarm|starting town/.test(n)) colors.add("W");
-    if (/island|steam vents|spirebluff|gloomlake|floodfarm/.test(n)) colors.add("U");
-    if (/swamp|watery grave|shadowy|underground|bleachbone/.test(n)) colors.add("B");
-    if (/mountain|steam vents|blood crypt|thundering|starting town/.test(n)) colors.add("R");
-    if (/forest|overgrown|breeding pool|botanical|lush portico/.test(n)) colors.add("G");
-  }
-  return `MTGO deck (${[...colors].join("") || "??"})`;
-}
-
 /**
  * Fetch one MTGO event and return structured decks from embedded JSON.
  */
@@ -200,7 +164,6 @@ export async function fetchMtgoEventDecks(eventUrl, format = "standard") {
     const html = await getText(eventUrl);
     const data = parseMtgoDecklistsData(html);
     if (!data?.decklists?.length) {
-      // Fallback: old regex packing (rarely works on JS shells)
       console.warn("[mtgo] no embedded decklists JSON for", eventUrl);
       return [];
     }
@@ -211,18 +174,21 @@ export async function fetchMtgoEventDecks(eventUrl, format = "standard") {
     for (const d of data.decklists) {
       const parsed = cardsFromMainDeck(d.main_deck || d.mainboard || []);
       if (parsed.mainCount < 50 || parsed.mainCount > 110) continue;
+      const colors = inferColorsFromCards(parsed.mainboard);
       const name =
         d.archetype ||
         d.deck_name ||
-        guessArchetype(parsed.mainboard);
+        guessArchetype(parsed.mainboard) ||
+        undefined;
       decks.push({
         ...parsed,
         name,
+        colors,
         player: d.player || d.loginid || undefined,
         source: "mtgo",
         sourceLabel: "MTGO official",
         url: eventUrl,
-        note: `MTGO ${eventName}${d.player ? ` · ${d.player}` : ""}`,
+        note: `MTGO ${eventName}${d.player ? ` · ${d.player}` : ""}${name ? ` · ${name}` : ""}`,
         format: format || mapMtgoFormat(data.format || eventUrl),
         listQuality: "authoritative",
       });

@@ -1,12 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { BoModeToggle } from "../components/BoModeToggle";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { IconStar } from "../components/NavIcons";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
-import type { Deck, FormatMeta, ManaColor } from "../types/meta";
+import type { Deck, FormatId, ManaColor } from "../types/meta";
 
 function filterDecks(
   decks: Deck[],
@@ -58,7 +57,7 @@ function DeckMiniCard({
           <button
             type="button"
             className={`star-btn${fav ? " on" : ""}`}
-            aria-label={fav ? "Remove from my queue" : "Add to my queue"}
+            aria-label={fav ? "Remove from queue" : "Add to queue"}
             onClick={(e) => {
               e.stopPropagation();
               onToggleFav();
@@ -81,70 +80,9 @@ function DeckMiniCard({
   );
 }
 
-function FormatDeckStrip({
-  fmt,
-  decks,
-  mode,
-  onOpenDeck,
-  onOpenFormat,
-  compact,
-}: {
-  fmt: FormatMeta;
-  decks: Deck[];
-  mode: "bo1" | "bo3";
-  onOpenDeck: (id: string) => void;
-  onOpenFormat: () => void;
-  compact?: boolean;
-}) {
-  const favorites = useAppStore((s) => s.favorites);
-  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
-  if (!decks.length) return null;
-  return (
-    <section className={compact ? "panel" : "panel panel-hero"}>
-      <div
-        className={`relative z-10 flex flex-wrap items-start justify-between gap-3 ${compact ? "mb-3" : "mb-4"}`}
-      >
-        <div>
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span
-              className={`text-xs font-bold tracking-widest uppercase ${
-                fmt.featured ? "text-gold-400" : "text-azure-300"
-              }`}
-            >
-              {fmt.featured ? "Featured · " : ""}
-              {fmt.name}
-            </span>
-            <span className="text-xs text-muted">
-              {mode.toUpperCase()} · {decks.length} decks
-            </span>
-          </div>
-          {!compact && (
-            <p className="text-sm text-muted m-0 max-w-2xl leading-relaxed">{fmt.metaNotes}</p>
-          )}
-        </div>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onOpenFormat}>
-          Full format view
-        </button>
-      </div>
-      <div className="relative z-10 format-grid">
-        {decks.map((d) => (
-          <DeckMiniCard
-            key={d.id}
-            d={d}
-            fav={favorites.includes(d.id)}
-            onOpen={() => onOpenDeck(d.id)}
-            onToggleFav={() => toggleFavorite(d.id)}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 export function Daily() {
   const meta = useAppStore((s) => s.meta);
   const mode = useAppStore((s) => s.mode);
-  const setMode = useAppStore((s) => s.setMode);
   const openFormat = useAppStore((s) => s.openFormat);
   const openDeck = useAppStore((s) => s.openDeck);
   const searchQuery = useAppStore((s) => s.searchQuery);
@@ -157,9 +95,21 @@ export function Daily() {
   const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
   const favorites = useAppStore((s) => s.favorites);
   const metaDiff = useAppStore((s) => s.metaDiff);
+  const dailyFormatId = useAppStore((s) => s.dailyFormatId);
+  const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
 
-  const standard = meta?.formats.find((f) => f.featured) ?? meta?.formats[0];
-  const rest = meta?.formats.filter((f) => f.id !== standard?.id) ?? [];
+  // Default to featured Standard when meta loads
+  useEffect(() => {
+    if (!meta?.formats?.length) return;
+    if (dailyFormatId && meta.formats.some((f) => f.id === dailyFormatId)) return;
+    const featured = meta.formats.find((f) => f.featured) ?? meta.formats[0];
+    setDailyFormatId(featured.id as FormatId);
+  }, [meta, dailyFormatId, setDailyFormatId]);
+
+  const activeFmt =
+    meta?.formats.find((f) => f.id === dailyFormatId) ??
+    meta?.formats.find((f) => f.featured) ??
+    meta?.formats[0];
 
   const filterOpts = useMemo(
     () => ({
@@ -182,9 +132,9 @@ export function Daily() {
     );
   }
 
-  const standardDecks = standard
+  const activeDecks = activeFmt
     ? filterDecks(
-        decksForMode(standard, mode, meta.decks),
+        decksForMode(activeFmt, mode, meta.decks),
         filterOpts.q,
         filterOpts.tier,
         filterOpts.color,
@@ -192,23 +142,41 @@ export function Daily() {
         filterOpts.favorites,
       )
     : [];
-  const hero = standard ? topDeckForMode(standard, mode, meta.decks) : undefined;
+  const hero = activeFmt ? topDeckForMode(activeFmt, mode, meta.decks) : undefined;
   const favDecks = favorites
     .map((id) => meta.decks[id])
     .filter((d): d is Deck => Boolean(d) && d.mode === mode);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="eyebrow">Daily picks · {meta.date}</p>
-          <p className="text-sm text-muted m-0 max-w-xl">
-            <strong className="text-foam">8 full decklists × 8 formats</strong>. Star decks for My
-            Queue. Search and filter anytime.
-          </p>
-        </div>
-        <BoModeToggle mode={mode} onChange={setMode} />
+      <div>
+        <p className="eyebrow">Today’s lists · {meta.date}</p>
+        <p className="text-sm text-muted m-0 max-w-2xl">
+          Pick a format below — eight ranked decks for the active Bo1/Bo3 mode. Star any deck for
+          your queue.
+        </p>
       </div>
+
+      {/* Format switcher for hero + list */}
+      {!showFavoritesOnly && (
+        <div className="format-switcher" role="tablist" aria-label="Format">
+          {meta.formats.map((f) => {
+            const active = f.id === activeFmt?.id;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`format-chip${active ? " active" : ""}`}
+                onClick={() => setDailyFormatId(f.id as FormatId)}
+              >
+                {f.shortLabel || f.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <div className="filter-bar">
         <input
@@ -244,17 +212,17 @@ export function Daily() {
           className={`filter-chip${showFavoritesOnly ? " active" : ""}`}
           onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
         >
-          ★ My queue ({favorites.length})
+          ★ Queue ({favorites.length})
         </button>
       </div>
 
-      {metaDiff.previousDate && metaDiff.changes.length > 0 && (
+      {metaDiff.previousDate && metaDiff.changes.length > 0 && !showFavoritesOnly && (
         <section className="panel diff-panel">
           <h3 className="text-sm font-semibold m-0 mb-2">
             Meta movement since {metaDiff.previousDate}
           </h3>
-          <div className="max-h-40 overflow-auto">
-            {metaDiff.changes.slice(0, 12).map((ch) => (
+          <div className="max-h-36 overflow-auto">
+            {metaDiff.changes.slice(0, 10).map((ch) => (
               <div key={`${ch.formatId}-${ch.mode}`} className="diff-row">
                 <span className="text-muted">
                   {ch.formatName} {ch.mode.toUpperCase()}
@@ -275,11 +243,6 @@ export function Daily() {
                       + {n}
                     </span>
                   ))}
-                  {ch.left.slice(0, 2).map((n) => (
-                    <span key={n} className="diff-down mr-2">
-                      − {n}
-                    </span>
-                  ))}
                 </span>
               </div>
             ))}
@@ -290,11 +253,11 @@ export function Daily() {
       {showFavoritesOnly && (
         <section className="panel">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-            My queue · {mode.toUpperCase()}
+            Your queue · {mode.toUpperCase()}
           </h3>
           {favDecks.length === 0 ? (
             <p className="text-sm text-muted m-0">
-              Star decks from the lists below to pin them here.
+              Star decks from any format to pin them here. Switch Bo1/Bo3 in the top bar.
             </p>
           ) : (
             <div className="format-grid">
@@ -312,80 +275,66 @@ export function Daily() {
         </section>
       )}
 
-      {standard && hero && !showFavoritesOnly && (
+      {activeFmt && hero && !showFavoritesOnly && (
         <section className="panel panel-hero">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="text-xs font-bold tracking-widest uppercase text-gold-400">
-                  Today’s #1 · Standard
+                  {activeFmt.name} · #{hero.rank ?? 1} · {mode.toUpperCase()}
                 </span>
                 <TierBadge tier={hero.tier} />
                 <ColorPips colors={hero.colors} />
                 {hero.metaShare != null && (
                   <span className="text-xs text-muted">{hero.metaShare}% meta</span>
                 )}
+                {hero.listQuality === "authoritative" && (
+                  <span className="badge-verified">Verified list</span>
+                )}
               </div>
               <h2 className="text-2xl font-semibold m-0 tracking-tight">{hero.name}</h2>
               <p className="text-sm text-muted mt-2 mb-0 leading-relaxed max-w-2xl">
                 {hero.description}
               </p>
+              {hero.listNote && (
+                <p className="text-xs text-muted mt-2 mb-0 opacity-80">{hero.listNote}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2 shrink-0">
               <button type="button" className="btn btn-primary" onClick={() => openDeck(hero.id)}>
-                Open #1 deck
+                Open deck
               </button>
               <button
                 type="button"
                 className="btn btn-ghost"
-                onClick={() => openFormat(standard.id)}
+                onClick={() => openFormat(activeFmt.id)}
               >
-                All Standard decks
+                Format details
               </button>
             </div>
           </div>
           <div className="relative z-10">
             <h3 className="text-sm font-semibold text-muted uppercase tracking-wide m-0 mb-3">
-              Standard · filtered ({standardDecks.length})
+              {activeFmt.name} · top {activeDecks.length}
             </h3>
-            <div className="format-grid">
-              {standardDecks.map((d) => (
-                <DeckMiniCard
-                  key={d.id}
-                  d={d}
-                  fav={favorites.includes(d.id)}
-                  onOpen={() => openDeck(d.id)}
-                  onToggleFav={() => useAppStore.getState().toggleFavorite(d.id)}
-                />
-              ))}
-            </div>
+            {activeDecks.length === 0 ? (
+              <p className="text-sm text-muted m-0">No decks match these filters.</p>
+            ) : (
+              <div className="format-grid">
+                {activeDecks.map((d) => (
+                  <DeckMiniCard
+                    key={d.id}
+                    d={d}
+                    fav={favorites.includes(d.id)}
+                    onOpen={() => openDeck(d.id)}
+                    onToggleFav={() => useAppStore.getState().toggleFavorite(d.id)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
-
-      {!showFavoritesOnly &&
-        rest.map((fmt) => {
-          const decks = filterDecks(
-            decksForMode(fmt, mode, meta.decks),
-            filterOpts.q,
-            filterOpts.tier,
-            filterOpts.color,
-            filterOpts.favOnly,
-            filterOpts.favorites,
-          );
-          if (!decks.length) return null;
-          return (
-            <FormatDeckStrip
-              key={fmt.id}
-              fmt={fmt}
-              decks={decks}
-              mode={mode}
-              compact
-              onOpenDeck={openDeck}
-              onOpenFormat={() => openFormat(fmt.id)}
-            />
-          );
-        })}
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function DeckView() {
       <div className="empty-state">
         <p>Deck not found.</p>
         <button type="button" className="btn btn-ghost" onClick={() => setPage("daily")}>
-          Back to Daily
+          Back to Decks
         </button>
       </div>
     );
@@ -79,7 +79,7 @@ export function DeckView() {
         <div>
           <div className="flex flex-wrap gap-2 mb-2">
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("daily")}>
-              <IconBack className="w-4 h-4" /> Daily
+              <IconBack className="w-4 h-4" /> Decks
             </button>
             {fmt && (
               <button
