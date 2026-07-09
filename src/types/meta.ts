@@ -62,6 +62,9 @@ export interface Deck {
   sources: DeckSource[];
   metaShare?: number;
   commander?: string;
+  /** authoritative = Goldfish/Melee export; fallback = offline pack */
+  listQuality?: "authoritative" | "partial" | "fallback";
+  listNote?: string;
 }
 
 export interface FormatTier {
@@ -111,4 +114,12 @@ export interface MetaBundle {
   sources: string[];
   version: string;
   decksPerFormat?: number;
+  /** Pipeline provenance (written by build-meta.mjs) */
+  pipeline?: {
+    authoritativeLists?: number;
+    failedLists?: number;
+    listPolicy?: string;
+    ranLive?: boolean;
+    sourcesDetail?: string[];
+  };
 }

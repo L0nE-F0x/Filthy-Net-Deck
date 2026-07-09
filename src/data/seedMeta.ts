@@ -433,6 +433,9 @@ function makeDeck(
     ],
     metaShare,
     commander: arch.commander,
+    listQuality: "fallback",
+    listNote:
+      "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available.",
   };
 }
 

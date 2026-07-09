@@ -19,6 +19,7 @@
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyAuthoritativeLists } from "./fetch-goldfish-lists.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -395,15 +396,19 @@ async function main() {
   bundle.version = bundle.version || "0.2.0";
   bundle = ensureEight(bundle);
 
+  // Tag all decks as fallback until proven otherwise
+  for (const d of Object.values(bundle.decks || {})) {
+    if (!d.listQuality) d.listQuality = "fallback";
+  }
+
   if (live) {
-    console.log("Live mode: fetching MTGGoldfish + Melee.gg …");
+    console.log("Live mode: MTGGoldfish metagame + Melee + authoritative deck exports …");
     const goldfishByFormat = {};
     for (const [fmtId, path] of Object.entries(GOLDFISH_FORMATS)) {
       goldfishByFormat[fmtId] = await fetchGoldfishMetagame(path);
       console.log(
         `  goldfish/${path}: ${goldfishByFormat[fmtId].archetypes.length} archetypes`,
       );
-      // polite delay
       await new Promise((r) => setTimeout(r, 400));
     }
     bundle = applyLiveRanking(bundle, goldfishByFormat);
@@ -411,8 +416,27 @@ async function main() {
     const melee = await fetchMeleeTournaments();
     console.log(`  melee: ${melee.tournaments.length} tournament links`);
     bundle = mergeMeleeTournaments(bundle, melee);
+
+    console.log("  Downloading Goldfish deck exports (authoritative 60s) …");
+    bundle = await applyAuthoritativeLists(bundle);
+    bundle.pipeline = {
+      ...(bundle.pipeline || {}),
+      ranLive: true,
+      sourcesDetail: [
+        "mtggoldfish-metagame-html",
+        "mtggoldfish-deck-export",
+        "melee-searchresults",
+      ],
+      listPolicy: "prefer-goldfish-export-never-invent-when-available",
+    };
   } else {
-    console.log("Offline mode (pass --live for MTGGoldfish + Melee).");
+    console.log("Offline mode (pass --live for multi-source aggregation).");
+    bundle.pipeline = {
+      ...(bundle.pipeline || {}),
+      ranLive: false,
+      listPolicy: "offline-export-only",
+      sourcesDetail: ["offline-pack"],
+    };
   }
 
   bundle = scrubSources(bundle);

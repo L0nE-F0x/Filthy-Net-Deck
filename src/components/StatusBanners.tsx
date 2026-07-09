@@ -33,8 +33,9 @@ export function StatusBanners() {
       className: "banner banner-warn",
       body: (
         <>
-          <strong>Offline pack</strong> — network meta unavailable. Showing built-in lists so you can
-          still browse. Tap Refresh when online for live Goldfish / Melee data.
+          <strong>Offline pack</strong> — could not reach Netlify{" "}
+          <code className="text-[10px]">/meta/latest.json</code>. Showing the installer’s last-known
+          lists (not live aggregation). Refresh when online.
         </>
       ),
     });
@@ -44,17 +45,20 @@ export function StatusBanners() {
       className: "banner banner-info",
       body: (
         <>
-          <strong>Cached feed</strong> — using last known good meta.
+          <strong>Cached feed</strong> — using last known good meta JSON.
         </>
       ),
     });
   } else if (feedStatus === "live") {
+    const auth = meta?.pipeline?.authoritativeLists;
     banners.push({
       key: "live",
       className: "banner banner-ok",
       body: (
         <>
-          <strong>Live feed</strong> — meta loaded from the network.
+          <strong>Live feed</strong> — downloaded published meta from Netlify
+          {auth != null ? ` · ${auth} verified deck export(s)` : ""}. Refresh re-fetches that file;
+          it does not re-scrape tournaments on your PC.
         </>
       ),
     });

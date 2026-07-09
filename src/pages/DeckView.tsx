@@ -119,6 +119,26 @@ export function DeckView() {
           <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
             {deck.description}
           </p>
+          <div className="mt-2 flex flex-wrap gap-2 items-center">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border ${
+                deck.listQuality === "authoritative"
+                  ? "border-good/40 text-good bg-good/10"
+                  : deck.listQuality === "partial"
+                    ? "border-fair/40 text-fair bg-fair/10"
+                    : "border-muted/40 text-muted bg-ink-800"
+              }`}
+            >
+              {deck.listQuality === "authoritative"
+                ? "Verified list"
+                : deck.listQuality === "partial"
+                  ? "Partial list"
+                  : "Offline / last-known list"}
+            </span>
+            {deck.listNote && (
+              <span className="text-[11px] text-muted">{deck.listNote}</span>
+            )}
+          </div>
           <div className="mt-3">
             <CardArtStrip names={pickPreviewCards(deck.mainboard, deck.commander)} max={6} />
           </div>

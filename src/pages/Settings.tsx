@@ -36,10 +36,41 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">Meta feed</h3>
+        <h3 className="text-sm font-semibold m-0 mb-1">What Refresh does</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          Daily JSON from Netlify. Leave blank for the default host. If the network is down, the app
-          uses a built-in offline pack (labeled offline — not a public “seed source”).
+          <strong className="text-foam">Refresh does not scrape tournament sites from your PC.</strong>{" "}
+          It re-downloads the published meta file from Netlify (
+          <code className="text-[10px]">/meta/latest.json</code>
+          ). That file is built offline by our multi-source pipeline (MTGGoldfish metagame + deck
+          exports, Melee events). Pipeline freshness = how often CI/you run{" "}
+          <code className="text-[10px]">npm run meta</code>.
+        </p>
+        {meta?.pipeline && (
+          <dl className="grid grid-cols-2 gap-2 text-xs m-0 mb-3">
+            <div>
+              <dt className="text-muted">Verified lists</dt>
+              <dd className="m-0 font-medium">{meta.pipeline.authoritativeLists ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-muted">Failed exports</dt>
+              <dd className="m-0 font-medium">{meta.pipeline.failedLists ?? "—"}</dd>
+            </div>
+            <div className="col-span-2">
+              <dt className="text-muted">Pipeline</dt>
+              <dd className="m-0 font-medium text-[11px]">
+                {meta.pipeline.ranLive ? "live multi-source" : "offline pack"} ·{" "}
+                {(meta.pipeline.sourcesDetail || []).join(", ") || "—"}
+              </dd>
+            </div>
+          </dl>
+        )}
+      </section>
+
+      <section className="panel">
+        <h3 className="text-sm font-semibold m-0 mb-1">Meta feed URL</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Default is the Netlify CDN. Override only for testing. If fetch fails, the app uses the
+          installer&apos;s offline pack (never labeled as live).
         </p>
         <label className="block text-xs text-muted mb-1" htmlFor="meta-url">
           Meta URL
@@ -95,35 +126,46 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">Updates</h3>
-        <p className="text-xs text-muted m-0 mb-3">
+        <h3 className="text-sm font-semibold m-0 mb-1">In-app app updates</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
           App version <strong className="text-foam">v{APP_VERSION}</strong>. Checks{" "}
-          <code className="text-[11px]">version.json</code> on the download site.
+          <code className="text-[11px]">version.json</code> on Netlify. You do{" "}
+          <strong className="text-foam">not</strong> need to open the website — download the
+          installer from here and run it.
         </p>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => {
-            void checkForUpdates().then(() => {
-              const u = useAppStore.getState().updateAvailable;
-              setUpdateMsg(
-                u
-                  ? `v${u.version} is available`
-                  : "You’re on the latest version (or check failed).",
-              );
-            });
-          }}
-        >
-          Check for updates
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              void checkForUpdates().then(() => {
+                const u = useAppStore.getState().updateAvailable;
+                setUpdateMsg(
+                  u
+                    ? `v${u.version} is available`
+                    : "You’re on the latest version (or check failed).",
+                );
+              });
+            }}
+          >
+            Check for updates
+          </button>
+          {updateAvailable?.downloadUrl && (
+            <a
+              className="btn btn-primary btn-sm"
+              href={updateAvailable.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download v{updateAvailable.version} installer
+            </a>
+          )}
+        </div>
         {updateAvailable && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} available.{" "}
-            {updateAvailable.downloadUrl && (
-              <a href={updateAvailable.downloadUrl} target="_blank" rel="noopener noreferrer">
-                Download
-              </a>
-            )}
+            Update v{updateAvailable.version} ready — install over this app (same or newer NSIS
+            setup). Silent signed auto-update (Tauri updater plugin) can be added once release
+            signing keys exist.
           </p>
         )}
         {updateMsg && !updateAvailable && (

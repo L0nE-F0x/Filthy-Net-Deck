@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T16:49:24.821Z",
+  "generatedAt": "2026-07-09T16:55:52.232Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -742,7 +742,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.9
+      "metaShare": 12.9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-selesnya-ouroboroid": {
       "id": "standard-bo3-selesnya-ouroboroid",
@@ -939,7 +941,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.9
+      "metaShare": 12.9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-jeskai-lessons": {
       "id": "standard-bo1-jeskai-lessons",
@@ -1095,7 +1099,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.9
+      "metaShare": 12.9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-jeskai-lessons": {
       "id": "standard-bo3-jeskai-lessons",
@@ -1309,7 +1315,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 14.1
+      "metaShare": 14.1,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-izzet-prowess": {
       "id": "standard-bo1-izzet-prowess",
@@ -1440,7 +1448,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 13.7
+      "metaShare": 13.7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-izzet-prowess": {
       "id": "standard-bo3-izzet-prowess",
@@ -1629,7 +1639,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.3
+      "metaShare": 12.3,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-4c-control": {
       "id": "standard-bo1-4c-control",
@@ -1798,7 +1810,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11.5
+      "metaShare": 11.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-4c-control": {
       "id": "standard-bo3-4c-control",
@@ -2025,7 +2039,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.7
+      "metaShare": 12.7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-izzet-spellementals": {
       "id": "standard-bo1-izzet-spellementals",
@@ -2160,7 +2176,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10.1
+      "metaShare": 10.1,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-izzet-spellementals": {
       "id": "standard-bo3-izzet-spellementals",
@@ -2353,7 +2371,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8.7
+      "metaShare": 8.7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-dimir-excruciator": {
       "id": "standard-bo1-dimir-excruciator",
@@ -2500,7 +2520,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.9
+      "metaShare": 6.9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-dimir-excruciator": {
       "id": "standard-bo3-dimir-excruciator",
@@ -2705,7 +2727,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8.1
+      "metaShare": 8.1,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-mono-green-landfall": {
       "id": "standard-bo1-mono-green-landfall",
@@ -2827,7 +2851,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.9
+      "metaShare": 6.9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-mono-green-landfall": {
       "id": "standard-bo3-mono-green-landfall",
@@ -3007,7 +3033,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.5
+      "metaShare": 5.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo1-selesnya-gearhulk": {
       "id": "standard-bo1-selesnya-gearhulk",
@@ -3142,7 +3170,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 4.1
+      "metaShare": 4.1,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard-bo3-selesnya-gearhulk": {
       "id": "standard-bo3-selesnya-gearhulk",
@@ -3335,7 +3365,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 4.1
+      "metaShare": 4.1,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-azorius-tempo": {
       "id": "alchemy-bo1-azorius-tempo",
@@ -3462,7 +3494,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 13
+      "metaShare": 13,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-azorius-tempo": {
       "id": "alchemy-bo3-azorius-tempo",
@@ -3614,7 +3648,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 13
+      "metaShare": 13,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-grixis-control": {
       "id": "alchemy-bo1-grixis-control",
@@ -3758,7 +3794,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11
+      "metaShare": 11,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-grixis-control": {
       "id": "alchemy-bo3-grixis-control",
@@ -3960,7 +3998,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.2
+      "metaShare": 12.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-rakdos-midrange": {
       "id": "alchemy-bo1-rakdos-midrange",
@@ -4087,7 +4127,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10
+      "metaShare": 10,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-rakdos-midrange": {
       "id": "alchemy-bo3-rakdos-midrange",
@@ -4239,7 +4281,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11.2
+      "metaShare": 11.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-selesnya-midrange": {
       "id": "alchemy-bo1-selesnya-midrange",
@@ -4366,7 +4410,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-selesnya-midrange": {
       "id": "alchemy-bo3-selesnya-midrange",
@@ -4518,7 +4564,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10.2
+      "metaShare": 10.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-izzet-spells": {
       "id": "alchemy-bo1-izzet-spells",
@@ -4641,7 +4689,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9.4
+      "metaShare": 9.4,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-izzet-spells": {
       "id": "alchemy-bo3-izzet-spells",
@@ -4789,7 +4839,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-dimir-bounce": {
       "id": "alchemy-bo1-dimir-bounce",
@@ -4916,7 +4968,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-dimir-bounce": {
       "id": "alchemy-bo3-dimir-bounce",
@@ -5068,7 +5122,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-mono-red": {
       "id": "alchemy-bo1-mono-red",
@@ -5170,7 +5226,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-mono-red": {
       "id": "alchemy-bo3-mono-red",
@@ -5297,7 +5355,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo1-orzhov-midrange": {
       "id": "alchemy-bo1-orzhov-midrange",
@@ -5424,7 +5484,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "alchemy-bo3-orzhov-midrange": {
       "id": "alchemy-bo3-orzhov-midrange",
@@ -5576,7 +5638,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.2
+      "metaShare": 6.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-jeskai-control": {
       "id": "historic-bo1-jeskai-control",
@@ -5728,7 +5792,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11
+      "metaShare": 11,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-jeskai-control": {
       "id": "historic-bo3-jeskai-control",
@@ -5905,7 +5971,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12.2
+      "metaShare": 12.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-jund-midrange": {
       "id": "historic-bo1-jund-midrange",
@@ -6053,7 +6121,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10
+      "metaShare": 10,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-jund-midrange": {
       "id": "historic-bo3-jund-midrange",
@@ -6259,7 +6329,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11.2
+      "metaShare": 11.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-izzet-creativity": {
       "id": "historic-bo1-izzet-creativity",
@@ -6394,7 +6466,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-izzet-creativity": {
       "id": "historic-bo3-izzet-creativity",
@@ -6554,7 +6628,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-creatures-toolbox": {
       "id": "historic-bo1-creatures-toolbox",
@@ -6688,7 +6764,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-creatures-toolbox": {
       "id": "historic-bo3-creatures-toolbox",
@@ -6847,7 +6925,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-affinity": {
       "id": "historic-bo1-affinity",
@@ -6973,7 +7053,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-affinity": {
       "id": "historic-bo3-affinity",
@@ -7124,7 +7206,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-storm": {
       "id": "historic-bo1-storm",
@@ -7255,7 +7339,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-storm": {
       "id": "historic-bo3-storm",
@@ -7411,7 +7497,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-azorius-control": {
       "id": "historic-bo1-azorius-control",
@@ -7546,7 +7634,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.5
+      "metaShare": 5.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-azorius-control": {
       "id": "historic-bo3-azorius-control",
@@ -7706,7 +7796,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.7
+      "metaShare": 6.7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo1-rakdos-arcanist": {
       "id": "historic-bo1-rakdos-arcanist",
@@ -7837,7 +7929,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic-bo3-rakdos-arcanist": {
       "id": "historic-bo3-rakdos-arcanist",
@@ -7993,7 +8087,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-rakdos-midrange": {
       "id": "pioneer-bo1-rakdos-midrange",
@@ -8124,7 +8220,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 13
+      "metaShare": 13,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-rakdos-midrange": {
       "id": "pioneer-bo3-rakdos-midrange",
@@ -8280,7 +8378,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 14.2
+      "metaShare": 14.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-azorius-control": {
       "id": "pioneer-bo1-azorius-control",
@@ -8415,7 +8515,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 12
+      "metaShare": 12,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-azorius-control": {
       "id": "pioneer-bo3-azorius-control",
@@ -8608,7 +8710,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 13.2
+      "metaShare": 13.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-izzet-phoenix": {
       "id": "pioneer-bo1-izzet-phoenix",
@@ -8739,7 +8843,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10
+      "metaShare": 10,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-izzet-phoenix": {
       "id": "pioneer-bo3-izzet-phoenix",
@@ -8895,7 +9001,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10
+      "metaShare": 10,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-lotus-field": {
       "id": "pioneer-bo1-lotus-field",
@@ -9026,7 +9134,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-lotus-field": {
       "id": "pioneer-bo3-lotus-field",
@@ -9182,7 +9292,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-amalia-combo": {
       "id": "pioneer-bo1-amalia-combo",
@@ -9317,7 +9429,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-amalia-combo": {
       "id": "pioneer-bo3-amalia-combo",
@@ -9477,7 +9591,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-mono-green-devotion": {
       "id": "pioneer-bo1-mono-green-devotion",
@@ -9607,7 +9723,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-mono-green-devotion": {
       "id": "pioneer-bo3-mono-green-devotion",
@@ -9762,7 +9880,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-boros-heroic": {
       "id": "pioneer-bo1-boros-heroic",
@@ -9893,7 +10013,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7.4
+      "metaShare": 7.4,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-boros-heroic": {
       "id": "pioneer-bo3-boros-heroic",
@@ -10049,7 +10171,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo1-dimir-control": {
       "id": "pioneer-bo1-dimir-control",
@@ -10184,7 +10308,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "pioneer-bo3-dimir-control": {
       "id": "pioneer-bo3-dimir-control",
@@ -10344,7 +10470,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.2
+      "metaShare": 6.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-reanimator": {
       "id": "timeless-bo1-reanimator",
@@ -10483,7 +10611,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-reanimator": {
       "id": "timeless-bo3-reanimator",
@@ -10647,7 +10777,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9
+      "metaShare": 9,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-death-s-shadow": {
       "id": "timeless-bo1-death-s-shadow",
@@ -10795,7 +10927,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-death-s-shadow": {
       "id": "timeless-bo3-death-s-shadow",
@@ -11001,7 +11135,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-show-and-tell": {
       "id": "timeless-bo1-show-and-tell",
@@ -11135,7 +11271,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-show-and-tell": {
       "id": "timeless-bo3-show-and-tell",
@@ -11294,7 +11432,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-beanstalk-control": {
       "id": "timeless-bo1-beanstalk-control",
@@ -11434,7 +11574,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7
+      "metaShare": 7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-beanstalk-control": {
       "id": "timeless-bo3-beanstalk-control",
@@ -11599,7 +11741,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8.2
+      "metaShare": 8.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-initiative": {
       "id": "timeless-bo1-initiative",
@@ -11729,7 +11873,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-initiative": {
       "id": "timeless-bo3-initiative",
@@ -11884,7 +12030,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-storm": {
       "id": "timeless-bo1-storm",
@@ -12020,7 +12168,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.5
+      "metaShare": 5.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-storm": {
       "id": "timeless-bo3-storm",
@@ -12181,7 +12331,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.5
+      "metaShare": 5.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-dimir-midrange": {
       "id": "timeless-bo1-dimir-midrange",
@@ -12316,7 +12468,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-dimir-midrange": {
       "id": "timeless-bo3-dimir-midrange",
@@ -12476,7 +12630,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.2
+      "metaShare": 6.2,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo1-domain-zoo": {
       "id": "timeless-bo1-domain-zoo",
@@ -12626,7 +12782,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 4.5
+      "metaShare": 4.5,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "timeless-bo3-domain-zoo": {
       "id": "timeless-bo3-domain-zoo",
@@ -12801,7 +12959,9 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.7
+      "metaShare": 5.7,
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-atraxa-midrange": {
       "id": "brawl-bo1-atraxa-midrange",
@@ -12975,7 +13135,9 @@
         }
       ],
       "metaShare": 7,
-      "commander": "Atraxa, Grand Unifier"
+      "commander": "Atraxa, Grand Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-atraxa-midrange": {
       "id": "brawl-bo3-atraxa-midrange",
@@ -13174,7 +13336,9 @@
         }
       ],
       "metaShare": 8.2,
-      "commander": "Atraxa, Grand Unifier"
+      "commander": "Atraxa, Grand Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-kinnan-combo": {
       "id": "brawl-bo1-kinnan-combo",
@@ -13326,7 +13490,9 @@
         }
       ],
       "metaShare": 6,
-      "commander": "Kinnan, Bonder Prodigy"
+      "commander": "Kinnan, Bonder Prodigy",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-kinnan-combo": {
       "id": "brawl-bo3-kinnan-combo",
@@ -13503,7 +13669,9 @@
         }
       ],
       "metaShare": 6,
-      "commander": "Kinnan, Bonder Prodigy"
+      "commander": "Kinnan, Bonder Prodigy",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-rusko-midrange": {
       "id": "brawl-bo1-rusko-midrange",
@@ -13639,7 +13807,9 @@
         }
       ],
       "metaShare": 5.5,
-      "commander": "Rusko, Clockmaker"
+      "commander": "Rusko, Clockmaker",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-rusko-midrange": {
       "id": "brawl-bo3-rusko-midrange",
@@ -13800,7 +13970,9 @@
         }
       ],
       "metaShare": 6.7,
-      "commander": "Rusko, Clockmaker"
+      "commander": "Rusko, Clockmaker",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-tivit-control": {
       "id": "brawl-bo1-tivit-control",
@@ -13933,7 +14105,9 @@
         }
       ],
       "metaShare": 5,
-      "commander": "Tivit, Seller of Secrets"
+      "commander": "Tivit, Seller of Secrets",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-tivit-control": {
       "id": "brawl-bo3-tivit-control",
@@ -14091,7 +14265,9 @@
         }
       ],
       "metaShare": 6.2,
-      "commander": "Tivit, Seller of Secrets"
+      "commander": "Tivit, Seller of Secrets",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-etali-ramp": {
       "id": "brawl-bo1-etali-ramp",
@@ -14219,7 +14395,9 @@
         }
       ],
       "metaShare": 4.5,
-      "commander": "Etali, Primal Conqueror"
+      "commander": "Etali, Primal Conqueror",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-etali-ramp": {
       "id": "brawl-bo3-etali-ramp",
@@ -14372,7 +14550,9 @@
         }
       ],
       "metaShare": 4.5,
-      "commander": "Etali, Primal Conqueror"
+      "commander": "Etali, Primal Conqueror",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-agatha-tokens": {
       "id": "brawl-bo1-agatha-tokens",
@@ -14497,7 +14677,9 @@
         }
       ],
       "metaShare": 4,
-      "commander": "Agatha of the Vile Cauldron"
+      "commander": "Agatha of the Vile Cauldron",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-agatha-tokens": {
       "id": "brawl-bo3-agatha-tokens",
@@ -14647,7 +14829,9 @@
         }
       ],
       "metaShare": 4,
-      "commander": "Agatha of the Vile Cauldron"
+      "commander": "Agatha of the Vile Cauldron",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-najeela-warriors": {
       "id": "brawl-bo1-najeela-warriors",
@@ -14774,7 +14958,9 @@
         }
       ],
       "metaShare": 3.8,
-      "commander": "Najeela, the Blade-Blossom"
+      "commander": "Najeela, the Blade-Blossom",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-najeela-warriors": {
       "id": "brawl-bo3-najeela-warriors",
@@ -14926,7 +15112,9 @@
         }
       ],
       "metaShare": 3.8,
-      "commander": "Najeela, the Blade-Blossom"
+      "commander": "Najeela, the Blade-Blossom",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo1-jodah-cascade": {
       "id": "brawl-bo1-jodah-cascade",
@@ -15049,7 +15237,9 @@
         }
       ],
       "metaShare": 3.5,
-      "commander": "Jodah, the Unifier"
+      "commander": "Jodah, the Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "brawl-bo3-jodah-cascade": {
       "id": "brawl-bo3-jodah-cascade",
@@ -15197,7 +15387,9 @@
         }
       ],
       "metaShare": 3.5,
-      "commander": "Jodah, the Unifier"
+      "commander": "Jodah, the Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-kellan-aggro": {
       "id": "standard_brawl-bo1-kellan-aggro",
@@ -15329,7 +15521,9 @@
         }
       ],
       "metaShare": 9.4,
-      "commander": "Kellan, the Kid"
+      "commander": "Kellan, the Kid",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-kellan-aggro": {
       "id": "standard_brawl-bo3-kellan-aggro",
@@ -15486,7 +15680,9 @@
         }
       ],
       "metaShare": 8,
-      "commander": "Kellan, the Kid"
+      "commander": "Kellan, the Kid",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-jace-control": {
       "id": "standard_brawl-bo1-jace-control",
@@ -15614,7 +15810,9 @@
         }
       ],
       "metaShare": 7,
-      "commander": "Jace, the Perfected Mind"
+      "commander": "Jace, the Perfected Mind",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-jace-control": {
       "id": "standard_brawl-bo3-jace-control",
@@ -15800,7 +15998,9 @@
         }
       ],
       "metaShare": 8.2,
-      "commander": "Jace, the Perfected Mind"
+      "commander": "Jace, the Perfected Mind",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-kaito-ninja": {
       "id": "standard_brawl-bo1-kaito-ninja",
@@ -15920,7 +16120,9 @@
         }
       ],
       "metaShare": 6,
-      "commander": "Kaito, Bane of Nightmares"
+      "commander": "Kaito, Bane of Nightmares",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-kaito-ninja": {
       "id": "standard_brawl-bo3-kaito-ninja",
@@ -16065,7 +16267,9 @@
         }
       ],
       "metaShare": 6,
-      "commander": "Kaito, Bane of Nightmares"
+      "commander": "Kaito, Bane of Nightmares",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-beza-midrange": {
       "id": "standard_brawl-bo1-beza-midrange",
@@ -16176,7 +16380,9 @@
         }
       ],
       "metaShare": 5.5,
-      "commander": "Beza, the Bounding Spring"
+      "commander": "Beza, the Bounding Spring",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-beza-midrange": {
       "id": "standard_brawl-bo3-beza-midrange",
@@ -16312,7 +16518,9 @@
         }
       ],
       "metaShare": 6.7,
-      "commander": "Beza, the Bounding Spring"
+      "commander": "Beza, the Bounding Spring",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-mono-red-aggro": {
       "id": "standard_brawl-bo1-mono-red-aggro",
@@ -16415,7 +16623,9 @@
         }
       ],
       "metaShare": 6.4,
-      "commander": "Screaming Nemesis"
+      "commander": "Screaming Nemesis",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-mono-red-aggro": {
       "id": "standard_brawl-bo3-mono-red-aggro",
@@ -16543,7 +16753,9 @@
         }
       ],
       "metaShare": 5,
-      "commander": "Screaming Nemesis"
+      "commander": "Screaming Nemesis",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-golgari-midrange": {
       "id": "standard_brawl-bo1-golgari-midrange",
@@ -16655,7 +16867,9 @@
         }
       ],
       "metaShare": 4.5,
-      "commander": "Glissa Sunslayer"
+      "commander": "Glissa Sunslayer",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-golgari-midrange": {
       "id": "standard_brawl-bo3-golgari-midrange",
@@ -16792,7 +17006,9 @@
         }
       ],
       "metaShare": 5.7,
-      "commander": "Glissa Sunslayer"
+      "commander": "Glissa Sunslayer",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-izzet-spells": {
       "id": "standard_brawl-bo1-izzet-spells",
@@ -16904,7 +17120,9 @@
         }
       ],
       "metaShare": 5.4,
-      "commander": "Ral, Crackling Wit"
+      "commander": "Ral, Crackling Wit",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-izzet-spells": {
       "id": "standard_brawl-bo3-izzet-spells",
@@ -17041,7 +17259,9 @@
         }
       ],
       "metaShare": 4,
-      "commander": "Ral, Crackling Wit"
+      "commander": "Ral, Crackling Wit",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo1-domain-ramp": {
       "id": "standard_brawl-bo1-domain-ramp",
@@ -17164,7 +17384,9 @@
         }
       ],
       "metaShare": 3.5,
-      "commander": "Herigast, Erupting Nullkite"
+      "commander": "Herigast, Erupting Nullkite",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "standard_brawl-bo3-domain-ramp": {
       "id": "standard_brawl-bo3-domain-ramp",
@@ -17312,7 +17534,9 @@
         }
       ],
       "metaShare": 4.7,
-      "commander": "Herigast, Erupting Nullkite"
+      "commander": "Herigast, Erupting Nullkite",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-omnath-lands": {
       "id": "historic_brawl-bo1-omnath-lands",
@@ -17466,7 +17690,9 @@
         }
       ],
       "metaShare": 7,
-      "commander": "Omnath, Locus of Creation"
+      "commander": "Omnath, Locus of Creation",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-omnath-lands": {
       "id": "historic_brawl-bo3-omnath-lands",
@@ -17645,7 +17871,9 @@
         }
       ],
       "metaShare": 7,
-      "commander": "Omnath, Locus of Creation"
+      "commander": "Omnath, Locus of Creation",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-tamiyo-control": {
       "id": "historic_brawl-bo1-tamiyo-control",
@@ -17773,7 +18001,9 @@
         }
       ],
       "metaShare": 6,
-      "commander": "Tamiyo, Inquisitive Student"
+      "commander": "Tamiyo, Inquisitive Student",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-tamiyo-control": {
       "id": "historic_brawl-bo3-tamiyo-control",
@@ -17959,7 +18189,9 @@
         }
       ],
       "metaShare": 7.2,
-      "commander": "Tamiyo, Inquisitive Student"
+      "commander": "Tamiyo, Inquisitive Student",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-atraxa-value": {
       "id": "historic_brawl-bo1-atraxa-value",
@@ -18097,7 +18329,9 @@
         }
       ],
       "metaShare": 5.5,
-      "commander": "Atraxa, Grand Unifier"
+      "commander": "Atraxa, Grand Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-atraxa-value": {
       "id": "historic_brawl-bo3-atraxa-value",
@@ -18260,7 +18494,9 @@
         }
       ],
       "metaShare": 5.5,
-      "commander": "Atraxa, Grand Unifier"
+      "commander": "Atraxa, Grand Unifier",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-rusko-clocks": {
       "id": "historic_brawl-bo1-rusko-clocks",
@@ -18376,7 +18612,9 @@
         }
       ],
       "metaShare": 5,
-      "commander": "Rusko, Clockmaker"
+      "commander": "Rusko, Clockmaker",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-rusko-clocks": {
       "id": "historic_brawl-bo3-rusko-clocks",
@@ -18517,7 +18755,9 @@
         }
       ],
       "metaShare": 5,
-      "commander": "Rusko, Clockmaker"
+      "commander": "Rusko, Clockmaker",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-kinnan": {
       "id": "historic_brawl-bo1-kinnan",
@@ -18633,7 +18873,9 @@
         }
       ],
       "metaShare": 4.8,
-      "commander": "Kinnan, Bonder Prodigy"
+      "commander": "Kinnan, Bonder Prodigy",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-kinnan": {
       "id": "historic_brawl-bo3-kinnan",
@@ -18774,7 +19016,9 @@
         }
       ],
       "metaShare": 4.8,
-      "commander": "Kinnan, Bonder Prodigy"
+      "commander": "Kinnan, Bonder Prodigy",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-etali-ramp": {
       "id": "historic_brawl-bo1-etali-ramp",
@@ -18886,7 +19130,9 @@
         }
       ],
       "metaShare": 4,
-      "commander": "Etali, Primal Conqueror"
+      "commander": "Etali, Primal Conqueror",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-etali-ramp": {
       "id": "historic_brawl-bo3-etali-ramp",
@@ -19023,7 +19269,9 @@
         }
       ],
       "metaShare": 4,
-      "commander": "Etali, Primal Conqueror"
+      "commander": "Etali, Primal Conqueror",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-golos-field": {
       "id": "historic_brawl-bo1-golos-field",
@@ -19146,7 +19394,9 @@
         }
       ],
       "metaShare": 3.8,
-      "commander": "Golos, Tireless Pilgrim"
+      "commander": "Golos, Tireless Pilgrim",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-golos-field": {
       "id": "historic_brawl-bo3-golos-field",
@@ -19294,7 +19544,9 @@
         }
       ],
       "metaShare": 3.8,
-      "commander": "Golos, Tireless Pilgrim"
+      "commander": "Golos, Tireless Pilgrim",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo1-yorion-blink": {
       "id": "historic_brawl-bo1-yorion-blink",
@@ -19410,7 +19662,9 @@
         }
       ],
       "metaShare": 3.5,
-      "commander": "Yorion, Sky Nomad"
+      "commander": "Yorion, Sky Nomad",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     },
     "historic_brawl-bo3-yorion-blink": {
       "id": "historic_brawl-bo3-yorion-blink",
@@ -19551,7 +19805,9 @@
         }
       ],
       "metaShare": 3.5,
-      "commander": "Yorion, Sky Nomad"
+      "commander": "Yorion, Sky Nomad",
+      "listQuality": "fallback",
+      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
     }
   },
   "tournaments": [
@@ -19742,5 +19998,12 @@
     "scryfall"
   ],
   "version": "0.6.1",
-  "decksPerFormat": 8
+  "decksPerFormat": 8,
+  "pipeline": {
+    "ranLive": false,
+    "listPolicy": "offline-export-only",
+    "sourcesDetail": [
+      "offline-pack"
+    ]
+  }
 }
