@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { fetchMetaBundle } from "../services/metaFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
 import { fetchRemoteVersion, isNewer } from "../services/versionCheck";
+import { resolveFormatId } from "../services/formatResolve";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
 
 const PREFS_KEY = "bbi.prefs";
@@ -75,7 +76,7 @@ interface AppState {
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
-  openFormat: (id: FormatId) => void;
+  openFormat: (id: FormatId | string) => void;
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
   setMetaUrl: (url: string) => void;
@@ -121,11 +122,19 @@ export const useAppStore = create<AppState>((set, get) => {
     updateAvailable: null,
     viewerUrl: null,
 
-    setPage: (page) => set({ page }),
+    setPage: (page) => set({ page, ...(page === "daily" ? {} : {}) }),
     setMode: (mode) => set({ mode }),
-    openFormat: (id) =>
-      set({ selectedFormatId: id, page: "format", selectedDeckId: null }),
-    openDeck: (deckId) => set({ selectedDeckId: deckId, page: "deck" }),
+    openFormat: (id) => {
+      const resolved = resolveFormatId(String(id)) ?? (id as FormatId);
+      set({
+        selectedFormatId: resolved,
+        page: "format",
+        selectedDeckId: null,
+        showFavoritesOnly: false,
+      });
+    },
+    openDeck: (deckId) =>
+      set({ selectedDeckId: deckId, page: "deck", showFavoritesOnly: false }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);

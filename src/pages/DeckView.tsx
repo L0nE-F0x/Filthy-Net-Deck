@@ -10,6 +10,7 @@ import { IconBack, IconCopy, IconStar } from "../components/NavIcons";
 import { copyToClipboard } from "../services/arenaImport";
 import { scryfallImageUrl } from "../services/scryfall";
 import { validateDeckNames } from "../services/scryfallValidate";
+import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
 
 export function DeckView() {
   const meta = useAppStore((s) => s.meta);
@@ -121,6 +122,9 @@ export function DeckView() {
           <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
             {deck.description}
           </p>
+          <div className="mt-3">
+            <CardArtStrip names={pickPreviewCards(deck.mainboard, deck.commander)} max={6} />
+          </div>
         </div>
       </div>
 

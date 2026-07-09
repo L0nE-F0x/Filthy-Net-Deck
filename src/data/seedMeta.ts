@@ -328,17 +328,39 @@ function sideGuide(mode: PlayMode, name: string): Deck["sideboardGuide"] {
   ];
 }
 
+function modeScore(name: string, mode: PlayMode, baseShare: number): number {
+  const n = name.toLowerCase();
+  let s = baseShare;
+  if (mode === "bo1") {
+    if (/prowess|aggro|burn|heroic|landfall|tempo|spells|spellemental|phoenix|discard|monored|mono-red|najeela|kellan/.test(n))
+      s += 4.5;
+    if (/control|lessons|excruciator|beanstalk|azorius|jeskai control|4c control|domain/.test(n))
+      s -= 2.5;
+  } else {
+    if (/control|lessons|excruciator|midrange|beanstalk|azorius|4c control|dimir|domain|jund|jeskai/.test(n))
+      s += 4;
+    if (/prowess|aggro|mono-red|monored|heroic|burn/.test(n)) s -= 1.5;
+  }
+  return s;
+}
+
 function makeDeck(
   format: FormatId,
   mode: PlayMode,
-  rank: number,
   arch: ArchetypeDef,
   peers: string[],
 ): Deck {
-  const id = `${format}-${mode}-r${rank}-${arch.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const slug = arch.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const id = `${format}-${mode}-${slug}`;
   const sideboard = mode === "bo3" ? (arch.sideboard ?? []) : [];
-  // Bo1: slightly leaner sideboard empty; optional trim of slow cards is editorial only
   const mainboard = arch.mainboard;
+  let metaShare = arch.metaShare;
+  if (mode === "bo3" && /control|midrange|lessons|excruciator|domain/i.test(arch.name)) {
+    metaShare = Math.round((metaShare + 1.2) * 10) / 10;
+  }
+  if (mode === "bo1" && /prowess|aggro|landfall|spellemental|spells|heroic/i.test(arch.name)) {
+    metaShare = Math.round((metaShare + 1.4) * 10) / 10;
+  }
   const arenaImport = buildArenaImport({
     mainboard,
     sideboard,
@@ -349,11 +371,11 @@ function makeDeck(
     name: arch.name,
     format,
     mode,
-    rank,
+    rank: 0, // assigned after mode-specific sort
     tier: arch.tier,
     colors: arch.colors,
     archetype: arch.name,
-    description: `${arch.description} Daily rank #${rank} for ${mode.toUpperCase()}.`,
+    description: arch.description,
     mainboard,
     sideboard,
     matchups: matchupsFor(arch.name, peers),
@@ -365,9 +387,22 @@ function makeDeck(
       { name: "Melee.gg Events", url: "https://melee.gg/Tournament/Search" },
       { name: "Scryfall", url: "https://scryfall.com" },
     ],
-    metaShare: arch.metaShare,
+    metaShare,
     commander: arch.commander,
   };
+}
+
+function rankModeList(list: Deck[], mode: PlayMode): string[] {
+  const sorted = [...list].sort(
+    (a, b) =>
+      modeScore(b.name, mode, b.metaShare ?? 0) - modeScore(a.name, mode, a.metaShare ?? 0),
+  );
+  sorted.forEach((d, i) => {
+    d.rank = i + 1;
+    d.tier = i < 3 ? 1 : i < 6 ? 2 : 3;
+    d.description = `${d.description.replace(/\s*Daily rank #.*$/i, "").trim()} Daily rank #${d.rank} for ${mode.toUpperCase()} — ordered for ${mode === "bo1" ? "ladder speed & consistency" : "post-board depth & interaction"}.`;
+  });
+  return sorted.map((d) => d.id);
 }
 
 function buildSeed(): MetaBundle {
@@ -380,29 +415,25 @@ function buildSeed(): MetaBundle {
       throw new Error(`${fm.id} must define exactly 8 archetypes, got ${arches.length}`);
     }
     const peers = arches.map((a) => a.name);
-    const bo1Ids: string[] = [];
-    const bo3Ids: string[] = [];
+    const bo1Decks: Deck[] = [];
+    const bo3Decks: Deck[] = [];
 
-    arches.forEach((arch, i) => {
-      const rank = i + 1;
-      const bo1 = makeDeck(fm.id, "bo1", rank, arch, peers);
-      const bo3 = makeDeck(fm.id, "bo3", rank, arch, peers);
-      // Bo3: slight meta share bump for midrange/control names
-      if (/control|midrange|domain/i.test(arch.name)) {
-        bo3.metaShare = Math.round((arch.metaShare + 0.8) * 10) / 10;
-      }
-      if (/aggro|prowess|phoenix|heroic/i.test(arch.name)) {
-        bo1.metaShare = Math.round((arch.metaShare + 0.6) * 10) / 10;
-      }
+    for (const arch of arches) {
+      const bo1 = makeDeck(fm.id, "bo1", arch, peers);
+      const bo3 = makeDeck(fm.id, "bo3", arch, peers);
       decks[bo1.id] = bo1;
       decks[bo3.id] = bo3;
-      bo1Ids.push(bo1.id);
-      bo3Ids.push(bo3.id);
-    });
+      bo1Decks.push(bo1);
+      bo3Decks.push(bo3);
+    }
 
-    const t1 = arches.filter((a) => a.tier === 1).map((a) => a.name);
-    const t2 = arches.filter((a) => a.tier === 2).map((a) => a.name);
-    const t3 = arches.filter((a) => a.tier === 3).map((a) => a.name);
+    const bo1Ids = rankModeList(bo1Decks, "bo1");
+    const bo3Ids = rankModeList(bo3Decks, "bo3");
+
+    const topForTiers = bo3Ids.map((id) => decks[id]);
+    const t1 = topForTiers.filter((d) => d.tier === 1).map((d) => d.archetype);
+    const t2 = topForTiers.filter((d) => d.tier === 2).map((d) => d.archetype);
+    const t3 = topForTiers.filter((d) => d.tier === 3).map((d) => d.archetype);
 
     formats.push({
       id: fm.id,
@@ -419,7 +450,10 @@ function buildSeed(): MetaBundle {
         { tier: 3, archetypes: t3 },
       ],
       metaNotes: fm.metaNotes,
-      metaShareTop: arches.slice(0, 4).map((a) => ({ name: a.name, pct: a.metaShare })),
+      metaShareTop: bo1Ids.slice(0, 4).map((id) => ({
+        name: decks[id].name,
+        pct: decks[id].metaShare ?? 0,
+      })),
     });
   }
 

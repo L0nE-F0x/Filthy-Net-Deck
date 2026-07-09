@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T16:13:14.307Z",
+  "generatedAt": "2026-07-09T16:27:06.238Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -8,46 +8,46 @@
       "shortLabel": "STD",
       "featured": true,
       "bo1DeckIds": [
-        "standard-bo1-r1-selesnya-ouroboroid",
-        "standard-bo1-r2-jeskai-lessons",
-        "standard-bo1-r3-izzet-prowess",
-        "standard-bo1-r4-4c-control",
-        "standard-bo1-r5-izzet-spellementals",
-        "standard-bo1-r6-dimir-excruciator",
-        "standard-bo1-r7-mono-green-landfall",
-        "standard-bo1-r8-selesnya-gearhulk"
+        "standard-bo1-izzet-prowess",
+        "standard-bo1-izzet-spellementals",
+        "standard-bo1-selesnya-ouroboroid",
+        "standard-bo1-mono-green-landfall",
+        "standard-bo1-jeskai-lessons",
+        "standard-bo1-4c-control",
+        "standard-bo1-dimir-excruciator",
+        "standard-bo1-selesnya-gearhulk"
       ],
       "bo3DeckIds": [
-        "standard-bo3-r1-selesnya-ouroboroid",
-        "standard-bo3-r2-jeskai-lessons",
-        "standard-bo3-r3-izzet-prowess",
-        "standard-bo3-r4-4c-control",
-        "standard-bo3-r5-izzet-spellementals",
-        "standard-bo3-r6-dimir-excruciator",
-        "standard-bo3-r7-mono-green-landfall",
-        "standard-bo3-r8-selesnya-gearhulk"
+        "standard-bo3-jeskai-lessons",
+        "standard-bo3-4c-control",
+        "standard-bo3-selesnya-ouroboroid",
+        "standard-bo3-dimir-excruciator",
+        "standard-bo3-izzet-prowess",
+        "standard-bo3-izzet-spellementals",
+        "standard-bo3-mono-green-landfall",
+        "standard-bo3-selesnya-gearhulk"
       ],
       "bo1": {
-        "deckId": "standard-bo1-r1-selesnya-ouroboroid"
+        "deckId": "standard-bo1-izzet-prowess"
       },
       "bo3": {
-        "deckId": "standard-bo3-r1-selesnya-ouroboroid"
+        "deckId": "standard-bo3-jeskai-lessons"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
-            "Selesnya Ouroboroid",
             "Jeskai Lessons",
-            "Izzet Prowess"
+            "4c Control",
+            "Selesnya Ouroboroid"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "4c Control",
-            "Izzet Spellementals",
-            "Dimir Excruciator"
+            "Dimir Excruciator",
+            "Izzet Prowess",
+            "Izzet Spellementals"
           ]
         },
         {
@@ -61,20 +61,20 @@
       "metaNotes": "July 2026 Standard (Marvel Super Heroes era). Ranked from MTGGoldfish meta % + recent Challenge/League results. Cross-check ladder trends on Untapped.gg. Eight full lists below — open any rank for the complete deck.",
       "metaShareTop": [
         {
-          "name": "Selesnya Ouroboroid",
-          "pct": 12
-        },
-        {
-          "name": "Jeskai Lessons",
-          "pct": 11
-        },
-        {
           "name": "Izzet Prowess",
-          "pct": 10
+          "pct": 13.7
         },
         {
-          "name": "4c Control",
-          "pct": 9
+          "name": "Izzet Spellementals",
+          "pct": 10.1
+        },
+        {
+          "name": "Selesnya Ouroboroid",
+          "pct": 12.9
+        },
+        {
+          "name": "Mono-Green Landfall",
+          "pct": 6.9
         }
       ]
     },
@@ -83,53 +83,53 @@
       "name": "Alchemy",
       "shortLabel": "ALC",
       "bo1DeckIds": [
-        "alchemy-bo1-r1-azorius-tempo",
-        "alchemy-bo1-r2-grixis-control",
-        "alchemy-bo1-r3-rakdos-midrange",
-        "alchemy-bo1-r4-selesnya-midrange",
-        "alchemy-bo1-r5-izzet-spells",
-        "alchemy-bo1-r6-dimir-bounce",
-        "alchemy-bo1-r7-mono-red",
-        "alchemy-bo1-r8-orzhov-midrange"
+        "alchemy-bo1-azorius-tempo",
+        "alchemy-bo1-izzet-spells",
+        "alchemy-bo1-mono-red",
+        "alchemy-bo1-rakdos-midrange",
+        "alchemy-bo1-selesnya-midrange",
+        "alchemy-bo1-grixis-control",
+        "alchemy-bo1-dimir-bounce",
+        "alchemy-bo1-orzhov-midrange"
       ],
       "bo3DeckIds": [
-        "alchemy-bo3-r1-azorius-tempo",
-        "alchemy-bo3-r2-grixis-control",
-        "alchemy-bo3-r3-rakdos-midrange",
-        "alchemy-bo3-r4-selesnya-midrange",
-        "alchemy-bo3-r5-izzet-spells",
-        "alchemy-bo3-r6-dimir-bounce",
-        "alchemy-bo3-r7-mono-red",
-        "alchemy-bo3-r8-orzhov-midrange"
+        "alchemy-bo3-azorius-tempo",
+        "alchemy-bo3-grixis-control",
+        "alchemy-bo3-rakdos-midrange",
+        "alchemy-bo3-selesnya-midrange",
+        "alchemy-bo3-dimir-bounce",
+        "alchemy-bo3-orzhov-midrange",
+        "alchemy-bo3-izzet-spells",
+        "alchemy-bo3-mono-red"
       ],
       "bo1": {
-        "deckId": "alchemy-bo1-r1-azorius-tempo"
+        "deckId": "alchemy-bo1-azorius-tempo"
       },
       "bo3": {
-        "deckId": "alchemy-bo3-r1-azorius-tempo"
+        "deckId": "alchemy-bo3-azorius-tempo"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
             "Azorius Tempo",
-            "Grixis Control"
+            "Grixis Control",
+            "Rakdos Midrange"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Rakdos Midrange",
             "Selesnya Midrange",
-            "Izzet Spells"
+            "Dimir Bounce",
+            "Orzhov Midrange"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
-            "Dimir Bounce",
-            "Mono-Red",
-            "Orzhov Midrange"
+            "Izzet Spells",
+            "Mono-Red"
           ]
         }
       ],
@@ -140,16 +140,16 @@
           "pct": 13
         },
         {
-          "name": "Grixis Control",
-          "pct": 11
+          "name": "Izzet Spells",
+          "pct": 9.4
+        },
+        {
+          "name": "Mono-Red",
+          "pct": 6
         },
         {
           "name": "Rakdos Midrange",
           "pct": 10
-        },
-        {
-          "name": "Selesnya Midrange",
-          "pct": 9
         }
       ]
     },
@@ -158,46 +158,46 @@
       "name": "Historic",
       "shortLabel": "HIS",
       "bo1DeckIds": [
-        "historic-bo1-r2-jund-midrange",
-        "historic-bo1-r1-jeskai-control",
-        "historic-bo1-r3-izzet-creativity",
-        "historic-bo1-r4-creatures-toolbox",
-        "historic-bo1-r5-affinity",
-        "historic-bo1-r6-storm",
-        "historic-bo1-r7-azorius-control",
-        "historic-bo1-r8-rakdos-arcanist"
+        "historic-bo1-jund-midrange",
+        "historic-bo1-izzet-creativity",
+        "historic-bo1-jeskai-control",
+        "historic-bo1-creatures-toolbox",
+        "historic-bo1-affinity",
+        "historic-bo1-storm",
+        "historic-bo1-rakdos-arcanist",
+        "historic-bo1-azorius-control"
       ],
       "bo3DeckIds": [
-        "historic-bo3-r2-jund-midrange",
-        "historic-bo3-r1-jeskai-control",
-        "historic-bo3-r3-izzet-creativity",
-        "historic-bo3-r4-creatures-toolbox",
-        "historic-bo3-r5-affinity",
-        "historic-bo3-r7-azorius-control",
-        "historic-bo3-r6-storm",
-        "historic-bo3-r8-rakdos-arcanist"
+        "historic-bo3-jeskai-control",
+        "historic-bo3-jund-midrange",
+        "historic-bo3-azorius-control",
+        "historic-bo3-izzet-creativity",
+        "historic-bo3-creatures-toolbox",
+        "historic-bo3-affinity",
+        "historic-bo3-storm",
+        "historic-bo3-rakdos-arcanist"
       ],
       "bo1": {
-        "deckId": "historic-bo1-r2-jund-midrange"
+        "deckId": "historic-bo1-jund-midrange"
       },
       "bo3": {
-        "deckId": "historic-bo3-r2-jund-midrange"
+        "deckId": "historic-bo3-jeskai-control"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
-            "Jund Midrange",
             "Jeskai Control",
-            "Izzet Creativity"
+            "Jund Midrange",
+            "Azorius Control"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
+            "Izzet Creativity",
             "Creatures Toolbox",
-            "Affinity",
-            "Azorius Control"
+            "Affinity"
           ]
         },
         {
@@ -212,15 +212,15 @@
       "metaShareTop": [
         {
           "name": "Jund Midrange",
-          "pct": 12
-        },
-        {
-          "name": "Jeskai Control",
-          "pct": 11.8
+          "pct": 10
         },
         {
           "name": "Izzet Creativity",
           "pct": 9
+        },
+        {
+          "name": "Jeskai Control",
+          "pct": 11
         },
         {
           "name": "Creatures Toolbox",
@@ -233,44 +233,44 @@
       "name": "Pioneer",
       "shortLabel": "PIO",
       "bo1DeckIds": [
-        "pioneer-bo1-r2-azorius-control",
-        "pioneer-bo1-r8-dimir-control",
-        "pioneer-bo1-r3-izzet-phoenix",
-        "pioneer-bo1-r1-rakdos-midrange",
-        "pioneer-bo1-r4-lotus-field",
-        "pioneer-bo1-r5-amalia-combo",
-        "pioneer-bo1-r6-mono-green-devotion",
-        "pioneer-bo1-r7-boros-heroic"
+        "pioneer-bo1-izzet-phoenix",
+        "pioneer-bo1-rakdos-midrange",
+        "pioneer-bo1-boros-heroic",
+        "pioneer-bo1-azorius-control",
+        "pioneer-bo1-lotus-field",
+        "pioneer-bo1-amalia-combo",
+        "pioneer-bo1-mono-green-devotion",
+        "pioneer-bo1-dimir-control"
       ],
       "bo3DeckIds": [
-        "pioneer-bo3-r2-azorius-control",
-        "pioneer-bo3-r8-dimir-control",
-        "pioneer-bo3-r3-izzet-phoenix",
-        "pioneer-bo3-r1-rakdos-midrange",
-        "pioneer-bo3-r4-lotus-field",
-        "pioneer-bo3-r5-amalia-combo",
-        "pioneer-bo3-r6-mono-green-devotion",
-        "pioneer-bo3-r7-boros-heroic"
+        "pioneer-bo3-rakdos-midrange",
+        "pioneer-bo3-azorius-control",
+        "pioneer-bo3-dimir-control",
+        "pioneer-bo3-izzet-phoenix",
+        "pioneer-bo3-lotus-field",
+        "pioneer-bo3-amalia-combo",
+        "pioneer-bo3-mono-green-devotion",
+        "pioneer-bo3-boros-heroic"
       ],
       "bo1": {
-        "deckId": "pioneer-bo1-r2-azorius-control"
+        "deckId": "pioneer-bo1-izzet-phoenix"
       },
       "bo3": {
-        "deckId": "pioneer-bo3-r2-azorius-control"
+        "deckId": "pioneer-bo3-rakdos-midrange"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
+            "Rakdos Midrange",
             "Azorius Control",
-            "Dimir Control",
-            "Izzet Phoenix"
+            "Dimir Control"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Rakdos Midrange",
+            "Izzet Phoenix",
             "Lotus Field",
             "Amalia Combo"
           ]
@@ -286,20 +286,20 @@
       "metaNotes": "Arena Pioneer tracks paper/RCQ results — eight competitive shells.",
       "metaShareTop": [
         {
-          "name": "Azorius Control",
-          "pct": 10
-        },
-        {
-          "name": "Dimir Control",
-          "pct": 10
-        },
-        {
           "name": "Izzet Phoenix",
-          "pct": 8
+          "pct": 10
         },
         {
           "name": "Rakdos Midrange",
-          "pct": 1
+          "pct": 13
+        },
+        {
+          "name": "Boros Heroic",
+          "pct": 7.4
+        },
+        {
+          "name": "Azorius Control",
+          "pct": 12
         }
       ]
     },
@@ -308,53 +308,53 @@
       "name": "Timeless",
       "shortLabel": "TIM",
       "bo1DeckIds": [
-        "timeless-bo1-r1-reanimator",
-        "timeless-bo1-r7-dimir-midrange",
-        "timeless-bo1-r3-show-and-tell",
-        "timeless-bo1-r6-storm",
-        "timeless-bo1-r2-death-s-shadow",
-        "timeless-bo1-r4-beanstalk-control",
-        "timeless-bo1-r5-initiative",
-        "timeless-bo1-r8-domain-zoo"
+        "timeless-bo1-reanimator",
+        "timeless-bo1-death-s-shadow",
+        "timeless-bo1-show-and-tell",
+        "timeless-bo1-initiative",
+        "timeless-bo1-storm",
+        "timeless-bo1-dimir-midrange",
+        "timeless-bo1-beanstalk-control",
+        "timeless-bo1-domain-zoo"
       ],
       "bo3DeckIds": [
-        "timeless-bo3-r1-reanimator",
-        "timeless-bo3-r7-dimir-midrange",
-        "timeless-bo3-r3-show-and-tell",
-        "timeless-bo3-r6-storm",
-        "timeless-bo3-r2-death-s-shadow",
-        "timeless-bo3-r4-beanstalk-control",
-        "timeless-bo3-r5-initiative",
-        "timeless-bo3-r8-domain-zoo"
+        "timeless-bo3-beanstalk-control",
+        "timeless-bo3-dimir-midrange",
+        "timeless-bo3-domain-zoo",
+        "timeless-bo3-reanimator",
+        "timeless-bo3-death-s-shadow",
+        "timeless-bo3-show-and-tell",
+        "timeless-bo3-initiative",
+        "timeless-bo3-storm"
       ],
       "bo1": {
-        "deckId": "timeless-bo1-r1-reanimator"
+        "deckId": "timeless-bo1-reanimator"
       },
       "bo3": {
-        "deckId": "timeless-bo3-r1-reanimator"
+        "deckId": "timeless-bo3-beanstalk-control"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
-            "Reanimator",
+            "Beanstalk Control",
             "Dimir Midrange",
-            "Show and Tell"
+            "Domain Zoo"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Storm",
+            "Reanimator",
             "Death's Shadow",
-            "Beanstalk Control"
+            "Show and Tell"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
             "Initiative",
-            "Domain Zoo"
+            "Storm"
           ]
         }
       ],
@@ -362,19 +362,19 @@
       "metaShareTop": [
         {
           "name": "Reanimator",
-          "pct": 10
-        },
-        {
-          "name": "Dimir Midrange",
-          "pct": 10
-        },
-        {
-          "name": "Show and Tell",
           "pct": 9
         },
         {
-          "name": "Storm",
-          "pct": 5
+          "name": "Death's Shadow",
+          "pct": 8
+        },
+        {
+          "name": "Show and Tell",
+          "pct": 7
+        },
+        {
+          "name": "Initiative",
+          "pct": 6
         }
       ]
     },
@@ -383,51 +383,51 @@
       "name": "Brawl",
       "shortLabel": "BRW",
       "bo1DeckIds": [
-        "brawl-bo1-r1-atraxa-midrange",
-        "brawl-bo1-r2-kinnan-combo",
-        "brawl-bo1-r3-rusko-midrange",
-        "brawl-bo1-r4-tivit-control",
-        "brawl-bo1-r5-etali-ramp",
-        "brawl-bo1-r6-agatha-tokens",
-        "brawl-bo1-r7-najeela-warriors",
-        "brawl-bo1-r8-jodah-cascade"
+        "brawl-bo1-najeela-warriors",
+        "brawl-bo1-atraxa-midrange",
+        "brawl-bo1-kinnan-combo",
+        "brawl-bo1-rusko-midrange",
+        "brawl-bo1-etali-ramp",
+        "brawl-bo1-agatha-tokens",
+        "brawl-bo1-jodah-cascade",
+        "brawl-bo1-tivit-control"
       ],
       "bo3DeckIds": [
-        "brawl-bo3-r1-atraxa-midrange",
-        "brawl-bo3-r2-kinnan-combo",
-        "brawl-bo3-r3-rusko-midrange",
-        "brawl-bo3-r4-tivit-control",
-        "brawl-bo3-r5-etali-ramp",
-        "brawl-bo3-r6-agatha-tokens",
-        "brawl-bo3-r7-najeela-warriors",
-        "brawl-bo3-r8-jodah-cascade"
+        "brawl-bo3-atraxa-midrange",
+        "brawl-bo3-rusko-midrange",
+        "brawl-bo3-tivit-control",
+        "brawl-bo3-kinnan-combo",
+        "brawl-bo3-etali-ramp",
+        "brawl-bo3-agatha-tokens",
+        "brawl-bo3-najeela-warriors",
+        "brawl-bo3-jodah-cascade"
       ],
       "bo1": {
-        "deckId": "brawl-bo1-r1-atraxa-midrange"
+        "deckId": "brawl-bo1-najeela-warriors"
       },
       "bo3": {
-        "deckId": "brawl-bo3-r1-atraxa-midrange"
+        "deckId": "brawl-bo3-atraxa-midrange"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
             "Atraxa Midrange",
-            "Kinnan Combo"
+            "Rusko Midrange",
+            "Tivit Control"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Rusko Midrange",
-            "Tivit Control",
-            "Etali Ramp"
+            "Kinnan Combo",
+            "Etali Ramp",
+            "Agatha Tokens"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
-            "Agatha Tokens",
             "Najeela Warriors",
             "Jodah Cascade"
           ]
@@ -435,6 +435,10 @@
       ],
       "metaNotes": "Eight commander-led Brawl lists for the open queue.",
       "metaShareTop": [
+        {
+          "name": "Najeela Warriors",
+          "pct": 3.8
+        },
         {
           "name": "Atraxa Midrange",
           "pct": 7
@@ -446,10 +450,6 @@
         {
           "name": "Rusko Midrange",
           "pct": 5.5
-        },
-        {
-          "name": "Tivit Control",
-          "pct": 5
         }
       ]
     },
@@ -458,53 +458,53 @@
       "name": "Standard Brawl",
       "shortLabel": "SBR",
       "bo1DeckIds": [
-        "standard_brawl-bo1-r1-kellan-aggro",
-        "standard_brawl-bo1-r2-jace-control",
-        "standard_brawl-bo1-r3-kaito-ninja",
-        "standard_brawl-bo1-r4-beza-midrange",
-        "standard_brawl-bo1-r5-mono-red-aggro",
-        "standard_brawl-bo1-r6-golgari-midrange",
-        "standard_brawl-bo1-r7-izzet-spells",
-        "standard_brawl-bo1-r8-domain-ramp"
+        "standard_brawl-bo1-kellan-aggro",
+        "standard_brawl-bo1-mono-red-aggro",
+        "standard_brawl-bo1-izzet-spells",
+        "standard_brawl-bo1-kaito-ninja",
+        "standard_brawl-bo1-beza-midrange",
+        "standard_brawl-bo1-jace-control",
+        "standard_brawl-bo1-golgari-midrange",
+        "standard_brawl-bo1-domain-ramp"
       ],
       "bo3DeckIds": [
-        "standard_brawl-bo3-r1-kellan-aggro",
-        "standard_brawl-bo3-r2-jace-control",
-        "standard_brawl-bo3-r3-kaito-ninja",
-        "standard_brawl-bo3-r4-beza-midrange",
-        "standard_brawl-bo3-r5-mono-red-aggro",
-        "standard_brawl-bo3-r6-golgari-midrange",
-        "standard_brawl-bo3-r7-izzet-spells",
-        "standard_brawl-bo3-r8-domain-ramp"
+        "standard_brawl-bo3-jace-control",
+        "standard_brawl-bo3-beza-midrange",
+        "standard_brawl-bo3-golgari-midrange",
+        "standard_brawl-bo3-domain-ramp",
+        "standard_brawl-bo3-kellan-aggro",
+        "standard_brawl-bo3-kaito-ninja",
+        "standard_brawl-bo3-izzet-spells",
+        "standard_brawl-bo3-mono-red-aggro"
       ],
       "bo1": {
-        "deckId": "standard_brawl-bo1-r1-kellan-aggro"
+        "deckId": "standard_brawl-bo1-kellan-aggro"
       },
       "bo3": {
-        "deckId": "standard_brawl-bo3-r1-kellan-aggro"
+        "deckId": "standard_brawl-bo3-jace-control"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
-            "Kellan Aggro",
-            "Jace Control"
+            "Jace Control",
+            "Beza Midrange",
+            "Golgari Midrange"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Kaito Ninja",
-            "Beza Midrange",
-            "Mono-Red Aggro"
+            "Domain Ramp",
+            "Kellan Aggro",
+            "Kaito Ninja"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
-            "Golgari Midrange",
             "Izzet Spells",
-            "Domain Ramp"
+            "Mono-Red Aggro"
           ]
         }
       ],
@@ -512,19 +512,19 @@
       "metaShareTop": [
         {
           "name": "Kellan Aggro",
-          "pct": 8
+          "pct": 9.4
         },
         {
-          "name": "Jace Control",
-          "pct": 7
+          "name": "Mono-Red Aggro",
+          "pct": 6.4
+        },
+        {
+          "name": "Izzet Spells",
+          "pct": 5.4
         },
         {
           "name": "Kaito Ninja",
           "pct": 6
-        },
-        {
-          "name": "Beza Midrange",
-          "pct": 5.5
         }
       ]
     },
@@ -533,51 +533,51 @@
       "name": "Historic Brawl",
       "shortLabel": "HBR",
       "bo1DeckIds": [
-        "historic_brawl-bo1-r1-omnath-lands",
-        "historic_brawl-bo1-r2-tamiyo-control",
-        "historic_brawl-bo1-r3-atraxa-value",
-        "historic_brawl-bo1-r4-rusko-clocks",
-        "historic_brawl-bo1-r5-kinnan",
-        "historic_brawl-bo1-r6-etali-ramp",
-        "historic_brawl-bo1-r7-golos-field",
-        "historic_brawl-bo1-r8-yorion-blink"
+        "historic_brawl-bo1-omnath-lands",
+        "historic_brawl-bo1-atraxa-value",
+        "historic_brawl-bo1-rusko-clocks",
+        "historic_brawl-bo1-kinnan",
+        "historic_brawl-bo1-etali-ramp",
+        "historic_brawl-bo1-golos-field",
+        "historic_brawl-bo1-tamiyo-control",
+        "historic_brawl-bo1-yorion-blink"
       ],
       "bo3DeckIds": [
-        "historic_brawl-bo3-r1-omnath-lands",
-        "historic_brawl-bo3-r2-tamiyo-control",
-        "historic_brawl-bo3-r3-atraxa-value",
-        "historic_brawl-bo3-r4-rusko-clocks",
-        "historic_brawl-bo3-r5-kinnan",
-        "historic_brawl-bo3-r6-etali-ramp",
-        "historic_brawl-bo3-r7-golos-field",
-        "historic_brawl-bo3-r8-yorion-blink"
+        "historic_brawl-bo3-tamiyo-control",
+        "historic_brawl-bo3-omnath-lands",
+        "historic_brawl-bo3-atraxa-value",
+        "historic_brawl-bo3-rusko-clocks",
+        "historic_brawl-bo3-kinnan",
+        "historic_brawl-bo3-etali-ramp",
+        "historic_brawl-bo3-golos-field",
+        "historic_brawl-bo3-yorion-blink"
       ],
       "bo1": {
-        "deckId": "historic_brawl-bo1-r1-omnath-lands"
+        "deckId": "historic_brawl-bo1-omnath-lands"
       },
       "bo3": {
-        "deckId": "historic_brawl-bo3-r1-omnath-lands"
+        "deckId": "historic_brawl-bo3-tamiyo-control"
       },
       "tiers": [
         {
           "tier": 1,
           "archetypes": [
+            "Tamiyo Control",
             "Omnath Lands",
-            "Tamiyo Control"
+            "Atraxa Value"
           ]
         },
         {
           "tier": 2,
           "archetypes": [
-            "Atraxa Value",
             "Rusko Clocks",
-            "Kinnan"
+            "Kinnan",
+            "Etali Ramp"
           ]
         },
         {
           "tier": 3,
           "archetypes": [
-            "Etali Ramp",
             "Golos Field",
             "Yorion Blink"
           ]
@@ -590,34 +590,34 @@
           "pct": 7
         },
         {
-          "name": "Tamiyo Control",
-          "pct": 6
-        },
-        {
           "name": "Atraxa Value",
           "pct": 5.5
         },
         {
           "name": "Rusko Clocks",
           "pct": 5
+        },
+        {
+          "name": "Kinnan",
+          "pct": 4.8
         }
       ]
     }
   ],
   "decks": {
-    "standard-bo1-r1-selesnya-ouroboroid": {
-      "id": "standard-bo1-r1-selesnya-ouroboroid",
+    "standard-bo1-selesnya-ouroboroid": {
+      "id": "standard-bo1-selesnya-ouroboroid",
       "name": "Selesnya Ouroboroid",
       "format": "standard",
       "mode": "bo1",
-      "rank": 1,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "W",
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #1 for BO1.",
+      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -726,6 +726,10 @@
       "arenaImport": "Deck\n4 Badgermole Cub\n4 Llanowar Elves\n3 Brightglass Gearhulk\n3 Pawpatch Recruit\n2 Overlord of the Hauntwoods\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Scrapshooter\n2 Beza, the Bounding Spring\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n2 Starting Town",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -736,27 +740,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12
+      "metaShare": 12.9
     },
-    "standard-bo3-r1-selesnya-ouroboroid": {
-      "id": "standard-bo3-r1-selesnya-ouroboroid",
+    "standard-bo3-selesnya-ouroboroid": {
+      "id": "standard-bo3-selesnya-ouroboroid",
       "name": "Selesnya Ouroboroid",
       "format": "standard",
       "mode": "bo3",
-      "rank": 1,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "W",
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #1 for BO3.",
+      "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -923,6 +923,10 @@
       "arenaImport": "Deck\n4 Badgermole Cub\n4 Llanowar Elves\n3 Brightglass Gearhulk\n3 Pawpatch Recruit\n2 Overlord of the Hauntwoods\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Scrapshooter\n2 Beza, the Bounding Spring\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n2 Starting Town\n\nSideboard\n2 Rest in Peace\n2 Destroy Evil\n2 Authority of the Consuls\n2 Ghost Vacuum\n2 Negate\n2 Beza, the Bounding Spring\n2 Tishana's Tidebinder\n1 Overlord of the Mistmoors",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -933,28 +937,24 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12
+      "metaShare": 12.9
     },
-    "standard-bo1-r2-jeskai-lessons": {
-      "id": "standard-bo1-r2-jeskai-lessons",
+    "standard-bo1-jeskai-lessons": {
+      "id": "standard-bo1-jeskai-lessons",
       "name": "Jeskai Lessons",
       "format": "standard",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 5,
+      "tier": 2,
       "colors": [
         "W",
         "U",
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #2 for BO1.",
+      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -1079,6 +1079,10 @@
       "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Torch the Tower\n3 Lightning Strike\n2 Get Lost\n3 Stock Up\n3 Accumulate Wisdom\n2 Jeskai Revelation\n2 Tablet of Discovery\n2 Three Steps Ahead\n2 The Wandering Emperor\n1 Beza, the Bounding Spring\n4 Spirebluff Canal\n3 Shivan Reef\n3 Adarkar Wastes\n2 Battlefield Forge\n2 Thundering Falls\n2 Meticulous Archive\n2 Restless Spire\n3 Island\n2 Mountain\n2 Plains\n2 Starting Town\n1 Otawara, Soaring City",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -1089,20 +1093,16 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 11
+      "metaShare": 12.9
     },
-    "standard-bo3-r2-jeskai-lessons": {
-      "id": "standard-bo3-r2-jeskai-lessons",
+    "standard-bo3-jeskai-lessons": {
+      "id": "standard-bo3-jeskai-lessons",
       "name": "Jeskai Lessons",
       "format": "standard",
       "mode": "bo3",
-      "rank": 2,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "W",
@@ -1110,7 +1110,7 @@
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #2 for BO3.",
+      "description": "Tied for top meta %. Jeskai Revelation / Tablet of Discovery / Accumulate Wisdom lesson package — Challenge winner shell. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -1293,6 +1293,10 @@
       "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Torch the Tower\n3 Lightning Strike\n2 Get Lost\n3 Stock Up\n3 Accumulate Wisdom\n2 Jeskai Revelation\n2 Tablet of Discovery\n2 Three Steps Ahead\n2 The Wandering Emperor\n1 Beza, the Bounding Spring\n4 Spirebluff Canal\n3 Shivan Reef\n3 Adarkar Wastes\n2 Battlefield Forge\n2 Thundering Falls\n2 Meticulous Archive\n2 Restless Spire\n3 Island\n2 Mountain\n2 Plains\n2 Starting Town\n1 Otawara, Soaring City\n\nSideboard\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Get Lost\n2 Temporary Lockdown\n2 Tishana's Tidebinder\n2 Rest in Peace\n1 Beza, the Bounding Spring",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -1303,27 +1307,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 11
+      "metaShare": 14.1
     },
-    "standard-bo1-r3-izzet-prowess": {
-      "id": "standard-bo1-r3-izzet-prowess",
+    "standard-bo1-izzet-prowess": {
+      "id": "standard-bo1-izzet-prowess",
       "name": "Izzet Prowess",
       "format": "standard",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #3 for BO1.",
+      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -1428,6 +1428,10 @@
       "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -1438,27 +1442,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 10
+      "metaShare": 13.7
     },
-    "standard-bo3-r3-izzet-prowess": {
-      "id": "standard-bo3-r3-izzet-prowess",
+    "standard-bo3-izzet-prowess": {
+      "id": "standard-bo3-izzet-prowess",
       "name": "Izzet Prowess",
       "format": "standard",
       "mode": "bo3",
-      "rank": 3,
-      "tier": 1,
+      "rank": 5,
+      "tier": 2,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #3 for BO3.",
+      "description": "Astrologian's Planisphere + Slickshot Show-Off + Flow State. Premier Bo1 ladder deck; constant League 5-0s. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -1621,6 +1621,10 @@
       "arenaImport": "Deck\n4 Slickshot Show-Off\n4 Monastery Swiftspear\n3 Stormcatch Mentor\n2 Astrologian's Planisphere\n4 Consider\n4 Opt\n3 Sleight of Hand\n4 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n2 Flow State\n2 Into the Flood Maw\n2 This Town Ain't Big Enough\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n1 Otawara, Soaring City\n\nSideboard\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Into the Flood Maw\n2 Stock Up\n1 Screaming Nemesis",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -1631,20 +1635,16 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 10
+      "metaShare": 12.3
     },
-    "standard-bo1-r4-4c-control": {
-      "id": "standard-bo1-r4-4c-control",
+    "standard-bo1-4c-control": {
+      "id": "standard-bo1-4c-control",
       "name": "4c Control",
       "format": "standard",
       "mode": "bo1",
-      "rank": 4,
+      "rank": 6,
       "tier": 2,
       "colors": [
         "W",
@@ -1653,7 +1653,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #4 for BO1.",
+      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -1790,6 +1790,10 @@
       "arenaImport": "Deck\n4 Consider\n3 Stock Up\n3 Three Steps Ahead\n2 Negate\n3 Get Lost\n2 Torch the Tower\n2 Inevitable Defeat\n2 Tablet of Discovery\n2 Temporary Lockdown\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n1 Tishana's Tidebinder\n1 Deadly Cover-Up\n2 Meticulous Archive\n2 Thundering Falls\n2 Undercity Sewers\n2 Raucous Theater\n2 Shadowy Backstreet\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Starting Town\n3 Island\n2 Plains\n2 Swamp\n2 Mountain\n2 Restless Anchorage\n1 Otawara, Soaring City\n1 Eiganjo, Seat of the Empire",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -1800,21 +1804,17 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 9
+      "metaShare": 11.5
     },
-    "standard-bo3-r4-4c-control": {
-      "id": "standard-bo3-r4-4c-control",
+    "standard-bo3-4c-control": {
+      "id": "standard-bo3-4c-control",
       "name": "4c Control",
       "format": "standard",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "W",
         "U",
@@ -1822,7 +1822,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #4 for BO3.",
+      "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -2017,6 +2017,10 @@
       "arenaImport": "Deck\n4 Consider\n3 Stock Up\n3 Three Steps Ahead\n2 Negate\n3 Get Lost\n2 Torch the Tower\n2 Inevitable Defeat\n2 Tablet of Discovery\n2 Temporary Lockdown\n2 Beza, the Bounding Spring\n2 The Wandering Emperor\n1 Tishana's Tidebinder\n1 Deadly Cover-Up\n2 Meticulous Archive\n2 Thundering Falls\n2 Undercity Sewers\n2 Raucous Theater\n2 Shadowy Backstreet\n2 Floodfarm Verge\n2 Gloomlake Verge\n2 Starting Town\n3 Island\n2 Plains\n2 Swamp\n2 Mountain\n2 Restless Anchorage\n1 Otawara, Soaring City\n1 Eiganjo, Seat of the Empire\n\nSideboard\n2 Duress\n2 Negate\n2 Disdainful Stroke\n2 Ghost Vacuum\n2 Rest in Peace\n2 Tishana's Tidebinder\n2 Beza, the Bounding Spring\n1 Deadly Cover-Up",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2027,27 +2031,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 9
+      "metaShare": 12.7
     },
-    "standard-bo1-r5-izzet-spellementals": {
-      "id": "standard-bo1-r5-izzet-spellementals",
+    "standard-bo1-izzet-spellementals": {
+      "id": "standard-bo1-izzet-spellementals",
       "name": "Izzet Spellementals",
       "format": "standard",
       "mode": "bo1",
-      "rank": 5,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #5 for BO1.",
+      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -2156,6 +2156,10 @@
       "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2166,27 +2170,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 8
+      "metaShare": 10.1
     },
-    "standard-bo3-r5-izzet-spellementals": {
-      "id": "standard-bo3-r5-izzet-spellementals",
+    "standard-bo3-izzet-spellementals": {
+      "id": "standard-bo3-izzet-spellementals",
       "name": "Izzet Spellementals",
       "format": "standard",
       "mode": "bo3",
-      "rank": 5,
+      "rank": 6,
       "tier": 2,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #5 for BO3.",
+      "description": "Namor the Sub-Mariner + Eddymurk Crab + cantrips. Spells-matter midrange that spikes Challenges. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -2353,6 +2353,10 @@
       "arenaImport": "Deck\n4 Consider\n4 Opt\n3 Sleight of Hand\n3 Play with Fire\n3 Lightning Strike\n2 Torch the Tower\n3 Stock Up\n3 Eddymurk Crab\n2 Namor the Sub-Mariner\n2 Slickshot Show-Off\n2 Three Steps Ahead\n2 Into the Flood Maw\n4 Spirebluff Canal\n4 Shivan Reef\n3 Restless Spire\n4 Island\n5 Mountain\n2 Thundering Falls\n2 Starting Town\n1 Otawara, Soaring City\n2 Stormcatch Mentor\n\nSideboard\n2 Negate\n2 Ghost Vacuum\n2 Brotherhood's End\n2 Tishana's Tidebinder\n2 Disdainful Stroke\n2 Into the Flood Maw\n2 Screaming Nemesis\n1 Stock Up",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2363,27 +2367,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 8
+      "metaShare": 8.7
     },
-    "standard-bo1-r6-dimir-excruciator": {
-      "id": "standard-bo1-r6-dimir-excruciator",
+    "standard-bo1-dimir-excruciator": {
+      "id": "standard-bo1-dimir-excruciator",
       "name": "Dimir Excruciator",
       "format": "standard",
       "mode": "bo1",
-      "rank": 6,
-      "tier": 2,
+      "rank": 7,
+      "tier": 3,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Excruciator",
-      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #6 for BO1.",
+      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -2500,6 +2500,10 @@
       "arenaImport": "Deck\n4 Consider\n3 Opt\n3 Cut Down\n3 Go for the Throat\n2 Duress\n3 Stock Up\n2 Three Steps Ahead\n3 Deep-Cavern Bat\n2 Deceit\n2 Superior Spider-Man\n2 Requiting Hex\n2 Tishana's Tidebinder\n2 Preacher of the Schism\n1 Sheoldred, the Apocalypse\n4 Darkslick Shores\n4 Underground River\n3 Gloomlake Verge\n3 Restless Reef\n3 Island\n4 Swamp\n2 Undercity Sewers\n2 Starting Town\n1 Otawara, Soaring City",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2510,27 +2514,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 7
+      "metaShare": 6.9
     },
-    "standard-bo3-r6-dimir-excruciator": {
-      "id": "standard-bo3-r6-dimir-excruciator",
+    "standard-bo3-dimir-excruciator": {
+      "id": "standard-bo3-dimir-excruciator",
       "name": "Dimir Excruciator",
       "format": "standard",
       "mode": "bo3",
-      "rank": 6,
+      "rank": 4,
       "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Excruciator",
-      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #6 for BO3.",
+      "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -2705,6 +2705,10 @@
       "arenaImport": "Deck\n4 Consider\n3 Opt\n3 Cut Down\n3 Go for the Throat\n2 Duress\n3 Stock Up\n2 Three Steps Ahead\n3 Deep-Cavern Bat\n2 Deceit\n2 Superior Spider-Man\n2 Requiting Hex\n2 Tishana's Tidebinder\n2 Preacher of the Schism\n1 Sheoldred, the Apocalypse\n4 Darkslick Shores\n4 Underground River\n3 Gloomlake Verge\n3 Restless Reef\n3 Island\n4 Swamp\n2 Undercity Sewers\n2 Starting Town\n1 Otawara, Soaring City\n\nSideboard\n2 Ghost Vacuum\n2 Anoint with Affliction\n2 Negate\n2 Disdainful Stroke\n2 Duress\n2 Tishana's Tidebinder\n2 The End\n1 Sheoldred, the Apocalypse",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2715,26 +2719,22 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 7
+      "metaShare": 8.1
     },
-    "standard-bo1-r7-mono-green-landfall": {
-      "id": "standard-bo1-r7-mono-green-landfall",
+    "standard-bo1-mono-green-landfall": {
+      "id": "standard-bo1-mono-green-landfall",
       "name": "Mono-Green Landfall",
       "format": "standard",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "G"
       ],
       "archetype": "Mono-Green Landfall",
-      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #7 for BO1.",
+      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -2827,6 +2827,10 @@
       "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n3 Icetill Explorer\n3 Pawpatch Recruit\n3 Earthbender Ascension\n2 Scrapshooter\n2 Overlord of the Hauntwoods\n2 Frenzied Baloth\n2 Keen-Eyed Curator\n3 Practiced Offense\n18 Forest\n3 Lair of the Hydra\n2 Boseiju, Who Endures\n3 Restless Ridgeline\n2 Starting Town\n2 Bushwhack\n2 Snakeskin Veil",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -2837,16 +2841,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 6
+      "metaShare": 6.9
     },
-    "standard-bo3-r7-mono-green-landfall": {
-      "id": "standard-bo3-r7-mono-green-landfall",
+    "standard-bo3-mono-green-landfall": {
+      "id": "standard-bo3-mono-green-landfall",
       "name": "Mono-Green Landfall",
       "format": "standard",
       "mode": "bo3",
@@ -2856,7 +2856,7 @@
         "G"
       ],
       "archetype": "Mono-Green Landfall",
-      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #7 for BO3.",
+      "description": "Badgermole Cub + Icetill Explorer + Earthbender Ascension landfall aggression. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -3007,6 +3007,10 @@
       "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n3 Icetill Explorer\n3 Pawpatch Recruit\n3 Earthbender Ascension\n2 Scrapshooter\n2 Overlord of the Hauntwoods\n2 Frenzied Baloth\n2 Keen-Eyed Curator\n3 Practiced Offense\n18 Forest\n3 Lair of the Hydra\n2 Boseiju, Who Endures\n3 Restless Ridgeline\n2 Starting Town\n2 Bushwhack\n2 Snakeskin Veil\n\nSideboard\n2 Pick Your Poison\n2 Ghost Vacuum\n2 Scrapshooter\n2 Tranquil Frillback\n2 Obstinate Baloth\n2 Tear Asunder\n2 Hunter's Talent\n1 Overlord of the Hauntwoods",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -3017,16 +3021,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 6
+      "metaShare": 5.5
     },
-    "standard-bo1-r8-selesnya-gearhulk": {
-      "id": "standard-bo1-r8-selesnya-gearhulk",
+    "standard-bo1-selesnya-gearhulk": {
+      "id": "standard-bo1-selesnya-gearhulk",
       "name": "Selesnya Gearhulk",
       "format": "standard",
       "mode": "bo1",
@@ -3037,7 +3037,7 @@
         "G"
       ],
       "archetype": "Selesnya Gearhulk",
-      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO1.",
+      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -3142,6 +3142,10 @@
       "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n4 Brightglass Gearhulk\n3 Pawpatch Recruit\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Beza, the Bounding Spring\n2 Overlord of the Mistmoors\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n1 Starting Town",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -3152,16 +3156,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5
+      "metaShare": 4.1
     },
-    "standard-bo3-r8-selesnya-gearhulk": {
-      "id": "standard-bo3-r8-selesnya-gearhulk",
+    "standard-bo3-selesnya-gearhulk": {
+      "id": "standard-bo3-selesnya-gearhulk",
       "name": "Selesnya Gearhulk",
       "format": "standard",
       "mode": "bo3",
@@ -3172,7 +3172,7 @@
         "G"
       ],
       "archetype": "Selesnya Gearhulk",
-      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO3.",
+      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -3335,6 +3335,10 @@
       "arenaImport": "Deck\n4 Llanowar Elves\n4 Badgermole Cub\n4 Brightglass Gearhulk\n3 Pawpatch Recruit\n3 Practiced Offense\n3 Get Lost\n2 Sheltered by Ghosts\n2 Beza, the Bounding Spring\n2 Overlord of the Mistmoors\n2 Collector's Cage\n4 Brushland\n4 Razorverge Thicket\n3 Hushwood Verge\n3 Restless Prairie\n4 Forest\n4 Plains\n2 Boseiju, Who Endures\n2 Eiganjo, Seat of the Empire\n2 Lush Portico\n1 Starting Town\n\nSideboard\n2 Rest in Peace\n2 Destroy Evil\n2 Authority of the Consuls\n2 Ghost Vacuum\n2 Negate\n2 Beza, the Bounding Spring\n2 Elspeth's Smite\n1 Overlord of the Hauntwoods",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -3345,16 +3349,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5
+      "metaShare": 4.1
     },
-    "alchemy-bo1-r1-azorius-tempo": {
-      "id": "alchemy-bo1-r1-azorius-tempo",
+    "alchemy-bo1-azorius-tempo": {
+      "id": "alchemy-bo1-azorius-tempo",
       "name": "Azorius Tempo",
       "format": "alchemy",
       "mode": "bo1",
@@ -3365,7 +3365,7 @@
         "U"
       ],
       "archetype": "Azorius Tempo",
-      "description": "Flash threats and bounce for Alchemy Bo1. Daily rank #1 for BO1.",
+      "description": "Flash threats and bounce for Alchemy Bo1. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -3480,8 +3480,8 @@
       ],
       "metaShare": 13
     },
-    "alchemy-bo3-r1-azorius-tempo": {
-      "id": "alchemy-bo3-r1-azorius-tempo",
+    "alchemy-bo3-azorius-tempo": {
+      "id": "alchemy-bo3-azorius-tempo",
       "name": "Azorius Tempo",
       "format": "alchemy",
       "mode": "bo3",
@@ -3492,7 +3492,7 @@
         "U"
       ],
       "archetype": "Azorius Tempo",
-      "description": "Flash threats and bounce for Alchemy Bo1. Daily rank #1 for BO3.",
+      "description": "Flash threats and bounce for Alchemy Bo1. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -3632,20 +3632,20 @@
       ],
       "metaShare": 13
     },
-    "alchemy-bo1-r2-grixis-control": {
-      "id": "alchemy-bo1-r2-grixis-control",
+    "alchemy-bo1-grixis-control": {
+      "id": "alchemy-bo1-grixis-control",
       "name": "Grixis Control",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "U",
         "B",
         "R"
       ],
       "archetype": "Grixis Control",
-      "description": "Flexible answers for Alchemy Bo3 events. Daily rank #2 for BO1.",
+      "description": "Flexible answers for Alchemy Bo3 events. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 3,
@@ -3776,8 +3776,8 @@
       ],
       "metaShare": 11
     },
-    "alchemy-bo3-r2-grixis-control": {
-      "id": "alchemy-bo3-r2-grixis-control",
+    "alchemy-bo3-grixis-control": {
+      "id": "alchemy-bo3-grixis-control",
       "name": "Grixis Control",
       "format": "alchemy",
       "mode": "bo3",
@@ -3789,7 +3789,7 @@
         "R"
       ],
       "archetype": "Grixis Control",
-      "description": "Flexible answers for Alchemy Bo3 events. Daily rank #2 for BO3.",
+      "description": "Flexible answers for Alchemy Bo3 events. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 3,
@@ -3976,21 +3976,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11.8
+      "metaShare": 12.2
     },
-    "alchemy-bo1-r3-rakdos-midrange": {
-      "id": "alchemy-bo1-r3-rakdos-midrange",
+    "alchemy-bo1-rakdos-midrange": {
+      "id": "alchemy-bo1-rakdos-midrange",
       "name": "Rakdos Midrange",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 4,
       "tier": 2,
       "colors": [
         "B",
         "R"
       ],
       "archetype": "Rakdos Midrange",
-      "description": "Aggressive midrange with strong removal. Daily rank #3 for BO1.",
+      "description": "Aggressive midrange with strong removal. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -4105,19 +4105,19 @@
       ],
       "metaShare": 10
     },
-    "alchemy-bo3-r3-rakdos-midrange": {
-      "id": "alchemy-bo3-r3-rakdos-midrange",
+    "alchemy-bo3-rakdos-midrange": {
+      "id": "alchemy-bo3-rakdos-midrange",
       "name": "Rakdos Midrange",
       "format": "alchemy",
       "mode": "bo3",
       "rank": 3,
-      "tier": 2,
+      "tier": 1,
       "colors": [
         "B",
         "R"
       ],
       "archetype": "Rakdos Midrange",
-      "description": "Aggressive midrange with strong removal. Daily rank #3 for BO3.",
+      "description": "Aggressive midrange with strong removal. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -4255,21 +4255,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 10.8
+      "metaShare": 11.2
     },
-    "alchemy-bo1-r4-selesnya-midrange": {
-      "id": "alchemy-bo1-r4-selesnya-midrange",
+    "alchemy-bo1-selesnya-midrange": {
+      "id": "alchemy-bo1-selesnya-midrange",
       "name": "Selesnya Midrange",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 4,
+      "rank": 5,
       "tier": 2,
       "colors": [
         "W",
         "G"
       ],
       "archetype": "Selesnya Midrange",
-      "description": "Creatures and combat tricks for Alchemy. Daily rank #4 for BO1.",
+      "description": "Creatures and combat tricks for Alchemy. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -4384,8 +4384,8 @@
       ],
       "metaShare": 9
     },
-    "alchemy-bo3-r4-selesnya-midrange": {
-      "id": "alchemy-bo3-r4-selesnya-midrange",
+    "alchemy-bo3-selesnya-midrange": {
+      "id": "alchemy-bo3-selesnya-midrange",
       "name": "Selesnya Midrange",
       "format": "alchemy",
       "mode": "bo3",
@@ -4396,7 +4396,7 @@
         "G"
       ],
       "archetype": "Selesnya Midrange",
-      "description": "Creatures and combat tricks for Alchemy. Daily rank #4 for BO3.",
+      "description": "Creatures and combat tricks for Alchemy. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -4534,21 +4534,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 9.8
+      "metaShare": 10.2
     },
-    "alchemy-bo1-r5-izzet-spells": {
-      "id": "alchemy-bo1-r5-izzet-spells",
+    "alchemy-bo1-izzet-spells": {
+      "id": "alchemy-bo1-izzet-spells",
       "name": "Izzet Spells",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 5,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spell-heavy tempo for digital-only tools. Daily rank #5 for BO1.",
+      "description": "Spell-heavy tempo for digital-only tools. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -4657,21 +4657,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8
+      "metaShare": 9.4
     },
-    "alchemy-bo3-r5-izzet-spells": {
-      "id": "alchemy-bo3-r5-izzet-spells",
+    "alchemy-bo3-izzet-spells": {
+      "id": "alchemy-bo3-izzet-spells",
       "name": "Izzet Spells",
       "format": "alchemy",
       "mode": "bo3",
-      "rank": 5,
-      "tier": 2,
+      "rank": 7,
+      "tier": 3,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spell-heavy tempo for digital-only tools. Daily rank #5 for BO3.",
+      "description": "Spell-heavy tempo for digital-only tools. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -4807,19 +4807,19 @@
       ],
       "metaShare": 8
     },
-    "alchemy-bo1-r6-dimir-bounce": {
-      "id": "alchemy-bo1-r6-dimir-bounce",
+    "alchemy-bo1-dimir-bounce": {
+      "id": "alchemy-bo1-dimir-bounce",
       "name": "Dimir Bounce",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 6,
+      "rank": 7,
       "tier": 3,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Bounce",
-      "description": "Bounce loops and discard pressure. Daily rank #6 for BO1.",
+      "description": "Bounce loops and discard pressure. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -4934,19 +4934,19 @@
       ],
       "metaShare": 7
     },
-    "alchemy-bo3-r6-dimir-bounce": {
-      "id": "alchemy-bo3-r6-dimir-bounce",
+    "alchemy-bo3-dimir-bounce": {
+      "id": "alchemy-bo3-dimir-bounce",
       "name": "Dimir Bounce",
       "format": "alchemy",
       "mode": "bo3",
-      "rank": 6,
-      "tier": 3,
+      "rank": 5,
+      "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Bounce",
-      "description": "Bounce loops and discard pressure. Daily rank #6 for BO3.",
+      "description": "Bounce loops and discard pressure. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -5086,18 +5086,18 @@
       ],
       "metaShare": 7
     },
-    "alchemy-bo1-r7-mono-red": {
-      "id": "alchemy-bo1-r7-mono-red",
+    "alchemy-bo1-mono-red": {
+      "id": "alchemy-bo1-mono-red",
       "name": "Mono-Red",
       "format": "alchemy",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "R"
       ],
       "archetype": "Mono-Red",
-      "description": "Linear aggro for Alchemy Bo1. Daily rank #7 for BO1.",
+      "description": "Linear aggro for Alchemy Bo1. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -5188,18 +5188,18 @@
       ],
       "metaShare": 6
     },
-    "alchemy-bo3-r7-mono-red": {
-      "id": "alchemy-bo3-r7-mono-red",
+    "alchemy-bo3-mono-red": {
+      "id": "alchemy-bo3-mono-red",
       "name": "Mono-Red",
       "format": "alchemy",
       "mode": "bo3",
-      "rank": 7,
+      "rank": 8,
       "tier": 3,
       "colors": [
         "R"
       ],
       "archetype": "Mono-Red",
-      "description": "Linear aggro for Alchemy Bo1. Daily rank #7 for BO3.",
+      "description": "Linear aggro for Alchemy Bo1. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -5315,8 +5315,8 @@
       ],
       "metaShare": 6
     },
-    "alchemy-bo1-r8-orzhov-midrange": {
-      "id": "alchemy-bo1-r8-orzhov-midrange",
+    "alchemy-bo1-orzhov-midrange": {
+      "id": "alchemy-bo1-orzhov-midrange",
       "name": "Orzhov Midrange",
       "format": "alchemy",
       "mode": "bo1",
@@ -5327,7 +5327,7 @@
         "B"
       ],
       "archetype": "Orzhov Midrange",
-      "description": "Bats and removal for fair Alchemy. Daily rank #8 for BO1.",
+      "description": "Bats and removal for fair Alchemy. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -5442,19 +5442,19 @@
       ],
       "metaShare": 5
     },
-    "alchemy-bo3-r8-orzhov-midrange": {
-      "id": "alchemy-bo3-r8-orzhov-midrange",
+    "alchemy-bo3-orzhov-midrange": {
+      "id": "alchemy-bo3-orzhov-midrange",
       "name": "Orzhov Midrange",
       "format": "alchemy",
       "mode": "bo3",
-      "rank": 8,
-      "tier": 3,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "W",
         "B"
       ],
       "archetype": "Orzhov Midrange",
-      "description": "Bats and removal for fair Alchemy. Daily rank #8 for BO3.",
+      "description": "Bats and removal for fair Alchemy. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -5592,14 +5592,14 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.8
+      "metaShare": 6.2
     },
-    "historic-bo1-r1-jeskai-control": {
-      "id": "historic-bo1-r1-jeskai-control",
+    "historic-bo1-jeskai-control": {
+      "id": "historic-bo1-jeskai-control",
       "name": "Jeskai Control",
       "format": "historic",
       "mode": "bo1",
-      "rank": 2,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "W",
@@ -5607,7 +5607,7 @@
         "R"
       ],
       "archetype": "Jeskai Control",
-      "description": "Sweepers, counters, Teferi endgame. Daily rank #1 for BO1.",
+      "description": "Sweepers, counters, Teferi endgame. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -5746,12 +5746,12 @@
       ],
       "metaShare": 11
     },
-    "historic-bo3-r1-jeskai-control": {
-      "id": "historic-bo3-r1-jeskai-control",
+    "historic-bo3-jeskai-control": {
+      "id": "historic-bo3-jeskai-control",
       "name": "Jeskai Control",
       "format": "historic",
       "mode": "bo3",
-      "rank": 2,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "W",
@@ -5759,7 +5759,7 @@
         "R"
       ],
       "archetype": "Jeskai Control",
-      "description": "Sweepers, counters, Teferi endgame. Daily rank #1 for BO3.",
+      "description": "Sweepers, counters, Teferi endgame. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -5921,10 +5921,10 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 11.8
+      "metaShare": 12.2
     },
-    "historic-bo1-r2-jund-midrange": {
-      "id": "historic-bo1-r2-jund-midrange",
+    "historic-bo1-jund-midrange": {
+      "id": "historic-bo1-jund-midrange",
       "name": "Jund Midrange",
       "format": "historic",
       "mode": "bo1",
@@ -5936,7 +5936,7 @@
         "G"
       ],
       "archetype": "Jund Midrange",
-      "description": "Ragavan, Fable, remove everything. Daily rank #2 for BO1.",
+      "description": "Ragavan, Fable, remove everything. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -6053,6 +6053,10 @@
       "arenaImport": "Deck\n4 Ragavan, Nimble Pilferer\n4 Deathrite Shaman\n3 Bloodtithe Harvester\n3 Fable of the Mirror-Breaker\n2 Sheoldred, the Apocalypse\n4 Thoughtseize\n3 Fatal Push\n2 Abrade\n2 Kolaghan's Command\n2 Wrenn and Six\n4 Blood Crypt\n4 Overgrown Tomb\n3 Stomping Ground\n3 Blackcleave Cliffs\n2 Blooming Marsh\n2 Takenuma, Abandoned Mire\n1 Boseiju, Who Endures\n2 Swamp\n1 Mountain\n1 Forest\n2 Glorybringer\n2 Ziatora's Proving Ground\n2 Copperline Gorge",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -6063,20 +6067,16 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/historic"
         }
       ],
-      "metaShare": 12
+      "metaShare": 10
     },
-    "historic-bo3-r2-jund-midrange": {
-      "id": "historic-bo3-r2-jund-midrange",
+    "historic-bo3-jund-midrange": {
+      "id": "historic-bo3-jund-midrange",
       "name": "Jund Midrange",
       "format": "historic",
       "mode": "bo3",
-      "rank": 1,
+      "rank": 2,
       "tier": 1,
       "colors": [
         "B",
@@ -6084,7 +6084,7 @@
         "G"
       ],
       "archetype": "Jund Midrange",
-      "description": "Ragavan, Fable, remove everything. Daily rank #2 for BO3.",
+      "description": "Ragavan, Fable, remove everything. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -6259,6 +6259,10 @@
       "arenaImport": "Deck\n4 Ragavan, Nimble Pilferer\n4 Deathrite Shaman\n3 Bloodtithe Harvester\n3 Fable of the Mirror-Breaker\n2 Sheoldred, the Apocalypse\n4 Thoughtseize\n3 Fatal Push\n2 Abrade\n2 Kolaghan's Command\n2 Wrenn and Six\n4 Blood Crypt\n4 Overgrown Tomb\n3 Stomping Ground\n3 Blackcleave Cliffs\n2 Blooming Marsh\n2 Takenuma, Abandoned Mire\n1 Boseiju, Who Endures\n2 Swamp\n1 Mountain\n1 Forest\n2 Glorybringer\n2 Ziatora's Proving Ground\n2 Copperline Gorge\n\nSideboard\n2 Duress\n2 Haywire Mite\n2 Unlicensed Hearse\n2 Culling Ritual\n2 Klothys, God of Destiny\n2 Extinction Event\n1 Glorybringer\n2 Pithing Needle",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -6269,27 +6273,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/historic"
         }
       ],
-      "metaShare": 12
+      "metaShare": 11.2
     },
-    "historic-bo1-r3-izzet-creativity": {
-      "id": "historic-bo1-r3-izzet-creativity",
+    "historic-bo1-izzet-creativity": {
+      "id": "historic-bo1-izzet-creativity",
       "name": "Izzet Creativity",
       "format": "historic",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 2,
       "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Creativity",
-      "description": "Creativity into Worldspine / Indomitable Creativity lines. Daily rank #3 for BO1.",
+      "description": "Creativity into Worldspine / Indomitable Creativity lines. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -6412,19 +6412,19 @@
       ],
       "metaShare": 9
     },
-    "historic-bo3-r3-izzet-creativity": {
-      "id": "historic-bo3-r3-izzet-creativity",
+    "historic-bo3-izzet-creativity": {
+      "id": "historic-bo3-izzet-creativity",
       "name": "Izzet Creativity",
       "format": "historic",
       "mode": "bo3",
-      "rank": 3,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Creativity",
-      "description": "Creativity into Worldspine / Indomitable Creativity lines. Daily rank #3 for BO3.",
+      "description": "Creativity into Worldspine / Indomitable Creativity lines. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -6572,8 +6572,8 @@
       ],
       "metaShare": 9
     },
-    "historic-bo1-r4-creatures-toolbox": {
-      "id": "historic-bo1-r4-creatures-toolbox",
+    "historic-bo1-creatures-toolbox": {
+      "id": "historic-bo1-creatures-toolbox",
       "name": "Creatures Toolbox",
       "format": "historic",
       "mode": "bo1",
@@ -6583,7 +6583,7 @@
         "G"
       ],
       "archetype": "Creatures Toolbox",
-      "description": "Collected Company and utility creatures. Daily rank #4 for BO1.",
+      "description": "Collected Company and utility creatures. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -6706,18 +6706,18 @@
       ],
       "metaShare": 8
     },
-    "historic-bo3-r4-creatures-toolbox": {
-      "id": "historic-bo3-r4-creatures-toolbox",
+    "historic-bo3-creatures-toolbox": {
+      "id": "historic-bo3-creatures-toolbox",
       "name": "Creatures Toolbox",
       "format": "historic",
       "mode": "bo3",
-      "rank": 4,
+      "rank": 5,
       "tier": 2,
       "colors": [
         "G"
       ],
       "archetype": "Creatures Toolbox",
-      "description": "Collected Company and utility creatures. Daily rank #4 for BO3.",
+      "description": "Collected Company and utility creatures. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -6865,8 +6865,8 @@
       ],
       "metaShare": 8
     },
-    "historic-bo1-r5-affinity": {
-      "id": "historic-bo1-r5-affinity",
+    "historic-bo1-affinity": {
+      "id": "historic-bo1-affinity",
       "name": "Affinity",
       "format": "historic",
       "mode": "bo1",
@@ -6876,7 +6876,7 @@
         "C"
       ],
       "archetype": "Affinity",
-      "description": "Artifact swarm with Thought Monitor. Daily rank #5 for BO1.",
+      "description": "Artifact swarm with Thought Monitor. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -6991,18 +6991,18 @@
       ],
       "metaShare": 7
     },
-    "historic-bo3-r5-affinity": {
-      "id": "historic-bo3-r5-affinity",
+    "historic-bo3-affinity": {
+      "id": "historic-bo3-affinity",
       "name": "Affinity",
       "format": "historic",
       "mode": "bo3",
-      "rank": 5,
+      "rank": 6,
       "tier": 2,
       "colors": [
         "C"
       ],
       "archetype": "Affinity",
-      "description": "Artifact swarm with Thought Monitor. Daily rank #5 for BO3.",
+      "description": "Artifact swarm with Thought Monitor. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -7142,8 +7142,8 @@
       ],
       "metaShare": 7
     },
-    "historic-bo1-r6-storm": {
-      "id": "historic-bo1-r6-storm",
+    "historic-bo1-storm": {
+      "id": "historic-bo1-storm",
       "name": "Storm",
       "format": "historic",
       "mode": "bo1",
@@ -7154,7 +7154,7 @@
         "R"
       ],
       "archetype": "Storm",
-      "description": "Ritual into grapeshot-style finishes. Daily rank #6 for BO1.",
+      "description": "Ritual into grapeshot-style finishes. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -7273,8 +7273,8 @@
       ],
       "metaShare": 6
     },
-    "historic-bo3-r6-storm": {
-      "id": "historic-bo3-r6-storm",
+    "historic-bo3-storm": {
+      "id": "historic-bo3-storm",
       "name": "Storm",
       "format": "historic",
       "mode": "bo3",
@@ -7285,7 +7285,7 @@
         "R"
       ],
       "archetype": "Storm",
-      "description": "Ritual into grapeshot-style finishes. Daily rank #6 for BO3.",
+      "description": "Ritual into grapeshot-style finishes. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -7429,19 +7429,19 @@
       ],
       "metaShare": 6
     },
-    "historic-bo1-r7-azorius-control": {
-      "id": "historic-bo1-r7-azorius-control",
+    "historic-bo1-azorius-control": {
+      "id": "historic-bo1-azorius-control",
       "name": "Azorius Control",
       "format": "historic",
       "mode": "bo1",
-      "rank": 7,
+      "rank": 8,
       "tier": 3,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "Classic UW control for Historic. Daily rank #7 for BO1.",
+      "description": "Classic UW control for Historic. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -7564,19 +7564,19 @@
       ],
       "metaShare": 5.5
     },
-    "historic-bo3-r7-azorius-control": {
-      "id": "historic-bo3-r7-azorius-control",
+    "historic-bo3-azorius-control": {
+      "id": "historic-bo3-azorius-control",
       "name": "Azorius Control",
       "format": "historic",
       "mode": "bo3",
-      "rank": 6,
-      "tier": 2,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "Classic UW control for Historic. Daily rank #7 for BO3.",
+      "description": "Classic UW control for Historic. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -7722,21 +7722,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.3
+      "metaShare": 6.7
     },
-    "historic-bo1-r8-rakdos-arcanist": {
-      "id": "historic-bo1-r8-rakdos-arcanist",
+    "historic-bo1-rakdos-arcanist": {
+      "id": "historic-bo1-rakdos-arcanist",
       "name": "Rakdos Arcanist",
       "format": "historic",
       "mode": "bo1",
-      "rank": 8,
+      "rank": 7,
       "tier": 3,
       "colors": [
         "B",
         "R"
       ],
       "archetype": "Rakdos Arcanist",
-      "description": "Dreadhorde Arcanist grind package. Daily rank #8 for BO1.",
+      "description": "Dreadhorde Arcanist grind package. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -7855,8 +7855,8 @@
       ],
       "metaShare": 5
     },
-    "historic-bo3-r8-rakdos-arcanist": {
-      "id": "historic-bo3-r8-rakdos-arcanist",
+    "historic-bo3-rakdos-arcanist": {
+      "id": "historic-bo3-rakdos-arcanist",
       "name": "Rakdos Arcanist",
       "format": "historic",
       "mode": "bo3",
@@ -7867,7 +7867,7 @@
         "R"
       ],
       "archetype": "Rakdos Arcanist",
-      "description": "Dreadhorde Arcanist grind package. Daily rank #8 for BO3.",
+      "description": "Dreadhorde Arcanist grind package. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -8011,19 +8011,19 @@
       ],
       "metaShare": 5
     },
-    "pioneer-bo1-r1-rakdos-midrange": {
-      "id": "pioneer-bo1-r1-rakdos-midrange",
+    "pioneer-bo1-rakdos-midrange": {
+      "id": "pioneer-bo1-rakdos-midrange",
       "name": "Rakdos Midrange",
       "format": "pioneer",
       "mode": "bo1",
-      "rank": 4,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "B",
         "R"
       ],
       "archetype": "Rakdos Midrange",
-      "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #1 for BO1.",
+      "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -8124,6 +8124,10 @@
       "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Bonecrusher Giant\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n4 Fatal Push\n3 Dreadbore\n4 Blood Crypt\n4 Blackcleave Cliffs\n3 Haunted Ridge\n4 Swamp\n3 Mountain\n2 Castle Locthwain\n2 Takenuma, Abandoned Mire\n2 Graveyard Trespasser\n2 Duress\n2 Extinction Event\n2 Den of the Bugbear\n2 Blightstep Pathway",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8134,27 +8138,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 1
+      "metaShare": 13
     },
-    "pioneer-bo3-r1-rakdos-midrange": {
-      "id": "pioneer-bo3-r1-rakdos-midrange",
+    "pioneer-bo3-rakdos-midrange": {
+      "id": "pioneer-bo3-rakdos-midrange",
       "name": "Rakdos Midrange",
       "format": "pioneer",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 1,
+      "tier": 1,
       "colors": [
         "B",
         "R"
       ],
       "archetype": "Rakdos Midrange",
-      "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #1 for BO3.",
+      "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -8280,6 +8280,10 @@
       "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Bonecrusher Giant\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n4 Fatal Push\n3 Dreadbore\n4 Blood Crypt\n4 Blackcleave Cliffs\n3 Haunted Ridge\n4 Swamp\n3 Mountain\n2 Castle Locthwain\n2 Takenuma, Abandoned Mire\n2 Graveyard Trespasser\n2 Duress\n2 Extinction Event\n2 Den of the Bugbear\n2 Blightstep Pathway",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8290,27 +8294,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 1
+      "metaShare": 14.2
     },
-    "pioneer-bo1-r2-azorius-control": {
-      "id": "pioneer-bo1-r2-azorius-control",
+    "pioneer-bo1-azorius-control": {
+      "id": "pioneer-bo1-azorius-control",
       "name": "Azorius Control",
       "format": "pioneer",
       "mode": "bo1",
-      "rank": 1,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #2 for BO1.",
+      "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -8415,6 +8415,10 @@
       "arenaImport": "Deck\n4 Memory Deluge\n3 Supreme Verdict\n2 Farewell\n4 No More Lies\n3 Dovin's Veto\n3 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Hengegate Pathway\n3 Deserted Beach\n4 Island\n3 Plains\n2 Shark Typhoon\n2 Get Lost\n2 Otawara, Soaring City\n2 Eiganjo, Seat of the Empire\n2 Hall of Storm Giants\n2 Field of Ruin\n2 Strict Proctor\n2 Change the Equation\n1 Absorb",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8425,27 +8429,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 10
+      "metaShare": 12
     },
-    "pioneer-bo3-r2-azorius-control": {
-      "id": "pioneer-bo3-r2-azorius-control",
+    "pioneer-bo3-azorius-control": {
+      "id": "pioneer-bo3-azorius-control",
       "name": "Azorius Control",
       "format": "pioneer",
       "mode": "bo3",
-      "rank": 1,
+      "rank": 2,
       "tier": 1,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #2 for BO3.",
+      "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -8608,6 +8608,10 @@
       "arenaImport": "Deck\n4 Memory Deluge\n3 Supreme Verdict\n2 Farewell\n4 No More Lies\n3 Dovin's Veto\n3 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Hengegate Pathway\n3 Deserted Beach\n4 Island\n3 Plains\n2 Shark Typhoon\n2 Get Lost\n2 Otawara, Soaring City\n2 Eiganjo, Seat of the Empire\n2 Hall of Storm Giants\n2 Field of Ruin\n2 Strict Proctor\n2 Change the Equation\n1 Absorb\n\nSideboard\n2 Rest in Peace\n2 Dovin's Veto\n2 Mystical Dispute\n2 Narset, Parter of Veils\n2 Aether Gust\n1 Farewell\n2 Elspeth Conquers Death\n2 Summary Dismissal",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8618,27 +8622,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 10
+      "metaShare": 13.2
     },
-    "pioneer-bo1-r3-izzet-phoenix": {
-      "id": "pioneer-bo1-r3-izzet-phoenix",
+    "pioneer-bo1-izzet-phoenix": {
+      "id": "pioneer-bo1-izzet-phoenix",
       "name": "Izzet Phoenix",
       "format": "pioneer",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "Arclight Phoenix recursion storm. Daily rank #3 for BO1.",
+      "description": "Arclight Phoenix recursion storm. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -8739,6 +8739,10 @@
       "arenaImport": "Deck\n4 Arclight Phoenix\n4 Consider\n4 Opt\n4 Lightning Axe\n3 Fiery Impulse\n3 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents\n4 Island\n3 Mountain\n3 Expressive Iteration\n2 Piecie of Mind\n2 Ledger Shredder\n2 Stormcarved Coast\n2 Otawara, Soaring City\n2 Thing in the Ice\n2 Picklock Prankster\n2 Fiery Islet\n2 Temporal Trespass",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8749,27 +8753,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8
+      "metaShare": 10
     },
-    "pioneer-bo3-r3-izzet-phoenix": {
-      "id": "pioneer-bo3-r3-izzet-phoenix",
+    "pioneer-bo3-izzet-phoenix": {
+      "id": "pioneer-bo3-izzet-phoenix",
       "name": "Izzet Phoenix",
       "format": "pioneer",
       "mode": "bo3",
-      "rank": 3,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "Arclight Phoenix recursion storm. Daily rank #3 for BO3.",
+      "description": "Arclight Phoenix recursion storm. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -8895,6 +8895,10 @@
       "arenaImport": "Deck\n4 Arclight Phoenix\n4 Consider\n4 Opt\n4 Lightning Axe\n3 Fiery Impulse\n3 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents\n4 Island\n3 Mountain\n3 Expressive Iteration\n2 Piecie of Mind\n2 Ledger Shredder\n2 Stormcarved Coast\n2 Otawara, Soaring City\n2 Thing in the Ice\n2 Picklock Prankster\n2 Fiery Islet\n2 Temporal Trespass",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -8905,16 +8909,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8
+      "metaShare": 10
     },
-    "pioneer-bo1-r4-lotus-field": {
-      "id": "pioneer-bo1-r4-lotus-field",
+    "pioneer-bo1-lotus-field": {
+      "id": "pioneer-bo1-lotus-field",
       "name": "Lotus Field",
       "format": "pioneer",
       "mode": "bo1",
@@ -8925,7 +8925,7 @@
         "G"
       ],
       "archetype": "Lotus Field",
-      "description": "Combo lotus into massive turns. Daily rank #4 for BO1.",
+      "description": "Combo lotus into massive turns. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -9044,8 +9044,8 @@
       ],
       "metaShare": 9
     },
-    "pioneer-bo3-r4-lotus-field": {
-      "id": "pioneer-bo3-r4-lotus-field",
+    "pioneer-bo3-lotus-field": {
+      "id": "pioneer-bo3-lotus-field",
       "name": "Lotus Field",
       "format": "pioneer",
       "mode": "bo3",
@@ -9056,7 +9056,7 @@
         "G"
       ],
       "archetype": "Lotus Field",
-      "description": "Combo lotus into massive turns. Daily rank #4 for BO3.",
+      "description": "Combo lotus into massive turns. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -9200,8 +9200,8 @@
       ],
       "metaShare": 9
     },
-    "pioneer-bo1-r5-amalia-combo": {
-      "id": "pioneer-bo1-r5-amalia-combo",
+    "pioneer-bo1-amalia-combo": {
+      "id": "pioneer-bo1-amalia-combo",
       "name": "Amalia Combo",
       "format": "pioneer",
       "mode": "bo1",
@@ -9212,7 +9212,7 @@
         "B"
       ],
       "archetype": "Amalia Combo",
-      "description": "Amalia + Wildgrowth Walker life combo. Daily rank #5 for BO1.",
+      "description": "Amalia + Wildgrowth Walker life combo. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -9335,8 +9335,8 @@
       ],
       "metaShare": 8
     },
-    "pioneer-bo3-r5-amalia-combo": {
-      "id": "pioneer-bo3-r5-amalia-combo",
+    "pioneer-bo3-amalia-combo": {
+      "id": "pioneer-bo3-amalia-combo",
       "name": "Amalia Combo",
       "format": "pioneer",
       "mode": "bo3",
@@ -9347,7 +9347,7 @@
         "B"
       ],
       "archetype": "Amalia Combo",
-      "description": "Amalia + Wildgrowth Walker life combo. Daily rank #5 for BO3.",
+      "description": "Amalia + Wildgrowth Walker life combo. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -9495,8 +9495,8 @@
       ],
       "metaShare": 8
     },
-    "pioneer-bo1-r6-mono-green-devotion": {
-      "id": "pioneer-bo1-r6-mono-green-devotion",
+    "pioneer-bo1-mono-green-devotion": {
+      "id": "pioneer-bo1-mono-green-devotion",
       "name": "Mono-Green Devotion",
       "format": "pioneer",
       "mode": "bo1",
@@ -9506,7 +9506,7 @@
         "G"
       ],
       "archetype": "Mono-Green Devotion",
-      "description": "Cavalier and Nykthos big mana. Daily rank #6 for BO1.",
+      "description": "Cavalier and Nykthos big mana. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -9625,8 +9625,8 @@
       ],
       "metaShare": 7
     },
-    "pioneer-bo3-r6-mono-green-devotion": {
-      "id": "pioneer-bo3-r6-mono-green-devotion",
+    "pioneer-bo3-mono-green-devotion": {
+      "id": "pioneer-bo3-mono-green-devotion",
       "name": "Mono-Green Devotion",
       "format": "pioneer",
       "mode": "bo3",
@@ -9636,7 +9636,7 @@
         "G"
       ],
       "archetype": "Mono-Green Devotion",
-      "description": "Cavalier and Nykthos big mana. Daily rank #6 for BO3.",
+      "description": "Cavalier and Nykthos big mana. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -9780,19 +9780,19 @@
       ],
       "metaShare": 7
     },
-    "pioneer-bo1-r7-boros-heroic": {
-      "id": "pioneer-bo1-r7-boros-heroic",
+    "pioneer-bo1-boros-heroic": {
+      "id": "pioneer-bo1-boros-heroic",
       "name": "Boros Heroic",
       "format": "pioneer",
       "mode": "bo1",
-      "rank": 8,
-      "tier": 3,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "W",
         "R"
       ],
       "archetype": "Boros Heroic",
-      "description": "Heroic pump and protection. Daily rank #7 for BO1.",
+      "description": "Heroic pump and protection. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -9909,10 +9909,10 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.6
+      "metaShare": 7.4
     },
-    "pioneer-bo3-r7-boros-heroic": {
-      "id": "pioneer-bo3-r7-boros-heroic",
+    "pioneer-bo3-boros-heroic": {
+      "id": "pioneer-bo3-boros-heroic",
       "name": "Boros Heroic",
       "format": "pioneer",
       "mode": "bo3",
@@ -9923,7 +9923,7 @@
         "R"
       ],
       "archetype": "Boros Heroic",
-      "description": "Heroic pump and protection. Daily rank #7 for BO3.",
+      "description": "Heroic pump and protection. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -10067,19 +10067,19 @@
       ],
       "metaShare": 6
     },
-    "pioneer-bo1-r8-dimir-control": {
-      "id": "pioneer-bo1-r8-dimir-control",
+    "pioneer-bo1-dimir-control": {
+      "id": "pioneer-bo1-dimir-control",
       "name": "Dimir Control",
       "format": "pioneer",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 8,
+      "tier": 3,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Control",
-      "description": "Discard and permission for Pioneer. Daily rank #8 for BO1.",
+      "description": "Discard and permission for Pioneer. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -10184,6 +10184,10 @@
       "arenaImport": "Deck\n4 Thoughtseize\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n3 Memory Deluge\n3 Drown in the Loch\n4 Watery Grave\n4 Darkslick Shores\n3 Clearwater Pathway\n3 Island\n3 Swamp\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Narset, Parter of Veils\n2 Shark Typhoon\n2 Extinction Event\n2 Negate\n2 Censor\n2 Consider\n2 Field of Ruin\n2 Hall of Storm Giants",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -10194,27 +10198,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 10
+      "metaShare": 5
     },
-    "pioneer-bo3-r8-dimir-control": {
-      "id": "pioneer-bo3-r8-dimir-control",
+    "pioneer-bo3-dimir-control": {
+      "id": "pioneer-bo3-dimir-control",
       "name": "Dimir Control",
       "format": "pioneer",
       "mode": "bo3",
-      "rank": 2,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Control",
-      "description": "Discard and permission for Pioneer. Daily rank #8 for BO3.",
+      "description": "Discard and permission for Pioneer. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -10344,6 +10344,10 @@
       "arenaImport": "Deck\n4 Thoughtseize\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n3 Memory Deluge\n3 Drown in the Loch\n4 Watery Grave\n4 Darkslick Shores\n3 Clearwater Pathway\n3 Island\n3 Swamp\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Narset, Parter of Veils\n2 Shark Typhoon\n2 Extinction Event\n2 Negate\n2 Censor\n2 Consider\n2 Field of Ruin\n2 Hall of Storm Giants",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -10354,16 +10358,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 10
+      "metaShare": 6.2
     },
-    "timeless-bo1-r1-reanimator": {
-      "id": "timeless-bo1-r1-reanimator",
+    "timeless-bo1-reanimator": {
+      "id": "timeless-bo1-reanimator",
       "name": "Reanimator",
       "format": "timeless",
       "mode": "bo1",
@@ -10374,7 +10374,7 @@
         "B"
       ],
       "archetype": "Reanimator",
-      "description": "Entomb into Archon / Atraxa. Daily rank #1 for BO1.",
+      "description": "Entomb into Archon / Atraxa. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -10483,6 +10483,10 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Entomb\n4 Reanimate\n3 Animate Dead\n3 Thoughtseize\n3 Brainstorm\n2 Show and Tell\n2 Atraxa, Grand Unifier\n2 Archon of Cruelty\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n3 Swamp\n2 Demonic Tutor\n2 Fatal Push\n2 Daze\n1 Griselbrand\n2 Ponder\n2 Otawara, Soaring City",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -10493,27 +10497,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 10
+      "metaShare": 9
     },
-    "timeless-bo3-r1-reanimator": {
-      "id": "timeless-bo3-r1-reanimator",
+    "timeless-bo3-reanimator": {
+      "id": "timeless-bo3-reanimator",
       "name": "Reanimator",
       "format": "timeless",
       "mode": "bo3",
-      "rank": 1,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Reanimator",
-      "description": "Entomb into Archon / Atraxa. Daily rank #1 for BO3.",
+      "description": "Entomb into Archon / Atraxa. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -10647,6 +10647,10 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Entomb\n4 Reanimate\n3 Animate Dead\n3 Thoughtseize\n3 Brainstorm\n2 Show and Tell\n2 Atraxa, Grand Unifier\n2 Archon of Cruelty\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n3 Swamp\n2 Demonic Tutor\n2 Fatal Push\n2 Daze\n1 Griselbrand\n2 Ponder\n2 Otawara, Soaring City",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -10657,28 +10661,24 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 10
+      "metaShare": 9
     },
-    "timeless-bo1-r2-death-s-shadow": {
-      "id": "timeless-bo1-r2-death-s-shadow",
+    "timeless-bo1-death-s-shadow": {
+      "id": "timeless-bo1-death-s-shadow",
       "name": "Death's Shadow",
       "format": "timeless",
       "mode": "bo1",
-      "rank": 5,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "W",
         "U",
         "B"
       ],
       "archetype": "Death's Shadow",
-      "description": "Interactive midrange with a lethal clock. Daily rank #2 for BO1.",
+      "description": "Interactive midrange with a lethal clock. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -10813,8 +10813,8 @@
       ],
       "metaShare": 8
     },
-    "timeless-bo3-r2-death-s-shadow": {
-      "id": "timeless-bo3-r2-death-s-shadow",
+    "timeless-bo3-death-s-shadow": {
+      "id": "timeless-bo3-death-s-shadow",
       "name": "Death's Shadow",
       "format": "timeless",
       "mode": "bo3",
@@ -10826,7 +10826,7 @@
         "B"
       ],
       "archetype": "Death's Shadow",
-      "description": "Interactive midrange with a lethal clock. Daily rank #2 for BO3.",
+      "description": "Interactive midrange with a lethal clock. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -11019,8 +11019,8 @@
       ],
       "metaShare": 8
     },
-    "timeless-bo1-r3-show-and-tell": {
-      "id": "timeless-bo1-r3-show-and-tell",
+    "timeless-bo1-show-and-tell": {
+      "id": "timeless-bo1-show-and-tell",
       "name": "Show and Tell",
       "format": "timeless",
       "mode": "bo1",
@@ -11030,7 +11030,7 @@
         "U"
       ],
       "archetype": "Show and Tell",
-      "description": "Omniscience / Emrakul packages. Daily rank #3 for BO1.",
+      "description": "Omniscience / Emrakul packages. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -11135,6 +11135,10 @@
       "arenaImport": "Deck\n4 Show and Tell\n4 Brainstorm\n4 Ponder\n3 Force of Will\n2 Omniscience\n2 Emrakul, the Aeons Torn\n4 Flooded Strand\n4 Misty Rainforest\n4 Island\n3 Tropical Island\n2 Otawara, Soaring City\n2 Force of Negation\n2 Daze\n2 Veil of Summer\n2 Dress Down\n2 Swords to Plowshares\n2 Atraxa, Grand Unifier\n2 Flusterstorm\n2 Spell Pierce\n2 Lotus Petal",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -11145,26 +11149,22 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 9
+      "metaShare": 7
     },
-    "timeless-bo3-r3-show-and-tell": {
-      "id": "timeless-bo3-r3-show-and-tell",
+    "timeless-bo3-show-and-tell": {
+      "id": "timeless-bo3-show-and-tell",
       "name": "Show and Tell",
       "format": "timeless",
       "mode": "bo3",
-      "rank": 3,
-      "tier": 1,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "U"
       ],
       "archetype": "Show and Tell",
-      "description": "Omniscience / Emrakul packages. Daily rank #3 for BO3.",
+      "description": "Omniscience / Emrakul packages. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -11294,6 +11294,10 @@
       "arenaImport": "Deck\n4 Show and Tell\n4 Brainstorm\n4 Ponder\n3 Force of Will\n2 Omniscience\n2 Emrakul, the Aeons Torn\n4 Flooded Strand\n4 Misty Rainforest\n4 Island\n3 Tropical Island\n2 Otawara, Soaring City\n2 Force of Negation\n2 Daze\n2 Veil of Summer\n2 Dress Down\n2 Swords to Plowshares\n2 Atraxa, Grand Unifier\n2 Flusterstorm\n2 Spell Pierce\n2 Lotus Petal",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -11304,28 +11308,24 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 9
+      "metaShare": 7
     },
-    "timeless-bo1-r4-beanstalk-control": {
-      "id": "timeless-bo1-r4-beanstalk-control",
+    "timeless-bo1-beanstalk-control": {
+      "id": "timeless-bo1-beanstalk-control",
       "name": "Beanstalk Control",
       "format": "timeless",
       "mode": "bo1",
-      "rank": 6,
-      "tier": 2,
+      "rank": 7,
+      "tier": 3,
       "colors": [
         "W",
         "U",
         "G"
       ],
       "archetype": "Beanstalk Control",
-      "description": "Up the Beanstalk card advantage control. Daily rank #4 for BO1.",
+      "description": "Up the Beanstalk card advantage control. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -11452,20 +11452,20 @@
       ],
       "metaShare": 7
     },
-    "timeless-bo3-r4-beanstalk-control": {
-      "id": "timeless-bo3-r4-beanstalk-control",
+    "timeless-bo3-beanstalk-control": {
+      "id": "timeless-bo3-beanstalk-control",
       "name": "Beanstalk Control",
       "format": "timeless",
       "mode": "bo3",
-      "rank": 6,
-      "tier": 2,
+      "rank": 1,
+      "tier": 1,
       "colors": [
         "W",
         "U",
         "G"
       ],
       "archetype": "Beanstalk Control",
-      "description": "Up the Beanstalk card advantage control. Daily rank #4 for BO3.",
+      "description": "Up the Beanstalk card advantage control. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -11615,20 +11615,20 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7.8
+      "metaShare": 8.2
     },
-    "timeless-bo1-r5-initiative": {
-      "id": "timeless-bo1-r5-initiative",
+    "timeless-bo1-initiative": {
+      "id": "timeless-bo1-initiative",
       "name": "Initiative",
       "format": "timeless",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "W"
       ],
       "archetype": "Initiative",
-      "description": "White Weenie with The Initiative. Daily rank #5 for BO1.",
+      "description": "White Weenie with The Initiative. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -11747,8 +11747,8 @@
       ],
       "metaShare": 6
     },
-    "timeless-bo3-r5-initiative": {
-      "id": "timeless-bo3-r5-initiative",
+    "timeless-bo3-initiative": {
+      "id": "timeless-bo3-initiative",
       "name": "Initiative",
       "format": "timeless",
       "mode": "bo3",
@@ -11758,7 +11758,7 @@
         "W"
       ],
       "archetype": "Initiative",
-      "description": "White Weenie with The Initiative. Daily rank #5 for BO3.",
+      "description": "White Weenie with The Initiative. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -11902,12 +11902,12 @@
       ],
       "metaShare": 6
     },
-    "timeless-bo1-r6-storm": {
-      "id": "timeless-bo1-r6-storm",
+    "timeless-bo1-storm": {
+      "id": "timeless-bo1-storm",
       "name": "Storm",
       "format": "timeless",
       "mode": "bo1",
-      "rank": 4,
+      "rank": 5,
       "tier": 2,
       "colors": [
         "U",
@@ -11915,7 +11915,7 @@
         "R"
       ],
       "archetype": "Storm",
-      "description": "Classic storm with dark ritual density. Daily rank #6 for BO1.",
+      "description": "Classic storm with dark ritual density. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -12020,6 +12020,10 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Brainstorm\n4 Ponder\n3 Tendrils of Agony\n3 Burning Wish\n4 Polluted Delta\n4 Bloodstained Mire\n3 Underground Sea\n2 Volcanic Island\n2 Swamp\n2 Island\n2 Lion's Eye Diamond\n2 Lotus Petal\n2 Chrome Mox\n2 Mishra's Bauble\n2 Thoughtseize\n2 Duress\n2 Cabal Ritual\n2 Past in Flames\n2 Infernal Tutor",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -12030,28 +12034,24 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5.5
     },
-    "timeless-bo3-r6-storm": {
-      "id": "timeless-bo3-r6-storm",
+    "timeless-bo3-storm": {
+      "id": "timeless-bo3-storm",
       "name": "Storm",
       "format": "timeless",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 8,
+      "tier": 3,
       "colors": [
         "U",
         "B",
         "R"
       ],
       "archetype": "Storm",
-      "description": "Classic storm with dark ritual density. Daily rank #6 for BO3.",
+      "description": "Classic storm with dark ritual density. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -12181,6 +12181,10 @@
       "arenaImport": "Deck\n4 Dark Ritual\n4 Brainstorm\n4 Ponder\n3 Tendrils of Agony\n3 Burning Wish\n4 Polluted Delta\n4 Bloodstained Mire\n3 Underground Sea\n2 Volcanic Island\n2 Swamp\n2 Island\n2 Lion's Eye Diamond\n2 Lotus Petal\n2 Chrome Mox\n2 Mishra's Bauble\n2 Thoughtseize\n2 Duress\n2 Cabal Ritual\n2 Past in Flames\n2 Infernal Tutor",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -12191,27 +12195,23 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 5
+      "metaShare": 5.5
     },
-    "timeless-bo1-r7-dimir-midrange": {
-      "id": "timeless-bo1-r7-dimir-midrange",
+    "timeless-bo1-dimir-midrange": {
+      "id": "timeless-bo1-dimir-midrange",
       "name": "Dimir Midrange",
       "format": "timeless",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "Fair blue-black value for Timeless. Daily rank #7 for BO1.",
+      "description": "Fair blue-black value for Timeless. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -12316,6 +12316,10 @@
       "arenaImport": "Deck\n4 Orcish Bowmasters\n4 Ragavan, Nimble Pilferer\n4 Thoughtseize\n4 Fatal Push\n3 Force of Will\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n2 Swamp\n2 Sheoldred, the Apocalypse\n2 Murderous Cut\n2 Daze\n2 Brainstorm\n2 Ponder\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Brazen Borrower\n2 Psychic Frog",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -12326,16 +12330,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 10
+      "metaShare": 5
     },
-    "timeless-bo3-r7-dimir-midrange": {
-      "id": "timeless-bo3-r7-dimir-midrange",
+    "timeless-bo3-dimir-midrange": {
+      "id": "timeless-bo3-dimir-midrange",
       "name": "Dimir Midrange",
       "format": "timeless",
       "mode": "bo3",
@@ -12346,7 +12346,7 @@
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "Fair blue-black value for Timeless. Daily rank #7 for BO3.",
+      "description": "Fair blue-black value for Timeless. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -12476,6 +12476,10 @@
       "arenaImport": "Deck\n4 Orcish Bowmasters\n4 Ragavan, Nimble Pilferer\n4 Thoughtseize\n4 Fatal Push\n3 Force of Will\n4 Polluted Delta\n4 Flooded Strand\n3 Underground Sea\n2 Watery Grave\n2 Island\n2 Swamp\n2 Sheoldred, the Apocalypse\n2 Murderous Cut\n2 Daze\n2 Brainstorm\n2 Ponder\n2 Otawara, Soaring City\n2 Takenuma, Abandoned Mire\n2 Brazen Borrower\n2 Psychic Frog",
       "sources": [
         {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        },
+        {
           "name": "Untapped.gg Standard Meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
@@ -12486,16 +12490,12 @@
         {
           "name": "Scryfall",
           "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/timeless"
         }
       ],
-      "metaShare": 10
+      "metaShare": 6.2
     },
-    "timeless-bo1-r8-domain-zoo": {
-      "id": "timeless-bo1-r8-domain-zoo",
+    "timeless-bo1-domain-zoo": {
+      "id": "timeless-bo1-domain-zoo",
       "name": "Domain Zoo",
       "format": "timeless",
       "mode": "bo1",
@@ -12509,7 +12509,7 @@
         "G"
       ],
       "archetype": "Domain Zoo",
-      "description": "Tribal Flames style domain aggro. Daily rank #8 for BO1.",
+      "description": "Tribal Flames style domain aggro. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 4,
@@ -12644,13 +12644,13 @@
       ],
       "metaShare": 4.5
     },
-    "timeless-bo3-r8-domain-zoo": {
-      "id": "timeless-bo3-r8-domain-zoo",
+    "timeless-bo3-domain-zoo": {
+      "id": "timeless-bo3-domain-zoo",
       "name": "Domain Zoo",
       "format": "timeless",
       "mode": "bo3",
-      "rank": 8,
-      "tier": 3,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "W",
         "U",
@@ -12659,7 +12659,7 @@
         "G"
       ],
       "archetype": "Domain Zoo",
-      "description": "Tribal Flames style domain aggro. Daily rank #8 for BO3.",
+      "description": "Tribal Flames style domain aggro. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 4,
@@ -12817,14 +12817,14 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.3
+      "metaShare": 5.7
     },
-    "brawl-bo1-r1-atraxa-midrange": {
-      "id": "brawl-bo1-r1-atraxa-midrange",
+    "brawl-bo1-atraxa-midrange": {
+      "id": "brawl-bo1-atraxa-midrange",
       "name": "Atraxa Midrange",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 1,
+      "rank": 2,
       "tier": 1,
       "colors": [
         "W",
@@ -12833,7 +12833,7 @@
         "G"
       ],
       "archetype": "Atraxa Midrange",
-      "description": "Value pile with Atraxa as commander. Daily rank #1 for BO1.",
+      "description": "Value pile with Atraxa as commander. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -12993,8 +12993,8 @@
       "metaShare": 7,
       "commander": "Atraxa, Grand Unifier"
     },
-    "brawl-bo3-r1-atraxa-midrange": {
-      "id": "brawl-bo3-r1-atraxa-midrange",
+    "brawl-bo3-atraxa-midrange": {
+      "id": "brawl-bo3-atraxa-midrange",
       "name": "Atraxa Midrange",
       "format": "brawl",
       "mode": "bo3",
@@ -13007,7 +13007,7 @@
         "G"
       ],
       "archetype": "Atraxa Midrange",
-      "description": "Value pile with Atraxa as commander. Daily rank #1 for BO3.",
+      "description": "Value pile with Atraxa as commander. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -13189,22 +13189,22 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7.8,
+      "metaShare": 8.2,
       "commander": "Atraxa, Grand Unifier"
     },
-    "brawl-bo1-r2-kinnan-combo": {
-      "id": "brawl-bo1-r2-kinnan-combo",
+    "brawl-bo1-kinnan-combo": {
+      "id": "brawl-bo1-kinnan-combo",
       "name": "Kinnan Combo",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 2,
+      "rank": 3,
       "tier": 1,
       "colors": [
         "U",
         "G"
       ],
       "archetype": "Kinnan Combo",
-      "description": "Explosive mana and combo lines. Daily rank #2 for BO1.",
+      "description": "Explosive mana and combo lines. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -13344,19 +13344,19 @@
       "metaShare": 6,
       "commander": "Kinnan, Bonder Prodigy"
     },
-    "brawl-bo3-r2-kinnan-combo": {
-      "id": "brawl-bo3-r2-kinnan-combo",
+    "brawl-bo3-kinnan-combo": {
+      "id": "brawl-bo3-kinnan-combo",
       "name": "Kinnan Combo",
       "format": "brawl",
       "mode": "bo3",
-      "rank": 2,
-      "tier": 1,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "U",
         "G"
       ],
       "archetype": "Kinnan Combo",
-      "description": "Explosive mana and combo lines. Daily rank #2 for BO3.",
+      "description": "Explosive mana and combo lines. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -13521,19 +13521,19 @@
       "metaShare": 6,
       "commander": "Kinnan, Bonder Prodigy"
     },
-    "brawl-bo1-r3-rusko-midrange": {
-      "id": "brawl-bo1-r3-rusko-midrange",
+    "brawl-bo1-rusko-midrange": {
+      "id": "brawl-bo1-rusko-midrange",
       "name": "Rusko Midrange",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 4,
       "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Rusko Midrange",
-      "description": "Clock and card advantage with Rusko. Daily rank #3 for BO1.",
+      "description": "Clock and card advantage with Rusko. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -13657,19 +13657,19 @@
       "metaShare": 5.5,
       "commander": "Rusko, Clockmaker"
     },
-    "brawl-bo3-r3-rusko-midrange": {
-      "id": "brawl-bo3-r3-rusko-midrange",
+    "brawl-bo3-rusko-midrange": {
+      "id": "brawl-bo3-rusko-midrange",
       "name": "Rusko Midrange",
       "format": "brawl",
       "mode": "bo3",
-      "rank": 3,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Rusko Midrange",
-      "description": "Clock and card advantage with Rusko. Daily rank #3 for BO3.",
+      "description": "Clock and card advantage with Rusko. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -13815,23 +13815,23 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.3,
+      "metaShare": 6.7,
       "commander": "Rusko, Clockmaker"
     },
-    "brawl-bo1-r4-tivit-control": {
-      "id": "brawl-bo1-r4-tivit-control",
+    "brawl-bo1-tivit-control": {
+      "id": "brawl-bo1-tivit-control",
       "name": "Tivit Control",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 4,
-      "tier": 2,
+      "rank": 8,
+      "tier": 3,
       "colors": [
         "W",
         "U",
         "B"
       ],
       "archetype": "Tivit Control",
-      "description": "Clue value and control with Tivit. Daily rank #4 for BO1.",
+      "description": "Clue value and control with Tivit. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -13951,20 +13951,20 @@
       "metaShare": 5,
       "commander": "Tivit, Seller of Secrets"
     },
-    "brawl-bo3-r4-tivit-control": {
-      "id": "brawl-bo3-r4-tivit-control",
+    "brawl-bo3-tivit-control": {
+      "id": "brawl-bo3-tivit-control",
       "name": "Tivit Control",
       "format": "brawl",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "W",
         "U",
         "B"
       ],
       "archetype": "Tivit Control",
-      "description": "Clue value and control with Tivit. Daily rank #4 for BO3.",
+      "description": "Clue value and control with Tivit. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -14106,11 +14106,11 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.8,
+      "metaShare": 6.2,
       "commander": "Tivit, Seller of Secrets"
     },
-    "brawl-bo1-r5-etali-ramp": {
-      "id": "brawl-bo1-r5-etali-ramp",
+    "brawl-bo1-etali-ramp": {
+      "id": "brawl-bo1-etali-ramp",
       "name": "Etali Ramp",
       "format": "brawl",
       "mode": "bo1",
@@ -14121,7 +14121,7 @@
         "G"
       ],
       "archetype": "Etali Ramp",
-      "description": "Big mana into Etali free casts. Daily rank #5 for BO1.",
+      "description": "Big mana into Etali free casts. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -14237,8 +14237,8 @@
       "metaShare": 4.5,
       "commander": "Etali, Primal Conqueror"
     },
-    "brawl-bo3-r5-etali-ramp": {
-      "id": "brawl-bo3-r5-etali-ramp",
+    "brawl-bo3-etali-ramp": {
+      "id": "brawl-bo3-etali-ramp",
       "name": "Etali Ramp",
       "format": "brawl",
       "mode": "bo3",
@@ -14249,7 +14249,7 @@
         "G"
       ],
       "archetype": "Etali Ramp",
-      "description": "Big mana into Etali free casts. Daily rank #5 for BO3.",
+      "description": "Big mana into Etali free casts. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -14390,20 +14390,20 @@
       "metaShare": 4.5,
       "commander": "Etali, Primal Conqueror"
     },
-    "brawl-bo1-r6-agatha-tokens": {
-      "id": "brawl-bo1-r6-agatha-tokens",
+    "brawl-bo1-agatha-tokens": {
+      "id": "brawl-bo1-agatha-tokens",
       "name": "Agatha Tokens",
       "format": "brawl",
       "mode": "bo1",
       "rank": 6,
-      "tier": 3,
+      "tier": 2,
       "colors": [
         "B",
         "R",
         "G"
       ],
       "archetype": "Agatha Tokens",
-      "description": "Food and tokens with Agatha. Daily rank #6 for BO1.",
+      "description": "Food and tokens with Agatha. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -14515,20 +14515,20 @@
       "metaShare": 4,
       "commander": "Agatha of the Vile Cauldron"
     },
-    "brawl-bo3-r6-agatha-tokens": {
-      "id": "brawl-bo3-r6-agatha-tokens",
+    "brawl-bo3-agatha-tokens": {
+      "id": "brawl-bo3-agatha-tokens",
       "name": "Agatha Tokens",
       "format": "brawl",
       "mode": "bo3",
       "rank": 6,
-      "tier": 3,
+      "tier": 2,
       "colors": [
         "B",
         "R",
         "G"
       ],
       "archetype": "Agatha Tokens",
-      "description": "Food and tokens with Agatha. Daily rank #6 for BO3.",
+      "description": "Food and tokens with Agatha. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -14665,13 +14665,13 @@
       "metaShare": 4,
       "commander": "Agatha of the Vile Cauldron"
     },
-    "brawl-bo1-r7-najeela-warriors": {
-      "id": "brawl-bo1-r7-najeela-warriors",
+    "brawl-bo1-najeela-warriors": {
+      "id": "brawl-bo1-najeela-warriors",
       "name": "Najeela Warriors",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 1,
+      "tier": 1,
       "colors": [
         "W",
         "U",
@@ -14680,7 +14680,7 @@
         "G"
       ],
       "archetype": "Najeela Warriors",
-      "description": "Combat-centric five-color warriors. Daily rank #7 for BO1.",
+      "description": "Combat-centric five-color warriors. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -14792,8 +14792,8 @@
       "metaShare": 3.8,
       "commander": "Najeela, the Blade-Blossom"
     },
-    "brawl-bo3-r7-najeela-warriors": {
-      "id": "brawl-bo3-r7-najeela-warriors",
+    "brawl-bo3-najeela-warriors": {
+      "id": "brawl-bo3-najeela-warriors",
       "name": "Najeela Warriors",
       "format": "brawl",
       "mode": "bo3",
@@ -14807,7 +14807,7 @@
         "G"
       ],
       "archetype": "Najeela Warriors",
-      "description": "Combat-centric five-color warriors. Daily rank #7 for BO3.",
+      "description": "Combat-centric five-color warriors. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -14944,12 +14944,12 @@
       "metaShare": 3.8,
       "commander": "Najeela, the Blade-Blossom"
     },
-    "brawl-bo1-r8-jodah-cascade": {
-      "id": "brawl-bo1-r8-jodah-cascade",
+    "brawl-bo1-jodah-cascade": {
+      "id": "brawl-bo1-jodah-cascade",
       "name": "Jodah Cascade",
       "format": "brawl",
       "mode": "bo1",
-      "rank": 8,
+      "rank": 7,
       "tier": 3,
       "colors": [
         "W",
@@ -14959,7 +14959,7 @@
         "G"
       ],
       "archetype": "Jodah Cascade",
-      "description": "Cascade and free spells with Jodah. Daily rank #8 for BO1.",
+      "description": "Cascade and free spells with Jodah. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -15067,8 +15067,8 @@
       "metaShare": 3.5,
       "commander": "Jodah, the Unifier"
     },
-    "brawl-bo3-r8-jodah-cascade": {
-      "id": "brawl-bo3-r8-jodah-cascade",
+    "brawl-bo3-jodah-cascade": {
+      "id": "brawl-bo3-jodah-cascade",
       "name": "Jodah Cascade",
       "format": "brawl",
       "mode": "bo3",
@@ -15082,7 +15082,7 @@
         "G"
       ],
       "archetype": "Jodah Cascade",
-      "description": "Cascade and free spells with Jodah. Daily rank #8 for BO3.",
+      "description": "Cascade and free spells with Jodah. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -15215,8 +15215,8 @@
       "metaShare": 3.5,
       "commander": "Jodah, the Unifier"
     },
-    "standard_brawl-bo1-r1-kellan-aggro": {
-      "id": "standard_brawl-bo1-r1-kellan-aggro",
+    "standard_brawl-bo1-kellan-aggro": {
+      "id": "standard_brawl-bo1-kellan-aggro",
       "name": "Kellan Aggro",
       "format": "standard_brawl",
       "mode": "bo1",
@@ -15227,7 +15227,7 @@
         "U"
       ],
       "archetype": "Kellan Aggro",
-      "description": "Proactive Standard Brawl with Kellan. Daily rank #1 for BO1.",
+      "description": "Proactive Standard Brawl with Kellan. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -15344,22 +15344,22 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 8.6,
+      "metaShare": 9.4,
       "commander": "Kellan, the Kid"
     },
-    "standard_brawl-bo3-r1-kellan-aggro": {
-      "id": "standard_brawl-bo3-r1-kellan-aggro",
+    "standard_brawl-bo3-kellan-aggro": {
+      "id": "standard_brawl-bo3-kellan-aggro",
       "name": "Kellan Aggro",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 1,
-      "tier": 1,
+      "rank": 5,
+      "tier": 2,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Kellan Aggro",
-      "description": "Proactive Standard Brawl with Kellan. Daily rank #1 for BO3.",
+      "description": "Proactive Standard Brawl with Kellan. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -15504,19 +15504,19 @@
       "metaShare": 8,
       "commander": "Kellan, the Kid"
     },
-    "standard_brawl-bo1-r2-jace-control": {
-      "id": "standard_brawl-bo1-r2-jace-control",
+    "standard_brawl-bo1-jace-control": {
+      "id": "standard_brawl-bo1-jace-control",
       "name": "Jace Control",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Jace Control",
-      "description": "Control and mill with Jace. Daily rank #2 for BO1.",
+      "description": "Control and mill with Jace. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -15632,19 +15632,19 @@
       "metaShare": 7,
       "commander": "Jace, the Perfected Mind"
     },
-    "standard_brawl-bo3-r2-jace-control": {
-      "id": "standard_brawl-bo3-r2-jace-control",
+    "standard_brawl-bo3-jace-control": {
+      "id": "standard_brawl-bo3-jace-control",
       "name": "Jace Control",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 2,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Jace Control",
-      "description": "Control and mill with Jace. Daily rank #2 for BO3.",
+      "description": "Control and mill with Jace. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -15815,22 +15815,22 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 7.8,
+      "metaShare": 8.2,
       "commander": "Jace, the Perfected Mind"
     },
-    "standard_brawl-bo1-r3-kaito-ninja": {
-      "id": "standard_brawl-bo1-r3-kaito-ninja",
+    "standard_brawl-bo1-kaito-ninja": {
+      "id": "standard_brawl-bo1-kaito-ninja",
       "name": "Kaito Ninja",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 3,
+      "rank": 4,
       "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Kaito Ninja",
-      "description": "Ninjutsu tempo with Kaito. Daily rank #3 for BO1.",
+      "description": "Ninjutsu tempo with Kaito. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -15938,19 +15938,19 @@
       "metaShare": 6,
       "commander": "Kaito, Bane of Nightmares"
     },
-    "standard_brawl-bo3-r3-kaito-ninja": {
-      "id": "standard_brawl-bo3-r3-kaito-ninja",
+    "standard_brawl-bo3-kaito-ninja": {
+      "id": "standard_brawl-bo3-kaito-ninja",
       "name": "Kaito Ninja",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 3,
+      "rank": 6,
       "tier": 2,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Kaito Ninja",
-      "description": "Ninjutsu tempo with Kaito. Daily rank #3 for BO3.",
+      "description": "Ninjutsu tempo with Kaito. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -16083,18 +16083,18 @@
       "metaShare": 6,
       "commander": "Kaito, Bane of Nightmares"
     },
-    "standard_brawl-bo1-r4-beza-midrange": {
-      "id": "standard_brawl-bo1-r4-beza-midrange",
+    "standard_brawl-bo1-beza-midrange": {
+      "id": "standard_brawl-bo1-beza-midrange",
       "name": "Beza Midrange",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 4,
+      "rank": 5,
       "tier": 2,
       "colors": [
         "W"
       ],
       "archetype": "Beza Midrange",
-      "description": "White midrange with Beza. Daily rank #4 for BO1.",
+      "description": "White midrange with Beza. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -16194,18 +16194,18 @@
       "metaShare": 5.5,
       "commander": "Beza, the Bounding Spring"
     },
-    "standard_brawl-bo3-r4-beza-midrange": {
-      "id": "standard_brawl-bo3-r4-beza-midrange",
+    "standard_brawl-bo3-beza-midrange": {
+      "id": "standard_brawl-bo3-beza-midrange",
       "name": "Beza Midrange",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 4,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "W"
       ],
       "archetype": "Beza Midrange",
-      "description": "White midrange with Beza. Daily rank #4 for BO3.",
+      "description": "White midrange with Beza. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -16327,21 +16327,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.3,
+      "metaShare": 6.7,
       "commander": "Beza, the Bounding Spring"
     },
-    "standard_brawl-bo1-r5-mono-red-aggro": {
-      "id": "standard_brawl-bo1-r5-mono-red-aggro",
+    "standard_brawl-bo1-mono-red-aggro": {
+      "id": "standard_brawl-bo1-mono-red-aggro",
       "name": "Mono-Red Aggro",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 5,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "R"
       ],
       "archetype": "Mono-Red Aggro",
-      "description": "Burn and haste for Standard Brawl. Daily rank #5 for BO1.",
+      "description": "Burn and haste for Standard Brawl. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -16430,21 +16430,21 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.6,
+      "metaShare": 6.4,
       "commander": "Screaming Nemesis"
     },
-    "standard_brawl-bo3-r5-mono-red-aggro": {
-      "id": "standard_brawl-bo3-r5-mono-red-aggro",
+    "standard_brawl-bo3-mono-red-aggro": {
+      "id": "standard_brawl-bo3-mono-red-aggro",
       "name": "Mono-Red Aggro",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 5,
-      "tier": 2,
+      "rank": 8,
+      "tier": 3,
       "colors": [
         "R"
       ],
       "archetype": "Mono-Red Aggro",
-      "description": "Burn and haste for Standard Brawl. Daily rank #5 for BO3.",
+      "description": "Burn and haste for Standard Brawl. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -16561,19 +16561,19 @@
       "metaShare": 5,
       "commander": "Screaming Nemesis"
     },
-    "standard_brawl-bo1-r6-golgari-midrange": {
-      "id": "standard_brawl-bo1-r6-golgari-midrange",
+    "standard_brawl-bo1-golgari-midrange": {
+      "id": "standard_brawl-bo1-golgari-midrange",
       "name": "Golgari Midrange",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 6,
+      "rank": 7,
       "tier": 3,
       "colors": [
         "B",
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "Value black-green for Standard Brawl. Daily rank #6 for BO1.",
+      "description": "Value black-green for Standard Brawl. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -16673,19 +16673,19 @@
       "metaShare": 4.5,
       "commander": "Glissa Sunslayer"
     },
-    "standard_brawl-bo3-r6-golgari-midrange": {
-      "id": "standard_brawl-bo3-r6-golgari-midrange",
+    "standard_brawl-bo3-golgari-midrange": {
+      "id": "standard_brawl-bo3-golgari-midrange",
       "name": "Golgari Midrange",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 6,
-      "tier": 3,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "B",
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "Value black-green for Standard Brawl. Daily rank #6 for BO3.",
+      "description": "Value black-green for Standard Brawl. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -16807,22 +16807,22 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 5.3,
+      "metaShare": 5.7,
       "commander": "Glissa Sunslayer"
     },
-    "standard_brawl-bo1-r7-izzet-spells": {
-      "id": "standard_brawl-bo1-r7-izzet-spells",
+    "standard_brawl-bo1-izzet-spells": {
+      "id": "standard_brawl-bo1-izzet-spells",
       "name": "Izzet Spells",
       "format": "standard_brawl",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "U",
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spells matter with an Izzet legend. Daily rank #7 for BO1.",
+      "description": "Spells matter with an Izzet legend. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -16919,11 +16919,11 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 4,
+      "metaShare": 5.4,
       "commander": "Ral, Crackling Wit"
     },
-    "standard_brawl-bo3-r7-izzet-spells": {
-      "id": "standard_brawl-bo3-r7-izzet-spells",
+    "standard_brawl-bo3-izzet-spells": {
+      "id": "standard_brawl-bo3-izzet-spells",
       "name": "Izzet Spells",
       "format": "standard_brawl",
       "mode": "bo3",
@@ -16934,7 +16934,7 @@
         "R"
       ],
       "archetype": "Izzet Spells",
-      "description": "Spells matter with an Izzet legend. Daily rank #7 for BO3.",
+      "description": "Spells matter with an Izzet legend. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -17059,8 +17059,8 @@
       "metaShare": 4,
       "commander": "Ral, Crackling Wit"
     },
-    "standard_brawl-bo1-r8-domain-ramp": {
-      "id": "standard_brawl-bo1-r8-domain-ramp",
+    "standard_brawl-bo1-domain-ramp": {
+      "id": "standard_brawl-bo1-domain-ramp",
       "name": "Domain Ramp",
       "format": "standard_brawl",
       "mode": "bo1",
@@ -17074,7 +17074,7 @@
         "G"
       ],
       "archetype": "Domain Ramp",
-      "description": "Domain payoffs in Standard Brawl. Daily rank #8 for BO1.",
+      "description": "Domain payoffs in Standard Brawl. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -17182,13 +17182,13 @@
       "metaShare": 3.5,
       "commander": "Herigast, Erupting Nullkite"
     },
-    "standard_brawl-bo3-r8-domain-ramp": {
-      "id": "standard_brawl-bo3-r8-domain-ramp",
+    "standard_brawl-bo3-domain-ramp": {
+      "id": "standard_brawl-bo3-domain-ramp",
       "name": "Domain Ramp",
       "format": "standard_brawl",
       "mode": "bo3",
-      "rank": 8,
-      "tier": 3,
+      "rank": 4,
+      "tier": 2,
       "colors": [
         "W",
         "U",
@@ -17197,7 +17197,7 @@
         "G"
       ],
       "archetype": "Domain Ramp",
-      "description": "Domain payoffs in Standard Brawl. Daily rank #8 for BO3.",
+      "description": "Domain payoffs in Standard Brawl. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -17327,11 +17327,11 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 4.3,
+      "metaShare": 4.7,
       "commander": "Herigast, Erupting Nullkite"
     },
-    "historic_brawl-bo1-r1-omnath-lands": {
-      "id": "historic_brawl-bo1-r1-omnath-lands",
+    "historic_brawl-bo1-omnath-lands": {
+      "id": "historic_brawl-bo1-omnath-lands",
       "name": "Omnath Lands",
       "format": "historic_brawl",
       "mode": "bo1",
@@ -17344,7 +17344,7 @@
         "G"
       ],
       "archetype": "Omnath Lands",
-      "description": "Landfall value engine. Daily rank #1 for BO1.",
+      "description": "Landfall value engine. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -17484,12 +17484,12 @@
       "metaShare": 7,
       "commander": "Omnath, Locus of Creation"
     },
-    "historic_brawl-bo3-r1-omnath-lands": {
-      "id": "historic_brawl-bo3-r1-omnath-lands",
+    "historic_brawl-bo3-omnath-lands": {
+      "id": "historic_brawl-bo3-omnath-lands",
       "name": "Omnath Lands",
       "format": "historic_brawl",
       "mode": "bo3",
-      "rank": 1,
+      "rank": 2,
       "tier": 1,
       "colors": [
         "W",
@@ -17498,7 +17498,7 @@
         "G"
       ],
       "archetype": "Omnath Lands",
-      "description": "Landfall value engine. Daily rank #1 for BO3.",
+      "description": "Landfall value engine. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -17663,19 +17663,19 @@
       "metaShare": 7,
       "commander": "Omnath, Locus of Creation"
     },
-    "historic_brawl-bo1-r2-tamiyo-control": {
-      "id": "historic_brawl-bo1-r2-tamiyo-control",
+    "historic_brawl-bo1-tamiyo-control": {
+      "id": "historic_brawl-bo1-tamiyo-control",
       "name": "Tamiyo Control",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 2,
-      "tier": 1,
+      "rank": 7,
+      "tier": 3,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Tamiyo Control",
-      "description": "Flash control with Tamiyo. Daily rank #2 for BO1.",
+      "description": "Flash control with Tamiyo. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -17791,19 +17791,19 @@
       "metaShare": 6,
       "commander": "Tamiyo, Inquisitive Student"
     },
-    "historic_brawl-bo3-r2-tamiyo-control": {
-      "id": "historic_brawl-bo3-r2-tamiyo-control",
+    "historic_brawl-bo3-tamiyo-control": {
+      "id": "historic_brawl-bo3-tamiyo-control",
       "name": "Tamiyo Control",
       "format": "historic_brawl",
       "mode": "bo3",
-      "rank": 2,
+      "rank": 1,
       "tier": 1,
       "colors": [
         "W",
         "U"
       ],
       "archetype": "Tamiyo Control",
-      "description": "Flash control with Tamiyo. Daily rank #2 for BO3.",
+      "description": "Flash control with Tamiyo. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -17974,16 +17974,16 @@
           "url": "https://scryfall.com"
         }
       ],
-      "metaShare": 6.8,
+      "metaShare": 7.2,
       "commander": "Tamiyo, Inquisitive Student"
     },
-    "historic_brawl-bo1-r3-atraxa-value": {
-      "id": "historic_brawl-bo1-r3-atraxa-value",
+    "historic_brawl-bo1-atraxa-value": {
+      "id": "historic_brawl-bo1-atraxa-value",
       "name": "Atraxa Value",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 3,
-      "tier": 2,
+      "rank": 2,
+      "tier": 1,
       "colors": [
         "W",
         "U",
@@ -17991,7 +17991,7 @@
         "G"
       ],
       "archetype": "Atraxa Value",
-      "description": "Historic Brawl Atraxa midrange. Daily rank #3 for BO1.",
+      "description": "Historic Brawl Atraxa midrange. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -18115,13 +18115,13 @@
       "metaShare": 5.5,
       "commander": "Atraxa, Grand Unifier"
     },
-    "historic_brawl-bo3-r3-atraxa-value": {
-      "id": "historic_brawl-bo3-r3-atraxa-value",
+    "historic_brawl-bo3-atraxa-value": {
+      "id": "historic_brawl-bo3-atraxa-value",
       "name": "Atraxa Value",
       "format": "historic_brawl",
       "mode": "bo3",
       "rank": 3,
-      "tier": 2,
+      "tier": 1,
       "colors": [
         "W",
         "U",
@@ -18129,7 +18129,7 @@
         "G"
       ],
       "archetype": "Atraxa Value",
-      "description": "Historic Brawl Atraxa midrange. Daily rank #3 for BO3.",
+      "description": "Historic Brawl Atraxa midrange. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -18278,19 +18278,19 @@
       "metaShare": 5.5,
       "commander": "Atraxa, Grand Unifier"
     },
-    "historic_brawl-bo1-r4-rusko-clocks": {
-      "id": "historic_brawl-bo1-r4-rusko-clocks",
+    "historic_brawl-bo1-rusko-clocks": {
+      "id": "historic_brawl-bo1-rusko-clocks",
       "name": "Rusko Clocks",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 4,
-      "tier": 2,
+      "rank": 3,
+      "tier": 1,
       "colors": [
         "U",
         "B"
       ],
       "archetype": "Rusko Clocks",
-      "description": "Clockmaker value in Historic Brawl. Daily rank #4 for BO1.",
+      "description": "Clockmaker value in Historic Brawl. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -18394,8 +18394,8 @@
       "metaShare": 5,
       "commander": "Rusko, Clockmaker"
     },
-    "historic_brawl-bo3-r4-rusko-clocks": {
-      "id": "historic_brawl-bo3-r4-rusko-clocks",
+    "historic_brawl-bo3-rusko-clocks": {
+      "id": "historic_brawl-bo3-rusko-clocks",
       "name": "Rusko Clocks",
       "format": "historic_brawl",
       "mode": "bo3",
@@ -18406,7 +18406,7 @@
         "B"
       ],
       "archetype": "Rusko Clocks",
-      "description": "Clockmaker value in Historic Brawl. Daily rank #4 for BO3.",
+      "description": "Clockmaker value in Historic Brawl. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -18535,19 +18535,19 @@
       "metaShare": 5,
       "commander": "Rusko, Clockmaker"
     },
-    "historic_brawl-bo1-r5-kinnan": {
-      "id": "historic_brawl-bo1-r5-kinnan",
+    "historic_brawl-bo1-kinnan": {
+      "id": "historic_brawl-bo1-kinnan",
       "name": "Kinnan",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 5,
+      "rank": 4,
       "tier": 2,
       "colors": [
         "U",
         "G"
       ],
       "archetype": "Kinnan",
-      "description": "Combo mana with Kinnan. Daily rank #5 for BO1.",
+      "description": "Combo mana with Kinnan. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -18651,8 +18651,8 @@
       "metaShare": 4.8,
       "commander": "Kinnan, Bonder Prodigy"
     },
-    "historic_brawl-bo3-r5-kinnan": {
-      "id": "historic_brawl-bo3-r5-kinnan",
+    "historic_brawl-bo3-kinnan": {
+      "id": "historic_brawl-bo3-kinnan",
       "name": "Kinnan",
       "format": "historic_brawl",
       "mode": "bo3",
@@ -18663,7 +18663,7 @@
         "G"
       ],
       "archetype": "Kinnan",
-      "description": "Combo mana with Kinnan. Daily rank #5 for BO3.",
+      "description": "Combo mana with Kinnan. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -18792,19 +18792,19 @@
       "metaShare": 4.8,
       "commander": "Kinnan, Bonder Prodigy"
     },
-    "historic_brawl-bo1-r6-etali-ramp": {
-      "id": "historic_brawl-bo1-r6-etali-ramp",
+    "historic_brawl-bo1-etali-ramp": {
+      "id": "historic_brawl-bo1-etali-ramp",
       "name": "Etali Ramp",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 6,
-      "tier": 3,
+      "rank": 5,
+      "tier": 2,
       "colors": [
         "R",
         "G"
       ],
       "archetype": "Etali Ramp",
-      "description": "Ramp into free-cast Etali. Daily rank #6 for BO1.",
+      "description": "Ramp into free-cast Etali. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -18904,19 +18904,19 @@
       "metaShare": 4,
       "commander": "Etali, Primal Conqueror"
     },
-    "historic_brawl-bo3-r6-etali-ramp": {
-      "id": "historic_brawl-bo3-r6-etali-ramp",
+    "historic_brawl-bo3-etali-ramp": {
+      "id": "historic_brawl-bo3-etali-ramp",
       "name": "Etali Ramp",
       "format": "historic_brawl",
       "mode": "bo3",
       "rank": 6,
-      "tier": 3,
+      "tier": 2,
       "colors": [
         "R",
         "G"
       ],
       "archetype": "Etali Ramp",
-      "description": "Ramp into free-cast Etali. Daily rank #6 for BO3.",
+      "description": "Ramp into free-cast Etali. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -19041,13 +19041,13 @@
       "metaShare": 4,
       "commander": "Etali, Primal Conqueror"
     },
-    "historic_brawl-bo1-r7-golos-field": {
-      "id": "historic_brawl-bo1-r7-golos-field",
+    "historic_brawl-bo1-golos-field": {
+      "id": "historic_brawl-bo1-golos-field",
       "name": "Golos Field",
       "format": "historic_brawl",
       "mode": "bo1",
-      "rank": 7,
-      "tier": 3,
+      "rank": 6,
+      "tier": 2,
       "colors": [
         "W",
         "U",
@@ -19056,7 +19056,7 @@
         "G"
       ],
       "archetype": "Golos Field",
-      "description": "Five-color Golos / Field strategies. Daily rank #7 for BO1.",
+      "description": "Five-color Golos / Field strategies. Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -19164,8 +19164,8 @@
       "metaShare": 3.8,
       "commander": "Golos, Tireless Pilgrim"
     },
-    "historic_brawl-bo3-r7-golos-field": {
-      "id": "historic_brawl-bo3-r7-golos-field",
+    "historic_brawl-bo3-golos-field": {
+      "id": "historic_brawl-bo3-golos-field",
       "name": "Golos Field",
       "format": "historic_brawl",
       "mode": "bo3",
@@ -19179,7 +19179,7 @@
         "G"
       ],
       "archetype": "Golos Field",
-      "description": "Five-color Golos / Field strategies. Daily rank #7 for BO3.",
+      "description": "Five-color Golos / Field strategies. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -19312,8 +19312,8 @@
       "metaShare": 3.8,
       "commander": "Golos, Tireless Pilgrim"
     },
-    "historic_brawl-bo1-r8-yorion-blink": {
-      "id": "historic_brawl-bo1-r8-yorion-blink",
+    "historic_brawl-bo1-yorion-blink": {
+      "id": "historic_brawl-bo1-yorion-blink",
       "name": "Yorion Blink",
       "format": "historic_brawl",
       "mode": "bo1",
@@ -19324,7 +19324,7 @@
         "U"
       ],
       "archetype": "Yorion Blink",
-      "description": "Blink value with Yorion companion energy. Daily rank #8 for BO1.",
+      "description": "Blink value with Yorion companion energy. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 1,
@@ -19428,8 +19428,8 @@
       "metaShare": 3.5,
       "commander": "Yorion, Sky Nomad"
     },
-    "historic_brawl-bo3-r8-yorion-blink": {
-      "id": "historic_brawl-bo3-r8-yorion-blink",
+    "historic_brawl-bo3-yorion-blink": {
+      "id": "historic_brawl-bo3-yorion-blink",
       "name": "Yorion Blink",
       "format": "historic_brawl",
       "mode": "bo3",
@@ -19440,7 +19440,7 @@
         "U"
       ],
       "archetype": "Yorion Blink",
-      "description": "Blink value with Yorion companion energy. Daily rank #8 for BO3.",
+      "description": "Blink value with Yorion companion energy. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 1,
@@ -19748,222 +19748,6 @@
       "url": "https://melee.gg/Tournament/Search",
       "topDecks": [],
       "notes": "Paper RCQs and organized play. Browse current events on Melee.",
-      "source": "melee"
-    },
-    {
-      "id": "melee-10",
-      "name": "Arena Community Cup | 1000$ in Prizes!",
-      "format": "standard",
-      "platform": "mtga",
-      "date": "2020-03-28",
-      "url": "https://melee.gg/Tournament/View/10",
-      "players": 81,
-      "topDecks": [],
-      "notes": "Org: The Mythic Society · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-14",
-      "name": "MTG 4 Charity Streamer Tournament",
-      "format": "pioneer",
-      "platform": "paper",
-      "date": "2020-03-21",
-      "url": "https://melee.gg/Tournament/View/14",
-      "players": 16,
-      "topDecks": [],
-      "notes": "Org: Placeholder Name · Format: Pioneer · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-21",
-      "name": "200$ MTG vs COVID-19 #1",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-18",
-      "url": "https://melee.gg/Tournament/View/21",
-      "players": 54,
-      "topDecks": [],
-      "notes": "Org: The Mythic Society · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-22",
-      "name": "Europe North Judge Arena Extravaganza",
-      "format": "standard",
-      "platform": "mtga",
-      "date": "2020-03-21",
-      "url": "https://melee.gg/Tournament/View/22",
-      "players": 10,
-      "topDecks": [],
-      "notes": "Org: NR Gaming · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-23",
-      "name": "Lotus Box Patreon Championship",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-22",
-      "url": "https://melee.gg/Tournament/View/23",
-      "players": 119,
-      "topDecks": [],
-      "notes": "Org: Team Lotus Box · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-26",
-      "name": "Northern Paladins - Tuesday Night Gauntlet - 03/24/2020",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-24",
-      "url": "https://melee.gg/Tournament/View/26",
-      "players": 13,
-      "topDecks": [],
-      "notes": "Org: Northern Paladins · Format: OldSchool · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-27",
-      "name": "Camberville Draft Punks - 3/18",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-18",
-      "url": "https://melee.gg/Tournament/View/27",
-      "players": 14,
-      "topDecks": [],
-      "notes": "Org: Elliot Raff · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-32",
-      "name": "200$ MTG vs COVID-19 #2 (STANDARD)",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-20",
-      "url": "https://melee.gg/Tournament/View/32",
-      "players": 64,
-      "topDecks": [],
-      "notes": "Org: The Mythic Society · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-35",
-      "name": "200$ MTG vs COVID-19 #3 (HISTORIC)",
-      "format": "historic",
-      "platform": "paper",
-      "date": "2020-03-21",
-      "url": "https://melee.gg/Tournament/View/35",
-      "players": 60,
-      "topDecks": [],
-      "notes": "Org: The Mythic Society · Format: Historic · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-37",
-      "name": "TDK Practice Event",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-20",
-      "url": "https://melee.gg/Tournament/View/37",
-      "players": 5,
-      "topDecks": [],
-      "notes": "Org: Top Deck Keep - Digital · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-38",
-      "name": "Arena Pilot | Bazaar of Baghdad",
-      "format": "standard",
-      "platform": "mtga",
-      "date": "2020-03-20",
-      "url": "https://melee.gg/Tournament/View/38",
-      "players": 8,
-      "topDecks": [],
-      "notes": "Org: Bazaar of Baghdad · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-39",
-      "name": "MoR Shenanigans! (Standard) ",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-22",
-      "url": "https://melee.gg/Tournament/View/39",
-      "players": 9,
-      "topDecks": [],
-      "notes": "Org: GoblinCredible Gaming · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-41",
-      "name": "FNM at Gamer's Gauntlet 3-20-20",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-20",
-      "url": "https://melee.gg/Tournament/View/41",
-      "players": 17,
-      "topDecks": [],
-      "notes": "Org: Gamer's Gauntlet · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-45",
-      "name": "Spanky's Card Shop MTGArena [STANDARD] ",
-      "format": "standard",
-      "platform": "mtga",
-      "date": "2020-03-22",
-      "url": "https://melee.gg/Tournament/View/45",
-      "players": 16,
-      "topDecks": [],
-      "notes": "Org: Spanky's Card Shop · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-47",
-      "name": "200$ MTG vs COVID-19 #4 (STANDARD)",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-23",
-      "url": "https://melee.gg/Tournament/View/47",
-      "players": 56,
-      "topDecks": [],
-      "notes": "Org: The Mythic Society · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-50",
-      "name": "Monday Night Brawl",
-      "format": "brawl",
-      "platform": "paper",
-      "date": "2020-03-24",
-      "url": "https://melee.gg/Tournament/View/50",
-      "players": 8,
-      "topDecks": [],
-      "notes": "Org: Gamer's Gauntlet · Format: Brawl · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-52",
-      "name": "Prueba Team Dealers",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-22",
-      "url": "https://melee.gg/Tournament/View/52",
-      "players": 8,
-      "topDecks": [],
-      "notes": "Org: MagicDealers · Format: Standard · Status: Ended",
-      "source": "melee"
-    },
-    {
-      "id": "melee-57",
-      "name": "MoR Money in the Bank! (FNM) ~$100 CA$H~",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2020-03-27",
-      "url": "https://melee.gg/Tournament/View/57",
-      "players": 9,
-      "topDecks": [],
-      "notes": "Org: GoblinCredible Gaming · Format: Standard · Status: Ended",
       "source": "melee"
     }
   ],

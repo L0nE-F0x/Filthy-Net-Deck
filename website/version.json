@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
-  "downloadUrl": "https://banbasicisland.netlify.app/downloads/Ban-Basic-Island-Setup-0.4.0.exe",
-  "notes": "Look & feel polish, favorites queue, search/filter, mana curve, meta diff, stale/update banners, Scryfall QA, in-app results viewer."
+  "version": "0.5.0",
+  "downloadUrl": "https://banbasicisland.netlify.app/downloads/Ban-Basic-Island-Setup-0.5.0.exe",
+  "notes": "Format button fix, distinct Bo1/Bo3 ranking, card art strips, meta share/tier/color charts, intel brief analysis, richer Format dashboard."
 }

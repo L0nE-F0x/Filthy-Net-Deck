@@ -169,7 +169,7 @@ export default function App() {
           </div>
         )}
 
-        <main className="content">
+        <main className="content" key={page}>
           {page === "daily" && <Daily />}
           {page === "format" && <FormatView />}
           {page === "deck" && <DeckView />}

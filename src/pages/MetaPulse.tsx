@@ -1,6 +1,7 @@
 import { useAppStore } from "../store/useAppStore";
 import type { TournamentPlatform } from "../types/meta";
 import { canShowResultsLink } from "../services/links";
+import { resolveFormatId } from "../services/formatResolve";
 
 function platformClass(p: TournamentPlatform): string {
   return `platform-chip platform-${p}`;
@@ -49,8 +50,8 @@ export function MetaPulse() {
         <p className="eyebrow">Meta pulse</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament intel</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Paper, MTGO, and Arena signals. Only verified https links are shown. Snapshot{" "}
-          {meta.date}.
+          Paper, MTGO, and Arena signals. <strong className="text-foam">Format</strong> opens that
+          format’s 8-deck dashboard. Snapshot {meta.date}.
         </p>
       </div>
 
@@ -90,76 +91,80 @@ export function MetaPulse() {
             );
           })}
         </div>
-        <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
-          Pipeline: MTGGoldfish metagame + events, Melee.gg tournament search, Untapped.gg Arena
-          meta, Scryfall cards. Broken or unknown hosts are hidden automatically.
-        </p>
       </section>
 
       <section className="flex flex-col gap-3">
         {sorted.length === 0 && (
           <div className="empty-state">No verified tournament links in this feed.</div>
         )}
-        {sorted.map((t) => (
-          <article key={t.id} className="panel">
-            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className={platformClass(t.platform)}>{platformLabel(t.platform)}</span>
-                  <span className="text-xs text-muted uppercase tracking-wide">{t.format}</span>
-                  <span className="text-xs text-muted">{t.date}</span>
-                  {t.source && (
-                    <span className="text-xs text-muted capitalize">· {t.source}</span>
+        {sorted.map((t) => {
+          const fid = resolveFormatId(String(t.format));
+          const hasFormat = fid && meta.formats.some((f) => f.id === fid);
+          return (
+            <article key={t.id} className="panel">
+              <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className={platformClass(t.platform)}>{platformLabel(t.platform)}</span>
+                    <span className="text-xs text-muted uppercase tracking-wide">{t.format}</span>
+                    <span className="text-xs text-muted">{t.date}</span>
+                    {t.source && (
+                      <span className="text-xs text-muted capitalize">· {t.source}</span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-semibold m-0">{t.name}</h3>
+                  {t.players != null && (
+                    <p className="text-xs text-muted m-0 mt-1">{t.players} players</p>
                   )}
                 </div>
-                <h3 className="text-base font-semibold m-0">{t.name}</h3>
-                {t.players != null && (
-                  <p className="text-xs text-muted m-0 mt-1">{t.players} players</p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {meta.formats.some((f) => f.id === t.format) && (
+                <div className="flex gap-2 flex-wrap">
+                  {hasFormat && fid && (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openFormat(fid);
+                      }}
+                    >
+                      Format
+                    </button>
+                  )}
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => openFormat(t.format as never)}
+                    className="btn btn-primary btn-sm"
+                    onClick={() => openViewer(t.url)}
                   >
-                    Format
+                    View in app
                   </button>
-                )}
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => openViewer(t.url)}
-                >
-                  View in app
-                </button>
-                <a
-                  href={t.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-ghost btn-sm"
-                >
-                  Browser
-                </a>
-              </div>
-            </div>
-            {t.notes && <p className="text-sm text-muted m-0 mb-3 leading-relaxed">{t.notes}</p>}
-            {t.topDecks.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {t.topDecks.map((d) => (
-                  <span
-                    key={`${t.id}-${d.place}-${d.archetype}`}
-                    className="text-xs px-2 py-1 rounded-md bg-ink-900 border border-ink-600/40"
+                  <a
+                    href={t.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-ghost btn-sm"
                   >
-                    <span className="text-gold-400 font-semibold">#{d.place}</span> {d.archetype}
-                    {d.pilot ? ` · ${d.pilot}` : ""}
-                  </span>
-                ))}
+                    Browser
+                  </a>
+                </div>
               </div>
-            )}
-          </article>
-        ))}
+              {t.notes && <p className="text-sm text-muted m-0 mb-3 leading-relaxed">{t.notes}</p>}
+              {t.topDecks.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {t.topDecks.map((d) => (
+                    <span
+                      key={`${t.id}-${d.place}-${d.archetype}`}
+                      className="text-xs px-2 py-1 rounded-md bg-ink-900 border border-ink-600/40"
+                    >
+                      <span className="text-gold-400 font-semibold">#{d.place}</span> {d.archetype}
+                      {d.pilot ? ` · ${d.pilot}` : ""}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </article>
+          );
+        })}
       </section>
     </div>
   );

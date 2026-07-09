@@ -236,10 +236,24 @@ function applyLiveRanking(bundle, goldfishByFormat) {
     if (!live.length) continue;
     sources.add("mtggoldfish");
 
-    const reRank = (ids) => {
+    const modeBias = (name, mode) => {
+      const n = String(name || "").toLowerCase();
+      if (mode === "bo1") {
+        if (/prowess|aggro|burn|heroic|landfall|tempo|spells|spellemental|phoenix/.test(n))
+          return 8;
+        if (/control|lessons|excruciator|beanstalk/.test(n)) return -4;
+      } else {
+        if (/control|lessons|excruciator|midrange|beanstalk|azorius|4c|dimir|jund/.test(n))
+          return 8;
+        if (/prowess|aggro|mono-red|heroic|burn/.test(n)) return -3;
+      }
+      return 0;
+    };
+
+    const reRank = (ids, mode) => {
       const scored = ids.map((id, idx) => {
         const deck = bundle.decks[id];
-        if (!deck) return { id, score: -idx, pct: deck?.metaShare };
+        if (!deck) return { id, score: -idx };
         let best = 0;
         let pct = deck.metaShare ?? 0;
         for (const a of live) {
@@ -249,8 +263,8 @@ function applyLiveRanking(bundle, goldfishByFormat) {
             pct = a.pct;
           }
         }
-        // Prefer live match, keep seed order as tiebreaker
-        const score = best >= 0.5 ? pct * 10 + best : (deck.metaShare ?? 0) + (8 - idx) * 0.01;
+        const base = best >= 0.5 ? pct * 10 + best : (deck.metaShare ?? 0) + (8 - idx) * 0.01;
+        const score = base + modeBias(deck.name, mode);
         if (best >= 0.5) {
           deck.metaShare = pct;
           deck.sources = [
@@ -268,15 +282,15 @@ function applyLiveRanking(bundle, goldfishByFormat) {
         const deck = bundle.decks[s.id];
         if (deck) {
           deck.rank = i + 1;
-          // Re-tier by new rank
           deck.tier = i < 3 ? 1 : i < 6 ? 2 : 3;
+          deck.mode = mode;
         }
         return s.id;
       });
     };
 
-    if (fmt.bo1DeckIds?.length) fmt.bo1DeckIds = reRank([...fmt.bo1DeckIds]);
-    if (fmt.bo3DeckIds?.length) fmt.bo3DeckIds = reRank([...fmt.bo3DeckIds]);
+    if (fmt.bo1DeckIds?.length) fmt.bo1DeckIds = reRank([...fmt.bo1DeckIds], "bo1");
+    if (fmt.bo3DeckIds?.length) fmt.bo3DeckIds = reRank([...fmt.bo3DeckIds], "bo3");
     fmt.bo1 = { deckId: fmt.bo1DeckIds?.[0] ?? "" };
     fmt.bo3 = { deckId: fmt.bo3DeckIds?.[0] ?? "" };
 

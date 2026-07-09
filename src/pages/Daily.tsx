@@ -5,6 +5,7 @@ import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { IconStar } from "../components/NavIcons";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
+import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatMeta, ManaColor } from "../types/meta";
 
 function filterDecks(
@@ -75,6 +76,7 @@ function DeckMiniCard({
         {d.metaShare != null ? `${d.metaShare}% · ` : ""}
         {d.archetype}
       </p>
+      <CardArtStrip names={pickPreviewCards(d.mainboard, d.commander)} max={4} />
     </article>
   );
 }
