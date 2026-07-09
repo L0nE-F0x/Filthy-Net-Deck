@@ -1,0 +1,12 @@
+node_modules
+dist
+src-tauri/target
+.DS_Store
+*.log
+.env
+.env.*
+pipeline/_load-seed.mts
+pipeline/seed-export.json
+.vscode
+.idea
+*.local

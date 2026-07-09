@@ -1,0 +1,15 @@
+[build]
+  publish = "."
+  # Optional: run pipeline before publish when wired to CI
+  # command = "node ../pipeline/build-meta.mjs --seed"
+
+[[headers]]
+  for = "/meta/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

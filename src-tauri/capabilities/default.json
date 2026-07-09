@@ -1,0 +1,28 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-hide",
+    "core:window:allow-show",
+    "core:window:allow-set-focus",
+    "core:window:allow-unminimize",
+    "core:window:allow-is-visible",
+    "core:window:allow-is-minimized",
+    "core:tray:default",
+    "opener:default",
+    "store:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://api.scryfall.com/**" },
+        { "url": "https://*.scryfall.io/**" },
+        { "url": "https://cards.scryfall.io/**" },
+        { "url": "https://*.netlify.app/**" },
+        { "url": "https://banbasicisland.netlify.app/**" }
+      ]
+    }
+  ]
+}

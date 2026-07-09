@@ -1,0 +1,16 @@
+# Deploy the marketing site + meta CDN + downloads from website/
+[build]
+  publish = "website"
+  # Meta JSON is committed under website/meta/. Optional rebuild if seed-export exists.
+  command = "node pipeline/build-meta.mjs"
+
+[[headers]]
+  for = "/meta/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
