@@ -58,26 +58,27 @@ export async function fetchMagicGgArticleDecks(articleUrl, format = "standard") 
       .replace(/&amp;/g, "&")
       .replace(/[ \t]+/g, " ");
 
-    // Capture heading-like labels that might sit before each deck
-    // e.g. "Selesnya Midrange — PlayerName" or "Deck 1"
+    // Card lines: "4 Card Name". Do NOT allow digits inside the name capture —
+    // otherwise "4 Thornspire Verge 4 Stomping" becomes one token.
     const tokens = [];
-    const simple = [
-      ...text.matchAll(/\b(\d{1,2})\s+([A-Z][A-Za-z0-9',./\-\s]{2,55})/g),
-    ];
-    for (const m of simple) {
+    const re =
+      /\b(\d{1,2})\s+([A-Z][A-Za-z][A-Za-z',./\-]*(?:\s+[A-Za-z][A-Za-z0-9',./\-]*){0,5})(?=\s+\d{1,2}\s+[A-Z]|\s*$)/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
       const count = parseInt(m[1], 10);
       let name = m[2].trim().replace(/\s+/g, " ");
-      if (name.length > 50) name = name.slice(0, 50).trim();
       if (count < 1 || count > 20) continue;
+      if (name.length < 3 || name.length > 42) continue;
+      // Safety: if a qty still leaked in, cut it
+      if (/\s\d{1,2}\s+[A-Z]/.test(name)) {
+        name = name.replace(/\s\d{1,2}\s+[A-Z].*$/, "").trim();
+      }
       if (
         /^(Layout|Latest|These|Learn|Back|July|June|May|Posted|Traditional|Ranked|Decklists|Magic|Copy)/i.test(
           name,
         )
       )
         continue;
-      // strip trailing junk that isn't card-like
-      name = name.replace(/\s+(Deck|Sideboard|Main).*$/i, "").trim();
-      if (name.length < 3) continue;
       tokens.push({ count, name });
     }
 

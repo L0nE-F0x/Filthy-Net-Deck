@@ -79,9 +79,57 @@ export function fuzzyArchetype(a, b) {
   return yt.length ? hit / yt.length : 0;
 }
 
+/** Cards known illegal in Standard / Standard Brawl (rotated or banned). */
+const STANDARD_ILLEGAL = new Set(
+  [
+    "Monastery Swiftspear",
+    "Kumano Faces Kakkazan",
+    "Experimental Synthesizer",
+    "Fable of the Mirror-Breaker",
+    "Reckoner Bankbuster",
+    "The Meathook Massacre",
+  ].map((n) => n.toLowerCase()),
+);
+
+export function cardIllegalInFormat(cardName, formatId) {
+  const n = String(cardName || "").toLowerCase();
+  if (!n) return false;
+  if (
+    formatId === "standard" ||
+    formatId === "standard_brawl" ||
+    formatId === "alchemy"
+  ) {
+    if (STANDARD_ILLEGAL.has(n)) return true;
+  }
+  return false;
+}
+
+/** Drop illegal cards; return false if mainboard becomes too thin. */
+export function scrubDeckLegality(deck) {
+  if (!deck?.mainboard) return deck;
+  const fmt = deck.format || "";
+  const filter = (arr) =>
+    (arr || []).filter((c) => !cardIllegalInFormat(c.name, fmt));
+  deck.mainboard = filter(deck.mainboard);
+  deck.sideboard = filter(deck.sideboard);
+  const n = deck.mainboard.reduce((s, c) => s + c.count, 0);
+  if (n < 50 && deck.listQuality === "authoritative") {
+    // Mark as partial so pipeline can replace later
+    deck.listQuality = "partial";
+    deck.listNote = `${deck.listNote || ""} · legality scrub thinned list`.trim();
+  }
+  deck.arenaImport = buildArenaImport(deck);
+  return deck;
+}
+
 /** Apply a verified list onto a deck object */
 export function applyListToDeck(deck, list, sourceMeta) {
   if (!list?.mainboard?.length) return false;
+  // Reject concatenated multi-card names from bad HTML parsers
+  for (const c of list.mainboard) {
+    const name = String(c.name || "");
+    if (name.length > 45 || /\s\d{1,2}\s+[A-Z]/.test(name)) return false;
+  }
   const n = list.mainboard.reduce((s, c) => s + c.count, 0);
   if (n < 50 || n > 110) return false;
   deck.mainboard = list.mainboard;
@@ -92,6 +140,7 @@ export function applyListToDeck(deck, list, sourceMeta) {
     { name: sourceMeta.sourceLabel || sourceMeta.source, url: sourceMeta.url },
     ...(deck.sources || []).filter((s) => s.url !== sourceMeta.url),
   ];
+  scrubDeckLegality(deck);
   deck.arenaImport = buildArenaImport(deck);
   return true;
 }

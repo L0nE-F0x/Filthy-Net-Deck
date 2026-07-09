@@ -143,13 +143,16 @@ export function Settings() {
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => {
-              void checkForUpdates().then(() => {
-                const u = useAppStore.getState().updateAvailable;
-                setUpdateMsg(
-                  u
-                    ? `v${u.version} is available`
-                    : "You’re on the latest version (or check failed).",
-                );
+              void checkForUpdates().then((result) => {
+                if (result.status === "update") {
+                  setUpdateMsg(`v${result.remote.version} is available — download below.`);
+                } else if (result.status === "latest") {
+                  setUpdateMsg(
+                    `You’re on the latest version (remote v${result.remote.version}).`,
+                  );
+                } else {
+                  setUpdateMsg(result.message);
+                }
               });
             }}
           >

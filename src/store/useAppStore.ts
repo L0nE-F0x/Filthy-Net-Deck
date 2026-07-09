@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { fetchMetaBundle } from "../services/metaFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
-import { fetchRemoteVersion, isNewer } from "../services/versionCheck";
+import {
+  checkRemoteVersion,
+  type VersionCheckResult,
+} from "../services/versionCheck";
 import { resolveFormatId } from "../services/formatResolve";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
 
@@ -92,7 +95,7 @@ interface AppState {
   setFilterTier: (t: 0 | 1 | 2 | 3) => void;
   setFilterColor: (c: string | null) => void;
   setShowFavoritesOnly: (v: boolean) => void;
-  checkForUpdates: () => Promise<void>;
+  checkForUpdates: () => Promise<VersionCheckResult>;
   dismissUpdate: () => void;
   openViewer: (url: string) => void;
   closeViewer: () => void;
@@ -171,18 +174,19 @@ export const useAppStore = create<AppState>((set, get) => {
     closeViewer: () => set({ viewerUrl: null }),
 
     checkForUpdates: async () => {
-      const remote = await fetchRemoteVersion();
-      if (remote && isNewer(remote.version)) {
+      const result = await checkRemoteVersion();
+      if (result.status === "update") {
         set({
           updateAvailable: {
-            version: remote.version,
-            downloadUrl: remote.downloadUrl,
-            notes: remote.notes,
+            version: result.remote.version,
+            downloadUrl: result.remote.downloadUrl,
+            notes: result.remote.notes,
           },
         });
       } else {
         set({ updateAvailable: null });
       }
+      return result;
     },
 
     dismissUpdate: () => set({ updateAvailable: null }),

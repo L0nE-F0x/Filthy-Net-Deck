@@ -4,13 +4,31 @@
  */
 import { applyListToDeck, fuzzyArchetype } from "./common.mjs";
 
+// MTGO embedded JSON is the most reliable full-list source.
+// magic.gg HTML parsing is secondary (can mis-split card names).
 const SOURCE_PRIORITY = {
-  "magic.gg": 100,
-  mtgo: 90,
-  mtggoldfish: 80,
-  melee: 70,
+  mtgo: 100,
+  mtggoldfish: 90,
+  "magic.gg": 70,
+  melee: 60,
   untapped: 40,
 };
+
+/** Reject lists whose card names look like concatenated multi-card garbage. */
+export function isSaneList(list) {
+  if (!list?.mainboard?.length) return false;
+  const n = list.mainboard.reduce((s, c) => s + (c.count || 0), 0);
+  if (n < 50 || n > 110) return false;
+  for (const c of list.mainboard) {
+    const name = String(c.name || "").trim();
+    if (!name || name.length < 2) return false;
+    // Parser bug: "Thornspire Verge 4 Stomping Ground 4 Forest…"
+    if (name.length > 45) return false;
+    if (/\s\d{1,2}\s+[A-Z]/.test(name)) return false;
+    if ((name.match(/\s/g) || []).length > 7) return false;
+  }
+  return true;
+}
 
 export function mergeTournamentFeeds(bundle, feeds) {
   const existing = new Set((bundle.tournaments || []).map((t) => t.id));
@@ -71,13 +89,14 @@ export function assignListsToBundle(bundle, lists) {
         let bestIdx = -1;
         for (let i = 0; i < available.length; i++) {
           const L = available[i];
-          // Prefer lists that still have cards
-          if (!L.mainboard?.length) continue;
-          // Name match if list has a name, else first-fit for standard fill
+          if (!isSaneList(L)) continue;
+          // Name match if list has a name, else weak first-fit
           const score = L.name
-            ? fuzzyArchetype(deck.name, L.name) ||
-              fuzzyArchetype(deck.archetype, L.name)
-            : 0.3;
+            ? Math.max(
+                fuzzyArchetype(deck.name, L.name),
+                fuzzyArchetype(deck.archetype || "", L.name),
+              )
+            : 0.25;
           const pri = SOURCE_PRIORITY[L.source] || 10;
           const combined = score * 10 + pri * 0.01;
           if (combined > bestScore) {
@@ -91,7 +110,8 @@ export function assignListsToBundle(bundle, lists) {
         const pri = SOURCE_PRIORITY[best.source] || 10;
         if (deck.listQuality === "authoritative" && pri <= curPri && bestScore < 0.85)
           continue;
-        if (bestScore < 0.35 && best.name) continue; // weak match with named list
+        // Require a real name match — never slap random MTGO lists onto wrong shells
+        if (best.name && bestScore < 0.45) continue;
 
         if (
           applyListToDeck(deck, best, {
@@ -102,17 +122,17 @@ export function assignListsToBundle(bundle, lists) {
           })
         ) {
           applied++;
-          // consume list so we don't duplicate same 60 on every deck
           available.splice(bestIdx, 1);
         }
       }
 
-      // Second pass: fill remaining fallback decks with any leftover lists (first-fit)
+      // Second pass: only assign leftover lists with no archetype name (anonymous blocks)
       for (const id of ids) {
         const deck = bundle.decks[id];
         if (!deck || deck.listQuality === "authoritative") continue;
-        const next = available.shift();
-        if (!next) break;
+        let nextIdx = available.findIndex((L) => isSaneList(L) && !L.name);
+        if (nextIdx < 0) break;
+        const next = available.splice(nextIdx, 1)[0];
         if (
           applyListToDeck(deck, next, {
             source: next.source,

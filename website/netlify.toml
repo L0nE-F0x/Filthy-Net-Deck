@@ -3,13 +3,25 @@
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
 
+# CORS so the Tauri desktop app can fetch meta + version.json
 [[headers]]
   for = "/meta/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    Cache-Control = "public, max-age=300"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Accept"
+    Cache-Control = "public, max-age=120"
+
+[[headers]]
+  for = "/version.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Accept"
+    Cache-Control = "public, max-age=60"
 
 [[headers]]
   for = "/downloads/*"
   [headers.values]
+    Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"

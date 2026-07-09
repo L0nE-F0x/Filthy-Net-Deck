@@ -8,15 +8,77 @@ export interface RemoteVersion {
   mandatory?: boolean;
 }
 
-export async function fetchRemoteVersion(
-  baseUrl = "https://filthy-net-deck.netlify.app",
-): Promise<RemoteVersion | null> {
+export type VersionCheckResult =
+  | { status: "update"; remote: RemoteVersion }
+  | { status: "latest"; remote: RemoteVersion }
+  | { status: "error"; message: string };
+
+const DEFAULT_BASE = "https://filthy-net-deck.netlify.app";
+
+/** Resolve version.json URL (supports meta-url override host). */
+export function versionJsonUrl(baseUrl = DEFAULT_BASE): string {
   try {
-    const res = await fetch(`${baseUrl}/version.json`, { cache: "no-cache" });
+    const override = localStorage.getItem("bbi.metaUrl");
+    if (override) {
+      const u = new URL(override);
+      return `${u.origin}/version.json`;
+    }
+  } catch {
+    /* ignore */
+  }
+  return `${baseUrl.replace(/\/$/, "")}/version.json`;
+}
+
+export async function fetchRemoteVersion(
+  baseUrl = DEFAULT_BASE,
+): Promise<RemoteVersion | null> {
+  const url = `${versionJsonUrl(baseUrl)}?t=${Date.now()}`;
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
     if (!res.ok) return null;
-    return (await res.json()) as RemoteVersion;
+    const data = (await res.json()) as RemoteVersion;
+    if (!data?.version) return null;
+    return data;
   } catch {
     return null;
+  }
+}
+
+/** Full check with distinct outcomes for Settings UI. */
+export async function checkRemoteVersion(
+  local: string = APP_VERSION,
+): Promise<VersionCheckResult> {
+  const url = versionJsonUrl();
+  try {
+    const res = await fetch(`${url}?t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) {
+      return {
+        status: "error",
+        message: `Could not reach version.json (${res.status}). Check network / CORS.`,
+      };
+    }
+    const remote = (await res.json()) as RemoteVersion;
+    if (!remote?.version) {
+      return { status: "error", message: "version.json missing a version field." };
+    }
+    if (isNewer(remote.version, local)) {
+      return { status: "update", remote };
+    }
+    return { status: "latest", remote };
+  } catch (e) {
+    return {
+      status: "error",
+      message:
+        e instanceof Error
+          ? `Update check failed: ${e.message}`
+          : "Update check failed (network or CORS).",
+    };
   }
 }
 

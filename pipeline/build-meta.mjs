@@ -32,6 +32,7 @@ import {
   mergeSourceTags,
   mergeTournamentFeeds,
 } from "./sources/aggregate.mjs";
+import { scrubDeckLegality } from "./sources/common.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -406,6 +407,11 @@ async function main() {
       listPolicy: "offline-export-only",
       sourcesDetail: ["offline-pack"],
     };
+  }
+
+  // Always strip known-illegal Standard cards (even offline pack)
+  for (const d of Object.values(bundle.decks || {})) {
+    scrubDeckLegality(d);
   }
 
   bundle = scrubSources(bundle);

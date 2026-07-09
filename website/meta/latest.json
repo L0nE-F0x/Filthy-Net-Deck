@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T17:19:56.525Z",
+  "generatedAt": "2026-07-09T17:47:04.533Z",
   "date": "2026-07-09",
   "formats": [
     {
@@ -620,140 +620,95 @@
       "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 2,
-          "name": "Cruelclaw's Heist 1 Ghost Vacuum 1 Emeritus of Abu"
-        },
-        {
-          "count": 1,
-          "name": "Withering Curse 1 Witherbloom Charm 3 Intimidation"
-        },
-        {
-          "count": 2,
-          "name": "Cruelclaw's Heist 2 Keen-Eyed Curator 2 Heritage R"
-        },
-        {
-          "count": 1,
-          "name": "Ghost Vacuum 1 The End 1 Withering Curse 1 End of"
-        },
-        {
-          "count": 1,
-          "name": "Painful Quandary 1 Nowhere to Run 4 Starting"
+          "count": 3,
+          "name": "Abandoned Air Temple"
         },
         {
           "count": 4,
-          "name": "Godless Shrine 4 Multiversal Passage 4 Bleachbone"
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 4,
+          "name": "Leatherhead, Swamp Stalker"
+        },
+        {
+          "count": 1,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 4,
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 1,
+          "name": "Jennifer Walters"
+        },
+        {
+          "count": 1,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 2,
+          "name": "Ouroboroid"
+        },
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 1,
+          "name": "Meltstrider's Resolve"
+        },
+        {
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 4,
+          "name": "Pawpatch Recruit"
         },
         {
           "count": 3,
-          "name": "Concealed Courtyard 2 Fountainport 1 Plains 1 Swam"
+          "name": "Surrak, Elusive Hunter"
         },
         {
           "count": 4,
-          "name": "Enduring Innocence 4 Haliya, Guided by Light 4 Ess"
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 1,
+          "name": "Seam Rip"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 1,
+          "name": "Elspeth, Storm Slayer"
         },
         {
           "count": 4,
-          "name": "Case of the Uneaten Feast 3 Moseo, Vein's New Dean"
+          "name": "Temple Garden"
+        },
+        {
+          "count": 6,
+          "name": "Forest"
+        },
+        {
+          "count": 4,
+          "name": "Brightglass Gearhulk"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
         },
         {
           "count": 3,
-          "name": "Amalia Benavides Aguirre 2 Bitter Triumph 2 Voice"
-        },
-        {
-          "count": 1,
-          "name": "Leonardo, Cutting Edge 1 Elspeth, Storm Slayer 1 G"
-        },
-        {
-          "count": 1,
-          "name": "Aunt May 4 High Noon 3 Requisition Raid 2 Zoraline"
-        },
-        {
-          "count": 2,
-          "name": "Withering Curse 1 Curious Farm Animals 1 Ghost Vac"
-        },
-        {
-          "count": 1,
-          "name": "Get Lost 4 Demolition Field 4 Mountain 3 Sac"
-        },
-        {
-          "count": 3,
-          "name": "Plains 3 Cori Mountain Monastery 3 Sunken Citadel"
-        },
-        {
-          "count": 1,
-          "name": "Echoing Deeps 1 Fountainport 4 Ugin, Eye of the St"
-        },
-        {
-          "count": 4,
-          "name": "Arc Reactor 4 Fountainport Bell 4 Candy Trail 2 Re"
-        },
-        {
-          "count": 2,
-          "name": "Avengers Disassembled 2 Abrade 2 Ark of Hunger 2 D"
-        },
-        {
-          "count": 2,
-          "name": "Boom Box 1 The Ooze 1 Ghost Vacuum 1 Clay-Fired Br"
-        },
-        {
-          "count": 1,
-          "name": "Tezzeret, Cruel Captain 4 Price of Freedom 2 Disen"
-        },
-        {
-          "count": 2,
-          "name": "Day of Judgment 2 Avengers Disassembled 1 Erode 1"
-        },
-        {
-          "count": 1,
-          "name": "Authority of the Consuls 1 Lightning Helix 1 Sandw"
-        },
-        {
-          "count": 4,
-          "name": "Wastewood Verge 4 Overgrown Tomb 4 Blooming Marsh"
-        },
-        {
-          "count": 3,
-          "name": "Swamp 2 Fabled Passage 2 Restless Cottage 1 Deathc"
-        },
-        {
-          "count": 1,
-          "name": "Forest 4 Badgermole Cub 4 Obsessive Pursuit 4 Gene"
-        },
-        {
-          "count": 4,
-          "name": "Beseech the Mirror 3 Tragic Trajectory 3 Mutagen M"
+          "name": "Leyline Weaver"
         }
       ],
-      "sideboard": [
-        {
-          "count": 3,
-          "name": "Sentinel of the Nameless City 2 Shoot the Sheriff"
-        },
-        {
-          "count": 2,
-          "name": "Witherbloom Charm 1 Elegy Acolyte 1 The Ooze 1 Now"
-        },
-        {
-          "count": 1,
-          "name": "Leatherhead, Swamp Stalker 1 Phoenix Fleet Airship"
-        },
-        {
-          "count": 2,
-          "name": "Intimidation Tactics 2 Defend the Rider 2 Day of B"
-        },
-        {
-          "count": 2,
-          "name": "Strategic Betrayal 1 Day of Judgment 1 Ancient Ven"
-        },
-        {
-          "count": 1,
-          "name": "Urgent Necropsy 4 Blood Crypt 4 Sacred Found"
-        },
-        {
-          "count": 4,
-          "name": "Starting Town 4 Multiversal Passage 3 Godless Shri"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Jeskai Lessons",
@@ -772,11 +727,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n2 Cruelclaw's Heist 1 Ghost Vacuum 1 Emeritus of Abu\n1 Withering Curse 1 Witherbloom Charm 3 Intimidation\n2 Cruelclaw's Heist 2 Keen-Eyed Curator 2 Heritage R\n1 Ghost Vacuum 1 The End 1 Withering Curse 1 End of\n1 Painful Quandary 1 Nowhere to Run 4 Starting\n4 Godless Shrine 4 Multiversal Passage 4 Bleachbone\n3 Concealed Courtyard 2 Fountainport 1 Plains 1 Swam\n4 Enduring Innocence 4 Haliya, Guided by Light 4 Ess\n4 Case of the Uneaten Feast 3 Moseo, Vein's New Dean\n3 Amalia Benavides Aguirre 2 Bitter Triumph 2 Voice\n1 Leonardo, Cutting Edge 1 Elspeth, Storm Slayer 1 G\n1 Aunt May 4 High Noon 3 Requisition Raid 2 Zoraline\n2 Withering Curse 1 Curious Farm Animals 1 Ghost Vac\n1 Get Lost 4 Demolition Field 4 Mountain 3 Sac\n3 Plains 3 Cori Mountain Monastery 3 Sunken Citadel\n1 Echoing Deeps 1 Fountainport 4 Ugin, Eye of the St\n4 Arc Reactor 4 Fountainport Bell 4 Candy Trail 2 Re\n2 Avengers Disassembled 2 Abrade 2 Ark of Hunger 2 D\n2 Boom Box 1 The Ooze 1 Ghost Vacuum 1 Clay-Fired Br\n1 Tezzeret, Cruel Captain 4 Price of Freedom 2 Disen\n2 Day of Judgment 2 Avengers Disassembled 1 Erode 1\n1 Authority of the Consuls 1 Lightning Helix 1 Sandw\n4 Wastewood Verge 4 Overgrown Tomb 4 Blooming Marsh\n3 Swamp 2 Fabled Passage 2 Restless Cottage 1 Deathc\n1 Forest 4 Badgermole Cub 4 Obsessive Pursuit 4 Gene\n4 Beseech the Mirror 3 Tragic Trajectory 3 Mutagen M\n\nSideboard\n3 Sentinel of the Nameless City 2 Shoot the Sheriff\n2 Witherbloom Charm 1 Elegy Acolyte 1 The Ooze 1 Now\n1 Leatherhead, Swamp Stalker 1 Phoenix Fleet Airship\n2 Intimidation Tactics 2 Defend the Rider 2 Day of B\n2 Strategic Betrayal 1 Day of Judgment 1 Ancient Ven\n1 Urgent Necropsy 4 Blood Crypt 4 Sacred Found\n4 Starting Town 4 Multiversal Passage 3 Godless Shri",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n4 Badgermole Cub\n4 Leatherhead, Swamp Stalker\n1 Bushwhack\n4 Hushwood Verge\n1 Jennifer Walters\n1 Keen-Eyed Curator\n2 Ouroboroid\n4 Llanowar Elves\n1 Meltstrider's Resolve\n1 Multiversal Passage\n4 Pawpatch Recruit\n3 Surrak, Elusive Hunter\n4 Practiced Offense\n1 Seam Rip\n2 Starting Town\n1 Elspeth, Storm Slayer\n4 Temple Garden\n6 Forest\n4 Brightglass Gearhulk\n2 Plains\n3 Leyline Weaver",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -797,7 +752,7 @@
       ],
       "metaShare": 12,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #2"
+      "listNote": "MTGO Standard Challenge 32 · RPA"
     },
     "standard-bo3-selesnya-ouroboroid": {
       "id": "standard-bo3-selesnya-ouroboroid",
@@ -814,140 +769,95 @@
       "description": "July 2026 #1 Standard shell (MTGGoldfish). Badgermole Cub + Brightglass Gearhulk + Practiced Offense value engine — top paper & MTGO share. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 2,
-          "name": "Cruelclaw's Heist 1 Ghost Vacuum 1 Emeritus of Abu"
-        },
-        {
-          "count": 1,
-          "name": "Withering Curse 1 Witherbloom Charm 3 Intimidation"
-        },
-        {
-          "count": 2,
-          "name": "Cruelclaw's Heist 2 Keen-Eyed Curator 2 Heritage R"
-        },
-        {
-          "count": 1,
-          "name": "Ghost Vacuum 1 The End 1 Withering Curse 1 End of"
-        },
-        {
-          "count": 1,
-          "name": "Painful Quandary 1 Nowhere to Run 4 Starting"
+          "count": 3,
+          "name": "Abandoned Air Temple"
         },
         {
           "count": 4,
-          "name": "Godless Shrine 4 Multiversal Passage 4 Bleachbone"
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 4,
+          "name": "Leatherhead, Swamp Stalker"
+        },
+        {
+          "count": 1,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 4,
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 1,
+          "name": "Jennifer Walters"
+        },
+        {
+          "count": 1,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 2,
+          "name": "Ouroboroid"
+        },
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 1,
+          "name": "Meltstrider's Resolve"
+        },
+        {
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 4,
+          "name": "Pawpatch Recruit"
         },
         {
           "count": 3,
-          "name": "Concealed Courtyard 2 Fountainport 1 Plains 1 Swam"
+          "name": "Surrak, Elusive Hunter"
         },
         {
           "count": 4,
-          "name": "Enduring Innocence 4 Haliya, Guided by Light 4 Ess"
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 1,
+          "name": "Seam Rip"
+        },
+        {
+          "count": 2,
+          "name": "Starting Town"
+        },
+        {
+          "count": 1,
+          "name": "Elspeth, Storm Slayer"
         },
         {
           "count": 4,
-          "name": "Case of the Uneaten Feast 3 Moseo, Vein's New Dean"
+          "name": "Temple Garden"
+        },
+        {
+          "count": 6,
+          "name": "Forest"
+        },
+        {
+          "count": 4,
+          "name": "Brightglass Gearhulk"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
         },
         {
           "count": 3,
-          "name": "Amalia Benavides Aguirre 2 Bitter Triumph 2 Voice"
-        },
-        {
-          "count": 1,
-          "name": "Leonardo, Cutting Edge 1 Elspeth, Storm Slayer 1 G"
-        },
-        {
-          "count": 1,
-          "name": "Aunt May 4 High Noon 3 Requisition Raid 2 Zoraline"
-        },
-        {
-          "count": 2,
-          "name": "Withering Curse 1 Curious Farm Animals 1 Ghost Vac"
-        },
-        {
-          "count": 1,
-          "name": "Get Lost 4 Demolition Field 4 Mountain 3 Sac"
-        },
-        {
-          "count": 3,
-          "name": "Plains 3 Cori Mountain Monastery 3 Sunken Citadel"
-        },
-        {
-          "count": 1,
-          "name": "Echoing Deeps 1 Fountainport 4 Ugin, Eye of the St"
-        },
-        {
-          "count": 4,
-          "name": "Arc Reactor 4 Fountainport Bell 4 Candy Trail 2 Re"
-        },
-        {
-          "count": 2,
-          "name": "Avengers Disassembled 2 Abrade 2 Ark of Hunger 2 D"
-        },
-        {
-          "count": 2,
-          "name": "Boom Box 1 The Ooze 1 Ghost Vacuum 1 Clay-Fired Br"
-        },
-        {
-          "count": 1,
-          "name": "Tezzeret, Cruel Captain 4 Price of Freedom 2 Disen"
-        },
-        {
-          "count": 2,
-          "name": "Day of Judgment 2 Avengers Disassembled 1 Erode 1"
-        },
-        {
-          "count": 1,
-          "name": "Authority of the Consuls 1 Lightning Helix 1 Sandw"
-        },
-        {
-          "count": 4,
-          "name": "Wastewood Verge 4 Overgrown Tomb 4 Blooming Marsh"
-        },
-        {
-          "count": 3,
-          "name": "Swamp 2 Fabled Passage 2 Restless Cottage 1 Deathc"
-        },
-        {
-          "count": 1,
-          "name": "Forest 4 Badgermole Cub 4 Obsessive Pursuit 4 Gene"
-        },
-        {
-          "count": 4,
-          "name": "Beseech the Mirror 3 Tragic Trajectory 3 Mutagen M"
+          "name": "Leyline Weaver"
         }
       ],
-      "sideboard": [
-        {
-          "count": 3,
-          "name": "Sentinel of the Nameless City 2 Shoot the Sheriff"
-        },
-        {
-          "count": 2,
-          "name": "Witherbloom Charm 1 Elegy Acolyte 1 The Ooze 1 Now"
-        },
-        {
-          "count": 1,
-          "name": "Leatherhead, Swamp Stalker 1 Phoenix Fleet Airship"
-        },
-        {
-          "count": 2,
-          "name": "Intimidation Tactics 2 Defend the Rider 2 Day of B"
-        },
-        {
-          "count": 2,
-          "name": "Strategic Betrayal 1 Day of Judgment 1 Ancient Ven"
-        },
-        {
-          "count": 1,
-          "name": "Urgent Necropsy 4 Blood Crypt 4 Sacred Found"
-        },
-        {
-          "count": 4,
-          "name": "Starting Town 4 Multiversal Passage 3 Godless Shri"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Jeskai Lessons",
@@ -991,11 +901,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n2 Cruelclaw's Heist 1 Ghost Vacuum 1 Emeritus of Abu\n1 Withering Curse 1 Witherbloom Charm 3 Intimidation\n2 Cruelclaw's Heist 2 Keen-Eyed Curator 2 Heritage R\n1 Ghost Vacuum 1 The End 1 Withering Curse 1 End of\n1 Painful Quandary 1 Nowhere to Run 4 Starting\n4 Godless Shrine 4 Multiversal Passage 4 Bleachbone\n3 Concealed Courtyard 2 Fountainport 1 Plains 1 Swam\n4 Enduring Innocence 4 Haliya, Guided by Light 4 Ess\n4 Case of the Uneaten Feast 3 Moseo, Vein's New Dean\n3 Amalia Benavides Aguirre 2 Bitter Triumph 2 Voice\n1 Leonardo, Cutting Edge 1 Elspeth, Storm Slayer 1 G\n1 Aunt May 4 High Noon 3 Requisition Raid 2 Zoraline\n2 Withering Curse 1 Curious Farm Animals 1 Ghost Vac\n1 Get Lost 4 Demolition Field 4 Mountain 3 Sac\n3 Plains 3 Cori Mountain Monastery 3 Sunken Citadel\n1 Echoing Deeps 1 Fountainport 4 Ugin, Eye of the St\n4 Arc Reactor 4 Fountainport Bell 4 Candy Trail 2 Re\n2 Avengers Disassembled 2 Abrade 2 Ark of Hunger 2 D\n2 Boom Box 1 The Ooze 1 Ghost Vacuum 1 Clay-Fired Br\n1 Tezzeret, Cruel Captain 4 Price of Freedom 2 Disen\n2 Day of Judgment 2 Avengers Disassembled 1 Erode 1\n1 Authority of the Consuls 1 Lightning Helix 1 Sandw\n4 Wastewood Verge 4 Overgrown Tomb 4 Blooming Marsh\n3 Swamp 2 Fabled Passage 2 Restless Cottage 1 Deathc\n1 Forest 4 Badgermole Cub 4 Obsessive Pursuit 4 Gene\n4 Beseech the Mirror 3 Tragic Trajectory 3 Mutagen M\n\nSideboard\n3 Sentinel of the Nameless City 2 Shoot the Sheriff\n2 Witherbloom Charm 1 Elegy Acolyte 1 The Ooze 1 Now\n1 Leatherhead, Swamp Stalker 1 Phoenix Fleet Airship\n2 Intimidation Tactics 2 Defend the Rider 2 Day of B\n2 Strategic Betrayal 1 Day of Judgment 1 Ancient Ven\n1 Urgent Necropsy 4 Blood Crypt 4 Sacred Found\n4 Starting Town 4 Multiversal Passage 3 Godless Shri",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n4 Badgermole Cub\n4 Leatherhead, Swamp Stalker\n1 Bushwhack\n4 Hushwood Verge\n1 Jennifer Walters\n1 Keen-Eyed Curator\n2 Ouroboroid\n4 Llanowar Elves\n1 Meltstrider's Resolve\n1 Multiversal Passage\n4 Pawpatch Recruit\n3 Surrak, Elusive Hunter\n4 Practiced Offense\n1 Seam Rip\n2 Starting Town\n1 Elspeth, Storm Slayer\n4 Temple Garden\n6 Forest\n4 Brightglass Gearhulk\n2 Plains\n3 Leyline Weaver",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -1016,7 +926,7 @@
       ],
       "metaShare": 12,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #2"
+      "listNote": "MTGO Standard Challenge 32 · RPA"
     },
     "standard-bo1-jeskai-lessons": {
       "id": "standard-bo1-jeskai-lessons",
@@ -1318,132 +1228,123 @@
       "description": "Current Standard (July 2026) prowess — Slickshot Show-Off, Stormchaser's Talent, Flow State, Eddymurk Crab. No rotated one-drops. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Thornspire Verge 4 Stomping Ground 4 Forest 3 Star"
+          "count": 2,
+          "name": "Abrade"
         },
         {
           "count": 3,
-          "name": "Multiversal Passage 1 Mountain 4 Bushwhack 4 Keen-"
+          "name": "Shattered Sanctum"
+        },
+        {
+          "count": 2,
+          "name": "Day of Judgment"
+        },
+        {
+          "count": 2,
+          "name": "Flashback"
+        },
+        {
+          "count": 1,
+          "name": "Floodfarm Verge"
         },
         {
           "count": 4,
-          "name": "Patchwork Beastie 4 Rapid Rescue 4 Wildfire Wicker"
+          "name": "Great Hall of the Biblioplex"
+        },
+        {
+          "count": 3,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 3,
+          "name": "Inevitable Defeat"
+        },
+        {
+          "count": 1,
+          "name": "Lightning Helix"
+        },
+        {
+          "count": 2,
+          "name": "Mistrise Village"
+        },
+        {
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 1,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "No More Lies"
+        },
+        {
+          "count": 1,
+          "name": "North Wind Avatar"
+        },
+        {
+          "count": 2,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Hallowed Fountain"
+        },
+        {
+          "count": 2,
+          "name": "Sear"
+        },
+        {
+          "count": 1,
+          "name": "Slagstorm"
+        },
+        {
+          "count": 1,
+          "name": "Cori Mountain Monastery"
         },
         {
           "count": 4,
-          "name": "Tersa Lightshatter 4 Fear of Missing Out 2 Overpro"
-        },
-        {
-          "count": 2,
-          "name": "Nova Hellkite 1 Itzquinth, Firstborn of Gishath 1"
-        },
-        {
-          "count": 1,
-          "name": "Webstrike Elite 4 Scrapshooter 3 The Legend of Rok"
-        },
-        {
-          "count": 2,
-          "name": "Ghost Vacuum 2 Scorching Shot 2 Fire Magic 1 Twinm"
-        },
-        {
-          "count": 1,
-          "name": "Impractical Joke 6 Plains 4 Sacred Foundry 4"
-        },
-        {
-          "count": 3,
-          "name": "Inspiring Vantage 2 Sundown Pass 1 Starting Town 1"
-        },
-        {
-          "count": 1,
-          "name": "Petrified Hamlet 1 Sunbillow Verge 1 Mountain 4 Qu"
+          "name": "Stock Up"
         },
         {
           "count": 4,
-          "name": "Sheltered by Ghosts 4 Agent Maria Hill 3 Daredevil"
-        },
-        {
-          "count": 3,
-          "name": "Practiced Offense 3 Arachne, Psionic Weaver 2 The"
-        },
-        {
-          "count": 2,
-          "name": "Case of the Crimson Pulse 2 Jennifer Walters 2 Ori"
-        },
-        {
-          "count": 2,
-          "name": "Captain America, Super-Soldier 2 Team Tactics 2 Da"
+          "name": "Tablet of Discovery"
         },
         {
           "count": 1,
-          "name": "Seam Rip 1 Petrified Hamlet 3 Exorcise 3 Rest in P"
-        },
-        {
-          "count": 2,
-          "name": "Torpor Orb 2 Sunspine Lynx 1 Restoration Magic 1 E"
+          "name": "Three Steps Ahead"
         },
         {
           "count": 1,
-          "name": "High Noon 4 Uthros, Titanic Godcore 4 Multiv"
-        },
-        {
-          "count": 3,
-          "name": "Steam Vents 3 Kavaron, Memorial World 3 Breeding P"
+          "name": "Thunder Magic"
         },
         {
           "count": 2,
-          "name": "Cavern of Souls 1 Dreamroot Cascade 1 Stomping Gro"
+          "name": "Watery Grave"
         },
         {
           "count": 1,
-          "name": "Mountain 4 Formidable Speaker 4 Omniscience 4 Kona"
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Steam Vents"
         },
         {
           "count": 4,
-          "name": "Ashling, Rekindled 3 Prismari Charm 3 Winternight"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up 3 Marang River Regent 2 North Wind Avatar"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Bounce Off 1 Lost in the Maze 1 Spe"
+          "name": "Jeskai Revelation"
         },
         {
           "count": 2,
-          "name": "Spider-Sense 2 Voice of Victory 1 Origin of Metalb"
+          "name": "Stormcarved Coast"
+        },
+        {
+          "count": 3,
+          "name": "Sacred Foundry"
         }
       ],
-      "sideboard": [
-        {
-          "count": 1,
-          "name": "Marang River Regent 1 Ill-Timed Explosion 1 Pyrocl"
-        },
-        {
-          "count": 1,
-          "name": "Soul-Guide Lantern 1 Stock Up 1 Omni-Changeling 1"
-        },
-        {
-          "count": 1,
-          "name": "Terror of the Peaks 1 Fire Magic 7 Swamp 4 W"
-        },
-        {
-          "count": 4,
-          "name": "Overgrown Tomb 4 Deathcap Glade 3 Restless Cottage"
-        },
-        {
-          "count": 1,
-          "name": "Fountainport 1 Forest 4 Professor Dellian Fel 4 De"
-        },
-        {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber 4 Requiting Hex 3 D"
-        },
-        {
-          "count": 3,
-          "name": "Firdoch Core 2 Cease // Desist 2 Bitter Triumph 2"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -1462,11 +1363,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Thornspire Verge 4 Stomping Ground 4 Forest 3 Star\n3 Multiversal Passage 1 Mountain 4 Bushwhack 4 Keen-\n4 Patchwork Beastie 4 Rapid Rescue 4 Wildfire Wicker\n4 Tersa Lightshatter 4 Fear of Missing Out 2 Overpro\n2 Nova Hellkite 1 Itzquinth, Firstborn of Gishath 1\n1 Webstrike Elite 4 Scrapshooter 3 The Legend of Rok\n2 Ghost Vacuum 2 Scorching Shot 2 Fire Magic 1 Twinm\n1 Impractical Joke 6 Plains 4 Sacred Foundry 4\n3 Inspiring Vantage 2 Sundown Pass 1 Starting Town 1\n1 Petrified Hamlet 1 Sunbillow Verge 1 Mountain 4 Qu\n4 Sheltered by Ghosts 4 Agent Maria Hill 3 Daredevil\n3 Practiced Offense 3 Arachne, Psionic Weaver 2 The\n2 Case of the Crimson Pulse 2 Jennifer Walters 2 Ori\n2 Captain America, Super-Soldier 2 Team Tactics 2 Da\n1 Seam Rip 1 Petrified Hamlet 3 Exorcise 3 Rest in P\n2 Torpor Orb 2 Sunspine Lynx 1 Restoration Magic 1 E\n1 High Noon 4 Uthros, Titanic Godcore 4 Multiv\n3 Steam Vents 3 Kavaron, Memorial World 3 Breeding P\n2 Cavern of Souls 1 Dreamroot Cascade 1 Stomping Gro\n1 Mountain 4 Formidable Speaker 4 Omniscience 4 Kona\n4 Ashling, Rekindled 3 Prismari Charm 3 Winternight\n3 Stock Up 3 Marang River Regent 2 North Wind Avatar\n1 Spell Pierce 1 Bounce Off 1 Lost in the Maze 1 Spe\n2 Spider-Sense 2 Voice of Victory 1 Origin of Metalb\n\nSideboard\n1 Marang River Regent 1 Ill-Timed Explosion 1 Pyrocl\n1 Soul-Guide Lantern 1 Stock Up 1 Omni-Changeling 1\n1 Terror of the Peaks 1 Fire Magic 7 Swamp 4 W\n4 Overgrown Tomb 4 Deathcap Glade 3 Restless Cottage\n1 Fountainport 1 Forest 4 Professor Dellian Fel 4 De\n4 Unholy Annex // Ritual Chamber 4 Requiting Hex 3 D\n3 Firdoch Core 2 Cease // Desist 2 Bitter Triumph 2",
+      "arenaImport": "Deck\n2 Abrade\n3 Shattered Sanctum\n2 Day of Judgment\n2 Flashback\n1 Floodfarm Verge\n4 Great Hall of the Biblioplex\n3 Consult the Star Charts\n3 Inevitable Defeat\n1 Lightning Helix\n2 Mistrise Village\n1 Multiversal Passage\n1 Plains\n2 No More Lies\n1 North Wind Avatar\n2 Riverpyre Verge\n2 Hallowed Fountain\n2 Sear\n1 Slagstorm\n1 Cori Mountain Monastery\n4 Stock Up\n4 Tablet of Discovery\n1 Three Steps Ahead\n1 Thunder Magic\n2 Watery Grave\n1 Mountain\n2 Steam Vents\n4 Jeskai Revelation\n2 Stormcarved Coast\n3 Sacred Foundry",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -1487,7 +1388,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #1"
+      "listNote": "MTGO Standard Challenge 32 · Capitano_CL"
     },
     "standard-bo3-izzet-prowess": {
       "id": "standard-bo3-izzet-prowess",
@@ -1504,132 +1405,123 @@
       "description": "Current Standard (July 2026) prowess — Slickshot Show-Off, Stormchaser's Talent, Flow State, Eddymurk Crab. No rotated one-drops. Daily rank #5 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Thornspire Verge 4 Stomping Ground 4 Forest 3 Star"
+          "count": 2,
+          "name": "Abrade"
         },
         {
           "count": 3,
-          "name": "Multiversal Passage 1 Mountain 4 Bushwhack 4 Keen-"
+          "name": "Shattered Sanctum"
+        },
+        {
+          "count": 2,
+          "name": "Day of Judgment"
+        },
+        {
+          "count": 2,
+          "name": "Flashback"
+        },
+        {
+          "count": 1,
+          "name": "Floodfarm Verge"
         },
         {
           "count": 4,
-          "name": "Patchwork Beastie 4 Rapid Rescue 4 Wildfire Wicker"
+          "name": "Great Hall of the Biblioplex"
+        },
+        {
+          "count": 3,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 3,
+          "name": "Inevitable Defeat"
+        },
+        {
+          "count": 1,
+          "name": "Lightning Helix"
+        },
+        {
+          "count": 2,
+          "name": "Mistrise Village"
+        },
+        {
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 1,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "No More Lies"
+        },
+        {
+          "count": 1,
+          "name": "North Wind Avatar"
+        },
+        {
+          "count": 2,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 2,
+          "name": "Hallowed Fountain"
+        },
+        {
+          "count": 2,
+          "name": "Sear"
+        },
+        {
+          "count": 1,
+          "name": "Slagstorm"
+        },
+        {
+          "count": 1,
+          "name": "Cori Mountain Monastery"
         },
         {
           "count": 4,
-          "name": "Tersa Lightshatter 4 Fear of Missing Out 2 Overpro"
-        },
-        {
-          "count": 2,
-          "name": "Nova Hellkite 1 Itzquinth, Firstborn of Gishath 1"
-        },
-        {
-          "count": 1,
-          "name": "Webstrike Elite 4 Scrapshooter 3 The Legend of Rok"
-        },
-        {
-          "count": 2,
-          "name": "Ghost Vacuum 2 Scorching Shot 2 Fire Magic 1 Twinm"
-        },
-        {
-          "count": 1,
-          "name": "Impractical Joke 6 Plains 4 Sacred Foundry 4"
-        },
-        {
-          "count": 3,
-          "name": "Inspiring Vantage 2 Sundown Pass 1 Starting Town 1"
-        },
-        {
-          "count": 1,
-          "name": "Petrified Hamlet 1 Sunbillow Verge 1 Mountain 4 Qu"
+          "name": "Stock Up"
         },
         {
           "count": 4,
-          "name": "Sheltered by Ghosts 4 Agent Maria Hill 3 Daredevil"
-        },
-        {
-          "count": 3,
-          "name": "Practiced Offense 3 Arachne, Psionic Weaver 2 The"
-        },
-        {
-          "count": 2,
-          "name": "Case of the Crimson Pulse 2 Jennifer Walters 2 Ori"
-        },
-        {
-          "count": 2,
-          "name": "Captain America, Super-Soldier 2 Team Tactics 2 Da"
+          "name": "Tablet of Discovery"
         },
         {
           "count": 1,
-          "name": "Seam Rip 1 Petrified Hamlet 3 Exorcise 3 Rest in P"
-        },
-        {
-          "count": 2,
-          "name": "Torpor Orb 2 Sunspine Lynx 1 Restoration Magic 1 E"
+          "name": "Three Steps Ahead"
         },
         {
           "count": 1,
-          "name": "High Noon 4 Uthros, Titanic Godcore 4 Multiv"
-        },
-        {
-          "count": 3,
-          "name": "Steam Vents 3 Kavaron, Memorial World 3 Breeding P"
+          "name": "Thunder Magic"
         },
         {
           "count": 2,
-          "name": "Cavern of Souls 1 Dreamroot Cascade 1 Stomping Gro"
+          "name": "Watery Grave"
         },
         {
           "count": 1,
-          "name": "Mountain 4 Formidable Speaker 4 Omniscience 4 Kona"
+          "name": "Mountain"
+        },
+        {
+          "count": 2,
+          "name": "Steam Vents"
         },
         {
           "count": 4,
-          "name": "Ashling, Rekindled 3 Prismari Charm 3 Winternight"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up 3 Marang River Regent 2 North Wind Avatar"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Bounce Off 1 Lost in the Maze 1 Spe"
+          "name": "Jeskai Revelation"
         },
         {
           "count": 2,
-          "name": "Spider-Sense 2 Voice of Victory 1 Origin of Metalb"
+          "name": "Stormcarved Coast"
+        },
+        {
+          "count": 3,
+          "name": "Sacred Foundry"
         }
       ],
-      "sideboard": [
-        {
-          "count": 1,
-          "name": "Marang River Regent 1 Ill-Timed Explosion 1 Pyrocl"
-        },
-        {
-          "count": 1,
-          "name": "Soul-Guide Lantern 1 Stock Up 1 Omni-Changeling 1"
-        },
-        {
-          "count": 1,
-          "name": "Terror of the Peaks 1 Fire Magic 7 Swamp 4 W"
-        },
-        {
-          "count": 4,
-          "name": "Overgrown Tomb 4 Deathcap Glade 3 Restless Cottage"
-        },
-        {
-          "count": 1,
-          "name": "Fountainport 1 Forest 4 Professor Dellian Fel 4 De"
-        },
-        {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber 4 Requiting Hex 3 D"
-        },
-        {
-          "count": 3,
-          "name": "Firdoch Core 2 Cease // Desist 2 Bitter Triumph 2"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -1673,11 +1565,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Thornspire Verge 4 Stomping Ground 4 Forest 3 Star\n3 Multiversal Passage 1 Mountain 4 Bushwhack 4 Keen-\n4 Patchwork Beastie 4 Rapid Rescue 4 Wildfire Wicker\n4 Tersa Lightshatter 4 Fear of Missing Out 2 Overpro\n2 Nova Hellkite 1 Itzquinth, Firstborn of Gishath 1\n1 Webstrike Elite 4 Scrapshooter 3 The Legend of Rok\n2 Ghost Vacuum 2 Scorching Shot 2 Fire Magic 1 Twinm\n1 Impractical Joke 6 Plains 4 Sacred Foundry 4\n3 Inspiring Vantage 2 Sundown Pass 1 Starting Town 1\n1 Petrified Hamlet 1 Sunbillow Verge 1 Mountain 4 Qu\n4 Sheltered by Ghosts 4 Agent Maria Hill 3 Daredevil\n3 Practiced Offense 3 Arachne, Psionic Weaver 2 The\n2 Case of the Crimson Pulse 2 Jennifer Walters 2 Ori\n2 Captain America, Super-Soldier 2 Team Tactics 2 Da\n1 Seam Rip 1 Petrified Hamlet 3 Exorcise 3 Rest in P\n2 Torpor Orb 2 Sunspine Lynx 1 Restoration Magic 1 E\n1 High Noon 4 Uthros, Titanic Godcore 4 Multiv\n3 Steam Vents 3 Kavaron, Memorial World 3 Breeding P\n2 Cavern of Souls 1 Dreamroot Cascade 1 Stomping Gro\n1 Mountain 4 Formidable Speaker 4 Omniscience 4 Kona\n4 Ashling, Rekindled 3 Prismari Charm 3 Winternight\n3 Stock Up 3 Marang River Regent 2 North Wind Avatar\n1 Spell Pierce 1 Bounce Off 1 Lost in the Maze 1 Spe\n2 Spider-Sense 2 Voice of Victory 1 Origin of Metalb\n\nSideboard\n1 Marang River Regent 1 Ill-Timed Explosion 1 Pyrocl\n1 Soul-Guide Lantern 1 Stock Up 1 Omni-Changeling 1\n1 Terror of the Peaks 1 Fire Magic 7 Swamp 4 W\n4 Overgrown Tomb 4 Deathcap Glade 3 Restless Cottage\n1 Fountainport 1 Forest 4 Professor Dellian Fel 4 De\n4 Unholy Annex // Ritual Chamber 4 Requiting Hex 3 D\n3 Firdoch Core 2 Cease // Desist 2 Bitter Triumph 2",
+      "arenaImport": "Deck\n2 Abrade\n3 Shattered Sanctum\n2 Day of Judgment\n2 Flashback\n1 Floodfarm Verge\n4 Great Hall of the Biblioplex\n3 Consult the Star Charts\n3 Inevitable Defeat\n1 Lightning Helix\n2 Mistrise Village\n1 Multiversal Passage\n1 Plains\n2 No More Lies\n1 North Wind Avatar\n2 Riverpyre Verge\n2 Hallowed Fountain\n2 Sear\n1 Slagstorm\n1 Cori Mountain Monastery\n4 Stock Up\n4 Tablet of Discovery\n1 Three Steps Ahead\n1 Thunder Magic\n2 Watery Grave\n1 Mountain\n2 Steam Vents\n4 Jeskai Revelation\n2 Stormcarved Coast\n3 Sacred Foundry",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -1698,7 +1590,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #1"
+      "listNote": "MTGO Standard Challenge 32 · Capitano_CL"
     },
     "standard-bo1-4c-control": {
       "id": "standard-bo1-4c-control",
@@ -1717,100 +1609,87 @@
       "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #6 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Black Widow, Super Spy 4 Timeline Culler 4 Burst L"
+          "count": 2,
+          "name": "Day of Black Sun"
         },
         {
-          "count": 4,
-          "name": "Lightning Helix 4 Leader's Talent 4 Hired Claw 4 D"
-        },
-        {
-          "count": 4,
-          "name": "Raphael, the Nightwatcher 4 Leonardo, Cutting Edge"
-        },
-        {
-          "count": 4,
-          "name": "Inevitable Defeat 4 Strategic Betrayal 4 Sheltered"
+          "count": 10,
+          "name": "Swamp"
         },
         {
           "count": 3,
-          "name": "Boros Charm 4 Sacred Foundry 4 Blood Crypt 3"
+          "name": "Bitter Triumph"
+        },
+        {
+          "count": 4,
+          "name": "Watery Grave"
+        },
+        {
+          "count": 2,
+          "name": "Winternight Stories"
+        },
+        {
+          "count": 4,
+          "name": "Requiting Hex"
+        },
+        {
+          "count": 4,
+          "name": "Gloomlake Verge"
         },
         {
           "count": 3,
-          "name": "Concealed Courtyard 2 Godless Shrine 2 Inspiring V"
-        },
-        {
-          "count": 2,
-          "name": "Multiversal Passage 2 Mountain 1 Blazemire Verge 4"
+          "name": "Stock Up"
         },
         {
           "count": 4,
-          "name": "Iron-Shield Elf 4 Practiced Offense 4 Marauding Ma"
+          "name": "Restless Reef"
         },
         {
           "count": 4,
-          "name": "Hardened Academic 3 Bloodghast 3 Requiting Hex 2 N"
-        },
-        {
-          "count": 2,
-          "name": "Tersa Lightshatter 1 Bitter Triumph 1 Inti, Senesc"
+          "name": "Deceit"
         },
         {
           "count": 1,
-          "name": "Erode 4 Leyline of the Void 3 Voice of Victory 2 S"
-        },
-        {
-          "count": 2,
-          "name": "Strategic Betrayal 2 Abrade 1 Bitter Triumph 1 Sho"
-        },
-        {
-          "count": 7,
-          "name": "Swamp 4 Gloomlake Verge 4 Restless Reef 4 Watery G"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers 1 Multiversal Passage 4 Deceit 4"
-        },
-        {
-          "count": 4,
-          "name": "Superior Spider-Man 4 Requiting Hex 3 Bitter Trium"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up 2 Winternight Stories 2 Day of Black Sun"
+          "name": "Undercity Sewers"
         },
         {
           "count": 1,
-          "name": "Shoot the Sheriff 1 Quantum Riddler 1 Deadly Cover"
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
+          "name": "Emeritus of Ideation"
+        },
+        {
+          "count": 4,
+          "name": "Duress"
         },
         {
           "count": 3,
-          "name": "Qarsi Revenant 2 Flashfreeze 2 Oildeep Gearhulk 1"
+          "name": "Doomsday Excruciator"
+        },
+        {
+          "count": 1,
+          "name": "Cavern of Souls"
+        },
+        {
+          "count": 4,
+          "name": "Kavaero, Mind-Bitten"
+        },
+        {
+          "count": 1,
+          "name": "Strategic Betrayal"
+        },
+        {
+          "count": 1,
+          "name": "M.O.D.O.K."
+        },
+        {
+          "count": 2,
+          "name": "Hidden Lair"
         }
       ],
-      "sideboard": [
-        {
-          "count": 1,
-          "name": "Deadly Cover-Up 1 Bitter Triumph 1 Outrageous Robb"
-        },
-        {
-          "count": 1,
-          "name": "Deathmark 1 Strategic Betrayal 1 Harvester of Mise"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents 4 Great Hall of the Biblioplex 4 Spire"
-        },
-        {
-          "count": 3,
-          "name": "Riverpyre Verge 3 Island 2 Hallowed Fountain 2 Sun"
-        },
-        {
-          "count": 4,
-          "name": "Gran-Gran 4 Tablet of Discovery 4 Firebending Less"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -1829,11 +1708,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Black Widow, Super Spy 4 Timeline Culler 4 Burst L\n4 Lightning Helix 4 Leader's Talent 4 Hired Claw 4 D\n4 Raphael, the Nightwatcher 4 Leonardo, Cutting Edge\n4 Inevitable Defeat 4 Strategic Betrayal 4 Sheltered\n3 Boros Charm 4 Sacred Foundry 4 Blood Crypt 3\n3 Concealed Courtyard 2 Godless Shrine 2 Inspiring V\n2 Multiversal Passage 2 Mountain 1 Blazemire Verge 4\n4 Iron-Shield Elf 4 Practiced Offense 4 Marauding Ma\n4 Hardened Academic 3 Bloodghast 3 Requiting Hex 2 N\n2 Tersa Lightshatter 1 Bitter Triumph 1 Inti, Senesc\n1 Erode 4 Leyline of the Void 3 Voice of Victory 2 S\n2 Strategic Betrayal 2 Abrade 1 Bitter Triumph 1 Sho\n7 Swamp 4 Gloomlake Verge 4 Restless Reef 4 Watery G\n2 Undercity Sewers 1 Multiversal Passage 4 Deceit 4\n4 Superior Spider-Man 4 Requiting Hex 3 Bitter Trium\n3 Stock Up 2 Winternight Stories 2 Day of Black Sun\n1 Shoot the Sheriff 1 Quantum Riddler 1 Deadly Cover\n3 Qarsi Revenant 2 Flashfreeze 2 Oildeep Gearhulk 1\n\nSideboard\n1 Deadly Cover-Up 1 Bitter Triumph 1 Outrageous Robb\n1 Deathmark 1 Strategic Betrayal 1 Harvester of Mise\n4 Steam Vents 4 Great Hall of the Biblioplex 4 Spire\n3 Riverpyre Verge 3 Island 2 Hallowed Fountain 2 Sun\n4 Gran-Gran 4 Tablet of Discovery 4 Firebending Less",
+      "arenaImport": "Deck\n2 Day of Black Sun\n10 Swamp\n3 Bitter Triumph\n4 Watery Grave\n2 Winternight Stories\n4 Requiting Hex\n4 Gloomlake Verge\n3 Stock Up\n4 Restless Reef\n4 Deceit\n1 Undercity Sewers\n1 Deadly Cover-Up\n2 Emeritus of Ideation\n4 Duress\n3 Doomsday Excruciator\n1 Cavern of Souls\n4 Kavaero, Mind-Bitten\n1 Strategic Betrayal\n1 M.O.D.O.K.\n2 Hidden Lair",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -1854,7 +1733,7 @@
       ],
       "metaShare": 9,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #3"
+      "listNote": "MTGO Standard Challenge 32 · kcomedina"
     },
     "standard-bo3-4c-control": {
       "id": "standard-bo3-4c-control",
@@ -1873,100 +1752,87 @@
       "description": "Inevitable Defeat + Tablet of Discovery + Stock Up control. High challenge presence (not old Domain Overlords). Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Black Widow, Super Spy 4 Timeline Culler 4 Burst L"
+          "count": 2,
+          "name": "Day of Black Sun"
         },
         {
-          "count": 4,
-          "name": "Lightning Helix 4 Leader's Talent 4 Hired Claw 4 D"
-        },
-        {
-          "count": 4,
-          "name": "Raphael, the Nightwatcher 4 Leonardo, Cutting Edge"
-        },
-        {
-          "count": 4,
-          "name": "Inevitable Defeat 4 Strategic Betrayal 4 Sheltered"
+          "count": 10,
+          "name": "Swamp"
         },
         {
           "count": 3,
-          "name": "Boros Charm 4 Sacred Foundry 4 Blood Crypt 3"
+          "name": "Bitter Triumph"
+        },
+        {
+          "count": 4,
+          "name": "Watery Grave"
+        },
+        {
+          "count": 2,
+          "name": "Winternight Stories"
+        },
+        {
+          "count": 4,
+          "name": "Requiting Hex"
+        },
+        {
+          "count": 4,
+          "name": "Gloomlake Verge"
         },
         {
           "count": 3,
-          "name": "Concealed Courtyard 2 Godless Shrine 2 Inspiring V"
-        },
-        {
-          "count": 2,
-          "name": "Multiversal Passage 2 Mountain 1 Blazemire Verge 4"
+          "name": "Stock Up"
         },
         {
           "count": 4,
-          "name": "Iron-Shield Elf 4 Practiced Offense 4 Marauding Ma"
+          "name": "Restless Reef"
         },
         {
           "count": 4,
-          "name": "Hardened Academic 3 Bloodghast 3 Requiting Hex 2 N"
-        },
-        {
-          "count": 2,
-          "name": "Tersa Lightshatter 1 Bitter Triumph 1 Inti, Senesc"
+          "name": "Deceit"
         },
         {
           "count": 1,
-          "name": "Erode 4 Leyline of the Void 3 Voice of Victory 2 S"
-        },
-        {
-          "count": 2,
-          "name": "Strategic Betrayal 2 Abrade 1 Bitter Triumph 1 Sho"
-        },
-        {
-          "count": 7,
-          "name": "Swamp 4 Gloomlake Verge 4 Restless Reef 4 Watery G"
-        },
-        {
-          "count": 2,
-          "name": "Undercity Sewers 1 Multiversal Passage 4 Deceit 4"
-        },
-        {
-          "count": 4,
-          "name": "Superior Spider-Man 4 Requiting Hex 3 Bitter Trium"
-        },
-        {
-          "count": 3,
-          "name": "Stock Up 2 Winternight Stories 2 Day of Black Sun"
+          "name": "Undercity Sewers"
         },
         {
           "count": 1,
-          "name": "Shoot the Sheriff 1 Quantum Riddler 1 Deadly Cover"
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
+          "name": "Emeritus of Ideation"
+        },
+        {
+          "count": 4,
+          "name": "Duress"
         },
         {
           "count": 3,
-          "name": "Qarsi Revenant 2 Flashfreeze 2 Oildeep Gearhulk 1"
+          "name": "Doomsday Excruciator"
+        },
+        {
+          "count": 1,
+          "name": "Cavern of Souls"
+        },
+        {
+          "count": 4,
+          "name": "Kavaero, Mind-Bitten"
+        },
+        {
+          "count": 1,
+          "name": "Strategic Betrayal"
+        },
+        {
+          "count": 1,
+          "name": "M.O.D.O.K."
+        },
+        {
+          "count": 2,
+          "name": "Hidden Lair"
         }
       ],
-      "sideboard": [
-        {
-          "count": 1,
-          "name": "Deadly Cover-Up 1 Bitter Triumph 1 Outrageous Robb"
-        },
-        {
-          "count": 1,
-          "name": "Deathmark 1 Strategic Betrayal 1 Harvester of Mise"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents 4 Great Hall of the Biblioplex 4 Spire"
-        },
-        {
-          "count": 3,
-          "name": "Riverpyre Verge 3 Island 2 Hallowed Fountain 2 Sun"
-        },
-        {
-          "count": 4,
-          "name": "Gran-Gran 4 Tablet of Discovery 4 Firebending Less"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -2010,11 +1876,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Black Widow, Super Spy 4 Timeline Culler 4 Burst L\n4 Lightning Helix 4 Leader's Talent 4 Hired Claw 4 D\n4 Raphael, the Nightwatcher 4 Leonardo, Cutting Edge\n4 Inevitable Defeat 4 Strategic Betrayal 4 Sheltered\n3 Boros Charm 4 Sacred Foundry 4 Blood Crypt 3\n3 Concealed Courtyard 2 Godless Shrine 2 Inspiring V\n2 Multiversal Passage 2 Mountain 1 Blazemire Verge 4\n4 Iron-Shield Elf 4 Practiced Offense 4 Marauding Ma\n4 Hardened Academic 3 Bloodghast 3 Requiting Hex 2 N\n2 Tersa Lightshatter 1 Bitter Triumph 1 Inti, Senesc\n1 Erode 4 Leyline of the Void 3 Voice of Victory 2 S\n2 Strategic Betrayal 2 Abrade 1 Bitter Triumph 1 Sho\n7 Swamp 4 Gloomlake Verge 4 Restless Reef 4 Watery G\n2 Undercity Sewers 1 Multiversal Passage 4 Deceit 4\n4 Superior Spider-Man 4 Requiting Hex 3 Bitter Trium\n3 Stock Up 2 Winternight Stories 2 Day of Black Sun\n1 Shoot the Sheriff 1 Quantum Riddler 1 Deadly Cover\n3 Qarsi Revenant 2 Flashfreeze 2 Oildeep Gearhulk 1\n\nSideboard\n1 Deadly Cover-Up 1 Bitter Triumph 1 Outrageous Robb\n1 Deathmark 1 Strategic Betrayal 1 Harvester of Mise\n4 Steam Vents 4 Great Hall of the Biblioplex 4 Spire\n3 Riverpyre Verge 3 Island 2 Hallowed Fountain 2 Sun\n4 Gran-Gran 4 Tablet of Discovery 4 Firebending Less",
+      "arenaImport": "Deck\n2 Day of Black Sun\n10 Swamp\n3 Bitter Triumph\n4 Watery Grave\n2 Winternight Stories\n4 Requiting Hex\n4 Gloomlake Verge\n3 Stock Up\n4 Restless Reef\n4 Deceit\n1 Undercity Sewers\n1 Deadly Cover-Up\n2 Emeritus of Ideation\n4 Duress\n3 Doomsday Excruciator\n1 Cavern of Souls\n4 Kavaero, Mind-Bitten\n1 Strategic Betrayal\n1 M.O.D.O.K.\n2 Hidden Lair",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2035,7 +1901,7 @@
       ],
       "metaShare": 9,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #3"
+      "listNote": "MTGO Standard Challenge 32 · kcomedina"
     },
     "standard-bo1-izzet-spellementals": {
       "id": "standard-bo1-izzet-spellementals",
@@ -2052,108 +1918,127 @@
       "description": "Namor + Eddymurk Crab + spell density — Standard spells-matter midrange (not legacy prowess one-drops). Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
+          "count": 2,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 1,
+          "name": "Cori Mountain Monastery"
+        },
+        {
+          "count": 2,
+          "name": "Day of Judgment"
+        },
+        {
+          "count": 1,
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
+          "name": "Erode"
+        },
+        {
+          "count": 2,
+          "name": "Flashback"
+        },
+        {
+          "count": 2,
+          "name": "Get Lost"
+        },
+        {
+          "count": 1,
+          "name": "Godless Shrine"
+        },
+        {
           "count": 4,
-          "name": "Colorstorm Stallion 3 Resonating Lute 3 Abstract P"
+          "name": "Great Hall of the Biblioplex"
         },
         {
           "count": 3,
-          "name": "Hydro-Channeler 3 Spectacular Skywhale 2 Sanar, Un"
+          "name": "Inevitable Defeat"
         },
         {
-          "count": 2,
-          "name": "Improvisation Capstone 2 Vibrant Outburst 2 Rubble"
-        },
-        {
-          "count": 2,
-          "name": "Stress Dream 2 Splatter Technique 2 Artistic Proce"
-        },
-        {
-          "count": 2,
-          "name": "Stress Dream 2 Artistic Process 2 Spirit Water Rev"
+          "count": 4,
+          "name": "Jeskai Revelation"
         },
         {
           "count": 1,
-          "name": "Hydro-Channeler 1 Rubble Rouser 1 Vibrant Outburst"
-        },
-        {
-          "count": 4,
-          "name": "Sacred Foundry 4 Mountain 4 Plains 3 Inspiring Van"
-        },
-        {
-          "count": 2,
-          "name": "Abandoned Air Temple 2 Dalkovan Encampment 1 Cori"
-        },
-        {
-          "count": 4,
-          "name": "Sanguine Evangelist 4 Fear of Missing Out 4 Voice"
-        },
-        {
-          "count": 4,
-          "name": "Hardened Academic 4 Lightning Helix 4 Stadium Head"
-        },
-        {
-          "count": 4,
-          "name": "Political Triumph 2 Wild Ride 2 Warleader's Call 2"
-        },
-        {
-          "count": 2,
-          "name": "Raph"
-        },
-        {
-          "count": 2,
-          "name": "Practiced Offense 3 Restoration Magic 2 Requisitio"
-        },
-        {
-          "count": 2,
-          "name": "Crystal Barricade 2 High Noon 2 Clarion Conqueror"
+          "name": "Lightning Helix"
         },
         {
           "count": 1,
-          "name": "Sear 1 Wild Ride 4 Multiversal Passage 4 Blo"
-        },
-        {
-          "count": 4,
-          "name": "Blazemire Verge 4 Raucous Theater 3 Cavern of Soul"
+          "name": "Meticulous Archive"
         },
         {
           "count": 2,
-          "name": "Mountain 1 Island 1 Undercity Sewers 4 Collector's"
+          "name": "Mistrise Village"
         },
         {
-          "count": 4,
-          "name": "Valgavoth, Terror Eater 4 Zombify 4 Bitter Triumph"
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 2,
+          "name": "No More Lies"
+        },
+        {
+          "count": 1,
+          "name": "Petrified Hamlet"
+        },
+        {
+          "count": 1,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Sear"
         },
         {
           "count": 3,
-          "name": "Pyroclasm 2 Rakdos Joins Up 2 The Infamous Cruelcl"
+          "name": "Shattered Sanctum"
+        },
+        {
+          "count": 3,
+          "name": "Starting Town"
         },
         {
           "count": 2,
-          "name": "Thor, God of Thunder 2 Krang, Utrom Warlord 2 Raph"
+          "name": "Steam Vents"
         },
         {
           "count": 4,
-          "name": "Intimidation Tactics 2 Ghost Vacuum 2 Untimely Mal"
-        }
-      ],
-      "sideboard": [
-        {
-          "count": 2,
-          "name": "Pilfer 2 Mister Negative 2 Withering Torment 1 Pyr"
+          "name": "Stock Up"
         },
         {
-          "count": 8,
-          "name": "Plains 4 Floodfarm Verge 4 Hallowed Fountain 3 Sta"
+          "count": 2,
+          "name": "Stormcarved Coast"
         },
         {
           "count": 1,
-          "name": "Multiversal Passage 1 Cavern of Souls 4 Sage of th"
+          "name": "Sunbillow Verge"
+        },
+        {
+          "count": 2,
+          "name": "Sundown Pass"
         },
         {
           "count": 4,
-          "name": "Starfield Shepherd 4 Momo, Friendly Flier 4 Steamc"
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 1,
+          "name": "Thor, God of Thunder"
+        },
+        {
+          "count": 1,
+          "name": "Traumatic Critique"
+        },
+        {
+          "count": 2,
+          "name": "Watery Grave"
         }
       ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -2172,11 +2057,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Colorstorm Stallion 3 Resonating Lute 3 Abstract P\n3 Hydro-Channeler 3 Spectacular Skywhale 2 Sanar, Un\n2 Improvisation Capstone 2 Vibrant Outburst 2 Rubble\n2 Stress Dream 2 Splatter Technique 2 Artistic Proce\n2 Stress Dream 2 Artistic Process 2 Spirit Water Rev\n1 Hydro-Channeler 1 Rubble Rouser 1 Vibrant Outburst\n4 Sacred Foundry 4 Mountain 4 Plains 3 Inspiring Van\n2 Abandoned Air Temple 2 Dalkovan Encampment 1 Cori\n4 Sanguine Evangelist 4 Fear of Missing Out 4 Voice\n4 Hardened Academic 4 Lightning Helix 4 Stadium Head\n4 Political Triumph 2 Wild Ride 2 Warleader's Call 2\n2 Raph\n2 Practiced Offense 3 Restoration Magic 2 Requisitio\n2 Crystal Barricade 2 High Noon 2 Clarion Conqueror\n1 Sear 1 Wild Ride 4 Multiversal Passage 4 Blo\n4 Blazemire Verge 4 Raucous Theater 3 Cavern of Soul\n2 Mountain 1 Island 1 Undercity Sewers 4 Collector's\n4 Valgavoth, Terror Eater 4 Zombify 4 Bitter Triumph\n3 Pyroclasm 2 Rakdos Joins Up 2 The Infamous Cruelcl\n2 Thor, God of Thunder 2 Krang, Utrom Warlord 2 Raph\n4 Intimidation Tactics 2 Ghost Vacuum 2 Untimely Mal\n\nSideboard\n2 Pilfer 2 Mister Negative 2 Withering Torment 1 Pyr\n8 Plains 4 Floodfarm Verge 4 Hallowed Fountain 3 Sta\n1 Multiversal Passage 1 Cavern of Souls 4 Sage of th\n4 Starfield Shepherd 4 Momo, Friendly Flier 4 Steamc",
+      "arenaImport": "Deck\n2 Consult the Star Charts\n1 Cori Mountain Monastery\n2 Day of Judgment\n1 Deadly Cover-Up\n2 Erode\n2 Flashback\n2 Get Lost\n1 Godless Shrine\n4 Great Hall of the Biblioplex\n3 Inevitable Defeat\n4 Jeskai Revelation\n1 Lightning Helix\n1 Meticulous Archive\n2 Mistrise Village\n1 Multiversal Passage\n2 No More Lies\n1 Petrified Hamlet\n1 Plains\n2 Sear\n3 Shattered Sanctum\n3 Starting Town\n2 Steam Vents\n4 Stock Up\n2 Stormcarved Coast\n1 Sunbillow Verge\n2 Sundown Pass\n4 Tablet of Discovery\n1 Thor, God of Thunder\n1 Traumatic Critique\n2 Watery Grave",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2197,7 +2082,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #7"
+      "listNote": "MTGO Standard Challenge 32 · Americanmisfit5"
     },
     "standard-bo3-izzet-spellementals": {
       "id": "standard-bo3-izzet-spellementals",
@@ -2214,108 +2099,127 @@
       "description": "Namor + Eddymurk Crab + spell density — Standard spells-matter midrange (not legacy prowess one-drops). Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
+          "count": 2,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 1,
+          "name": "Cori Mountain Monastery"
+        },
+        {
+          "count": 2,
+          "name": "Day of Judgment"
+        },
+        {
+          "count": 1,
+          "name": "Deadly Cover-Up"
+        },
+        {
+          "count": 2,
+          "name": "Erode"
+        },
+        {
+          "count": 2,
+          "name": "Flashback"
+        },
+        {
+          "count": 2,
+          "name": "Get Lost"
+        },
+        {
+          "count": 1,
+          "name": "Godless Shrine"
+        },
+        {
           "count": 4,
-          "name": "Colorstorm Stallion 3 Resonating Lute 3 Abstract P"
+          "name": "Great Hall of the Biblioplex"
         },
         {
           "count": 3,
-          "name": "Hydro-Channeler 3 Spectacular Skywhale 2 Sanar, Un"
+          "name": "Inevitable Defeat"
         },
         {
-          "count": 2,
-          "name": "Improvisation Capstone 2 Vibrant Outburst 2 Rubble"
-        },
-        {
-          "count": 2,
-          "name": "Stress Dream 2 Splatter Technique 2 Artistic Proce"
-        },
-        {
-          "count": 2,
-          "name": "Stress Dream 2 Artistic Process 2 Spirit Water Rev"
+          "count": 4,
+          "name": "Jeskai Revelation"
         },
         {
           "count": 1,
-          "name": "Hydro-Channeler 1 Rubble Rouser 1 Vibrant Outburst"
-        },
-        {
-          "count": 4,
-          "name": "Sacred Foundry 4 Mountain 4 Plains 3 Inspiring Van"
-        },
-        {
-          "count": 2,
-          "name": "Abandoned Air Temple 2 Dalkovan Encampment 1 Cori"
-        },
-        {
-          "count": 4,
-          "name": "Sanguine Evangelist 4 Fear of Missing Out 4 Voice"
-        },
-        {
-          "count": 4,
-          "name": "Hardened Academic 4 Lightning Helix 4 Stadium Head"
-        },
-        {
-          "count": 4,
-          "name": "Political Triumph 2 Wild Ride 2 Warleader's Call 2"
-        },
-        {
-          "count": 2,
-          "name": "Raph"
-        },
-        {
-          "count": 2,
-          "name": "Practiced Offense 3 Restoration Magic 2 Requisitio"
-        },
-        {
-          "count": 2,
-          "name": "Crystal Barricade 2 High Noon 2 Clarion Conqueror"
+          "name": "Lightning Helix"
         },
         {
           "count": 1,
-          "name": "Sear 1 Wild Ride 4 Multiversal Passage 4 Blo"
-        },
-        {
-          "count": 4,
-          "name": "Blazemire Verge 4 Raucous Theater 3 Cavern of Soul"
+          "name": "Meticulous Archive"
         },
         {
           "count": 2,
-          "name": "Mountain 1 Island 1 Undercity Sewers 4 Collector's"
+          "name": "Mistrise Village"
         },
         {
-          "count": 4,
-          "name": "Valgavoth, Terror Eater 4 Zombify 4 Bitter Triumph"
+          "count": 1,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 2,
+          "name": "No More Lies"
+        },
+        {
+          "count": 1,
+          "name": "Petrified Hamlet"
+        },
+        {
+          "count": 1,
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Sear"
         },
         {
           "count": 3,
-          "name": "Pyroclasm 2 Rakdos Joins Up 2 The Infamous Cruelcl"
+          "name": "Shattered Sanctum"
+        },
+        {
+          "count": 3,
+          "name": "Starting Town"
         },
         {
           "count": 2,
-          "name": "Thor, God of Thunder 2 Krang, Utrom Warlord 2 Raph"
+          "name": "Steam Vents"
         },
         {
           "count": 4,
-          "name": "Intimidation Tactics 2 Ghost Vacuum 2 Untimely Mal"
-        }
-      ],
-      "sideboard": [
-        {
-          "count": 2,
-          "name": "Pilfer 2 Mister Negative 2 Withering Torment 1 Pyr"
+          "name": "Stock Up"
         },
         {
-          "count": 8,
-          "name": "Plains 4 Floodfarm Verge 4 Hallowed Fountain 3 Sta"
+          "count": 2,
+          "name": "Stormcarved Coast"
         },
         {
           "count": 1,
-          "name": "Multiversal Passage 1 Cavern of Souls 4 Sage of th"
+          "name": "Sunbillow Verge"
+        },
+        {
+          "count": 2,
+          "name": "Sundown Pass"
         },
         {
           "count": 4,
-          "name": "Starfield Shepherd 4 Momo, Friendly Flier 4 Steamc"
+          "name": "Tablet of Discovery"
+        },
+        {
+          "count": 1,
+          "name": "Thor, God of Thunder"
+        },
+        {
+          "count": 1,
+          "name": "Traumatic Critique"
+        },
+        {
+          "count": 2,
+          "name": "Watery Grave"
         }
       ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -2359,11 +2263,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Colorstorm Stallion 3 Resonating Lute 3 Abstract P\n3 Hydro-Channeler 3 Spectacular Skywhale 2 Sanar, Un\n2 Improvisation Capstone 2 Vibrant Outburst 2 Rubble\n2 Stress Dream 2 Splatter Technique 2 Artistic Proce\n2 Stress Dream 2 Artistic Process 2 Spirit Water Rev\n1 Hydro-Channeler 1 Rubble Rouser 1 Vibrant Outburst\n4 Sacred Foundry 4 Mountain 4 Plains 3 Inspiring Van\n2 Abandoned Air Temple 2 Dalkovan Encampment 1 Cori\n4 Sanguine Evangelist 4 Fear of Missing Out 4 Voice\n4 Hardened Academic 4 Lightning Helix 4 Stadium Head\n4 Political Triumph 2 Wild Ride 2 Warleader's Call 2\n2 Raph\n2 Practiced Offense 3 Restoration Magic 2 Requisitio\n2 Crystal Barricade 2 High Noon 2 Clarion Conqueror\n1 Sear 1 Wild Ride 4 Multiversal Passage 4 Blo\n4 Blazemire Verge 4 Raucous Theater 3 Cavern of Soul\n2 Mountain 1 Island 1 Undercity Sewers 4 Collector's\n4 Valgavoth, Terror Eater 4 Zombify 4 Bitter Triumph\n3 Pyroclasm 2 Rakdos Joins Up 2 The Infamous Cruelcl\n2 Thor, God of Thunder 2 Krang, Utrom Warlord 2 Raph\n4 Intimidation Tactics 2 Ghost Vacuum 2 Untimely Mal\n\nSideboard\n2 Pilfer 2 Mister Negative 2 Withering Torment 1 Pyr\n8 Plains 4 Floodfarm Verge 4 Hallowed Fountain 3 Sta\n1 Multiversal Passage 1 Cavern of Souls 4 Sage of th\n4 Starfield Shepherd 4 Momo, Friendly Flier 4 Steamc",
+      "arenaImport": "Deck\n2 Consult the Star Charts\n1 Cori Mountain Monastery\n2 Day of Judgment\n1 Deadly Cover-Up\n2 Erode\n2 Flashback\n2 Get Lost\n1 Godless Shrine\n4 Great Hall of the Biblioplex\n3 Inevitable Defeat\n4 Jeskai Revelation\n1 Lightning Helix\n1 Meticulous Archive\n2 Mistrise Village\n1 Multiversal Passage\n2 No More Lies\n1 Petrified Hamlet\n1 Plains\n2 Sear\n3 Shattered Sanctum\n3 Starting Town\n2 Steam Vents\n4 Stock Up\n2 Stormcarved Coast\n1 Sunbillow Verge\n2 Sundown Pass\n4 Tablet of Discovery\n1 Thor, God of Thunder\n1 Traumatic Critique\n2 Watery Grave",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2384,7 +2288,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #7"
+      "listNote": "MTGO Standard Challenge 32 · Americanmisfit5"
     },
     "standard-bo1-dimir-excruciator": {
       "id": "standard-bo1-dimir-excruciator",
@@ -2401,94 +2305,106 @@
       "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #7 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Springleaf Drum 4 Practiced Offense 4 Daydream 4 Q"
+          "count": 2,
+          "name": "Starting Town"
         },
         {
           "count": 2,
-          "name": "Seam Rip 1 Erode 1 Emeritus of Ideation 1 Figure o"
-        },
-        {
-          "count": 1,
-          "name": "Nurturing Pixie 1 Novice Inspector 2 Get Lost 2 Re"
+          "name": "Soulstone Sanctuary"
         },
         {
           "count": 2,
-          "name": "Emeritus of Ideation 1 Spider-Sense 1 Spectacular"
-        },
-        {
-          "count": 1,
-          "name": "Disdainful Stroke 1 Flashfreeze 1 Negate 1 Seam Ri"
-        },
-        {
-          "count": 1,
-          "name": "Clarion Conqueror 1 Dawn's Truce 6 Swamp 6 P"
+          "name": "Island"
         },
         {
           "count": 4,
-          "name": "Concealed Courtyard 4 Bleachbone Verge 4 Godless S"
+          "name": "Dream Beavers"
         },
         {
           "count": 4,
-          "name": "Corpses of the Lost 4 Ethereal Armor 4 Case of the"
+          "name": "Floodpits Drowner"
         },
         {
           "count": 4,
-          "name": "United Battlefront 4 Shardmage's Rescue 4 Forsaken"
+          "name": "Kaito, Bane of Nightmares"
         },
         {
           "count": 4,
-          "name": "Optimistic Scavenger 4 Nowhere to Run 4 Sheltered"
-        },
-        {
-          "count": 2,
-          "name": "Sporogenic Infection 2 Tinybones, the Pickpocket 2"
-        },
-        {
-          "count": 2,
-          "name": "Momentum Breaker 2 Villainous Wrath 2 Day of Judgm"
-        },
-        {
-          "count": 9,
-          "name": "Swamp 4 Starting Town 4 Watery Grave 3 Gloomlake V"
+          "name": "Oroku Saki, Shredder Rising"
         },
         {
           "count": 4,
-          "name": "Timeline Culler 4 Strategic Betrayal 4 Cecil, Dark"
+          "name": "Spyglass Siren"
         },
         {
           "count": 4,
-          "name": "Kaito, Bane of Nightmares 4 Duress 4 Tragic Trajec"
+          "name": "Requiting Hex"
         },
         {
           "count": 3,
-          "name": "Dream Beavers 3 Bitter Triumph 3 Forsaken Miner"
+          "name": "Shoot the Sheriff"
         },
         {
-          "count": 6,
-          "name": "Plains 5 Island 4 Multiversal Passage 3 Starting T"
+          "count": 3,
+          "name": "Cecil, Dark Knight"
+        },
+        {
+          "count": 2,
+          "name": "Tragic Trajectory"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
+        },
+        {
+          "count": 2,
+          "name": "Subterranean Schooner"
+        },
+        {
+          "count": 2,
+          "name": "Phantom Interference"
+        },
+        {
+          "count": 3,
+          "name": "Negate"
+        },
+        {
+          "count": 3,
+          "name": "Strategic Betrayal"
+        },
+        {
+          "count": 3,
+          "name": "Duress"
+        },
+        {
+          "count": 2,
+          "name": "Spell Snare"
+        },
+        {
+          "count": 2,
+          "name": "Day of Black Sun"
         }
       ],
       "sideboard": [
         {
           "count": 1,
-          "name": "Fomori Vault 1 Hallowed Fountain 1 Restless Anchor"
+          "name": "Shoot the Sheriff"
+        },
+        {
+          "count": 1,
+          "name": "The Ooze"
         },
         {
           "count": 4,
-          "name": "Clay-Fired Bricks 4 United Battlefront 4 Spring-Lo"
+          "name": "Starfield Shepherd"
         },
         {
           "count": 4,
-          "name": "Perilous Snare 4 Cryogen Relic 4 Repurposing Bay 4"
-        },
-        {
-          "count": 2,
-          "name": "Erode 2 Braided Net 1 White Auracite 1 The Fire Cr"
+          "name": "Giada, Font of Hope"
         },
         {
           "count": 4,
-          "name": "Voice of Victory 3 Rest in Peace 2 Spell Pierce 2"
+          "name": "Daydream"
         }
       ],
       "matchups": [
@@ -2509,11 +2425,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Springleaf Drum 4 Practiced Offense 4 Daydream 4 Q\n2 Seam Rip 1 Erode 1 Emeritus of Ideation 1 Figure o\n1 Nurturing Pixie 1 Novice Inspector 2 Get Lost 2 Re\n2 Emeritus of Ideation 1 Spider-Sense 1 Spectacular\n1 Disdainful Stroke 1 Flashfreeze 1 Negate 1 Seam Ri\n1 Clarion Conqueror 1 Dawn's Truce 6 Swamp 6 P\n4 Concealed Courtyard 4 Bleachbone Verge 4 Godless S\n4 Corpses of the Lost 4 Ethereal Armor 4 Case of the\n4 United Battlefront 4 Shardmage's Rescue 4 Forsaken\n4 Optimistic Scavenger 4 Nowhere to Run 4 Sheltered\n2 Sporogenic Infection 2 Tinybones, the Pickpocket 2\n2 Momentum Breaker 2 Villainous Wrath 2 Day of Judgm\n9 Swamp 4 Starting Town 4 Watery Grave 3 Gloomlake V\n4 Timeline Culler 4 Strategic Betrayal 4 Cecil, Dark\n4 Kaito, Bane of Nightmares 4 Duress 4 Tragic Trajec\n3 Dream Beavers 3 Bitter Triumph 3 Forsaken Miner\n6 Plains 5 Island 4 Multiversal Passage 3 Starting T\n\nSideboard\n1 Fomori Vault 1 Hallowed Fountain 1 Restless Anchor\n4 Clay-Fired Bricks 4 United Battlefront 4 Spring-Lo\n4 Perilous Snare 4 Cryogen Relic 4 Repurposing Bay 4\n2 Erode 2 Braided Net 1 White Auracite 1 The Fire Cr\n4 Voice of Victory 3 Rest in Peace 2 Spell Pierce 2",
+      "arenaImport": "Deck\n2 Starting Town\n2 Soulstone Sanctuary\n2 Island\n4 Dream Beavers\n4 Floodpits Drowner\n4 Kaito, Bane of Nightmares\n4 Oroku Saki, Shredder Rising\n4 Spyglass Siren\n4 Requiting Hex\n3 Shoot the Sheriff\n3 Cecil, Dark Knight\n2 Tragic Trajectory\n2 Spell Pierce\n2 Subterranean Schooner\n2 Phantom Interference\n3 Negate\n3 Strategic Betrayal\n3 Duress\n2 Spell Snare\n2 Day of Black Sun\n\nSideboard\n1 Shoot the Sheriff\n1 The Ooze\n4 Starfield Shepherd\n4 Giada, Font of Hope\n4 Daydream",
       "sources": [
         {
           "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026"
+          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2534,7 +2450,7 @@
       ],
       "metaShare": 7,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #8"
+      "listNote": "magic.gg ranked/official post · list #20"
     },
     "standard-bo3-dimir-excruciator": {
       "id": "standard-bo3-dimir-excruciator",
@@ -2551,94 +2467,106 @@
       "description": "Deceit + Superior Spider-Man + Requiting Hex package. Current Dimir shell — not legacy midrange bats. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Springleaf Drum 4 Practiced Offense 4 Daydream 4 Q"
+          "count": 2,
+          "name": "Starting Town"
         },
         {
           "count": 2,
-          "name": "Seam Rip 1 Erode 1 Emeritus of Ideation 1 Figure o"
-        },
-        {
-          "count": 1,
-          "name": "Nurturing Pixie 1 Novice Inspector 2 Get Lost 2 Re"
+          "name": "Soulstone Sanctuary"
         },
         {
           "count": 2,
-          "name": "Emeritus of Ideation 1 Spider-Sense 1 Spectacular"
-        },
-        {
-          "count": 1,
-          "name": "Disdainful Stroke 1 Flashfreeze 1 Negate 1 Seam Ri"
-        },
-        {
-          "count": 1,
-          "name": "Clarion Conqueror 1 Dawn's Truce 6 Swamp 6 P"
+          "name": "Island"
         },
         {
           "count": 4,
-          "name": "Concealed Courtyard 4 Bleachbone Verge 4 Godless S"
+          "name": "Dream Beavers"
         },
         {
           "count": 4,
-          "name": "Corpses of the Lost 4 Ethereal Armor 4 Case of the"
+          "name": "Floodpits Drowner"
         },
         {
           "count": 4,
-          "name": "United Battlefront 4 Shardmage's Rescue 4 Forsaken"
+          "name": "Kaito, Bane of Nightmares"
         },
         {
           "count": 4,
-          "name": "Optimistic Scavenger 4 Nowhere to Run 4 Sheltered"
-        },
-        {
-          "count": 2,
-          "name": "Sporogenic Infection 2 Tinybones, the Pickpocket 2"
-        },
-        {
-          "count": 2,
-          "name": "Momentum Breaker 2 Villainous Wrath 2 Day of Judgm"
-        },
-        {
-          "count": 9,
-          "name": "Swamp 4 Starting Town 4 Watery Grave 3 Gloomlake V"
+          "name": "Oroku Saki, Shredder Rising"
         },
         {
           "count": 4,
-          "name": "Timeline Culler 4 Strategic Betrayal 4 Cecil, Dark"
+          "name": "Spyglass Siren"
         },
         {
           "count": 4,
-          "name": "Kaito, Bane of Nightmares 4 Duress 4 Tragic Trajec"
+          "name": "Requiting Hex"
         },
         {
           "count": 3,
-          "name": "Dream Beavers 3 Bitter Triumph 3 Forsaken Miner"
+          "name": "Shoot the Sheriff"
         },
         {
-          "count": 6,
-          "name": "Plains 5 Island 4 Multiversal Passage 3 Starting T"
+          "count": 3,
+          "name": "Cecil, Dark Knight"
+        },
+        {
+          "count": 2,
+          "name": "Tragic Trajectory"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
+        },
+        {
+          "count": 2,
+          "name": "Subterranean Schooner"
+        },
+        {
+          "count": 2,
+          "name": "Phantom Interference"
+        },
+        {
+          "count": 3,
+          "name": "Negate"
+        },
+        {
+          "count": 3,
+          "name": "Strategic Betrayal"
+        },
+        {
+          "count": 3,
+          "name": "Duress"
+        },
+        {
+          "count": 2,
+          "name": "Spell Snare"
+        },
+        {
+          "count": 2,
+          "name": "Day of Black Sun"
         }
       ],
       "sideboard": [
         {
           "count": 1,
-          "name": "Fomori Vault 1 Hallowed Fountain 1 Restless Anchor"
+          "name": "Shoot the Sheriff"
+        },
+        {
+          "count": 1,
+          "name": "The Ooze"
         },
         {
           "count": 4,
-          "name": "Clay-Fired Bricks 4 United Battlefront 4 Spring-Lo"
+          "name": "Starfield Shepherd"
         },
         {
           "count": 4,
-          "name": "Perilous Snare 4 Cryogen Relic 4 Repurposing Bay 4"
-        },
-        {
-          "count": 2,
-          "name": "Erode 2 Braided Net 1 White Auracite 1 The Fire Cr"
+          "name": "Giada, Font of Hope"
         },
         {
           "count": 4,
-          "name": "Voice of Victory 3 Rest in Peace 2 Spell Pierce 2"
+          "name": "Daydream"
         }
       ],
       "matchups": [
@@ -2684,11 +2612,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Springleaf Drum 4 Practiced Offense 4 Daydream 4 Q\n2 Seam Rip 1 Erode 1 Emeritus of Ideation 1 Figure o\n1 Nurturing Pixie 1 Novice Inspector 2 Get Lost 2 Re\n2 Emeritus of Ideation 1 Spider-Sense 1 Spectacular\n1 Disdainful Stroke 1 Flashfreeze 1 Negate 1 Seam Ri\n1 Clarion Conqueror 1 Dawn's Truce 6 Swamp 6 P\n4 Concealed Courtyard 4 Bleachbone Verge 4 Godless S\n4 Corpses of the Lost 4 Ethereal Armor 4 Case of the\n4 United Battlefront 4 Shardmage's Rescue 4 Forsaken\n4 Optimistic Scavenger 4 Nowhere to Run 4 Sheltered\n2 Sporogenic Infection 2 Tinybones, the Pickpocket 2\n2 Momentum Breaker 2 Villainous Wrath 2 Day of Judgm\n9 Swamp 4 Starting Town 4 Watery Grave 3 Gloomlake V\n4 Timeline Culler 4 Strategic Betrayal 4 Cecil, Dark\n4 Kaito, Bane of Nightmares 4 Duress 4 Tragic Trajec\n3 Dream Beavers 3 Bitter Triumph 3 Forsaken Miner\n6 Plains 5 Island 4 Multiversal Passage 3 Starting T\n\nSideboard\n1 Fomori Vault 1 Hallowed Fountain 1 Restless Anchor\n4 Clay-Fired Bricks 4 United Battlefront 4 Spring-Lo\n4 Perilous Snare 4 Cryogen Relic 4 Repurposing Bay 4\n2 Erode 2 Braided Net 1 White Auracite 1 The Fire Cr\n4 Voice of Victory 3 Rest in Peace 2 Spell Pierce 2",
+      "arenaImport": "Deck\n2 Starting Town\n2 Soulstone Sanctuary\n2 Island\n4 Dream Beavers\n4 Floodpits Drowner\n4 Kaito, Bane of Nightmares\n4 Oroku Saki, Shredder Rising\n4 Spyglass Siren\n4 Requiting Hex\n3 Shoot the Sheriff\n3 Cecil, Dark Knight\n2 Tragic Trajectory\n2 Spell Pierce\n2 Subterranean Schooner\n2 Phantom Interference\n3 Negate\n3 Strategic Betrayal\n3 Duress\n2 Spell Snare\n2 Day of Black Sun\n\nSideboard\n1 Shoot the Sheriff\n1 The Ooze\n4 Starfield Shepherd\n4 Giada, Font of Hope\n4 Daydream",
       "sources": [
         {
           "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026"
+          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2709,7 +2637,7 @@
       ],
       "metaShare": 7,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #8"
+      "listNote": "magic.gg ranked/official post · list #20"
     },
     "standard-bo1-mono-green-landfall": {
       "id": "standard-bo1-mono-green-landfall",
@@ -2726,15 +2654,23 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Ancestral Anger"
+          "name": "Thornspire Verge"
+        },
+        {
+          "count": 4,
+          "name": "Stomping Ground"
+        },
+        {
+          "count": 4,
+          "name": "Forest"
+        },
+        {
+          "count": 3,
+          "name": "Starting Town"
         },
         {
           "count": 3,
           "name": "Multiversal Passage"
-        },
-        {
-          "count": 4,
-          "name": "Callous Sell-Sword"
         },
         {
           "count": 1,
@@ -2742,70 +2678,79 @@
         },
         {
           "count": 4,
-          "name": "Elusive Otter"
+          "name": "Bushwhack"
+        },
+        {
+          "count": 4,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 4,
+          "name": "Patchwork Beastie"
+        },
+        {
+          "count": 4,
+          "name": "Rapid Rescue"
+        },
+        {
+          "count": 4,
+          "name": "Wildfire Wickerfolk"
+        },
+        {
+          "count": 4,
+          "name": "Break Out"
+        },
+        {
+          "count": 4,
+          "name": "Tersa Lightshatter"
+        },
+        {
+          "count": 4,
+          "name": "Fear of Missing Out"
         },
         {
           "count": 2,
-          "name": "Full Bore"
+          "name": "Overprotect"
         },
         {
           "count": 2,
-          "name": "Drake Hatcher"
+          "name": "Violent Urge"
+        },
+        {
+          "count": 2,
+          "name": "Nova Hellkite"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 1,
+          "name": "Itzquinth, Firstborn of Gishath"
         },
         {
           "count": 1,
-          "name": "Balmor, Battlemage Captain"
+          "name": "Hellcat, Undying Vigilante"
+        },
+        {
+          "count": 1,
+          "name": "Webstrike Elite"
+        },
+        {
+          "count": 4,
+          "name": "Scrapshooter"
         },
         {
           "count": 3,
-          "name": "Riverpyre Verge"
+          "name": "The Legend of Roku"
         },
         {
           "count": 2,
-          "name": "Shore Up"
-        },
-        {
-          "count": 4,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 4,
-          "name": "Slickshot Show-Off"
-        },
-        {
-          "count": 4,
-          "name": "Spirebluff Canal"
-        },
-        {
-          "count": 4,
-          "name": "Starting Town"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents"
-        },
-        {
-          "count": 4,
-          "name": "Stormchaser's Talent"
+          "name": "Ghost Vacuum"
         },
         {
           "count": 2,
-          "name": "Turn Inside Out"
-        },
-        {
-          "count": 4,
-          "name": "Wild Ride"
-        },
-        {
-          "count": 2,
-          "name": "Opt"
-        },
-        {
-          "count": 2,
-          "name": "Secret Identity"
+          "name": "Scorching Shot"
         }
       ],
-      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -2824,11 +2769,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Ancestral Anger\n3 Multiversal Passage\n4 Callous Sell-Sword\n1 Mountain\n4 Elusive Otter\n2 Full Bore\n2 Drake Hatcher\n1 Balmor, Battlemage Captain\n3 Riverpyre Verge\n2 Shore Up\n4 Sleight of Hand\n4 Slickshot Show-Off\n4 Spirebluff Canal\n4 Starting Town\n4 Steam Vents\n4 Stormchaser's Talent\n2 Turn Inside Out\n4 Wild Ride\n2 Opt\n2 Secret Identity",
+      "arenaImport": "Deck\n4 Thornspire Verge\n4 Stomping Ground\n4 Forest\n3 Starting Town\n3 Multiversal Passage\n1 Mountain\n4 Bushwhack\n4 Keen-Eyed Curator\n4 Patchwork Beastie\n4 Rapid Rescue\n4 Wildfire Wickerfolk\n4 Break Out\n4 Tersa Lightshatter\n4 Fear of Missing Out\n2 Overprotect\n2 Violent Urge\n2 Nova Hellkite\n\nSideboard\n1 Itzquinth, Firstborn of Gishath\n1 Hellcat, Undying Vigilante\n1 Webstrike Elite\n4 Scrapshooter\n3 The Legend of Roku\n2 Ghost Vacuum\n2 Scorching Shot",
       "sources": [
         {
-          "name": "MTGO official",
-          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
+          "name": "magic.gg official",
+          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -2849,7 +2794,7 @@
       ],
       "metaShare": 6,
       "listQuality": "authoritative",
-      "listNote": "MTGO Standard Challenge 32 · sandydogmtg"
+      "listNote": "magic.gg ranked/official post · list #1"
     },
     "standard-bo3-mono-green-landfall": {
       "id": "standard-bo3-mono-green-landfall",
@@ -2866,15 +2811,23 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Ancestral Anger"
+          "name": "Thornspire Verge"
+        },
+        {
+          "count": 4,
+          "name": "Stomping Ground"
+        },
+        {
+          "count": 4,
+          "name": "Forest"
+        },
+        {
+          "count": 3,
+          "name": "Starting Town"
         },
         {
           "count": 3,
           "name": "Multiversal Passage"
-        },
-        {
-          "count": 4,
-          "name": "Callous Sell-Sword"
         },
         {
           "count": 1,
@@ -2882,70 +2835,79 @@
         },
         {
           "count": 4,
-          "name": "Elusive Otter"
+          "name": "Bushwhack"
+        },
+        {
+          "count": 4,
+          "name": "Keen-Eyed Curator"
+        },
+        {
+          "count": 4,
+          "name": "Patchwork Beastie"
+        },
+        {
+          "count": 4,
+          "name": "Rapid Rescue"
+        },
+        {
+          "count": 4,
+          "name": "Wildfire Wickerfolk"
+        },
+        {
+          "count": 4,
+          "name": "Break Out"
+        },
+        {
+          "count": 4,
+          "name": "Tersa Lightshatter"
+        },
+        {
+          "count": 4,
+          "name": "Fear of Missing Out"
         },
         {
           "count": 2,
-          "name": "Full Bore"
+          "name": "Overprotect"
         },
         {
           "count": 2,
-          "name": "Drake Hatcher"
+          "name": "Violent Urge"
+        },
+        {
+          "count": 2,
+          "name": "Nova Hellkite"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 1,
+          "name": "Itzquinth, Firstborn of Gishath"
         },
         {
           "count": 1,
-          "name": "Balmor, Battlemage Captain"
+          "name": "Hellcat, Undying Vigilante"
+        },
+        {
+          "count": 1,
+          "name": "Webstrike Elite"
+        },
+        {
+          "count": 4,
+          "name": "Scrapshooter"
         },
         {
           "count": 3,
-          "name": "Riverpyre Verge"
+          "name": "The Legend of Roku"
         },
         {
           "count": 2,
-          "name": "Shore Up"
-        },
-        {
-          "count": 4,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 4,
-          "name": "Slickshot Show-Off"
-        },
-        {
-          "count": 4,
-          "name": "Spirebluff Canal"
-        },
-        {
-          "count": 4,
-          "name": "Starting Town"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents"
-        },
-        {
-          "count": 4,
-          "name": "Stormchaser's Talent"
+          "name": "Ghost Vacuum"
         },
         {
           "count": 2,
-          "name": "Turn Inside Out"
-        },
-        {
-          "count": 4,
-          "name": "Wild Ride"
-        },
-        {
-          "count": 2,
-          "name": "Opt"
-        },
-        {
-          "count": 2,
-          "name": "Secret Identity"
+          "name": "Scorching Shot"
         }
       ],
-      "sideboard": [],
       "matchups": [
         {
           "vs": "Selesnya Ouroboroid",
@@ -2989,184 +2951,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Ancestral Anger\n3 Multiversal Passage\n4 Callous Sell-Sword\n1 Mountain\n4 Elusive Otter\n2 Full Bore\n2 Drake Hatcher\n1 Balmor, Battlemage Captain\n3 Riverpyre Verge\n2 Shore Up\n4 Sleight of Hand\n4 Slickshot Show-Off\n4 Spirebluff Canal\n4 Starting Town\n4 Steam Vents\n4 Stormchaser's Talent\n2 Turn Inside Out\n4 Wild Ride\n2 Opt\n2 Secret Identity",
-      "sources": [
-        {
-          "name": "MTGO official",
-          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
-        },
-        {
-          "name": "Untapped.gg Standard Meta",
-          "url": "https://mtga.untapped.gg/constructed/standard/meta"
-        },
-        {
-          "name": "Melee.gg Events",
-          "url": "https://melee.gg/Tournament/Search"
-        },
-        {
-          "name": "Scryfall",
-          "url": "https://scryfall.com"
-        },
-        {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
-        }
-      ],
-      "metaShare": 6,
-      "listQuality": "authoritative",
-      "listNote": "MTGO Standard Challenge 32 · sandydogmtg"
-    },
-    "standard-bo1-selesnya-gearhulk": {
-      "id": "standard-bo1-selesnya-gearhulk",
-      "name": "Selesnya Gearhulk",
-      "format": "standard",
-      "mode": "bo1",
-      "rank": 8,
-      "tier": 3,
-      "colors": [
-        "W",
-        "G"
-      ],
-      "archetype": "Selesnya Gearhulk",
-      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
-      "mainboard": [
-        {
-          "count": 4,
-          "name": "Abandon Attachments 4 Stock Up 4 Jeskai Revelation"
-        },
-        {
-          "count": 2,
-          "name": "Iroh's Demonstration 2 It'll Quench Ya"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Ral, Crackling Wit 4 Price of Freed"
-        },
-        {
-          "count": 2,
-          "name": "Flashfreeze 2 Annul 2 Splatter Technique 1 Ghost V"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Emeritus of Ideation 1 Ral, Crackli"
-        },
-        {
-          "count": 1,
-          "name": "Avengers Disassembled 14 Forest 4 Escape Tun"
-        },
-        {
-          "count": 4,
-          "name": "Fabled Passage 3 Ba Sing Se 1 Promising Vein 4 Esp"
-        },
-        {
-          "count": 4,
-          "name": "Icetill Explorer 4 Mightform Harmonizer 4 Earthben"
-        },
-        {
-          "count": 4,
-          "name": "Llanowar Elves 4 Badgermole Cub 4 Sazh's Chocobo 3"
-        },
-        {
-          "count": 1,
-          "name": "Surrak, Elusive Hunter 1 Archdruid's Charm 1 Lumbe"
-        },
-        {
-          "count": 4,
-          "name": "Mossborn Hydra 3 Sapling Nursery 2 Leatherhead, Sw"
-        },
-        {
-          "count": 2,
-          "name": "Soul-Guide Lantern 2 Torpor Orb 1 Surrak, Elusive"
-        },
-        {
-          "count": 1,
-          "name": "Meltstrider's Resolve 5 Forest 4 Cavern of S"
-        },
-        {
-          "count": 4,
-          "name": "Stomping Ground 3 Wastewood Verge 3 Restless Cotta"
-        },
-        {
-          "count": 4,
-          "name": "Michelangelo's Technique 4 Commune with Beavers 4"
-        },
-        {
-          "count": 4,
-          "name": "Thornvault Forager 4 Badgermole Cub 4 Llanowar Elv"
-        },
-        {
-          "count": 3,
-          "name": "Formidable Speaker 3 Enduring Courage 2 Valley Rot"
-        },
-        {
-          "count": 2,
-          "name": "Agatha's Soul Cauldron 4 Duress 3 Bitter Triumph 2"
-        },
-        {
-          "count": 4,
-          "name": "Starting Town 4 Blood Crypt 4 Multiversal Passage"
-        },
-        {
-          "count": 2,
-          "name": "Restless Vents 2 Rockface Village 2 Mudflat Villag"
-        },
-        {
-          "count": 1,
-          "name": "Swamp 4 Valley Flamecaller 4 Hired Claw 4 Gastal T"
-        },
-        {
-          "count": 4,
-          "name": "Gev, Scaled Scorch 4 Iridescent Vinelasher 4 Flame"
-        },
-        {
-          "count": 4,
-          "name": "Requiting Hex 3 The Ruinous Wrecking Crew 1 Shoot"
-        },
-        {
-          "count": 1,
-          "name": "Laughing Jasper Flint 1 Forsaken Miner 1 Burst Lig"
-        },
-        {
-          "count": 1,
-          "name": "Nova Hellkite 1 Fireglass Mentor 1 Ral Zarek, Gues"
-        },
-        {
-          "count": 1,
-          "name": "Strategic Betrayal 1 Long Goodbye 1 Sear 1 Intimid"
-        },
-        {
-          "count": 1,
-          "name": "Magebane Lizard 1 Shredder's Technique 1 End of th"
-        },
-        {
-          "count": 1,
-          "name": "The Ruinous Wrecking Crew 1 Thought-Stalker Warloc"
-        },
-        {
-          "count": 1,
-          "name": "Day of Black Sun 1 Deep-Cavern Bat 1 Abrade 1 Dure"
-        }
-      ],
-      "sideboard": [],
-      "matchups": [
-        {
-          "vs": "Selesnya Ouroboroid",
-          "favor": "favored",
-          "notes": "Keep interaction for their key turns; you are favored if you curve out."
-        },
-        {
-          "vs": "Jeskai Lessons",
-          "favor": "even",
-          "notes": "Skill-intensive mirror of plans — pilot edge decides."
-        },
-        {
-          "vs": "Izzet Prowess",
-          "favor": "unfavored",
-          "notes": "Mulligan for hate pieces; they can run away if unanswered."
-        }
-      ],
-      "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Abandon Attachments 4 Stock Up 4 Jeskai Revelation\n2 Iroh's Demonstration 2 It'll Quench Ya\n1 Spell Pierce 1 Ral, Crackling Wit 4 Price of Freed\n2 Flashfreeze 2 Annul 2 Splatter Technique 1 Ghost V\n1 Spell Pierce 1 Emeritus of Ideation 1 Ral, Crackli\n1 Avengers Disassembled 14 Forest 4 Escape Tun\n4 Fabled Passage 3 Ba Sing Se 1 Promising Vein 4 Esp\n4 Icetill Explorer 4 Mightform Harmonizer 4 Earthben\n4 Llanowar Elves 4 Badgermole Cub 4 Sazh's Chocobo 3\n1 Surrak, Elusive Hunter 1 Archdruid's Charm 1 Lumbe\n4 Mossborn Hydra 3 Sapling Nursery 2 Leatherhead, Sw\n2 Soul-Guide Lantern 2 Torpor Orb 1 Surrak, Elusive\n1 Meltstrider's Resolve 5 Forest 4 Cavern of S\n4 Stomping Ground 3 Wastewood Verge 3 Restless Cotta\n4 Michelangelo's Technique 4 Commune with Beavers 4\n4 Thornvault Forager 4 Badgermole Cub 4 Llanowar Elv\n3 Formidable Speaker 3 Enduring Courage 2 Valley Rot\n2 Agatha's Soul Cauldron 4 Duress 3 Bitter Triumph 2\n4 Starting Town 4 Blood Crypt 4 Multiversal Passage\n2 Restless Vents 2 Rockface Village 2 Mudflat Villag\n1 Swamp 4 Valley Flamecaller 4 Hired Claw 4 Gastal T\n4 Gev, Scaled Scorch 4 Iridescent Vinelasher 4 Flame\n4 Requiting Hex 3 The Ruinous Wrecking Crew 1 Shoot\n1 Laughing Jasper Flint 1 Forsaken Miner 1 Burst Lig\n1 Nova Hellkite 1 Fireglass Mentor 1 Ral Zarek, Gues\n1 Strategic Betrayal 1 Long Goodbye 1 Sear 1 Intimid\n1 Magebane Lizard 1 Shredder's Technique 1 End of th\n1 The Ruinous Wrecking Crew 1 Thought-Stalker Warloc\n1 Day of Black Sun 1 Deep-Cavern Bat 1 Abrade 1 Dure",
+      "arenaImport": "Deck\n4 Thornspire Verge\n4 Stomping Ground\n4 Forest\n3 Starting Town\n3 Multiversal Passage\n1 Mountain\n4 Bushwhack\n4 Keen-Eyed Curator\n4 Patchwork Beastie\n4 Rapid Rescue\n4 Wildfire Wickerfolk\n4 Break Out\n4 Tersa Lightshatter\n4 Fear of Missing Out\n2 Overprotect\n2 Violent Urge\n2 Nova Hellkite\n\nSideboard\n1 Itzquinth, Firstborn of Gishath\n1 Hellcat, Undying Vigilante\n1 Webstrike Elite\n4 Scrapshooter\n3 The Legend of Roku\n2 Ghost Vacuum\n2 Scorching Shot",
       "sources": [
         {
           "name": "magic.gg official",
@@ -3189,9 +2974,150 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
+      "metaShare": 6,
+      "listQuality": "authoritative",
+      "listNote": "magic.gg ranked/official post · list #1"
+    },
+    "standard-bo1-selesnya-gearhulk": {
+      "id": "standard-bo1-selesnya-gearhulk",
+      "name": "Selesnya Gearhulk",
+      "format": "standard",
+      "mode": "bo1",
+      "rank": 8,
+      "tier": 3,
+      "colors": [
+        "W",
+        "G"
+      ],
+      "archetype": "Selesnya Gearhulk",
+      "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
+      "mainboard": [
+        {
+          "count": 3,
+          "name": "Abandoned Air Temple"
+        },
+        {
+          "count": 1,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 7,
+          "name": "Forest"
+        },
+        {
+          "count": 2,
+          "name": "Ouroboroid"
+        },
+        {
+          "count": 1,
+          "name": "Meltstrider's Resolve"
+        },
+        {
+          "count": 2,
+          "name": "Multiversal Passage"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub"
+        },
+        {
+          "count": 4,
+          "name": "Pawpatch Recruit"
+        },
+        {
+          "count": 4,
+          "name": "Practiced Offense"
+        },
+        {
+          "count": 2,
+          "name": "Seam Rip"
+        },
+        {
+          "count": 3,
+          "name": "Surrak, Elusive Hunter"
+        },
+        {
+          "count": 3,
+          "name": "Spider Manifestation"
+        },
+        {
+          "count": 1,
+          "name": "Ba Sing Se"
+        },
+        {
+          "count": 2,
+          "name": "Plains"
+        },
+        {
+          "count": 4,
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
+        },
+        {
+          "count": 2,
+          "name": "Jennifer Walters"
+        },
+        {
+          "count": 4,
+          "name": "Brightglass Gearhulk"
+        },
+        {
+          "count": 4,
+          "name": "Leatherhead, Swamp Stalker"
+        },
+        {
+          "count": 4,
+          "name": "Temple Garden"
+        }
+      ],
+      "sideboard": [],
+      "matchups": [
+        {
+          "vs": "Selesnya Ouroboroid",
+          "favor": "favored",
+          "notes": "Keep interaction for their key turns; you are favored if you curve out."
+        },
+        {
+          "vs": "Jeskai Lessons",
+          "favor": "even",
+          "notes": "Skill-intensive mirror of plans — pilot edge decides."
+        },
+        {
+          "vs": "Izzet Prowess",
+          "favor": "unfavored",
+          "notes": "Mulligan for hate pieces; they can run away if unanswered."
+        }
+      ],
+      "sideboardGuide": [],
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Bushwhack\n7 Forest\n2 Ouroboroid\n1 Meltstrider's Resolve\n2 Multiversal Passage\n4 Badgermole Cub\n4 Pawpatch Recruit\n4 Practiced Offense\n2 Seam Rip\n3 Surrak, Elusive Hunter\n3 Spider Manifestation\n1 Ba Sing Se\n2 Plains\n4 Hushwood Verge\n4 Llanowar Elves\n2 Jennifer Walters\n4 Brightglass Gearhulk\n4 Leatherhead, Swamp Stalker\n4 Temple Garden",
+      "sources": [
+        {
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
+        },
+        {
+          "name": "Untapped.gg Standard Meta",
+          "url": "https://mtga.untapped.gg/constructed/standard/meta"
+        },
+        {
+          "name": "Melee.gg Events",
+          "url": "https://melee.gg/Tournament/Search"
+        },
+        {
+          "name": "Scryfall",
+          "url": "https://scryfall.com"
+        },
+        {
+          "name": "MTGGoldfish Metagame",
+          "url": "https://www.mtggoldfish.com/metagame/standard"
+        }
+      ],
       "metaShare": 5,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #4"
+      "listNote": "MTGO Standard Challenge 32 · Searzist"
     },
     "standard-bo3-selesnya-gearhulk": {
       "id": "standard-bo3-selesnya-gearhulk",
@@ -3208,120 +3134,84 @@
       "description": "Brightglass Gearhulk midrange plan — sibling of Ouroboroid with more combat-focused packages. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Abandon Attachments 4 Stock Up 4 Jeskai Revelation"
+          "count": 3,
+          "name": "Abandoned Air Temple"
+        },
+        {
+          "count": 1,
+          "name": "Bushwhack"
+        },
+        {
+          "count": 7,
+          "name": "Forest"
         },
         {
           "count": 2,
-          "name": "Iroh's Demonstration 2 It'll Quench Ya"
+          "name": "Ouroboroid"
         },
         {
           "count": 1,
-          "name": "Spell Pierce 1 Ral, Crackling Wit 4 Price of Freed"
+          "name": "Meltstrider's Resolve"
         },
         {
           "count": 2,
-          "name": "Flashfreeze 2 Annul 2 Splatter Technique 1 Ghost V"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Emeritus of Ideation 1 Ral, Crackli"
-        },
-        {
-          "count": 1,
-          "name": "Avengers Disassembled 14 Forest 4 Escape Tun"
+          "name": "Multiversal Passage"
         },
         {
           "count": 4,
-          "name": "Fabled Passage 3 Ba Sing Se 1 Promising Vein 4 Esp"
+          "name": "Badgermole Cub"
         },
         {
           "count": 4,
-          "name": "Icetill Explorer 4 Mightform Harmonizer 4 Earthben"
+          "name": "Pawpatch Recruit"
         },
         {
           "count": 4,
-          "name": "Llanowar Elves 4 Badgermole Cub 4 Sazh's Chocobo 3"
-        },
-        {
-          "count": 1,
-          "name": "Surrak, Elusive Hunter 1 Archdruid's Charm 1 Lumbe"
-        },
-        {
-          "count": 4,
-          "name": "Mossborn Hydra 3 Sapling Nursery 2 Leatherhead, Sw"
+          "name": "Practiced Offense"
         },
         {
           "count": 2,
-          "name": "Soul-Guide Lantern 2 Torpor Orb 1 Surrak, Elusive"
-        },
-        {
-          "count": 1,
-          "name": "Meltstrider's Resolve 5 Forest 4 Cavern of S"
-        },
-        {
-          "count": 4,
-          "name": "Stomping Ground 3 Wastewood Verge 3 Restless Cotta"
-        },
-        {
-          "count": 4,
-          "name": "Michelangelo's Technique 4 Commune with Beavers 4"
-        },
-        {
-          "count": 4,
-          "name": "Thornvault Forager 4 Badgermole Cub 4 Llanowar Elv"
+          "name": "Seam Rip"
         },
         {
           "count": 3,
-          "name": "Formidable Speaker 3 Enduring Courage 2 Valley Rot"
+          "name": "Surrak, Elusive Hunter"
+        },
+        {
+          "count": 3,
+          "name": "Spider Manifestation"
+        },
+        {
+          "count": 1,
+          "name": "Ba Sing Se"
         },
         {
           "count": 2,
-          "name": "Agatha's Soul Cauldron 4 Duress 3 Bitter Triumph 2"
+          "name": "Plains"
         },
         {
           "count": 4,
-          "name": "Starting Town 4 Blood Crypt 4 Multiversal Passage"
+          "name": "Hushwood Verge"
+        },
+        {
+          "count": 4,
+          "name": "Llanowar Elves"
         },
         {
           "count": 2,
-          "name": "Restless Vents 2 Rockface Village 2 Mudflat Villag"
-        },
-        {
-          "count": 1,
-          "name": "Swamp 4 Valley Flamecaller 4 Hired Claw 4 Gastal T"
+          "name": "Jennifer Walters"
         },
         {
           "count": 4,
-          "name": "Gev, Scaled Scorch 4 Iridescent Vinelasher 4 Flame"
+          "name": "Brightglass Gearhulk"
         },
         {
           "count": 4,
-          "name": "Requiting Hex 3 The Ruinous Wrecking Crew 1 Shoot"
+          "name": "Leatherhead, Swamp Stalker"
         },
         {
-          "count": 1,
-          "name": "Laughing Jasper Flint 1 Forsaken Miner 1 Burst Lig"
-        },
-        {
-          "count": 1,
-          "name": "Nova Hellkite 1 Fireglass Mentor 1 Ral Zarek, Gues"
-        },
-        {
-          "count": 1,
-          "name": "Strategic Betrayal 1 Long Goodbye 1 Sear 1 Intimid"
-        },
-        {
-          "count": 1,
-          "name": "Magebane Lizard 1 Shredder's Technique 1 End of th"
-        },
-        {
-          "count": 1,
-          "name": "The Ruinous Wrecking Crew 1 Thought-Stalker Warloc"
-        },
-        {
-          "count": 1,
-          "name": "Day of Black Sun 1 Deep-Cavern Bat 1 Abrade 1 Dure"
+          "count": 4,
+          "name": "Temple Garden"
         }
       ],
       "sideboard": [],
@@ -3368,11 +3258,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Abandon Attachments 4 Stock Up 4 Jeskai Revelation\n2 Iroh's Demonstration 2 It'll Quench Ya\n1 Spell Pierce 1 Ral, Crackling Wit 4 Price of Freed\n2 Flashfreeze 2 Annul 2 Splatter Technique 1 Ghost V\n1 Spell Pierce 1 Emeritus of Ideation 1 Ral, Crackli\n1 Avengers Disassembled 14 Forest 4 Escape Tun\n4 Fabled Passage 3 Ba Sing Se 1 Promising Vein 4 Esp\n4 Icetill Explorer 4 Mightform Harmonizer 4 Earthben\n4 Llanowar Elves 4 Badgermole Cub 4 Sazh's Chocobo 3\n1 Surrak, Elusive Hunter 1 Archdruid's Charm 1 Lumbe\n4 Mossborn Hydra 3 Sapling Nursery 2 Leatherhead, Sw\n2 Soul-Guide Lantern 2 Torpor Orb 1 Surrak, Elusive\n1 Meltstrider's Resolve 5 Forest 4 Cavern of S\n4 Stomping Ground 3 Wastewood Verge 3 Restless Cotta\n4 Michelangelo's Technique 4 Commune with Beavers 4\n4 Thornvault Forager 4 Badgermole Cub 4 Llanowar Elv\n3 Formidable Speaker 3 Enduring Courage 2 Valley Rot\n2 Agatha's Soul Cauldron 4 Duress 3 Bitter Triumph 2\n4 Starting Town 4 Blood Crypt 4 Multiversal Passage\n2 Restless Vents 2 Rockface Village 2 Mudflat Villag\n1 Swamp 4 Valley Flamecaller 4 Hired Claw 4 Gastal T\n4 Gev, Scaled Scorch 4 Iridescent Vinelasher 4 Flame\n4 Requiting Hex 3 The Ruinous Wrecking Crew 1 Shoot\n1 Laughing Jasper Flint 1 Forsaken Miner 1 Burst Lig\n1 Nova Hellkite 1 Fireglass Mentor 1 Ral Zarek, Gues\n1 Strategic Betrayal 1 Long Goodbye 1 Sear 1 Intimid\n1 Magebane Lizard 1 Shredder's Technique 1 End of th\n1 The Ruinous Wrecking Crew 1 Thought-Stalker Warloc\n1 Day of Black Sun 1 Deep-Cavern Bat 1 Abrade 1 Dure",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Bushwhack\n7 Forest\n2 Ouroboroid\n1 Meltstrider's Resolve\n2 Multiversal Passage\n4 Badgermole Cub\n4 Pawpatch Recruit\n4 Practiced Offense\n2 Seam Rip\n3 Surrak, Elusive Hunter\n3 Spider Manifestation\n1 Ba Sing Se\n2 Plains\n4 Hushwood Verge\n4 Llanowar Elves\n2 Jennifer Walters\n4 Brightglass Gearhulk\n4 Leatherhead, Swamp Stalker\n4 Temple Garden",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -3393,7 +3283,7 @@
       ],
       "metaShare": 5,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #4"
+      "listNote": "MTGO Standard Challenge 32 · Searzist"
     },
     "alchemy-bo1-azorius-tempo": {
       "id": "alchemy-bo1-azorius-tempo",
@@ -4052,10 +3942,6 @@
         },
         {
           "count": 3,
-          "name": "Fable of the Mirror-Breaker"
-        },
-        {
-          "count": 3,
           "name": "Sheoldred, the Apocalypse"
         },
         {
@@ -4134,7 +4020,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Deep-Cavern Bat\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Go for the Throat\n3 Cut Down\n3 Torch the Tower\n2 Duress\n4 Blackcleave Cliffs\n4 Sulfurous Springs\n3 Restless Vents\n4 Swamp\n4 Mountain\n3 Blightstep Pathway\n2 Takenuma, Abandoned Mire\n2 Screaming Nemesis\n2 Gix's Command\n2 Den of the Bugbear",
+      "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Deep-Cavern Bat\n3 Sheoldred, the Apocalypse\n4 Go for the Throat\n3 Cut Down\n3 Torch the Tower\n2 Duress\n4 Blackcleave Cliffs\n4 Sulfurous Springs\n3 Restless Vents\n4 Swamp\n4 Mountain\n3 Blightstep Pathway\n2 Takenuma, Abandoned Mire\n2 Screaming Nemesis\n2 Gix's Command\n2 Den of the Bugbear",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -4178,10 +4064,6 @@
         {
           "count": 4,
           "name": "Deep-Cavern Bat"
-        },
-        {
-          "count": 3,
-          "name": "Fable of the Mirror-Breaker"
         },
         {
           "count": 3,
@@ -4288,7 +4170,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Deep-Cavern Bat\n3 Fable of the Mirror-Breaker\n3 Sheoldred, the Apocalypse\n4 Go for the Throat\n3 Cut Down\n3 Torch the Tower\n2 Duress\n4 Blackcleave Cliffs\n4 Sulfurous Springs\n3 Restless Vents\n4 Swamp\n4 Mountain\n3 Blightstep Pathway\n2 Takenuma, Abandoned Mire\n2 Screaming Nemesis\n2 Gix's Command\n2 Den of the Bugbear",
+      "arenaImport": "Deck\n4 Bloodtithe Harvester\n4 Deep-Cavern Bat\n3 Sheoldred, the Apocalypse\n4 Go for the Throat\n3 Cut Down\n3 Torch the Tower\n2 Duress\n4 Blackcleave Cliffs\n4 Sulfurous Springs\n3 Restless Vents\n4 Swamp\n4 Mountain\n3 Blightstep Pathway\n2 Takenuma, Abandoned Mire\n2 Screaming Nemesis\n2 Gix's Command\n2 Den of the Bugbear",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -10013,7 +9895,7 @@
         "R"
       ],
       "archetype": "Boros Heroic",
-      "description": "Heroic pump and protection. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
+      "description": "Heroic pump and protection — no rotated one-drops. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
           "count": 2,
@@ -10150,7 +10032,7 @@
         "R"
       ],
       "archetype": "Boros Heroic",
-      "description": "Heroic pump and protection. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
+      "description": "Heroic pump and protection — no rotated one-drops. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
           "count": 2,
@@ -10674,144 +10556,99 @@
       "description": "Entomb into Archon / Atraxa. Daily rank #1 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Modern"
+          "count": 4,
+          "name": "Wasteland"
         },
         {
           "count": 1,
-          "name": "Modern"
+          "name": "Verdant Catacombs"
         },
         {
           "count": 4,
-          "name": "Slickshot Show-Off 4 Dragon's Rage Channeler 4 Cor"
+          "name": "Underground Sea"
         },
         {
-          "count": 2,
-          "name": "Scalding Tarn 1 Violent Urge 1 Flashback 4 Preorda"
+          "count": 1,
+          "name": "Undercity Sewers"
         },
         {
           "count": 4,
-          "name": "Lightning Bolt 4 Mutagenic Growth 4 Expressive Ite"
+          "name": "Thoughtseize"
         },
         {
           "count": 1,
-          "name": "Thundering Falls 3 Bloodstained Mire 2 Arid Mesa 3"
+          "name": "Swamp"
         },
         {
           "count": 4,
-          "name": "Mishra's Bauble 2 Fiery Islet 3 Mountain 4 Lava Da"
+          "name": "Flow State"
         },
         {
           "count": 3,
-          "name": "Consign to Memory 1 Assault Strobe 1 Unholy Heat 3"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Spell Snare 2 Meltdown 1 Mystical D"
-        },
-        {
-          "count": 1,
-          "name": "Into the Flood Maw 1 Fire Magic 4 Ajani, Nacat"
-        },
-        {
-          "count": 1,
-          "name": "Arena of Glory 4 Arid Mesa 2 Elegant Parlor 4 Floo"
+          "name": "Ponder"
         },
         {
           "count": 4,
-          "name": "Galvanic Discharge 3 Goblin Bombardment 4 Guide of"
+          "name": "Polluted Delta"
         },
         {
           "count": 3,
-          "name": "Marsh Flats 1 Mountain 4 Ocelot Pride 3 Plains 4 R"
+          "name": "Orcish Bowmasters"
+        },
+        {
+          "count": 2,
+          "name": "Murktide Regent"
+        },
+        {
+          "count": 1,
+          "name": "Island"
+        },
+        {
+          "count": 4,
+          "name": "Force of Will"
+        },
+        {
+          "count": 2,
+          "name": "Flooded Strand"
+        },
+        {
+          "count": 4,
+          "name": "Tamiyo, Inquisitive Student"
         },
         {
           "count": 3,
-          "name": "Sacred Foundry 2 Seasoned Pyromancer 2 Thraben Cha"
-        },
-        {
-          "count": 2,
-          "name": "Ranger-Captain of Eos 2 Dalkovan Encampment 2 Bloo"
-        },
-        {
-          "count": 1,
-          "name": "Solitude 1 Fable of the Mirror-Breaker 2 Rest in P"
-        },
-        {
-          "count": 1,
-          "name": "Celestial Purge 3 Obsidian Charmaw 1 High Noon 1 O"
-        },
-        {
-          "count": 1,
-          "name": "The Legend of Roku 2 Vexing Bauble 2 Wrath of the"
-        },
-        {
-          "count": 2,
-          "name": "Wear // Tear 2 Cavern of Souls 4 Basking Brood"
+          "name": "Fatal Push"
         },
         {
           "count": 3,
-          "name": "Blade of the Bloodchief 1 Boseiju, Who Endures 4 E"
+          "name": "Daze"
+        },
+        {
+          "count": 4,
+          "name": "Brainstorm"
         },
         {
           "count": 1,
-          "name": "Commercial District 4 Grove of the Burnwillows 2 E"
-        },
-        {
-          "count": 2,
-          "name": "Writhing Chrysalis 4 Glaring Fleshraker 1 Verdant"
-        },
-        {
-          "count": 1,
-          "name": "Haywire Mite 4 Kozilek's Command 4 Malevolent Rumb"
-        },
-        {
-          "count": 2,
-          "name": "Stomping Ground 3 Unholy Heat 4 Urza's Saga 1 Wind"
+          "name": "Bloodstained Mire"
         },
         {
           "count": 3,
-          "name": "Vexing Bauble 1 Walking Ballista 1 Wooded Foothill"
+          "name": "Nethergoyf"
+        },
+        {
+          "count": 1,
+          "name": "Snuff Out"
         },
         {
           "count": 2,
-          "name": "Forest 4 Ancient Stirrings 2 Soulless Jailer 1 Thi"
+          "name": "Kaito, Bane of Nightmares"
         },
         {
           "count": 1,
-          "name": "Pithing Needle 2 Veil of Summer 1 Grafdigger's Cag"
-        },
-        {
-          "count": 1,
-          "name": "Unholy Heat 1 Vexing Bauble 1 Warping Wail 1 Fire"
-        },
-        {
-          "count": 1,
-          "name": "Writhing Chrysalis 1 Soul-Guide Lantern 4 Bask"
+          "name": "Barrowgoyf"
         }
       ],
-      "sideboard": [
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures 4 Devourer of Destiny 4 Emrak"
-        },
-        {
-          "count": 4,
-          "name": "Forest 4 Glaring Fleshraker 1 Haywire Mite 4 Kozil"
-        },
-        {
-          "count": 4,
-          "name": "Malevolent Rumble 4 Eldrazi Temple 1 Cavern of Sou"
-        },
-        {
-          "count": 1,
-          "name": "Pithing Needle 4 Vexing Bauble 1 Walking Ballista"
-        },
-        {
-          "count": 4,
-          "name": "Ugin's Labyrinth 4 Grove of the Burnwillows 2 Warp"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Death's Shadow",
@@ -10830,11 +10667,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Modern\n1 Modern\n4 Slickshot Show-Off 4 Dragon's Rage Channeler 4 Cor\n2 Scalding Tarn 1 Violent Urge 1 Flashback 4 Preorda\n4 Lightning Bolt 4 Mutagenic Growth 4 Expressive Ite\n1 Thundering Falls 3 Bloodstained Mire 2 Arid Mesa 3\n4 Mishra's Bauble 2 Fiery Islet 3 Mountain 4 Lava Da\n3 Consign to Memory 1 Assault Strobe 1 Unholy Heat 3\n1 Spell Pierce 1 Spell Snare 2 Meltdown 1 Mystical D\n1 Into the Flood Maw 1 Fire Magic 4 Ajani, Nacat\n1 Arena of Glory 4 Arid Mesa 2 Elegant Parlor 4 Floo\n4 Galvanic Discharge 3 Goblin Bombardment 4 Guide of\n3 Marsh Flats 1 Mountain 4 Ocelot Pride 3 Plains 4 R\n3 Sacred Foundry 2 Seasoned Pyromancer 2 Thraben Cha\n2 Ranger-Captain of Eos 2 Dalkovan Encampment 2 Bloo\n1 Solitude 1 Fable of the Mirror-Breaker 2 Rest in P\n1 Celestial Purge 3 Obsidian Charmaw 1 High Noon 1 O\n1 The Legend of Roku 2 Vexing Bauble 2 Wrath of the\n2 Wear // Tear 2 Cavern of Souls 4 Basking Brood\n3 Blade of the Bloodchief 1 Boseiju, Who Endures 4 E\n1 Commercial District 4 Grove of the Burnwillows 2 E\n2 Writhing Chrysalis 4 Glaring Fleshraker 1 Verdant\n1 Haywire Mite 4 Kozilek's Command 4 Malevolent Rumb\n2 Stomping Ground 3 Unholy Heat 4 Urza's Saga 1 Wind\n3 Vexing Bauble 1 Walking Ballista 1 Wooded Foothill\n2 Forest 4 Ancient Stirrings 2 Soulless Jailer 1 Thi\n1 Pithing Needle 2 Veil of Summer 1 Grafdigger's Cag\n1 Unholy Heat 1 Vexing Bauble 1 Warping Wail 1 Fire\n1 Writhing Chrysalis 1 Soul-Guide Lantern 4 Bask\n\nSideboard\n2 Boseiju, Who Endures 4 Devourer of Destiny 4 Emrak\n4 Forest 4 Glaring Fleshraker 1 Haywire Mite 4 Kozil\n4 Malevolent Rumble 4 Eldrazi Temple 1 Cavern of Sou\n1 Pithing Needle 4 Vexing Bauble 1 Walking Ballista\n4 Ugin's Labyrinth 4 Grove of the Burnwillows 2 Warp",
+      "arenaImport": "Deck\n4 Wasteland\n1 Verdant Catacombs\n4 Underground Sea\n1 Undercity Sewers\n4 Thoughtseize\n1 Swamp\n4 Flow State\n3 Ponder\n4 Polluted Delta\n3 Orcish Bowmasters\n2 Murktide Regent\n1 Island\n4 Force of Will\n2 Flooded Strand\n4 Tamiyo, Inquisitive Student\n3 Fatal Push\n3 Daze\n4 Brainstorm\n1 Bloodstained Mire\n3 Nethergoyf\n1 Snuff Out\n2 Kaito, Bane of Nightmares\n1 Barrowgoyf",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/2026-magic-online-champions-showcase-season-1-modern-decklists"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/legacy-showcase-challenge-2026-07-0412846445"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -10855,7 +10692,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #1"
+      "listNote": "MTGO Legacy Showcase Challenge · Aced5"
     },
     "timeless-bo3-reanimator": {
       "id": "timeless-bo3-reanimator",
@@ -10872,144 +10709,91 @@
       "description": "Entomb into Archon / Atraxa. Daily rank #4 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Modern"
+          "count": 4,
+          "name": "Atraxa, Grand Unifier"
         },
         {
           "count": 1,
-          "name": "Modern"
+          "name": "Archon of Cruelty"
+        },
+        {
+          "count": 3,
+          "name": "Bloodstained Mire"
+        },
+        {
+          "count": 2,
+          "name": "Badlands"
+        },
+        {
+          "count": 2,
+          "name": "Cabal Therapy"
         },
         {
           "count": 4,
-          "name": "Slickshot Show-Off 4 Dragon's Rage Channeler 4 Cor"
-        },
-        {
-          "count": 2,
-          "name": "Scalding Tarn 1 Violent Urge 1 Flashback 4 Preorda"
+          "name": "Griselbrand"
         },
         {
           "count": 4,
-          "name": "Lightning Bolt 4 Mutagenic Growth 4 Expressive Ite"
-        },
-        {
-          "count": 1,
-          "name": "Thundering Falls 3 Bloodstained Mire 2 Arid Mesa 3"
+          "name": "Thoughtseize"
         },
         {
           "count": 4,
-          "name": "Mishra's Bauble 2 Fiery Islet 3 Mountain 4 Lava Da"
+          "name": "Lotus Petal"
         },
         {
-          "count": 3,
-          "name": "Consign to Memory 1 Assault Strobe 1 Unholy Heat 3"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce 1 Spell Snare 2 Meltdown 1 Mystical D"
+          "count": 2,
+          "name": "Raph & Mikey, Troublemakers"
         },
         {
           "count": 1,
-          "name": "Into the Flood Maw 1 Fire Magic 4 Ajani, Nacat"
-        },
-        {
-          "count": 1,
-          "name": "Arena of Glory 4 Arid Mesa 2 Elegant Parlor 4 Floo"
+          "name": "Raucous Theater"
         },
         {
           "count": 4,
-          "name": "Galvanic Discharge 3 Goblin Bombardment 4 Guide of"
+          "name": "Unmask"
         },
         {
-          "count": 3,
-          "name": "Marsh Flats 1 Mountain 4 Ocelot Pride 3 Plains 4 R"
+          "count": 4,
+          "name": "Shallow Grave"
         },
         {
-          "count": 3,
-          "name": "Sacred Foundry 2 Seasoned Pyromancer 2 Thraben Cha"
+          "count": 4,
+          "name": "Faithless Looting"
+        },
+        {
+          "count": 4,
+          "name": "Dark Ritual"
+        },
+        {
+          "count": 1,
+          "name": "Undercity Sewers"
+        },
+        {
+          "count": 1,
+          "name": "Underground Sea"
+        },
+        {
+          "count": 4,
+          "name": "Animate Dead"
+        },
+        {
+          "count": 4,
+          "name": "Polluted Delta"
+        },
+        {
+          "count": 4,
+          "name": "Reanimate"
+        },
+        {
+          "count": 1,
+          "name": "Koma, World-Eater"
         },
         {
           "count": 2,
-          "name": "Ranger-Captain of Eos 2 Dalkovan Encampment 2 Bloo"
-        },
-        {
-          "count": 1,
-          "name": "Solitude 1 Fable of the Mirror-Breaker 2 Rest in P"
-        },
-        {
-          "count": 1,
-          "name": "Celestial Purge 3 Obsidian Charmaw 1 High Noon 1 O"
-        },
-        {
-          "count": 1,
-          "name": "The Legend of Roku 2 Vexing Bauble 2 Wrath of the"
-        },
-        {
-          "count": 2,
-          "name": "Wear // Tear 2 Cavern of Souls 4 Basking Brood"
-        },
-        {
-          "count": 3,
-          "name": "Blade of the Bloodchief 1 Boseiju, Who Endures 4 E"
-        },
-        {
-          "count": 1,
-          "name": "Commercial District 4 Grove of the Burnwillows 2 E"
-        },
-        {
-          "count": 2,
-          "name": "Writhing Chrysalis 4 Glaring Fleshraker 1 Verdant"
-        },
-        {
-          "count": 1,
-          "name": "Haywire Mite 4 Kozilek's Command 4 Malevolent Rumb"
-        },
-        {
-          "count": 2,
-          "name": "Stomping Ground 3 Unholy Heat 4 Urza's Saga 1 Wind"
-        },
-        {
-          "count": 3,
-          "name": "Vexing Bauble 1 Walking Ballista 1 Wooded Foothill"
-        },
-        {
-          "count": 2,
-          "name": "Forest 4 Ancient Stirrings 2 Soulless Jailer 1 Thi"
-        },
-        {
-          "count": 1,
-          "name": "Pithing Needle 2 Veil of Summer 1 Grafdigger's Cag"
-        },
-        {
-          "count": 1,
-          "name": "Unholy Heat 1 Vexing Bauble 1 Warping Wail 1 Fire"
-        },
-        {
-          "count": 1,
-          "name": "Writhing Chrysalis 1 Soul-Guide Lantern 4 Bask"
+          "name": "Swamp"
         }
       ],
-      "sideboard": [
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures 4 Devourer of Destiny 4 Emrak"
-        },
-        {
-          "count": 4,
-          "name": "Forest 4 Glaring Fleshraker 1 Haywire Mite 4 Kozil"
-        },
-        {
-          "count": 4,
-          "name": "Malevolent Rumble 4 Eldrazi Temple 1 Cavern of Sou"
-        },
-        {
-          "count": 1,
-          "name": "Pithing Needle 4 Vexing Bauble 1 Walking Ballista"
-        },
-        {
-          "count": 4,
-          "name": "Ugin's Labyrinth 4 Grove of the Burnwillows 2 Warp"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Death's Shadow",
@@ -11053,11 +10837,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Modern\n1 Modern\n4 Slickshot Show-Off 4 Dragon's Rage Channeler 4 Cor\n2 Scalding Tarn 1 Violent Urge 1 Flashback 4 Preorda\n4 Lightning Bolt 4 Mutagenic Growth 4 Expressive Ite\n1 Thundering Falls 3 Bloodstained Mire 2 Arid Mesa 3\n4 Mishra's Bauble 2 Fiery Islet 3 Mountain 4 Lava Da\n3 Consign to Memory 1 Assault Strobe 1 Unholy Heat 3\n1 Spell Pierce 1 Spell Snare 2 Meltdown 1 Mystical D\n1 Into the Flood Maw 1 Fire Magic 4 Ajani, Nacat\n1 Arena of Glory 4 Arid Mesa 2 Elegant Parlor 4 Floo\n4 Galvanic Discharge 3 Goblin Bombardment 4 Guide of\n3 Marsh Flats 1 Mountain 4 Ocelot Pride 3 Plains 4 R\n3 Sacred Foundry 2 Seasoned Pyromancer 2 Thraben Cha\n2 Ranger-Captain of Eos 2 Dalkovan Encampment 2 Bloo\n1 Solitude 1 Fable of the Mirror-Breaker 2 Rest in P\n1 Celestial Purge 3 Obsidian Charmaw 1 High Noon 1 O\n1 The Legend of Roku 2 Vexing Bauble 2 Wrath of the\n2 Wear // Tear 2 Cavern of Souls 4 Basking Brood\n3 Blade of the Bloodchief 1 Boseiju, Who Endures 4 E\n1 Commercial District 4 Grove of the Burnwillows 2 E\n2 Writhing Chrysalis 4 Glaring Fleshraker 1 Verdant\n1 Haywire Mite 4 Kozilek's Command 4 Malevolent Rumb\n2 Stomping Ground 3 Unholy Heat 4 Urza's Saga 1 Wind\n3 Vexing Bauble 1 Walking Ballista 1 Wooded Foothill\n2 Forest 4 Ancient Stirrings 2 Soulless Jailer 1 Thi\n1 Pithing Needle 2 Veil of Summer 1 Grafdigger's Cag\n1 Unholy Heat 1 Vexing Bauble 1 Warping Wail 1 Fire\n1 Writhing Chrysalis 1 Soul-Guide Lantern 4 Bask\n\nSideboard\n2 Boseiju, Who Endures 4 Devourer of Destiny 4 Emrak\n4 Forest 4 Glaring Fleshraker 1 Haywire Mite 4 Kozil\n4 Malevolent Rumble 4 Eldrazi Temple 1 Cavern of Sou\n1 Pithing Needle 4 Vexing Bauble 1 Walking Ballista\n4 Ugin's Labyrinth 4 Grove of the Burnwillows 2 Warp",
+      "arenaImport": "Deck\n4 Atraxa, Grand Unifier\n1 Archon of Cruelty\n3 Bloodstained Mire\n2 Badlands\n2 Cabal Therapy\n4 Griselbrand\n4 Thoughtseize\n4 Lotus Petal\n2 Raph & Mikey, Troublemakers\n1 Raucous Theater\n4 Unmask\n4 Shallow Grave\n4 Faithless Looting\n4 Dark Ritual\n1 Undercity Sewers\n1 Underground Sea\n4 Animate Dead\n4 Polluted Delta\n4 Reanimate\n1 Koma, World-Eater\n2 Swamp",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/2026-magic-online-champions-showcase-season-1-modern-decklists"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/legacy-showcase-challenge-2026-07-0412846445"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -11078,7 +10862,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #1"
+      "listNote": "MTGO Legacy Showcase Challenge · firstshot"
     },
     "timeless-bo1-death-s-shadow": {
       "id": "timeless-bo1-death-s-shadow",
@@ -11097,99 +10881,143 @@
       "mainboard": [
         {
           "count": 1,
-          "name": "Bojuka Bog"
+          "name": "Volcanic Island"
+        },
+        {
+          "count": 4,
+          "name": "Lórien Revealed"
+        },
+        {
+          "count": 4,
+          "name": "Leyline Binding"
+        },
+        {
+          "count": 4,
+          "name": "Flooded Strand"
+        },
+        {
+          "count": 2,
+          "name": "Island"
+        },
+        {
+          "count": 1,
+          "name": "Xander's Lounge"
+        },
+        {
+          "count": 1,
+          "name": "Meticulous Archive"
         },
         {
           "count": 3,
-          "name": "Dark Depths"
-        },
-        {
-          "count": 4,
-          "name": "Urza's Saga"
-        },
-        {
-          "count": 4,
-          "name": "Yavimaya, Cradle of Growth"
-        },
-        {
-          "count": 4,
-          "name": "Mox Diamond"
+          "name": "Quantum Riddler"
         },
         {
           "count": 1,
-          "name": "The Tabernacle at Pendrell Vale"
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Polluted Delta"
         },
         {
           "count": 4,
-          "name": "Thespian's Stage"
+          "name": "Ponder"
         },
         {
           "count": 1,
-          "name": "Expedition Map"
+          "name": "Savannah"
         },
         {
           "count": 4,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 4,
-          "name": "Crop Rotation"
+          "name": "Brainstorm"
         },
         {
           "count": 1,
-          "name": "Pithing Needle"
+          "name": "Mystic Sanctuary"
         },
         {
-          "count": 1,
-          "name": "Maze of Ith"
+          "count": 2,
+          "name": "Tropical Island"
+        },
+        {
+          "count": 2,
+          "name": "Tundra"
+        },
+        {
+          "count": 2,
+          "name": "Phelia, Exuberant Shepherd"
         },
         {
           "count": 4,
+          "name": "Up the Beanstalk"
+        },
+        {
+          "count": 3,
+          "name": "Force of Negation"
+        },
+        {
+          "count": 4,
+          "name": "Misty Rainforest"
+        },
+        {
+          "count": 2,
+          "name": "Tamiyo, Inquisitive Student"
+        },
+        {
+          "count": 4,
+          "name": "Swords to Plowshares"
+        },
+        {
+          "count": 2,
+          "name": "Uro, Titan of Nature's Wrath"
+        },
+        {
+          "count": 4,
+          "name": "Force of Will"
+        },
+        {
+          "count": 2,
+          "name": "Windswept Heath"
+        },
+        {
+          "count": 3,
           "name": "Wasteland"
+        },
+        {
+          "count": 3,
+          "name": "Consign to Memory"
+        },
+        {
+          "count": 1,
+          "name": "Terminus"
+        },
+        {
+          "count": 1,
+          "name": "Wrath of the Skies"
+        },
+        {
+          "count": 2,
+          "name": "Flow State"
+        },
+        {
+          "count": 2,
+          "name": "Prismatic Ending"
         },
         {
           "count": 1,
           "name": "Forest"
         },
         {
-          "count": 4,
-          "name": "Sphere of Resistance"
-        },
-        {
-          "count": 4,
-          "name": "Life from the Loam"
-        },
-        {
-          "count": 4,
-          "name": "Exploration"
-        },
-        {
-          "count": 4,
-          "name": "Malevolent Rumble"
+          "count": 1,
+          "name": "Hedge Maze"
         },
         {
           "count": 1,
-          "name": "Karakas"
-        },
-        {
-          "count": 2,
-          "name": "Ancient Tomb"
+          "name": "Icetill Explorer"
         },
         {
           "count": 1,
-          "name": "Ghost Quarter"
-        },
-        {
-          "count": 1,
-          "name": "Skateboard"
-        },
-        {
-          "count": 1,
-          "name": "Grafdigger's Cage"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
+          "name": "Stifle"
         }
       ],
       "sideboard": [],
@@ -11211,7 +11039,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Bojuka Bog\n3 Dark Depths\n4 Urza's Saga\n4 Yavimaya, Cradle of Growth\n4 Mox Diamond\n1 The Tabernacle at Pendrell Vale\n4 Thespian's Stage\n1 Expedition Map\n4 Boseiju, Who Endures\n4 Crop Rotation\n1 Pithing Needle\n1 Maze of Ith\n4 Wasteland\n1 Forest\n4 Sphere of Resistance\n4 Life from the Loam\n4 Exploration\n4 Malevolent Rumble\n1 Karakas\n2 Ancient Tomb\n1 Ghost Quarter\n1 Skateboard\n1 Grafdigger's Cage\n1 Otawara, Soaring City",
+      "arenaImport": "Deck\n1 Volcanic Island\n4 Lórien Revealed\n4 Leyline Binding\n4 Flooded Strand\n2 Island\n1 Xander's Lounge\n1 Meticulous Archive\n3 Quantum Riddler\n1 Plains\n2 Polluted Delta\n4 Ponder\n1 Savannah\n4 Brainstorm\n1 Mystic Sanctuary\n2 Tropical Island\n2 Tundra\n2 Phelia, Exuberant Shepherd\n4 Up the Beanstalk\n3 Force of Negation\n4 Misty Rainforest\n2 Tamiyo, Inquisitive Student\n4 Swords to Plowshares\n2 Uro, Titan of Nature's Wrath\n4 Force of Will\n2 Windswept Heath\n3 Wasteland\n3 Consign to Memory\n1 Terminus\n1 Wrath of the Skies\n2 Flow State\n2 Prismatic Ending\n1 Forest\n1 Hedge Maze\n1 Icetill Explorer\n1 Stifle",
       "sources": [
         {
           "name": "MTGO official",
@@ -11236,7 +11064,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · Sprouts"
+      "listNote": "MTGO Legacy Showcase Challenge · McWinSauce"
     },
     "timeless-bo3-death-s-shadow": {
       "id": "timeless-bo3-death-s-shadow",
@@ -11255,99 +11083,143 @@
       "mainboard": [
         {
           "count": 1,
-          "name": "Bojuka Bog"
+          "name": "Volcanic Island"
+        },
+        {
+          "count": 4,
+          "name": "Lórien Revealed"
+        },
+        {
+          "count": 4,
+          "name": "Leyline Binding"
+        },
+        {
+          "count": 4,
+          "name": "Flooded Strand"
+        },
+        {
+          "count": 2,
+          "name": "Island"
+        },
+        {
+          "count": 1,
+          "name": "Xander's Lounge"
+        },
+        {
+          "count": 1,
+          "name": "Meticulous Archive"
         },
         {
           "count": 3,
-          "name": "Dark Depths"
-        },
-        {
-          "count": 4,
-          "name": "Urza's Saga"
-        },
-        {
-          "count": 4,
-          "name": "Yavimaya, Cradle of Growth"
-        },
-        {
-          "count": 4,
-          "name": "Mox Diamond"
+          "name": "Quantum Riddler"
         },
         {
           "count": 1,
-          "name": "The Tabernacle at Pendrell Vale"
+          "name": "Plains"
+        },
+        {
+          "count": 2,
+          "name": "Polluted Delta"
         },
         {
           "count": 4,
-          "name": "Thespian's Stage"
+          "name": "Ponder"
         },
         {
           "count": 1,
-          "name": "Expedition Map"
+          "name": "Savannah"
         },
         {
           "count": 4,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 4,
-          "name": "Crop Rotation"
+          "name": "Brainstorm"
         },
         {
           "count": 1,
-          "name": "Pithing Needle"
+          "name": "Mystic Sanctuary"
         },
         {
-          "count": 1,
-          "name": "Maze of Ith"
+          "count": 2,
+          "name": "Tropical Island"
+        },
+        {
+          "count": 2,
+          "name": "Tundra"
+        },
+        {
+          "count": 2,
+          "name": "Phelia, Exuberant Shepherd"
         },
         {
           "count": 4,
+          "name": "Up the Beanstalk"
+        },
+        {
+          "count": 3,
+          "name": "Force of Negation"
+        },
+        {
+          "count": 4,
+          "name": "Misty Rainforest"
+        },
+        {
+          "count": 2,
+          "name": "Tamiyo, Inquisitive Student"
+        },
+        {
+          "count": 4,
+          "name": "Swords to Plowshares"
+        },
+        {
+          "count": 2,
+          "name": "Uro, Titan of Nature's Wrath"
+        },
+        {
+          "count": 4,
+          "name": "Force of Will"
+        },
+        {
+          "count": 2,
+          "name": "Windswept Heath"
+        },
+        {
+          "count": 3,
           "name": "Wasteland"
+        },
+        {
+          "count": 3,
+          "name": "Consign to Memory"
+        },
+        {
+          "count": 1,
+          "name": "Terminus"
+        },
+        {
+          "count": 1,
+          "name": "Wrath of the Skies"
+        },
+        {
+          "count": 2,
+          "name": "Flow State"
+        },
+        {
+          "count": 2,
+          "name": "Prismatic Ending"
         },
         {
           "count": 1,
           "name": "Forest"
         },
         {
-          "count": 4,
-          "name": "Sphere of Resistance"
-        },
-        {
-          "count": 4,
-          "name": "Life from the Loam"
-        },
-        {
-          "count": 4,
-          "name": "Exploration"
-        },
-        {
-          "count": 4,
-          "name": "Malevolent Rumble"
+          "count": 1,
+          "name": "Hedge Maze"
         },
         {
           "count": 1,
-          "name": "Karakas"
-        },
-        {
-          "count": 2,
-          "name": "Ancient Tomb"
+          "name": "Icetill Explorer"
         },
         {
           "count": 1,
-          "name": "Ghost Quarter"
-        },
-        {
-          "count": 1,
-          "name": "Skateboard"
-        },
-        {
-          "count": 1,
-          "name": "Grafdigger's Cage"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
+          "name": "Stifle"
         }
       ],
       "sideboard": [],
@@ -11394,7 +11266,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Bojuka Bog\n3 Dark Depths\n4 Urza's Saga\n4 Yavimaya, Cradle of Growth\n4 Mox Diamond\n1 The Tabernacle at Pendrell Vale\n4 Thespian's Stage\n1 Expedition Map\n4 Boseiju, Who Endures\n4 Crop Rotation\n1 Pithing Needle\n1 Maze of Ith\n4 Wasteland\n1 Forest\n4 Sphere of Resistance\n4 Life from the Loam\n4 Exploration\n4 Malevolent Rumble\n1 Karakas\n2 Ancient Tomb\n1 Ghost Quarter\n1 Skateboard\n1 Grafdigger's Cage\n1 Otawara, Soaring City",
+      "arenaImport": "Deck\n1 Volcanic Island\n4 Lórien Revealed\n4 Leyline Binding\n4 Flooded Strand\n2 Island\n1 Xander's Lounge\n1 Meticulous Archive\n3 Quantum Riddler\n1 Plains\n2 Polluted Delta\n4 Ponder\n1 Savannah\n4 Brainstorm\n1 Mystic Sanctuary\n2 Tropical Island\n2 Tundra\n2 Phelia, Exuberant Shepherd\n4 Up the Beanstalk\n3 Force of Negation\n4 Misty Rainforest\n2 Tamiyo, Inquisitive Student\n4 Swords to Plowshares\n2 Uro, Titan of Nature's Wrath\n4 Force of Will\n2 Windswept Heath\n3 Wasteland\n3 Consign to Memory\n1 Terminus\n1 Wrath of the Skies\n2 Flow State\n2 Prismatic Ending\n1 Forest\n1 Hedge Maze\n1 Icetill Explorer\n1 Stifle",
       "sources": [
         {
           "name": "MTGO official",
@@ -11419,7 +11291,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · Sprouts"
+      "listNote": "MTGO Legacy Showcase Challenge · McWinSauce"
     },
     "timeless-bo1-show-and-tell": {
       "id": "timeless-bo1-show-and-tell",
@@ -11435,104 +11307,103 @@
       "description": "Omniscience / Emrakul packages. Daily rank #3 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 2,
-          "name": "Soulless Jailer 1 Gemstone Caverns 3 Thought-Knot"
+          "count": 1,
+          "name": "Bojuka Bog"
+        },
+        {
+          "count": 3,
+          "name": "Dark Depths"
+        },
+        {
+          "count": 4,
+          "name": "Urza's Saga"
+        },
+        {
+          "count": 4,
+          "name": "Yavimaya, Cradle of Growth"
+        },
+        {
+          "count": 4,
+          "name": "Mox Diamond"
         },
         {
           "count": 1,
-          "name": "Grafdigger's Cage 1 Cavern of Souls 2 Warping Wail"
+          "name": "The Tabernacle at Pendrell Vale"
+        },
+        {
+          "count": 4,
+          "name": "Thespian's Stage"
         },
         {
           "count": 1,
-          "name": "Springleaf Drum 4 Basking Broodscale 1 Soul-Guide"
+          "name": "Expedition Map"
         },
         {
           "count": 4,
-          "name": "Malevolent Rumble 4 Eldrazi Temple 4 Grove of the"
-        },
-        {
-          "count": 3,
-          "name": "Emrakul, the Promised End 4 Glaring Fleshraker 1 H"
+          "name": "Boseiju, Who Endures"
         },
         {
           "count": 4,
-          "name": "Kozilek's Command 1 Boseiju, Who Endures 4 Blade o"
-        },
-        {
-          "count": 4,
-          "name": "Sowing Mycospawn 4 Ancient Stirrings 4 Urza's Saga"
-        },
-        {
-          "count": 4,
-          "name": "Forest 4 Prismatic Vista 1 Wastes 1 Walking Ballis"
-        },
-        {
-          "count": 2,
-          "name": "Sire of Seven Deaths 2 Thief of Existence 1 Pithin"
-        },
-        {
-          "count": 3,
-          "name": "Nature's Claim 1 Grafdigger's Cage 1 Soulless Jail"
+          "name": "Crop Rotation"
         },
         {
           "count": 1,
-          "name": "Cavern of Souls 1 Gemstone Caverns 1 Vexing Bauble"
+          "name": "Pithing Needle"
         },
         {
-          "count": 2,
-          "name": "Arcbound Ravager 3 Claws of Gix 1 Krang, Master Mi"
-        },
-        {
-          "count": 4,
-          "name": "Mox Opal 4 Kappa Cannoneer 4 Mishra's Bauble 2 Ste"
+          "count": 1,
+          "name": "Maze of Ith"
         },
         {
           "count": 4,
-          "name": "Pinnacle Emissary 1 Pithing Needle 1 Shadowspear 1"
+          "name": "Wasteland"
         },
         {
-          "count": 3,
-          "name": "Spirebluff Canal 3 Tormod's Crypt 4 Urza's Saga 4"
-        },
-        {
-          "count": 4,
-          "name": "Engineered Explosives 3 Metallic Rebuke 1 Welding"
-        },
-        {
-          "count": 3,
-          "name": "Emry, Lurker of the Loch 2 Island 1 Shivan Reef 3"
-        },
-        {
-          "count": 2,
-          "name": "Whipflare 3 Consign to Memory 1 Mystical Dispute 2"
-        },
-        {
-          "count": 2,
-          "name": "Galvanic Blast 2 Force of Negation 2 Wooded Fo"
-        },
-        {
-          "count": 2,
-          "name": "Wish 1 Sunbaked Canyon 2 Scalding Tarn 1 Sacred Fo"
+          "count": 1,
+          "name": "Forest"
         },
         {
           "count": 4,
-          "name": "Ruby Medallion 2 Flashback 4 Reckless Impulse 2 Gl"
+          "name": "Sphere of Resistance"
+        },
+        {
+          "count": 4,
+          "name": "Life from the Loam"
+        },
+        {
+          "count": 4,
+          "name": "Exploration"
+        },
+        {
+          "count": 4,
+          "name": "Malevolent Rumble"
+        },
+        {
+          "count": 1,
+          "name": "Karakas"
+        },
+        {
+          "count": 2,
+          "name": "Ancient Tomb"
+        },
+        {
+          "count": 1,
+          "name": "Ghost Quarter"
+        },
+        {
+          "count": 1,
+          "name": "Skateboard"
+        },
+        {
+          "count": 1,
+          "name": "Grafdigger's Cage"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
-      "sideboard": [
-        {
-          "count": 4,
-          "name": "Ral, Monsoon Mage 4 Pyretic Ritual 3 Past in Flame"
-        },
-        {
-          "count": 4,
-          "name": "Manamorphose 1 Grapeshot 1 Gemstone Caverns 1 Eleg"
-        },
-        {
-          "count": 4,
-          "name": "Desperate Ritual 1 Thundering Falls 2 Bloodstained"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Reanimator",
@@ -11551,11 +11422,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n2 Soulless Jailer 1 Gemstone Caverns 3 Thought-Knot\n1 Grafdigger's Cage 1 Cavern of Souls 2 Warping Wail\n1 Springleaf Drum 4 Basking Broodscale 1 Soul-Guide\n4 Malevolent Rumble 4 Eldrazi Temple 4 Grove of the\n3 Emrakul, the Promised End 4 Glaring Fleshraker 1 H\n4 Kozilek's Command 1 Boseiju, Who Endures 4 Blade o\n4 Sowing Mycospawn 4 Ancient Stirrings 4 Urza's Saga\n4 Forest 4 Prismatic Vista 1 Wastes 1 Walking Ballis\n2 Sire of Seven Deaths 2 Thief of Existence 1 Pithin\n3 Nature's Claim 1 Grafdigger's Cage 1 Soulless Jail\n1 Cavern of Souls 1 Gemstone Caverns 1 Vexing Bauble\n2 Arcbound Ravager 3 Claws of Gix 1 Krang, Master Mi\n4 Mox Opal 4 Kappa Cannoneer 4 Mishra's Bauble 2 Ste\n4 Pinnacle Emissary 1 Pithing Needle 1 Shadowspear 1\n3 Spirebluff Canal 3 Tormod's Crypt 4 Urza's Saga 4\n4 Engineered Explosives 3 Metallic Rebuke 1 Welding\n3 Emry, Lurker of the Loch 2 Island 1 Shivan Reef 3\n2 Whipflare 3 Consign to Memory 1 Mystical Dispute 2\n2 Galvanic Blast 2 Force of Negation 2 Wooded Fo\n2 Wish 1 Sunbaked Canyon 2 Scalding Tarn 1 Sacred Fo\n4 Ruby Medallion 2 Flashback 4 Reckless Impulse 2 Gl\n\nSideboard\n4 Ral, Monsoon Mage 4 Pyretic Ritual 3 Past in Flame\n4 Manamorphose 1 Grapeshot 1 Gemstone Caverns 1 Eleg\n4 Desperate Ritual 1 Thundering Falls 2 Bloodstained",
+      "arenaImport": "Deck\n1 Bojuka Bog\n3 Dark Depths\n4 Urza's Saga\n4 Yavimaya, Cradle of Growth\n4 Mox Diamond\n1 The Tabernacle at Pendrell Vale\n4 Thespian's Stage\n1 Expedition Map\n4 Boseiju, Who Endures\n4 Crop Rotation\n1 Pithing Needle\n1 Maze of Ith\n4 Wasteland\n1 Forest\n4 Sphere of Resistance\n4 Life from the Loam\n4 Exploration\n4 Malevolent Rumble\n1 Karakas\n2 Ancient Tomb\n1 Ghost Quarter\n1 Skateboard\n1 Grafdigger's Cage\n1 Otawara, Soaring City",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/2026-magic-online-champions-showcase-season-1-modern-decklists"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/legacy-showcase-challenge-2026-07-0412846445"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -11576,7 +11447,7 @@
       ],
       "metaShare": 9,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #2"
+      "listNote": "MTGO Legacy Showcase Challenge · Sprouts"
     },
     "timeless-bo3-show-and-tell": {
       "id": "timeless-bo3-show-and-tell",
@@ -11592,104 +11463,103 @@
       "description": "Omniscience / Emrakul packages. Daily rank #6 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 2,
-          "name": "Soulless Jailer 1 Gemstone Caverns 3 Thought-Knot"
+          "count": 1,
+          "name": "Bojuka Bog"
+        },
+        {
+          "count": 3,
+          "name": "Dark Depths"
+        },
+        {
+          "count": 4,
+          "name": "Urza's Saga"
+        },
+        {
+          "count": 4,
+          "name": "Yavimaya, Cradle of Growth"
+        },
+        {
+          "count": 4,
+          "name": "Mox Diamond"
         },
         {
           "count": 1,
-          "name": "Grafdigger's Cage 1 Cavern of Souls 2 Warping Wail"
+          "name": "The Tabernacle at Pendrell Vale"
+        },
+        {
+          "count": 4,
+          "name": "Thespian's Stage"
         },
         {
           "count": 1,
-          "name": "Springleaf Drum 4 Basking Broodscale 1 Soul-Guide"
+          "name": "Expedition Map"
         },
         {
           "count": 4,
-          "name": "Malevolent Rumble 4 Eldrazi Temple 4 Grove of the"
-        },
-        {
-          "count": 3,
-          "name": "Emrakul, the Promised End 4 Glaring Fleshraker 1 H"
+          "name": "Boseiju, Who Endures"
         },
         {
           "count": 4,
-          "name": "Kozilek's Command 1 Boseiju, Who Endures 4 Blade o"
-        },
-        {
-          "count": 4,
-          "name": "Sowing Mycospawn 4 Ancient Stirrings 4 Urza's Saga"
-        },
-        {
-          "count": 4,
-          "name": "Forest 4 Prismatic Vista 1 Wastes 1 Walking Ballis"
-        },
-        {
-          "count": 2,
-          "name": "Sire of Seven Deaths 2 Thief of Existence 1 Pithin"
-        },
-        {
-          "count": 3,
-          "name": "Nature's Claim 1 Grafdigger's Cage 1 Soulless Jail"
+          "name": "Crop Rotation"
         },
         {
           "count": 1,
-          "name": "Cavern of Souls 1 Gemstone Caverns 1 Vexing Bauble"
+          "name": "Pithing Needle"
         },
         {
-          "count": 2,
-          "name": "Arcbound Ravager 3 Claws of Gix 1 Krang, Master Mi"
-        },
-        {
-          "count": 4,
-          "name": "Mox Opal 4 Kappa Cannoneer 4 Mishra's Bauble 2 Ste"
+          "count": 1,
+          "name": "Maze of Ith"
         },
         {
           "count": 4,
-          "name": "Pinnacle Emissary 1 Pithing Needle 1 Shadowspear 1"
+          "name": "Wasteland"
         },
         {
-          "count": 3,
-          "name": "Spirebluff Canal 3 Tormod's Crypt 4 Urza's Saga 4"
-        },
-        {
-          "count": 4,
-          "name": "Engineered Explosives 3 Metallic Rebuke 1 Welding"
-        },
-        {
-          "count": 3,
-          "name": "Emry, Lurker of the Loch 2 Island 1 Shivan Reef 3"
-        },
-        {
-          "count": 2,
-          "name": "Whipflare 3 Consign to Memory 1 Mystical Dispute 2"
-        },
-        {
-          "count": 2,
-          "name": "Galvanic Blast 2 Force of Negation 2 Wooded Fo"
-        },
-        {
-          "count": 2,
-          "name": "Wish 1 Sunbaked Canyon 2 Scalding Tarn 1 Sacred Fo"
+          "count": 1,
+          "name": "Forest"
         },
         {
           "count": 4,
-          "name": "Ruby Medallion 2 Flashback 4 Reckless Impulse 2 Gl"
+          "name": "Sphere of Resistance"
+        },
+        {
+          "count": 4,
+          "name": "Life from the Loam"
+        },
+        {
+          "count": 4,
+          "name": "Exploration"
+        },
+        {
+          "count": 4,
+          "name": "Malevolent Rumble"
+        },
+        {
+          "count": 1,
+          "name": "Karakas"
+        },
+        {
+          "count": 2,
+          "name": "Ancient Tomb"
+        },
+        {
+          "count": 1,
+          "name": "Ghost Quarter"
+        },
+        {
+          "count": 1,
+          "name": "Skateboard"
+        },
+        {
+          "count": 1,
+          "name": "Grafdigger's Cage"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City"
         }
       ],
-      "sideboard": [
-        {
-          "count": 4,
-          "name": "Ral, Monsoon Mage 4 Pyretic Ritual 3 Past in Flame"
-        },
-        {
-          "count": 4,
-          "name": "Manamorphose 1 Grapeshot 1 Gemstone Caverns 1 Eleg"
-        },
-        {
-          "count": 4,
-          "name": "Desperate Ritual 1 Thundering Falls 2 Bloodstained"
-        }
-      ],
+      "sideboard": [],
       "matchups": [
         {
           "vs": "Reanimator",
@@ -11733,11 +11603,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n2 Soulless Jailer 1 Gemstone Caverns 3 Thought-Knot\n1 Grafdigger's Cage 1 Cavern of Souls 2 Warping Wail\n1 Springleaf Drum 4 Basking Broodscale 1 Soul-Guide\n4 Malevolent Rumble 4 Eldrazi Temple 4 Grove of the\n3 Emrakul, the Promised End 4 Glaring Fleshraker 1 H\n4 Kozilek's Command 1 Boseiju, Who Endures 4 Blade o\n4 Sowing Mycospawn 4 Ancient Stirrings 4 Urza's Saga\n4 Forest 4 Prismatic Vista 1 Wastes 1 Walking Ballis\n2 Sire of Seven Deaths 2 Thief of Existence 1 Pithin\n3 Nature's Claim 1 Grafdigger's Cage 1 Soulless Jail\n1 Cavern of Souls 1 Gemstone Caverns 1 Vexing Bauble\n2 Arcbound Ravager 3 Claws of Gix 1 Krang, Master Mi\n4 Mox Opal 4 Kappa Cannoneer 4 Mishra's Bauble 2 Ste\n4 Pinnacle Emissary 1 Pithing Needle 1 Shadowspear 1\n3 Spirebluff Canal 3 Tormod's Crypt 4 Urza's Saga 4\n4 Engineered Explosives 3 Metallic Rebuke 1 Welding\n3 Emry, Lurker of the Loch 2 Island 1 Shivan Reef 3\n2 Whipflare 3 Consign to Memory 1 Mystical Dispute 2\n2 Galvanic Blast 2 Force of Negation 2 Wooded Fo\n2 Wish 1 Sunbaked Canyon 2 Scalding Tarn 1 Sacred Fo\n4 Ruby Medallion 2 Flashback 4 Reckless Impulse 2 Gl\n\nSideboard\n4 Ral, Monsoon Mage 4 Pyretic Ritual 3 Past in Flame\n4 Manamorphose 1 Grapeshot 1 Gemstone Caverns 1 Eleg\n4 Desperate Ritual 1 Thundering Falls 2 Bloodstained",
+      "arenaImport": "Deck\n1 Bojuka Bog\n3 Dark Depths\n4 Urza's Saga\n4 Yavimaya, Cradle of Growth\n4 Mox Diamond\n1 The Tabernacle at Pendrell Vale\n4 Thespian's Stage\n1 Expedition Map\n4 Boseiju, Who Endures\n4 Crop Rotation\n1 Pithing Needle\n1 Maze of Ith\n4 Wasteland\n1 Forest\n4 Sphere of Resistance\n4 Life from the Loam\n4 Exploration\n4 Malevolent Rumble\n1 Karakas\n2 Ancient Tomb\n1 Ghost Quarter\n1 Skateboard\n1 Grafdigger's Cage\n1 Otawara, Soaring City",
       "sources": [
         {
-          "name": "magic.gg official",
-          "url": "https://magic.gg/decklists/2026-magic-online-champions-showcase-season-1-modern-decklists"
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/legacy-showcase-challenge-2026-07-0412846445"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -11758,7 +11628,7 @@
       ],
       "metaShare": 9,
       "listQuality": "authoritative",
-      "listNote": "magic.gg ranked/official post · list #2"
+      "listNote": "MTGO Legacy Showcase Challenge · Sprouts"
     },
     "timeless-bo1-beanstalk-control": {
       "id": "timeless-bo1-beanstalk-control",
@@ -12107,52 +11977,16 @@
       "description": "White Weenie with The Initiative. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Forest"
-        },
-        {
-          "count": 1,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Talon Gates of Madara"
-        },
-        {
-          "count": 1,
-          "name": "Underground Mortuary"
-        },
-        {
-          "count": 3,
-          "name": "Wight of the Reliquary"
+          "count": 4,
+          "name": "Ajani, Nacatl Pariah"
         },
         {
           "count": 4,
-          "name": "Verdant Catacombs"
-        },
-        {
-          "count": 2,
-          "name": "Bayou"
-        },
-        {
-          "count": 4,
-          "name": "Wasteland"
+          "name": "Amped Raptor"
         },
         {
           "count": 1,
-          "name": "Marsh Flats"
-        },
-        {
-          "count": 1,
-          "name": "Windswept Heath"
-        },
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 3,
-          "name": "Fatal Push"
+          "name": "Badlands"
         },
         {
           "count": 4,
@@ -12160,55 +11994,79 @@
         },
         {
           "count": 3,
-          "name": "Elvish Reclaimer"
-        },
-        {
-          "count": 1,
-          "name": "Dryad Arbor"
-        },
-        {
-          "count": 1,
-          "name": "Bojuka Bog"
+          "name": "Cabal Therapy"
         },
         {
           "count": 4,
-          "name": "Hogaak, Arisen Necropolis"
+          "name": "Swords to Plowshares"
+        },
+        {
+          "count": 4,
+          "name": "Guide of Souls"
+        },
+        {
+          "count": 4,
+          "name": "Marsh Flats"
+        },
+        {
+          "count": 4,
+          "name": "Ocelot Pride"
         },
         {
           "count": 3,
-          "name": "Sylvan Safekeeper"
-        },
-        {
-          "count": 1,
-          "name": "Misty Rainforest"
-        },
-        {
-          "count": 4,
           "name": "Orcish Bowmasters"
         },
         {
-          "count": 4,
-          "name": "Stitcher's Supplier"
-        },
-        {
           "count": 1,
-          "name": "Polluted Delta"
-        },
-        {
-          "count": 1,
-          "name": "Eumidian Hatchery"
+          "name": "Plains"
         },
         {
           "count": 2,
-          "name": "Malevolent Rumble"
+          "name": "Scrubland"
         },
         {
-          "count": 3,
-          "name": "Once Upon a Time"
+          "count": 1,
+          "name": "Shadowy Backstreet"
+        },
+        {
+          "count": 1,
+          "name": "Elegant Parlor"
+        },
+        {
+          "count": 2,
+          "name": "Goblin Bombardment"
         },
         {
           "count": 4,
-          "name": "Moonshadow"
+          "name": "Arid Mesa"
+        },
+        {
+          "count": 3,
+          "name": "Voice of Victory"
+        },
+        {
+          "count": 4,
+          "name": "Wasteland"
+        },
+        {
+          "count": 1,
+          "name": "Karakas"
+        },
+        {
+          "count": 2,
+          "name": "Plateau"
+        },
+        {
+          "count": 1,
+          "name": "Silent Clearing"
+        },
+        {
+          "count": 2,
+          "name": "Hexing Squelcher"
+        },
+        {
+          "count": 1,
+          "name": "Static Prison"
         }
       ],
       "sideboard": [],
@@ -12230,7 +12088,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Forest\n1 Swamp\n1 Talon Gates of Madara\n1 Underground Mortuary\n3 Wight of the Reliquary\n4 Verdant Catacombs\n2 Bayou\n4 Wasteland\n1 Marsh Flats\n1 Windswept Heath\n2 Boseiju, Who Endures\n3 Fatal Push\n4 Thoughtseize\n3 Elvish Reclaimer\n1 Dryad Arbor\n1 Bojuka Bog\n4 Hogaak, Arisen Necropolis\n3 Sylvan Safekeeper\n1 Misty Rainforest\n4 Orcish Bowmasters\n4 Stitcher's Supplier\n1 Polluted Delta\n1 Eumidian Hatchery\n2 Malevolent Rumble\n3 Once Upon a Time\n4 Moonshadow",
+      "arenaImport": "Deck\n4 Ajani, Nacatl Pariah\n4 Amped Raptor\n1 Badlands\n4 Thoughtseize\n3 Cabal Therapy\n4 Swords to Plowshares\n4 Guide of Souls\n4 Marsh Flats\n4 Ocelot Pride\n3 Orcish Bowmasters\n1 Plains\n2 Scrubland\n1 Shadowy Backstreet\n1 Elegant Parlor\n2 Goblin Bombardment\n4 Arid Mesa\n3 Voice of Victory\n4 Wasteland\n1 Karakas\n2 Plateau\n1 Silent Clearing\n2 Hexing Squelcher\n1 Static Prison",
       "sources": [
         {
           "name": "MTGO official",
@@ -12255,7 +12113,7 @@
       ],
       "metaShare": 6,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · leeties"
+      "listNote": "MTGO Legacy Showcase Challenge · danlogan"
     },
     "timeless-bo3-initiative": {
       "id": "timeless-bo3-initiative",
@@ -12271,52 +12129,16 @@
       "description": "White Weenie with The Initiative. Daily rank #7 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Forest"
-        },
-        {
-          "count": 1,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Talon Gates of Madara"
-        },
-        {
-          "count": 1,
-          "name": "Underground Mortuary"
-        },
-        {
-          "count": 3,
-          "name": "Wight of the Reliquary"
+          "count": 4,
+          "name": "Ajani, Nacatl Pariah"
         },
         {
           "count": 4,
-          "name": "Verdant Catacombs"
-        },
-        {
-          "count": 2,
-          "name": "Bayou"
-        },
-        {
-          "count": 4,
-          "name": "Wasteland"
+          "name": "Amped Raptor"
         },
         {
           "count": 1,
-          "name": "Marsh Flats"
-        },
-        {
-          "count": 1,
-          "name": "Windswept Heath"
-        },
-        {
-          "count": 2,
-          "name": "Boseiju, Who Endures"
-        },
-        {
-          "count": 3,
-          "name": "Fatal Push"
+          "name": "Badlands"
         },
         {
           "count": 4,
@@ -12324,55 +12146,79 @@
         },
         {
           "count": 3,
-          "name": "Elvish Reclaimer"
-        },
-        {
-          "count": 1,
-          "name": "Dryad Arbor"
-        },
-        {
-          "count": 1,
-          "name": "Bojuka Bog"
+          "name": "Cabal Therapy"
         },
         {
           "count": 4,
-          "name": "Hogaak, Arisen Necropolis"
+          "name": "Swords to Plowshares"
+        },
+        {
+          "count": 4,
+          "name": "Guide of Souls"
+        },
+        {
+          "count": 4,
+          "name": "Marsh Flats"
+        },
+        {
+          "count": 4,
+          "name": "Ocelot Pride"
         },
         {
           "count": 3,
-          "name": "Sylvan Safekeeper"
-        },
-        {
-          "count": 1,
-          "name": "Misty Rainforest"
-        },
-        {
-          "count": 4,
           "name": "Orcish Bowmasters"
         },
         {
-          "count": 4,
-          "name": "Stitcher's Supplier"
-        },
-        {
           "count": 1,
-          "name": "Polluted Delta"
-        },
-        {
-          "count": 1,
-          "name": "Eumidian Hatchery"
+          "name": "Plains"
         },
         {
           "count": 2,
-          "name": "Malevolent Rumble"
+          "name": "Scrubland"
         },
         {
-          "count": 3,
-          "name": "Once Upon a Time"
+          "count": 1,
+          "name": "Shadowy Backstreet"
+        },
+        {
+          "count": 1,
+          "name": "Elegant Parlor"
+        },
+        {
+          "count": 2,
+          "name": "Goblin Bombardment"
         },
         {
           "count": 4,
-          "name": "Moonshadow"
+          "name": "Arid Mesa"
+        },
+        {
+          "count": 3,
+          "name": "Voice of Victory"
+        },
+        {
+          "count": 4,
+          "name": "Wasteland"
+        },
+        {
+          "count": 1,
+          "name": "Karakas"
+        },
+        {
+          "count": 2,
+          "name": "Plateau"
+        },
+        {
+          "count": 1,
+          "name": "Silent Clearing"
+        },
+        {
+          "count": 2,
+          "name": "Hexing Squelcher"
+        },
+        {
+          "count": 1,
+          "name": "Static Prison"
         }
       ],
       "sideboard": [],
@@ -12419,7 +12265,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Forest\n1 Swamp\n1 Talon Gates of Madara\n1 Underground Mortuary\n3 Wight of the Reliquary\n4 Verdant Catacombs\n2 Bayou\n4 Wasteland\n1 Marsh Flats\n1 Windswept Heath\n2 Boseiju, Who Endures\n3 Fatal Push\n4 Thoughtseize\n3 Elvish Reclaimer\n1 Dryad Arbor\n1 Bojuka Bog\n4 Hogaak, Arisen Necropolis\n3 Sylvan Safekeeper\n1 Misty Rainforest\n4 Orcish Bowmasters\n4 Stitcher's Supplier\n1 Polluted Delta\n1 Eumidian Hatchery\n2 Malevolent Rumble\n3 Once Upon a Time\n4 Moonshadow",
+      "arenaImport": "Deck\n4 Ajani, Nacatl Pariah\n4 Amped Raptor\n1 Badlands\n4 Thoughtseize\n3 Cabal Therapy\n4 Swords to Plowshares\n4 Guide of Souls\n4 Marsh Flats\n4 Ocelot Pride\n3 Orcish Bowmasters\n1 Plains\n2 Scrubland\n1 Shadowy Backstreet\n1 Elegant Parlor\n2 Goblin Bombardment\n4 Arid Mesa\n3 Voice of Victory\n4 Wasteland\n1 Karakas\n2 Plateau\n1 Silent Clearing\n2 Hexing Squelcher\n1 Static Prison",
       "sources": [
         {
           "name": "MTGO official",
@@ -12444,7 +12290,7 @@
       ],
       "metaShare": 6,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · leeties"
+      "listNote": "MTGO Legacy Showcase Challenge · danlogan"
     },
     "timeless-bo1-storm": {
       "id": "timeless-bo1-storm",
@@ -12462,88 +12308,108 @@
       "description": "Classic storm with dark ritual density. Daily rank #5 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Atraxa, Grand Unifier"
+          "count": 1,
+          "name": "Forest"
         },
         {
           "count": 1,
-          "name": "Archon of Cruelty"
+          "name": "Swamp"
+        },
+        {
+          "count": 1,
+          "name": "Talon Gates of Madara"
+        },
+        {
+          "count": 1,
+          "name": "Underground Mortuary"
         },
         {
           "count": 3,
-          "name": "Bloodstained Mire"
-        },
-        {
-          "count": 2,
-          "name": "Badlands"
-        },
-        {
-          "count": 2,
-          "name": "Cabal Therapy"
+          "name": "Wight of the Reliquary"
         },
         {
           "count": 4,
-          "name": "Griselbrand"
+          "name": "Verdant Catacombs"
+        },
+        {
+          "count": 2,
+          "name": "Bayou"
+        },
+        {
+          "count": 4,
+          "name": "Wasteland"
+        },
+        {
+          "count": 1,
+          "name": "Marsh Flats"
+        },
+        {
+          "count": 1,
+          "name": "Windswept Heath"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 3,
+          "name": "Fatal Push"
         },
         {
           "count": 4,
           "name": "Thoughtseize"
         },
         {
-          "count": 4,
-          "name": "Lotus Petal"
-        },
-        {
-          "count": 2,
-          "name": "Raph & Mikey, Troublemakers"
+          "count": 3,
+          "name": "Elvish Reclaimer"
         },
         {
           "count": 1,
-          "name": "Raucous Theater"
-        },
-        {
-          "count": 4,
-          "name": "Unmask"
-        },
-        {
-          "count": 4,
-          "name": "Shallow Grave"
-        },
-        {
-          "count": 4,
-          "name": "Faithless Looting"
-        },
-        {
-          "count": 4,
-          "name": "Dark Ritual"
+          "name": "Dryad Arbor"
         },
         {
           "count": 1,
-          "name": "Undercity Sewers"
+          "name": "Bojuka Bog"
+        },
+        {
+          "count": 4,
+          "name": "Hogaak, Arisen Necropolis"
+        },
+        {
+          "count": 3,
+          "name": "Sylvan Safekeeper"
         },
         {
           "count": 1,
-          "name": "Underground Sea"
+          "name": "Misty Rainforest"
         },
         {
           "count": 4,
-          "name": "Animate Dead"
+          "name": "Orcish Bowmasters"
         },
         {
           "count": 4,
+          "name": "Stitcher's Supplier"
+        },
+        {
+          "count": 1,
           "name": "Polluted Delta"
         },
         {
-          "count": 4,
-          "name": "Reanimate"
-        },
-        {
           "count": 1,
-          "name": "Koma, World-Eater"
+          "name": "Eumidian Hatchery"
         },
         {
           "count": 2,
-          "name": "Swamp"
+          "name": "Malevolent Rumble"
+        },
+        {
+          "count": 3,
+          "name": "Once Upon a Time"
+        },
+        {
+          "count": 4,
+          "name": "Moonshadow"
         }
       ],
       "sideboard": [],
@@ -12565,7 +12431,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Atraxa, Grand Unifier\n1 Archon of Cruelty\n3 Bloodstained Mire\n2 Badlands\n2 Cabal Therapy\n4 Griselbrand\n4 Thoughtseize\n4 Lotus Petal\n2 Raph & Mikey, Troublemakers\n1 Raucous Theater\n4 Unmask\n4 Shallow Grave\n4 Faithless Looting\n4 Dark Ritual\n1 Undercity Sewers\n1 Underground Sea\n4 Animate Dead\n4 Polluted Delta\n4 Reanimate\n1 Koma, World-Eater\n2 Swamp",
+      "arenaImport": "Deck\n1 Forest\n1 Swamp\n1 Talon Gates of Madara\n1 Underground Mortuary\n3 Wight of the Reliquary\n4 Verdant Catacombs\n2 Bayou\n4 Wasteland\n1 Marsh Flats\n1 Windswept Heath\n2 Boseiju, Who Endures\n3 Fatal Push\n4 Thoughtseize\n3 Elvish Reclaimer\n1 Dryad Arbor\n1 Bojuka Bog\n4 Hogaak, Arisen Necropolis\n3 Sylvan Safekeeper\n1 Misty Rainforest\n4 Orcish Bowmasters\n4 Stitcher's Supplier\n1 Polluted Delta\n1 Eumidian Hatchery\n2 Malevolent Rumble\n3 Once Upon a Time\n4 Moonshadow",
       "sources": [
         {
           "name": "MTGO official",
@@ -12590,7 +12456,7 @@
       ],
       "metaShare": 5,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · firstshot"
+      "listNote": "MTGO Legacy Showcase Challenge · leeties"
     },
     "timeless-bo3-storm": {
       "id": "timeless-bo3-storm",
@@ -12608,88 +12474,108 @@
       "description": "Classic storm with dark ritual density. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Atraxa, Grand Unifier"
+          "count": 1,
+          "name": "Forest"
         },
         {
           "count": 1,
-          "name": "Archon of Cruelty"
+          "name": "Swamp"
+        },
+        {
+          "count": 1,
+          "name": "Talon Gates of Madara"
+        },
+        {
+          "count": 1,
+          "name": "Underground Mortuary"
         },
         {
           "count": 3,
-          "name": "Bloodstained Mire"
-        },
-        {
-          "count": 2,
-          "name": "Badlands"
-        },
-        {
-          "count": 2,
-          "name": "Cabal Therapy"
+          "name": "Wight of the Reliquary"
         },
         {
           "count": 4,
-          "name": "Griselbrand"
+          "name": "Verdant Catacombs"
+        },
+        {
+          "count": 2,
+          "name": "Bayou"
+        },
+        {
+          "count": 4,
+          "name": "Wasteland"
+        },
+        {
+          "count": 1,
+          "name": "Marsh Flats"
+        },
+        {
+          "count": 1,
+          "name": "Windswept Heath"
+        },
+        {
+          "count": 2,
+          "name": "Boseiju, Who Endures"
+        },
+        {
+          "count": 3,
+          "name": "Fatal Push"
         },
         {
           "count": 4,
           "name": "Thoughtseize"
         },
         {
-          "count": 4,
-          "name": "Lotus Petal"
-        },
-        {
-          "count": 2,
-          "name": "Raph & Mikey, Troublemakers"
+          "count": 3,
+          "name": "Elvish Reclaimer"
         },
         {
           "count": 1,
-          "name": "Raucous Theater"
-        },
-        {
-          "count": 4,
-          "name": "Unmask"
-        },
-        {
-          "count": 4,
-          "name": "Shallow Grave"
-        },
-        {
-          "count": 4,
-          "name": "Faithless Looting"
-        },
-        {
-          "count": 4,
-          "name": "Dark Ritual"
+          "name": "Dryad Arbor"
         },
         {
           "count": 1,
-          "name": "Undercity Sewers"
+          "name": "Bojuka Bog"
+        },
+        {
+          "count": 4,
+          "name": "Hogaak, Arisen Necropolis"
+        },
+        {
+          "count": 3,
+          "name": "Sylvan Safekeeper"
         },
         {
           "count": 1,
-          "name": "Underground Sea"
+          "name": "Misty Rainforest"
         },
         {
           "count": 4,
-          "name": "Animate Dead"
+          "name": "Orcish Bowmasters"
         },
         {
           "count": 4,
+          "name": "Stitcher's Supplier"
+        },
+        {
+          "count": 1,
           "name": "Polluted Delta"
         },
         {
-          "count": 4,
-          "name": "Reanimate"
-        },
-        {
           "count": 1,
-          "name": "Koma, World-Eater"
+          "name": "Eumidian Hatchery"
         },
         {
           "count": 2,
-          "name": "Swamp"
+          "name": "Malevolent Rumble"
+        },
+        {
+          "count": 3,
+          "name": "Once Upon a Time"
+        },
+        {
+          "count": 4,
+          "name": "Moonshadow"
         }
       ],
       "sideboard": [],
@@ -12736,7 +12622,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Atraxa, Grand Unifier\n1 Archon of Cruelty\n3 Bloodstained Mire\n2 Badlands\n2 Cabal Therapy\n4 Griselbrand\n4 Thoughtseize\n4 Lotus Petal\n2 Raph & Mikey, Troublemakers\n1 Raucous Theater\n4 Unmask\n4 Shallow Grave\n4 Faithless Looting\n4 Dark Ritual\n1 Undercity Sewers\n1 Underground Sea\n4 Animate Dead\n4 Polluted Delta\n4 Reanimate\n1 Koma, World-Eater\n2 Swamp",
+      "arenaImport": "Deck\n1 Forest\n1 Swamp\n1 Talon Gates of Madara\n1 Underground Mortuary\n3 Wight of the Reliquary\n4 Verdant Catacombs\n2 Bayou\n4 Wasteland\n1 Marsh Flats\n1 Windswept Heath\n2 Boseiju, Who Endures\n3 Fatal Push\n4 Thoughtseize\n3 Elvish Reclaimer\n1 Dryad Arbor\n1 Bojuka Bog\n4 Hogaak, Arisen Necropolis\n3 Sylvan Safekeeper\n1 Misty Rainforest\n4 Orcish Bowmasters\n4 Stitcher's Supplier\n1 Polluted Delta\n1 Eumidian Hatchery\n2 Malevolent Rumble\n3 Once Upon a Time\n4 Moonshadow",
       "sources": [
         {
           "name": "MTGO official",
@@ -12761,7 +12647,7 @@
       ],
       "metaShare": 5,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · firstshot"
+      "listNote": "MTGO Legacy Showcase Challenge · leeties"
     },
     "timeless-bo1-dimir-midrange": {
       "id": "timeless-bo1-dimir-midrange",
@@ -12779,95 +12665,87 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Wasteland"
+          "name": "Atraxa, Grand Unifier"
         },
         {
           "count": 1,
-          "name": "Verdant Catacombs"
+          "name": "Archon of Cruelty"
+        },
+        {
+          "count": 3,
+          "name": "Bloodstained Mire"
+        },
+        {
+          "count": 2,
+          "name": "Badlands"
+        },
+        {
+          "count": 2,
+          "name": "Cabal Therapy"
         },
         {
           "count": 4,
-          "name": "Underground Sea"
-        },
-        {
-          "count": 1,
-          "name": "Undercity Sewers"
+          "name": "Griselbrand"
         },
         {
           "count": 4,
           "name": "Thoughtseize"
         },
         {
+          "count": 4,
+          "name": "Lotus Petal"
+        },
+        {
+          "count": 2,
+          "name": "Raph & Mikey, Troublemakers"
+        },
+        {
           "count": 1,
-          "name": "Swamp"
+          "name": "Raucous Theater"
         },
         {
           "count": 4,
-          "name": "Flow State"
+          "name": "Unmask"
         },
         {
-          "count": 3,
-          "name": "Ponder"
+          "count": 4,
+          "name": "Shallow Grave"
+        },
+        {
+          "count": 4,
+          "name": "Faithless Looting"
+        },
+        {
+          "count": 4,
+          "name": "Dark Ritual"
+        },
+        {
+          "count": 1,
+          "name": "Undercity Sewers"
+        },
+        {
+          "count": 1,
+          "name": "Underground Sea"
+        },
+        {
+          "count": 4,
+          "name": "Animate Dead"
         },
         {
           "count": 4,
           "name": "Polluted Delta"
         },
         {
-          "count": 3,
-          "name": "Orcish Bowmasters"
+          "count": 4,
+          "name": "Reanimate"
+        },
+        {
+          "count": 1,
+          "name": "Koma, World-Eater"
         },
         {
           "count": 2,
-          "name": "Murktide Regent"
-        },
-        {
-          "count": 1,
-          "name": "Island"
-        },
-        {
-          "count": 4,
-          "name": "Force of Will"
-        },
-        {
-          "count": 2,
-          "name": "Flooded Strand"
-        },
-        {
-          "count": 4,
-          "name": "Tamiyo, Inquisitive Student"
-        },
-        {
-          "count": 3,
-          "name": "Fatal Push"
-        },
-        {
-          "count": 3,
-          "name": "Daze"
-        },
-        {
-          "count": 4,
-          "name": "Brainstorm"
-        },
-        {
-          "count": 1,
-          "name": "Bloodstained Mire"
-        },
-        {
-          "count": 3,
-          "name": "Nethergoyf"
-        },
-        {
-          "count": 1,
-          "name": "Snuff Out"
-        },
-        {
-          "count": 2,
-          "name": "Kaito, Bane of Nightmares"
-        },
-        {
-          "count": 1,
-          "name": "Barrowgoyf"
+          "name": "Swamp"
         }
       ],
       "sideboard": [],
@@ -12889,7 +12767,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Wasteland\n1 Verdant Catacombs\n4 Underground Sea\n1 Undercity Sewers\n4 Thoughtseize\n1 Swamp\n4 Flow State\n3 Ponder\n4 Polluted Delta\n3 Orcish Bowmasters\n2 Murktide Regent\n1 Island\n4 Force of Will\n2 Flooded Strand\n4 Tamiyo, Inquisitive Student\n3 Fatal Push\n3 Daze\n4 Brainstorm\n1 Bloodstained Mire\n3 Nethergoyf\n1 Snuff Out\n2 Kaito, Bane of Nightmares\n1 Barrowgoyf",
+      "arenaImport": "Deck\n4 Atraxa, Grand Unifier\n1 Archon of Cruelty\n3 Bloodstained Mire\n2 Badlands\n2 Cabal Therapy\n4 Griselbrand\n4 Thoughtseize\n4 Lotus Petal\n2 Raph & Mikey, Troublemakers\n1 Raucous Theater\n4 Unmask\n4 Shallow Grave\n4 Faithless Looting\n4 Dark Ritual\n1 Undercity Sewers\n1 Underground Sea\n4 Animate Dead\n4 Polluted Delta\n4 Reanimate\n1 Koma, World-Eater\n2 Swamp",
       "sources": [
         {
           "name": "MTGO official",
@@ -12914,7 +12792,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · Aced5"
+      "listNote": "MTGO Legacy Showcase Challenge · firstshot"
     },
     "timeless-bo3-dimir-midrange": {
       "id": "timeless-bo3-dimir-midrange",
@@ -13112,144 +12990,80 @@
       "description": "Tribal Flames style domain aggro. Daily rank #8 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Volcanic Island"
+          "count": 4,
+          "name": "Thoughtseize"
         },
         {
           "count": 4,
-          "name": "Lórien Revealed"
+          "name": "Raph & Mikey, Troublemakers"
         },
         {
           "count": 4,
-          "name": "Leyline Binding"
+          "name": "Griselbrand"
         },
         {
           "count": 4,
-          "name": "Flooded Strand"
-        },
-        {
-          "count": 2,
-          "name": "Island"
-        },
-        {
-          "count": 1,
-          "name": "Xander's Lounge"
-        },
-        {
-          "count": 1,
-          "name": "Meticulous Archive"
+          "name": "Atraxa, Grand Unifier"
         },
         {
           "count": 3,
-          "name": "Quantum Riddler"
+          "name": "Cabal Therapy"
         },
         {
-          "count": 1,
-          "name": "Plains"
+          "count": 4,
+          "name": "Animate Dead"
         },
         {
-          "count": 2,
+          "count": 4,
+          "name": "Reanimate"
+        },
+        {
+          "count": 4,
+          "name": "Dark Ritual"
+        },
+        {
+          "count": 4,
+          "name": "Goryo's Vengeance"
+        },
+        {
+          "count": 4,
+          "name": "Unmask"
+        },
+        {
+          "count": 4,
           "name": "Polluted Delta"
         },
         {
           "count": 4,
-          "name": "Ponder"
-        },
-        {
-          "count": 1,
-          "name": "Savannah"
-        },
-        {
-          "count": 4,
-          "name": "Brainstorm"
-        },
-        {
-          "count": 1,
-          "name": "Mystic Sanctuary"
-        },
-        {
-          "count": 2,
-          "name": "Tropical Island"
-        },
-        {
-          "count": 2,
-          "name": "Tundra"
-        },
-        {
-          "count": 2,
-          "name": "Phelia, Exuberant Shepherd"
-        },
-        {
-          "count": 4,
-          "name": "Up the Beanstalk"
+          "name": "Lotus Petal"
         },
         {
           "count": 3,
-          "name": "Force of Negation"
-        },
-        {
-          "count": 4,
-          "name": "Misty Rainforest"
-        },
-        {
-          "count": 2,
-          "name": "Tamiyo, Inquisitive Student"
-        },
-        {
-          "count": 4,
-          "name": "Swords to Plowshares"
-        },
-        {
-          "count": 2,
-          "name": "Uro, Titan of Nature's Wrath"
-        },
-        {
-          "count": 4,
-          "name": "Force of Will"
-        },
-        {
-          "count": 2,
-          "name": "Windswept Heath"
+          "name": "Bloodstained Mire"
         },
         {
           "count": 3,
-          "name": "Wasteland"
-        },
-        {
-          "count": 3,
-          "name": "Consign to Memory"
+          "name": "Swamp"
         },
         {
           "count": 1,
-          "name": "Terminus"
+          "name": "Bayou"
         },
         {
           "count": 1,
-          "name": "Wrath of the Skies"
-        },
-        {
-          "count": 2,
-          "name": "Flow State"
-        },
-        {
-          "count": 2,
-          "name": "Prismatic Ending"
+          "name": "Raucous Theater"
         },
         {
           "count": 1,
-          "name": "Forest"
+          "name": "Badlands"
         },
         {
           "count": 1,
-          "name": "Hedge Maze"
+          "name": "Underground Mortuary"
         },
         {
-          "count": 1,
-          "name": "Icetill Explorer"
-        },
-        {
-          "count": 1,
-          "name": "Stifle"
+          "count": 4,
+          "name": "Collective Brutality"
         }
       ],
       "sideboard": [],
@@ -13271,7 +13085,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Volcanic Island\n4 Lórien Revealed\n4 Leyline Binding\n4 Flooded Strand\n2 Island\n1 Xander's Lounge\n1 Meticulous Archive\n3 Quantum Riddler\n1 Plains\n2 Polluted Delta\n4 Ponder\n1 Savannah\n4 Brainstorm\n1 Mystic Sanctuary\n2 Tropical Island\n2 Tundra\n2 Phelia, Exuberant Shepherd\n4 Up the Beanstalk\n3 Force of Negation\n4 Misty Rainforest\n2 Tamiyo, Inquisitive Student\n4 Swords to Plowshares\n2 Uro, Titan of Nature's Wrath\n4 Force of Will\n2 Windswept Heath\n3 Wasteland\n3 Consign to Memory\n1 Terminus\n1 Wrath of the Skies\n2 Flow State\n2 Prismatic Ending\n1 Forest\n1 Hedge Maze\n1 Icetill Explorer\n1 Stifle",
+      "arenaImport": "Deck\n4 Thoughtseize\n4 Raph & Mikey, Troublemakers\n4 Griselbrand\n4 Atraxa, Grand Unifier\n3 Cabal Therapy\n4 Animate Dead\n4 Reanimate\n4 Dark Ritual\n4 Goryo's Vengeance\n4 Unmask\n4 Polluted Delta\n4 Lotus Petal\n3 Bloodstained Mire\n3 Swamp\n1 Bayou\n1 Raucous Theater\n1 Badlands\n1 Underground Mortuary\n4 Collective Brutality",
       "sources": [
         {
           "name": "MTGO official",
@@ -13296,7 +13110,7 @@
       ],
       "metaShare": 4.5,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · McWinSauce"
+      "listNote": "MTGO Legacy Showcase Challenge · Roodslay"
     },
     "timeless-bo3-domain-zoo": {
       "id": "timeless-bo3-domain-zoo",
@@ -13316,144 +13130,80 @@
       "description": "Tribal Flames style domain aggro. Daily rank #3 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Volcanic Island"
+          "count": 4,
+          "name": "Thoughtseize"
         },
         {
           "count": 4,
-          "name": "Lórien Revealed"
+          "name": "Raph & Mikey, Troublemakers"
         },
         {
           "count": 4,
-          "name": "Leyline Binding"
+          "name": "Griselbrand"
         },
         {
           "count": 4,
-          "name": "Flooded Strand"
-        },
-        {
-          "count": 2,
-          "name": "Island"
-        },
-        {
-          "count": 1,
-          "name": "Xander's Lounge"
-        },
-        {
-          "count": 1,
-          "name": "Meticulous Archive"
+          "name": "Atraxa, Grand Unifier"
         },
         {
           "count": 3,
-          "name": "Quantum Riddler"
+          "name": "Cabal Therapy"
         },
         {
-          "count": 1,
-          "name": "Plains"
+          "count": 4,
+          "name": "Animate Dead"
         },
         {
-          "count": 2,
+          "count": 4,
+          "name": "Reanimate"
+        },
+        {
+          "count": 4,
+          "name": "Dark Ritual"
+        },
+        {
+          "count": 4,
+          "name": "Goryo's Vengeance"
+        },
+        {
+          "count": 4,
+          "name": "Unmask"
+        },
+        {
+          "count": 4,
           "name": "Polluted Delta"
         },
         {
           "count": 4,
-          "name": "Ponder"
-        },
-        {
-          "count": 1,
-          "name": "Savannah"
-        },
-        {
-          "count": 4,
-          "name": "Brainstorm"
-        },
-        {
-          "count": 1,
-          "name": "Mystic Sanctuary"
-        },
-        {
-          "count": 2,
-          "name": "Tropical Island"
-        },
-        {
-          "count": 2,
-          "name": "Tundra"
-        },
-        {
-          "count": 2,
-          "name": "Phelia, Exuberant Shepherd"
-        },
-        {
-          "count": 4,
-          "name": "Up the Beanstalk"
+          "name": "Lotus Petal"
         },
         {
           "count": 3,
-          "name": "Force of Negation"
-        },
-        {
-          "count": 4,
-          "name": "Misty Rainforest"
-        },
-        {
-          "count": 2,
-          "name": "Tamiyo, Inquisitive Student"
-        },
-        {
-          "count": 4,
-          "name": "Swords to Plowshares"
-        },
-        {
-          "count": 2,
-          "name": "Uro, Titan of Nature's Wrath"
-        },
-        {
-          "count": 4,
-          "name": "Force of Will"
-        },
-        {
-          "count": 2,
-          "name": "Windswept Heath"
+          "name": "Bloodstained Mire"
         },
         {
           "count": 3,
-          "name": "Wasteland"
-        },
-        {
-          "count": 3,
-          "name": "Consign to Memory"
+          "name": "Swamp"
         },
         {
           "count": 1,
-          "name": "Terminus"
+          "name": "Bayou"
         },
         {
           "count": 1,
-          "name": "Wrath of the Skies"
-        },
-        {
-          "count": 2,
-          "name": "Flow State"
-        },
-        {
-          "count": 2,
-          "name": "Prismatic Ending"
+          "name": "Raucous Theater"
         },
         {
           "count": 1,
-          "name": "Forest"
+          "name": "Badlands"
         },
         {
           "count": 1,
-          "name": "Hedge Maze"
+          "name": "Underground Mortuary"
         },
         {
-          "count": 1,
-          "name": "Icetill Explorer"
-        },
-        {
-          "count": 1,
-          "name": "Stifle"
+          "count": 4,
+          "name": "Collective Brutality"
         }
       ],
       "sideboard": [],
@@ -13500,7 +13250,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Volcanic Island\n4 Lórien Revealed\n4 Leyline Binding\n4 Flooded Strand\n2 Island\n1 Xander's Lounge\n1 Meticulous Archive\n3 Quantum Riddler\n1 Plains\n2 Polluted Delta\n4 Ponder\n1 Savannah\n4 Brainstorm\n1 Mystic Sanctuary\n2 Tropical Island\n2 Tundra\n2 Phelia, Exuberant Shepherd\n4 Up the Beanstalk\n3 Force of Negation\n4 Misty Rainforest\n2 Tamiyo, Inquisitive Student\n4 Swords to Plowshares\n2 Uro, Titan of Nature's Wrath\n4 Force of Will\n2 Windswept Heath\n3 Wasteland\n3 Consign to Memory\n1 Terminus\n1 Wrath of the Skies\n2 Flow State\n2 Prismatic Ending\n1 Forest\n1 Hedge Maze\n1 Icetill Explorer\n1 Stifle",
+      "arenaImport": "Deck\n4 Thoughtseize\n4 Raph & Mikey, Troublemakers\n4 Griselbrand\n4 Atraxa, Grand Unifier\n3 Cabal Therapy\n4 Animate Dead\n4 Reanimate\n4 Dark Ritual\n4 Goryo's Vengeance\n4 Unmask\n4 Polluted Delta\n4 Lotus Petal\n3 Bloodstained Mire\n3 Swamp\n1 Bayou\n1 Raucous Theater\n1 Badlands\n1 Underground Mortuary\n4 Collective Brutality",
       "sources": [
         {
           "name": "MTGO official",
@@ -13525,7 +13275,7 @@
       ],
       "metaShare": 5.7,
       "listQuality": "authoritative",
-      "listNote": "MTGO Legacy Showcase Challenge · McWinSauce"
+      "listNote": "MTGO Legacy Showcase Challenge · Roodslay"
     },
     "brawl-bo1-atraxa-midrange": {
       "id": "brawl-bo1-atraxa-midrange",
@@ -17097,12 +16847,8 @@
         "R"
       ],
       "archetype": "Mono-Red Aggro",
-      "description": "Burn and haste for Standard Brawl. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
+      "description": "Burn and haste for Standard Brawl (Standard-legal only). Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
-        {
-          "count": 1,
-          "name": "Monastery Swiftspear"
-        },
         {
           "count": 1,
           "name": "Heartfire Hero"
@@ -17113,11 +16859,19 @@
         },
         {
           "count": 1,
+          "name": "Emberheart Challenger"
+        },
+        {
+          "count": 1,
           "name": "Play with Fire"
         },
         {
           "count": 1,
           "name": "Lightning Strike"
+        },
+        {
+          "count": 1,
+          "name": "Burst Lightning"
         },
         {
           "count": 18,
@@ -17133,19 +16887,15 @@
         },
         {
           "count": 1,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 1,
           "name": "Witchstalker Frenzy"
         },
         {
           "count": 1,
-          "name": "Burst Lightning"
+          "name": "Sokenzan, Crucible of Defiance"
         },
         {
           "count": 1,
-          "name": "Sokenzan, Crucible of Defiance"
+          "name": "Screaming Nemesis"
         }
       ],
       "sideboard": [],
@@ -17167,7 +16917,7 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Commander\n1 Screaming Nemesis\n\nDeck\n1 Monastery Swiftspear\n1 Heartfire Hero\n1 Slickshot Show-Off\n1 Play with Fire\n1 Lightning Strike\n18 Mountain\n1 Rockface Village\n1 Den of the Bugbear\n1 Emberheart Challenger\n1 Witchstalker Frenzy\n1 Burst Lightning\n1 Sokenzan, Crucible of Defiance",
+      "arenaImport": "Commander\n1 Screaming Nemesis\n\nDeck\n1 Heartfire Hero\n1 Slickshot Show-Off\n1 Emberheart Challenger\n1 Play with Fire\n1 Lightning Strike\n1 Burst Lightning\n18 Mountain\n1 Rockface Village\n1 Den of the Bugbear\n1 Witchstalker Frenzy\n1 Sokenzan, Crucible of Defiance\n1 Screaming Nemesis",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -17202,12 +16952,8 @@
         "R"
       ],
       "archetype": "Mono-Red Aggro",
-      "description": "Burn and haste for Standard Brawl. Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
+      "description": "Burn and haste for Standard Brawl (Standard-legal only). Daily rank #8 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
-        {
-          "count": 1,
-          "name": "Monastery Swiftspear"
-        },
         {
           "count": 1,
           "name": "Heartfire Hero"
@@ -17218,11 +16964,19 @@
         },
         {
           "count": 1,
+          "name": "Emberheart Challenger"
+        },
+        {
+          "count": 1,
           "name": "Play with Fire"
         },
         {
           "count": 1,
           "name": "Lightning Strike"
+        },
+        {
+          "count": 1,
+          "name": "Burst Lightning"
         },
         {
           "count": 18,
@@ -17238,19 +16992,15 @@
         },
         {
           "count": 1,
-          "name": "Emberheart Challenger"
-        },
-        {
-          "count": 1,
           "name": "Witchstalker Frenzy"
         },
         {
           "count": 1,
-          "name": "Burst Lightning"
+          "name": "Sokenzan, Crucible of Defiance"
         },
         {
           "count": 1,
-          "name": "Sokenzan, Crucible of Defiance"
+          "name": "Screaming Nemesis"
         }
       ],
       "sideboard": [],
@@ -17297,7 +17047,7 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Commander\n1 Screaming Nemesis\n\nDeck\n1 Monastery Swiftspear\n1 Heartfire Hero\n1 Slickshot Show-Off\n1 Play with Fire\n1 Lightning Strike\n18 Mountain\n1 Rockface Village\n1 Den of the Bugbear\n1 Emberheart Challenger\n1 Witchstalker Frenzy\n1 Burst Lightning\n1 Sokenzan, Crucible of Defiance",
+      "arenaImport": "Commander\n1 Screaming Nemesis\n\nDeck\n1 Heartfire Hero\n1 Slickshot Show-Off\n1 Emberheart Challenger\n1 Play with Fire\n1 Lightning Strike\n1 Burst Lightning\n18 Mountain\n1 Rockface Village\n1 Den of the Bugbear\n1 Witchstalker Frenzy\n1 Sokenzan, Crucible of Defiance\n1 Screaming Nemesis",
       "sources": [
         {
           "name": "MTGGoldfish Metagame",
@@ -20698,17 +20448,6 @@
       "source": "mtgo"
     },
     {
-      "id": "mtgo-limited-rc-super-qualifier-2026-07-0312846444",
-      "name": "limited rc super qualifier 2026 07 0312846444",
-      "format": "standard",
-      "platform": "mtgo",
-      "date": "2026-07-03",
-      "url": "https://www.mtgo.com/decklist/limited-rc-super-qualifier-2026-07-0312846444",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
       "id": "mtgo-standard-challenge-32-2026-07-0912847094",
       "name": "standard challenge 32 2026 07 0912847094",
       "format": "standard",
@@ -20907,6 +20646,17 @@
       "source": "mtgo"
     },
     {
+      "id": "mtgo-premodern-challenge-32-2026-07-0412846493",
+      "name": "premodern challenge 32 2026 07 0412846493",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-04",
+      "url": "https://www.mtgo.com/decklist/premodern-challenge-32-2026-07-0412846493",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
       "id": "melee-303",
       "name": "Latam Online Challenge - Test Event #4",
       "format": "standard",
@@ -20946,7 +20696,7 @@
     "failedLists": 80,
     "listPolicy": "multi-source: magic.gg > mtgo embedded JSON > goldfish export > tagged fallback only",
     "ranLive": true,
-    "freeListsIngested": 146,
+    "freeListsIngested": 223,
     "sourcesDetail": [
       "magic.gg-decklists",
       "mtgo-embedded-json",
