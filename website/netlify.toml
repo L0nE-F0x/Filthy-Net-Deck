@@ -3,6 +3,17 @@
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
 
+# Force UTF-8 so em dashes / curly quotes never mojibake in browsers
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=UTF-8"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Content-Type = "text/html; charset=UTF-8"
+
 # CORS so the Tauri desktop app can fetch meta + version.json
 [[headers]]
   for = "/meta/*"
