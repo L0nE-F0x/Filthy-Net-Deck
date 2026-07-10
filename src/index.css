@@ -750,21 +750,21 @@ select,
   color: var(--color-muted);
 }
 
-.sticky-import {
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
-  margin: 0 -0.25rem;
-  padding: 0.65rem 0.85rem;
-  background: color-mix(in srgb, var(--color-ink-900) 94%, transparent);
-  border-top: 1px solid color-mix(in srgb, var(--color-gold-500) 28%, transparent);
-  backdrop-filter: blur(12px);
+/* Scrolls with deck content — do not sticky/fixed (was overlapping mainboard). */
+.deck-import-bar {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--color-ink-850) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 28%, transparent);
+  border-radius: 12px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  box-shadow: 0 -8px 24px color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, black 25%, transparent);
   animation: pageIn 0.2s ease;
 }
 

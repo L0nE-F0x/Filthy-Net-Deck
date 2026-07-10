@@ -6,6 +6,7 @@ import { applyListToDeck, fuzzyArchetype } from "./common.mjs";
 import {
   colorCompatibility,
   inferColorsFromCards,
+  listFitsArchetype,
 } from "./archetypeGuess.mjs";
 
 const SOURCE_PRIORITY = {
@@ -105,17 +106,23 @@ export function assignListsToBundle(bundle, lists) {
           const listColors =
             L.colors || inferColorsFromCards(L.mainboard || []);
           const cScore = colorCompatibility(deck.colors || [], listColors);
+          const fit = listFitsArchetype(
+            deck.archetype || deck.name,
+            L.mainboard || [],
+          );
 
           // Hard reject color mismatch (e.g. UB Dimir on 4c Control)
           if (cScore < 0.4) continue;
+          // Hard reject archetype poison (e.g. Mardu TMNT aggro labeled 4c Control)
+          if (fit < 0.5) continue;
           // Require real name match for named lists
           if (L.name && nScore < 0.55) continue;
-          // Unnamed lists only if colors fit well
-          if (!L.name && cScore < 0.7) continue;
+          // Unnamed lists only if colors fit well AND archetype fit is solid
+          if (!L.name && (cScore < 0.7 || fit < 0.55)) continue;
 
           const pri = SOURCE_PRIORITY[L.source] || 10;
-          // Name dominates; colors break ties; source is a light boost
-          const combined = nScore * 10 + cScore * 3 + pri * 0.01;
+          // Name dominates; fit + colors break ties; source is a light boost
+          const combined = nScore * 10 + fit * 4 + cScore * 3 + pri * 0.01;
           if (combined > bestScore) {
             bestScore = combined;
             best = L;
@@ -125,8 +132,14 @@ export function assignListsToBundle(bundle, lists) {
 
         if (!best) continue;
         const pri = SOURCE_PRIORITY[best.source] || 10;
-        // Don't replace a better/equal authoritative list with a weak match
-        if (deck.listQuality === "authoritative" && pri <= curPri && bestScore < 8)
+        // Never downgrade source priority (e.g. magic.gg must not overwrite Goldfish/MTGO)
+        if (deck.listQuality === "authoritative" && pri < curPri) continue;
+        // Equal priority needs a clearly stronger combined match
+        if (
+          deck.listQuality === "authoritative" &&
+          pri === curPri &&
+          bestScore < 8
+        )
           continue;
 
         if (
@@ -154,4 +167,37 @@ export function mergeSourceTags(bundle, tags) {
   for (const bad of ["seed", "spicerack"]) set.delete(bad);
   bundle.sources = [...set];
   return bundle;
+}
+
+/**
+ * Final QA: strip "authoritative" from decks whose mainboard fails archetype fit.
+ * Call after all list assignment. Optionally restore from seedDeck if provided.
+ */
+export function scrubMisfitAuthoritative(bundle, seedBundle = null) {
+  let scrubbed = 0;
+  for (const [id, deck] of Object.entries(bundle.decks || {})) {
+    if (!deck?.mainboard?.length) continue;
+    const fit = listFitsArchetype(deck.archetype || deck.name, deck.mainboard);
+    if (fit >= 0.5) continue;
+    // Only hard-scrub clear poison / control-aggro mismatches
+    if (fit > 0.25 && deck.listQuality !== "authoritative") continue;
+    if (fit > 0.25) continue; // soft unknowns keep their list; assignment already gated
+
+    const seedDeck = seedBundle?.decks?.[id];
+    if (seedDeck?.mainboard?.length) {
+      deck.mainboard = seedDeck.mainboard;
+      deck.sideboard = seedDeck.sideboard || [];
+      deck.arenaImport = seedDeck.arenaImport;
+      deck.listQuality = "fallback";
+      deck.listNote =
+        "Restored offline pack — live list failed archetype fit QA";
+      scrubbed++;
+      console.log(`  QA scrub: ${id} fit=${fit.toFixed(2)} → seed`);
+    } else if (deck.listQuality === "authoritative") {
+      deck.listQuality = "partial";
+      deck.listNote = `${deck.listNote || ""} · archetype fit QA warning`.trim();
+      scrubbed++;
+    }
+  }
+  return scrubbed;
 }

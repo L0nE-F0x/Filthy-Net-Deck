@@ -74,7 +74,7 @@ export function DeckView() {
   };
 
   return (
-    <div className="flex flex-col gap-4 max-w-5xl pb-16">
+    <div className="flex flex-col gap-4 max-w-5xl pb-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap gap-2 mb-2">
@@ -241,7 +241,7 @@ export function DeckView() {
         </aside>
       </div>
 
-      <div className="sticky-import">
+      <div className="deck-import-bar">
         <div className="text-sm">
           <strong className="text-foam">{deck.name}</strong>
           <span className="text-muted text-xs ml-2">

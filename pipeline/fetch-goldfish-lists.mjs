@@ -3,6 +3,8 @@
  * Used by build-meta.mjs --live so we never invent 60 cards when a list exists.
  */
 
+import { listFitsArchetype } from "./sources/archetypeGuess.mjs";
+
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
@@ -164,6 +166,17 @@ export async function applyAuthoritativeLists(bundle) {
         await sleep(350);
 
         if (live && live.mainboard?.length) {
+          const fit = listFitsArchetype(
+            deck.archetype || deck.name,
+            live.mainboard,
+          );
+          if (fit < 0.5) {
+            failed++;
+            console.log(
+              `  ✗ ${fmt.id} ${deck.name} — Goldfish list failed archetype fit (${fit.toFixed(2)})`,
+            );
+            continue;
+          }
           deck.mainboard = live.mainboard;
           // Keep full export for both modes (accuracy > BO1 aesthetics)
           deck.sideboard = live.sideboard || [];

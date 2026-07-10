@@ -31,6 +31,7 @@ import {
   assignListsToBundle,
   mergeSourceTags,
   mergeTournamentFeeds,
+  scrubMisfitAuthoritative,
 } from "./sources/aggregate.mjs";
 import { scrubDeckLegality } from "./sources/common.mjs";
 
@@ -365,6 +366,11 @@ async function main() {
     console.log(
       `  Assigned ${assigned} lists from magic.gg/MTGO/Melee pool onto decks (pool=${allLists.length})`,
     );
+
+    // Reject creature-aggro / wrong-shell lists that slipped past name match
+    const seedForQa = loadSeedExport();
+    const scrubbed = scrubMisfitAuthoritative(bundle, seedForQa);
+    if (scrubbed) console.log(`  QA scrub restored ${scrubbed} misfit list(s)`);
 
     bundle = mergeSourceTags(bundle, [
       "mtggoldfish",
