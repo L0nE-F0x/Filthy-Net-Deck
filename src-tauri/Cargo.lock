@@ -1035,7 +1035,7 @@ dependencies = [
 
 [[package]]
 name = "filthy-net-deck"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "serde",
  "serde_json",

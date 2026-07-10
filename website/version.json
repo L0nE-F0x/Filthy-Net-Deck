@@ -1,5 +1,5 @@
 {
-  "version": "0.7.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.2.exe",
-  "notes": "UX: Decks format switcher, Events opens browser, Queue nav. Accuracy: color-matched list assignment (no more Dimir lists on 4c Control)."
+  "version": "0.7.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.3.exe",
+  "notes": "Fix 4c Control mislabeled aggro lists; Copy Arena import bar scrolls with the page (no sticky overlap). Offline pack includes corrected lists."
 }
