@@ -42,7 +42,6 @@ function pageTitle(page: Page, queueMode: boolean): string {
 function feedLabel(status: string | null): string {
   if (status === "live") return "live";
   if (status === "cached") return "cached";
-  if (status === "offline") return "offline pack";
   return "—";
 }
 
@@ -179,11 +178,30 @@ export default function App() {
         )}
 
         <main className="content" key={page}>
-          {page === "daily" && <Daily />}
-          {page === "format" && <FormatView />}
-          {page === "deck" && <DeckView />}
-          {page === "meta" && <MetaPulse />}
-          {page === "settings" && <Settings />}
+          {!meta && !loading && page !== "settings" ? (
+            <div className="empty-state">
+              <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
+              <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
+                This app only shows real, verified meta data — there is no built-in placeholder
+                pack. Connect to the internet and refresh to download today’s lists.
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary mt-4"
+                onClick={() => void refreshMeta()}
+              >
+                Retry download
+              </button>
+            </div>
+          ) : (
+            <>
+              {page === "daily" && <Daily />}
+              {page === "format" && <FormatView />}
+              {page === "deck" && <DeckView />}
+              {page === "meta" && <MetaPulse />}
+              {page === "settings" && <Settings />}
+            </>
+          )}
         </main>
       </div>
     </div>

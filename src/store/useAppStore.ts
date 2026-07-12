@@ -5,6 +5,7 @@ import {
   checkRemoteVersion,
   type VersionCheckResult,
 } from "../services/versionCheck";
+import { checkAppUpdate, installPendingUpdate } from "../services/appUpdater";
 import { resolveFormatId } from "../services/formatResolve";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
 
@@ -54,7 +55,7 @@ function saveFavorites(ids: string[]) {
   }
 }
 
-export type FeedStatus = "live" | "cached" | "offline" | null;
+export type FeedStatus = "live" | "cached" | null;
 
 interface AppState {
   page: Page;
@@ -64,7 +65,7 @@ interface AppState {
   dailyFormatId: FormatId | null;
   selectedDeckId: string | null;
   meta: MetaBundle | null;
-  metaSource: "network" | "seed" | "cache" | null;
+  metaSource: "network" | "cache" | null;
   feedStatus: FeedStatus;
   loading: boolean;
   error: string | null;
@@ -80,7 +81,12 @@ interface AppState {
     version: string;
     downloadUrl?: string;
     notes?: string;
+    /** true = Tauri updater can install + relaunch in one click */
+    canAutoInstall?: boolean;
   } | null;
+  /** In-app update install state */
+  updating: boolean;
+  updateProgress: number | null;
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
@@ -98,13 +104,12 @@ interface AppState {
   setFilterColor: (c: string | null) => void;
   setShowFavoritesOnly: (v: boolean) => void;
   checkForUpdates: () => Promise<VersionCheckResult>;
+  installUpdate: () => Promise<void>;
   dismissUpdate: () => void;
 }
 
-function mapFeedStatus(from: "network" | "seed" | "cache"): FeedStatus {
-  if (from === "network") return "live";
-  if (from === "cache") return "cached";
-  return "offline";
+function mapFeedStatus(from: "network" | "cache"): FeedStatus {
+  return from === "network" ? "live" : "cached";
 }
 
 export const useAppStore = create<AppState>((set, get) => {
@@ -129,6 +134,8 @@ export const useAppStore = create<AppState>((set, get) => {
     showFavoritesOnly: false,
     metaDiff: { previousDate: null, changes: [] },
     updateAvailable: null,
+    updating: false,
+    updateProgress: null,
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
@@ -173,6 +180,22 @@ export const useAppStore = create<AppState>((set, get) => {
     setShowFavoritesOnly: (showFavoritesOnly) => set({ showFavoritesOnly }),
 
     checkForUpdates: async () => {
+      // Preferred: Tauri updater (signed, one-click install + relaunch)
+      const auto = await checkAppUpdate();
+      if (auto) {
+        set({
+          updateAvailable: {
+            version: auto.version,
+            notes: auto.notes,
+            canAutoInstall: true,
+          },
+        });
+        return {
+          status: "update",
+          remote: { version: auto.version, notes: auto.notes },
+        };
+      }
+      // Fallback: version.json manual-download flow (also covers browser dev)
       const result = await checkRemoteVersion();
       if (result.status === "update") {
         set({
@@ -180,12 +203,31 @@ export const useAppStore = create<AppState>((set, get) => {
             version: result.remote.version,
             downloadUrl: result.remote.downloadUrl,
             notes: result.remote.notes,
+            canAutoInstall: false,
           },
         });
       } else {
         set({ updateAvailable: null });
       }
       return result;
+    },
+
+    installUpdate: async () => {
+      if (get().updating) return;
+      set({ updating: true, updateProgress: 0, error: null });
+      try {
+        await installPendingUpdate((pct) => set({ updateProgress: pct }));
+        // relaunch() exits the app — nothing to do after this
+      } catch (e) {
+        set({
+          updating: false,
+          updateProgress: null,
+          error:
+            e instanceof Error
+              ? `Update failed: ${e.message}. You can still download the installer from Settings.`
+              : "Update failed — download the installer from Settings instead.",
+        });
+      }
     },
 
     dismissUpdate: () => set({ updateAvailable: null }),

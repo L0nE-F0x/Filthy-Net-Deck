@@ -1,8 +1,14 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Filthy Net Deck",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "identifier": "com.filthynetdeck.desktop",
+  "plugins": {
+    "updater": {
+      "endpoints": ["https://filthy-net-deck.netlify.app/updater/latest.json"],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY1Q0I1QkQyRUE4QzhBQ0IKUldUTGlvenEwbHZMWmJrRCtoREtxWENoSmVTZEt6bEppZ3U2eUVyK213TGFIRFNiOTl1STQ5RU0K"
+    }
+  },
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -30,6 +36,7 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "dmg"],
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -47,7 +54,7 @@
       "minimumSystemVersion": "10.15",
       "signingIdentity": "-"
     },
-    "shortDescription": "Daily MTG Arena meta decks — filthy netdecks, zero shame",
-    "longDescription": "Filthy Net Deck is a desktop companion for Magic: The Gathering Arena. Eight ranked decks per constructed format every day, Bo1/Bo3, tiers, matchups, sideboard guides, and tournament pulse — so you can netdeck with confidence."
+    "shortDescription": "Daily Standard & Pioneer meta decks — filthy netdecks, zero shame",
+    "longDescription": "Filthy Net Deck is a desktop meta companion for Magic: The Gathering. The daily Standard and Pioneer metagame — real ranked lists only, every card verified on Scryfall. Bo1/Bo3, tiers, card art, Arena import, and tournament pulse."
   }
 }

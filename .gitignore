@@ -5,8 +5,15 @@ src-tauri/target
 *.log
 .env
 .env.*
-pipeline/_load-seed.mts
-pipeline/seed-export.json
 .vscode
 .idea
 *.local
+
+# Installers must never live in the app's public dir — Vite copies public/ into
+# the bundle, which recursively inflates every installer. Site downloads live in
+# website/downloads/ instead.
+public/downloads/
+
+# Tauri updater signing keys — never commit these
+*.key
+*.key.pub

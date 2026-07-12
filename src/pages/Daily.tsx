@@ -75,7 +75,7 @@ function DeckMiniCard({
         {d.metaShare != null ? `${d.metaShare}% · ` : ""}
         {d.archetype}
       </p>
-      <CardArtStrip names={pickPreviewCards(d.mainboard, d.commander)} max={4} />
+      <CardArtStrip cards={pickPreviewCards(d)} max={4} />
     </article>
   );
 }

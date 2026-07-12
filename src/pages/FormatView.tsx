@@ -44,7 +44,7 @@ export function FormatView() {
       canShowResultsLink(t.url),
   );
   const hero = deckList[0];
-  const heroArts = hero ? pickPreviewCards(hero.mainboard, hero.commander) : [];
+  const heroArts = hero ? pickPreviewCards(hero) : [];
 
   return (
     <div className="flex flex-col gap-4 max-w-6xl format-dashboard">
@@ -91,9 +91,14 @@ export function FormatView() {
               </div>
             </div>
             <div className="format-hero-art">
-              {heroArts.slice(0, 3).map((n, i) => (
-                <div key={n} className={`hero-card hero-card-${i}`}>
-                  <CardArt name={n} size="normal" className="hero-card-img" />
+              {heroArts.slice(0, 3).map((c, i) => (
+                <div key={c.name} className={`hero-card hero-card-${i}`}>
+                  <CardArt
+                    name={c.name}
+                    scryfallId={c.scryfallId}
+                    size="normal"
+                    className="hero-card-img"
+                  />
                 </div>
               ))}
             </div>
@@ -132,7 +137,7 @@ export function FormatView() {
         </div>
         <div className="format-deck-stack">
           {deckList.map((deck) => {
-            const arts = pickPreviewCards(deck.mainboard, deck.commander);
+            const arts = pickPreviewCards(deck);
             const mainCount = deck.mainboard.reduce((n, c) => n + c.count, 0);
             return (
               <article
@@ -159,7 +164,7 @@ export function FormatView() {
                     <span className="text-xs text-muted">{mainCount} cards</span>
                   </div>
                   <p className="text-sm text-muted m-0 mt-1 line-clamp-2">{deck.description}</p>
-                  <CardArtStrip names={arts} max={5} />
+                  <CardArtStrip cards={arts} max={5} />
                 </div>
                 <div className="format-deck-actions">
                   <button

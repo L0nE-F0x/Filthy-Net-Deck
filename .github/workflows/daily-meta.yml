@@ -22,7 +22,10 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Export offline pack + live aggregation
+      # Aborts without writing when live data is unavailable — the previously
+      # published (real) meta stays live rather than shipping anything stale-labeled
+      # as fresh or fabricated.
+      - name: Build live meta (Standard + Pioneer)
         run: npm run meta
         continue-on-error: true
 

@@ -13,6 +13,9 @@ export function StatusBanners() {
   const feedStatus = useAppStore((s) => s.feedStatus);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const dismissUpdate = useAppStore((s) => s.dismissUpdate);
+  const installUpdate = useAppStore((s) => s.installUpdate);
+  const updating = useAppStore((s) => s.updating);
+  const updateProgress = useAppStore((s) => s.updateProgress);
   const metaDiff = useAppStore((s) => s.metaDiff);
   const loading = useAppStore((s) => s.loading);
 
@@ -29,25 +32,14 @@ export function StatusBanners() {
 
   const banners: { key: string; className: string; body: ReactNode }[] = [];
 
-  if (feedStatus === "offline") {
+  if (feedStatus === "cached") {
     banners.push({
-      key: "offline",
+      key: "cached",
       className: "banner banner-warn",
       body: (
         <>
-          <strong>Offline pack</strong> — could not reach Netlify{" "}
-          <code className="text-[10px]">/meta/latest.json</code>. Showing the installer’s last-known
-          lists (not live aggregation). Refresh when online.
-        </>
-      ),
-    });
-  } else if (feedStatus === "cached") {
-    banners.push({
-      key: "cached",
-      className: "banner banner-info",
-      body: (
-        <>
-          <strong>Cached feed</strong> — using last known good meta JSON.
+          <strong>Cached feed</strong> — couldn’t reach Netlify, showing the last successfully
+          downloaded meta (real data, possibly not today’s). Refresh when online.
         </>
       ),
     });
@@ -59,8 +51,8 @@ export function StatusBanners() {
       body: (
         <>
           <strong>Live feed</strong> — downloaded published meta from Netlify
-          {auth != null ? ` · ${auth} verified deck export(s)` : ""}. Refresh re-fetches that file;
-          it does not re-scrape tournaments on your PC.
+          {auth != null ? ` · ${auth} verified lists` : ""} · every card Scryfall-checked. Refresh
+          re-fetches that file; it does not re-scrape tournaments on your PC.
         </>
       ),
     });
@@ -91,7 +83,38 @@ export function StatusBanners() {
           {updateAvailable.notes ? (
             <span className="text-muted">{updateAvailable.notes} </span>
           ) : null}
-          {updateAvailable.downloadUrl ? (
+          {updateAvailable.canAutoInstall ? (
+            updating ? (
+              <span className="text-muted">
+                {updateProgress != null && updateProgress >= 0
+                  ? `Updating… ${updateProgress}%`
+                  : "Updating…"}{" "}
+                The app restarts itself when done.
+              </span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="update-dl"
+                  onClick={() => void installUpdate()}
+                >
+                  Update &amp; restart
+                </button>
+                <span className="text-muted">
+                  {" "}
+                  — downloads, installs, and relaunches automatically.
+                </span>
+                <button
+                  type="button"
+                  className="update-dismiss"
+                  onClick={() => dismissUpdate()}
+                  title="Dismiss until next launch"
+                >
+                  Later
+                </button>
+              </>
+            )
+          ) : updateAvailable.downloadUrl ? (
             <>
               <button
                 type="button"

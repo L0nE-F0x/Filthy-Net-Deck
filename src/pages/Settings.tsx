@@ -16,6 +16,9 @@ export function Settings() {
   const loading = useAppStore((s) => s.loading);
   const meta = useAppStore((s) => s.meta);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
+  const installUpdate = useAppStore((s) => s.installUpdate);
+  const updating = useAppStore((s) => s.updating);
+  const updateProgress = useAppStore((s) => s.updateProgress);
   const favorites = useAppStore((s) => s.favorites);
 
   const [urlDraft, setUrlDraft] = useState(prefs.metaUrl ?? "");
@@ -42,13 +45,11 @@ export function Settings() {
           <strong className="text-foam">Refresh does not scrape tournament sites from your PC.</strong>{" "}
           It re-downloads the published meta file from Netlify (
           <code className="text-[10px]">/meta/latest.json</code>
-          ). That file is built by the multi-source pipeline:{" "}
-          <strong className="text-foam">magic.gg</strong>,{" "}
-          <strong className="text-foam">MTGO</strong> challenges,{" "}
-          <strong className="text-foam">MTGGoldfish</strong> metagame + exports,{" "}
-          <strong className="text-foam">Melee.gg</strong>,{" "}
-          <strong className="text-foam">Untapped.gg</strong>. Pipeline freshness = CI daily job /{" "}
-          <code className="text-[10px]">npm run meta</code>.
+          ). That file is built daily from the{" "}
+          <strong className="text-foam">MTGGoldfish</strong> Standard &amp; Pioneer metagame with
+          every card name verified on <strong className="text-foam">Scryfall</strong>. Tournament
+          links come from magic.gg, MTGO, and Melee.gg. If live data can’t be fetched, the previous
+          day’s real data stays published — nothing is ever fabricated.
         </p>
         {meta?.pipeline && (
           <dl className="grid grid-cols-2 gap-2 text-xs m-0 mb-3">
@@ -63,7 +64,6 @@ export function Settings() {
             <div className="col-span-2">
               <dt className="text-muted">Pipeline</dt>
               <dd className="m-0 font-medium text-[11px]">
-                {meta.pipeline.ranLive ? "live multi-source" : "offline pack"} ·{" "}
                 {(meta.pipeline.sourcesDetail || []).join(", ") || "—"}
               </dd>
             </div>
@@ -74,8 +74,8 @@ export function Settings() {
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-1">Meta feed URL</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          Default is the Netlify CDN. Override only for testing. If fetch fails, the app uses the
-          installer&apos;s offline pack (never labeled as live).
+          Default is the Netlify CDN. Override only for testing. If fetch fails, the app shows the
+          last successfully downloaded copy — never placeholder data.
         </p>
         <label className="block text-xs text-muted mb-1" htmlFor="meta-url">
           Meta URL
@@ -131,21 +131,23 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">In-app app updates</h3>
+        <h3 className="text-sm font-semibold m-0 mb-1">In-app updates</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          App version <strong className="text-foam">v{APP_VERSION}</strong>. Checks{" "}
-          <code className="text-[11px]">version.json</code> on Netlify. You do{" "}
-          <strong className="text-foam">not</strong> need to open the website — download the
-          installer from here and run it.
+          App version <strong className="text-foam">v{APP_VERSION}</strong>. When a new signed
+          release is published, the app can{" "}
+          <strong className="text-foam">download, install, and relaunch itself</strong> — no
+          reinstall, no website visit. A banner also pops up automatically when one is found.
         </p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             className="btn btn-ghost btn-sm"
+            disabled={updating}
             onClick={() => {
+              setUpdateMsg("Checking…");
               void checkForUpdates().then((result) => {
                 if (result.status === "update") {
-                  setUpdateMsg(`v${result.remote.version} is available — download below.`);
+                  setUpdateMsg(`v${result.remote.version} is available.`);
                 } else if (result.status === "latest") {
                   setUpdateMsg(
                     `You’re on the latest version (remote v${result.remote.version}).`,
@@ -158,7 +160,21 @@ export function Settings() {
           >
             Check for updates
           </button>
-          {updateAvailable?.downloadUrl && (
+          {updateAvailable?.canAutoInstall && (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={updating}
+              onClick={() => void installUpdate()}
+            >
+              {updating
+                ? updateProgress != null && updateProgress >= 0
+                  ? `Updating… ${updateProgress}%`
+                  : "Updating…"
+                : `Update to v${updateAvailable.version} & restart`}
+            </button>
+          )}
+          {updateAvailable && !updateAvailable.canAutoInstall && updateAvailable.downloadUrl && (
             <button
               type="button"
               className="btn btn-primary btn-sm"
@@ -170,11 +186,15 @@ export function Settings() {
             </button>
           )}
         </div>
-        {updateAvailable && (
+        {updateAvailable?.canAutoInstall && !updating && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} ready — install over this app (same or newer NSIS
-            setup). Silent signed auto-update (Tauri updater plugin) can be added once release
-            signing keys exist.
+            Update v{updateAvailable.version} ready — one click installs it and restarts the app.
+          </p>
+        )}
+        {updateAvailable && !updateAvailable.canAutoInstall && (
+          <p className="text-sm text-gold-300 mt-2 mb-0">
+            Update v{updateAvailable.version} ready — running in a browser without the desktop
+            updater, so use the installer download.
           </p>
         )}
         {updateMsg && !updateAvailable && (
@@ -185,9 +205,10 @@ export function Settings() {
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-2">About Filthy Net Deck</h3>
         <p className="text-sm text-muted m-0 leading-relaxed">
-          Netdeck without the guilt (or with all of it). Daily meta for{" "}
-          <em>Magic: The Gathering Arena</em> — eight ranked decks per format, Bo1/Bo3, tiers,
-          matchups, queue favorites, and tournament pulse.
+          Netdeck without the guilt (or with all of it). Daily <em>Magic: The Gathering</em> meta
+          for <strong className="text-foam">Standard</strong> and{" "}
+          <strong className="text-foam">Pioneer</strong> — real ranked lists only, Bo1/Bo3, tiers,
+          queue favorites, and tournament pulse. No Alchemy-pool formats, no placeholder decks.
         </p>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
           Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of

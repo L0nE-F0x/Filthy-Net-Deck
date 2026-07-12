@@ -47,15 +47,9 @@ export async function cardExistsOnScryfall(name: string): Promise<boolean> {
     const res = await throttledFetch(
       `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}`,
     );
-    if (res.ok) {
-      cache.set(key, true);
-      return true;
-    }
-    // try fuzzy
-    const fuzzy = await throttledFetch(
-      `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(name)}`,
-    );
-    const ok = fuzzy.ok;
+    // Exact-only on purpose: a fuzzy hit would hide typos/invented names,
+    // which is exactly what this QA check exists to surface.
+    const ok = res.ok;
     cache.set(key, ok);
     return ok;
   } catch {

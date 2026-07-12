@@ -1,4 +1,20 @@
-/** Scryfall helpers — resolve real CDN image URLs (img tags that hit /format=image often fail in Tauri WebView). */
+/**
+ * Scryfall image helpers.
+ *
+ * Preferred path: the pipeline embeds a `scryfallId` on every card entry, so
+ * we can build the exact CDN URL with zero API calls and zero ambiguity.
+ * Fallback path: exact-name lookup only. We deliberately do NOT use the fuzzy
+ * endpoint — a fuzzy hit on a bad name renders a *different card's* art,
+ * which is worse than showing no image at all.
+ */
+
+export type ArtSize = "small" | "normal" | "art_crop";
+
+/** Direct CDN URL from a scryfall card id — no API round-trip needed. */
+export function scryfallCdnUrl(id: string, size: ArtSize = "normal"): string {
+  const version = size === "art_crop" ? "art_crop" : size;
+  return `https://cards.scryfall.io/${version}/front/${id[0]}/${id[1]}/${id}.jpg`;
+}
 
 const imageCache = new Map<string, string | null>();
 const queue: Array<() => void> = [];
@@ -19,12 +35,7 @@ function runQueue() {
 function throttledFetch(url: string): Promise<Response> {
   return new Promise((resolve, reject) => {
     queue.push(() => {
-      fetch(url, {
-        headers: {
-          Accept: "application/json",
-          // Scryfall asks for a descriptive UA on bulk use
-        },
-      })
+      fetch(url, { headers: { Accept: "application/json" } })
         .then((r) => {
           setTimeout(() => {
             active--;
@@ -43,27 +54,11 @@ function throttledFetch(url: string): Promise<Response> {
 }
 
 type ScryfallCard = {
-  image_uris?: {
-    small?: string;
-    normal?: string;
-    large?: string;
-    art_crop?: string;
-    border_crop?: string;
-  };
-  card_faces?: {
-    image_uris?: {
-      small?: string;
-      normal?: string;
-      large?: string;
-      art_crop?: string;
-    };
-  }[];
+  image_uris?: Record<string, string | undefined>;
+  card_faces?: { image_uris?: Record<string, string | undefined> }[];
 };
 
-function pickUri(
-  data: ScryfallCard,
-  size: "small" | "normal" | "art_crop",
-): string | null {
+function pickUri(data: ScryfallCard, size: ArtSize): string | null {
   const uris =
     data.image_uris ??
     data.card_faces?.[0]?.image_uris ??
@@ -75,44 +70,35 @@ function pickUri(
 }
 
 /**
- * Resolve a stable https://cards.scryfall.io/... URL for a card name.
- * Tries exact then fuzzy. Caches misses as null.
+ * Resolve an image URL for a card.
+ * With a scryfallId this is synchronous-fast (direct CDN URL).
+ * Without one, exact-name lookup; unknown names resolve to null (placeholder).
  */
 export async function resolveCardImage(
   cardName: string,
-  size: "small" | "normal" | "art_crop" = "normal",
+  size: ArtSize = "normal",
+  scryfallId?: string,
 ): Promise<string | null> {
+  if (scryfallId) return scryfallCdnUrl(scryfallId, size);
+
   const key = `${size}::${cardName.trim().toLowerCase()}`;
   if (imageCache.has(key)) return imageCache.get(key) ?? null;
 
-  const tryNamed = async (mode: "exact" | "fuzzy") => {
-    const url = `https://api.scryfall.com/cards/named?${mode}=${encodeURIComponent(cardName)}`;
-    const res = await throttledFetch(url);
-    if (!res.ok) return null;
-    const data = (await res.json()) as ScryfallCard;
-    return pickUri(data, size);
-  };
-
   try {
-    let uri = await tryNamed("exact");
-    if (!uri) uri = await tryNamed("fuzzy");
+    const url = `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`;
+    const res = await throttledFetch(url);
+    if (!res.ok) {
+      imageCache.set(key, null);
+      return null;
+    }
+    const data = (await res.json()) as ScryfallCard;
+    const uri = pickUri(data, size);
     imageCache.set(key, uri);
     return uri;
   } catch {
     imageCache.set(key, null);
     return null;
   }
-}
-
-/** @deprecated Prefer resolveCardImage — direct format=image URLs break in some WebViews */
-export function scryfallImageUrl(
-  cardName: string,
-  size: "small" | "normal" | "art_crop" = "normal",
-): string {
-  const encoded = encodeURIComponent(cardName);
-  const version = size === "art_crop" ? "art_crop" : size;
-  // fuzzy is more forgiving for list previews
-  return `https://api.scryfall.com/cards/named?fuzzy=${encoded}&format=image&version=${version}`;
 }
 
 export function colorPipClass(c: string): string {

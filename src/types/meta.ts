@@ -1,14 +1,6 @@
 export type PlayMode = "bo1" | "bo3";
 
-export type FormatId =
-  | "standard"
-  | "alchemy"
-  | "historic"
-  | "pioneer"
-  | "timeless"
-  | "brawl"
-  | "standard_brawl"
-  | "historic_brawl";
+export type FormatId = "standard" | "pioneer";
 
 export type ManaColor = "W" | "U" | "B" | "R" | "G" | "C";
 
@@ -23,6 +15,10 @@ export interface CardEntry {
   count: number;
   name: string;
   scryfallId?: string;
+  /** Real mana value from Scryfall (embedded by the pipeline) */
+  cmc?: number;
+  /** True when the card's front face is a land */
+  land?: boolean;
 }
 
 export interface Matchup {
@@ -62,6 +58,8 @@ export interface Deck {
   sources: DeckSource[];
   metaShare?: number;
   commander?: string;
+  /** Signature cards from the metagame source (e.g. Goldfish tile) — used for art strips */
+  keyCards?: string[];
   /** authoritative = Goldfish/Melee export; fallback = offline pack */
   listQuality?: "authoritative" | "partial" | "fallback";
   listNote?: string;

@@ -1,16 +1,40 @@
 # Deploy the marketing site + meta CDN + downloads from website/
+# NOTE: no build command — the daily meta pipeline runs in GitHub Actions
+# (.github/workflows/daily-meta.yml) and commits the JSON. Running it here would
+# let a "no live data" abort fail the whole site deploy (including downloads).
 [build]
   publish = "website"
-  # Meta JSON is committed under website/meta/. Optional rebuild if seed-export exists.
-  command = "node pipeline/build-meta.mjs"
 
+# Force UTF-8 so em dashes / curly quotes never mojibake
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=UTF-8"
+
+# CORS so the Tauri desktop app can fetch meta + version + updater manifest
 [[headers]]
   for = "/meta/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
     Cache-Control = "public, max-age=300"
 
 [[headers]]
+  for = "/version.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60"
+
+[[headers]]
+  for = "/updater/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Cache-Control = "public, max-age=60"
+
+# Installers are large and immutable per-version — cache hard
+[[headers]]
   for = "/downloads/*"
   [headers.values]
+    Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"

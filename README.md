@@ -1,6 +1,8 @@
 # Filthy Net Deck
 
-Desktop companion for **Magic: The Gathering Arena** — **8 ranked decks × 8 constructed formats every day**, Standard featured first, Bo1/Bo3 modes, tiers, matchups, sideboard guides, card art, and tournament pulse.
+Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, and tournament pulse.
+
+**Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.
 
 **Download:** https://filthy-net-deck.netlify.app/  
 **Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck
@@ -17,24 +19,26 @@ npm run tauri:dev
 ```
 
 ```bash
-npm run meta         # export seed + live pipeline
+npm run meta         # build today's live meta (Standard + Pioneer)
 npm run tauri:build  # Windows/macOS installers
 ```
 
 ## Meta pipeline
 
+Formats: **Standard** and **Pioneer** only. Design rules:
+
+1. Only real data ships — the pipeline **aborts without writing** when live data
+   is unavailable, so the previously published real data stays live.
+2. A deck's identity, rank, list, colors, and key cards all come from **one
+   source**. No fuzzy cross-source matching.
+3. Every card name is validated on Scryfall before it ships.
+
 | Source | Role |
 |--------|------|
-| Built-in offline pack | Always present — 8 decks × format × mode |
-| MTGGoldfish | Metagame % re-rank |
-| Melee.gg | Tournament discovery |
-| Untapped.gg | Arena ladder link-outs |
-| Scryfall | Card images (CDN URLs resolved in-app) |
-
-```bash
-npm run export-meta
-npm run pipeline:live
-```
+| MTGGoldfish metagame tiles | Archetype name, colors, meta %, key cards, rank |
+| MTGGoldfish archetype pages | Representative decklist (embedded `deck_input`, not the CF-blocked `arena_download`) |
+| Scryfall `/cards/collection` | Validation gate — canonical names, per-format legality, `scryfallId` per card (client builds exact CDN image URLs from these; no fuzzy lookups) |
+| magic.gg / MTGO / Melee.gg / Untapped.gg | Standard/Pioneer tournament links only — never deck lists |
 
 ## Netlify
 

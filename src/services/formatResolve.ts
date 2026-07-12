@@ -3,16 +3,8 @@ import type { FormatId, FormatMeta, MetaBundle } from "../types/meta";
 const ALIASES: Record<string, FormatId> = {
   standard: "standard",
   std: "standard",
-  alchemy: "alchemy",
-  historic: "historic",
   pioneer: "pioneer",
   explorer: "pioneer",
-  timeless: "timeless",
-  brawl: "brawl",
-  standard_brawl: "standard_brawl",
-  "standard brawl": "standard_brawl",
-  historic_brawl: "historic_brawl",
-  "historic brawl": "historic_brawl",
 };
 
 export function resolveFormatId(raw: string | undefined | null): FormatId | null {

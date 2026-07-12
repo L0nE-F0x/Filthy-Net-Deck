@@ -6,16 +6,11 @@ async function resolveScryfallImage(name) {
   const key = name.toLowerCase();
   if (cardCache.has(key)) return cardCache.get(key);
   try {
-    let res = await fetch(
+    // Exact only — same policy as the app: never render a fuzzy-matched wrong card.
+    const res = await fetch(
       `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}`,
       { headers: { Accept: "application/json" } },
     );
-    if (!res.ok) {
-      res = await fetch(
-        `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(name)}`,
-        { headers: { Accept: "application/json" } },
-      );
-    }
     if (!res.ok) {
       cardCache.set(key, null);
       return null;

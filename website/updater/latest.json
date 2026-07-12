@@ -1,0 +1,11 @@
+{
+  "version": "0.8.0",
+  "notes": "Standard & Pioneer only — every deck is a real, live, Scryfall-verified list. New: in-app updates.",
+  "pub_date": "2026-07-12T19:28:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWlQycGhZSnBpWWQvdHJ5cDV6T0hCYWx0cFhHenBvOEhYWGpVM3djWmVmUlhYUUNTWk1Ba0E2U1RYUFZ2dTNrbUhvcmsrUWE1YWdqNHlRWk5rY3hXRkFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzODU1NzA3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOC4wX3g2NC1zZXR1cC5leGUKUWJVVTJNcyswSkZ5YURvZHFvWjk1amptU0RPMEY5OEE5Z21iYm82Um9NNGFnUW9vN3lNdXRrQXA0WlpLWjF5OVNNbDgzdjNhSUtuZHBqQkQ2citmREE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.0.exe"
+    }
+  }
+}

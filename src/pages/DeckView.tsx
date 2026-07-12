@@ -58,10 +58,8 @@ export function DeckView() {
     );
   }
 
-  const previewCard =
-    deck.commander ??
-    deck.mainboard.find((c) => !/^(Plains|Island|Swamp|Mountain|Forest)/i.test(c.name))?.name ??
-    deck.mainboard[0]?.name;
+  const previewCards = pickPreviewCards(deck);
+  const previewCard = previewCards[0];
 
   const mainCount = deck.mainboard.reduce((n, c) => n + c.count, 0);
   const sbCount = deck.sideboard.reduce((n, c) => n + c.count, 0);
@@ -140,7 +138,7 @@ export function DeckView() {
             )}
           </div>
           <div className="mt-3">
-            <CardArtStrip names={pickPreviewCards(deck.mainboard, deck.commander)} max={6} />
+            <CardArtStrip cards={previewCards} max={6} />
           </div>
         </div>
       </div>
@@ -207,18 +205,25 @@ export function DeckView() {
             </section>
           )}
 
-          <section className="panel">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-              Matchups
-            </h3>
-            <MatchupTable matchups={deck.matchups} />
-          </section>
+          {deck.matchups.length > 0 && (
+            <section className="panel">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
+                Matchups
+              </h3>
+              <MatchupTable matchups={deck.matchups} />
+            </section>
+          )}
+
+          {deck.sideboardGuide.length > 0 && (
+            <section className="panel">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
+                Sideboard guide
+              </h3>
+              <SideboardGuide guide={deck.sideboardGuide} />
+            </section>
+          )}
 
           <section className="panel">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-              Sideboard guide
-            </h3>
-            <SideboardGuide guide={deck.sideboardGuide} />
             <SourceFooter sources={deck.sources} />
           </section>
         </div>
@@ -226,8 +231,13 @@ export function DeckView() {
         <aside className="flex flex-col gap-3">
           {previewCard && (
             <div className="panel p-2 overflow-hidden">
-              <CardArt name={previewCard} size="normal" className="w-full card-art-large" />
-              <p className="text-[11px] text-muted text-center m-0 mt-2">{previewCard}</p>
+              <CardArt
+                name={previewCard.name}
+                scryfallId={previewCard.scryfallId}
+                size="normal"
+                className="w-full card-art-large"
+              />
+              <p className="text-[11px] text-muted text-center m-0 mt-2">{previewCard.name}</p>
             </div>
           )}
           <div className="panel">

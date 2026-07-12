@@ -7,9 +7,6 @@ import { getText } from "./common.mjs";
 
 const FORMATS = [
   { id: "standard", path: "standard" },
-  { id: "historic", path: "historic" },
-  { id: "alchemy", path: "alchemy" },
-  { id: "timeless", path: "timeless" },
   { id: "explorer", path: "explorer", mapTo: "pioneer" },
 ];
 

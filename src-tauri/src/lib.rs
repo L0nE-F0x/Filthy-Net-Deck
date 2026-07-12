@@ -23,6 +23,13 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .setup(|app| {
+            #[cfg(desktop)]
+            {
+                app.handle()
+                    .plugin(tauri_plugin_updater::Builder::new().build())?;
+                app.handle().plugin(tauri_plugin_process::init())?;
+            }
+
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;
             let sep = PredefinedMenuItem::separator(app)?;
