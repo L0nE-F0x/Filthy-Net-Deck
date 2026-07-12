@@ -38,3 +38,11 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"
+
+# Social preview image
+[[headers]]
+  for = "/assets/og-image.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "image/png"
+
