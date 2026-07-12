@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-11T08:03:50.945Z",
-  "date": "2026-07-11",
+  "generatedAt": "2026-07-12T08:24:33.964Z",
+  "date": "2026-07-12",
   "formats": [
     {
       "id": "standard",
@@ -624,6 +624,10 @@
           "name": "Abandoned Air Temple"
         },
         {
+          "count": 1,
+          "name": "Ba Sing Se"
+        },
+        {
           "count": 4,
           "name": "Badgermole Cub"
         },
@@ -636,7 +640,7 @@
           "name": "Bushwhack"
         },
         {
-          "count": 7,
+          "count": 6,
           "name": "Forest"
         },
         {
@@ -644,7 +648,7 @@
           "name": "Hushwood Verge"
         },
         {
-          "count": 2,
+          "count": 1,
           "name": "Jennifer Walters"
         },
         {
@@ -664,7 +668,7 @@
           "name": "Multiversal Passage"
         },
         {
-          "count": 2,
+          "count": 3,
           "name": "Ouroboroid"
         },
         {
@@ -697,6 +701,10 @@
         },
         {
           "count": 2,
+          "name": "Dawn's Truce"
+        },
+        {
+          "count": 1,
           "name": "Elspeth, Storm Slayer"
         },
         {
@@ -705,11 +713,11 @@
         },
         {
           "count": 1,
-          "name": "Kutzil's Flanker"
+          "name": "Meltstrider's Resolve"
         },
         {
-          "count": 1,
-          "name": "Meltstrider's Resolve"
+          "count": 2,
+          "name": "Origin of Metalbending"
         },
         {
           "count": 3,
@@ -717,11 +725,11 @@
         },
         {
           "count": 3,
-          "name": "Restoration Magic"
+          "name": "Sheltered by Ghosts"
         },
         {
-          "count": 3,
-          "name": "Sheltered by Ghosts"
+          "count": 1,
+          "name": "Soul-Guide Lantern"
         }
       ],
       "sideboard": [],
@@ -743,11 +751,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n3 Abandoned Air Temple\n4 Badgermole Cub\n4 Brightglass Gearhulk\n1 Bushwhack\n7 Forest\n4 Hushwood Verge\n2 Jennifer Walters\n4 Leatherhead, Swamp Stalker\n4 Llanowar Elves\n1 Meltstrider's Resolve\n2 Multiversal Passage\n2 Ouroboroid\n4 Pawpatch Recruit\n2 Plains\n4 Practiced Offense\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Temple Garden\n2 Elspeth, Storm Slayer\n2 Erode\n1 Kutzil's Flanker\n1 Meltstrider's Resolve\n3 Rest in Peace\n3 Restoration Magic\n3 Sheltered by Ghosts",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Ba Sing Se\n4 Badgermole Cub\n4 Brightglass Gearhulk\n1 Bushwhack\n6 Forest\n4 Hushwood Verge\n1 Jennifer Walters\n4 Leatherhead, Swamp Stalker\n4 Llanowar Elves\n1 Meltstrider's Resolve\n2 Multiversal Passage\n3 Ouroboroid\n4 Pawpatch Recruit\n2 Plains\n4 Practiced Offense\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Temple Garden\n2 Dawn's Truce\n1 Elspeth, Storm Slayer\n2 Erode\n1 Meltstrider's Resolve\n2 Origin of Metalbending\n3 Rest in Peace\n3 Sheltered by Ghosts\n1 Soul-Guide Lantern",
       "sources": [
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868315"
+          "url": "https://www.mtggoldfish.com/deck/7869747"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -768,7 +776,7 @@
       ],
       "metaShare": 12,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868315"
+      "listNote": "Mainboard from MTGGoldfish deck #7869747"
     },
     "standard-bo3-selesnya-ouroboroid": {
       "id": "standard-bo3-selesnya-ouroboroid",
@@ -789,6 +797,10 @@
           "name": "Abandoned Air Temple"
         },
         {
+          "count": 1,
+          "name": "Ba Sing Se"
+        },
+        {
           "count": 4,
           "name": "Badgermole Cub"
         },
@@ -801,7 +813,7 @@
           "name": "Bushwhack"
         },
         {
-          "count": 7,
+          "count": 6,
           "name": "Forest"
         },
         {
@@ -809,7 +821,7 @@
           "name": "Hushwood Verge"
         },
         {
-          "count": 2,
+          "count": 1,
           "name": "Jennifer Walters"
         },
         {
@@ -829,7 +841,7 @@
           "name": "Multiversal Passage"
         },
         {
-          "count": 2,
+          "count": 3,
           "name": "Ouroboroid"
         },
         {
@@ -862,6 +874,10 @@
         },
         {
           "count": 2,
+          "name": "Dawn's Truce"
+        },
+        {
+          "count": 1,
           "name": "Elspeth, Storm Slayer"
         },
         {
@@ -870,11 +886,11 @@
         },
         {
           "count": 1,
-          "name": "Kutzil's Flanker"
+          "name": "Meltstrider's Resolve"
         },
         {
-          "count": 1,
-          "name": "Meltstrider's Resolve"
+          "count": 2,
+          "name": "Origin of Metalbending"
         },
         {
           "count": 3,
@@ -882,11 +898,11 @@
         },
         {
           "count": 3,
-          "name": "Restoration Magic"
+          "name": "Sheltered by Ghosts"
         },
         {
-          "count": 3,
-          "name": "Sheltered by Ghosts"
+          "count": 1,
+          "name": "Soul-Guide Lantern"
         }
       ],
       "sideboard": [],
@@ -933,11 +949,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n3 Abandoned Air Temple\n4 Badgermole Cub\n4 Brightglass Gearhulk\n1 Bushwhack\n7 Forest\n4 Hushwood Verge\n2 Jennifer Walters\n4 Leatherhead, Swamp Stalker\n4 Llanowar Elves\n1 Meltstrider's Resolve\n2 Multiversal Passage\n2 Ouroboroid\n4 Pawpatch Recruit\n2 Plains\n4 Practiced Offense\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Temple Garden\n2 Elspeth, Storm Slayer\n2 Erode\n1 Kutzil's Flanker\n1 Meltstrider's Resolve\n3 Rest in Peace\n3 Restoration Magic\n3 Sheltered by Ghosts",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Ba Sing Se\n4 Badgermole Cub\n4 Brightglass Gearhulk\n1 Bushwhack\n6 Forest\n4 Hushwood Verge\n1 Jennifer Walters\n4 Leatherhead, Swamp Stalker\n4 Llanowar Elves\n1 Meltstrider's Resolve\n2 Multiversal Passage\n3 Ouroboroid\n4 Pawpatch Recruit\n2 Plains\n4 Practiced Offense\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Temple Garden\n2 Dawn's Truce\n1 Elspeth, Storm Slayer\n2 Erode\n1 Meltstrider's Resolve\n2 Origin of Metalbending\n3 Rest in Peace\n3 Sheltered by Ghosts\n1 Soul-Guide Lantern",
       "sources": [
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868315"
+          "url": "https://www.mtggoldfish.com/deck/7869747"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -958,7 +974,7 @@
       ],
       "metaShare": 12,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868315"
+      "listNote": "Mainboard from MTGGoldfish deck #7869747"
     },
     "standard-bo1-jeskai-lessons": {
       "id": "standard-bo1-jeskai-lessons",
@@ -1083,7 +1099,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867878"
+          "url": "https://www.mtggoldfish.com/deck/7869773"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -1254,7 +1270,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867878"
+          "url": "https://www.mtggoldfish.com/deck/7869773"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -1395,7 +1411,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867848"
+          "url": "https://www.mtggoldfish.com/deck/7869774"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -1561,7 +1577,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867848"
+          "url": "https://www.mtggoldfish.com/deck/7869774"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -1716,7 +1732,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867852"
+          "url": "https://www.mtggoldfish.com/deck/7869775"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -1896,7 +1912,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867852"
+          "url": "https://www.mtggoldfish.com/deck/7869775"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2041,7 +2057,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867845"
+          "url": "https://www.mtggoldfish.com/deck/7869770"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2211,7 +2227,7 @@
         },
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7867845"
+          "url": "https://www.mtggoldfish.com/deck/7869770"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2293,11 +2309,7 @@
           "name": "M.O.D.O.K."
         },
         {
-          "count": 1,
-          "name": "Nowhere to Run"
-        },
-        {
-          "count": 3,
+          "count": 4,
           "name": "Requiting Hex"
         },
         {
@@ -2317,12 +2329,8 @@
           "name": "Superior Spider-Man"
         },
         {
-          "count": 9,
+          "count": 10,
           "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Undercity Sewers"
         },
         {
           "count": 4,
@@ -2338,22 +2346,6 @@
         },
         {
           "count": 1,
-          "name": "Deathmark"
-        },
-        {
-          "count": 1,
-          "name": "Decorum Dissertation"
-        },
-        {
-          "count": 1,
-          "name": "Disdainful Stroke"
-        },
-        {
-          "count": 1,
-          "name": "Doomsday Excruciator"
-        },
-        {
-          "count": 1,
           "name": "Emeritus of Ideation"
         },
         {
@@ -2365,12 +2357,24 @@
           "name": "Ghost Vacuum"
         },
         {
-          "count": 3,
-          "name": "Oildeep Gearhulk"
+          "count": 1,
+          "name": "M.O.D.O.K."
         },
         {
           "count": 2,
-          "name": "Qarsi Revenant"
+          "name": "Malcolm, Alluring Scoundrel"
+        },
+        {
+          "count": 3,
+          "name": "Preacher of the Schism"
+        },
+        {
+          "count": 1,
+          "name": "Quantum Riddler"
+        },
+        {
+          "count": 2,
+          "name": "Shoot the Sheriff"
         },
         {
           "count": 1,
@@ -2396,11 +2400,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n3 Bitter Triumph\n2 Cavern of Souls\n2 Day of Black Sun\n1 Deadly Cover-Up\n4 Deceit\n3 Doomsday Excruciator\n4 Duress\n2 Emeritus of Ideation\n4 Gloomlake Verge\n2 Hidden Lair\n1 M.O.D.O.K.\n1 Nowhere to Run\n3 Requiting Hex\n4 Restless Reef\n3 Stock Up\n1 Strategic Betrayal\n4 Superior Spider-Man\n9 Swamp\n1 Undercity Sewers\n4 Watery Grave\n2 Winternight Stories\n1 Deadly Cover-Up\n1 Deathmark\n1 Decorum Dissertation\n1 Disdainful Stroke\n1 Doomsday Excruciator\n1 Emeritus of Ideation\n2 Flashfreeze\n1 Ghost Vacuum\n3 Oildeep Gearhulk\n2 Qarsi Revenant\n1 Strategic Betrayal",
+      "arenaImport": "Deck\n3 Bitter Triumph\n2 Cavern of Souls\n2 Day of Black Sun\n1 Deadly Cover-Up\n4 Deceit\n3 Doomsday Excruciator\n4 Duress\n2 Emeritus of Ideation\n4 Gloomlake Verge\n2 Hidden Lair\n1 M.O.D.O.K.\n4 Requiting Hex\n4 Restless Reef\n3 Stock Up\n1 Strategic Betrayal\n4 Superior Spider-Man\n10 Swamp\n4 Watery Grave\n2 Winternight Stories\n1 Deadly Cover-Up\n1 Emeritus of Ideation\n2 Flashfreeze\n1 Ghost Vacuum\n1 M.O.D.O.K.\n2 Malcolm, Alluring Scoundrel\n3 Preacher of the Schism\n1 Quantum Riddler\n2 Shoot the Sheriff\n1 Strategic Betrayal",
       "sources": [
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868805"
+          "url": "https://www.mtggoldfish.com/deck/7869103"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2421,7 +2425,7 @@
       ],
       "metaShare": 7,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868805"
+      "listNote": "Mainboard from MTGGoldfish deck #7869103"
     },
     "standard-bo3-dimir-excruciator": {
       "id": "standard-bo3-dimir-excruciator",
@@ -2482,11 +2486,7 @@
           "name": "M.O.D.O.K."
         },
         {
-          "count": 1,
-          "name": "Nowhere to Run"
-        },
-        {
-          "count": 3,
+          "count": 4,
           "name": "Requiting Hex"
         },
         {
@@ -2506,12 +2506,8 @@
           "name": "Superior Spider-Man"
         },
         {
-          "count": 9,
+          "count": 10,
           "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Undercity Sewers"
         },
         {
           "count": 4,
@@ -2527,22 +2523,6 @@
         },
         {
           "count": 1,
-          "name": "Deathmark"
-        },
-        {
-          "count": 1,
-          "name": "Decorum Dissertation"
-        },
-        {
-          "count": 1,
-          "name": "Disdainful Stroke"
-        },
-        {
-          "count": 1,
-          "name": "Doomsday Excruciator"
-        },
-        {
-          "count": 1,
           "name": "Emeritus of Ideation"
         },
         {
@@ -2554,12 +2534,24 @@
           "name": "Ghost Vacuum"
         },
         {
-          "count": 3,
-          "name": "Oildeep Gearhulk"
+          "count": 1,
+          "name": "M.O.D.O.K."
         },
         {
           "count": 2,
-          "name": "Qarsi Revenant"
+          "name": "Malcolm, Alluring Scoundrel"
+        },
+        {
+          "count": 3,
+          "name": "Preacher of the Schism"
+        },
+        {
+          "count": 1,
+          "name": "Quantum Riddler"
+        },
+        {
+          "count": 2,
+          "name": "Shoot the Sheriff"
         },
         {
           "count": 1,
@@ -2610,11 +2602,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n3 Bitter Triumph\n2 Cavern of Souls\n2 Day of Black Sun\n1 Deadly Cover-Up\n4 Deceit\n3 Doomsday Excruciator\n4 Duress\n2 Emeritus of Ideation\n4 Gloomlake Verge\n2 Hidden Lair\n1 M.O.D.O.K.\n1 Nowhere to Run\n3 Requiting Hex\n4 Restless Reef\n3 Stock Up\n1 Strategic Betrayal\n4 Superior Spider-Man\n9 Swamp\n1 Undercity Sewers\n4 Watery Grave\n2 Winternight Stories\n1 Deadly Cover-Up\n1 Deathmark\n1 Decorum Dissertation\n1 Disdainful Stroke\n1 Doomsday Excruciator\n1 Emeritus of Ideation\n2 Flashfreeze\n1 Ghost Vacuum\n3 Oildeep Gearhulk\n2 Qarsi Revenant\n1 Strategic Betrayal",
+      "arenaImport": "Deck\n3 Bitter Triumph\n2 Cavern of Souls\n2 Day of Black Sun\n1 Deadly Cover-Up\n4 Deceit\n3 Doomsday Excruciator\n4 Duress\n2 Emeritus of Ideation\n4 Gloomlake Verge\n2 Hidden Lair\n1 M.O.D.O.K.\n4 Requiting Hex\n4 Restless Reef\n3 Stock Up\n1 Strategic Betrayal\n4 Superior Spider-Man\n10 Swamp\n4 Watery Grave\n2 Winternight Stories\n1 Deadly Cover-Up\n1 Emeritus of Ideation\n2 Flashfreeze\n1 Ghost Vacuum\n1 M.O.D.O.K.\n2 Malcolm, Alluring Scoundrel\n3 Preacher of the Schism\n1 Quantum Riddler\n2 Shoot the Sheriff\n1 Strategic Betrayal",
       "sources": [
         {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868805"
+          "url": "https://www.mtggoldfish.com/deck/7869103"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2635,7 +2627,7 @@
       ],
       "metaShare": 7,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868805"
+      "listNote": "Mainboard from MTGGoldfish deck #7869103"
     },
     "standard-bo1-mono-green-landfall": {
       "id": "standard-bo1-mono-green-landfall",
@@ -5596,99 +5588,131 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Expressive Iteration"
-        },
-        {
-          "count": 3,
-          "name": "Memory Deluge"
-        },
-        {
-          "count": 3,
-          "name": "Supreme Verdict"
-        },
-        {
-          "count": 2,
-          "name": "Wrath of God"
+          "name": "Abandon Attachments"
         },
         {
           "count": 4,
-          "name": "No More Lies"
+          "name": "Accumulate Wisdom"
         },
         {
-          "count": 3,
-          "name": "Dovin's Veto"
+          "count": 4,
+          "name": "Combustion Technique"
         },
         {
-          "count": 2,
-          "name": "Lightning Helix"
+          "count": 4,
+          "name": "Firebending Lesson"
         },
         {
-          "count": 2,
-          "name": "Get Lost"
+          "count": 1,
+          "name": "Flashback"
         },
         {
-          "count": 3,
-          "name": "The Wandering Emperor"
+          "count": 4,
+          "name": "Gran-Gran"
         },
         {
-          "count": 2,
-          "name": "Teferi, Hero of Dominaria"
+          "count": 4,
+          "name": "Great Hall of the Biblioplex"
         },
         {
           "count": 4,
           "name": "Hallowed Fountain"
         },
         {
+          "count": 2,
+          "name": "Iroh's Demonstration"
+        },
+        {
+          "count": 3,
+          "name": "Island"
+        },
+        {
+          "count": 3,
+          "name": "It'll Quench Ya!"
+        },
+        {
+          "count": 4,
+          "name": "Jeskai Revelation"
+        },
+        {
+          "count": 1,
+          "name": "Mistrise Village"
+        },
+        {
+          "count": 2,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 3,
+          "name": "Spirebluff Canal"
+        },
+        {
           "count": 4,
           "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Sacred Foundry"
-        },
-        {
-          "count": 3,
-          "name": "Raugrin Triome"
+          "count": 2,
+          "name": "Stock Up"
         },
         {
           "count": 2,
-          "name": "Deserted Beach"
+          "name": "Sundown Pass"
         },
         {
-          "count": 2,
-          "name": "Stormcarved Coast"
-        },
-        {
-          "count": 2,
-          "name": "Island"
+          "count": 4,
+          "name": "Tablet of Discovery"
         },
         {
           "count": 1,
-          "name": "Plains"
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "Abrade"
         },
         {
           "count": 1,
-          "name": "Mountain"
-        },
-        {
-          "count": 2,
-          "name": "Otawara, Soaring City"
-        },
-        {
-          "count": 2,
-          "name": "Hengegate Pathway"
-        },
-        {
-          "count": 2,
-          "name": "Riverglide Pathway"
-        },
-        {
-          "count": 2,
-          "name": "Needleverge Pathway"
+          "name": "Day of Judgment"
         },
         {
           "count": 1,
-          "name": "Shark Typhoon"
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 1,
+          "name": "Flashfreeze"
+        },
+        {
+          "count": 1,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 1,
+          "name": "Negate"
+        },
+        {
+          "count": 1,
+          "name": "Ral, Crackling Wit"
+        },
+        {
+          "count": 2,
+          "name": "Slagstorm"
+        },
+        {
+          "count": 1,
+          "name": "Soul-Guide Lantern"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
+        },
+        {
+          "count": 1,
+          "name": "The Unagi of Kyoshi Island"
+        },
+        {
+          "count": 1,
+          "name": "Three Steps Ahead"
         }
       ],
       "sideboard": [],
@@ -5710,11 +5734,15 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Expressive Iteration\n3 Memory Deluge\n3 Supreme Verdict\n2 Wrath of God\n4 No More Lies\n3 Dovin's Veto\n2 Lightning Helix\n2 Get Lost\n3 The Wandering Emperor\n2 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Steam Vents\n3 Sacred Foundry\n3 Raugrin Triome\n2 Deserted Beach\n2 Stormcarved Coast\n2 Island\n1 Plains\n1 Mountain\n2 Otawara, Soaring City\n2 Hengegate Pathway\n2 Riverglide Pathway\n2 Needleverge Pathway\n1 Shark Typhoon",
+      "arenaImport": "Deck\n4 Abandon Attachments\n4 Accumulate Wisdom\n4 Combustion Technique\n4 Firebending Lesson\n1 Flashback\n4 Gran-Gran\n4 Great Hall of the Biblioplex\n4 Hallowed Fountain\n2 Iroh's Demonstration\n3 Island\n3 It'll Quench Ya!\n4 Jeskai Revelation\n1 Mistrise Village\n2 Riverpyre Verge\n3 Spirebluff Canal\n4 Steam Vents\n2 Stock Up\n2 Sundown Pass\n4 Tablet of Discovery\n1 Three Steps Ahead\n2 Abrade\n1 Day of Judgment\n1 Disdainful Stroke\n1 Flashfreeze\n1 Ghost Vacuum\n1 Negate\n1 Ral, Crackling Wit\n2 Slagstorm\n1 Soul-Guide Lantern\n2 Spell Pierce\n1 The Unagi of Kyoshi Island\n1 Three Steps Ahead",
       "sources": [
         {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
+          "name": "MTGGoldfish deck",
+          "url": "https://www.mtggoldfish.com/deck/7869761"
+        },
+        {
+          "name": "MTGGoldfish archetype",
+          "url": "https://www.mtggoldfish.com/archetype/historic-jeskai-control"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -5730,8 +5758,8 @@
         }
       ],
       "metaShare": 11,
-      "listQuality": "fallback",
-      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
+      "listQuality": "authoritative",
+      "listNote": "Mainboard from MTGGoldfish deck #7869761"
     },
     "historic-bo3-jeskai-control": {
       "id": "historic-bo3-jeskai-control",
@@ -5750,99 +5778,131 @@
       "mainboard": [
         {
           "count": 4,
-          "name": "Expressive Iteration"
-        },
-        {
-          "count": 3,
-          "name": "Memory Deluge"
-        },
-        {
-          "count": 3,
-          "name": "Supreme Verdict"
-        },
-        {
-          "count": 2,
-          "name": "Wrath of God"
+          "name": "Abandon Attachments"
         },
         {
           "count": 4,
-          "name": "No More Lies"
+          "name": "Accumulate Wisdom"
         },
         {
-          "count": 3,
-          "name": "Dovin's Veto"
+          "count": 4,
+          "name": "Combustion Technique"
         },
         {
-          "count": 2,
-          "name": "Lightning Helix"
+          "count": 4,
+          "name": "Firebending Lesson"
         },
         {
-          "count": 2,
-          "name": "Get Lost"
+          "count": 1,
+          "name": "Flashback"
         },
         {
-          "count": 3,
-          "name": "The Wandering Emperor"
+          "count": 4,
+          "name": "Gran-Gran"
         },
         {
-          "count": 2,
-          "name": "Teferi, Hero of Dominaria"
+          "count": 4,
+          "name": "Great Hall of the Biblioplex"
         },
         {
           "count": 4,
           "name": "Hallowed Fountain"
         },
         {
+          "count": 2,
+          "name": "Iroh's Demonstration"
+        },
+        {
+          "count": 3,
+          "name": "Island"
+        },
+        {
+          "count": 3,
+          "name": "It'll Quench Ya!"
+        },
+        {
+          "count": 4,
+          "name": "Jeskai Revelation"
+        },
+        {
+          "count": 1,
+          "name": "Mistrise Village"
+        },
+        {
+          "count": 2,
+          "name": "Riverpyre Verge"
+        },
+        {
+          "count": 3,
+          "name": "Spirebluff Canal"
+        },
+        {
           "count": 4,
           "name": "Steam Vents"
         },
         {
-          "count": 3,
-          "name": "Sacred Foundry"
-        },
-        {
-          "count": 3,
-          "name": "Raugrin Triome"
+          "count": 2,
+          "name": "Stock Up"
         },
         {
           "count": 2,
-          "name": "Deserted Beach"
+          "name": "Sundown Pass"
         },
         {
-          "count": 2,
-          "name": "Stormcarved Coast"
-        },
-        {
-          "count": 2,
-          "name": "Island"
+          "count": 4,
+          "name": "Tablet of Discovery"
         },
         {
           "count": 1,
-          "name": "Plains"
+          "name": "Three Steps Ahead"
+        },
+        {
+          "count": 2,
+          "name": "Abrade"
         },
         {
           "count": 1,
-          "name": "Mountain"
-        },
-        {
-          "count": 2,
-          "name": "Otawara, Soaring City"
-        },
-        {
-          "count": 2,
-          "name": "Hengegate Pathway"
-        },
-        {
-          "count": 2,
-          "name": "Riverglide Pathway"
-        },
-        {
-          "count": 2,
-          "name": "Needleverge Pathway"
+          "name": "Day of Judgment"
         },
         {
           "count": 1,
-          "name": "Shark Typhoon"
+          "name": "Disdainful Stroke"
+        },
+        {
+          "count": 1,
+          "name": "Flashfreeze"
+        },
+        {
+          "count": 1,
+          "name": "Ghost Vacuum"
+        },
+        {
+          "count": 1,
+          "name": "Negate"
+        },
+        {
+          "count": 1,
+          "name": "Ral, Crackling Wit"
+        },
+        {
+          "count": 2,
+          "name": "Slagstorm"
+        },
+        {
+          "count": 1,
+          "name": "Soul-Guide Lantern"
+        },
+        {
+          "count": 2,
+          "name": "Spell Pierce"
+        },
+        {
+          "count": 1,
+          "name": "The Unagi of Kyoshi Island"
+        },
+        {
+          "count": 1,
+          "name": "Three Steps Ahead"
         }
       ],
       "sideboard": [],
@@ -5889,11 +5949,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Expressive Iteration\n3 Memory Deluge\n3 Supreme Verdict\n2 Wrath of God\n4 No More Lies\n3 Dovin's Veto\n2 Lightning Helix\n2 Get Lost\n3 The Wandering Emperor\n2 Teferi, Hero of Dominaria\n4 Hallowed Fountain\n4 Steam Vents\n3 Sacred Foundry\n3 Raugrin Triome\n2 Deserted Beach\n2 Stormcarved Coast\n2 Island\n1 Plains\n1 Mountain\n2 Otawara, Soaring City\n2 Hengegate Pathway\n2 Riverglide Pathway\n2 Needleverge Pathway\n1 Shark Typhoon",
+      "arenaImport": "Deck\n4 Abandon Attachments\n4 Accumulate Wisdom\n4 Combustion Technique\n4 Firebending Lesson\n1 Flashback\n4 Gran-Gran\n4 Great Hall of the Biblioplex\n4 Hallowed Fountain\n2 Iroh's Demonstration\n3 Island\n3 It'll Quench Ya!\n4 Jeskai Revelation\n1 Mistrise Village\n2 Riverpyre Verge\n3 Spirebluff Canal\n4 Steam Vents\n2 Stock Up\n2 Sundown Pass\n4 Tablet of Discovery\n1 Three Steps Ahead\n2 Abrade\n1 Day of Judgment\n1 Disdainful Stroke\n1 Flashfreeze\n1 Ghost Vacuum\n1 Negate\n1 Ral, Crackling Wit\n2 Slagstorm\n1 Soul-Guide Lantern\n2 Spell Pierce\n1 The Unagi of Kyoshi Island\n1 Three Steps Ahead",
       "sources": [
         {
-          "name": "MTGGoldfish Metagame",
-          "url": "https://www.mtggoldfish.com/metagame/standard"
+          "name": "MTGGoldfish deck",
+          "url": "https://www.mtggoldfish.com/deck/7869761"
+        },
+        {
+          "name": "MTGGoldfish archetype",
+          "url": "https://www.mtggoldfish.com/archetype/historic-jeskai-control"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -5909,8 +5973,8 @@
         }
       ],
       "metaShare": 12.2,
-      "listQuality": "fallback",
-      "listNote": "Offline pack baseline. Live pipeline replaces with Goldfish deck exports when available."
+      "listQuality": "authoritative",
+      "listNote": "Mainboard from MTGGoldfish deck #7869761"
     },
     "historic-bo1-jund-midrange": {
       "id": "historic-bo1-jund-midrange",
@@ -8043,32 +8107,24 @@
       "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #2 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Abrade"
-        },
-        {
-          "count": 4,
-          "name": "Blackcleave Cliffs"
+          "count": 3,
+          "name": "Overgrown Tomb"
         },
         {
           "count": 3,
           "name": "Blazemire Verge"
         },
         {
-          "count": 4,
-          "name": "Blightstep Pathway"
+          "count": 2,
+          "name": "Swamp"
         },
         {
           "count": 4,
-          "name": "Blood Crypt"
-        },
-        {
-          "count": 4,
-          "name": "Bloodtithe Harvester"
+          "name": "Scavenger's Talent"
         },
         {
           "count": 1,
-          "name": "Duress"
+          "name": "Sokenzan, Crucible of Defiance"
         },
         {
           "count": 4,
@@ -8076,103 +8132,55 @@
         },
         {
           "count": 4,
-          "name": "Fatal Push"
-        },
-        {
-          "count": 3,
-          "name": "Fear of Missing Out"
-        },
-        {
-          "count": 2,
-          "name": "Go for the Throat"
-        },
-        {
-          "count": 2,
-          "name": "Graveyard Trespasser"
+          "name": "Bloodtithe Harvester"
         },
         {
           "count": 1,
-          "name": "Kolaghan's Command"
+          "name": "Den of the Bugbear"
+        },
+        {
+          "count": 4,
+          "name": "Deadly Dispute"
+        },
+        {
+          "count": 4,
+          "name": "Eyetwitch"
         },
         {
           "count": 1,
           "name": "Kroxa, Titan of Death's Hunger"
         },
         {
-          "count": 4,
-          "name": "Mutavault"
-        },
-        {
-          "count": 3,
-          "name": "Sheoldred, the Apocalypse"
-        },
-        {
-          "count": 1,
-          "name": "Sokenzan, Crucible of Defiance"
-        },
-        {
-          "count": 1,
-          "name": "Sulfurous Springs"
-        },
-        {
           "count": 2,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Takenuma, Abandoned Mire"
+          "name": "Ygra, Eater of All"
         },
         {
           "count": 4,
-          "name": "Thoughtseize"
-        },
-        {
-          "count": 1,
-          "name": "Torch the Tower"
+          "name": "Blood Crypt"
         },
         {
           "count": 4,
-          "name": "Unholy Annex/Ritual Chamber"
+          "name": "Blackcleave Cliffs"
         },
         {
-          "count": 1,
-          "name": "Urborg, Tomb of Yawgmoth"
+          "count": 4,
+          "name": "Fatal Push"
         },
         {
-          "count": 1,
-          "name": "Damping Sphere"
+          "count": 4,
+          "name": "Mayhem Devil"
         },
         {
-          "count": 2,
-          "name": "Duress"
+          "count": 4,
+          "name": "Cauldron Familiar"
         },
         {
-          "count": 2,
-          "name": "Extinction Event"
+          "count": 4,
+          "name": "Witch's Oven"
         },
         {
-          "count": 1,
-          "name": "Gix's Command"
-        },
-        {
-          "count": 2,
-          "name": "Hidetsugu Consumes All"
-        },
-        {
-          "count": 2,
-          "name": "Invoke Despair"
-        },
-        {
-          "count": 2,
-          "name": "Ray of Enfeeblement"
-        },
-        {
-          "count": 1,
-          "name": "Sheoldred's Edict"
-        },
-        {
-          "count": 2,
-          "name": "Unlicensed Hearse"
+          "count": 4,
+          "name": "Blightstep Pathway"
         }
       ],
       "sideboard": [],
@@ -8194,8 +8202,12 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Abrade\n4 Blackcleave Cliffs\n3 Blazemire Verge\n4 Blightstep Pathway\n4 Blood Crypt\n4 Bloodtithe Harvester\n1 Duress\n4 Fable of the Mirror-Breaker\n4 Fatal Push\n3 Fear of Missing Out\n2 Go for the Throat\n2 Graveyard Trespasser\n1 Kolaghan's Command\n1 Kroxa, Titan of Death's Hunger\n4 Mutavault\n3 Sheoldred, the Apocalypse\n1 Sokenzan, Crucible of Defiance\n1 Sulfurous Springs\n2 Swamp\n1 Takenuma, Abandoned Mire\n4 Thoughtseize\n1 Torch the Tower\n4 Unholy Annex/Ritual Chamber\n1 Urborg, Tomb of Yawgmoth\n1 Damping Sphere\n2 Duress\n2 Extinction Event\n1 Gix's Command\n2 Hidetsugu Consumes All\n2 Invoke Despair\n2 Ray of Enfeeblement\n1 Sheoldred's Edict\n2 Unlicensed Hearse",
+      "arenaImport": "Deck\n3 Overgrown Tomb\n3 Blazemire Verge\n2 Swamp\n4 Scavenger's Talent\n1 Sokenzan, Crucible of Defiance\n4 Fable of the Mirror-Breaker\n4 Bloodtithe Harvester\n1 Den of the Bugbear\n4 Deadly Dispute\n4 Eyetwitch\n1 Kroxa, Titan of Death's Hunger\n2 Ygra, Eater of All\n4 Blood Crypt\n4 Blackcleave Cliffs\n4 Fatal Push\n4 Mayhem Devil\n4 Cauldron Familiar\n4 Witch's Oven\n4 Blightstep Pathway",
       "sources": [
+        {
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
+        },
         {
           "name": "MTGGoldfish deck",
           "url": "https://www.mtggoldfish.com/deck/7867739"
@@ -8219,7 +8231,7 @@
       ],
       "metaShare": 1,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7867739"
+      "listNote": "MTGO Pioneer Challenge 32 · JulioP1985 · Rakdos Midrange"
     },
     "pioneer-bo3-rakdos-midrange": {
       "id": "pioneer-bo3-rakdos-midrange",
@@ -8236,32 +8248,24 @@
       "description": "Pioneer workhorse with Fable and Thoughtseize. Daily rank #1 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
-          "count": 1,
-          "name": "Abrade"
-        },
-        {
-          "count": 4,
-          "name": "Blackcleave Cliffs"
+          "count": 3,
+          "name": "Overgrown Tomb"
         },
         {
           "count": 3,
           "name": "Blazemire Verge"
         },
         {
-          "count": 4,
-          "name": "Blightstep Pathway"
+          "count": 2,
+          "name": "Swamp"
         },
         {
           "count": 4,
-          "name": "Blood Crypt"
-        },
-        {
-          "count": 4,
-          "name": "Bloodtithe Harvester"
+          "name": "Scavenger's Talent"
         },
         {
           "count": 1,
-          "name": "Duress"
+          "name": "Sokenzan, Crucible of Defiance"
         },
         {
           "count": 4,
@@ -8269,103 +8273,55 @@
         },
         {
           "count": 4,
-          "name": "Fatal Push"
-        },
-        {
-          "count": 3,
-          "name": "Fear of Missing Out"
-        },
-        {
-          "count": 2,
-          "name": "Go for the Throat"
-        },
-        {
-          "count": 2,
-          "name": "Graveyard Trespasser"
+          "name": "Bloodtithe Harvester"
         },
         {
           "count": 1,
-          "name": "Kolaghan's Command"
+          "name": "Den of the Bugbear"
+        },
+        {
+          "count": 4,
+          "name": "Deadly Dispute"
+        },
+        {
+          "count": 4,
+          "name": "Eyetwitch"
         },
         {
           "count": 1,
           "name": "Kroxa, Titan of Death's Hunger"
         },
         {
-          "count": 4,
-          "name": "Mutavault"
-        },
-        {
-          "count": 3,
-          "name": "Sheoldred, the Apocalypse"
-        },
-        {
-          "count": 1,
-          "name": "Sokenzan, Crucible of Defiance"
-        },
-        {
-          "count": 1,
-          "name": "Sulfurous Springs"
-        },
-        {
           "count": 2,
-          "name": "Swamp"
-        },
-        {
-          "count": 1,
-          "name": "Takenuma, Abandoned Mire"
+          "name": "Ygra, Eater of All"
         },
         {
           "count": 4,
-          "name": "Thoughtseize"
-        },
-        {
-          "count": 1,
-          "name": "Torch the Tower"
+          "name": "Blood Crypt"
         },
         {
           "count": 4,
-          "name": "Unholy Annex/Ritual Chamber"
+          "name": "Blackcleave Cliffs"
         },
         {
-          "count": 1,
-          "name": "Urborg, Tomb of Yawgmoth"
+          "count": 4,
+          "name": "Fatal Push"
         },
         {
-          "count": 1,
-          "name": "Damping Sphere"
+          "count": 4,
+          "name": "Mayhem Devil"
         },
         {
-          "count": 2,
-          "name": "Duress"
+          "count": 4,
+          "name": "Cauldron Familiar"
         },
         {
-          "count": 2,
-          "name": "Extinction Event"
+          "count": 4,
+          "name": "Witch's Oven"
         },
         {
-          "count": 1,
-          "name": "Gix's Command"
-        },
-        {
-          "count": 2,
-          "name": "Hidetsugu Consumes All"
-        },
-        {
-          "count": 2,
-          "name": "Invoke Despair"
-        },
-        {
-          "count": 2,
-          "name": "Ray of Enfeeblement"
-        },
-        {
-          "count": 1,
-          "name": "Sheoldred's Edict"
-        },
-        {
-          "count": 2,
-          "name": "Unlicensed Hearse"
+          "count": 4,
+          "name": "Blightstep Pathway"
         }
       ],
       "sideboard": [],
@@ -8412,8 +8368,12 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Abrade\n4 Blackcleave Cliffs\n3 Blazemire Verge\n4 Blightstep Pathway\n4 Blood Crypt\n4 Bloodtithe Harvester\n1 Duress\n4 Fable of the Mirror-Breaker\n4 Fatal Push\n3 Fear of Missing Out\n2 Go for the Throat\n2 Graveyard Trespasser\n1 Kolaghan's Command\n1 Kroxa, Titan of Death's Hunger\n4 Mutavault\n3 Sheoldred, the Apocalypse\n1 Sokenzan, Crucible of Defiance\n1 Sulfurous Springs\n2 Swamp\n1 Takenuma, Abandoned Mire\n4 Thoughtseize\n1 Torch the Tower\n4 Unholy Annex/Ritual Chamber\n1 Urborg, Tomb of Yawgmoth\n1 Damping Sphere\n2 Duress\n2 Extinction Event\n1 Gix's Command\n2 Hidetsugu Consumes All\n2 Invoke Despair\n2 Ray of Enfeeblement\n1 Sheoldred's Edict\n2 Unlicensed Hearse",
+      "arenaImport": "Deck\n3 Overgrown Tomb\n3 Blazemire Verge\n2 Swamp\n4 Scavenger's Talent\n1 Sokenzan, Crucible of Defiance\n4 Fable of the Mirror-Breaker\n4 Bloodtithe Harvester\n1 Den of the Bugbear\n4 Deadly Dispute\n4 Eyetwitch\n1 Kroxa, Titan of Death's Hunger\n2 Ygra, Eater of All\n4 Blood Crypt\n4 Blackcleave Cliffs\n4 Fatal Push\n4 Mayhem Devil\n4 Cauldron Familiar\n4 Witch's Oven\n4 Blightstep Pathway",
       "sources": [
+        {
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
+        },
         {
           "name": "MTGGoldfish deck",
           "url": "https://www.mtggoldfish.com/deck/7867739"
@@ -8437,7 +8397,7 @@
       ],
       "metaShare": 1,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7867739"
+      "listNote": "MTGO Pioneer Challenge 32 · JulioP1985 · Rakdos Midrange"
     },
     "pioneer-bo1-azorius-control": {
       "id": "pioneer-bo1-azorius-control",
@@ -8454,52 +8414,24 @@
       "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #4 for BO1 — ordered for ladder speed & consistency.",
       "mainboard": [
         {
+          "count": 4,
+          "name": "Hallowed Fountain"
+        },
+        {
           "count": 1,
-          "name": "Beza, the Bounding Spring"
+          "name": "Spell Snare"
         },
         {
           "count": 2,
-          "name": "Change the Equation"
+          "name": "Supreme Verdict"
         },
         {
           "count": 4,
-          "name": "Consult the Star Charts"
-        },
-        {
-          "count": 3,
-          "name": "Deserted Beach"
-        },
-        {
-          "count": 2,
-          "name": "Dovin's Veto"
-        },
-        {
-          "count": 1,
-          "name": "Eiganjo, Seat of the Empire"
-        },
-        {
-          "count": 2,
-          "name": "Emeritus of Ideation"
-        },
-        {
-          "count": 1,
-          "name": "Farewell"
-        },
-        {
-          "count": 1,
-          "name": "Field of Ruin"
+          "name": "Hengegate Pathway"
         },
         {
           "count": 4,
-          "name": "Floodfarm Verge"
-        },
-        {
-          "count": 2,
-          "name": "Fountainport"
-        },
-        {
-          "count": 3,
-          "name": "Get Lost"
+          "name": "March of Otherworldly Light"
         },
         {
           "count": 1,
@@ -8507,107 +8439,79 @@
         },
         {
           "count": 4,
-          "name": "Hallowed Fountain"
+          "name": "The Wandering Emperor"
         },
         {
-          "count": 2,
-          "name": "Island"
+          "count": 3,
+          "name": "Get Lost"
         },
         {
-          "count": 2,
-          "name": "Knockout Blow"
-        },
-        {
-          "count": 4,
-          "name": "March of Otherworldly Light"
-        },
-        {
-          "count": 2,
-          "name": "Meticulous Archive"
-        },
-        {
-          "count": 4,
-          "name": "No More Lies"
+          "count": 1,
+          "name": "Eiganjo, Seat of the Empire"
         },
         {
           "count": 1,
           "name": "Otawara, Soaring City"
         },
         {
-          "count": 1,
-          "name": "Petrified Hamlet"
+          "count": 4,
+          "name": "No More Lies"
         },
         {
-          "count": 2,
-          "name": "Plains"
+          "count": 4,
+          "name": "Dovin's Veto"
         },
         {
-          "count": 2,
-          "name": "Restless Anchorage"
+          "count": 4,
+          "name": "Omen of the Sea"
         },
         {
-          "count": 1,
-          "name": "Supreme Verdict"
-        },
-        {
-          "count": 2,
+          "count": 3,
           "name": "Teferi, Hero of Dominaria"
         },
         {
+          "count": 5,
+          "name": "Island"
+        },
+        {
+          "count": 6,
+          "name": "Plains"
+        },
+        {
+          "count": 4,
+          "name": "Deserted Beach"
+        },
+        {
+          "count": 4,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 3,
+          "name": "Restless Anchorage"
+        },
+        {
           "count": 2,
+          "name": "Emeritus of Ideation"
+        },
+        {
+          "count": 4,
           "name": "Temporary Lockdown"
         },
         {
           "count": 3,
-          "name": "The Wandering Emperor"
-        },
-        {
-          "count": 1,
-          "name": "Three Steps Ahead"
-        },
-        {
-          "count": 2,
           "name": "Beza, the Bounding Spring"
         },
         {
-          "count": 1,
-          "name": "Brimaz, King of Oreskos"
-        },
-        {
-          "count": 1,
-          "name": "Dovin's Veto"
-        },
-        {
-          "count": 1,
-          "name": "Get Lost"
+          "count": 4,
+          "name": "Floodfarm Verge"
         },
         {
           "count": 2,
-          "name": "High Noon"
+          "name": "Erode"
         },
         {
-          "count": 1,
-          "name": "Kaheera, the Orphanguard"
-        },
-        {
-          "count": 1,
-          "name": "Knockout Blow"
-        },
-        {
-          "count": 1,
-          "name": "Kutzil's Flanker"
-        },
-        {
-          "count": 2,
-          "name": "Regal Caracal"
-        },
-        {
-          "count": 2,
-          "name": "Rest in Peace"
-        },
-        {
-          "count": 1,
-          "name": "Temporary Lockdown"
+          "count": 3,
+          "name": "Petrified Hamlet"
         }
       ],
       "sideboard": [],
@@ -8629,11 +8533,15 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n1 Beza, the Bounding Spring\n2 Change the Equation\n4 Consult the Star Charts\n3 Deserted Beach\n2 Dovin's Veto\n1 Eiganjo, Seat of the Empire\n2 Emeritus of Ideation\n1 Farewell\n1 Field of Ruin\n4 Floodfarm Verge\n2 Fountainport\n3 Get Lost\n1 Hall of Storm Giants\n4 Hallowed Fountain\n2 Island\n2 Knockout Blow\n4 March of Otherworldly Light\n2 Meticulous Archive\n4 No More Lies\n1 Otawara, Soaring City\n1 Petrified Hamlet\n2 Plains\n2 Restless Anchorage\n1 Supreme Verdict\n2 Teferi, Hero of Dominaria\n2 Temporary Lockdown\n3 The Wandering Emperor\n1 Three Steps Ahead\n2 Beza, the Bounding Spring\n1 Brimaz, King of Oreskos\n1 Dovin's Veto\n1 Get Lost\n2 High Noon\n1 Kaheera, the Orphanguard\n1 Knockout Blow\n1 Kutzil's Flanker\n2 Regal Caracal\n2 Rest in Peace\n1 Temporary Lockdown",
+      "arenaImport": "Deck\n4 Hallowed Fountain\n1 Spell Snare\n2 Supreme Verdict\n4 Hengegate Pathway\n4 March of Otherworldly Light\n1 Hall of Storm Giants\n4 The Wandering Emperor\n3 Get Lost\n1 Eiganjo, Seat of the Empire\n1 Otawara, Soaring City\n4 No More Lies\n4 Dovin's Veto\n4 Omen of the Sea\n3 Teferi, Hero of Dominaria\n5 Island\n6 Plains\n4 Deserted Beach\n4 Consult the Star Charts\n3 Restless Anchorage\n2 Emeritus of Ideation\n4 Temporary Lockdown\n3 Beza, the Bounding Spring\n4 Floodfarm Verge\n2 Erode\n3 Petrified Hamlet",
       "sources": [
         {
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
+        },
+        {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868237"
+          "url": "https://www.mtggoldfish.com/deck/7869997"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -8654,7 +8562,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868237"
+      "listNote": "MTGO Pioneer Challenge 32 · Magicofplayer1 · Azorius Control"
     },
     "pioneer-bo3-azorius-control": {
       "id": "pioneer-bo3-azorius-control",
@@ -8671,52 +8579,24 @@
       "description": "Verdicts and Teferi for Pioneer Bo3. Daily rank #2 for BO3 — ordered for post-board depth & interaction.",
       "mainboard": [
         {
+          "count": 4,
+          "name": "Hallowed Fountain"
+        },
+        {
           "count": 1,
-          "name": "Beza, the Bounding Spring"
+          "name": "Spell Snare"
         },
         {
           "count": 2,
-          "name": "Change the Equation"
+          "name": "Supreme Verdict"
         },
         {
           "count": 4,
-          "name": "Consult the Star Charts"
-        },
-        {
-          "count": 3,
-          "name": "Deserted Beach"
-        },
-        {
-          "count": 2,
-          "name": "Dovin's Veto"
-        },
-        {
-          "count": 1,
-          "name": "Eiganjo, Seat of the Empire"
-        },
-        {
-          "count": 2,
-          "name": "Emeritus of Ideation"
-        },
-        {
-          "count": 1,
-          "name": "Farewell"
-        },
-        {
-          "count": 1,
-          "name": "Field of Ruin"
+          "name": "Hengegate Pathway"
         },
         {
           "count": 4,
-          "name": "Floodfarm Verge"
-        },
-        {
-          "count": 2,
-          "name": "Fountainport"
-        },
-        {
-          "count": 3,
-          "name": "Get Lost"
+          "name": "March of Otherworldly Light"
         },
         {
           "count": 1,
@@ -8724,107 +8604,79 @@
         },
         {
           "count": 4,
-          "name": "Hallowed Fountain"
+          "name": "The Wandering Emperor"
         },
         {
-          "count": 2,
-          "name": "Island"
+          "count": 3,
+          "name": "Get Lost"
         },
         {
-          "count": 2,
-          "name": "Knockout Blow"
-        },
-        {
-          "count": 4,
-          "name": "March of Otherworldly Light"
-        },
-        {
-          "count": 2,
-          "name": "Meticulous Archive"
-        },
-        {
-          "count": 4,
-          "name": "No More Lies"
+          "count": 1,
+          "name": "Eiganjo, Seat of the Empire"
         },
         {
           "count": 1,
           "name": "Otawara, Soaring City"
         },
         {
-          "count": 1,
-          "name": "Petrified Hamlet"
+          "count": 4,
+          "name": "No More Lies"
         },
         {
-          "count": 2,
-          "name": "Plains"
+          "count": 4,
+          "name": "Dovin's Veto"
         },
         {
-          "count": 2,
-          "name": "Restless Anchorage"
+          "count": 4,
+          "name": "Omen of the Sea"
         },
         {
-          "count": 1,
-          "name": "Supreme Verdict"
-        },
-        {
-          "count": 2,
+          "count": 3,
           "name": "Teferi, Hero of Dominaria"
         },
         {
+          "count": 5,
+          "name": "Island"
+        },
+        {
+          "count": 6,
+          "name": "Plains"
+        },
+        {
+          "count": 4,
+          "name": "Deserted Beach"
+        },
+        {
+          "count": 4,
+          "name": "Consult the Star Charts"
+        },
+        {
+          "count": 3,
+          "name": "Restless Anchorage"
+        },
+        {
           "count": 2,
+          "name": "Emeritus of Ideation"
+        },
+        {
+          "count": 4,
           "name": "Temporary Lockdown"
         },
         {
           "count": 3,
-          "name": "The Wandering Emperor"
-        },
-        {
-          "count": 1,
-          "name": "Three Steps Ahead"
-        },
-        {
-          "count": 2,
           "name": "Beza, the Bounding Spring"
         },
         {
-          "count": 1,
-          "name": "Brimaz, King of Oreskos"
-        },
-        {
-          "count": 1,
-          "name": "Dovin's Veto"
-        },
-        {
-          "count": 1,
-          "name": "Get Lost"
+          "count": 4,
+          "name": "Floodfarm Verge"
         },
         {
           "count": 2,
-          "name": "High Noon"
+          "name": "Erode"
         },
         {
-          "count": 1,
-          "name": "Kaheera, the Orphanguard"
-        },
-        {
-          "count": 1,
-          "name": "Knockout Blow"
-        },
-        {
-          "count": 1,
-          "name": "Kutzil's Flanker"
-        },
-        {
-          "count": 2,
-          "name": "Regal Caracal"
-        },
-        {
-          "count": 2,
-          "name": "Rest in Peace"
-        },
-        {
-          "count": 1,
-          "name": "Temporary Lockdown"
+          "count": 3,
+          "name": "Petrified Hamlet"
         }
       ],
       "sideboard": [],
@@ -8871,11 +8723,15 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n1 Beza, the Bounding Spring\n2 Change the Equation\n4 Consult the Star Charts\n3 Deserted Beach\n2 Dovin's Veto\n1 Eiganjo, Seat of the Empire\n2 Emeritus of Ideation\n1 Farewell\n1 Field of Ruin\n4 Floodfarm Verge\n2 Fountainport\n3 Get Lost\n1 Hall of Storm Giants\n4 Hallowed Fountain\n2 Island\n2 Knockout Blow\n4 March of Otherworldly Light\n2 Meticulous Archive\n4 No More Lies\n1 Otawara, Soaring City\n1 Petrified Hamlet\n2 Plains\n2 Restless Anchorage\n1 Supreme Verdict\n2 Teferi, Hero of Dominaria\n2 Temporary Lockdown\n3 The Wandering Emperor\n1 Three Steps Ahead\n2 Beza, the Bounding Spring\n1 Brimaz, King of Oreskos\n1 Dovin's Veto\n1 Get Lost\n2 High Noon\n1 Kaheera, the Orphanguard\n1 Knockout Blow\n1 Kutzil's Flanker\n2 Regal Caracal\n2 Rest in Peace\n1 Temporary Lockdown",
+      "arenaImport": "Deck\n4 Hallowed Fountain\n1 Spell Snare\n2 Supreme Verdict\n4 Hengegate Pathway\n4 March of Otherworldly Light\n1 Hall of Storm Giants\n4 The Wandering Emperor\n3 Get Lost\n1 Eiganjo, Seat of the Empire\n1 Otawara, Soaring City\n4 No More Lies\n4 Dovin's Veto\n4 Omen of the Sea\n3 Teferi, Hero of Dominaria\n5 Island\n6 Plains\n4 Deserted Beach\n4 Consult the Star Charts\n3 Restless Anchorage\n2 Emeritus of Ideation\n4 Temporary Lockdown\n3 Beza, the Bounding Spring\n4 Floodfarm Verge\n2 Erode\n3 Petrified Hamlet",
       "sources": [
         {
+          "name": "MTGO official",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
+        },
+        {
           "name": "MTGGoldfish deck",
-          "url": "https://www.mtggoldfish.com/deck/7868237"
+          "url": "https://www.mtggoldfish.com/deck/7869997"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -8896,7 +8752,7 @@
       ],
       "metaShare": 10,
       "listQuality": "authoritative",
-      "listNote": "Mainboard from MTGGoldfish deck #7868237"
+      "listNote": "MTGO Pioneer Challenge 32 · Magicofplayer1 · Azorius Control"
     },
     "pioneer-bo1-izzet-phoenix": {
       "id": "pioneer-bo1-izzet-phoenix",
@@ -8925,16 +8781,24 @@
           "name": "Consider"
         },
         {
-          "count": 4,
-          "name": "Fiery Impulse"
+          "count": 3,
+          "name": "Demilich"
         },
         {
-          "count": 4,
-          "name": "Spirebluff Canal"
+          "count": 3,
+          "name": "Fiery Impulse"
         },
         {
           "count": 3,
           "name": "Into the Flood Maw"
+        },
+        {
+          "count": 1,
+          "name": "Jwari Disruption"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
@@ -8942,23 +8806,11 @@
         },
         {
           "count": 3,
-          "name": "Lightning Axe"
-        },
-        {
-          "count": 4,
           "name": "Island"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
         },
         {
           "count": 4,
           "name": "Picklock Prankster"
-        },
-        {
-          "count": 3,
-          "name": "Demilich"
         },
         {
           "count": 1,
@@ -8969,20 +8821,28 @@
           "name": "Riverglide Pathway"
         },
         {
-          "count": 4,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents"
+          "count": 2,
+          "name": "Shivan Reef"
         },
         {
           "count": 1,
-          "name": "Stormcarved Coast"
+          "name": "Hall of Storm Giants"
+        },
+        {
+          "count": 3,
+          "name": "Lightning Axe"
         },
         {
           "count": 4,
           "name": "Treasure Cruise"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 4,
+          "name": "Steam Vents"
         }
       ],
       "sideboard": [],
@@ -9004,11 +8864,11 @@
         }
       ],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Arclight Phoenix\n4 Artist's Talent\n4 Consider\n4 Fiery Impulse\n4 Spirebluff Canal\n3 Into the Flood Maw\n4 Opt\n3 Lightning Axe\n4 Island\n1 Otawara, Soaring City\n4 Picklock Prankster\n3 Demilich\n1 Proft's Eidetic Memory\n4 Riverglide Pathway\n4 Sleight of Hand\n4 Steam Vents\n1 Stormcarved Coast\n4 Treasure Cruise",
+      "arenaImport": "Deck\n4 Arclight Phoenix\n4 Artist's Talent\n4 Consider\n3 Demilich\n3 Fiery Impulse\n3 Into the Flood Maw\n1 Jwari Disruption\n4 Sleight of Hand\n4 Opt\n3 Island\n4 Picklock Prankster\n1 Proft's Eidetic Memory\n4 Riverglide Pathway\n2 Shivan Reef\n1 Hall of Storm Giants\n3 Lightning Axe\n4 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents",
       "sources": [
         {
           "name": "MTGO official",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1012847120"
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -9029,7 +8889,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "MTGO Pioneer Challenge 32 · _Falcon_ · Izzet Phoenix"
+      "listNote": "MTGO Pioneer Challenge 32 · Lord_Beerus · Izzet Phoenix"
     },
     "pioneer-bo3-izzet-phoenix": {
       "id": "pioneer-bo3-izzet-phoenix",
@@ -9058,16 +8918,24 @@
           "name": "Consider"
         },
         {
-          "count": 4,
-          "name": "Fiery Impulse"
+          "count": 3,
+          "name": "Demilich"
         },
         {
-          "count": 4,
-          "name": "Spirebluff Canal"
+          "count": 3,
+          "name": "Fiery Impulse"
         },
         {
           "count": 3,
           "name": "Into the Flood Maw"
+        },
+        {
+          "count": 1,
+          "name": "Jwari Disruption"
+        },
+        {
+          "count": 4,
+          "name": "Sleight of Hand"
         },
         {
           "count": 4,
@@ -9075,23 +8943,11 @@
         },
         {
           "count": 3,
-          "name": "Lightning Axe"
-        },
-        {
-          "count": 4,
           "name": "Island"
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City"
         },
         {
           "count": 4,
           "name": "Picklock Prankster"
-        },
-        {
-          "count": 3,
-          "name": "Demilich"
         },
         {
           "count": 1,
@@ -9102,20 +8958,28 @@
           "name": "Riverglide Pathway"
         },
         {
-          "count": 4,
-          "name": "Sleight of Hand"
-        },
-        {
-          "count": 4,
-          "name": "Steam Vents"
+          "count": 2,
+          "name": "Shivan Reef"
         },
         {
           "count": 1,
-          "name": "Stormcarved Coast"
+          "name": "Hall of Storm Giants"
+        },
+        {
+          "count": 3,
+          "name": "Lightning Axe"
         },
         {
           "count": 4,
           "name": "Treasure Cruise"
+        },
+        {
+          "count": 4,
+          "name": "Spirebluff Canal"
+        },
+        {
+          "count": 4,
+          "name": "Steam Vents"
         }
       ],
       "sideboard": [],
@@ -9162,11 +9026,11 @@
           "notes": "Post-board becomes a stack war — protect your haymakers."
         }
       ],
-      "arenaImport": "Deck\n4 Arclight Phoenix\n4 Artist's Talent\n4 Consider\n4 Fiery Impulse\n4 Spirebluff Canal\n3 Into the Flood Maw\n4 Opt\n3 Lightning Axe\n4 Island\n1 Otawara, Soaring City\n4 Picklock Prankster\n3 Demilich\n1 Proft's Eidetic Memory\n4 Riverglide Pathway\n4 Sleight of Hand\n4 Steam Vents\n1 Stormcarved Coast\n4 Treasure Cruise",
+      "arenaImport": "Deck\n4 Arclight Phoenix\n4 Artist's Talent\n4 Consider\n3 Demilich\n3 Fiery Impulse\n3 Into the Flood Maw\n1 Jwari Disruption\n4 Sleight of Hand\n4 Opt\n3 Island\n4 Picklock Prankster\n1 Proft's Eidetic Memory\n4 Riverglide Pathway\n2 Shivan Reef\n1 Hall of Storm Giants\n3 Lightning Axe\n4 Treasure Cruise\n4 Spirebluff Canal\n4 Steam Vents",
       "sources": [
         {
           "name": "MTGO official",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1012847120"
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134"
         },
         {
           "name": "Untapped.gg Standard Meta",
@@ -9187,7 +9051,7 @@
       ],
       "metaShare": 8,
       "listQuality": "authoritative",
-      "listNote": "MTGO Pioneer Challenge 32 · _Falcon_ · Izzet Phoenix"
+      "listNote": "MTGO Pioneer Challenge 32 · Lord_Beerus · Izzet Phoenix"
     },
     "pioneer-bo1-lotus-field": {
       "id": "pioneer-bo1-lotus-field",
@@ -20140,7 +20004,7 @@
       "name": "Untapped.gg — Standard constructed meta",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://mtga.untapped.gg/constructed/standard/meta",
       "topDecks": [
         {
@@ -20168,7 +20032,7 @@
       "name": "Melee.gg — find live / recent events",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://melee.gg/Tournament/Search",
       "topDecks": [],
       "notes": "Paper RCQs and organized play. Browse current events on Melee.",
@@ -20179,7 +20043,7 @@
       "name": "traditional standard ranked decklists july 6 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20190,7 +20054,7 @@
       "name": "traditional standard ranked decklists june 29 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20201,7 +20065,7 @@
       "name": "traditional standard ranked decklists june 22 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-22-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20212,7 +20076,7 @@
       "name": "traditional standard ranked decklists june 15 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-15-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20223,7 +20087,7 @@
       "name": "traditional standard ranked decklists june 8 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-8-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20234,7 +20098,7 @@
       "name": "2026 magic online champions showcase season 1 modern decklists",
       "format": "timeless",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/2026-magic-online-champions-showcase-season-1-modern-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20245,7 +20109,7 @@
       "name": "traditional standard ranked decklists june 1 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-1-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20256,7 +20120,7 @@
       "name": "united states regional championships washington dc may 2026 top 32 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20267,7 +20131,7 @@
       "name": "ultimate guard european magic series prague may 2026 top 36 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/ultimate-guard-european-magic-series-prague-may-2026-top-36-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20278,7 +20142,7 @@
       "name": "magic spotlight secrets chiba 2026 top 8 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20289,7 +20153,7 @@
       "name": "traditional standard ranked decklists may 25 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-may-25-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -20300,11 +20164,22 @@
       "name": "anz super series finals adelaide may 2026 top 10 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-11",
+      "date": "2026-07-12",
       "url": "https://magic.gg/decklists/anz-super-series-finals-adelaide-may-2026-top-10-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
       "source": "magic.gg"
+    },
+    {
+      "id": "mtgo-standard-showcase-challenge-2026-07-1112847088",
+      "name": "standard showcase challenge 2026 07 1112847088",
+      "format": "standard",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/standard-showcase-challenge-2026-07-1112847088",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
     },
     {
       "id": "mtgo-legacy-showcase-challenge-2026-07-0412846445",
@@ -20318,12 +20193,100 @@
       "source": "mtgo"
     },
     {
+      "id": "mtgo-legacy-challenge-32-2026-07-1212847138",
+      "name": "legacy challenge 32 2026 07 1212847138",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-12",
+      "url": "https://www.mtgo.com/decklist/legacy-challenge-32-2026-07-1212847138",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-modern-challenge-64-2026-07-1212847137",
+      "name": "modern challenge 64 2026 07 1212847137",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-12",
+      "url": "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-1212847137",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-premodern-challenge-32-2026-07-1112847135",
+      "name": "premodern challenge 32 2026 07 1112847135",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/premodern-challenge-32-2026-07-1112847135",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-pioneer-challenge-32-2026-07-1112847134",
+      "name": "pioneer challenge 32 2026 07 1112847134",
+      "format": "pioneer",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-vintage-challenge-32-2026-07-1112847132",
+      "name": "vintage challenge 32 2026 07 1112847132",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/vintage-challenge-32-2026-07-1112847132",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-modern-challenge-64-2026-07-1112847130",
+      "name": "modern challenge 64 2026 07 1112847130",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-1112847130",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-modern-challenge-32-2026-07-1112847126",
+      "name": "modern challenge 32 2026 07 1112847126",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/modern-challenge-32-2026-07-1112847126",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
       "id": "mtgo-standard-challenge-32-2026-07-1112847125",
       "name": "standard challenge 32 2026 07 1112847125",
       "format": "standard",
       "platform": "mtgo",
       "date": "2026-07-11",
       "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1112847125",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-modern-challenge-64-2026-07-1112847124",
+      "name": "modern challenge 64 2026 07 1112847124",
+      "format": "timeless",
+      "platform": "mtgo",
+      "date": "2026-07-11",
+      "url": "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-1112847124",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
@@ -20428,105 +20391,6 @@
       "source": "mtgo"
     },
     {
-      "id": "mtgo-premodern-challenge-32-2026-07-0912847102",
-      "name": "premodern challenge 32 2026 07 0912847102",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-09",
-      "url": "https://www.mtgo.com/decklist/premodern-challenge-32-2026-07-0912847102",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-vintage-challenge-32-2026-07-0912847100",
-      "name": "vintage challenge 32 2026 07 0912847100",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-09",
-      "url": "https://www.mtgo.com/decklist/vintage-challenge-32-2026-07-0912847100",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-modern-challenge-64-2026-07-0912847098",
-      "name": "modern challenge 64 2026 07 0912847098",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-09",
-      "url": "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-0912847098",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-standard-challenge-32-2026-07-0912847094",
-      "name": "standard challenge 32 2026 07 0912847094",
-      "format": "standard",
-      "platform": "mtgo",
-      "date": "2026-07-09",
-      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-legacy-challenge-32-2026-07-0812847092",
-      "name": "legacy challenge 32 2026 07 0812847092",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-08",
-      "url": "https://www.mtgo.com/decklist/legacy-challenge-32-2026-07-0812847092",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-modern-challenge-96-2026-07-0812846538",
-      "name": "modern challenge 96 2026 07 0812846538",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-08",
-      "url": "https://www.mtgo.com/decklist/modern-challenge-96-2026-07-0812846538",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-modern-challenge-32-2026-07-0812846530",
-      "name": "modern challenge 32 2026 07 0812846530",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-08",
-      "url": "https://www.mtgo.com/decklist/modern-challenge-32-2026-07-0812846530",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-modern-challenge-64-2026-07-0712846528",
-      "name": "modern challenge 64 2026 07 0712846528",
-      "format": "timeless",
-      "platform": "mtgo",
-      "date": "2026-07-07",
-      "url": "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-0712846528",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-standard-challenge-32-2026-07-0712846527",
-      "name": "standard challenge 32 2026 07 0712846527",
-      "format": "standard",
-      "platform": "mtgo",
-      "date": "2026-07-07",
-      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0712846527",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
       "id": "melee-303",
       "name": "Latam Online Challenge - Test Event #4",
       "format": "standard",
@@ -20562,11 +20426,11 @@
   "version": "0.6.1",
   "decksPerFormat": 8,
   "pipeline": {
-    "authoritativeLists": 20,
-    "failedLists": 108,
+    "authoritativeLists": 22,
+    "failedLists": 106,
     "listPolicy": "multi-source: magic.gg > mtgo embedded JSON > goldfish export > tagged fallback only",
     "ranLive": true,
-    "freeListsIngested": 223,
+    "freeListsIngested": 191,
     "sourcesDetail": [
       "magic.gg-decklists",
       "mtgo-embedded-json",
