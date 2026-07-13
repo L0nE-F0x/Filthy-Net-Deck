@@ -1,5 +1,5 @@
 {
-  "version": "0.8.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.2.exe",
-  "notes": "Cleaner top: the status banners and Refresh button are gone — the app now syncs the daily meta by itself (launch, reconnect, hourly)."
+  "version": "0.8.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.3.exe",
+  "notes": "Feed locked to the official CDN — the test-only meta URL override is gone from Settings, and sync stats moved into the data panel."
 }

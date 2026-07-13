@@ -15,17 +15,8 @@ export type VersionCheckResult =
 
 const DEFAULT_BASE = "https://filthy-net-deck.netlify.app";
 
-/** Resolve version.json URL (supports meta-url override host). */
+/** Resolve version.json URL — always the official CDN. */
 export function versionJsonUrl(baseUrl = DEFAULT_BASE): string {
-  try {
-    const override = localStorage.getItem("bbi.metaUrl");
-    if (override) {
-      const u = new URL(override);
-      return `${u.origin}/version.json`;
-    }
-  } catch {
-    /* ignore */
-  }
   return `${baseUrl.replace(/\/$/, "")}/version.json`;
 }
 

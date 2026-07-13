@@ -1,19 +1,13 @@
 import type { MetaBundle } from "../types/meta";
 import { normalizeMetaBundle } from "./deckHelpers";
 
-/** Primary feed URL — override via localStorage `bbi.metaUrl` for testing. */
-export const DEFAULT_META_URL = "https://filthy-net-deck.netlify.app/meta/latest.json";
+/** Primary feed URL — the app always syncs from the official CDN. */
+const DEFAULT_META_URL = "https://filthy-net-deck.netlify.app/meta/latest.json";
 
 const LOCAL_META_PATH = "/meta/latest.json";
 const CACHE_KEY = "bbi.meta.lastGood";
 
 function getMetaUrl(): string {
-  try {
-    const override = localStorage.getItem("bbi.metaUrl");
-    if (override) return override;
-  } catch {
-    /* ignore */
-  }
   // Prefer same-origin / relative when bundled with website or public/
   if (typeof window !== "undefined" && window.location?.protocol === "http:") {
     return LOCAL_META_PATH;

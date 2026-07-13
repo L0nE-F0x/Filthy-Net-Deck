@@ -14,13 +14,15 @@ const FAV_KEY = "bbi.favorites";
 
 interface Prefs {
   defaultMode: PlayMode;
-  metaUrl?: string;
 }
 
 function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
-    if (raw) return JSON.parse(raw) as Prefs;
+    if (raw) {
+      const parsed = JSON.parse(raw) as { defaultMode?: PlayMode };
+      return { defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1" };
+    }
   } catch {
     /* ignore */
   }
@@ -30,8 +32,6 @@ function loadPrefs(): Prefs {
 function savePrefs(p: Prefs) {
   try {
     localStorage.setItem(PREFS_KEY, JSON.stringify(p));
-    if (p.metaUrl) localStorage.setItem("bbi.metaUrl", p.metaUrl);
-    else localStorage.removeItem("bbi.metaUrl");
   } catch {
     /* ignore */
   }
@@ -94,7 +94,6 @@ interface AppState {
   openFormat: (id: FormatId | string) => void;
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
-  setMetaUrl: (url: string) => void;
   refreshMeta: () => Promise<void>;
   clearError: () => void;
   toggleFavorite: (deckId: string) => void;
@@ -114,6 +113,12 @@ function mapFeedStatus(from: "network" | "cache"): FeedStatus {
 
 export const useAppStore = create<AppState>((set, get) => {
   const prefs = loadPrefs();
+  // The test-only meta URL override was removed in 0.8.3 — clear any leftover.
+  try {
+    localStorage.removeItem("bbi.metaUrl");
+  } catch {
+    /* ignore */
+  }
   return {
     page: "daily",
     mode: prefs.defaultMode,
@@ -156,11 +161,6 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);
       set({ prefs: next, mode: m });
-    },
-    setMetaUrl: (url) => {
-      const next = { ...get().prefs, metaUrl: url.trim() || undefined };
-      savePrefs(next);
-      set({ prefs: next });
     },
     clearError: () => set({ error: null }),
 

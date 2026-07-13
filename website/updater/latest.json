@@ -1,11 +1,11 @@
 {
-  "version": "0.8.2",
-  "notes": "Cleaner top: the status banners and Refresh button are gone — the app now syncs the daily meta by itself (launch, reconnect, hourly).",
-  "pub_date": "2026-07-13T08:11:25Z",
+  "version": "0.8.3",
+  "notes": "Feed locked to the official CDN — the test-only meta URL override is gone from Settings, and sync stats moved into the data panel.",
+  "pub_date": "2026-07-13T08:24:19Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWmFzTmR4YUFGS213cm1PZ01MaDNFbTFOOTZ4bDNGdWZ3NXdYT3NUSzZOUFZIblVIYXUxemZ6czhNVmpXRE9GMXpEWXFiNDI0TUd6Z1JzZ1VpdG91NWdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzOTMwMjYzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOC4yX3g2NC1zZXR1cC5leGUKZnRqNVpyM2NvcnJ0L1MyMzg4Vml2Nk92Mi9IbTFhTCtSNWt1Q2l4ZnljRmdrMlNlOFdicUxiR2tHWnlzT2ZlWVMzbFRjWCttSjFCeGl2Wlh5L2VDQlE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWlc0czFybGRoMTNLUmVPc1RMVHl6VjFEWDV1MWhhd3NwRmoyRlBaTE9tVGZtWjM5WjliU29kMkh4VEhQYUFVVUtZWVdFQWVtY3BCelR6bDJFS1hmN1FvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzOTMxMDM2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOC4zX3g2NC1zZXR1cC5leGUKRHFIN0sxc1pleGxoemk0VWdxZUxBK2hpUnhrekhHUnIwVXA1bWQzRkhKenkvb0s2Nk1aWmcrZmJ1NXRyUnhBSlNIZ3JhamZXL0prdTZVTEQyd3pFRHc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.3.exe"
     }
   }
 }

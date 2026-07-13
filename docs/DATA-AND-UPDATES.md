@@ -8,7 +8,7 @@ Since v0.8.2 the app has no manual Refresh button. It re-downloads the published
 
 | Step | What happens |
 |------|----------------|
-| 1 | `GET https://filthy-net-deck.netlify.app/meta/latest.json` (or your Settings override URL) |
+| 1 | `GET https://filthy-net-deck.netlify.app/meta/latest.json` (fixed — the URL-override setting was removed in v0.8.3) |
 | 2 | Parse that JSON (formats, 8×8 decks, tournaments, sources) |
 | 3 | Diff vs last snapshot (meta movement) |
 | 4 | Cache in memory + local snapshot for offline/diff |
