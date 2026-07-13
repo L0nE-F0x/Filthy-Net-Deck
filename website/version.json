@@ -1,5 +1,5 @@
 {
-  "version": "0.8.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.0.exe",
-  "notes": "Focused pivot: Standard & Pioneer only (no Alchemy-pool formats). Every deck is a real, live, Scryfall-verified list — no placeholder or seeded data. New: in-app updates — future versions install and relaunch themselves."
+  "version": "0.8.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.1.exe",
+  "notes": "Clearer stale-meta banner: Refresh only re-downloads the published feed; a new date needs the daily pipeline."
 }

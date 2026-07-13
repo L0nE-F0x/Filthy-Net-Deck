@@ -1,5 +1,5 @@
 {
-  "version": "0.7.3",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.7.3.exe",
-  "notes": "Fix 4c Control mislabeled aggro lists; Copy Arena import bar scrolls with the page (no sticky overlap). Offline pack includes corrected lists."
+  "version": "0.8.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.1.exe",
+  "notes": "Clearer stale-meta banner: Refresh only re-downloads the published feed; a new date needs the daily pipeline."
 }
