@@ -64,8 +64,10 @@ export function StatusBanners() {
       className: "banner banner-warn",
       body: (
         <>
-          <strong>Stale meta</strong> — feed date is {meta.date}, today is{" "}
-          {new Date().toISOString().slice(0, 10)}. Tap Refresh or wait for the daily pipeline.
+          <strong>Stale meta</strong> — published feed is from {meta.date}, today is{" "}
+          {new Date().toISOString().slice(0, 10)}. Waiting for the daily pipeline to publish a new
+          file on Netlify; Refresh only re-downloads what is already live (it cannot scrape new
+          lists).
         </>
       ),
     });
