@@ -84,6 +84,6 @@ export async function fetchMetaBundle(): Promise<{
   }
 
   throw new Error(
-    "Could not download the meta feed and no previously downloaded copy exists on this machine. Check your connection and hit Refresh — this app never shows placeholder deck data.",
+    "Could not download the meta feed and no previously downloaded copy exists on this machine. Check your connection — the app retries automatically once you’re back online. It never shows placeholder deck data.",
   );
 }

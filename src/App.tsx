@@ -71,15 +71,27 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // No manual Refresh button: the app syncs itself — on launch, on focus or
+  // hourly when the copy is >90 min old, and immediately when connectivity
+  // returns. The published feed only changes when the daily pipeline runs.
   useEffect(() => {
-    const onFocus = () => {
+    const syncIfStale = () => {
       if (!loading && lastRefresh) {
         const age = Date.now() - new Date(lastRefresh).getTime();
         if (age > 90 * 60 * 1000) void refreshMeta();
       }
     };
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const onOnline = () => {
+      if (!loading) void refreshMeta();
+    };
+    window.addEventListener("focus", syncIfStale);
+    window.addEventListener("online", onOnline);
+    const timer = window.setInterval(syncIfStale, 60 * 60 * 1000);
+    return () => {
+      window.removeEventListener("focus", syncIfStale);
+      window.removeEventListener("online", onOnline);
+      window.clearInterval(timer);
+    };
   }, [lastRefresh, loading, refreshMeta]);
 
   return (
@@ -151,19 +163,9 @@ export default function App() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {(page === "daily" || page === "format" || page === "deck") && (
-              <BoModeToggle mode={mode} onChange={setMode} />
-            )}
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              disabled={loading}
-              onClick={() => void refreshMeta()}
-            >
-              {loading ? "…" : "Refresh"}
-            </button>
-          </div>
+          {(page === "daily" || page === "format" || page === "deck") && (
+            <BoModeToggle mode={mode} onChange={setMode} />
+          )}
         </header>
 
         <StatusBanners />
@@ -183,7 +185,7 @@ export default function App() {
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
               <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
                 This app only shows real, verified meta data — there is no built-in placeholder
-                pack. Connect to the internet and refresh to download today’s lists.
+                pack. Connect to the internet and it will download today’s lists automatically.
               </p>
               <button
                 type="button"

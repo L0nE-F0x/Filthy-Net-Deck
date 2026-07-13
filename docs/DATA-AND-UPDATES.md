@@ -1,8 +1,10 @@
 # Filthy Net Deck — Data pipeline & updates
 
-## What **Refresh** does (inside the app)
+## How the app syncs (automatic — there is no Refresh button)
 
-**Refresh does *not* scrape MTGGoldfish, Melee, Untapped, or tournaments from your PC.**
+Since v0.8.2 the app has no manual Refresh button. It re-downloads the published feed by itself: on launch, when connectivity returns (`online` event), and on focus / an hourly timer whenever the loaded copy is more than 90 minutes old.
+
+**Syncing does *not* scrape MTGGoldfish, Melee, Untapped, or tournaments from your PC.**
 
 | Step | What happens |
 |------|----------------|
@@ -12,10 +14,10 @@
 | 4 | Cache in memory + local snapshot for offline/diff |
 | 5 | Check `version.json` for a newer **app** build (soft update banner) |
 
-If the Netlify JSON cannot be fetched, the app falls back to the **built-in offline pack** that shipped inside the installer (labeled **offline pack** — not “live meta”).
+If the Netlify JSON cannot be fetched, the app shows the **last successfully downloaded copy** (real data, banner marks it offline). There is no built-in seed pack — with no network and no cached copy the app shows an explicit error state.
 
 ```
-┌─────────────┐     Refresh      ┌──────────────────────────┐
+┌─────────────┐    auto-sync     ┌──────────────────────────┐
 │  Desktop    │ ───────────────► │ Netlify CDN              │
 │  Filthy Net │   latest.json    │ /meta/latest.json        │
 │  Deck app   │ ◄─────────────── │ (built by CI / pipeline) │
@@ -31,7 +33,7 @@ If the Netlify JSON cannot be fetched, the app falls back to the **built-in offl
           magic.gg · MTGO · Goldfish · Melee · Untapped
 ```
 
-**Cutting-edge accuracy depends on how often the pipeline runs and how good its sources are — not on Refresh alone.** Refresh only re-downloads whatever is already published on Netlify.
+**Cutting-edge accuracy depends on how often the pipeline runs and how good its sources are.** The app only ever re-downloads whatever is already published on Netlify.
 
 ---
 
@@ -84,7 +86,7 @@ Articles (e.g. Traditional Standard Ranked) contain continuous `N Card Name` run
 
 | Mode | Behavior |
 |------|----------|
-| **Soft (shipped)** | On launch + Refresh: check `version.json` → gold banner when remote > local → **Download installer** opens the `.exe` URL via Tauri opener (or browser fallback). Settings → “Check for updates” same path. |
+| **Soft (shipped)** | On launch + every auto-sync: check `version.json` → gold banner when remote > local → **Download installer** opens the `.exe` URL via Tauri opener (or browser fallback). Settings → “Check for updates” same path. |
 | **Hard (Tauri plugin-updater)** | Signed updates, silent install. Needs signing keys + release workflow. Scaffolded but optional until keys exist. |
 
 `website/version.json` shape:
@@ -110,6 +112,6 @@ Ship steps when releasing a new app build:
 
 1. Run `npm run meta` (export + `--live`) on a schedule (GitHub Action daily).
 2. Commit or artifact-upload `website/meta/latest.json` to Netlify.
-3. Users hit **Refresh** → get that JSON.
+3. Users’ apps auto-sync → get that JSON.
 
 Ideal end state: pipeline only ships decks whose `mainboard` came from magic.gg, MTGO JSON, Goldfish export, or Melee decklist text, validated against Scryfall legality where possible.

@@ -40,12 +40,13 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">What Refresh does</h3>
+        <h3 className="text-sm font-semibold m-0 mb-1">Where the data comes from</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          <strong className="text-foam">Refresh does not scrape tournament sites from your PC.</strong>{" "}
-          It re-downloads the published meta file from Netlify (
-          <code className="text-[10px]">/meta/latest.json</code>
-          ). That file is built daily from the{" "}
+          <strong className="text-foam">The app never scrapes tournament sites from your PC.</strong>{" "}
+          It downloads the published meta file from Netlify (
+          <code className="text-[10px]">/meta/latest.json</code>) automatically — on launch, when
+          you come back online, and whenever the loaded copy is more than 90 minutes old. That
+          file is rebuilt once a day from the{" "}
           <strong className="text-foam">MTGGoldfish</strong> Standard &amp; Pioneer metagame with
           every card name verified on <strong className="text-foam">Scryfall</strong>. Tournament
           links come from magic.gg, MTGO, and Melee.gg. If live data can’t be fetched, the previous
@@ -92,20 +93,13 @@ export function Settings() {
           <button
             type="button"
             className="btn btn-primary btn-sm"
+            disabled={loading}
             onClick={() => {
               setMetaUrl(urlDraft);
               void refreshMeta();
             }}
           >
-            Save &amp; refresh
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            disabled={loading}
-            onClick={() => void refreshMeta()}
-          >
-            {loading ? "Refreshing…" : "Refresh now"}
+            {loading ? "Saving…" : "Save"}
           </button>
         </div>
         <dl className="mt-4 grid grid-cols-2 gap-2 text-xs m-0">
@@ -118,7 +112,7 @@ export function Settings() {
             <dd className="m-0 font-medium">{meta?.date ?? "—"}</dd>
           </div>
           <div className="col-span-2">
-            <dt className="text-muted">Last refresh</dt>
+            <dt className="text-muted">Last sync</dt>
             <dd className="m-0 font-medium">
               {lastRefresh ? new Date(lastRefresh).toLocaleString() : "—"}
             </dd>

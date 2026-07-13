@@ -1,5 +1,5 @@
 {
-  "version": "0.8.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.1.exe",
-  "notes": "Clearer stale-meta banner: Refresh only re-downloads the published feed; a new date needs the daily pipeline."
+  "version": "0.8.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.2.exe",
+  "notes": "Cleaner top: the status banners and Refresh button are gone — the app now syncs the daily meta by itself (launch, reconnect, hourly)."
 }
