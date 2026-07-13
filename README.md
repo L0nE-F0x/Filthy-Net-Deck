@@ -1,6 +1,6 @@
 # Filthy Net Deck
 
-Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, and tournament pulse.
+Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, tournament pulse, and a **local winrate tracker** for your own Arena matches.
 
 **Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.
 
@@ -39,6 +39,19 @@ Formats: **Standard** and **Pioneer** only. Design rules:
 | MTGGoldfish archetype pages | Representative decklist (embedded `deck_input`, not the CF-blocked `arena_download`) |
 | Scryfall `/cards/collection` | Validation gate — canonical names, per-format legality, `scryfallId` per card (client builds exact CDN image URLs from these; no fuzzy lookups) |
 | magic.gg / MTGO / Melee.gg / Untapped.gg | Standard/Pioneer tournament links only — never deck lists |
+
+## Winrate tracker (My Stats)
+
+The desktop app tails MTG Arena's own `Player.log` and records your matches —
+result, opponent, deck, queue, play/draw, and rank — **entirely on your PC**.
+Nothing is uploaded anywhere.
+
+- Requires **Detailed Logs (Plugin Support)** enabled in Arena
+  (Options → Account); the app walks you through it if it's off.
+- Matches are stored as JSONL in the app data dir (`tracker-matches.jsonl`).
+- The log format is unofficial; if an Arena update changes it, the My Stats
+  page says so instead of recording garbage. To debug against a real log:
+  `FND_REPLAY_LOG=path/to/Player.log cargo test replay_real_log -- --nocapture --ignored`
 
 ## Netlify
 

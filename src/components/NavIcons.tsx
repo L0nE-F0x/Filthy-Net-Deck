@@ -62,6 +62,16 @@ export function IconStar({ className, filled }: IconProps & { filled?: boolean }
   );
 }
 
+export function IconStats({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M8 4h8v5.5a4 4 0 01-8 0V4z" />
+      <path d="M8 5.5H5.5a2.5 2.5 0 002.6 3.4M16 5.5h2.5a2.5 2.5 0 01-2.6 3.4" />
+      <path d="M12 13.5V16M9.5 19h5M10.5 16h3" />
+    </svg>
+  );
+}
+
 export function IconQueue({ className }: IconProps): ReactNode {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">

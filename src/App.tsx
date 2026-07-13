@@ -4,10 +4,11 @@ import { Daily } from "./pages/Daily";
 import { FormatView } from "./pages/FormatView";
 import { DeckView } from "./pages/DeckView";
 import { MetaPulse } from "./pages/MetaPulse";
+import { Stats } from "./pages/Stats";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { StatusBanners } from "./components/StatusBanners";
-import { IconDaily, IconMeta, IconSettings, IconQueue } from "./components/NavIcons";
+import { IconDaily, IconMeta, IconSettings, IconQueue, IconStats } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 
@@ -18,6 +19,7 @@ const NAV: {
 }[] = [
   { id: "daily", label: "Decks", icon: IconDaily },
   { id: "meta", label: "Events", icon: IconMeta },
+  { id: "stats", label: "My Stats", icon: IconStats },
   { id: "settings", label: "Settings", icon: IconSettings },
 ];
 
@@ -32,6 +34,8 @@ function pageTitle(page: Page, queueMode: boolean): string {
       return "Deck";
     case "meta":
       return "Events";
+    case "stats":
+      return "My Stats";
     case "settings":
       return "Settings";
     default:
@@ -61,8 +65,10 @@ export default function App() {
   const showFavoritesOnly = useAppStore((s) => s.showFavoritesOnly);
   const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
+  const initTracker = useAppStore((s) => s.initTracker);
 
   useEffect(() => {
+    void initTracker();
     if (!meta && !loading) {
       void refreshMeta();
     } else {
@@ -180,7 +186,7 @@ export default function App() {
         )}
 
         <main className="content" key={page}>
-          {!meta && !loading && page !== "settings" ? (
+          {!meta && !loading && page !== "settings" && page !== "stats" ? (
             <div className="empty-state">
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
               <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
@@ -201,6 +207,7 @@ export default function App() {
               {page === "format" && <FormatView />}
               {page === "deck" && <DeckView />}
               {page === "meta" && <MetaPulse />}
+              {page === "stats" && <Stats />}
               {page === "settings" && <Settings />}
             </>
           )}

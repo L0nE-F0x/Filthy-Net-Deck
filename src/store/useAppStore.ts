@@ -7,7 +7,14 @@ import {
 } from "../services/versionCheck";
 import { checkAppUpdate, installPendingUpdate } from "../services/appUpdater";
 import { resolveFormatId } from "../services/formatResolve";
+import {
+  clearTrackerHistory,
+  fetchTrackerMatches,
+  fetchTrackerStatus,
+  subscribeTracker,
+} from "../services/tracker";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
+import type { TrackedMatch, TrackerStatus } from "../types/tracker";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
@@ -87,6 +94,10 @@ interface AppState {
   /** In-app update install state */
   updating: boolean;
   updateProgress: number | null;
+  /** Winrate tracker (null status = not running / browser build) */
+  trackerStatus: TrackerStatus | null;
+  trackerMatches: TrackedMatch[];
+  trackerReady: boolean;
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
@@ -105,10 +116,19 @@ interface AppState {
   checkForUpdates: () => Promise<VersionCheckResult>;
   installUpdate: () => Promise<void>;
   dismissUpdate: () => void;
+  initTracker: () => Promise<void>;
+  clearTracker: () => Promise<void>;
 }
 
 function mapFeedStatus(from: "network" | "cache"): FeedStatus {
   return from === "network" ? "live" : "cached";
+}
+
+// Dev-only handle for driving the store from a plain browser (no Tauri).
+declare global {
+  interface Window {
+    __fndStore?: typeof useAppStore;
+  }
 }
 
 export const useAppStore = create<AppState>((set, get) => {
@@ -141,6 +161,9 @@ export const useAppStore = create<AppState>((set, get) => {
     updateAvailable: null,
     updating: false,
     updateProgress: null,
+    trackerStatus: null,
+    trackerMatches: [],
+    trackerReady: false,
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
@@ -232,6 +255,36 @@ export const useAppStore = create<AppState>((set, get) => {
 
     dismissUpdate: () => set({ updateAvailable: null }),
 
+    initTracker: async () => {
+      if (get().trackerReady) return;
+      set({ trackerReady: true });
+      const [status, matches] = await Promise.all([
+        fetchTrackerStatus(),
+        fetchTrackerMatches(),
+      ]);
+      set({ trackerStatus: status, trackerMatches: matches });
+      await subscribeTracker({
+        onMatch: (m) => {
+          const cur = get().trackerMatches;
+          if (cur.some((x) => x.matchId === m.matchId)) return;
+          set({ trackerMatches: [m, ...cur] });
+        },
+        onStatus: (s) => set({ trackerStatus: s }),
+      });
+    },
+
+    clearTracker: async () => {
+      try {
+        await clearTrackerHistory();
+        set({ trackerMatches: [] });
+      } catch (e) {
+        set({
+          error:
+            e instanceof Error ? `Could not clear history: ${e.message}` : "Could not clear history",
+        });
+      }
+    },
+
     refreshMeta: async () => {
       set({ loading: true, error: null });
       try {
@@ -257,3 +310,7 @@ export const useAppStore = create<AppState>((set, get) => {
     },
   };
 });
+
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  window.__fndStore = useAppStore;
+}

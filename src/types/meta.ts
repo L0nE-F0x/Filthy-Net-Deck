@@ -9,6 +9,7 @@ export type Page =
   | "format"
   | "deck"
   | "meta"
+  | "stats"
   | "settings";
 
 export interface CardEntry {

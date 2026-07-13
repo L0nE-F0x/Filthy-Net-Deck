@@ -1,3 +1,5 @@
+mod tracker;
+
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -22,6 +24,12 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_store::Builder::new().build())
+        .manage(tracker::TrackerShared(Default::default()))
+        .invoke_handler(tauri::generate_handler![
+            tracker::tracker_status,
+            tracker::tracker_matches,
+            tracker::tracker_clear
+        ])
         .setup(|app| {
             #[cfg(desktop)]
             {
@@ -29,6 +37,9 @@ pub fn run() {
                     .plugin(tauri_plugin_updater::Builder::new().build())?;
                 app.handle().plugin(tauri_plugin_process::init())?;
             }
+
+            // Winrate tracker: tail MTG Arena's Player.log in the background.
+            tracker::start(app.handle().clone());
 
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;
