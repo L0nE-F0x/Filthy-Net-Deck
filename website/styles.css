@@ -1148,3 +1148,101 @@ main,
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* My Stats marketing card */
+.fb-kicker {
+  display: inline-block;
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent, #c8f060);
+}
+.fb-stats-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: #0c0d0a;
+  border: 1px solid rgba(53, 61, 40, 0.85);
+}
+.stats-mock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+.stats-mock-head strong {
+  color: var(--text, #eef0e6);
+}
+.stats-pill {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  color: #0a1204;
+  background: linear-gradient(120deg, #c8f060, #8fd14f);
+}
+.stats-mock-rate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.65rem;
+  align-items: baseline;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(200, 240, 96, 0.06);
+  border: 1px solid rgba(200, 240, 96, 0.18);
+}
+.stats-mock-rate em {
+  grid-column: 1 / -1;
+  font-style: normal;
+  font-size: 0.68rem;
+  color: var(--muted, #9aa38a);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.stats-mock-rate b {
+  font-size: 1.55rem;
+  line-height: 1;
+  color: #c8f060;
+}
+.stats-mock-rate span {
+  font-size: 0.72rem;
+  color: var(--muted, #9aa38a);
+}
+.stats-mock-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.2rem 0.5rem;
+  align-items: center;
+  font-size: 0.74rem;
+}
+.stats-mock-row span {
+  color: var(--text, #eef0e6);
+}
+.stats-mock-row b {
+  color: #c8f060;
+  font-variant-numeric: tabular-nums;
+}
+.stats-mock-row i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(53, 61, 40, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+.stats-mock-row i::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w, 50%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8fd14f, #c8f060);
+}
