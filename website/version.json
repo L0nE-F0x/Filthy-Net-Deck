@@ -1,5 +1,5 @@
 {
-  "version": "0.8.3",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.3.exe",
-  "notes": "Feed locked to the official CDN — the test-only meta URL override is gone from Settings, and sync stats moved into the data panel."
+  "version": "0.9.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.9.0.exe",
+  "notes": "New: My Stats — a local winrate tracker. The app now records your Arena matches (deck, opponent, play/draw, rank) automatically, entirely on your PC."
 }

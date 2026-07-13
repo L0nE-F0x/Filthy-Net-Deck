@@ -1,11 +1,11 @@
 {
-  "version": "0.8.3",
-  "notes": "Feed locked to the official CDN — the test-only meta URL override is gone from Settings, and sync stats moved into the data panel.",
-  "pub_date": "2026-07-13T08:24:19Z",
+  "version": "0.9.0",
+  "notes": "New: My Stats — a local winrate tracker. The app now records your Arena matches (deck, opponent, play/draw, rank) automatically, entirely on your PC.",
+  "pub_date": "2026-07-13T15:31:40Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWlc0czFybGRoMTNLUmVPc1RMVHl6VjFEWDV1MWhhd3NwRmoyRlBaTE9tVGZtWjM5WjliU29kMkh4VEhQYUFVVUtZWVdFQWVtY3BCelR6bDJFS1hmN1FvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzOTMxMDM2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOC4zX3g2NC1zZXR1cC5leGUKRHFIN0sxc1pleGxoemk0VWdxZUxBK2hpUnhrekhHUnIwVXA1bWQzRkhKenkvb0s2Nk1aWmcrZmJ1NXRyUnhBSlNIZ3JhamZXL0prdTZVTEQyd3pFRHc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.8.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWll6NnF1Qi9YNXlnYXVtS3FGMHdSbUMzNUZGRDhveUp1VytSb1RaUzg4Z2NtOUwyR0hCeE96TVN6Sk5ZKzc3YUxsQ2g4c09DT0pCSi9XeEdvZUV4U2dBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzOTU2NjgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOS4wX3g2NC1zZXR1cC5leGUKUUZ5YVdQSGVFZkZvMHZvVHdpR2d3bUwvL1JuYTcyUEs1SVVPVFdleEpYT1VSYlNLQVFaUTdvclVKTGV0LzhiMS9DTmVGRS9LUEhHWldJSWdTRmRHQ1E9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.9.0.exe"
     }
   }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "filthy-net-deck"
-version = "0.8.3"
+version = "0.9.0"
 description = "Filthy Net Deck — MTG Arena meta companion"
 authors = ["you"]
 edition = "2021"
