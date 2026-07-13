@@ -1,4 +1,4 @@
-"""Generate og-image.png for social previews (1200x630)."""
+﻿"""Generate og-image.png for social previews (1200x630)."""
 from __future__ import annotations
 
 import os
@@ -49,7 +49,7 @@ def soft_orb(
 def main() -> None:
     img = Image.new("RGBA", (W, H), (*INK_950, 255))
 
-    # Atmosphere — keep glows away from title area
+    # Atmosphere - keep glows away from title area
     img = Image.alpha_composite(img, soft_orb((W, H), 210, 340, 420, ACID, 55))
     img = Image.alpha_composite(img, soft_orb((W, H), 1040, 500, 380, (212, 168, 75), 45))
     img = Image.alpha_composite(img, soft_orb((W, H), 900, 80, 260, (92, 107, 42), 35))
@@ -110,36 +110,53 @@ def main() -> None:
     body_font = load_font(regular, 28)
     chip_font = load_font(bold, 20)
     small_font = load_font(regular, 22)
+    badge_font = load_font(bold, 18)
 
-    tx, ty = 500, 145
+    tx, ty = 500, 118
+    mid = "\u00b7"  # middle dot
 
-    # Eyebrow as plain acid text (no pill — more reliable across PIL versions)
-    draw.text((tx, ty), "FREE  ·  WINDOWS  ·  MTG ARENA", font=chip_font, fill=ACID)
+    # Eyebrow as plain acid text (no pill - more reliable across PIL versions)
+    draw.text((tx, ty), f"FREE  {mid}  WINDOWS  {mid}  MTG ARENA", font=chip_font, fill=ACID)
 
     # Live dot
     draw.ellipse([tx - 18, ty + 8, tx - 6, ty + 20], fill=(52, 211, 153, 255))
 
-    draw.text((tx, ty + 42), "Filthy Net Deck", font=title_font, fill=FOAM)
-    draw.text((tx, ty + 132), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
+    draw.text((tx, ty + 40), "Filthy Net Deck", font=title_font, fill=FOAM)
+    draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
+
+    # Feature callout badge for My Stats
+    badge_text = f"NEW  {mid}  MY STATS \u2014 LOCAL WINRATES"
+    badge_pad_x, badge_pad_y = 14, 8
+    bb = draw.textbbox((0, 0), badge_text, font=badge_font)
+    bw, bh = bb[2] - bb[0], bb[3] - bb[1]
+    bx, by = tx, ty + 182
+    draw.rounded_rectangle(
+        [bx, by, bx + bw + badge_pad_x * 2, by + bh + badge_pad_y * 2],
+        radius=8,
+        fill=(184, 240, 0, 28),
+        outline=(*ACID, 160),
+        width=1,
+    )
+    draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
         "Daily Standard & Pioneer meta.",
-        "Real ranked lists · Scryfall-verified.",
-        "Bo1 / Bo3 · One-click Arena import.",
+        f"Real ranked lists {mid} Scryfall-verified.",
+        f"Local winrate tracker {mid} 100% on your PC.",
+        f"Bo1 / Bo3 {mid} One-click Arena import.",
     ]
-    dy = ty + 200
+    dy = ty + 236
     for line in lines:
         draw.text((tx, dy), line, font=body_font, fill=MUTED)
-        dy += 38
+        dy += 36
 
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v0.8.0", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v0.9.0", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.netlify.app", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")
-    # JPEG is also fine for social, but PNG preserves acid greens; keep under ~1MB
     final.save(OUT, "PNG", optimize=True)
     print(f"wrote {OUT} {final.size} {OUT.stat().st_size} bytes")
 
