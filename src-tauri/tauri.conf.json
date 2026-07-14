@@ -1,12 +1,12 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Filthy Net Deck",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "identifier": "com.filthynetdeck.desktop",
   "plugins": {
     "updater": {
       "endpoints": ["https://filthy-net-deck.netlify.app/updater/latest.json"],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY1Q0I1QkQyRUE4QzhBQ0IKUldUTGlvenEwbHZMWmJrRCtoREtxWENoSmVTZEt6bEppZ3U2eUVyK213TGFIRFNiOTl1STQ5RU0K"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY3RkNBOTkwMEY1MjNENDkKUldSSlBWSVBrS244WjRjaUJKUWVDWGVuRENuYm51RjV4VTB1Vzg2RVRqYm9EdityamQvVDhwb08K"
     }
   },
   "build": {

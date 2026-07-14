@@ -1,9 +1,10 @@
 /**
- * Arena card id → name + Scryfall identity, via Scryfall's collection endpoint
- * (`identifiers: [{ arena_id }]`, max 75 per request). Resolved cards are
- * cached in localStorage so deck version diffs and My Stats art work offline
- * after first sight. Unresolvable ids simply stay absent — callers fall back
- * to "#id" / no art.
+ * Arena card id → name + Scryfall identity.
+ *
+ * Scryfall's /cards/collection endpoint no longer accepts `arena_id` identifiers
+ * (returns "Invalid identifier schema"). We resolve via GET /cards/arena/{id}
+ * instead, throttled and cached in localStorage so version diffs / My Stats art
+ * work offline after first sight.
  */
 
 export type ArenaCardInfo = {
@@ -11,9 +12,12 @@ export type ArenaCardInfo = {
   scryfallId?: string;
 };
 
-const CACHE_KEY = "bbi.arenaCards.v2";
-const LEGACY_NAME_KEY = "bbi.arenaCardNames";
-const BATCH = 75;
+const CACHE_KEY = "bbi.arenaCards.v3";
+const LEGACY_KEYS = ["bbi.arenaCards.v2", "bbi.arenaCardNames"];
+const MAX_CONCURRENT = 4;
+const DELAY_MS = 50;
+/** Scryfall requires a descriptive User-Agent on API calls. */
+const UA = "FilthyNetDeck/0.12 (https://filthy-net-deck.netlify.app; local companion)";
 
 let memCache: Record<number, ArenaCardInfo> | null = null;
 /** Ids Scryfall said it does not know — skip re-fetching every session. */
@@ -27,18 +31,30 @@ function loadCache(): Record<number, ArenaCardInfo> {
       memCache = JSON.parse(raw) as Record<number, ArenaCardInfo>;
       return memCache;
     }
-    // One-time migrate v1 name-only cache so offline users keep names.
-    const legacy = localStorage.getItem(LEGACY_NAME_KEY);
-    if (legacy) {
-      const names = JSON.parse(legacy) as Record<string, string>;
-      const migrated: Record<number, ArenaCardInfo> = {};
-      for (const [k, name] of Object.entries(names)) {
-        const id = Number(k);
-        if (Number.isFinite(id) && name) migrated[id] = { name };
+    // Migrate older caches (name-only is still useful for offline labels).
+    for (const key of LEGACY_KEYS) {
+      const legacy = localStorage.getItem(key);
+      if (!legacy) continue;
+      try {
+        const parsed = JSON.parse(legacy) as Record<string, string | ArenaCardInfo>;
+        const migrated: Record<number, ArenaCardInfo> = {};
+        for (const [k, v] of Object.entries(parsed)) {
+          const id = Number(k);
+          if (!Number.isFinite(id)) continue;
+          if (typeof v === "string" && v) migrated[id] = { name: v };
+          else if (v && typeof v === "object" && "name" in v && v.name) {
+            migrated[id] = {
+              name: v.name,
+              scryfallId: (v as ArenaCardInfo).scryfallId,
+            };
+          }
+        }
+        memCache = migrated;
+        saveCache(migrated);
+        return memCache;
+      } catch {
+        /* try next */
       }
-      memCache = migrated;
-      saveCache(migrated);
-      return memCache;
     }
   } catch {
     /* ignore */
@@ -56,54 +72,74 @@ function saveCache(cache: Record<number, ArenaCardInfo>) {
   }
 }
 
-type CollectionCard = {
+type ArenaApiCard = {
   name?: string;
   arena_id?: number;
   id?: string;
+  object?: string;
+  status?: number;
 };
 
-type CollectionResponse = {
-  data?: CollectionCard[];
-  not_found?: { arena_id?: number }[];
-};
+async function fetchArenaCard(arenaId: number): Promise<ArenaCardInfo | null> {
+  try {
+    const res = await fetch(`https://api.scryfall.com/cards/arena/${arenaId}`, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": UA,
+      },
+    });
+    if (res.status === 404) {
+      notFound.add(arenaId);
+      return null;
+    }
+    if (!res.ok) return null;
+    const body = (await res.json()) as ArenaApiCard;
+    if (!body?.name) return null;
+    return { name: body.name, scryfallId: body.id };
+  } catch {
+    return null;
+  }
+}
+
+/** Run async work over `items` with a concurrency cap. */
+async function mapPool<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i]);
+      if (DELAY_MS > 0) await new Promise((r) => setTimeout(r, DELAY_MS));
+    }
+  }
+  const n = Math.min(limit, Math.max(1, items.length));
+  await Promise.all(Array.from({ length: n }, () => worker()));
+  return out;
+}
 
 export async function resolveArenaCards(
   ids: number[],
 ): Promise<Record<number, ArenaCardInfo>> {
   const cache = { ...loadCache() };
   const missing = [...new Set(ids)].filter(
-    (id) => cache[id] === undefined && !notFound.has(id),
+    (id) => cache[id] === undefined && !notFound.has(id) && Number.isFinite(id),
   );
 
-  for (let i = 0; i < missing.length; i += BATCH) {
-    const batch = missing.slice(i, i + BATCH);
-    try {
-      const res = await fetch("https://api.scryfall.com/cards/collection", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          identifiers: batch.map((arena_id) => ({ arena_id })),
-        }),
-      });
-      if (!res.ok) break;
-      const body = (await res.json()) as CollectionResponse;
-      for (const card of body.data ?? []) {
-        if (card.arena_id != null && card.name) {
-          cache[card.arena_id] = {
-            name: card.name,
-            scryfallId: card.id,
-          };
-        }
-      }
-      for (const miss of body.not_found ?? []) {
-        if (miss.arena_id != null) notFound.add(miss.arena_id);
-      }
-    } catch {
-      break; // offline — return whatever the cache already has
+  if (missing.length > 0) {
+    const results = await mapPool(missing, MAX_CONCURRENT, async (id) => {
+      const info = await fetchArenaCard(id);
+      return { id, info };
+    });
+    for (const { id, info } of results) {
+      if (info) cache[id] = info;
     }
+    saveCache(cache);
   }
 
-  if (missing.length > 0) saveCache(cache);
   return cache;
 }
 

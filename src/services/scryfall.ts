@@ -32,10 +32,17 @@ function runQueue() {
   }
 }
 
+const UA = "FilthyNetDeck/0.12 (https://filthy-net-deck.netlify.app; local companion)";
+
 function throttledFetch(url: string): Promise<Response> {
   return new Promise((resolve, reject) => {
     queue.push(() => {
-      fetch(url, { headers: { Accept: "application/json" } })
+      fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": UA,
+        },
+      })
         .then((r) => {
           setTimeout(() => {
             active--;

@@ -1,5 +1,5 @@
 {
-  "version": "0.12.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.0.exe",
-  "notes": "v0.12: Matchup Lab (opponent tags, prep notes, worst-rate sorts) + Climb Tracker (season rank graph, games-to-next-rank, decks that climb). My Stats gains mini card-art version diffs and arsenal fans. Queue removed."
+  "version": "0.12.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.1.exe",
+  "notes": "v0.12.1: Fix version-history card art (Scryfall arena lookup). Restore signed in-app Update & restart. Matchup Lab + Climb Tracker from 0.12."
 }
