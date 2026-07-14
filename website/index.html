@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Filthy Net Deck — Daily Meta + Local Winrate Tracker</title>
+    <title>Filthy Net Deck — Daily Meta + Deck-Level Winrate Tracker</title>
     <meta
       name="description"
-      content="Free Windows MTG Arena companion. NEW My Stats: local winrate tracker for your matches (deck, opponents, play/draw, rank) — nothing leaves your PC. Daily Standard &amp; Pioneer ranked lists, Scryfall-verified, one-click Arena import."
+      content="Free Windows MTG Arena companion. My Stats now goes deep: click any deck for play/draw splits, monthly ranked seasons, fresh runs, and build-by-build version tracking that shows how card swaps moved your winrate — all local, nothing leaves your PC. Daily Standard &amp; Pioneer ranked lists, Scryfall-verified, one-click Arena import."
     />
     <meta name="theme-color" content="#070806" />
     <meta name="color-scheme" content="dark" />
@@ -19,33 +19,33 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta property="og:title" content="Filthy Net Deck — Daily meta + local winrate tracker" />
+    <meta property="og:title" content="Filthy Net Deck — Daily meta + deck-level winrate tracker" />
     <meta
       property="og:description"
-      content="NEW: My Stats tracks every MTG Arena match on your PC — win rate by deck, opponents, play/draw, rank. Plus daily Standard &amp; Pioneer meta, Scryfall-verified lists, and one-click Arena import. Free Windows app."
+      content="NEW: click any deck in My Stats for its full story — play/draw splits, monthly ranked seasons, fresh runs, and version tracking that shows how card swaps moved your winrate. All local. Plus daily Standard &amp; Pioneer meta and one-click Arena import. Free Windows app."
     />
-    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.9.0" />
-    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.9.0" />
+    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.10.0" />
+    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.10.0" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Filthy Net Deck v0.9 — daily Standard & Pioneer meta plus My Stats local winrate tracker"
+      content="Filthy Net Deck v0.10 — deck drill-down winrate tracking plus daily Standard & Pioneer meta"
     />
 
     <!-- X / Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta name="twitter:title" content="Filthy Net Deck — Daily meta + local winrate tracker" />
+    <meta name="twitter:title" content="Filthy Net Deck — Daily meta + deck-level winrate tracker" />
     <meta
       name="twitter:description"
-      content="NEW: My Stats tracks every MTG Arena match on your PC — win rate by deck, opponents, play/draw, rank. Plus daily Standard &amp; Pioneer meta and one-click Arena import."
+      content="NEW: click any deck in My Stats for play/draw splits, ranked seasons, fresh runs, and build-by-build version tracking — see how card swaps moved your winrate, all on your PC."
     />
-    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.9.0" />
+    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.10.0" />
     <meta
       name="twitter:image:alt"
-      content="Filthy Net Deck v0.9 — daily Standard & Pioneer meta plus My Stats local winrate tracker"
+      content="Filthy Net Deck v0.10 — deck drill-down winrate tracking plus daily Standard & Pioneer meta"
     />
 
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
@@ -94,17 +94,17 @@
             The daily <strong>Standard</strong> and <strong>Pioneer</strong> metagame on your
             desktop — <strong>real ranked lists only</strong>, pulled from the live tournament
             meta and verified card-by-card on Scryfall. Plus <strong>My Stats</strong>: automatic
-            local winrate tracking for your Arena matches. Bo1 and Bo3, full sideboards, one-click
-            Arena import.
+            local winrate tracking with per-deck deep dives, ranked-season splits, and
+            build-by-build version history. Bo1 and Bo3, full sideboards, one-click Arena import.
           </p>
           <div class="hero-actions">
             <a
               class="btn btn-primary"
-              href="downloads/Filthy-Net-Deck-Setup-0.9.0.exe"
+              href="downloads/Filthy-Net-Deck-Setup-0.10.0.exe"
               download
             >
               Download for Windows
-              <span class="btn-meta">v0.9.0 · Windows installer</span>
+              <span class="btn-meta">v0.10.0 · Windows installer</span>
             </a>
             <a
               class="btn btn-ghost"
@@ -139,7 +139,7 @@
                   <img src="assets/app-icon.png" alt="" />
                   <div>
                     <strong>Filthy Net Deck</strong>
-                    <small>Standard &amp; Pioneer · v0.9.0</small>
+                    <small>Standard &amp; Pioneer · v0.10.0</small>
                   </div>
                 </div>
                 <button class="mock-nav on" type="button">
@@ -276,32 +276,33 @@
           </article>
           <article class="fb fb-wide fb-stats reveal">
             <div class="fb-copy">
-              <p class="fb-kicker">New in v0.9</p>
-              <h3>My Stats — local winrate tracker</h3>
+              <p class="fb-kicker">New in v0.10</p>
+              <h3>My Stats — now with deck deep dives</h3>
               <p>
-                Every Arena match lands automatically: result, opponent, your deck, play/draw, and
-                rank. Untapped-style tracking without the cloud — nothing is uploaded. Flip on
-                Detailed Logs in Arena once, and Filthy Net Deck does the rest on your machine.
+                Click any deck for its full story: play/draw and Bo1/Bo3 splits, monthly ranked
+                seasons, and a build-by-build version history that shows exactly which card swaps
+                raised (or tanked) your winrate. Start a fresh run to reset a deck's counter
+                without losing history. Still 100% local — nothing is uploaded, ever.
               </p>
             </div>
             <div class="fb-visual fb-stats-visual" aria-hidden="true">
               <div class="stats-mock-head">
-                <strong>My Stats</strong>
-                <span class="stats-pill">Watching Player.log</span>
+                <strong>Izzet Cauldron</strong>
+                <span class="stats-pill">This season · 14 matches</span>
               </div>
               <div class="stats-mock-rate">
-                <em>Overall</em>
-                <b>58%</b>
-                <span>24W · 17L · local only</span>
+                <em>Build 3 · current</em>
+                <b>63%</b>
+                <span>5W · 3L · ▲ 13 pp vs build 2</span>
               </div>
               <div class="stats-mock-row">
-                <span>Selesnya Ouroboroid</span><i style="--w: 72%"></i><b>64%</b>
-              </div>
-              <div class="stats-mock-row">
-                <span>Jeskai Lessons</span><i style="--w: 55%"></i><b>50%</b>
+                <span>+1 Stormchaser's Talent</span><i style="--w: 72%"></i><b>▲</b>
               </div>
               <div class="stats-mock-row">
                 <span>On the play</span><i style="--w: 61%"></i><b>61%</b>
+              </div>
+              <div class="stats-mock-row">
+                <span>On the draw</span><i style="--w: 55%"></i><b>55%</b>
               </div>
             </div>
           </article>
@@ -423,11 +424,11 @@
           <div class="download-row">
             <a
               class="btn btn-primary btn-lg"
-              href="downloads/Filthy-Net-Deck-Setup-0.9.0.exe"
+              href="downloads/Filthy-Net-Deck-Setup-0.10.0.exe"
               download
             >
               Download for Windows
-              <span class="btn-meta">v0.9.0 · NSIS · current user install</span>
+              <span class="btn-meta">v0.10.0 · NSIS · current user install</span>
             </a>
             <a
               class="btn btn-ghost btn-lg"
