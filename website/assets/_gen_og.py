@@ -116,7 +116,7 @@ def main() -> None:
     mid = "\u00b7"  # middle dot
 
     # Eyebrow as plain acid text (no pill - more reliable across PIL versions)
-    draw.text((tx, ty), f"FREE  {mid}  WINDOWS  {mid}  MTG ARENA", font=chip_font, fill=ACID)
+    draw.text((tx, ty), f"FREE  {mid}  WINDOWS & MACOS  {mid}  MTG ARENA", font=chip_font, fill=ACID)
 
     # Live dot
     draw.ellipse([tx - 18, ty + 8, tx - 6, ty + 20], fill=(52, 211, 153, 255))
