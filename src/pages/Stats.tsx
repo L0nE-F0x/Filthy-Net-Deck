@@ -26,6 +26,52 @@ function winrateFavor(rate: number): "favored" | "even" | "unfavored" {
   return "unfavored";
 }
 
+type SortDir = "asc" | "desc";
+
+/** Click a column header: same key flips direction; new key uses its default. */
+function nextSort<K extends string>(
+  key: K,
+  current: { key: K; dir: SortDir },
+  defaults: Record<K, SortDir>,
+): { key: K; dir: SortDir } {
+  if (current.key === key) {
+    return { key, dir: current.dir === "asc" ? "desc" : "asc" };
+  }
+  return { key, dir: defaults[key] };
+}
+
+function SortHeaderBtn({
+  label,
+  active,
+  dir,
+  align = "left",
+  onClick,
+  className = "",
+}: {
+  label: string;
+  active: boolean;
+  dir: SortDir;
+  align?: "left" | "right" | "center";
+  onClick: () => void;
+  className?: string;
+}) {
+  const marker = active ? (dir === "asc" ? "▲" : "▼") : "";
+  return (
+    <button
+      type="button"
+      className={`sort-head-btn align-${align}${active ? " active" : ""}${className ? ` ${className}` : ""}`}
+      onClick={onClick}
+      title={`Sort by ${label}${active ? ` (${dir === "asc" ? "ascending" : "descending"})` : ""}`}
+      aria-sort={active ? (dir === "asc" ? "ascending" : "descending") : "none"}
+    >
+      {label}
+      <span className={`sort-marker${active ? " on" : ""}`} aria-hidden="true">
+        {marker}
+      </span>
+    </button>
+  );
+}
+
 interface Tally {
   wins: number;
   losses: number;
@@ -269,7 +315,7 @@ interface DeckGroup {
   runActive: boolean;
 }
 
-/** Group matches by deck (newest deckName wins as the display name). */
+/** Group matches by deck (newest deckName wins as the display name). Unsorted. */
 function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[] {
   const byKey = new Map<string, DeckGroup>();
   for (const m of matches) {
@@ -286,7 +332,36 @@ function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[] {
   for (const g of byKey.values()) {
     if (!g.name) g.name = "Unknown deck";
   }
-  return [...byKey.values()].sort((a, b) => b.matches.length - a.matches.length);
+  return [...byKey.values()];
+}
+
+type DeckSortKey = "name" | "matches" | "rate";
+const DECK_SORT_DEFAULTS: Record<DeckSortKey, SortDir> = {
+  name: "asc",
+  matches: "desc",
+  rate: "desc",
+};
+
+function sortDecks(decks: DeckGroup[], key: DeckSortKey, dir: SortDir): DeckGroup[] {
+  const mul = dir === "asc" ? 1 : -1;
+  return [...decks].sort((a, b) => {
+    if (key === "name") {
+      const cmp = a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
+    }
+    if (key === "matches") {
+      const cmp = a.matches.length - b.matches.length;
+      return cmp !== 0 ? cmp * mul : a.name.localeCompare(b.name);
+    }
+    // rate — nulls always last
+    const ra = tally(a.matches).rate;
+    const rb = tally(b.matches).rate;
+    if (ra == null && rb == null) return a.name.localeCompare(b.name);
+    if (ra == null) return 1;
+    if (rb == null) return -1;
+    const cmp = ra - rb;
+    return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
+  });
 }
 
 function DeckBreakdown({
@@ -296,13 +371,48 @@ function DeckBreakdown({
   decks: DeckGroup[];
   onSelect: (key: string) => void;
 }) {
+  const [sort, setSort] = useState<{ key: DeckSortKey; dir: SortDir }>({
+    key: "matches",
+    dir: "desc",
+  });
+  const sorted = useMemo(
+    () => sortDecks(decks, sort.key, sort.dir),
+    [decks, sort.key, sort.dir],
+  );
+
   if (decks.length === 0) return null;
+
+  const setCol = (key: DeckSortKey) =>
+    setSort((cur) => nextSort(key, cur, DECK_SORT_DEFAULTS));
 
   return (
     <div className="panel">
       <h3 className="dash-title">Your decks</h3>
       <div className="meta-bars">
-        {decks.map((d) => {
+        <div className="meta-bar-row deck-wr-row deck-row-btn deck-sort-head" role="row">
+          <SortHeaderBtn
+            label="Deck"
+            active={sort.key === "name"}
+            dir={sort.dir}
+            onClick={() => setCol("name")}
+          />
+          <SortHeaderBtn
+            label="Matches"
+            active={sort.key === "matches"}
+            dir={sort.dir}
+            align="center"
+            onClick={() => setCol("matches")}
+          />
+          <SortHeaderBtn
+            label="Win rate"
+            active={sort.key === "rate"}
+            dir={sort.dir}
+            align="right"
+            onClick={() => setCol("rate")}
+          />
+          <span className="deck-row-chevron" aria-hidden="true" />
+        </div>
+        {sorted.map((d) => {
           const t = tally(d.matches);
           return (
             <button
@@ -322,7 +432,9 @@ function DeckBreakdown({
           );
         })}
       </div>
-      <p className="text-xs text-muted m-0 mt-2">Click a deck for its full breakdown.</p>
+      <p className="text-xs text-muted m-0 mt-2">
+        Click a column header to sort · click a deck for its full breakdown.
+      </p>
     </div>
   );
 }
@@ -531,23 +643,101 @@ function MatchRow({ m }: { m: TrackedMatch }) {
   );
 }
 
+type MatchSortKey = "result" | "opponent" | "deck" | "when";
+const MATCH_SORT_DEFAULTS: Record<MatchSortKey, SortDir> = {
+  result: "asc",
+  opponent: "asc",
+  deck: "asc",
+  when: "desc",
+};
+
+const RESULT_ORDER: Record<MatchResult, number> = {
+  win: 0,
+  draw: 1,
+  loss: 2,
+  unknown: 3,
+};
+
+function sortMatches(matches: TrackedMatch[], key: MatchSortKey, dir: SortDir): TrackedMatch[] {
+  const mul = dir === "asc" ? 1 : -1;
+  return [...matches].sort((a, b) => {
+    let cmp = 0;
+    if (key === "result") {
+      cmp = RESULT_ORDER[a.result] - RESULT_ORDER[b.result];
+    } else if (key === "opponent") {
+      cmp = (a.opponentName ?? "").localeCompare(b.opponentName ?? "", undefined, {
+        sensitivity: "base",
+      });
+    } else if (key === "deck") {
+      cmp = (a.deckName ?? "").localeCompare(b.deckName ?? "", undefined, {
+        sensitivity: "base",
+      });
+      if (cmp === 0) cmp = queueLabel(a.eventId).localeCompare(queueLabel(b.eventId));
+    } else {
+      cmp = a.endedAt - b.endedAt;
+    }
+    if (cmp !== 0) return cmp * mul;
+    // Stable secondary: newest first
+    return b.endedAt - a.endedAt;
+  });
+}
+
 function MatchHistory({ matches }: { matches: TrackedMatch[] }) {
   const [visible, setVisible] = useState(30);
+  const [sort, setSort] = useState<{ key: MatchSortKey; dir: SortDir }>({
+    key: "when",
+    dir: "desc",
+  });
+  const sorted = useMemo(
+    () => sortMatches(matches, sort.key, sort.dir),
+    [matches, sort.key, sort.dir],
+  );
+
+  const setCol = (key: MatchSortKey) =>
+    setSort((cur) => nextSort(key, cur, MATCH_SORT_DEFAULTS));
+
   return (
     <div className="panel">
       <h3 className="dash-title">Match history</h3>
       <div className="match-rows">
-        {matches.slice(0, visible).map((m) => (
+        <div className="match-row match-sort-head" role="row">
+          <SortHeaderBtn
+            label="Result"
+            active={sort.key === "result"}
+            dir={sort.dir}
+            onClick={() => setCol("result")}
+          />
+          <SortHeaderBtn
+            label="Opponent"
+            active={sort.key === "opponent"}
+            dir={sort.dir}
+            onClick={() => setCol("opponent")}
+          />
+          <SortHeaderBtn
+            label="Deck"
+            active={sort.key === "deck"}
+            dir={sort.dir}
+            onClick={() => setCol("deck")}
+          />
+          <SortHeaderBtn
+            label="When"
+            active={sort.key === "when"}
+            dir={sort.dir}
+            align="right"
+            onClick={() => setCol("when")}
+          />
+        </div>
+        {sorted.slice(0, visible).map((m) => (
           <MatchRow key={m.matchId} m={m} />
         ))}
       </div>
-      {matches.length > visible && (
+      {sorted.length > visible && (
         <button
           type="button"
           className="btn btn-ghost btn-sm mt-3"
           onClick={() => setVisible((v) => v + 50)}
         >
-          Show more ({matches.length - visible} older)
+          Show more ({sorted.length - visible} older)
         </button>
       )}
     </div>
