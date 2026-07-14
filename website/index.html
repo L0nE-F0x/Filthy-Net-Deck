@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Filthy Net Deck — Daily Meta + Deck-Level Winrate Tracker</title>
+    <title>Filthy Net Deck — Matchup Lab, Climb Tracker &amp; Daily Meta</title>
     <meta
       name="description"
-      content="Free MTG Arena companion for Windows &amp; macOS. My Stats is fully sortable — click any column to rearrange decks and match history by win rate, result, opponent, or date. Deck deep dives, ranked seasons, fresh runs, and version tracking stay 100% local. Daily Standard &amp; Pioneer ranked lists, Scryfall-verified, one-click Arena import."
+      content="Free MTG Arena companion for Windows &amp; macOS. NEW: Matchup Lab (opponent tags, prep notes, worst-rate sorts) and Climb Tracker (season rank graph, games-to-next-rank, decks that climb). Plus My Stats with card-art version history. Daily Standard &amp; Pioneer ranked lists, 100% local tracking."
     />
     <meta name="theme-color" content="#070806" />
     <meta name="color-scheme" content="dark" />
@@ -19,33 +19,33 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta property="og:title" content="Filthy Net Deck — Daily meta + deck-level winrate tracker" />
+    <meta property="og:title" content="Filthy Net Deck — Matchup Lab + Climb Tracker" />
     <meta
       property="og:description"
-      content="NEW: My Stats columns are sortable — click headers to rearrange decks by win rate or match count, and match history by result, opponent, deck, or date. Deck deep dives, ranked seasons, and version tracking stay 100% local. Free for Windows &amp; macOS."
+      content="NEW in v0.12: Matchup Lab and Climb Tracker — opponent prep notes, season rank graphs, games-to-next-rank estimates. Card-art version history in My Stats. Free for Windows &amp; macOS. 100% local."
     />
-    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.11.0" />
-    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.11.0" />
+    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.12.0" />
+    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.12.0" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Filthy Net Deck v0.11 — sortable My Stats tables plus daily Standard & Pioneer meta"
+      content="Filthy Net Deck v0.12 — Matchup Lab, Climb Tracker, and daily Standard & Pioneer meta"
     />
 
     <!-- X / Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta name="twitter:title" content="Filthy Net Deck — Daily meta + deck-level winrate tracker" />
+    <meta name="twitter:title" content="Filthy Net Deck — Matchup Lab + Climb Tracker" />
     <meta
       name="twitter:description"
-      content="NEW: My Stats columns are sortable — decks by win rate, matches by result or opponent, plus deck deep dives. All local. Free for Windows &amp; macOS."
+      content="NEW in v0.12: Matchup Lab and Climb Tracker plus card-art version history. All local. Free for Windows &amp; macOS."
     />
-    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.11.0" />
+    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.12.0" />
     <meta
       name="twitter:image:alt"
-      content="Filthy Net Deck v0.11 — sortable My Stats tables plus daily Standard & Pioneer meta"
+      content="Filthy Net Deck v0.12 — Matchup Lab, Climb Tracker, and daily Standard & Pioneer meta"
     />
 
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
@@ -92,27 +92,28 @@
           </h1>
           <p class="lede">
             The daily <strong>Standard</strong> and <strong>Pioneer</strong> metagame on your
-            desktop — <strong>real ranked lists only</strong>, pulled from the live tournament
-            meta and verified card-by-card on Scryfall. Plus <strong>My Stats</strong>: automatic
-            local winrate tracking with per-deck deep dives, ranked-season splits, and
-            build-by-build version history. Bo1 and Bo3, full sideboards, one-click Arena import.
+            desktop — <strong>real ranked lists only</strong>, Scryfall-verified. Plus a private
+            tracker: <strong>Matchup Lab</strong> (opponent tags &amp; prep notes),
+            <strong>Climb Tracker</strong> (season rank graph &amp; games-to-next-rank), and
+            <strong>My Stats</strong> with mini card-art version history. Bo1/Bo3, one-click Arena
+            import. Nothing leaves your PC.
           </p>
           <div class="hero-actions">
             <a
               class="btn btn-primary"
-              href="downloads/Filthy-Net-Deck-Setup-0.11.0.exe"
+              href="downloads/Filthy-Net-Deck-Setup-0.12.0.exe"
               download
             >
               Download for Windows
-              <span class="btn-meta">v0.11.0 · Windows installer</span>
+              <span class="btn-meta">v0.12.0 · Windows installer</span>
             </a>
             <a
               class="btn btn-ghost"
-              href="downloads/Filthy-Net-Deck-0.11.0-universal.dmg"
+              href="downloads/Filthy-Net-Deck-0.12.0-universal.dmg"
               download
             >
               Download for macOS
-              <span class="btn-meta">v0.11.0 · universal .dmg</span>
+              <span class="btn-meta">v0.12.0 · universal .dmg</span>
             </a>
             <a
               class="btn btn-ghost"
@@ -126,9 +127,9 @@
           </div>
           <ul class="trust-row">
             <li>Standard + Pioneer</li>
-            <li>Real verified lists only</li>
+            <li>Matchup Lab</li>
+            <li>Climb Tracker</li>
             <li>Local win rates</li>
-            <li>Bo1 / Bo3</li>
             <li>Scryfall art</li>
           </ul>
         </div>
@@ -147,50 +148,47 @@
                   <img src="assets/app-icon.png" alt="" />
                   <div>
                     <strong>Filthy Net Deck</strong>
-                    <small>Standard &amp; Pioneer · v0.11.0</small>
+                    <small>Standard &amp; Pioneer · v0.12.0</small>
                   </div>
                 </div>
-                <button class="mock-nav on" type="button">
-                  <span class="mock-ico">▣</span> Daily
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">▣</span> Decks
                 </button>
                 <button class="mock-nav" type="button">
                   <span class="mock-ico">↗</span> Events
                 </button>
                 <button class="mock-nav" type="button">
-                  <span class="mock-ico">⚙</span> Settings
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">☰</span> My queue
-                </button>
-                <button class="mock-nav" type="button">
                   <span class="mock-ico">📊</span> My Stats
+                </button>
+                <button class="mock-nav on" type="button">
+                  <span class="mock-ico">⚔</span> Matchups
+                </button>
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">↗</span> Climb
+                </button>
+                <button class="mock-nav" type="button">
+                  <span class="mock-ico">⚙</span> Settings
                 </button>
                 <p class="mock-legal">Not affiliated with Wizards of the Coast.</p>
               </aside>
               <div class="mock-main">
                 <header class="mock-top">
                   <div>
-                    <h2>Format</h2>
-                    <p><span class="live-dot"></span> Meta live · Standard</p>
-                  </div>
-                  <div class="mock-mode">
-                    <span class="on">Bo1</span>
-                    <span>Bo3</span>
+                    <h2>Matchup Lab</h2>
+                    <p><span class="live-dot"></span> Local only · this season</p>
                   </div>
                 </header>
                 <div class="mock-hero-panel">
                   <div class="mock-hero-text">
                     <div class="mock-tags">
-                      <em>#1 · BO1 PICK</em>
-                      <b>TIER 1</b>
-                      <i class="pip w"></i>
-                      <i class="pip g"></i>
+                      <em>OPPONENT</em>
+                      <b>DOMAIN</b>
                     </div>
-                    <strong>Selesnya Ouroboroid</strong>
-                    <span>12.9% of the Standard meta · live verified list</span>
+                    <strong>vs Bigswedish</strong>
+                    <span>4W 6L · 40% · Selesnya Aggro · prep notes saved</span>
                     <div class="mock-btns">
-                      <span class="mb primary">Open full decklist</span>
-                      <span class="mb">★ Queue</span>
+                      <span class="mb primary">Tag archetype</span>
+                      <span class="mb">Sideboard notes</span>
                     </div>
                   </div>
                   <div class="mock-cards">
@@ -249,12 +247,68 @@
           <p class="eyebrow">Features</p>
           <h2>Everything you need to stay filthy-current</h2>
           <p class="section-lede">
-            Meta share, card art, mana curves, Arena import, and a private winrate tracker — one
-            native app instead of a dozen tabs. Only real data, always. Your match history never
-            leaves your PC.
+            Meta share, card art, mana curves, Arena import, Matchup Lab, Climb Tracker, and a
+            private winrate tracker — one native app instead of a dozen tabs. Only real data. Your
+            match history never leaves your PC.
           </p>
         </div>
         <div class="feature-bento">
+          <article class="fb fb-wide fb-stats reveal">
+            <div class="fb-copy">
+              <p class="fb-kicker">New in v0.12</p>
+              <h3>Matchup Lab — know your enemies</h3>
+              <p>
+                Every opponent from your local match history, sorted by who actually beats you.
+                Tag them with archetypes, jot sideboard plans, filter by your deck or season, and
+                open a prep panel before the rematch. Tags and notes stay on this PC only.
+              </p>
+            </div>
+            <div class="fb-visual fb-stats-visual" aria-hidden="true">
+              <div class="stats-mock-head">
+                <strong>vs Bigswedish</strong>
+                <span class="stats-pill">Domain</span>
+              </div>
+              <div class="stats-mock-rate">
+                <em>This season · Selesnya Aggro</em>
+                <b>40%</b>
+                <span>4W · 6L · worst-rate sort</span>
+              </div>
+              <div class="stats-mock-row">
+                <span>Prep: cut 2 land, +2 Rest in Peace</span><i style="--w: 68%"></i><b>note</b>
+              </div>
+              <div class="stats-mock-row">
+                <span>On the play vs them</span><i style="--w: 50%"></i><b>50%</b>
+              </div>
+            </div>
+          </article>
+          <article class="fb fb-wide fb-stats reveal">
+            <div class="fb-copy">
+              <p class="fb-kicker">New in v0.12</p>
+              <h3>Climb Tracker — watch the rank move</h3>
+              <p>
+                Season rank graph from every rank Arena stamps on a match. Peak vs current, recent
+                form dots, games-to-next-rank estimates from <em>your</em> step history, and which
+                decks actually push you up the ladder.
+              </p>
+            </div>
+            <div class="fb-visual fb-stats-visual" aria-hidden="true">
+              <div class="stats-mock-head">
+                <strong>Diamond 1</strong>
+                <span class="stats-pill">This season</span>
+              </div>
+              <div class="stats-mock-rate">
+                <em>Peak · started Platinum 2</em>
+                <b>+5</b>
+                <span>steps · ~4 matches to Mythic</span>
+              </div>
+              <div class="stats-mock-row">
+                <span>Selesnya Aggro</span><i style="--w: 72%"></i><b>▲ 3</b>
+              </div>
+              <div class="stats-mock-row">
+                <span>Recent form</span><i style="--w: 60%"></i><b>6–4</b>
+              </div>
+            </div>
+          </article>
           <article class="fb fb-wide reveal">
             <div class="fb-copy">
               <h3>Standard &amp; Pioneer daily boards</h3>
@@ -282,42 +336,10 @@
               </div>
             </div>
           </article>
-          <article class="fb fb-wide fb-stats reveal">
-            <div class="fb-copy">
-              <p class="fb-kicker">New in v0.11</p>
-              <h3>My Stats — sortable tables + deck deep dives</h3>
-              <p>
-                Click any column header to sort Your decks (name, matches, win rate) or Match
-                history (result, opponent, deck, when) ascending or descending. Drill into any
-                deck for play/draw splits, monthly ranked seasons, fresh runs, and build-by-build
-                version history. Still 100% local — nothing is uploaded, ever.
-              </p>
-            </div>
-            <div class="fb-visual fb-stats-visual" aria-hidden="true">
-              <div class="stats-mock-head">
-                <strong>Izzet Cauldron</strong>
-                <span class="stats-pill">This season · 14 matches</span>
-              </div>
-              <div class="stats-mock-rate">
-                <em>Build 3 · current</em>
-                <b>63%</b>
-                <span>5W · 3L · ▲ 13 pp vs build 2</span>
-              </div>
-              <div class="stats-mock-row">
-                <span>+1 Stormchaser's Talent</span><i style="--w: 72%"></i><b>▲</b>
-              </div>
-              <div class="stats-mock-row">
-                <span>On the play</span><i style="--w: 61%"></i><b>61%</b>
-              </div>
-              <div class="stats-mock-row">
-                <span>On the draw</span><i style="--w: 55%"></i><b>55%</b>
-              </div>
-            </div>
-          </article>
           <article class="fb reveal delay-1">
-            <div class="fb-icon">★</div>
-            <h3>My queue</h3>
-            <p>Star decks for the day. Jump back without hunting the list.</p>
+            <div class="fb-icon">📊</div>
+            <h3>My Stats</h3>
+            <p>Sortable decks &amp; history, seasons, fresh runs, mini card-art version diffs.</p>
           </article>
           <article class="fb reveal delay-2">
             <div class="fb-icon">⇄</div>
@@ -327,7 +349,7 @@
           <article class="fb reveal delay-1">
             <div class="fb-icon">◈</div>
             <h3>Visual intel</h3>
-            <p>Mana curves, meta bars, tier mix, color pressure — from real list data.</p>
+            <p>Mana curves, meta bars, arsenal fans, version art — from real lists &amp; logs.</p>
           </article>
           <article class="fb reveal delay-2">
             <div class="fb-icon">↗</div>
@@ -338,7 +360,7 @@
             <div class="fb-copy">
               <h3>Copy straight into Arena</h3>
               <p>
-                Sticky import bar on every deck. One click, paste in MTG Arena, queue. Scryfall art
+                Sticky import bar on every deck. One click, paste in MTG Arena, play. Scryfall art
                 for the cards that resolve.
               </p>
             </div>
@@ -426,25 +448,25 @@
           <p class="eyebrow">Get the app</p>
           <h2>Install Filthy Net Deck</h2>
           <p class="section-lede center">
-            Free. Native. No account. Daily Standard &amp; Pioneer meta on launch — plus a private
-            winrate tracker that never leaves your PC.
+            Free. Native. No account. Daily Standard &amp; Pioneer meta on launch — plus Matchup
+            Lab, Climb Tracker, and a private winrate tracker that never leaves your PC.
           </p>
           <div class="download-row">
             <a
               class="btn btn-primary btn-lg"
-              href="downloads/Filthy-Net-Deck-Setup-0.11.0.exe"
+              href="downloads/Filthy-Net-Deck-Setup-0.12.0.exe"
               download
             >
               Download for Windows
-              <span class="btn-meta">v0.11.0 · NSIS · current user install</span>
+              <span class="btn-meta">v0.12.0 · NSIS · current user install</span>
             </a>
             <a
               class="btn btn-ghost btn-lg"
-              href="downloads/Filthy-Net-Deck-0.11.0-universal.dmg"
+              href="downloads/Filthy-Net-Deck-0.12.0-universal.dmg"
               download
             >
               Download for macOS
-              <span class="btn-meta">v0.11.0 · Apple silicon + Intel</span>
+              <span class="btn-meta">v0.12.0 · Apple silicon + Intel</span>
             </a>
             <a
               class="btn btn-ghost btn-lg"

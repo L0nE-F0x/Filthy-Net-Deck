@@ -1,7 +1,7 @@
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
-import { IconBack, IconStar } from "../components/NavIcons";
+import { IconBack } from "../components/NavIcons";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import {
   AnalysisPanel,
@@ -19,8 +19,6 @@ export function FormatView() {
   const formatId = useAppStore((s) => s.selectedFormatId);
   const setPage = useAppStore((s) => s.setPage);
   const openDeck = useAppStore((s) => s.openDeck);
-  const favorites = useAppStore((s) => s.favorites);
-  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
 
   const fmt = meta?.formats.find((f) => f.id === formatId);
   if (!meta || !fmt) {
@@ -80,13 +78,6 @@ export function FormatView() {
               <div className="flex flex-wrap gap-2">
                 <button type="button" className="btn btn-primary" onClick={() => openDeck(hero.id)}>
                   Open full decklist
-                </button>
-                <button
-                  type="button"
-                  className={`btn btn-ghost star-btn${favorites.includes(hero.id) ? " on" : ""}`}
-                  onClick={() => toggleFavorite(hero.id)}
-                >
-                  <IconStar className="w-4 h-4" filled={favorites.includes(hero.id)} /> Queue
                 </button>
               </div>
             </div>
@@ -167,16 +158,6 @@ export function FormatView() {
                   <CardArtStrip cards={arts} max={5} />
                 </div>
                 <div className="format-deck-actions">
-                  <button
-                    type="button"
-                    className={`star-btn${favorites.includes(deck.id) ? " on" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(deck.id);
-                    }}
-                  >
-                    <IconStar className="w-4 h-4" filled={favorites.includes(deck.id)} />
-                  </button>
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"

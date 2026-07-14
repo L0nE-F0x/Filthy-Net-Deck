@@ -15,7 +15,6 @@ export function Settings() {
   const installUpdate = useAppStore((s) => s.installUpdate);
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
-  const favorites = useAppStore((s) => s.favorites);
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
 
@@ -61,10 +60,6 @@ export function Settings() {
             <dd className="m-0 font-medium">
               {lastRefresh ? new Date(lastRefresh).toLocaleString() : "—"}
             </dd>
-          </div>
-          <div>
-            <dt className="text-muted">Queued decks</dt>
-            <dd className="m-0 font-medium">{favorites.length}</dd>
           </div>
           {meta?.pipeline && (
             <>
@@ -165,7 +160,7 @@ export function Settings() {
           Netdeck without the guilt (or with all of it). Daily <em>Magic: The Gathering</em> meta
           for <strong className="text-foam">Standard</strong> and{" "}
           <strong className="text-foam">Pioneer</strong> — real ranked lists only, Bo1/Bo3, tiers,
-          queue favorites, and tournament pulse. No Alchemy-pool formats, no placeholder decks.
+          tournament pulse, and local match tracking. No Alchemy-pool formats, no placeholder decks.
         </p>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
           Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of

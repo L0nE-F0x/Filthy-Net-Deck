@@ -6,7 +6,7 @@ import { MatchupTable } from "../components/MatchupTable";
 import { SideboardGuide } from "../components/SideboardGuide";
 import { SourceFooter } from "../components/SourceFooter";
 import { ManaCurve, ColorPie } from "../components/ManaCurve";
-import { IconBack, IconCopy, IconStar } from "../components/NavIcons";
+import { IconBack, IconCopy } from "../components/NavIcons";
 import { copyToClipboard } from "../services/arenaImport";
 import { validateDeckNames } from "../services/scryfallValidate";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
@@ -16,15 +16,12 @@ export function DeckView() {
   const deckId = useAppStore((s) => s.selectedDeckId);
   const setPage = useAppStore((s) => s.setPage);
   const openFormat = useAppStore((s) => s.openFormat);
-  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
-  const favorites = useAppStore((s) => s.favorites);
   const [toast, setToast] = useState<string | null>(null);
   const [unknown, setUnknown] = useState<string[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
 
   const deck = deckId && meta ? meta.decks[deckId] : undefined;
   const fmt = deck ? meta?.formats.find((f) => f.id === deck.format) : undefined;
-  const fav = deck ? favorites.includes(deck.id) : false;
 
   useEffect(() => {
     setUnknown([]);
@@ -100,17 +97,7 @@ export function DeckView() {
               <span className="text-xs text-muted">{deck.metaShare}% meta</span>
             )}
           </div>
-          <h2 className="text-2xl font-semibold m-0 tracking-tight flex items-center gap-2">
-            {deck.name}
-            <button
-              type="button"
-              className={`star-btn${fav ? " on" : ""}`}
-              onClick={() => toggleFavorite(deck.id)}
-              aria-label={fav ? "Unstar" : "Star"}
-            >
-              <IconStar className="w-5 h-5" filled={fav} />
-            </button>
-          </h2>
+          <h2 className="text-2xl font-semibold m-0 tracking-tight">{deck.name}</h2>
           {deck.commander && (
             <p className="text-sm text-gold-300 mt-1 mb-0">Commander: {deck.commander}</p>
           )}
@@ -259,13 +246,6 @@ export function DeckView() {
           </span>
         </div>
         <div className="flex gap-2">
-          <button
-            type="button"
-            className={`btn btn-ghost btn-sm star-btn${fav ? " on" : ""}`}
-            onClick={() => toggleFavorite(deck.id)}
-          >
-            <IconStar className="w-4 h-4" filled={fav} /> Queue
-          </button>
           <button type="button" className="btn btn-primary btn-sm" onClick={() => void onCopy()}>
             <IconCopy className="w-4 h-4" /> Copy Arena import
           </button>

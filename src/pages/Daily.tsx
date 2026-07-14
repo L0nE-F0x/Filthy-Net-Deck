@@ -2,7 +2,6 @@ import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
-import { IconStar } from "../components/NavIcons";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
@@ -12,12 +11,9 @@ function filterDecks(
   q: string,
   tier: 0 | 1 | 2 | 3,
   color: string | null,
-  favOnly: boolean,
-  favorites: string[],
 ): Deck[] {
   const query = q.trim().toLowerCase();
   return decks.filter((d) => {
-    if (favOnly && !favorites.includes(d.id)) return false;
     if (tier && d.tier !== tier) return false;
     if (color && !d.colors.includes(color as ManaColor)) return false;
     if (!query) return true;
@@ -32,13 +28,9 @@ function filterDecks(
 function DeckMiniCard({
   d,
   onOpen,
-  onToggleFav,
-  fav,
 }: {
   d: Deck;
   onOpen: () => void;
-  onToggleFav: () => void;
-  fav: boolean;
 }) {
   return (
     <article
@@ -52,20 +44,7 @@ function DeckMiniCard({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-bold text-gold-400">#{d.rank ?? "—"}</span>
-        <div className="flex items-center gap-1">
-          <TierBadge tier={d.tier} />
-          <button
-            type="button"
-            className={`star-btn${fav ? " on" : ""}`}
-            aria-label={fav ? "Remove from queue" : "Add to queue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFav();
-            }}
-          >
-            <IconStar className="w-4 h-4" filled={fav} />
-          </button>
-        </div>
+        <TierBadge tier={d.tier} />
       </div>
       <h3 className="flex items-center gap-2 flex-wrap">
         {d.name}
@@ -91,9 +70,6 @@ export function Daily() {
   const setFilterTier = useAppStore((s) => s.setFilterTier);
   const filterColor = useAppStore((s) => s.filterColor);
   const setFilterColor = useAppStore((s) => s.setFilterColor);
-  const showFavoritesOnly = useAppStore((s) => s.showFavoritesOnly);
-  const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
-  const favorites = useAppStore((s) => s.favorites);
   const metaDiff = useAppStore((s) => s.metaDiff);
   const dailyFormatId = useAppStore((s) => s.dailyFormatId);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
@@ -116,10 +92,8 @@ export function Daily() {
       q: searchQuery,
       tier: filterTier,
       color: filterColor,
-      favOnly: showFavoritesOnly,
-      favorites,
     }),
-    [searchQuery, filterTier, filterColor, showFavoritesOnly, favorites],
+    [searchQuery, filterTier, filterColor],
   );
 
   if (!meta) {
@@ -138,45 +112,37 @@ export function Daily() {
         filterOpts.q,
         filterOpts.tier,
         filterOpts.color,
-        filterOpts.favOnly,
-        filterOpts.favorites,
       )
     : [];
   const hero = activeFmt ? topDeckForMode(activeFmt, mode, meta.decks) : undefined;
-  const favDecks = favorites
-    .map((id) => meta.decks[id])
-    .filter((d): d is Deck => Boolean(d) && d.mode === mode);
 
   return (
     <div className="flex flex-col gap-4">
       <div>
         <p className="eyebrow">Today’s lists · {meta.date}</p>
         <p className="text-sm text-muted m-0 max-w-2xl">
-          Pick a format below — eight ranked decks for the active Bo1/Bo3 mode. Star any deck for
-          your queue.
+          Pick a format below — eight ranked decks for the active Bo1/Bo3 mode. Open any deck
+          for the full list, curve, and one-click Arena import.
         </p>
       </div>
 
-      {/* Format switcher for hero + list */}
-      {!showFavoritesOnly && (
-        <div className="format-switcher" role="tablist" aria-label="Format">
-          {meta.formats.map((f) => {
-            const active = f.id === activeFmt?.id;
-            return (
-              <button
-                key={f.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                className={`format-chip${active ? " active" : ""}`}
-                onClick={() => setDailyFormatId(f.id as FormatId)}
-              >
-                {f.shortLabel || f.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="format-switcher" role="tablist" aria-label="Format">
+        {meta.formats.map((f) => {
+          const active = f.id === activeFmt?.id;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              className={`format-chip${active ? " active" : ""}`}
+              onClick={() => setDailyFormatId(f.id as FormatId)}
+            >
+              {f.shortLabel || f.name}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="filter-bar">
         <input
@@ -207,16 +173,9 @@ export function Daily() {
             {c}
           </button>
         ))}
-        <button
-          type="button"
-          className={`filter-chip${showFavoritesOnly ? " active" : ""}`}
-          onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-        >
-          ★ Queue ({favorites.length})
-        </button>
       </div>
 
-      {metaDiff.previousDate && metaDiff.changes.length > 0 && !showFavoritesOnly && (
+      {metaDiff.previousDate && metaDiff.changes.length > 0 && (
         <section className="panel diff-panel">
           <h3 className="text-sm font-semibold m-0 mb-2">
             Meta movement since {metaDiff.previousDate}
@@ -250,32 +209,7 @@ export function Daily() {
         </section>
       )}
 
-      {showFavoritesOnly && (
-        <section className="panel">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-            Your queue · {mode.toUpperCase()}
-          </h3>
-          {favDecks.length === 0 ? (
-            <p className="text-sm text-muted m-0">
-              Star decks from any format to pin them here. Switch Bo1/Bo3 in the top bar.
-            </p>
-          ) : (
-            <div className="format-grid">
-              {favDecks.map((d) => (
-                <DeckMiniCard
-                  key={d.id}
-                  d={d}
-                  fav
-                  onOpen={() => openDeck(d.id)}
-                  onToggleFav={() => useAppStore.getState().toggleFavorite(d.id)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {activeFmt && hero && !showFavoritesOnly && (
+      {activeFmt && hero && (
         <section className="panel panel-hero">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div className="min-w-0 flex-1">
@@ -322,13 +256,7 @@ export function Daily() {
             ) : (
               <div className="format-grid">
                 {activeDecks.map((d) => (
-                  <DeckMiniCard
-                    key={d.id}
-                    d={d}
-                    fav={favorites.includes(d.id)}
-                    onOpen={() => openDeck(d.id)}
-                    onToggleFav={() => useAppStore.getState().toggleFavorite(d.id)}
-                  />
+                  <DeckMiniCard key={d.id} d={d} onOpen={() => openDeck(d.id)} />
                 ))}
               </div>
             )}

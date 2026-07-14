@@ -134,15 +134,15 @@ select,
 .nav-btn {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
   width: 100%;
-  padding: 0.65rem 0.75rem;
+  padding: 0.52rem 0.7rem;
   border: none;
   border-radius: 10px;
   background: transparent;
   color: var(--color-muted);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   cursor: pointer;
   text-align: left;
   transition: background 0.15s, color 0.15s;
@@ -1402,9 +1402,493 @@ select,
   border: 1px solid color-mix(in srgb, var(--color-poor) 28%, transparent);
 }
 
+/* ——— version history mini card art ——— */
+.diff-art-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.65rem;
+  padding: 0.15rem 0 0.1rem;
+}
+.diff-art-card {
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+}
+.diff-art-frame {
+  position: relative;
+  width: 56px;
+  height: 78px;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, white 14%, transparent);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  background: var(--color-ink-900);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.diff-art-card:hover .diff-art-frame {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
+  z-index: 2;
+}
+.diff-art-card.add .diff-art-frame {
+  border-color: color-mix(in srgb, var(--color-good) 55%, transparent);
+}
+.diff-art-card.cut .diff-art-frame {
+  border-color: color-mix(in srgb, var(--color-poor) 50%, transparent);
+}
+.diff-art-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+.diff-art-img.card-art-fallback,
+.diff-art-img.card-art-loading {
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 0.85rem;
+}
+.diff-art-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 0.08rem 0.28rem;
+  border-radius: 5px;
+  line-height: 1.1;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.diff-art-card.add .diff-art-badge {
+  color: #04140a;
+  background: color-mix(in srgb, var(--color-good) 88%, white);
+}
+.diff-art-card.cut .diff-art-badge {
+  color: #1a0505;
+  background: color-mix(in srgb, var(--color-poor) 88%, white);
+}
+.diff-art-sb {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  z-index: 2;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.06rem 0.22rem;
+  border-radius: 4px;
+  color: var(--color-foam);
+  background: color-mix(in srgb, var(--color-ink-950) 75%, transparent);
+  border: 1px solid color-mix(in srgb, white 18%, transparent);
+}
+.diff-art-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.22;
+}
+.diff-art-glow.add {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-good) 55%, transparent), transparent 55%);
+}
+.diff-art-glow.cut {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-poor) 50%, transparent), transparent 55%);
+  opacity: 0.28;
+}
+.diff-art-card.cut .diff-art-img {
+  filter: saturate(0.75) brightness(0.92);
+}
+.diff-art-name {
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-muted);
+  max-width: 64px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.ver-build-art {
+  margin: 0.05rem 0 0.15rem;
+}
+.ver-build-art .card-art-strip { margin-top: 0; }
+.ver-build-art .card-art-thumb {
+  width: 36px;
+  height: 50px;
+}
+
+/* ——— My Stats arsenal + deck row art ——— */
+.stats-arsenal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.25rem;
+  overflow: hidden;
+  position: relative;
+}
+.stats-arsenal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 80% at 85% 50%, color-mix(in srgb, var(--color-gold-500) 10%, transparent), transparent 70%),
+    radial-gradient(ellipse 40% 70% at 15% 80%, color-mix(in srgb, var(--color-azure-400) 8%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.stats-arsenal-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 220px;
+}
+.stats-arsenal-fans {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem 1.4rem;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+.stats-arsenal-fan {
+  position: relative;
+  width: 108px;
+  height: 118px;
+  flex-shrink: 0;
+}
+.stats-arsenal-card {
+  position: absolute;
+  width: 58px;
+  height: 82px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 28%, transparent);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+.stats-arsenal-card-0 { left: 0; top: 8px; transform: rotate(-9deg); }
+.stats-arsenal-card-1 { left: 26px; top: 0; transform: rotate(1deg); }
+.stats-arsenal-card-2 { left: 50px; top: 10px; transform: rotate(10deg); }
+.stats-arsenal-fan:hover .stats-arsenal-card-0 { transform: rotate(-12deg) translateY(-4px); }
+.stats-arsenal-fan:hover .stats-arsenal-card-1 { transform: rotate(0deg) translateY(-6px); }
+.stats-arsenal-fan:hover .stats-arsenal-card-2 { transform: rotate(12deg) translateY(-4px); }
+.stats-arsenal-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+.stats-arsenal-img.card-art-fallback,
+.stats-arsenal-img.card-art-loading {
+  width: 100% !important;
+  height: 100% !important;
+}
+.stats-arsenal-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-foam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.deck-row-with-art {
+  grid-template-columns: 118px minmax(90px, 1.1fr) 1.4fr 110px 14px !important;
+  align-items: center;
+  min-height: 52px;
+}
+.deck-row-art {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.deck-row-art .card-art-strip {
+  margin-top: 0;
+  padding-left: 0;
+}
+.deck-row-art .card-art-thumb {
+  width: 30px;
+  height: 42px;
+  border-radius: 5px;
+}
+.deck-row-art .card-art-strip-item { margin-left: -8px; }
+.deck-row-art .card-art-strip-item:first-child { margin-left: 0; }
+.deck-row-art-empty {
+  display: block;
+  width: 30px;
+  height: 42px;
+  border-radius: 5px;
+  background: linear-gradient(145deg, var(--color-ink-700), var(--color-ink-900));
+  border: 1px solid color-mix(in srgb, white 8%, transparent);
+}
+.deck-row-art-spacer { display: block; }
+.deck-detail-hero .deck-detail-art {
+  margin-top: 0.75rem;
+}
+.deck-detail-art .card-art-thumb {
+  width: 44px;
+  height: 62px;
+}
+
+/* ——— Matchup Lab + Climb Tracker ——— */
+.lab-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+.lab-intro-stats {
+  display: flex;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+}
+.lab-intro-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 4.5rem;
+}
+.lab-intro-stats strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.lab-intro-stats span {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.mu-lab-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+.mu-lab-layout.has-detail {
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.95fr);
+  align-items: start;
+}
+.mu-lab-rows {
+  display: flex;
+  flex-direction: column;
+  max-height: min(62vh, 640px);
+  overflow: auto;
+}
+.mu-lab-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 55%, transparent);
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.35rem;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.mu-lab-row:hover {
+  background: color-mix(in srgb, var(--color-gold-500) 7%, transparent);
+}
+.mu-lab-row.active {
+  background: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold-500) 28%, transparent);
+}
+.mu-lab-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+}
+.mu-lab-name strong {
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mu-lab-tag {
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  color: var(--color-gold-300);
+  background: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 28%, transparent);
+}
+.mu-lab-tag.ghost {
+  color: var(--color-muted);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-ink-600) 60%, transparent);
+  font-weight: 600;
+}
+.mu-lab-note-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-azure-400);
+  box-shadow: 0 0 6px var(--color-azure-400);
+}
+.mu-lab-meta {
+  font-size: 0.72rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mu-lab-score {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.mu-lab-score strong { margin-left: 0.15rem; }
+.mu-lab-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.mu-lab-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.mu-lab-field input,
+.mu-lab-field textarea {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--color-foam);
+  background: color-mix(in srgb, var(--color-ink-950) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  resize: vertical;
+}
+.mu-lab-field input:focus,
+.mu-lab-field textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-gold-500) 15%, transparent);
+}
+.mu-lab-matches {
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow: auto;
+}
+.mu-lab-match {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.35rem 0;
+  font-size: 0.78rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 50%, transparent);
+}
+.mu-lab-match:last-child { border-bottom: none; }
+
+.climb-tiles .stat-label {
+  max-width: 11rem;
+  line-height: 1.25;
+}
+.climb-chart {
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-ink-950) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-700) 60%, transparent);
+  padding: 0.5rem 0.35rem 0.35rem;
+}
+.climb-chart.empty {
+  padding: 1rem;
+  min-height: 100px;
+  display: grid;
+  place-items: center;
+}
+.climb-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.climb-grid {
+  stroke: color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.climb-axis {
+  fill: var(--color-muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+.climb-area {
+  fill: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+}
+.climb-line {
+  stroke: var(--color-gold-300);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.climb-dot {
+  fill: var(--color-gold-300);
+  stroke: var(--color-ink-950);
+  stroke-width: 1;
+}
+.climb-chart-foot {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.15rem 0.5rem 0.25rem;
+  font-size: 0.65rem;
+  color: var(--color-muted);
+}
+.climb-deck-row .meta-bar-label {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
 @media (max-width: 960px) {
   .stat-tiles { grid-template-columns: repeat(2, 1fr); }
   .match-row { grid-template-columns: 52px 1fr auto; }
   .match-detail { grid-column: 1 / -1; }
   .deck-row-btn { grid-template-columns: minmax(90px, 1fr) 1fr 100px 14px; }
+  .deck-row-with-art {
+    grid-template-columns: 88px minmax(70px, 1fr) 1fr 90px 14px !important;
+  }
+  .deck-row-art .card-art-thumb { width: 24px; height: 34px; }
+  .stats-arsenal { flex-direction: column; align-items: flex-start; }
+  .stats-arsenal-fans { justify-content: flex-start; }
+  .mu-lab-layout.has-detail { grid-template-columns: 1fr; }
+  .mu-lab-row {
+    grid-template-columns: 1fr auto;
+  }
+  .mu-lab-meta { grid-column: 1 / -1; }
 }

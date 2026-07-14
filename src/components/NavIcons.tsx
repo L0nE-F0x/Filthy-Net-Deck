@@ -79,3 +79,24 @@ export function IconQueue({ className }: IconProps): ReactNode {
     </svg>
   );
 }
+
+export function IconMatchups({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="8" cy="9" r="3" />
+      <circle cx="16" cy="9" r="3" />
+      <path d="M4.5 18c.6-2.2 2.3-3.5 3.5-3.5S10.9 15.8 11.5 18" />
+      <path d="M12.5 18c.6-2.2 2.3-3.5 3.5-3.5s2.9 1.3 3.5 3.5" />
+      <path d="M11 11.5l2 0" />
+    </svg>
+  );
+}
+
+export function IconClimb({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M4 18l5-6 4 3 7-9" />
+      <path d="M15 6h5v5" />
+    </svg>
+  );
+}

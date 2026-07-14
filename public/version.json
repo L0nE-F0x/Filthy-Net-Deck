@@ -1,5 +1,5 @@
 {
-  "version": "0.11.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.11.0.exe",
-  "notes": "My Stats tables are now sortable — click any column header on Your decks or Match history to rearrange by name, win rate, result, opponent, or date (asc/desc)."
+  "version": "0.12.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.0.exe",
+  "notes": "v0.12: Matchup Lab (opponent tags, prep notes, worst-rate sorts) + Climb Tracker (season rank graph, games-to-next-rank, decks that climb). My Stats gains mini card-art version diffs and arsenal fans. Queue removed."
 }

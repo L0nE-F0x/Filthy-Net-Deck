@@ -10,8 +10,65 @@ import {
   timeAgo,
 } from "../services/tracker";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
-import { resolveArenaCardNames } from "../services/arenaCards";
+import {
+  resolveArenaCards,
+  type ArenaCardInfo,
+} from "../services/arenaCards";
+import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
+
+/** Rough land filter for Arena-id lists (we only have names after Scryfall resolve). */
+const LANDISH =
+  /^(Plains|Island|Swamp|Mountain|Forest|Snow-Covered|Wastes)|Verge$|Pathway$|Canal$|Reef$|Shores$|Coast$|Fountain$|Vents$|Crypt$|Tomb$|Town$|Sewers$|Archive$|Falls$|Theater$|Backstreet$|District$|Maze$|Portico$|Monastery$|Village$|^Restless |^Starting Town|Brushland|Razorverge|Llanowar Wastes|Underground River|Shivan Reef|Adarkar|Battlefield Forge|Caves of Koilos|Concealed Courtyard|Blooming Marsh|Blackcleave|Inspiring Vantage|Spirebluff|Seachrome|Darkslick|Hushwood|Wastewood|Floodfarm|Gloomlake|Commercial District|Hedge Maze|Lush Portico|Meticulous|Shadowy|Undercity|Thundering|Raucous|Boseiju|Otawara|Eiganjo|Takenuma|Sokenzan|Lair of the Hydra|Rockface|Den of the Bugbear|Command Tower|Breeding Pool|Hallowed Fountain|Watery Grave|Overgrown Tomb|Temple Garden|Godless Shrine|Blood Crypt|Steam Vents|Sacred Foundry|Stomping Ground|Flooded Strand|Polluted Delta|Misty Rainforest|Windswept Heath|Wooded Foothills|Bloodstained Mire|Marsh Flats|Scalding Tarn|Arid Mesa|Verdant Catacombs|Fabled Passage|Mana Confluence|Multiversal Passage|Great Hall|Mistrise|Stormcarved|Shattered Sanctum|Cori Mountain/i;
+
+function pickArenaPreview(
+  main: number[] | undefined,
+  cards: Record<number, ArenaCardInfo>,
+  max = 4,
+): ArtRef[] {
+  if (!main?.length) return [];
+  const counts = new Map<number, number>();
+  for (const id of main) counts.set(id, (counts.get(id) ?? 0) + 1);
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+  const spells: ArtRef[] = [];
+  const lands: ArtRef[] = [];
+  for (const [id] of ranked) {
+    const info = cards[id];
+    if (!info?.name) continue;
+    const ref: ArtRef = { name: info.name, scryfallId: info.scryfallId };
+    if (LANDISH.test(info.name)) lands.push(ref);
+    else spells.push(ref);
+  }
+  return [...spells, ...lands].slice(0, max);
+}
+
+/** Latest stored mainboard for a deck group (newest match with a list wins). */
+function latestMainboard(matches: TrackedMatch[]): number[] | undefined {
+  for (const m of matches) {
+    if (m.deckMain?.length) return m.deckMain;
+  }
+  return undefined;
+}
+
+function useArenaCardMap(ids: number[]): Record<number, ArenaCardInfo> {
+  const [cards, setCards] = useState<Record<number, ArenaCardInfo>>({});
+  const key = ids.slice().sort((a, b) => a - b).join(",");
+  useEffect(() => {
+    if (ids.length === 0) {
+      setCards({});
+      return;
+    }
+    let alive = true;
+    void resolveArenaCards(ids).then((map) => {
+      if (alive) setCards(map);
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return cards;
+}
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -380,6 +437,24 @@ function DeckBreakdown({
     [decks, sort.key, sort.dir],
   );
 
+  const previewIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const d of decks) {
+      const main = latestMainboard(d.matches);
+      if (!main) continue;
+      // Cap per deck so we don't request the whole 60.
+      const counts = new Map<number, number>();
+      for (const id of main) counts.set(id, (counts.get(id) ?? 0) + 1);
+      const top = [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([id]) => id);
+      for (const id of top) ids.add(id);
+    }
+    return [...ids];
+  }, [decks]);
+  const cards = useArenaCardMap(previewIds);
+
   if (decks.length === 0) return null;
 
   const setCol = (key: DeckSortKey) =>
@@ -388,8 +463,9 @@ function DeckBreakdown({
   return (
     <div className="panel">
       <h3 className="dash-title">Your decks</h3>
-      <div className="meta-bars">
-        <div className="meta-bar-row deck-wr-row deck-row-btn deck-sort-head" role="row">
+      <div className="meta-bars deck-bars-art">
+        <div className="meta-bar-row deck-wr-row deck-row-btn deck-sort-head deck-row-with-art" role="row">
+          <span className="deck-row-art-spacer" aria-hidden="true" />
           <SortHeaderBtn
             label="Deck"
             active={sort.key === "name"}
@@ -414,14 +490,22 @@ function DeckBreakdown({
         </div>
         {sorted.map((d) => {
           const t = tally(d.matches);
+          const arts = pickArenaPreview(latestMainboard(d.matches), cards, 4);
           return (
             <button
               key={d.key}
               type="button"
-              className="meta-bar-row deck-wr-row deck-row-btn"
+              className="meta-bar-row deck-wr-row deck-row-btn deck-row-with-art"
               onClick={() => onSelect(d.key)}
               title={`${d.name} — open deck stats`}
             >
+              <span className="deck-row-art" aria-hidden="true">
+                {arts.length > 0 ? (
+                  <CardArtStrip cards={arts} max={4} />
+                ) : (
+                  <span className="deck-row-art-empty" />
+                )}
+              </span>
               <span className="meta-bar-label">
                 <span className="meta-bar-name">{d.name}</span>
                 {d.runActive && <span className="run-badge">run</span>}
@@ -435,6 +519,67 @@ function DeckBreakdown({
       <p className="text-xs text-muted m-0 mt-2">
         Click a column header to sort · click a deck for its full breakdown.
       </p>
+    </div>
+  );
+}
+
+/** Hero fan of cards from your most-played decks — livens up the Stats home. */
+function StatsArsenal({ decks }: { decks: DeckGroup[] }) {
+  const top = useMemo(() => sortDecks(decks, "matches", "desc").slice(0, 4), [decks]);
+  const ids = useMemo(() => {
+    const out = new Set<number>();
+    for (const d of top) {
+      const main = latestMainboard(d.matches);
+      if (!main) continue;
+      const counts = new Map<number, number>();
+      for (const id of main) counts.set(id, (counts.get(id) ?? 0) + 1);
+      for (const [id] of [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6)) {
+        out.add(id);
+      }
+    }
+    return [...out];
+  }, [top]);
+  const cards = useArenaCardMap(ids);
+
+  const fans = top
+    .map((d) => ({
+      deck: d,
+      arts: pickArenaPreview(latestMainboard(d.matches), cards, 3),
+    }))
+    .filter((f) => f.arts.length > 0);
+
+  if (fans.length === 0) return null;
+
+  return (
+    <div className="panel stats-arsenal">
+      <div className="stats-arsenal-copy">
+        <h3 className="dash-title m-0">Your arsenal</h3>
+        <p className="text-sm text-muted m-0 leading-relaxed">
+          Signature cards from the decks you&apos;ve been grinding this filter.
+        </p>
+      </div>
+      <div className="stats-arsenal-fans">
+        {fans.map(({ deck, arts }) => (
+          <div key={deck.key} className="stats-arsenal-fan" title={deck.name}>
+            {arts.map((c, i) => (
+              <div
+                key={`${c.name}-${i}`}
+                className={`stats-arsenal-card stats-arsenal-card-${i}`}
+                style={{ zIndex: arts.length - i }}
+              >
+                <CardArt
+                  name={c.name}
+                  scryfallId={c.scryfallId}
+                  size="normal"
+                  rounded={false}
+                  className="stats-arsenal-img"
+                />
+              </div>
+            ))}
+            <span className="stats-arsenal-label">{deck.name}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -484,37 +629,66 @@ function diffLists(prev: number[], next: number[]): { id: number; delta: number 
     .sort((a, b) => b.delta - a.delta || a.id - b.id);
 }
 
-function DiffChips({
+function DiffArt({
   main,
   side,
-  names,
+  cards,
 }: {
   main: { id: number; delta: number }[];
   side: { id: number; delta: number }[];
-  names: Record<number, string>;
+  cards: Record<number, ArenaCardInfo>;
 }) {
-  const chip = (d: { id: number; delta: number }, sb: boolean) => (
-    <span key={`${sb ? "sb" : "mb"}-${d.id}`} className={`diff-chip ${d.delta > 0 ? "add" : "cut"}`}>
-      {d.delta > 0 ? "+" : "−"}
-      {Math.abs(d.delta)} {sb ? "SB " : ""}
-      {names[d.id] ?? `#${d.id}`}
-    </span>
-  );
+  const items = [
+    ...main.map((d) => ({ ...d, sb: false })),
+    ...side.map((d) => ({ ...d, sb: true })),
+  ];
+  if (items.length === 0) return null;
+
   return (
-    <span className="diff-chips">
-      {main.map((d) => chip(d, false))}
-      {side.map((d) => chip(d, true))}
-    </span>
+    <div className="diff-art-row" role="list">
+      {items.map((d) => {
+        const info = cards[d.id];
+        const name = info?.name ?? `Card #${d.id}`;
+        const add = d.delta > 0;
+        return (
+          <div
+            key={`${d.sb ? "sb" : "mb"}-${d.id}`}
+            className={`diff-art-card ${add ? "add" : "cut"}`}
+            role="listitem"
+            title={`${add ? "+" : "−"}${Math.abs(d.delta)} ${d.sb ? "SB " : ""}${name}`}
+          >
+            <div className="diff-art-frame">
+              <CardArt
+                name={info?.name ?? `Card ${d.id}`}
+                scryfallId={info?.scryfallId}
+                size="small"
+                rounded={false}
+                className="diff-art-img"
+              />
+              <span className="diff-art-badge" aria-hidden="true">
+                {add ? `+${d.delta}` : `−${Math.abs(d.delta)}`}
+              </span>
+              {d.sb && <span className="diff-art-sb">SB</span>}
+              <span className={`diff-art-glow ${add ? "add" : "cut"}`} aria-hidden="true" />
+            </div>
+            <span className="diff-art-name">{name}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
 function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
   const versions = useMemo(() => buildVersions(deckMatches), [deckMatches]);
-  const [names, setNames] = useState<Record<number, string>>({});
 
-  // Every card id that shows up in a diff needs a name.
-  const diffIds = useMemo(() => {
+  // Diff cards + a preview of each build's mainboard for art.
+  const allIds = useMemo(() => {
     const ids = new Set<number>();
+    for (const v of versions) {
+      for (const id of v.main ?? []) ids.add(id);
+      for (const id of v.side ?? []) ids.add(id);
+    }
     for (let i = 1; i < versions.length; i++) {
       const prev = versions[i - 1];
       const cur = versions[i];
@@ -526,36 +700,32 @@ function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
     return [...ids];
   }, [versions]);
 
-  useEffect(() => {
-    if (diffIds.length === 0) return;
-    let alive = true;
-    void resolveArenaCardNames(diffIds).then((map) => {
-      if (alive) setNames(map);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [diffIds]);
+  const cards = useArenaCardMap(allIds);
 
   if (versions.length === 0) return null;
 
   if (versions.length === 1) {
+    const only = versions[0];
+    const preview = pickArenaPreview(only.main, cards, 5);
     return (
       <div className="panel">
         <h3 className="dash-title">Version history</h3>
+        {preview.length > 0 && (
+          <div className="ver-build-art mb-2">
+            <CardArtStrip cards={preview} max={5} />
+          </div>
+        )}
         <p className="text-sm text-muted m-0 leading-relaxed">
           One build recorded so far. Change some cards in Arena and matches on the new list
-          will show up here as a separate version — with the exact card diff and whether it
-          plays better or worse.
+          will show up here as a separate version — with mini card art for every swap and
+          whether it plays better or worse.
         </p>
       </div>
     );
   }
 
   // Newest build first for display.
-  const rows = versions
-    .map((v, i) => ({ v, i }))
-    .reverse();
+  const rows = versions.map((v, i) => ({ v, i })).reverse();
 
   return (
     <div className="panel">
@@ -572,6 +742,7 @@ function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
           const mainDiff = prev?.main && v.main ? diffLists(prev.main, v.main) : null;
           const sideDiff =
             prev?.main && v.main ? diffLists(prev.side ?? [], v.side ?? []) : null;
+          const buildPreview = pickArenaPreview(v.main, cards, 4);
           return (
             <div key={v.hash} className="ver-row">
               <div className="ver-head">
@@ -598,10 +769,15 @@ function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
                   )}
                 </span>
               </div>
+              {buildPreview.length > 0 && (
+                <div className="ver-build-art">
+                  <CardArtStrip cards={buildPreview} max={4} />
+                </div>
+              )}
               {i > 0 &&
                 (mainDiff ? (
                   mainDiff.length + (sideDiff?.length ?? 0) > 0 ? (
-                    <DiffChips main={mainDiff} side={sideDiff ?? []} names={names} />
+                    <DiffArt main={mainDiff} side={sideDiff ?? []} cards={cards} />
                   ) : (
                     <p className="text-xs text-muted m-0">Same 75 — sideboard shuffle only.</p>
                   )
@@ -767,15 +943,23 @@ function DeckDetail({
       ? deck.matches.filter((m) => m.endedAt >= runStart)
       : deck.matches;
 
+  const mainIds = useMemo(() => {
+    const main = latestMainboard(deck.matches);
+    if (!main) return [] as number[];
+    return [...new Set(main)];
+  }, [deck.matches]);
+  const cardMap = useArenaCardMap(mainIds);
+  const headerArts = pickArenaPreview(latestMainboard(deck.matches), cardMap, 6);
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="panel">
+      <div className="panel deck-detail-hero">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 min-w-0">
             <button type="button" className="btn btn-ghost btn-sm" onClick={onBack}>
               ‹ All decks
             </button>
-            <h3 className="dash-title m-0">{deck.name}</h3>
+            <h3 className="dash-title m-0 truncate">{deck.name}</h3>
           </span>
           <span className="flex items-center gap-2 flex-wrap">
             {runStart === undefined ? (
@@ -833,6 +1017,11 @@ function DeckDetail({
             )}
           </span>
         </div>
+        {headerArts.length > 0 && (
+          <div className="deck-detail-art">
+            <CardArtStrip cards={headerArts} max={6} />
+          </div>
+        )}
         {runStart !== undefined && (
           <p className="run-banner">
             Fresh run since {new Date(runStart).toLocaleDateString()} — {hiddenByRun} earlier
@@ -997,6 +1186,7 @@ export function Stats() {
           )}
 
           <SummaryTiles matches={filtered} />
+          <StatsArsenal decks={decks} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
           <MatchHistory matches={filtered} />

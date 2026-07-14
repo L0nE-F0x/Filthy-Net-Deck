@@ -10,6 +10,8 @@ export type Page =
   | "deck"
   | "meta"
   | "stats"
+  | "matchups"
+  | "climb"
   | "settings";
 
 export interface CardEntry {

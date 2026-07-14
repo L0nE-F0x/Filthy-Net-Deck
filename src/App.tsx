@@ -5,10 +5,19 @@ import { FormatView } from "./pages/FormatView";
 import { DeckView } from "./pages/DeckView";
 import { MetaPulse } from "./pages/MetaPulse";
 import { Stats } from "./pages/Stats";
+import { Matchups } from "./pages/Matchups";
+import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { StatusBanners } from "./components/StatusBanners";
-import { IconDaily, IconMeta, IconSettings, IconQueue, IconStats } from "./components/NavIcons";
+import {
+  IconDaily,
+  IconMeta,
+  IconSettings,
+  IconStats,
+  IconMatchups,
+  IconClimb,
+} from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 
@@ -20,11 +29,15 @@ const NAV: {
   { id: "daily", label: "Decks", icon: IconDaily },
   { id: "meta", label: "Events", icon: IconMeta },
   { id: "stats", label: "My Stats", icon: IconStats },
+  { id: "matchups", label: "Matchups", icon: IconMatchups },
+  { id: "climb", label: "Climb", icon: IconClimb },
   { id: "settings", label: "Settings", icon: IconSettings },
 ];
 
-function pageTitle(page: Page, queueMode: boolean): string {
-  if (page === "daily" && queueMode) return "Queue";
+/** Pages that work offline / without a meta download. */
+const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb"];
+
+function pageTitle(page: Page): string {
   switch (page) {
     case "daily":
       return "Decks";
@@ -36,6 +49,10 @@ function pageTitle(page: Page, queueMode: boolean): string {
       return "Events";
     case "stats":
       return "My Stats";
+    case "matchups":
+      return "Matchup Lab";
+    case "climb":
+      return "Climb Tracker";
     case "settings":
       return "Settings";
     default:
@@ -61,9 +78,6 @@ export default function App() {
   const clearError = useAppStore((s) => s.clearError);
   const feedStatus = useAppStore((s) => s.feedStatus);
   const lastRefresh = useAppStore((s) => s.lastRefresh);
-  const favorites = useAppStore((s) => s.favorites);
-  const showFavoritesOnly = useAppStore((s) => s.showFavoritesOnly);
-  const setShowFavoritesOnly = useAppStore((s) => s.setShowFavoritesOnly);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const initTracker = useAppStore((s) => s.initTracker);
 
@@ -113,38 +127,20 @@ export default function App() {
         {NAV.map((item) => {
           const active =
             (item.id === "daily" &&
-              (page === "daily" || page === "format" || page === "deck") &&
-              !showFavoritesOnly) ||
+              (page === "daily" || page === "format" || page === "deck")) ||
             (item.id !== "daily" && page === item.id);
           return (
             <button
               key={item.id}
               type="button"
               className={`nav-btn${active ? " active" : ""}`}
-              onClick={() => {
-                if (item.id === "daily") setShowFavoritesOnly(false);
-                setPage(item.id);
-              }}
+              onClick={() => setPage(item.id)}
             >
               <item.icon />
               {item.label}
             </button>
           );
         })}
-        <button
-          type="button"
-          className={`nav-btn${page === "daily" && showFavoritesOnly ? " active" : ""}`}
-          onClick={() => {
-            setShowFavoritesOnly(true);
-            setPage("daily");
-          }}
-        >
-          <IconQueue />
-          Queue
-          {favorites.length > 0 && (
-            <span className="ml-auto text-[10px] text-gold-400">{favorites.length}</span>
-          )}
-        </button>
         <div className="mt-auto pt-4 px-1">
           <p className="text-[10px] text-muted leading-relaxed m-0">
             Not affiliated with Wizards of the Coast.
@@ -155,7 +151,7 @@ export default function App() {
       <div className="main-pane">
         <header className="topbar">
           <div>
-            <h1>{pageTitle(page, showFavoritesOnly)}</h1>
+            <h1>{pageTitle(page)}</h1>
             <p className="meta-line">
               {meta ? (
                 <>
@@ -186,7 +182,7 @@ export default function App() {
         )}
 
         <main className="content" key={page}>
-          {!meta && !loading && page !== "settings" && page !== "stats" ? (
+          {!meta && !loading && !LOCAL_PAGES.includes(page) ? (
             <div className="empty-state">
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
               <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
@@ -208,6 +204,8 @@ export default function App() {
               {page === "deck" && <DeckView />}
               {page === "meta" && <MetaPulse />}
               {page === "stats" && <Stats />}
+              {page === "matchups" && <Matchups />}
+              {page === "climb" && <Climb />}
               {page === "settings" && <Settings />}
             </>
           )}
