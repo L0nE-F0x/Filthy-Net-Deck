@@ -1,11 +1,11 @@
 {
-  "version": "0.9.0",
-  "notes": "New: My Stats — a local winrate tracker. The app now records your Arena matches (deck, opponent, play/draw, rank) automatically, entirely on your PC.",
-  "pub_date": "2026-07-13T15:31:40Z",
+  "version": "0.10.0",
+  "notes": "My Stats levels up: click any deck for its full breakdown, monthly ranked-season stats, fresh runs, per-deck delete, and version tracking that shows how card changes moved your winrate.",
+  "pub_date": "2026-07-14T10:20:05Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWll6NnF1Qi9YNXlnYXVtS3FGMHdSbUMzNUZGRDhveUp1VytSb1RaUzg4Z2NtOUwyR0hCeE96TVN6Sk5ZKzc3YUxsQ2g4c09DT0pCSi9XeEdvZUV4U2dBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgzOTU2NjgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuOS4wX3g2NC1zZXR1cC5leGUKUUZ5YVdQSGVFZkZvMHZvVHdpR2d3bUwvL1JuYTcyUEs1SVVPVFdleEpYT1VSYlNLQVFaUTdvclVKTGV0LzhiMS9DTmVGRS9LUEhHWldJSWdTRmRHQ1E9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.9.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWmVBNkZ0LzZpK3ppWHBld2ZkTVlnMm5idSsxQTNCdThQSXNzaTJ4eEFncU52dG9CSEpSemYwS3lzd3d5SlRoRnJWT2hhOWhYRSsxWmROYzI0b1AzZ3dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDI0Mzg3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTAuMF94NjQtc2V0dXAuZXhlCjVKYUttUS9KL0NXQUxKRSs0Smc2YUFoU0NReEtPcmxWRm5RZ3FoQS96Q3ZmQUQzQ2NNZ3F0Z0lNK24ybkIwVVduc0lEdm9tQ3VSUk5SemJVL0huckRnPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.10.0.exe"
     }
   }
 }

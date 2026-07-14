@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.9.0.exe",
-  "notes": "New: My Stats — a local winrate tracker. The app now records your Arena matches (deck, opponent, play/draw, rank) automatically, entirely on your PC."
+  "version": "0.10.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.10.0.exe",
+  "notes": "My Stats levels up: click any deck for its full breakdown, monthly ranked-season stats, fresh runs, per-deck delete, and version tracking that shows how card changes moved your winrate."
 }
