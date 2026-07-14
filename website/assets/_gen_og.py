@@ -124,8 +124,8 @@ def main() -> None:
     draw.text((tx, ty + 40), "Filthy Net Deck", font=title_font, fill=FOAM)
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
-    # Feature callout badge for the v0.10 deck deep dives
-    badge_text = f"NEW  {mid}  DECK DEEP DIVES \u2014 VERSIONS & SEASONS"
+    # Feature callout badge for the v0.11 sortable My Stats
+    badge_text = f"NEW  {mid}  SORTABLE MY STATS \u2014 CLICK TO REORDER"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -143,8 +143,8 @@ def main() -> None:
 
     lines = [
         "Daily Standard & Pioneer meta.",
-        f"Click any deck {mid} play/draw {mid} ranked seasons.",
-        f"Version tracking {mid} see how card swaps play out.",
+        f"Sort any My Stats column {mid} asc or desc.",
+        f"Deck deep dives {mid} versions {mid} seasons.",
         f"100% local winrates {mid} One-click Arena import.",
     ]
     dy = ty + 236
@@ -155,7 +155,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v0.10.0", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v0.11.0", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.netlify.app", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")

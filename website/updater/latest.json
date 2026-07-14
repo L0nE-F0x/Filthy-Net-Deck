@@ -1,11 +1,11 @@
 {
-  "version": "0.10.0",
-  "notes": "My Stats levels up: click any deck for its full breakdown, monthly ranked-season stats, fresh runs, per-deck delete, and version tracking that shows how card changes moved your winrate.",
-  "pub_date": "2026-07-14T10:20:05Z",
+  "version": "0.11.0",
+  "notes": "My Stats tables are now sortable — click any column header on Your decks or Match history to rearrange by name, win rate, result, opponent, or date (asc/desc).",
+  "pub_date": "2026-07-14T12:14:17Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWmVBNkZ0LzZpK3ppWHBld2ZkTVlnMm5idSsxQTNCdThQSXNzaTJ4eEFncU52dG9CSEpSemYwS3lzd3d5SlRoRnJWT2hhOWhYRSsxWmROYzI0b1AzZ3dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDI0Mzg3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTAuMF94NjQtc2V0dXAuZXhlCjVKYUttUS9KL0NXQUxKRSs0Smc2YUFoU0NReEtPcmxWRm5RZ3FoQS96Q3ZmQUQzQ2NNZ3F0Z0lNK24ybkIwVVduc0lEdm9tQ3VSUk5SemJVL0huckRnPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.10.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUTGlvenEwbHZMWmZ0OC9xYWpkVkt1SC9sK0lSTXVZMnFtSmlrbTRDWEZMY213bUpLdktBS0hMRFErVnBiU1FJYmk1Y3VaYjBTcjBqWFhZdDNXU3N3ek11a2ZrU250NEFrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDMxMjM0CWZpbGU6RmlsdGh5LU5ldC1EZWNrLVNldHVwLTAuMTEuMC5leGUKektUZk83RkdVSW1jR21kTnpqMnlxNThMZ1hsOXlaQ1hleW5GV3ZmUm5SNlhhTDY5dDVLaHBpYlV1VGZsMHlIYnhwa09uMm52bzhXaFRUUkFKY1Y5REE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.11.0.exe"
     }
   }
 }
