@@ -1,4 +1,4 @@
-﻿"""Generate og-image.png for social previews (1200x630)."""
+"""Generate og-image.png for social previews (1200x630)."""
 from __future__ import annotations
 
 import os
@@ -115,8 +115,13 @@ def main() -> None:
     tx, ty = 500, 118
     mid = "\u00b7"  # middle dot
 
-    # Eyebrow as plain acid text (no pill - more reliable across PIL versions)
-    draw.text((tx, ty), f"FREE  {mid}  WINDOWS & MACOS  {mid}  MTG ARENA", font=chip_font, fill=ACID)
+    # Eyebrow — spell out both platforms clearly (X crops tight previews)
+    draw.text(
+        (tx, ty),
+        f"FREE  {mid}  WINDOWS + MACOS  {mid}  MTG ARENA",
+        font=chip_font,
+        fill=ACID,
+    )
 
     # Live dot
     draw.ellipse([tx - 18, ty + 8, tx - 6, ty + 20], fill=(52, 211, 153, 255))
@@ -124,14 +129,12 @@ def main() -> None:
     draw.text((tx, ty + 40), "Filthy Net Deck", font=title_font, fill=FOAM)
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
-    # Feature callout badge for the v0.11 sortable My Stats
-    badge_text = f"NEW  {mid}  SORTABLE MY STATS \u2014 CLICK TO REORDER"
+    # Feature callout badge for v0.12
+    badge_text = f"NEW  {mid}  MATCHUP LAB + CLIMB TRACKER"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
     bx, by = tx, ty + 182
-    # Dark pill + acid text: guaranteed contrast regardless of how the PIL
-    # version at hand blends RGBA fills.
     draw.rounded_rectangle(
         [bx, by, bx + bw + badge_pad_x * 2, by + bh + badge_pad_y * 2],
         radius=8,
@@ -143,9 +146,9 @@ def main() -> None:
 
     lines = [
         "Daily Standard & Pioneer meta.",
-        f"Sort any My Stats column {mid} asc or desc.",
-        f"Deck deep dives {mid} versions {mid} seasons.",
-        f"100% local winrates {mid} One-click Arena import.",
+        f"Opponent prep notes {mid} season rank graph.",
+        f"Card-art version history {mid} local winrates.",
+        f"Bo1 / Bo3 {mid} One-click Arena import.",
     ]
     dy = ty + 236
     for line in lines:
@@ -155,7 +158,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v0.11.0", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v0.12.1  ·  Windows + macOS", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.netlify.app", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")
