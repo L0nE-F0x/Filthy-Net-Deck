@@ -1,0 +1,62 @@
+# Builds the universal macOS dmg on a mac runner (impossible from the
+# Windows dev box) and attaches it to a GitHub Release, where the release
+# flow curls it into website/downloads for Netlify to serve.
+#
+# Updater artifacts are deliberately disabled: the Tauri signing key lives
+# only on the dev machine and is NOT a repo secret. Mac auto-update can be
+# wired up later by adding TAURI_SIGNING_PRIVATE_KEY as a secret and
+# dropping the --config override.
+name: macOS build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - name: Build universal app + dmg (updater artifacts off — key stays local)
+        run: npm run tauri:build -- --target universal-apple-darwin --config '{"bundle":{"createUpdaterArtifacts":false}}'
+
+      - name: Rename dmg for the website
+        run: |
+          set -e
+          DMG=$(ls "src-tauri/target/universal-apple-darwin/release/bundle/dmg/"*.dmg)
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp "$DMG" "Filthy-Net-Deck-${VERSION}-universal.dmg"
+          ls -la Filthy-Net-Deck-*.dmg
+
+      - name: Attach dmg to the release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Filthy-Net-Deck-*-universal.dmg
+
+      - name: Upload dmg as workflow artifact (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: Filthy-Net-Deck-*-universal.dmg
