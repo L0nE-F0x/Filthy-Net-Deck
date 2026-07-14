@@ -30,6 +30,12 @@ export interface TrackedMatch {
   deckHash?: string;
   /** Constructed rank when the match was recorded, e.g. "Diamond 1". */
   myRank?: string;
+  /** Game-1 submitted mainboard as Arena card ids (repeats = quantity). */
+  deckMain?: number[];
+  /** Game-1 sideboard as Arena card ids. */
+  deckSide?: number[];
+  /** Arena ranked season ordinal (seasons reset monthly). */
+  seasonOrdinal?: number;
 }
 
 export interface TrackerStatus {

@@ -26,6 +26,12 @@ export async function clearTrackerHistory(): Promise<void> {
   await invoke("tracker_clear");
 }
 
+/** Permanently delete specific matches (backend rewrites + tombstones them). */
+export async function deleteTrackerMatches(matchIds: string[]): Promise<void> {
+  if (!isTauri()) return;
+  await invoke("tracker_delete_matches", { matchIds });
+}
+
 export async function subscribeTracker(handlers: {
   onMatch: (m: TrackedMatch) => void;
   onStatus: (s: TrackerStatus) => void;
@@ -61,6 +67,34 @@ export function queueLabel(eventId: string): string {
   }
   const label = [parts.join(" "), kind].filter(Boolean).join(" ").trim() || eventId;
   return bo3 ? `${label} · Bo3` : label;
+}
+
+/**
+ * Stable identity for "the same deck" across renames and card edits:
+ * Arena's DeckId when we caught it, else the name, else the list fingerprint.
+ */
+export function deckKey(m: TrackedMatch): string {
+  return m.deckId ?? m.deckName ?? m.deckHash ?? "unknown";
+}
+
+/** Arena ranked seasons reset monthly — key a match to its calendar month. */
+export function seasonKeyOf(ms: number): string {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export function currentSeasonKey(): string {
+  return seasonKeyOf(Date.now());
+}
+
+/** "2026-07" → "Jul 2026" (or "This season" for the current month). */
+export function seasonLabel(key: string): string {
+  if (key === currentSeasonKey()) return "This season";
+  const [y, m] = key.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, 1).toLocaleString(undefined, {
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export function timeAgo(ms: number): string {

@@ -28,7 +28,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             tracker::tracker_status,
             tracker::tracker_matches,
-            tracker::tracker_clear
+            tracker::tracker_clear,
+            tracker::tracker_delete_matches
         ])
         .setup(|app| {
             #[cfg(desktop)]

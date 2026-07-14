@@ -31,6 +31,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 const MATCHES_FILE: &str = "tracker-matches.jsonl";
+/// Tombstones for user-deleted matches: without them a restart would re-record
+/// deleted matches straight back out of the Arena logs during backfill.
+const DELETED_FILE: &str = "tracker-deleted.json";
 const POLL_INTERVAL_MS: u64 = 1500;
 /// Guard against a corrupt log producing an unbounded "line".
 const MAX_LINE_BYTES: usize = 8 * 1024 * 1024;
@@ -84,6 +87,16 @@ pub struct TrackedMatch {
     /// Local player's constructed rank when the match was recorded, e.g. "Diamond 1".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub my_rank: Option<String>,
+    /// Game-1 submitted mainboard as Arena card ids (repeats = quantity).
+    /// Only game 1 is registered — later games are post-sideboard lists.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deck_main: Option<Vec<u32>>,
+    /// Game-1 sideboard as Arena card ids.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deck_side: Option<Vec<u32>>,
+    /// Arena ranked season ordinal (from rank payloads; seasons reset monthly).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub season_ordinal: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -113,6 +126,7 @@ pub struct TrackerData {
     pub matches: Vec<TrackedMatch>,
     recorded_ids: HashSet<String>,
     data_file: Option<PathBuf>,
+    deleted_file: Option<PathBuf>,
 }
 
 pub struct TrackerShared(pub Mutex<TrackerData>);
@@ -146,10 +160,51 @@ pub fn tracker_clear(app: AppHandle, state: State<'_, TrackerShared>) -> Result<
                 fs::remove_file(&file).map_err(|e| e.to_string())?;
             }
         }
+        // A full clear is a clean slate: drop per-match tombstones too, so the
+        // documented "delete + restart re-backfills from the logs" still holds.
+        if let Some(file) = data.deleted_file.clone() {
+            if file.exists() {
+                let _ = fs::remove_file(&file);
+            }
+        }
         data.status.clone()
     };
     let _ = app.emit("tracker:status", &status);
     Ok(())
+}
+
+/// Delete specific matches (e.g. one deck's history). Rewrites the JSONL and
+/// tombstones the ids so log backfill can never resurrect them.
+#[tauri::command]
+pub fn tracker_delete_matches(
+    app: AppHandle,
+    state: State<'_, TrackerShared>,
+    match_ids: Vec<String>,
+) -> Result<usize, String> {
+    let ids: HashSet<String> = match_ids.into_iter().collect();
+    let (removed, status) = {
+        let mut data = state.0.lock().expect("tracker lock");
+        let before = data.matches.len();
+        data.matches.retain(|m| !ids.contains(&m.match_id));
+        let removed = before - data.matches.len();
+        data.status.matches_recorded = data.matches.len();
+        if removed > 0 {
+            // recorded_ids keeps the ids, so the live tail also skips them.
+            if let Some(file) = data.data_file.clone() {
+                rewrite_matches(&file, &data.matches).map_err(|e| e.to_string())?;
+            }
+            if let Some(file) = data.deleted_file.clone() {
+                let mut all = load_deleted(&file);
+                all.extend(ids);
+                save_deleted(&file, &all);
+            }
+        }
+        (removed, data.status.clone())
+    };
+    if removed > 0 {
+        let _ = app.emit("tracker:status", &status);
+    }
+    Ok(removed)
 }
 
 // ---------------------------------------------------------------------------
@@ -215,7 +270,10 @@ struct PendingMatch {
     deck_name: Option<String>,
     deck_id: Option<String>,
     deck_hash: Option<String>,
+    deck_main: Option<Vec<u32>>,
+    deck_side: Option<Vec<u32>>,
     my_rank: Option<String>,
+    season_ordinal: Option<u32>,
     /// Per-game "was I on the play", indexed by GRE connection order.
     game_on_play: Vec<Option<bool>>,
     awaiting_first_turn: bool,
@@ -231,6 +289,7 @@ pub struct LogParser {
     /// Deck fingerprint -> (deckId, name); survives queue switches and renames.
     courses_by_hash: HashMap<String, (Option<String>, Option<String>)>,
     current_rank: Option<String>,
+    current_season: Option<u32>,
     pending: HashMap<String, PendingMatch>,
     current_match_id: Option<String>,
     pub parse_errors: u64,
@@ -339,6 +398,12 @@ impl LogParser {
             // Rank payloads share a line shape with other bare JSON; not an error.
             return;
         };
+        if let Some(season) = v
+            .get("constructedSeasonOrdinal")
+            .and_then(|s| s.as_u64())
+        {
+            self.current_season = Some(season as u32);
+        }
         let class = v.get("constructedClass").and_then(|c| c.as_str());
         let level = v.get("constructedLevel").and_then(|l| l.as_u64());
         if let Some(class) = class {
@@ -383,7 +448,7 @@ impl LogParser {
 
         if has_deck {
             if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
-                if let Some(cards) = find_deck_cards(&v) {
+                if let Some((cards, side)) = find_deck_message(&v) {
                     // New GRE connection = new game; expect its turn-1 info next.
                     pending.game_on_play.push(None);
                     pending.awaiting_first_turn = true;
@@ -399,6 +464,8 @@ impl LogParser {
                             }
                         }
                         pending.deck_hash = Some(hash);
+                        pending.deck_main = Some(cards);
+                        pending.deck_side = Some(side);
                     }
                 }
             } else {
@@ -482,12 +549,14 @@ impl LogParser {
     fn upsert_pending(&mut self, match_id: &str, ts: u64, players: &[serde_json::Value]) {
         let local_id = self.local_user_id.clone();
         let rank = self.current_rank.clone();
+        let season = self.current_season;
         let entry = self
             .pending
             .entry(match_id.to_string())
             .or_insert_with(|| PendingMatch {
                 started_at: ts,
                 my_rank: rank,
+                season_ordinal: season,
                 ..PendingMatch::default()
             });
 
@@ -620,7 +689,10 @@ fn finalize_match(
         deck_name: pending.deck_name,
         deck_id: pending.deck_id,
         deck_hash: pending.deck_hash,
+        deck_main: pending.deck_main,
+        deck_side: pending.deck_side,
         my_rank: pending.my_rank,
+        season_ordinal: pending.season_ordinal,
     }
 }
 
@@ -698,24 +770,28 @@ fn collect_courses(v: &serde_json::Value, out: &mut Vec<(String, CourseInfo)>) {
     }
 }
 
-/// Find `connectResp.deckMessage.deckCards` anywhere in a GRE payload.
-fn find_deck_cards(v: &serde_json::Value) -> Option<Vec<u32>> {
+/// Find `connectResp.deckMessage` anywhere in a GRE payload; returns
+/// `(deckCards, sideboardCards)` (sideboard empty when absent, e.g. Bo1).
+fn find_deck_message(v: &serde_json::Value) -> Option<(Vec<u32>, Vec<u32>)> {
+    fn ids(deck: &serde_json::Value, key: &str) -> Option<Vec<u32>> {
+        deck.get(key).and_then(|c| c.as_array()).map(|cards| {
+            cards
+                .iter()
+                .filter_map(|c| c.as_u64())
+                .map(|c| c as u32)
+                .collect()
+        })
+    }
     match v {
         serde_json::Value::Object(map) => {
             if let Some(deck) = map.get("deckMessage") {
-                if let Some(cards) = deck.get("deckCards").and_then(|c| c.as_array()) {
-                    return Some(
-                        cards
-                            .iter()
-                            .filter_map(|c| c.as_u64())
-                            .map(|c| c as u32)
-                            .collect(),
-                    );
+                if let Some(cards) = ids(deck, "deckCards") {
+                    return Some((cards, ids(deck, "sideboardCards").unwrap_or_default()));
                 }
             }
-            map.values().find_map(find_deck_cards)
+            map.values().find_map(find_deck_message)
         }
-        serde_json::Value::Array(arr) => arr.iter().find_map(find_deck_cards),
+        serde_json::Value::Array(arr) => arr.iter().find_map(find_deck_message),
         _ => None,
     }
 }
@@ -778,20 +854,24 @@ fn run_loop(app: AppHandle) {
     let log_path = dir.as_ref().map(|d| d.join("Player.log"));
     let prev_path = dir.as_ref().map(|d| d.join("Player-prev.log"));
 
-    let data_file = app
-        .path()
-        .app_data_dir()
-        .ok()
-        .map(|d| d.join(MATCHES_FILE));
+    let app_data_dir = app.path().app_data_dir().ok();
+    let data_file = app_data_dir.as_ref().map(|d| d.join(MATCHES_FILE));
+    let deleted_file = app_data_dir.as_ref().map(|d| d.join(DELETED_FILE));
 
     // Load persisted history.
     {
         let mut data = shared.0.lock().expect("tracker lock");
         data.data_file = data_file.clone();
+        data.deleted_file = deleted_file.clone();
         data.status.log_path = log_path
             .as_ref()
             .map(|p| p.display().to_string())
             .unwrap_or_else(|| "unsupported platform".to_string());
+        // Tombstoned ids go in first so neither the JSONL load below nor the
+        // log backfill can bring a deleted match back.
+        if let Some(file) = &deleted_file {
+            data.recorded_ids.extend(load_deleted(file));
+        }
         if let Some(file) = &data_file {
             for m in load_matches(file) {
                 if data.recorded_ids.insert(m.match_id.clone()) {
@@ -965,6 +1045,43 @@ fn load_matches(file: &Path) -> Vec<TrackedMatch> {
         .collect()
 }
 
+/// Rewrite the whole matches file (used after deletions). Writes to a temp
+/// file first so a crash mid-write can't lose the surviving history.
+fn rewrite_matches(file: &Path, matches: &[TrackedMatch]) -> std::io::Result<()> {
+    if let Some(dir) = file.parent() {
+        fs::create_dir_all(dir)?;
+    }
+    let mut out = String::new();
+    for m in matches {
+        if let Ok(json) = serde_json::to_string(m) {
+            out.push_str(&json);
+            out.push('\n');
+        }
+    }
+    let tmp = file.with_extension("jsonl.tmp");
+    fs::write(&tmp, out)?;
+    fs::rename(&tmp, file)
+}
+
+fn load_deleted(file: &Path) -> HashSet<String> {
+    fs::read_to_string(file)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Vec<String>>(&text).ok())
+        .map(|ids| ids.into_iter().collect())
+        .unwrap_or_default()
+}
+
+fn save_deleted(file: &Path, ids: &HashSet<String>) {
+    if let Some(dir) = file.parent() {
+        let _ = fs::create_dir_all(dir);
+    }
+    let mut sorted: Vec<&String> = ids.iter().collect();
+    sorted.sort();
+    if let Ok(json) = serde_json::to_string(&sorted) {
+        let _ = fs::write(file, json);
+    }
+}
+
 fn append_match(file: &Path, m: &TrackedMatch) {
     if let Some(dir) = file.parent() {
         let _ = fs::create_dir_all(dir);
@@ -1052,6 +1169,12 @@ mod tests {
         assert_eq!(m.deck_name.as_deref(), Some("Izzet Cauldron"));
         assert_eq!(m.deck_id.as_deref(), Some("deck-1"));
         assert!(m.deck_hash.is_some());
+        assert_eq!(
+            m.deck_main.as_deref(),
+            Some(&[101, 101, 101, 101, 102, 102][..])
+        );
+        assert_eq!(m.deck_side.as_deref(), Some(&[103][..]));
+        assert_eq!(m.season_ordinal, Some(91));
         assert_eq!(m.my_rank.as_deref(), Some("Diamond 1"));
         assert_eq!(m.games.len(), 1);
         assert_eq!(m.games[0].on_play, Some(true));
@@ -1209,6 +1332,39 @@ mod tests {
         let done = drain_complete_lines(&mut carry, &mut p);
         assert!(done.is_empty());
         assert!(carry.is_empty());
+    }
+
+    #[test]
+    fn old_jsonl_lines_without_new_fields_still_load() {
+        // Matches recorded by v0.9.0 lack deckMain/deckSide/seasonOrdinal.
+        let line = r#"{"matchId":"m-old","startedAt":1,"endedAt":2,"eventId":"Ladder","bestOf":1,"myTeamId":2,"games":[],"result":"win"}"#;
+        let m: TrackedMatch = serde_json::from_str(line).expect("old line parses");
+        assert_eq!(m.deck_main, None);
+        assert_eq!(m.season_ordinal, None);
+    }
+
+    #[test]
+    fn rewrite_and_tombstones_survive_reload() {
+        let dir = std::env::temp_dir().join(format!("fnd-tracker-test-{}", std::process::id()));
+        let matches_file = dir.join(MATCHES_FILE);
+        let deleted_file = dir.join(DELETED_FILE);
+        let _ = fs::remove_dir_all(&dir);
+
+        let mut p = LogParser::new();
+        let all = full_match(&mut p);
+        for m in &all {
+            append_match(&matches_file, m);
+        }
+        assert_eq!(load_matches(&matches_file).len(), 1);
+
+        // Delete everything, tombstone the ids, reload: nothing comes back.
+        rewrite_matches(&matches_file, &[]).expect("rewrite");
+        let ids: HashSet<String> = all.iter().map(|m| m.match_id.clone()).collect();
+        save_deleted(&deleted_file, &ids);
+        assert!(load_matches(&matches_file).is_empty());
+        assert!(load_deleted(&deleted_file).contains("m-1"));
+
+        let _ = fs::remove_dir_all(&dir);
     }
 
     /// Replay a real Player.log: `FND_REPLAY_LOG=path cargo test replay_real_log -- --nocapture --ignored`

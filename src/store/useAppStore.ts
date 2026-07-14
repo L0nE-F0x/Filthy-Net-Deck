@@ -9,6 +9,7 @@ import { checkAppUpdate, installPendingUpdate } from "../services/appUpdater";
 import { resolveFormatId } from "../services/formatResolve";
 import {
   clearTrackerHistory,
+  deleteTrackerMatches,
   fetchTrackerMatches,
   fetchTrackerStatus,
   subscribeTracker,
@@ -118,6 +119,7 @@ interface AppState {
   dismissUpdate: () => void;
   initTracker: () => Promise<void>;
   clearTracker: () => Promise<void>;
+  deleteMatches: (matchIds: string[]) => Promise<void>;
 }
 
 function mapFeedStatus(from: "network" | "cache"): FeedStatus {
@@ -271,6 +273,23 @@ export const useAppStore = create<AppState>((set, get) => {
         },
         onStatus: (s) => set({ trackerStatus: s }),
       });
+    },
+
+    deleteMatches: async (matchIds) => {
+      try {
+        await deleteTrackerMatches(matchIds);
+        const drop = new Set(matchIds);
+        set({
+          trackerMatches: get().trackerMatches.filter((m) => !drop.has(m.matchId)),
+        });
+      } catch (e) {
+        set({
+          error:
+            e instanceof Error
+              ? `Could not delete matches: ${e.message}`
+              : "Could not delete matches",
+        });
+      }
     },
 
     clearTracker: async () => {
