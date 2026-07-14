@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-13T09:37:06.384Z",
-  "date": "2026-07-13",
+  "generatedAt": "2026-07-14T08:17:26.808Z",
+  "date": "2026-07-14",
   "formats": [
     {
       "id": "standard",
@@ -58,7 +58,7 @@
           ]
         }
       ],
-      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-13). Every card name verified via Scryfall. Rank = metagame share.",
+      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-14). Every card name verified via Scryfall. Rank = metagame share.",
       "metaShareTop": [
         {
           "name": "Selesnya Ouroboroid",
@@ -134,7 +134,7 @@
           ]
         }
       ],
-      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-13). Every card name verified via Scryfall. Rank = metagame share.",
+      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-14). Every card name verified via Scryfall. Rank = metagame share.",
       "metaShareTop": [
         {
           "name": "Mono-Red Prowess",
@@ -6517,6 +6517,17 @@
   },
   "tournaments": [
     {
+      "id": "magicgg-traditional-standard-ranked-decklists-july-13-2026",
+      "name": "traditional standard ranked decklists july 13 2026",
+      "format": "standard",
+      "platform": "mtga",
+      "date": "2026-07-13",
+      "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-13-2026",
+      "topDecks": [],
+      "notes": "Official magic.gg decklist publication",
+      "source": "magic.gg"
+    },
+    {
       "id": "magicgg-traditional-standard-ranked-decklists-july-6-2026",
       "name": "traditional standard ranked decklists july 6 2026",
       "format": "standard",
@@ -6583,12 +6594,12 @@
       "source": "magic.gg"
     },
     {
-      "id": "magicgg-united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
-      "name": "united states regional championships washington dc may 2026 top 32 standard decklists",
+      "id": "magicgg-magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
+      "name": "magic spotlight secrets chiba 2026 top 8 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-13",
-      "url": "https://magic.gg/decklists/united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
+      "date": "2026-07-14",
+      "url": "https://magic.gg/decklists/magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
       "source": "magic.gg"
@@ -6598,19 +6609,19 @@
       "name": "ultimate guard european magic series prague may 2026 top 36 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-13",
+      "date": "2026-07-14",
       "url": "https://magic.gg/decklists/ultimate-guard-european-magic-series-prague-may-2026-top-36-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
       "source": "magic.gg"
     },
     {
-      "id": "magicgg-magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
-      "name": "magic spotlight secrets chiba 2026 top 8 standard decklists",
+      "id": "magicgg-united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
+      "name": "united states regional championships washington dc may 2026 top 32 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-13",
-      "url": "https://magic.gg/decklists/magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
+      "date": "2026-07-14",
+      "url": "https://magic.gg/decklists/united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
       "source": "magic.gg"
@@ -6627,23 +6638,34 @@
       "source": "magic.gg"
     },
     {
-      "id": "magicgg-anz-super-series-finals-adelaide-may-2026-top-10-standard-decklists",
-      "name": "anz super series finals adelaide may 2026 top 10 standard decklists",
-      "format": "standard",
-      "platform": "paper",
-      "date": "2026-07-13",
-      "url": "https://magic.gg/decklists/anz-super-series-finals-adelaide-may-2026-top-10-standard-decklists",
-      "topDecks": [],
-      "notes": "Official magic.gg decklist publication",
-      "source": "magic.gg"
-    },
-    {
       "id": "mtgo-standard-showcase-challenge-2026-07-1112847088",
       "name": "standard showcase challenge 2026 07 1112847088",
       "format": "standard",
       "platform": "mtgo",
       "date": "2026-07-11",
       "url": "https://www.mtgo.com/decklist/standard-showcase-challenge-2026-07-1112847088",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-pioneer-challenge-32-2026-07-1312847160",
+      "name": "pioneer challenge 32 2026 07 1312847160",
+      "format": "pioneer",
+      "platform": "mtgo",
+      "date": "2026-07-13",
+      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1312847160",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-standard-challenge-32-2026-07-1312847158",
+      "name": "standard challenge 32 2026 07 1312847158",
+      "format": "standard",
+      "platform": "mtgo",
+      "date": "2026-07-13",
+      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1312847158",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
@@ -6677,17 +6699,6 @@
       "platform": "mtgo",
       "date": "2026-07-12",
       "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1212847143",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-pioneer-challenge-32-2026-07-1112847134",
-      "name": "pioneer challenge 32 2026 07 1112847134",
-      "format": "pioneer",
-      "platform": "mtgo",
-      "date": "2026-07-11",
-      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847134",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
@@ -6889,7 +6900,7 @@
       "name": "Untapped.gg — standard constructed meta",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-13",
+      "date": "2026-07-14",
       "url": "https://mtga.untapped.gg/constructed/standard/meta",
       "topDecks": [],
       "notes": "Arena ladder / Mythic meta tracker.",
@@ -6900,7 +6911,7 @@
       "name": "Untapped.gg — explorer constructed meta",
       "format": "pioneer",
       "platform": "mtga",
-      "date": "2026-07-13",
+      "date": "2026-07-14",
       "url": "https://mtga.untapped.gg/constructed/explorer/meta",
       "topDecks": [],
       "notes": "Arena ladder / Mythic meta tracker.",
