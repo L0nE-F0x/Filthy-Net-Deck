@@ -109,8 +109,11 @@ Ship steps when releasing a new app build:
 3. Update `website/updater/latest.json` (version, notes, url, **signature**).
 4. Update `website/version.json` + `public/version.json`.
 5. Update `website/index.html` download links + marketed copy.
-6. Push `main` (Netlify). Confirm live `version.json` / `updater/latest.json`.
-7. Tag `vX.Y.Z` for macOS CI when shipping a mac build.
+6. **Share card:** update `og:*` / `twitter:*` / page title+description; edit `website/assets/_gen_og.py` (version + features); run `python website/assets/_gen_og.py`; set image URLs to `og-image.png?v=<version>` so caches refresh.
+7. Push `main` (Netlify). Confirm live `version.json` / `updater/latest.json` / OG image.
+8. Tag `vX.Y.Z` for macOS CI when shipping a mac build.
+
+Full checklist: root `AGENTS.md`.
 
 ---
 

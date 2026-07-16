@@ -17,10 +17,11 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 | **Windows installer** | `npm run tauri:build` with updater signing keys set → copy NSIS setup to `website/downloads/Filthy-Net-Deck-Setup-<ver>.exe` **and** the `.sig` next to it. |
 | **Signed in-app updater** | Update `website/updater/latest.json` with new `version`, `notes`, `pub_date`, `platforms.windows-x86_64.url` + **signature** from the build. Prefer **Update & restart** over browser download. |
 | **Soft version channel** | Update `website/version.json` **and** `public/version.json` (`version`, `downloadUrl`, `notes`) so Settings / soft fallback see the new build. |
-| **Marketing site** | `website/index.html` download buttons, version labels, hero/mock version strings, feature copy, OG/twitter blurb when the feature is marketed. |
-| **Netlify** | Push to `main` so the site, `version.json`, `updater/latest.json`, and `downloads/*` go live. Confirm live URLs return the new version (not just local files). |
+| **Marketing site** | `website/index.html` download buttons, version labels, hero/mock version strings, feature copy. |
+| **Share card / SEO (mandatory every version bump)** | Refresh Open Graph + Twitter meta in `website/index.html` (`title`, `description`, `og:*`, `twitter:*`) to market the **current** release. Regenerate `website/assets/og-image.png` via `website/assets/_gen_og.py` (version badge + feature lines). **Cache-bust** image URLs with `?v=<version>` so X/Discord/Slack pick up the new card (e.g. `og-image.png?v=0.12.4`). |
+| **Netlify** | Push to `main` so the site, `version.json`, `updater/latest.json`, `downloads/*`, and `assets/og-image.png` go live. Confirm live URLs return the new version (not just local files). Spot-check the homepage meta and OG image in a private/incognito share preview if possible. |
 | **macOS (when shipping a tagged release)** | Tag `vX.Y.Z` so `.github/workflows/macos-build.yml` can produce a dmg; roll the dmg into `website/downloads/` and fix macOS download links (same pattern as past “Roll vX out to macOS” commits). |
-| **Git** | Commit installer + metadata, push `origin/main`, push the version tag when cutting a release. |
+| **Git** | Commit installer + metadata + OG assets, push `origin/main`, push the version tag when cutting a release. |
 
 ### Release checklist (copy into the PR / commit message)
 
@@ -31,9 +32,13 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 [ ] website/updater/latest.json → version + signature + url
 [ ] website/version.json + public/version.json
 [ ] website/index.html download links + marketed feature copy
+[ ] OG / Twitter meta titles + descriptions match this release
+[ ] website/assets/_gen_og.py updated + og-image.png regenerated
+[ ] og-image.png?v=<version> cache-bust on og:image + twitter:image
 [ ] Pushed main; Netlify live version.json matches
 [ ] Tag vX.Y.Z (macOS CI) when appropriate
 [ ] Verified: in-app Check for updates offers Update & restart (not only Chrome download)
+[ ] Verified: link share preview shows new OG card (not a stale X cache)
 ```
 
 ### Hard rules
@@ -43,6 +48,7 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 3. **Signing keys** live only on the dev machine (`%USERPROFILE%\.tauri\filthy-net-deck.key`). Do not commit private keys. Password is required for encrypted keys — prompt the user if missing; do not skip signed publish and call the release finished.
 4. **Meta pipeline** (`npm run meta`) is separate from app releases: daily meta can ship without an app bump; app features never ship without the table above.
 5. **Desktop only** for Arena log tracking / winrate. Do not add Android APK promises for auto WR tracking.
+6. **Share previews are part of the product.** A version bump without fresh `og:title` / `og:description` / `og-image` (+ `?v=` cache-bust) is an incomplete release — X marketing depends on it.
 
 ## Product constraints
 
