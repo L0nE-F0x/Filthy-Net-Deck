@@ -1,11 +1,11 @@
 {
-  "version": "0.13.0",
-  "notes": "v0.13.0: Set Radar — Arena-first spoilers and release dates. No Alchemy.",
-  "pub_date": "2026-07-16T08:52:31Z",
+  "version": "0.13.1",
+  "notes": "v0.13.1: Full set card galleries in Set Radar — browse every spoiled card in-app.",
+  "pub_date": "2026-07-16T14:03:27Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnlUZ1hObldjcEhvdmlob1drMlg4VjFGeTN4YS92UWg4VHZTeGFXSlJ4WGM5YkxWbTRWVUNnaGRmR3BGYjJvWFJwd2dLUE5yNCtnRTF0dHYyTklIUVFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTkxOTMwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTMuMF94NjQtc2V0dXAuZXhlCmF6b2JWTFkrTUxWRUV3ZDhEblJQRlZISldIMXV1MUMzbHV3WTJGVVJKOEl0NDhCaDNXN05XRitaZnhhczBaOWJlb2dqMk9STTVYREIzaFMxdEZqakRRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.13.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjBwL1o1QlJmb0tMeFo4N3FkWWJvL0F5VGQxNnBzOEJwTGIwV0lDMG9TYi80MVVSY1ZVNnd1TkJWa3M2VkpuYzFXVWJPbXpjeFdER3kxbnNyK242d3cwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjEwNjAwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTMuMV94NjQtc2V0dXAuZXhlCkRzelZsYWVmVWlXc1g5dTh0VjlGQTNaaHo5S1Y3bzhGTDdLOGNsWW43alpCeE56UWVZejN4Q21ackRWUTlMQ2hDOGZDMDFvb28zN0NremZaU21McEF3PT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.13.1.exe"
     }
   }
 }

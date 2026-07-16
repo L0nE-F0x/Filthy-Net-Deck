@@ -38,10 +38,19 @@ export interface UpcomingSet {
     prerelease: DateConfidence;
   };
   heroScryfallId: string | null;
+  /** Compact newest-first rail on the set card */
   previews: SetPreviewCard[];
+  /** Full spoiled gallery (collector order). May equal previews on tiny sets. */
+  cards?: SetPreviewCard[];
   overrideSource: string | null;
   notes: string | null;
   status: SetStatus;
+}
+
+/** Prefer full gallery; fall back to previews for older feeds. */
+export function setGalleryCards(set: UpcomingSet): SetPreviewCard[] {
+  if (set.cards?.length) return set.cards;
+  return set.previews || [];
 }
 
 export interface SetsBundle {

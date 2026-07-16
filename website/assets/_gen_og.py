@@ -130,7 +130,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v0.13  {mid}  SET RADAR"
+    badge_text = f"NEW  {mid}  v0.13.1  {mid}  FULL GALLERIES"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -146,7 +146,7 @@ def main() -> None:
 
     lines = [
         "Daily Standard & Pioneer meta.",
-        f"Set Radar {mid} Arena drop dates {mid} spoilers.",
+        f"Full card galleries {mid} Arena drop dates.",
         f"Matchup Lab {mid} Climb Tracker {mid} My Stats.",
         f"No Alchemy {mid} 100% local {mid} free Win + macOS.",
     ]
@@ -158,7 +158,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v0.13.0  ·  Windows + macOS", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v0.13.1  ·  Windows + macOS", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.netlify.app", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")

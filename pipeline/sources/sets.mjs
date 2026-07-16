@@ -103,27 +103,45 @@ function computeStatus(set, today) {
   return "announced";
 }
 
-async function fetchSpoiledCards(code, limit = 12) {
+function mapCard(c) {
+  return {
+    name: c.name,
+    scryfallId: c.id,
+    rarity: c.rarity || "common",
+    collectorNumber: c.collector_number || "",
+    typeLine: c.type_line || "",
+    manaCost: c.mana_cost || c.card_faces?.[0]?.mana_cost || "",
+  };
+}
+
+/** Full set gallery — paginate Scryfall until has_more is false. */
+async function fetchAllSetCards(code) {
+  const cards = [];
+  let path = `/cards/search?q=${encodeURIComponent(`set:${code}`)}&unique=prints&order=set&dir=asc`;
   try {
-    const q = encodeURIComponent(`set:${code}`);
-    const data = await scryfallGet(
-      `/cards/search?q=${q}&unique=prints&order=spoiled&dir=desc`,
-    );
-    const cards = data.data || [];
-    return cards.slice(0, limit).map((c) => ({
-      name: c.name,
-      scryfallId: c.id,
-      rarity: c.rarity,
-      collectorNumber: c.collector_number,
-      typeLine: c.type_line || "",
-      manaCost: c.mana_cost || c.card_faces?.[0]?.mana_cost || "",
-    }));
+    while (path) {
+      await sleep(100);
+      let data;
+      if (path.startsWith("http")) {
+        const res = await fetch(path, { headers: HEADERS });
+        if (res.status === 429) {
+          await sleep(1500);
+          continue;
+        }
+        if (res.status === 404) break;
+        if (!res.ok) throw new Error(`Scryfall page → ${res.status}`);
+        data = await res.json();
+      } else {
+        data = await scryfallGet(path);
+      }
+      for (const c of data.data || []) cards.push(mapCard(c));
+      path = data.has_more && data.next_page ? data.next_page : null;
+    }
   } catch (e) {
-    // 404 = no cards spoiled yet
-    if (String(e.message).includes("404")) return [];
-    console.warn(`  spoilers ${code}: ${e.message}`);
-    return [];
+    if (String(e.message).includes("404")) return cards;
+    console.warn(`  gallery ${code}: ${e.message}`);
   }
+  return cards;
 }
 
 /**
@@ -171,21 +189,15 @@ export async function buildSetsBundle() {
       arenaConfidence = "estimated";
     }
 
-    const previews = await fetchSpoiledCards(code, 14);
-    // Prefer search total if present
-    let spoiledCount = previews.length;
-    try {
-      const q = encodeURIComponent(`set:${code}`);
-      const page = await scryfallGet(`/cards/search?q=${q}&unique=prints`);
-      spoiledCount = typeof page.total_cards === "number" ? page.total_cards : spoiledCount;
-    } catch {
-      /* keep previews length */
-    }
+    const cards = await fetchAllSetCards(code);
+    const spoiledCount = cards.length;
+    // Newest spoilers first for the compact rail
+    const previews = [...cards].reverse().slice(0, 14);
 
     const hero =
-      previews.find((c) => c.rarity === "mythic") ||
-      previews.find((c) => c.rarity === "rare") ||
-      previews[0] ||
+      cards.find((c) => c.rarity === "mythic") ||
+      cards.find((c) => c.rarity === "rare") ||
+      cards[0] ||
       null;
 
     const entry = {
@@ -209,7 +221,10 @@ export async function buildSetsBundle() {
         prerelease: tabletop ? "estimated" : "unknown",
       },
       heroScryfallId: hero?.scryfallId || null,
+      /** Compact rail (newest first) */
       previews,
+      /** Full set gallery (collector order) */
+      cards,
       overrideSource: ov.source || null,
       notes: ov.notes || null,
       status: "announced",
@@ -217,7 +232,7 @@ export async function buildSetsBundle() {
     entry.status = computeStatus(entry, today);
     sets.push(entry);
     console.log(
-      `  ${code} · ${s.name} · ${entry.status} · spoiled ${spoiledCount}/${entry.cardCount} · arena ${arena || "—"} (${arenaConfidence})`,
+      `  ${code} · ${s.name} · ${entry.status} · gallery ${spoiledCount}/${entry.cardCount} · arena ${arena || "—"} (${arenaConfidence})`,
     );
     await sleep(80);
   }

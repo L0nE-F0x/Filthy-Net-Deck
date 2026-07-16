@@ -2385,3 +2385,162 @@ select,
   margin-top: auto;
   padding-top: 0.15rem;
 }
+
+/* ——— Set gallery (full set) ——— */
+.set-gallery-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.set-gallery-search {
+  width: 100%;
+  max-width: 360px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 90%, transparent);
+  color: var(--color-foam);
+  font: inherit;
+  font-size: 0.88rem;
+}
+.set-gallery-search:focus {
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  outline: none;
+}
+.set-rarity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.set-rarity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.set-rarity-chip:hover {
+  color: var(--color-foam);
+  border-color: color-mix(in srgb, var(--color-gold-500) 30%, transparent);
+}
+.set-rarity-chip.active {
+  color: var(--color-foam);
+  background: color-mix(in srgb, var(--color-gold-500) 14%, var(--color-ink-800));
+  border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
+}
+.set-rarity-n {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+  font-weight: 500;
+}
+.set-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 0.75rem;
+}
+.set-gallery-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-ink-900);
+  cursor: pointer;
+  box-shadow: 0 6px 18px color-mix(in srgb, black 35%, transparent);
+  border: 1px solid color-mix(in srgb, white 8%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.set-gallery-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px color-mix(in srgb, black 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-gold-500) 35%, transparent);
+}
+.set-gallery-cell img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  display: block;
+  background: var(--color-ink-850);
+}
+.set-gallery-rarity {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.rarity-mythic { background: #f59e0b; }
+.rarity-rare { background: #eab308; }
+.rarity-uncommon { background: #94a3b8; }
+.rarity-common { background: #52525b; }
+.rarity-special { background: #a78bfa; }
+.set-gallery-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.35rem 0.4rem 0.45rem;
+  background: color-mix(in srgb, var(--color-ink-950) 92%, transparent);
+}
+.set-gallery-cn {
+  font-size: 0.62rem;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.set-gallery-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-foam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.set-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: color-mix(in srgb, black 78%, transparent);
+  backdrop-filter: blur(8px);
+  cursor: zoom-out;
+}
+.set-lightbox-img {
+  max-width: min(420px, 92vw);
+  max-height: min(72vh, 640px);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+.set-lightbox-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--color-foam);
+  font-size: 0.85rem;
+  text-align: center;
+  max-width: 28rem;
+}
+.set-lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
