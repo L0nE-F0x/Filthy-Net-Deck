@@ -18,10 +18,12 @@ import {
   IconStats,
   IconMatchups,
   IconClimb,
+  IconSets,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
+import { Sets } from "./pages/Sets";
 
 const NAV: {
   id: Page;
@@ -30,6 +32,7 @@ const NAV: {
 }[] = [
   { id: "daily", label: "Decks", icon: IconDaily },
   { id: "meta", label: "Events", icon: IconMeta },
+  { id: "sets", label: "Sets", icon: IconSets },
   { id: "stats", label: "My Stats", icon: IconStats },
   { id: "matchups", label: "Matchups", icon: IconMatchups },
   { id: "climb", label: "Climb", icon: IconClimb },
@@ -37,7 +40,7 @@ const NAV: {
 ];
 
 /** Pages that work offline / without a meta download. */
-const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb"];
+const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb", "sets"];
 
 function pageTitle(page: Page): string {
   switch (page) {
@@ -49,6 +52,8 @@ function pageTitle(page: Page): string {
       return "Deck";
     case "meta":
       return "Events";
+    case "sets":
+      return "Sets";
     case "stats":
       return "My Stats";
     case "matchups":
@@ -212,6 +217,7 @@ export default function App() {
               {page === "format" && <FormatView />}
               {page === "deck" && <DeckView />}
               {page === "meta" && <MetaPulse />}
+              {page === "sets" && <Sets />}
               {page === "stats" && <Stats />}
               {page === "matchups" && <Matchups />}
               {page === "climb" && <Climb />}

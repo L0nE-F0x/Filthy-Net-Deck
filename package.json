@@ -1,7 +1,7 @@
 {
   "name": "filthy-net-deck",
   "private": true,
-  "version": "0.12.4",
+  "version": "0.13.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,8 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "pipeline": "node pipeline/build-meta.mjs",
-    "meta": "node pipeline/build-meta.mjs"
+    "meta": "node pipeline/build-meta.mjs",
+    "sets": "node pipeline/build-sets.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

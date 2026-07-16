@@ -9,6 +9,7 @@ export type Page =
   | "format"
   | "deck"
   | "meta"
+  | "sets"
   | "stats"
   | "matchups"
   | "climb"

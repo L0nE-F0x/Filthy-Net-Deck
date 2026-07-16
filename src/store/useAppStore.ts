@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { fetchMetaBundle } from "../services/metaFeed";
+import { fetchSetsBundle } from "../services/setsFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
 import {
   checkRemoteVersion,
@@ -21,6 +22,7 @@ import {
   subscribeTracker,
 } from "../services/tracker";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
+import type { SetsBundle } from "../types/sets";
 import type { TrackedMatch, TrackerStatus } from "../types/tracker";
 
 const PREFS_KEY = "bbi.prefs";
@@ -106,6 +108,10 @@ interface AppState {
   trackerStatus: TrackerStatus | null;
   trackerMatches: TrackedMatch[];
   trackerReady: boolean;
+  /** Arena-first set radar (spoilers / release dates) */
+  sets: SetsBundle | null;
+  setsLoading: boolean;
+  setsError: string | null;
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
@@ -114,6 +120,7 @@ interface AppState {
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
   refreshMeta: () => Promise<void>;
+  refreshSets: () => Promise<void>;
   clearError: () => void;
   toggleFavorite: (deckId: string) => void;
   isFavorite: (deckId: string) => boolean;
@@ -173,6 +180,9 @@ export const useAppStore = create<AppState>((set, get) => {
     trackerStatus: null,
     trackerMatches: [],
     trackerReady: false,
+    sets: null,
+    setsLoading: false,
+    setsError: null,
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
@@ -343,10 +353,26 @@ export const useAppStore = create<AppState>((set, get) => {
           metaDiff: diff,
         });
         void get().checkForUpdates();
+        void get().refreshSets();
       } catch (e) {
         set({
           loading: false,
           error: e instanceof Error ? e.message : "Failed to load meta",
+        });
+        // Still try set radar even if deck meta failed
+        void get().refreshSets();
+      }
+    },
+
+    refreshSets: async () => {
+      set({ setsLoading: true, setsError: null });
+      try {
+        const { bundle } = await fetchSetsBundle();
+        set({ sets: bundle, setsLoading: false, setsError: null });
+      } catch (e) {
+        set({
+          setsLoading: false,
+          setsError: e instanceof Error ? e.message : "Failed to load sets",
         });
       }
     },

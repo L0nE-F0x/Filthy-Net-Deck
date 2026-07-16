@@ -100,3 +100,13 @@ export function IconClimb({ className }: IconProps): ReactNode {
     </svg>
   );
 }
+
+export function IconSets({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <rect x="4" y="3" width="12" height="16" rx="1.5" />
+      <path d="M8 3v16M16 7h4v12a1.5 1.5 0 01-1.5 1.5H8" />
+      <path d="M7 8h2M7 12h2M7 16h2" />
+    </svg>
+  );
+}

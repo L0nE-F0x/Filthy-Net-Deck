@@ -82,6 +82,21 @@ Articles (e.g. Traditional Standard Ranked) contain continuous `N Card Name` run
 
 ---
 
+## Set radar (`sets.json`)
+
+Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
+
+| Piece | Role |
+|-------|------|
+| `npm run sets` | `pipeline/build-sets.mjs` → Scryfall `/sets` + spoiled cards |
+| `pipeline/sources/set-calendar-overrides.json` | Optional official Arena / spoiler dates |
+| `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
+| App page **Sets** | Countdown (Arena emphasized), spoiler rail, Scryfall link |
+
+Daily CI runs `npm run sets` after the deck meta job. Arena dates are `official` when overridden, otherwise `estimated` (paper − 3 days) and labeled in the UI.
+
+---
+
 ## Built-in app updater
 
 | Mode | Behavior |

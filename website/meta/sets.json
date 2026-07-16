@@ -1,0 +1,517 @@
+{
+  "generatedAt": "2026-07-16T08:49:37.001Z",
+  "date": "2026-07-16",
+  "version": "1.0.0",
+  "policy": {
+    "arenaFirst": true,
+    "noAlchemy": true,
+    "formats": "Standard/Pioneer-facing expansions only",
+    "arenaDates": "official overrides when known; otherwise estimated as paper release minus 3 days (labeled)"
+  },
+  "sources": [
+    "scryfall",
+    "set-calendar-overrides"
+  ],
+  "sets": [
+    {
+      "code": "hob",
+      "name": "The Hobbit",
+      "setType": "expansion",
+      "iconSvg": "https://svgs.scryfall.io/sets/hob.svg?1783915200",
+      "scryfallUri": "https://scryfall.com/sets/hob",
+      "cardCount": 39,
+      "spoiledCount": 39,
+      "dates": {
+        "tabletop": "2026-08-14",
+        "arena": "2026-08-11",
+        "spoilerStart": null,
+        "prerelease": "2026-08-07"
+      },
+      "datesConfidence": {
+        "tabletop": "scryfall",
+        "arena": "official",
+        "spoilerStart": "unknown",
+        "prerelease": "estimated"
+      },
+      "heroScryfallId": "dda07973-ed78-4f50-8794-f5cbfc6e8975",
+      "previews": [
+        {
+          "name": "An Unexpected Party // At the Door",
+          "scryfallId": "f75207fd-89d2-417b-8f36-4ea96b4e3794",
+          "rarity": "rare",
+          "collectorNumber": "289",
+          "typeLine": "Enchantment // Sorcery — Adventure",
+          "manaCost": "{2}{W}{W} // {X}{2}{W}"
+        },
+        {
+          "name": "Bilbo, Thief in the Night",
+          "scryfallId": "dda07973-ed78-4f50-8794-f5cbfc6e8975",
+          "rarity": "mythic",
+          "collectorNumber": "219",
+          "typeLine": "Legendary Creature — Halfling Rogue",
+          "manaCost": "{1}{U}"
+        },
+        {
+          "name": "Bilbo, Thief in the Night",
+          "scryfallId": "c0c313d6-5a76-459d-9db1-9491c57861fe",
+          "rarity": "mythic",
+          "collectorNumber": "255",
+          "typeLine": "Legendary Creature — Halfling Rogue",
+          "manaCost": "{1}{U}"
+        },
+        {
+          "name": "My Precious // Allure of Power",
+          "scryfallId": "ceb193ed-b05f-4820-a17f-e2982bf547ae",
+          "rarity": "rare",
+          "collectorNumber": "235",
+          "typeLine": "Legendary Artifact — Equipment // Instant — Adventure",
+          "manaCost": "{3} // {1}{B}"
+        },
+        {
+          "name": "My Precious // Allure of Power",
+          "scryfallId": "ce239994-1bc6-4083-b9cf-776e862c5479",
+          "rarity": "rare",
+          "collectorNumber": "271",
+          "typeLine": "Legendary Artifact — Equipment // Instant — Adventure",
+          "manaCost": "{3} // {1}{B}"
+        },
+        {
+          "name": "Riddles in the Dark",
+          "scryfallId": "234e941d-ad86-4a3e-bd8c-0e680944919a",
+          "rarity": "rare",
+          "collectorNumber": "292",
+          "typeLine": "Instant",
+          "manaCost": "{2}{U}"
+        },
+        {
+          "name": "Smaug the Magnificent",
+          "scryfallId": "4edcf8eb-d0b0-4aec-bec0-64c56982cdce",
+          "rarity": "mythic",
+          "collectorNumber": "229",
+          "typeLine": "Legendary Creature — Dragon",
+          "manaCost": "{2}{R}{R}"
+        },
+        {
+          "name": "Smaug the Magnificent",
+          "scryfallId": "43c56e15-ba46-4a27-b9b0-55cde9f8c933",
+          "rarity": "mythic",
+          "collectorNumber": "249",
+          "typeLine": "Legendary Creature — Dragon",
+          "manaCost": "{2}{R}{R}"
+        },
+        {
+          "name": "Smaug the Magnificent",
+          "scryfallId": "b6529666-0ec8-45a8-8740-3bffc19d2265",
+          "rarity": "mythic",
+          "collectorNumber": "265",
+          "typeLine": "Legendary Creature — Dragon",
+          "manaCost": "{2}{R}{R}"
+        },
+        {
+          "name": "The Arkenstone // Seek the Heart",
+          "scryfallId": "ba3ff39b-b591-4434-8d41-4826d0809ca7",
+          "rarity": "mythic",
+          "collectorNumber": "234",
+          "typeLine": "Legendary Artifact // Sorcery — Adventure",
+          "manaCost": "{5} // {2}{W}"
+        },
+        {
+          "name": "The Arkenstone // Seek the Heart",
+          "scryfallId": "6c6193e8-453b-49dd-ad65-ee6e363bff93",
+          "rarity": "mythic",
+          "collectorNumber": "247",
+          "typeLine": "Legendary Artifact // Sorcery — Adventure",
+          "manaCost": "{5} // {2}{W}"
+        },
+        {
+          "name": "The Arkenstone // Seek the Heart",
+          "scryfallId": "2d08a806-c70d-4421-a9eb-e29e54e4268f",
+          "rarity": "mythic",
+          "collectorNumber": "270",
+          "typeLine": "Legendary Artifact // Sorcery — Adventure",
+          "manaCost": "{5} // {2}{W}"
+        },
+        {
+          "name": "The Arkenstone // Seek the Heart",
+          "scryfallId": "9a0d62ce-8fd3-4465-b3aa-5d5052df30dc",
+          "rarity": "mythic",
+          "collectorNumber": "283",
+          "typeLine": "Legendary Artifact // Sorcery — Adventure",
+          "manaCost": "{5} // {2}{W}"
+        },
+        {
+          "name": "Thorin, Mountain-king",
+          "scryfallId": "2401d2a5-f65b-4a13-906c-999990589a1e",
+          "rarity": "mythic",
+          "collectorNumber": "243",
+          "typeLine": "Legendary Creature — Dwarf Noble",
+          "manaCost": "{3}{R}"
+        }
+      ],
+      "overrideSource": "https://articles.starcitygames.com/magic-the-gathering/magic-the-gathering-full-set-release-schedule-for-2026/",
+      "notes": "Arena typically a few days before paper; confirm when WotC posts official schedule",
+      "status": "spoiling"
+    },
+    {
+      "code": "fra",
+      "name": "Reality Fracture",
+      "setType": "expansion",
+      "iconSvg": "https://svgs.scryfall.io/sets/fra.svg?1783915200",
+      "scryfallUri": "https://scryfall.com/sets/fra",
+      "cardCount": 7,
+      "spoiledCount": 7,
+      "dates": {
+        "tabletop": "2026-10-02",
+        "arena": "2026-09-29",
+        "spoilerStart": null,
+        "prerelease": "2026-09-25"
+      },
+      "datesConfidence": {
+        "tabletop": "scryfall",
+        "arena": "estimated",
+        "spoilerStart": "unknown",
+        "prerelease": "estimated"
+      },
+      "heroScryfallId": "9a5db4d2-035f-4f48-8752-75487267c222",
+      "previews": [
+        {
+          "name": "Bloodline Recollector // Ancestral Craving",
+          "scryfallId": "9a5db4d2-035f-4f48-8752-75487267c222",
+          "rarity": "mythic",
+          "collectorNumber": "402",
+          "typeLine": "Creature — Vampire Warlock // Instant",
+          "manaCost": "{1}{B} // {B}"
+        },
+        {
+          "name": "Bloodline Recollector // Ancestral Craving",
+          "scryfallId": "9fb84b18-0775-44eb-83af-5dcb69518360",
+          "rarity": "mythic",
+          "collectorNumber": "427",
+          "typeLine": "Creature — Vampire Warlock // Instant",
+          "manaCost": "{1}{B} // {B}"
+        },
+        {
+          "name": "Stingcaster Mage",
+          "scryfallId": "38096f2a-7fae-43f1-a1e9-f9c670bc191d",
+          "rarity": "mythic",
+          "collectorNumber": "457",
+          "typeLine": "Creature — Human Wizard",
+          "manaCost": "{1}{R}"
+        },
+        {
+          "name": "Chandra, Chill of Compliance",
+          "scryfallId": "240f58ab-944c-4f4c-9df9-5f40b132bf3e",
+          "rarity": "mythic",
+          "collectorNumber": "212",
+          "typeLine": "Legendary Planeswalker — Chandra",
+          "manaCost": "{1}{U}{U}"
+        },
+        {
+          "name": "Bloodline Recollector // Ancestral Craving",
+          "scryfallId": "4fcc913e-f736-460a-b24b-022fa2e861b9",
+          "rarity": "mythic",
+          "collectorNumber": "49",
+          "typeLine": "Creature — Vampire Warlock // Instant",
+          "manaCost": "{1}{B} // {B}"
+        },
+        {
+          "name": "Chandra, Torch of Defiance",
+          "scryfallId": "40cb22c8-cb03-45c9-bb0e-b8cabdcc43cd",
+          "rarity": "mythic",
+          "collectorNumber": "244",
+          "typeLine": "Legendary Planeswalker — Chandra",
+          "manaCost": "{2}{R}{R}"
+        },
+        {
+          "name": "Stingcaster Mage",
+          "scryfallId": "086ef095-32ad-4311-a40b-996c5f7b86cf",
+          "rarity": "mythic",
+          "collectorNumber": "329",
+          "typeLine": "Creature — Human Wizard",
+          "manaCost": "{1}{R}"
+        }
+      ],
+      "overrideSource": null,
+      "notes": null,
+      "status": "spoiling"
+    },
+    {
+      "code": "trk",
+      "name": "Star Trek",
+      "setType": "expansion",
+      "iconSvg": "https://svgs.scryfall.io/sets/trk.svg?1783915200",
+      "scryfallUri": "https://scryfall.com/sets/trk",
+      "cardCount": 61,
+      "spoiledCount": 61,
+      "dates": {
+        "tabletop": "2026-11-13",
+        "arena": "2026-11-10",
+        "spoilerStart": null,
+        "prerelease": "2026-11-06"
+      },
+      "datesConfidence": {
+        "tabletop": "scryfall",
+        "arena": "estimated",
+        "spoilerStart": "unknown",
+        "prerelease": "estimated"
+      },
+      "heroScryfallId": "367aa1e6-ce6c-41a0-ba7c-af00487a4302",
+      "previews": [
+        {
+          "name": "Blood Crypt",
+          "scryfallId": "32b61634-d3be-4d78-8e52-357b6be9ad61",
+          "rarity": "rare",
+          "collectorNumber": "489",
+          "typeLine": "Land — Swamp Mountain",
+          "manaCost": ""
+        },
+        {
+          "name": "Breeding Pool",
+          "scryfallId": "638731af-512e-42bd-813a-d540a36c8ead",
+          "rarity": "rare",
+          "collectorNumber": "496",
+          "typeLine": "Land — Forest Island",
+          "manaCost": ""
+        },
+        {
+          "name": "Captain James T. Kirk",
+          "scryfallId": "367aa1e6-ce6c-41a0-ba7c-af00487a4302",
+          "rarity": "mythic",
+          "collectorNumber": "418",
+          "typeLine": "Legendary Creature — Human Officer",
+          "manaCost": "{2}{R}"
+        },
+        {
+          "name": "Captain James T. Kirk",
+          "scryfallId": "a7f991c5-0a55-4d34-8dee-d3f206167be1",
+          "rarity": "mythic",
+          "collectorNumber": "542",
+          "typeLine": "Legendary Creature — Human Officer",
+          "manaCost": "{2}{R}"
+        },
+        {
+          "name": "Captain James T. Kirk",
+          "scryfallId": "b1cfb3f1-f1ad-47aa-a7f0-ff3ebd2ffa5e",
+          "rarity": "mythic",
+          "collectorNumber": "1701",
+          "typeLine": "Legendary Creature — Human Officer",
+          "manaCost": "{2}{R}"
+        },
+        {
+          "name": "Captain Kathryn Janeway",
+          "scryfallId": "2e462516-fddb-4e76-836b-b590d37e783f",
+          "rarity": "mythic",
+          "collectorNumber": "520",
+          "typeLine": "Legendary Creature — Human Officer",
+          "manaCost": "{3}{G}"
+        },
+        {
+          "name": "Captain Kathryn Janeway",
+          "scryfallId": "e40fe4b6-81c0-4822-9668-2dac7820dcb9",
+          "rarity": "mythic",
+          "collectorNumber": "1704",
+          "typeLine": "Legendary Creature — Human Officer",
+          "manaCost": "{3}{G}"
+        },
+        {
+          "name": "Crystalline Entity",
+          "scryfallId": "741798a7-67df-4b8b-b0e9-dd8c2797ccc4",
+          "rarity": "mythic",
+          "collectorNumber": "478",
+          "typeLine": "Artifact Creature — Elemental",
+          "manaCost": "{8}"
+        },
+        {
+          "name": "Dr. Beverly Crusher",
+          "scryfallId": "179d50b5-cab1-482c-85a6-36f59335b562",
+          "rarity": "mythic",
+          "collectorNumber": "500",
+          "typeLine": "Legendary Creature — Human Doctor",
+          "manaCost": "{2}{W}"
+        },
+        {
+          "name": "Godless Shrine",
+          "scryfallId": "2a540ef6-ba54-4729-9642-fada37843292",
+          "rarity": "rare",
+          "collectorNumber": "492",
+          "typeLine": "Land — Plains Swamp",
+          "manaCost": ""
+        },
+        {
+          "name": "Hallowed Fountain",
+          "scryfallId": "8868a343-2e57-45a8-9e53-971211fe5cc9",
+          "rarity": "rare",
+          "collectorNumber": "487",
+          "typeLine": "Land — Plains Island",
+          "manaCost": ""
+        },
+        {
+          "name": "Overgrown Tomb",
+          "scryfallId": "e97cb934-fc79-4010-829f-bc9bb0ba7635",
+          "rarity": "rare",
+          "collectorNumber": "494",
+          "typeLine": "Land — Swamp Forest",
+          "manaCost": ""
+        },
+        {
+          "name": "Sacred Foundry",
+          "scryfallId": "1ff8510e-bec2-401b-8e6e-cc350f805574",
+          "rarity": "rare",
+          "collectorNumber": "495",
+          "typeLine": "Land — Mountain Plains",
+          "manaCost": ""
+        },
+        {
+          "name": "Salt Vampire",
+          "scryfallId": "d633a0bf-bb3a-471f-a286-7686da81bb01",
+          "rarity": "rare",
+          "collectorNumber": "541",
+          "typeLine": "Creature — Vampire Shapeshifter",
+          "manaCost": "{1}{B}"
+        }
+      ],
+      "overrideSource": null,
+      "notes": null,
+      "status": "spoiling"
+    },
+    {
+      "code": "msh",
+      "name": "Marvel Super Heroes",
+      "setType": "expansion",
+      "iconSvg": "https://svgs.scryfall.io/sets/msh.svg?1783915200",
+      "scryfallUri": "https://scryfall.com/sets/msh",
+      "cardCount": 453,
+      "spoiledCount": 453,
+      "dates": {
+        "tabletop": "2026-06-26",
+        "arena": "2026-06-23",
+        "spoilerStart": null,
+        "prerelease": "2026-06-19"
+      },
+      "datesConfidence": {
+        "tabletop": "scryfall",
+        "arena": "official",
+        "spoilerStart": "unknown",
+        "prerelease": "estimated"
+      },
+      "heroScryfallId": "8e3c4b2a-4ef7-41ea-a4b5-b0cc942a9889",
+      "previews": [
+        {
+          "name": "Moonstone, Harsh Mistress",
+          "scryfallId": "792e4119-0518-4c97-822d-d146a5368a15",
+          "rarity": "uncommon",
+          "collectorNumber": "447",
+          "typeLine": "Legendary Creature — Human Doctor Villain",
+          "manaCost": "{3}{B}"
+        },
+        {
+          "name": "Villainous Hideout",
+          "scryfallId": "cb4727f5-4a7e-487e-bd72-5f58eb8bf88e",
+          "rarity": "uncommon",
+          "collectorNumber": "454",
+          "typeLine": "Land",
+          "manaCost": ""
+        },
+        {
+          "name": "Speed, Young Avenger",
+          "scryfallId": "7224b9cc-6a88-4aea-a7ab-ab64e0e25451",
+          "rarity": "uncommon",
+          "collectorNumber": "448",
+          "typeLine": "Legendary Creature — Mutant Hero",
+          "manaCost": "{1}{R}"
+        },
+        {
+          "name": "Black Widow, Super Spy",
+          "scryfallId": "8e3c4b2a-4ef7-41ea-a4b5-b0cc942a9889",
+          "rarity": "mythic",
+          "collectorNumber": "393",
+          "typeLine": "Legendary Creature — Human Spy Hero",
+          "manaCost": "{1}{B}"
+        },
+        {
+          "name": "Cloak and Dagger, Entwined",
+          "scryfallId": "50aa361c-72fd-4ecb-b877-a27646c66ad0",
+          "rarity": "rare",
+          "collectorNumber": "419",
+          "typeLine": "Legendary Creature — Human Hero",
+          "manaCost": "{1}{W}{B}"
+        },
+        {
+          "name": "Heroic Feast",
+          "scryfallId": "dd9b6b3f-07b1-42d2-8aff-8da3113b9d88",
+          "rarity": "rare",
+          "collectorNumber": "414",
+          "typeLine": "Enchantment",
+          "manaCost": "{2}{G}"
+        },
+        {
+          "name": "Iron Man Armor",
+          "scryfallId": "cb2f6737-8063-4e67-affc-42c4915d2db1",
+          "rarity": "mythic",
+          "collectorNumber": "427",
+          "typeLine": "Artifact — Equipment",
+          "manaCost": "{3}"
+        },
+        {
+          "name": "Shang-Chi, Master of Kung Fu",
+          "scryfallId": "b367d034-ae08-4b08-b090-39a6d4f79dc2",
+          "rarity": "mythic",
+          "collectorNumber": "396",
+          "typeLine": "Legendary Creature — Human Warrior Hero",
+          "manaCost": "{1}{G}"
+        },
+        {
+          "name": "Super-Adaptoid",
+          "scryfallId": "5dcdba1d-434e-4c4e-8ec5-f51472f915de",
+          "rarity": "rare",
+          "collectorNumber": "428",
+          "typeLine": "Legendary Artifact Creature — Robot Villain",
+          "manaCost": "{2}"
+        },
+        {
+          "name": "Taskmaster, Mercenary Mimic",
+          "scryfallId": "0251766b-ab59-4079-aea7-9968b49f04ef",
+          "rarity": "rare",
+          "collectorNumber": "425",
+          "typeLine": "Legendary Creature — Human Mercenary Villain",
+          "manaCost": "{2}{U}{B}"
+        },
+        {
+          "name": "Arnim Zola, Bio-Fanatic",
+          "scryfallId": "8e3fdece-348a-45eb-871f-fffa91a1fbda",
+          "rarity": "uncommon",
+          "collectorNumber": "319",
+          "typeLine": "Legendary Artifact Creature — Scientist Villain",
+          "manaCost": "{2}{B}"
+        },
+        {
+          "name": "Black Widow, Super Spy",
+          "scryfallId": "c88457b3-0385-43b5-8d56-f537e022eb94",
+          "rarity": "mythic",
+          "collectorNumber": "347",
+          "typeLine": "Legendary Creature — Human Spy Hero",
+          "manaCost": "{1}{B}"
+        },
+        {
+          "name": "Black Widow, Super Spy",
+          "scryfallId": "73cf4b89-2551-444c-beb8-ec23e446d44a",
+          "rarity": "mythic",
+          "collectorNumber": "364",
+          "typeLine": "Legendary Creature — Human Spy Hero",
+          "manaCost": "{1}{B}"
+        },
+        {
+          "name": "Blazing Crescendo",
+          "scryfallId": "1ac8c104-572e-443d-b6d2-0cd26c0fef98",
+          "rarity": "common",
+          "collectorNumber": "340",
+          "typeLine": "Instant",
+          "manaCost": "{1}{R}"
+        }
+      ],
+      "overrideSource": "https://magic.wizards.com/en/news/mtg-arena/marvel-super-heroes-event-schedule",
+      "notes": "Arena drop announced by WotC",
+      "status": "live_on_arena"
+    }
+  ]
+}

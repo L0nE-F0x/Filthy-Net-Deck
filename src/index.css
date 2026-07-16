@@ -2120,3 +2120,268 @@ select,
   70% { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
+
+/* ——— Set radar ——— */
+.set-section-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.set-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.set-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-ink-850) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  box-shadow: 0 12px 36px color-mix(in srgb, black 28%, transparent);
+  display: flex;
+  flex-direction: column;
+}
+.set-card-hero {
+  position: relative;
+  height: 148px;
+  background: linear-gradient(145deg, var(--color-ink-800), var(--color-ink-950));
+  overflow: hidden;
+}
+.set-card-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0.88;
+}
+.set-card-hero-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--color-gold-500) 22%, transparent), transparent 55%),
+    var(--color-ink-900);
+}
+.set-card-hero-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-ink-950) 0%, transparent 55%),
+    linear-gradient(to right, color-mix(in srgb, var(--color-ink-950) 50%, transparent), transparent 40%);
+}
+.set-card-hero-top {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  z-index: 1;
+}
+.set-card-hero-bottom {
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.7rem;
+  z-index: 1;
+}
+.set-card-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-foam);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+}
+.set-card-code {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold-300);
+  font-weight: 600;
+}
+.set-icon {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0) invert(0.92) sepia(0.4) saturate(4) hue-rotate(10deg)
+    drop-shadow(0 1px 4px black);
+  opacity: 0.95;
+}
+.set-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  border: 1px solid transparent;
+}
+.set-status-spoiling {
+  color: #1a1205;
+  background: linear-gradient(180deg, var(--color-gold-300), var(--color-gold-500));
+  border-color: color-mix(in srgb, var(--color-gold-200) 40%, transparent);
+}
+.set-status-announced {
+  color: var(--color-azure-300);
+  background: color-mix(in srgb, var(--color-azure-500) 18%, var(--color-ink-900));
+  border-color: color-mix(in srgb, var(--color-azure-400) 35%, transparent);
+}
+.set-status-live_on_arena {
+  color: #052e1a;
+  background: linear-gradient(180deg, #6ee7b7, var(--color-good));
+  border-color: color-mix(in srgb, var(--color-good) 40%, transparent);
+}
+.set-status-released {
+  color: var(--color-muted);
+  background: color-mix(in srgb, var(--color-ink-700) 90%, transparent);
+  border-color: color-mix(in srgb, var(--color-ink-600) 80%, transparent);
+}
+.set-card-body {
+  padding: 0.9rem 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+.set-countdown-strip {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 0.55rem;
+}
+.set-countdown-main,
+.set-countdown-side {
+  border-radius: 12px;
+  padding: 0.55rem 0.65rem;
+  background: color-mix(in srgb, var(--color-ink-900) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 50%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.set-countdown-main {
+  border-color: color-mix(in srgb, var(--color-gold-500) 32%, var(--color-ink-600));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-gold-500) 12%, var(--color-ink-900)),
+    var(--color-ink-900)
+  );
+}
+.set-countdown-eyebrow {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.set-countdown-main .set-countdown-eyebrow {
+  color: var(--color-gold-300);
+}
+.set-countdown-main strong,
+.set-countdown-side strong {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-foam);
+  line-height: 1.1;
+}
+.set-countdown-sub {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+}
+.set-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+.set-date-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  gap: 0.4rem;
+  align-items: baseline;
+  font-size: 0.78rem;
+}
+.set-date-label {
+  color: var(--color-muted);
+}
+.set-date-value {
+  color: var(--color-foam);
+  font-weight: 500;
+}
+.set-date-hint {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: 0.72rem;
+}
+.set-date-count {
+  color: var(--color-gold-300);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+.set-date-arena .set-date-label {
+  color: var(--color-gold-300);
+  font-weight: 600;
+}
+.set-spoiler-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-bottom: 0.3rem;
+}
+.set-spoiler-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  overflow: hidden;
+}
+.set-spoiler-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-gold-500), var(--color-gold-300));
+  transition: width 0.35s ease;
+}
+.set-preview-rail {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  scrollbar-width: thin;
+}
+.set-preview-thumb {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 58px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, white 10%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, black 35%, transparent);
+}
+.set-preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.set-no-spoilers {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+.set-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.15rem;
+}

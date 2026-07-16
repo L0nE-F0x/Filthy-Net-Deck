@@ -1,0 +1,15 @@
+{
+  "_comment": "Optional Arena / spoiler dates when Scryfall only has paper released_at. Keys = Scryfall set code (lowercase). Prefer official WotC / magic.gg sources; leave fields out rather than inventing.",
+  "msh": {
+    "arena": "2026-06-23",
+    "spoilerStart": null,
+    "source": "https://magic.wizards.com/en/news/mtg-arena/marvel-super-heroes-event-schedule",
+    "notes": "Arena drop announced by WotC"
+  },
+  "hob": {
+    "arena": "2026-08-11",
+    "spoilerStart": null,
+    "source": "https://articles.starcitygames.com/magic-the-gathering/magic-the-gathering-full-set-release-schedule-for-2026/",
+    "notes": "Arena typically a few days before paper; confirm when WotC posts official schedule"
+  }
+}
