@@ -1,5 +1,5 @@
 {
-  "version": "0.12.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.1.exe",
-  "notes": "v0.12.1: Fix version-history card art (Scryfall arena lookup). Restore signed in-app Update & restart. Matchup Lab + Climb Tracker from 0.12."
+  "version": "0.12.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.2.exe",
+  "notes": "v0.12.2: Built by ApexForge credit in the app sidebar and Settings. Marketing site footer link to ame-apexforge.org."
 }
