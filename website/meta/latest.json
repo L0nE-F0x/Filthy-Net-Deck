@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-15T08:23:03.046Z",
-  "date": "2026-07-15",
+  "generatedAt": "2026-07-16T08:22:13.457Z",
+  "date": "2026-07-16",
   "formats": [
     {
       "id": "standard",
@@ -58,23 +58,23 @@
           ]
         }
       ],
-      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-15). Every card name verified via Scryfall. Rank = metagame share.",
+      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-16). Every card name verified via Scryfall. Rank = metagame share.",
       "metaShareTop": [
         {
           "name": "Selesnya Ouroboroid",
-          "pct": 15.1
+          "pct": 15
         },
         {
           "name": "Izzet Prowess",
-          "pct": 14.2
+          "pct": 14.1
         },
         {
           "name": "Jeskai Lessons",
-          "pct": 12.6
+          "pct": 12.5
         },
         {
           "name": "4c Control",
-          "pct": 12.3
+          "pct": 12.2
         }
       ]
     },
@@ -134,23 +134,23 @@
           ]
         }
       ],
-      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-15). Every card name verified via Scryfall. Rank = metagame share.",
+      "metaNotes": "Meta % and lists from MTGGoldfish (2026-07-16). Every card name verified via Scryfall. Rank = metagame share.",
       "metaShareTop": [
         {
           "name": "Mono-Red Prowess",
-          "pct": 13.6
+          "pct": 13.2
         },
         {
           "name": "Golgari Midrange",
-          "pct": 11.4
+          "pct": 11
         },
         {
           "name": "Izzet Prowess",
-          "pct": 8.7
+          "pct": 8.5
         },
         {
           "name": "Azorius Control",
-          "pct": 8.6
+          "pct": 8.4
         }
       ]
     }
@@ -168,7 +168,7 @@
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "15.1% of tracked Standard decks (219 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "15% of tracked Standard decks (219 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 3,
@@ -312,7 +312,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 15.1,
+      "metaShare": 15,
       "keyCards": [
         "Badgermole Cub",
         "Brightglass Gearhulk",
@@ -333,7 +333,7 @@
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "15.1% of tracked Standard decks (219 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "15% of tracked Standard decks (219 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 3,
@@ -532,7 +532,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 15.1,
+      "metaShare": 15,
       "keyCards": [
         "Badgermole Cub",
         "Brightglass Gearhulk",
@@ -553,7 +553,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "14.2% of tracked Standard decks (206 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "14.1% of tracked Standard decks (206 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -689,7 +689,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 14.2,
+      "metaShare": 14.1,
       "keyCards": [
         "Astrologian's Planisphere",
         "Slickshot Show-Off",
@@ -710,7 +710,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "14.2% of tracked Standard decks (206 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "14.1% of tracked Standard decks (206 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -919,7 +919,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 14.2,
+      "metaShare": 14.1,
       "keyCards": [
         "Astrologian's Planisphere",
         "Slickshot Show-Off",
@@ -941,7 +941,7 @@
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "12.6% of tracked Standard decks (182 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "12.5% of tracked Standard decks (182 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 1,
@@ -1086,7 +1086,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12.6,
+      "metaShare": 12.5,
       "keyCards": [
         "Jeskai Revelation",
         "Tablet of Discovery",
@@ -1108,7 +1108,7 @@
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "12.6% of tracked Standard decks (182 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "12.5% of tracked Standard decks (182 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 1,
@@ -1308,7 +1308,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12.6,
+      "metaShare": 12.5,
       "keyCards": [
         "Jeskai Revelation",
         "Tablet of Discovery",
@@ -1331,7 +1331,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "12.3% of tracked Standard decks (178 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "12.2% of tracked Standard decks (178 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -1536,7 +1536,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12.3,
+      "metaShare": 12.2,
       "keyCards": [
         "Inevitable Defeat",
         "Jeskai Revelation",
@@ -1559,7 +1559,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "12.3% of tracked Standard decks (178 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "12.2% of tracked Standard decks (178 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -1838,7 +1838,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 12.3,
+      "metaShare": 12.2,
       "keyCards": [
         "Inevitable Defeat",
         "Jeskai Revelation",
@@ -1859,7 +1859,7 @@
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "9% of tracked Standard decks (130 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.9% of tracked Standard decks (130 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 7,
@@ -1983,7 +1983,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 9,
+      "metaShare": 8.9,
       "keyCards": [
         "Sunderflock",
         "Eddymurk Crab",
@@ -2004,7 +2004,7 @@
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "9% of tracked Standard decks (130 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.9% of tracked Standard decks (130 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 7,
@@ -2189,7 +2189,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 9,
+      "metaShare": 8.9,
       "keyCards": [
         "Sunderflock",
         "Eddymurk Crab",
@@ -2210,7 +2210,7 @@
         "B"
       ],
       "archetype": "Dimir Excruciator",
-      "description": "5.9% of tracked Standard decks (85 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.8% of tracked Standard decks (85 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 3,
@@ -2354,7 +2354,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.9,
+      "metaShare": 5.8,
       "keyCards": [
         "Deceit",
         "Superior Spider-Man",
@@ -2375,7 +2375,7 @@
         "B"
       ],
       "archetype": "Dimir Excruciator",
-      "description": "5.9% of tracked Standard decks (85 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.8% of tracked Standard decks (85 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 3,
@@ -2574,7 +2574,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.9,
+      "metaShare": 5.8,
       "keyCards": [
         "Deceit",
         "Superior Spider-Man",
@@ -2594,7 +2594,7 @@
         "G"
       ],
       "archetype": "Mono-Green Landfall",
-      "description": "5.7% of tracked Standard decks (82 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.6% of tracked Standard decks (82 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -2699,7 +2699,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.7,
+      "metaShare": 5.6,
       "keyCards": [
         "Badgermole Cub",
         "Icetill Explorer",
@@ -2719,7 +2719,7 @@
         "G"
       ],
       "archetype": "Mono-Green Landfall",
-      "description": "5.7% of tracked Standard decks (82 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.6% of tracked Standard decks (82 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -2873,7 +2873,7 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 5.7,
+      "metaShare": 5.6,
       "keyCards": [
         "Badgermole Cub",
         "Icetill Explorer",
@@ -3273,7 +3273,7 @@
         "R"
       ],
       "archetype": "Mono-Red Prowess",
-      "description": "13.6% of tracked Pioneer decks (125 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "13.2% of tracked Pioneer decks (125 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -3385,7 +3385,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 13.6,
+      "metaShare": 13.2,
       "keyCards": [
         "Screaming Nemesis",
         "Sunspine Lynx",
@@ -3405,7 +3405,7 @@
         "R"
       ],
       "archetype": "Mono-Red Prowess",
-      "description": "13.6% of tracked Pioneer decks (125 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "13.2% of tracked Pioneer decks (125 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -3554,7 +3554,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 13.6,
+      "metaShare": 13.2,
       "keyCards": [
         "Screaming Nemesis",
         "Sunspine Lynx",
@@ -3575,7 +3575,7 @@
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "11.4% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "11% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -3753,7 +3753,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 11.4,
+      "metaShare": 11,
       "keyCards": [
         "Badgermole Cub",
         "Thoughtseize",
@@ -3774,7 +3774,7 @@
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "11.4% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "11% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -4013,7 +4013,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 11.4,
+      "metaShare": 11,
       "keyCards": [
         "Badgermole Cub",
         "Thoughtseize",
@@ -4034,7 +4034,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "8.7% of tracked Pioneer decks (80 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.5% of tracked Pioneer decks (80 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -4172,7 +4172,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.7,
+      "metaShare": 8.5,
       "keyCards": [
         "Flow State",
         "Soul-Scar Mage",
@@ -4193,7 +4193,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "8.7% of tracked Pioneer decks (80 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.5% of tracked Pioneer decks (80 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -4398,7 +4398,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.7,
+      "metaShare": 8.5,
       "keyCards": [
         "Flow State",
         "Soul-Scar Mage",
@@ -4419,7 +4419,7 @@
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "8.6% of tracked Pioneer decks (79 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.4% of tracked Pioneer decks (79 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 6,
@@ -4610,7 +4610,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.6,
+      "metaShare": 8.4,
       "keyCards": [
         "Teferi, Hero of Dominaria",
         "The Wandering Emperor",
@@ -4631,7 +4631,7 @@
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "8.6% of tracked Pioneer decks (79 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "8.4% of tracked Pioneer decks (79 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 6,
@@ -4877,7 +4877,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.6,
+      "metaShare": 8.4,
       "keyCards": [
         "Teferi, Hero of Dominaria",
         "The Wandering Emperor",
@@ -4899,7 +4899,7 @@
         "G"
       ],
       "archetype": "Abzan Greasefang",
-      "description": "8.2% of tracked Pioneer decks (75 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "7.9% of tracked Pioneer decks (75 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 1,
@@ -5084,7 +5084,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.2,
+      "metaShare": 7.9,
       "keyCards": [
         "Greasefang, Okiba Boss",
         "Thoughtseize",
@@ -5106,7 +5106,7 @@
         "G"
       ],
       "archetype": "Abzan Greasefang",
-      "description": "8.2% of tracked Pioneer decks (75 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "7.9% of tracked Pioneer decks (75 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 1,
@@ -5352,7 +5352,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 8.2,
+      "metaShare": 7.9,
       "keyCards": [
         "Greasefang, Okiba Boss",
         "Thoughtseize",
@@ -5373,7 +5373,7 @@
         "B"
       ],
       "archetype": "Orzhov Greasefang",
-      "description": "6.3% of tracked Pioneer decks (58 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "6.1% of tracked Pioneer decks (58 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -5546,7 +5546,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 6.3,
+      "metaShare": 6.1,
       "keyCards": [
         "Monument to Endurance",
         "Thoughtseize",
@@ -5567,7 +5567,7 @@
         "B"
       ],
       "archetype": "Orzhov Greasefang",
-      "description": "6.3% of tracked Pioneer decks (58 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "6.1% of tracked Pioneer decks (58 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 2,
@@ -5789,7 +5789,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 6.3,
+      "metaShare": 6.1,
       "keyCards": [
         "Monument to Endurance",
         "Thoughtseize",
@@ -5810,7 +5810,7 @@
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "5.6% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.4% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -5947,7 +5947,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 5.6,
+      "metaShare": 5.4,
       "keyCards": [
         "Arclight Phoenix",
         "Sleight of Hand",
@@ -5968,7 +5968,7 @@
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "5.6% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.4% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -6148,7 +6148,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 5.6,
+      "metaShare": 5.4,
       "keyCards": [
         "Arclight Phoenix",
         "Sleight of Hand",
@@ -6169,7 +6169,7 @@
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "5.6% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.4% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -6321,7 +6321,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 5.6,
+      "metaShare": 5.4,
       "keyCards": [
         "Kaito, Bane of Nightmares",
         "Thoughtseize",
@@ -6342,7 +6342,7 @@
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "5.6% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "5.4% of tracked Pioneer decks (51 lists) on MTGGoldfish. Representative current list from the archetype page.",
       "mainboard": [
         {
           "count": 4,
@@ -6549,7 +6549,7 @@
           "url": "https://www.mtggoldfish.com/metagame/pioneer"
         }
       ],
-      "metaShare": 5.6,
+      "metaShare": 5.4,
       "keyCards": [
         "Kaito, Bane of Nightmares",
         "Thoughtseize",
@@ -6642,7 +6642,7 @@
       "name": "magic spotlight secrets chiba 2026 top 8 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-15",
+      "date": "2026-07-16",
       "url": "https://magic.gg/decklists/magic-spotlight-secrets-chiba-2026-top-8-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -6653,7 +6653,7 @@
       "name": "ultimate guard european magic series prague may 2026 top 36 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-15",
+      "date": "2026-07-16",
       "url": "https://magic.gg/decklists/ultimate-guard-european-magic-series-prague-may-2026-top-36-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -6664,7 +6664,7 @@
       "name": "united states regional championships washington dc may 2026 top 32 standard decklists",
       "format": "standard",
       "platform": "paper",
-      "date": "2026-07-15",
+      "date": "2026-07-16",
       "url": "https://magic.gg/decklists/united-states-regional-championships-washington-dc-may-2026-top-32-standard-decklists",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -6693,56 +6693,45 @@
       "source": "mtgo"
     },
     {
-      "id": "mtgo-standard-challenge-32-2026-07-1212847168",
-      "name": "standard challenge 32 2026 07 1212847168",
+      "id": "mtgo-standard-challenge-32-2026-07-1612847673",
+      "name": "standard challenge 32 2026 07 1612847673",
       "format": "standard",
       "platform": "mtgo",
-      "date": "2026-07-12",
-      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1212847168",
+      "date": "2026-07-16",
+      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1612847673",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
     },
     {
-      "id": "mtgo-pioneer-challenge-32-2026-07-1112847160",
-      "name": "pioneer challenge 32 2026 07 1112847160",
+      "id": "mtgo-standard-challenge-32-2026-07-1412847168",
+      "name": "standard challenge 32 2026 07 1412847168",
+      "format": "standard",
+      "platform": "mtgo",
+      "date": "2026-07-14",
+      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1412847168",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-pioneer-challenge-32-2026-07-1312847160",
+      "name": "pioneer challenge 32 2026 07 1312847160",
       "format": "pioneer",
       "platform": "mtgo",
-      "date": "2026-07-11",
-      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1112847160",
+      "date": "2026-07-13",
+      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1312847160",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
     },
     {
-      "id": "mtgo-standard-challenge-32-2026-07-1112847158",
-      "name": "standard challenge 32 2026 07 1112847158",
+      "id": "mtgo-standard-challenge-32-2026-07-1312847158",
+      "name": "standard challenge 32 2026 07 1312847158",
       "format": "standard",
       "platform": "mtgo",
-      "date": "2026-07-11",
-      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1112847158",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-standard-challenge-32-2026-07-1212847148",
-      "name": "standard challenge 32 2026 07 1212847148",
-      "format": "standard",
-      "platform": "mtgo",
-      "date": "2026-07-12",
-      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1212847148",
-      "topDecks": [],
-      "notes": "Official MTGO published decklists",
-      "source": "mtgo"
-    },
-    {
-      "id": "mtgo-pioneer-challenge-32-2026-07-0912847147",
-      "name": "pioneer challenge 32 2026 07 0912847147",
-      "format": "pioneer",
-      "platform": "mtgo",
-      "date": "2026-07-09",
-      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-0912847147",
+      "date": "2026-07-13",
+      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1312847158",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
@@ -6944,7 +6933,7 @@
       "name": "Untapped.gg — standard constructed meta",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-15",
+      "date": "2026-07-16",
       "url": "https://mtga.untapped.gg/constructed/standard/meta",
       "topDecks": [],
       "notes": "Arena ladder / Mythic meta tracker.",
@@ -6955,7 +6944,7 @@
       "name": "Untapped.gg — explorer constructed meta",
       "format": "pioneer",
       "platform": "mtga",
-      "date": "2026-07-15",
+      "date": "2026-07-16",
       "url": "https://mtga.untapped.gg/constructed/explorer/meta",
       "topDecks": [],
       "notes": "Arena ladder / Mythic meta tracker.",
