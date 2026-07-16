@@ -1892,3 +1892,231 @@ select,
   }
   .mu-lab-meta { grid-column: 1 / -1; }
 }
+/* ——— Launch splash ——— */
+.splash-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ink-950);
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  visibility: visible;
+}
+.splash-root.splash-exit {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.splash-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.55;
+  animation: splash-orb-drift 8s ease-in-out infinite alternate;
+}
+.splash-orb-a {
+  width: 42vmin;
+  height: 42vmin;
+  top: -8%;
+  left: -6%;
+  background: color-mix(in srgb, var(--color-gold-500) 55%, transparent);
+  animation-duration: 9s;
+}
+.splash-orb-b {
+  width: 36vmin;
+  height: 36vmin;
+  bottom: -10%;
+  right: -4%;
+  background: color-mix(in srgb, var(--color-azure-500) 45%, transparent);
+  animation-duration: 11s;
+  animation-delay: -2s;
+}
+.splash-orb-c {
+  width: 28vmin;
+  height: 28vmin;
+  top: 40%;
+  left: 55%;
+  background: color-mix(in srgb, var(--color-gold-400) 25%, transparent);
+  animation-duration: 7s;
+  animation-delay: -4s;
+}
+.splash-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-foam) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-foam) 4%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, black 20%, transparent 75%);
+  opacity: 0.55;
+}
+.splash-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.splash-core {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.35rem;
+  padding: 2rem;
+  text-align: center;
+  animation: splash-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.splash-ring {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  display: grid;
+  place-items: center;
+}
+.splash-ring-spin {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--color-gold-400);
+  border-right-color: color-mix(in srgb, var(--color-gold-500) 35%, transparent);
+  animation: splash-spin 1.15s linear infinite;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--color-gold-500) 28%, transparent);
+}
+.splash-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--color-ink-700) 80%, var(--color-gold-500)),
+      var(--color-ink-900));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-gold-500) 40%, transparent),
+    0 12px 40px color-mix(in srgb, black 55%, transparent),
+    0 0 48px color-mix(in srgb, var(--color-gold-500) 18%, transparent);
+  animation: splash-pulse-glow 2.2s ease-in-out infinite;
+}
+.splash-icon-wrap img {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: block;
+}
+
+.splash-copy {
+  max-width: 22rem;
+}
+.splash-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.splash-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-good);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-good) 55%, transparent);
+  animation: splash-live 1.6s ease-out infinite;
+}
+.splash-title {
+  margin: 0;
+  font-size: clamp(1.65rem, 3.5vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-foam);
+  text-shadow: 0 2px 24px color-mix(in srgb, var(--color-gold-500) 25%, transparent);
+}
+.splash-tagline {
+  margin: 0.45rem 0 0;
+  font-size: 1rem;
+  color: var(--color-muted);
+}
+.splash-tagline span {
+  color: var(--color-gold-300);
+  font-weight: 600;
+}
+.splash-tip {
+  margin: 1rem 0 0;
+  min-height: 1.35em;
+  font-size: 0.86rem;
+  color: color-mix(in srgb, var(--color-gold-300) 85%, var(--color-foam));
+  animation: splash-tip-in 0.35s ease both;
+}
+
+.splash-bar {
+  width: min(220px, 55vw);
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink-600) 80%, transparent);
+  overflow: hidden;
+}
+.splash-bar-fill {
+  height: 100%;
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-gold-500), var(--color-gold-300), var(--color-azure-400));
+  animation: splash-bar 1.35s ease-in-out infinite;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-gold-400) 50%, transparent);
+}
+
+.splash-version {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--color-muted) 80%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes splash-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes splash-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes splash-tip-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes splash-bar {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
+}
+@keyframes splash-orb-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(12px, -18px) scale(1.08); }
+}
+@keyframes splash-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold-500) 40%, transparent), 0 12px 40px color-mix(in srgb, black 55%, transparent), 0 0 36px color-mix(in srgb, var(--color-gold-500) 14%, transparent); }
+  50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold-400) 55%, transparent), 0 14px 48px color-mix(in srgb, black 50%, transparent), 0 0 64px color-mix(in srgb, var(--color-gold-500) 28%, transparent); }
+}
+@keyframes splash-live {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-good) 55%, transparent); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}

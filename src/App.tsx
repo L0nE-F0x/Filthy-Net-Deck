@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "./store/useAppStore";
 import { Daily } from "./pages/Daily";
 import { FormatView } from "./pages/FormatView";
@@ -10,6 +10,7 @@ import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { StatusBanners } from "./components/StatusBanners";
+import { SplashScreen } from "./components/SplashScreen";
 import {
   IconDaily,
   IconMeta,
@@ -79,16 +80,12 @@ export default function App() {
   const clearError = useAppStore((s) => s.clearError);
   const feedStatus = useAppStore((s) => s.feedStatus);
   const lastRefresh = useAppStore((s) => s.lastRefresh);
-  const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const initTracker = useAppStore((s) => s.initTracker);
+  const [bootDone, setBootDone] = useState(false);
 
   useEffect(() => {
     void initTracker();
-    if (!meta && !loading) {
-      void refreshMeta();
-    } else {
-      void checkForUpdates();
-    }
+    void refreshMeta().finally(() => setBootDone(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -116,6 +113,7 @@ export default function App() {
   }, [lastRefresh, loading, refreshMeta]);
 
   return (
+    <SplashScreen ready={bootDone}>
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
@@ -223,5 +221,6 @@ export default function App() {
         </main>
       </div>
     </div>
+    </SplashScreen>
   );
 }

@@ -8,13 +8,11 @@ export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
-  const feedStatus = useAppStore((s) => s.feedStatus);
-  const lastRefresh = useAppStore((s) => s.lastRefresh);
-  const meta = useAppStore((s) => s.meta);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const installUpdate = useAppStore((s) => s.installUpdate);
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
+  const meta = useAppStore((s) => s.meta);
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
 
@@ -28,67 +26,22 @@ export function Settings() {
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-1">Default play mode</h3>
         <p className="text-xs text-muted m-0 mb-3">
-          Used on launch. Toggle Bo1/Bo3 anytime in the top bar.
+          Opens with this mode. Switch Bo1 / Bo3 anytime from the top bar.
         </p>
         <BoModeToggle mode={prefs.defaultMode} onChange={setDefaultMode} />
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">Where the data comes from</h3>
+        <h3 className="text-sm font-semibold m-0 mb-1">Updates</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          <strong className="text-foam">The app never scrapes tournament sites from your PC.</strong>{" "}
-          It downloads the published meta file from Netlify (
-          <code className="text-[10px]">/meta/latest.json</code>) automatically — on launch, when
-          you come back online, and whenever the loaded copy is more than 90 minutes old. That
-          file is rebuilt once a day from the{" "}
-          <strong className="text-foam">MTGGoldfish</strong> Standard &amp; Pioneer metagame with
-          every card name verified on <strong className="text-foam">Scryfall</strong>. Tournament
-          links come from magic.gg, MTGO, and Melee.gg. If live data can’t be fetched, the previous
-          day’s real data stays published — nothing is ever fabricated.
-        </p>
-        <dl className="grid grid-cols-2 gap-2 text-xs m-0">
-          <div>
-            <dt className="text-muted">Feed</dt>
-            <dd className="m-0 font-medium capitalize">{feedStatus ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-muted">Meta date</dt>
-            <dd className="m-0 font-medium">{meta?.date ?? "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-muted">Last sync</dt>
-            <dd className="m-0 font-medium">
-              {lastRefresh ? new Date(lastRefresh).toLocaleString() : "—"}
-            </dd>
-          </div>
-          {meta?.pipeline && (
+          You’re on <strong className="text-foam">v{APP_VERSION}</strong>
+          {meta?.date ? (
             <>
-              <div>
-                <dt className="text-muted">Verified lists</dt>
-                <dd className="m-0 font-medium">{meta.pipeline.authoritativeLists ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-muted">Failed exports</dt>
-                <dd className="m-0 font-medium">{meta.pipeline.failedLists ?? "—"}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-muted">Pipeline</dt>
-                <dd className="m-0 font-medium text-[11px]">
-                  {(meta.pipeline.sourcesDetail || []).join(", ") || "—"}
-                </dd>
-              </div>
+              {" "}
+              · meta for <strong className="text-foam">{meta.date}</strong>
             </>
-          )}
-        </dl>
-      </section>
-
-      <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-1">In-app updates</h3>
-        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          App version <strong className="text-foam">v{APP_VERSION}</strong>. When a new release
-          is published, the app can{" "}
-          <strong className="text-foam">download, install, and relaunch itself</strong> — no
-          Chrome, no manual reinstall. A banner also appears when an update is found.
+          ) : null}
+          . New versions install inside the app — no reinstall dance.
         </p>
         <div className="flex flex-wrap gap-2">
           <button
@@ -99,11 +52,9 @@ export function Settings() {
               setUpdateMsg("Checking…");
               void checkForUpdates().then((result) => {
                 if (result.status === "update") {
-                  setUpdateMsg(`v${result.remote.version} is available.`);
+                  setUpdateMsg(`v${result.remote.version} is ready.`);
                 } else if (result.status === "latest") {
-                  setUpdateMsg(
-                    `You’re on the latest version (remote v${result.remote.version}).`,
-                  );
+                  setUpdateMsg("You’re up to date.");
                 } else {
                   setUpdateMsg(result.message);
                 }
@@ -134,20 +85,18 @@ export function Settings() {
                 void downloadInstaller(updateAvailable.downloadUrl!);
               }}
             >
-              Download v{updateAvailable.version} installer
+              Get v{updateAvailable.version}
             </button>
           )}
         </div>
         {updateAvailable?.canAutoInstall && !updating && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} ready — one click installs inside the app and
-            restarts. No browser.
+            v{updateAvailable.version} is ready — one click and you’re done.
           </p>
         )}
         {updateAvailable && !updateAvailable.canAutoInstall && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} ready — this session can’t install silently (browser
-            preview or missing installer URL). Use the download button or the website.
+            v{updateAvailable.version} is ready — use the button above to get it.
           </p>
         )}
         {updateMsg && !updateAvailable && (
@@ -156,16 +105,14 @@ export function Settings() {
       </section>
 
       <section className="panel">
-        <h3 className="text-sm font-semibold m-0 mb-2">About Filthy Net Deck</h3>
+        <h3 className="text-sm font-semibold m-0 mb-2">About</h3>
         <p className="text-sm text-muted m-0 leading-relaxed">
-          Netdeck without the guilt (or with all of it). Daily <em>Magic: The Gathering</em> meta
-          for <strong className="text-foam">Standard</strong> and{" "}
-          <strong className="text-foam">Pioneer</strong> — real ranked lists only, Bo1/Bo3, tiers,
-          tournament pulse, and local match tracking. No Alchemy-pool formats, no placeholder decks.
+          Daily <strong className="text-foam">Standard</strong> and{" "}
+          <strong className="text-foam">Pioneer</strong> meta, matchup notes, climb tracking, and
+          private win rates — all local on your PC.
         </p>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
-          Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of
-          the Coast LLC. Card images via Scryfall.
+          Fan project · not affiliated with Wizards of the Coast · card images via Scryfall
         </p>
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
           Built by{" "}
