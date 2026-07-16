@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { APP_VERSION } from "../version";
-import { downloadInstaller } from "../services/openExternal";
+import { downloadInstaller, openExternal } from "../services/openExternal";
 
 export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
@@ -165,6 +165,16 @@ export function Settings() {
         <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
           Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of
           the Coast LLC. Card images via Scryfall.
+        </p>
+        <p className="text-xs text-muted mt-3 mb-0 leading-relaxed">
+          Built by{" "}
+          <button
+            type="button"
+            className="text-gold-300 hover:text-gold-200 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-xs"
+            onClick={() => void openExternal("https://ame-apexforge.org/")}
+          >
+            ApexForge
+          </button>
         </p>
       </section>
     </div>

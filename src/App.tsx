@@ -20,6 +20,7 @@ import {
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
+import { openExternal } from "./services/openExternal";
 
 const NAV: {
   id: Page;
@@ -141,9 +142,19 @@ export default function App() {
             </button>
           );
         })}
-        <div className="mt-auto pt-4 px-1">
+        <div className="mt-auto pt-4 px-1 flex flex-col gap-1.5">
           <p className="text-[10px] text-muted leading-relaxed m-0">
             Not affiliated with Wizards of the Coast.
+          </p>
+          <p className="text-[10px] text-muted leading-relaxed m-0">
+            Built by{" "}
+            <button
+              type="button"
+              className="text-gold-300 hover:text-gold-200 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-[10px]"
+              onClick={() => void openExternal("https://ame-apexforge.org/")}
+            >
+              ApexForge
+            </button>
           </p>
         </div>
       </aside>

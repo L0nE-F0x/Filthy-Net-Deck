@@ -1088,6 +1088,22 @@ main,
   color: var(--muted);
   max-width: 36rem;
 }
+.footer-credit {
+  flex-basis: 100%;
+  max-width: none !important;
+  font-size: 0.8rem !important;
+  color: var(--muted);
+}
+.footer-credit a {
+  color: var(--acid);
+  text-decoration: none;
+  font-weight: 600;
+}
+.footer-credit a:hover {
+  color: var(--acid-bright);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 @media (max-width: 1020px) {
   .hero {
