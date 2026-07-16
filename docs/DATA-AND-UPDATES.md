@@ -86,8 +86,9 @@ Articles (e.g. Traditional Standard Ranked) contain continuous `N Card Name` run
 
 | Mode | Behavior |
 |------|----------|
-| **Soft (shipped)** | On launch + every auto-sync: check `version.json` → gold banner when remote > local → **Download installer** opens the `.exe` URL via Tauri opener (or browser fallback). Settings → “Check for updates” same path. |
-| **Hard (Tauri plugin-updater)** | Signed updates, silent install. Needs signing keys + release workflow. Scaffolded but optional until keys exist. |
+| **Signed (preferred)** | `plugin-updater` reads `updater/latest.json`, verifies minisign against the pubkey in `tauri.conf.json`, then **download + install + relaunch** in one click. |
+| **Silent NSIS (desktop fallback)** | If signed metadata isn’t available but `version.json` has a newer build + `downloadUrl`, the app downloads the official setup to temp, runs ` /S`, and relaunches. **Never opens Chrome.** |
+| **Browser (last resort)** | Vite preview / non-Tauri only: open the installer URL externally. |
 
 `website/version.json` shape:
 
@@ -99,12 +100,17 @@ Articles (e.g. Traditional Standard Ranked) contain continuous `N Card Name` run
 }
 ```
 
+**End-to-end release is mandatory** for any user-visible change — see root `AGENTS.md`.
+
 Ship steps when releasing a new app build:
 
 1. Bump `package.json` / `src/version.ts` / `src-tauri` version.
-2. `npm run tauri:build` → copy installer into `website/downloads/`.
-3. Update `website/version.json` (`version`, `downloadUrl`, `notes`).
-4. Deploy Netlify (website + meta). Users open the app → banner → download → run NSIS.
+2. `npm run tauri:build` with `TAURI_SIGNING_PRIVATE_KEY` (+ password) → copy installer + `.sig` into `website/downloads/`.
+3. Update `website/updater/latest.json` (version, notes, url, **signature**).
+4. Update `website/version.json` + `public/version.json`.
+5. Update `website/index.html` download links + marketed copy.
+6. Push `main` (Netlify). Confirm live `version.json` / `updater/latest.json`.
+7. Tag `vX.Y.Z` for macOS CI when shipping a mac build.
 
 ---
 

@@ -85,10 +85,10 @@ export function Settings() {
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-1">In-app updates</h3>
         <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-          App version <strong className="text-foam">v{APP_VERSION}</strong>. When a new signed
-          release is published, the app can{" "}
+          App version <strong className="text-foam">v{APP_VERSION}</strong>. When a new release
+          is published, the app can{" "}
           <strong className="text-foam">download, install, and relaunch itself</strong> — no
-          reinstall, no website visit. A banner also pops up automatically when one is found.
+          Chrome, no manual reinstall. A banner also appears when an update is found.
         </p>
         <div className="flex flex-wrap gap-2">
           <button
@@ -140,13 +140,14 @@ export function Settings() {
         </div>
         {updateAvailable?.canAutoInstall && !updating && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} ready — one click installs it and restarts the app.
+            Update v{updateAvailable.version} ready — one click installs inside the app and
+            restarts. No browser.
           </p>
         )}
         {updateAvailable && !updateAvailable.canAutoInstall && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
-            Update v{updateAvailable.version} ready — running in a browser without the desktop
-            updater, so use the installer download.
+            Update v{updateAvailable.version} ready — this session can’t install silently (browser
+            preview or missing installer URL). Use the download button or the website.
           </p>
         )}
         {updateMsg && !updateAvailable && (

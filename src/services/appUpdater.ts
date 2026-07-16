@@ -1,14 +1,14 @@
 /**
- * In-app updates via the Tauri updater plugin.
+ * In-app updates (desktop).
  *
- * Flow: check() hits https://filthy-net-deck.netlify.app/updater/latest.json,
- * verifies the minisign signature against the pubkey baked into the app, then
- * downloadAndInstall() runs the new installer silently and relaunch() restarts.
- *
- * In a plain browser (vite dev / website preview) none of this is available —
- * every function degrades to a no-op so the old download-the-installer flow
- * still works.
+ * 1. **Signed (preferred):** Tauri updater plugin checks
+ *    `updater/latest.json`, verifies minisign, downloadAndInstall + relaunch.
+ * 2. **Silent NSIS fallback:** download official setup from Netlify into temp,
+ *    run `/S`, relaunch — never opens Chrome.
+ * 3. **Browser:** last resort outside Tauri (vite preview only).
  */
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
@@ -19,11 +19,15 @@ export function isTauri(): boolean {
 /** The pending update object must stay out of the store (not serializable). */
 let pendingUpdate: Update | null = null;
 
+export type UpdateInstallMode = "signed" | "silent" | "browser";
+
 export interface AppUpdateInfo {
   version: string;
   notes?: string;
-  /** true = one-click install available; false = manual download fallback */
+  downloadUrl?: string;
+  /** true = one click installs inside the app (signed or silent NSIS) */
   canAutoInstall: boolean;
+  installMode: UpdateInstallMode;
 }
 
 export async function checkAppUpdate(): Promise<AppUpdateInfo | null> {
@@ -39,6 +43,7 @@ export async function checkAppUpdate(): Promise<AppUpdateInfo | null> {
       version: update.version,
       notes: update.body ?? undefined,
       canAutoInstall: true,
+      installMode: "signed",
     };
   } catch {
     pendingUpdate = null;
@@ -47,7 +52,7 @@ export async function checkAppUpdate(): Promise<AppUpdateInfo | null> {
 }
 
 /**
- * Download + install the pending update, then relaunch the app.
+ * Download + install the pending signed update, then relaunch the app.
  * onProgress receives 0–100 (best effort; -1 when size unknown).
  */
 export async function installPendingUpdate(
@@ -68,4 +73,31 @@ export async function installPendingUpdate(
     }
   });
   await relaunch();
+}
+
+/**
+ * Download the official NSIS setup and install silently (Windows desktop).
+ * The Rust side exits the app so files can be replaced, then relaunches.
+ */
+export async function installSilentFromUrl(
+  url: string,
+  onProgress: (pct: number) => void,
+): Promise<void> {
+  if (!isTauri()) {
+    throw new Error("Silent install requires the desktop app.");
+  }
+  if (!url) throw new Error("Missing installer URL.");
+
+  const unlisten = await listen<number>("updater:progress", (e) => {
+    const n = typeof e.payload === "number" ? e.payload : -1;
+    onProgress(n);
+  });
+  try {
+    onProgress(0);
+    await invoke("install_update_silent", { url });
+    // Process normally exits on success; if we return, treat as done.
+    onProgress(100);
+  } finally {
+    unlisten();
+  }
 }

@@ -1,11 +1,11 @@
 {
-  "version": "0.12.1",
-  "notes": "v0.12.1: Fix version-history card art (Scryfall arena lookup). Restore signed in-app Update & restart. Matchup Lab + Climb Tracker from 0.12.",
-  "pub_date": "2026-07-14T15:23:45Z",
+  "version": "0.12.3",
+  "notes": "v0.12.3: True in-app Update & restart (no Chrome). ApexForge credit. Silent installer fallback + signed updater.",
+  "pub_date": "2026-07-16T08:05:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZlV0VnRmFudGNJeDZtRnJQTGQxczFWNVdzT2YyeWI3WGFucEJLYWIxWkRlWWpubHEwanhPd2Y4UGlZcXNFakxDYlRFWkVkQXVncFlndG1CaFFzYWdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MDQyNTc2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTIuMV94NjQtc2V0dXAuZXhlCjR1K2NINHYvVW1xeGNuc0dnUGM2ME1ucC9YYVBjMzBFdEVvMEduYzlPU1RjanZOZHlWOEgxT1JWRVpPMU9YamVIOHBMYXB0RENkeWpaZkYveWhDYkN3PT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitlQk5qNklDbzA3YkhuZDdGWjcrc3dKN0p1SmhjRnFHNjJ5K2hLc3h4UXdHMDF6RTYycjZaTHFsMEJGSElCNC9wNm1tcW9wcy9VVE84K2JzNXljdVFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTg5MDkyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTIuM194NjQtc2V0dXAuZXhlCm5PTmRTYmJ0NWZHSG9KY0h2MlN4WFBYV0tWQWZrSVcvZW5kbStzSFlyUnpCOUx0akR0MHRGejNPV2x0TVB6clAvdDJiSkxzdVBMMld2czU4KzMvVUNnPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.3.exe"
     }
   }
 }

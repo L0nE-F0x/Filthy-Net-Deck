@@ -5,7 +5,13 @@ import {
   checkRemoteVersion,
   type VersionCheckResult,
 } from "../services/versionCheck";
-import { checkAppUpdate, installPendingUpdate } from "../services/appUpdater";
+import {
+  checkAppUpdate,
+  installPendingUpdate,
+  installSilentFromUrl,
+  isTauri,
+  type UpdateInstallMode,
+} from "../services/appUpdater";
 import { resolveFormatId } from "../services/formatResolve";
 import {
   clearTrackerHistory,
@@ -89,8 +95,9 @@ interface AppState {
     version: string;
     downloadUrl?: string;
     notes?: string;
-    /** true = Tauri updater can install + relaunch in one click */
+    /** true = one-click in-app install (signed updater or silent NSIS) */
     canAutoInstall?: boolean;
+    installMode?: UpdateInstallMode;
   } | null;
   /** In-app update install state */
   updating: boolean;
@@ -205,7 +212,7 @@ export const useAppStore = create<AppState>((set, get) => {
     setShowFavoritesOnly: (showFavoritesOnly) => set({ showFavoritesOnly }),
 
     checkForUpdates: async () => {
-      // Preferred: Tauri updater (signed, one-click install + relaunch)
+      // Preferred: signed Tauri updater (minisign + plugin)
       const auto = await checkAppUpdate();
       if (auto) {
         set({
@@ -213,6 +220,7 @@ export const useAppStore = create<AppState>((set, get) => {
             version: auto.version,
             notes: auto.notes,
             canAutoInstall: true,
+            installMode: "signed",
           },
         });
         return {
@@ -220,15 +228,17 @@ export const useAppStore = create<AppState>((set, get) => {
           remote: { version: auto.version, notes: auto.notes },
         };
       }
-      // Fallback: version.json manual-download flow (also covers browser dev)
+      // Fallback: version.json — on desktop, silent NSIS install (no browser)
       const result = await checkRemoteVersion();
       if (result.status === "update") {
+        const silent = isTauri() && !!result.remote.downloadUrl;
         set({
           updateAvailable: {
             version: result.remote.version,
             downloadUrl: result.remote.downloadUrl,
             notes: result.remote.notes,
-            canAutoInstall: false,
+            canAutoInstall: silent,
+            installMode: silent ? "silent" : "browser",
           },
         });
       } else {
@@ -239,18 +249,31 @@ export const useAppStore = create<AppState>((set, get) => {
 
     installUpdate: async () => {
       if (get().updating) return;
+      const available = get().updateAvailable;
+      if (!available) return;
       set({ updating: true, updateProgress: 0, error: null });
       try {
-        await installPendingUpdate((pct) => set({ updateProgress: pct }));
-        // relaunch() exits the app — nothing to do after this
+        if (available.installMode === "signed") {
+          await installPendingUpdate((pct) => set({ updateProgress: pct }));
+          // relaunch() exits the app
+          return;
+        }
+        if (available.installMode === "silent" && available.downloadUrl) {
+          await installSilentFromUrl(available.downloadUrl, (pct) =>
+            set({ updateProgress: pct }),
+          );
+          // Rust exits + relaunches
+          return;
+        }
+        throw new Error("No in-app install path available for this update.");
       } catch (e) {
         set({
           updating: false,
           updateProgress: null,
           error:
             e instanceof Error
-              ? `Update failed: ${e.message}. You can still download the installer from Settings.`
-              : "Update failed — download the installer from Settings instead.",
+              ? `Update failed: ${e.message}. You can still download the installer from the website.`
+              : "Update failed — download the installer from the website instead.",
         });
       }
     },

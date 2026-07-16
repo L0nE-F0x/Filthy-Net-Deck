@@ -1,5 +1,5 @@
 {
-  "version": "0.12.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.2.exe",
-  "notes": "v0.12.2: Built by ApexForge credit in the app sidebar and Settings. Marketing site footer link to ame-apexforge.org."
+  "version": "0.12.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.12.3.exe",
+  "notes": "v0.12.3: True in-app Update & restart (no Chrome). ApexForge credit. Silent installer fallback + signed updater."
 }

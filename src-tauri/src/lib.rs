@@ -1,3 +1,4 @@
+mod silent_update;
 mod tracker;
 
 use tauri::{
@@ -29,7 +30,8 @@ pub fn run() {
             tracker::tracker_status,
             tracker::tracker_matches,
             tracker::tracker_clear,
-            tracker::tracker_delete_matches
+            tracker::tracker_delete_matches,
+            silent_update::install_update_silent
         ])
         .setup(|app| {
             #[cfg(desktop)]

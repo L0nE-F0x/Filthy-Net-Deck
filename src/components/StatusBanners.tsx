@@ -59,7 +59,7 @@ export function StatusBanners() {
                 </button>
                 <span className="text-muted">
                   {" "}
-                  — downloads, installs, and relaunches automatically.
+                  — downloads and installs inside the app, then relaunches. No browser.
                 </span>
                 <button
                   type="button"
@@ -84,7 +84,7 @@ export function StatusBanners() {
               </button>
               <span className="text-muted">
                 {" "}
-                — runs your browser/download folder; open the NSIS setup to upgrade.
+                — open the setup file after download (browser/dev fallback only).
               </span>
               <button
                 type="button"
