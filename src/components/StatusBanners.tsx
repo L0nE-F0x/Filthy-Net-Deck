@@ -6,6 +6,7 @@ import { downloadInstaller } from "../services/openExternal";
 export function StatusBanners() {
   const feedStatus = useAppStore((s) => s.feedStatus);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
+  const dismissedUpdateVersion = useAppStore((s) => s.dismissedUpdateVersion);
   const dismissUpdate = useAppStore((s) => s.dismissUpdate);
   const installUpdate = useAppStore((s) => s.installUpdate);
   const updating = useAppStore((s) => s.updating);
@@ -28,7 +29,9 @@ export function StatusBanners() {
     });
   }
 
-  if (updateAvailable) {
+  // "Later" hides the banner for that version until next launch; the hourly
+  // sync re-detects the update but must not re-raise it. Settings still shows it.
+  if (updateAvailable && updateAvailable.version !== dismissedUpdateVersion) {
     banners.push({
       key: "update",
       className: "banner banner-gold banner-update",

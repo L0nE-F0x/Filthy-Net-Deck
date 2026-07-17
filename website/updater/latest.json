@@ -1,11 +1,11 @@
 {
-  "version": "0.14.0",
-  "notes": "v0.14.0: Set Radar pulse — Std/Pio legality, gallery filters, new-since-last-visit, Decks home banner, Arena-eve notifications.",
-  "pub_date": "2026-07-17T03:03:22Z",
+  "version": "0.14.1",
+  "notes": "v0.14.1: daily meta now syncs reliably on installed apps, new-spoiler badges stick until you visit Set Radar, Esc closes the card viewer, update reminders respect Later.",
+  "pub_date": "2026-07-17T04:11:27Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjBqWDl0RVl0SWxzSkVjWUNzWjdUY0ljVkNXWVNMWEhEaE9pT0lIVFVtcHhScEpMQUM2UnMxeGdabGtaRHBuWndoU0ttQ1RMYjRwYWszekVLSEgxU0FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjU3Mzk0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTQuMF94NjQtc2V0dXAuZXhlCnpBUkQ3UUdLVElnc2NVc3FjRlA2WTVnRHZtU2QvMmhqU0ZHVGZXTE40TmdtaFFneGYyL0NhcWJnc2Qxdjc4WXVoMlJzTWw2aVovUFBzYmN1ZkZEVkJRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.14.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlBMENJaHJiclUwSXFqRkdENGl1TWFpMXk0eU9WN2k2ZU9CWTN4bEszTURLTVFPMTZFYkk1bTBicXprSitFS3hlRE8vNGdNZGdEazVlM2RkUEtZVXdRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYxNDY3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTQuMV94NjQtc2V0dXAuZXhlCkk2YTFKNUUzSjc5TUwrb1NVOE1pVk5LODJIQ1dMd0hnQWFwTVhNck0vWXhzRFpGejlDU0MzRVNaalJQWjNFQm1VZWVnQUpqK2I2b0VaSGpHa05XZ0NBPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.14.1.exe"
     }
   }
 }

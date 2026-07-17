@@ -18,14 +18,16 @@ export function SpoilerPulse() {
   const top = items[0];
   if (!top) return null;
 
+  // Estimated Arena dates are a paper−3d guess — say "expected", not "hits".
+  const estimated = top.arenaConfidence === "estimated";
   let headline = top.name;
   let detail = "";
   if (top.kind === "arena_today") {
-    detail = "hits Arena today";
+    detail = estimated ? "expected on Arena today" : "hits Arena today";
   } else if (top.kind === "arena_tomorrow") {
-    detail = "hits Arena tomorrow";
+    detail = estimated ? "expected on Arena tomorrow" : "hits Arena tomorrow";
   } else if (top.kind === "arena_soon" && top.arenaIn != null) {
-    detail = `Arena in ${top.arenaIn}d`;
+    detail = `Arena in ${top.arenaIn}d${estimated ? " (est.)" : ""}`;
   } else {
     detail = "spoilers live";
   }

@@ -7,6 +7,7 @@
 **Studio:** https://ame-apexforge.org/
 
 Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not invent process that contradicts either.
+**Active work queue:** **`ROADMAP.md`** — the prioritized milestone list from the 2026-07 preproduction audit. Work it top to bottom; check items off as they ship.
 
 ---
 

@@ -5,9 +5,10 @@ const LOCAL_SETS_PATH = "/meta/sets.json";
 const CACHE_KEY = "bbi.sets.lastGood";
 
 function getSetsUrl(): string {
-  if (typeof window !== "undefined" && window.location?.protocol === "http:") {
-    return LOCAL_SETS_PATH;
-  }
+  // Relative path only on the Vite dev server — see getMetaUrl in metaFeed.ts:
+  // Tauri's Windows production origin is http://tauri.localhost, where a
+  // relative fetch would serve the build-time snapshot, not the live feed.
+  if (import.meta.env.DEV) return LOCAL_SETS_PATH;
   return DEFAULT_SETS_URL;
 }
 

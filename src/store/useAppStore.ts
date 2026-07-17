@@ -121,6 +121,8 @@ interface AppState {
   /** In-app update install state */
   updating: boolean;
   updateProgress: number | null;
+  /** Version the user dismissed with "Later" — banner stays hidden for it this session. */
+  dismissedUpdateVersion: string | null;
   /** Winrate tracker (null status = not running / browser build) */
   trackerStatus: TrackerStatus | null;
   trackerMatches: TrackedMatch[];
@@ -141,6 +143,8 @@ interface AppState {
   setNotifyArenaEve: (v: boolean) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
+  /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
+  markSetsSeen: () => void;
   clearError: () => void;
   toggleFavorite: (deckId: string) => void;
   isFavorite: (deckId: string) => boolean;
@@ -197,6 +201,7 @@ export const useAppStore = create<AppState>((set, get) => {
     updateAvailable: null,
     updating: false,
     updateProgress: null,
+    dismissedUpdateVersion: null,
     trackerStatus: null,
     trackerMatches: [],
     trackerReady: false,
@@ -314,7 +319,8 @@ export const useAppStore = create<AppState>((set, get) => {
       }
     },
 
-    dismissUpdate: () => set({ updateAvailable: null }),
+    dismissUpdate: () =>
+      set({ dismissedUpdateVersion: get().updateAvailable?.version ?? null }),
 
     initTracker: async () => {
       if (get().trackerReady) return;
@@ -390,13 +396,23 @@ export const useAppStore = create<AppState>((set, get) => {
       }
     },
 
+    markSetsSeen: () => {
+      const bundle = get().sets;
+      if (!bundle) return;
+      saveCardSnap(bundle);
+      set({ setsNewByCode: {} });
+    },
+
     refreshSets: async () => {
       set({ setsLoading: true, setsError: null });
       try {
         const prevSnap = loadCardSnap();
         const { bundle } = await fetchSetsBundle();
+        // Diff against the last *seen* snapshot — do NOT save it here. The
+        // hourly background sync must not erase "new since last visit"
+        // badges; the snapshot is baselined by markSetsSeen when the user
+        // actually leaves the Sets page.
         const setsNewByCode = newCardsBySet(bundle, prevSnap);
-        saveCardSnap(bundle);
         set({
           sets: bundle,
           setsLoading: false,
@@ -409,9 +425,17 @@ export const useAppStore = create<AppState>((set, get) => {
           const eve = arenaTomorrowSets(bundle);
           if (eve.length) {
             const names = eve.map((s) => s.name).join(", ");
+            // Estimated dates (paper − 3d guess) must not be announced as fact.
+            const allOfficial = eve.every(
+              (s) =>
+                s.datesConfidence.arena === "official" ||
+                s.datesConfidence.arena === "override",
+            );
             void notifyDesktop(
-              "Arena drop tomorrow",
-              `${names} hits MTG Arena tomorrow. Open Set Radar for the gallery.`,
+              allOfficial ? "Arena drop tomorrow" : "Arena drop expected tomorrow",
+              allOfficial
+                ? `${names} hits MTG Arena tomorrow. Open Set Radar for the gallery.`
+                : `${names} is expected on MTG Arena tomorrow (estimated date). Open Set Radar for the gallery.`,
             );
             markArenaNotifyFired();
           }

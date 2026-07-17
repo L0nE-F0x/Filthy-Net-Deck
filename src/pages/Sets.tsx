@@ -1,4 +1,11 @@
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useAppStore } from "../store/useAppStore";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { openExternal } from "../services/openExternal";
@@ -156,6 +163,22 @@ function CardDetailDrawer({
   card: SetPreviewCard;
   onClose: () => void;
 }): ReactNode {
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Modal basics: take focus on open, close on Escape, hand focus back.
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    drawerRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previous?.focus?.();
+    };
+  }, [onClose]);
+
   const uri =
     card.scryfallUri || `https://scryfall.com/card/${card.scryfallId}`;
   return (
@@ -166,7 +189,12 @@ function CardDetailDrawer({
       aria-label={card.name}
       onClick={onClose}
     >
-      <div className="set-drawer" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="set-drawer"
+        ref={drawerRef}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="set-drawer-art">
           <img src={scryfallCdnUrl(card.scryfallId, "normal")} alt={card.name} />
         </div>
@@ -228,6 +256,8 @@ function SetGallery({
   const [query, setQuery] = useState("");
   const [newOnly, setNewOnly] = useState(false);
   const [focus, setFocus] = useState<SetPreviewCard | null>(null);
+  // Stable ref so the drawer's focus/Escape effect doesn't re-run per render.
+  const closeFocus = useCallback(() => setFocus(null), []);
 
   const all = useMemo(() => setGalleryCards(set), [set]);
 
@@ -477,7 +507,7 @@ function SetGallery({
         </div>
       )}
 
-      {focus ? <CardDetailDrawer card={focus} onClose={() => setFocus(null)} /> : null}
+      {focus ? <CardDetailDrawer card={focus} onClose={closeFocus} /> : null}
     </div>
   );
 }
@@ -626,6 +656,12 @@ export function Sets() {
   const setsNewByCode = useAppStore((s) => s.setsNewByCode);
   const refreshSets = useAppStore((s) => s.refreshSets);
   const [openCode, setOpenCode] = useState<string | null>(null);
+
+  // Leaving the page baselines "new since last visit" — badges survive
+  // background syncs but reset once the user has actually seen the radar.
+  useEffect(() => {
+    return () => useAppStore.getState().markSetsSeen();
+  }, []);
 
   const { upcoming, live } = useMemo(() => {
     const list = sets?.sets ?? [];

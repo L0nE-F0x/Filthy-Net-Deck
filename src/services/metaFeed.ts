@@ -8,10 +8,11 @@ const LOCAL_META_PATH = "/meta/latest.json";
 const CACHE_KEY = "bbi.meta.lastGood";
 
 function getMetaUrl(): string {
-  // Prefer same-origin / relative when bundled with website or public/
-  if (typeof window !== "undefined" && window.location?.protocol === "http:") {
-    return LOCAL_META_PATH;
-  }
+  // Relative path only on the Vite dev server. The installed desktop app must
+  // always hit the CDN: Tauri serves production from http://tauri.localhost on
+  // Windows, where a relative fetch would return the meta snapshot baked into
+  // the bundle at build time instead of today's published feed.
+  if (import.meta.env.DEV) return LOCAL_META_PATH;
   return DEFAULT_META_URL;
 }
 
