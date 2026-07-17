@@ -2736,3 +2736,42 @@ select,
   background: color-mix(in srgb, var(--color-ink-700) 80%, transparent);
   border-color: color-mix(in srgb, var(--color-ink-600) 70%, transparent);
 }
+
+/* --- Stats: form tiles + rolling winrate sparkline (v0.16) --- */
+.stat-tiles-3 { grid-template-columns: repeat(3, 1fr); }
+.stat-tile-spark { justify-content: center; align-items: center; }
+.wr-spark { width: 100%; max-width: 230px; height: 44px; display: block; }
+.wr-spark-mid {
+  stroke: color-mix(in srgb, var(--color-muted) 35%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.wr-spark-line { stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Matchup Lab: opponent search (v0.16) --- */
+.mu-lab-search {
+  width: 100%;
+  max-width: 260px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 90%, transparent);
+  color: var(--color-foam);
+  font-size: 0.8rem;
+}
+.mu-lab-search:focus {
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  outline: none;
+}
+
+/* --- Decks: "you vs this archetype" chip (v0.16) --- */
+.vs-you-chip {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  white-space: nowrap;
+}

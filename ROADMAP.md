@@ -41,14 +41,15 @@ Remaining correctness/quality items plus the highest-value shell improvements.
 
 ## Milestone 3 — v0.16.0 "Stats & Matchup upgrades"
 
-- [ ] **Session line in My Stats** — "Today: 5W 2L (71%)" tile at the top; streamers screenshot exactly this.
-- [ ] **Current win/loss streak indicator.**
-- [ ] **Tag-aggregated matchup table** — the Matchup Lab payoff: once opponents are tagged, show per-deck "vs Izzet Prowess: 12W 8L" aggregated across all opponents with that tag.
-- [ ] **Seed tag autocomplete with today's meta archetype names** (from the loaded meta bundle), not just previously-typed tags.
-- [ ] **CSV export of match history** — local file save; respects the privacy story.
-- [ ] **Opponent search box** in Matchup Lab / match history.
-- [ ] **Winrate-over-time sparkline** on the Stats home.
-- [ ] **Meta ↔ personal bridge** — match tracked deck names/hashes to meta archetypes; show "your winrate with this archetype" on Decks-page deck cards.
+- [x] **Session line in My Stats** — "Today" tile (W-L + %) in the new FormTiles row.
+- [x] **Current win/loss streak indicator** — W3/L2 tile with encouraging copy.
+- [x] **Tag-aggregated matchup table** — "Matchups by archetype" panel in Matchup Lab; rows click through to the tag filter.
+- [x] **Seed tag autocomplete with today's meta archetype names** — merged into the datalist after the user's own tags.
+- [x] **CSV export of match history** — `tracker_export_csv` Rust command writes to Downloads and reveals the file; button in My Stats.
+- [x] **Opponent search box** — searches names, tags, and notes in Matchup Lab.
+- [x] **Winrate-over-time sparkline** — rolling-10 trend tile on the Stats home.
+- [x] **Meta ↔ personal bridge** — "you 4–0" chip on Decks-page cards when a Matchup Lab tag matches the archetype (`recordVsTags`).
+- [ ] **Release v0.16.0 end-to-end** (full AGENTS.md checklist; macOS rolls straight from 0.14.1 to 0.16.0 — 0.15.0's dmg stays on the GitHub release only).
 
 ## Milestone 4 — v0.17.0 "Set Radar & Decks upgrades"
 

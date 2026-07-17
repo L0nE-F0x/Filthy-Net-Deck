@@ -148,6 +148,106 @@ pub fn tracker_matches(state: State<'_, TrackerShared>) -> Vec<TrackedMatch> {
     out
 }
 
+/// Export the full match history as CSV into the user's Downloads folder and
+/// reveal the file in the system file manager. Returns the written path.
+#[tauri::command]
+pub fn tracker_export_csv(
+    app: AppHandle,
+    state: State<'_, TrackerShared>,
+) -> Result<String, String> {
+    fn csv_escape(s: &str) -> String {
+        if s.contains([',', '"', '\n']) {
+            format!("\"{}\"", s.replace('"', "\"\""))
+        } else {
+            s.to_string()
+        }
+    }
+    fn iso_date(ms: u64) -> String {
+        // Days since epoch → Y-M-D (civil calendar), no chrono dependency.
+        let days = (ms / 86_400_000) as i64;
+        let (mut y, mut doy) = (1970i64, days);
+        loop {
+            let leap = (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
+            let len = if leap { 366 } else { 365 };
+            if doy < len {
+                let months = if leap {
+                    [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                } else {
+                    [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                };
+                let mut m = 0usize;
+                while doy >= months[m] {
+                    doy -= months[m];
+                    m += 1;
+                }
+                return format!("{y:04}-{:02}-{:02}", m + 1, doy + 1);
+            }
+            doy -= len;
+            y += 1;
+        }
+    }
+
+    let matches = {
+        let data = state.0.lock().expect("tracker lock");
+        let mut out = data.matches.clone();
+        out.sort_by(|a, b| b.started_at.cmp(&a.started_at));
+        out
+    };
+    if matches.is_empty() {
+        return Err("No matches to export yet.".into());
+    }
+
+    let mut csv = String::from(
+        "date,result,deck,opponent,opponent_platform,queue,best_of,games_won,games_lost,rank,game1_on_play,match_id\n",
+    );
+    for m in &matches {
+        let wins = m
+            .games
+            .iter()
+            .filter(|g| g.winning_team_id == Some(m.my_team_id))
+            .count();
+        let losses = m
+            .games
+            .iter()
+            .filter(|g| g.winning_team_id.is_some() && g.winning_team_id != Some(m.my_team_id))
+            .count();
+        let on_play = m
+            .games
+            .first()
+            .and_then(|g| g.on_play)
+            .map(|p| if p { "play" } else { "draw" })
+            .unwrap_or("");
+        csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            iso_date(m.ended_at),
+            m.result,
+            csv_escape(m.deck_name.as_deref().unwrap_or("")),
+            csv_escape(m.opponent_name.as_deref().unwrap_or("")),
+            csv_escape(m.opponent_platform.as_deref().unwrap_or("")),
+            csv_escape(&m.event_id),
+            m.best_of,
+            wins,
+            losses,
+            csv_escape(m.my_rank.as_deref().unwrap_or("")),
+            on_play,
+            csv_escape(&m.match_id),
+        ));
+    }
+
+    let dir = app
+        .path()
+        .download_dir()
+        .or_else(|_| app.path().app_data_dir())
+        .map_err(|e| format!("No folder to write to: {e}"))?;
+    let file = dir.join(format!(
+        "filthy-net-deck-matches-{}.csv",
+        iso_date(now_ms())
+    ));
+    fs::write(&file, csv).map_err(|e| format!("Could not write CSV: {e}"))?;
+    let _ = tauri_plugin_opener::reveal_item_in_dir(&file);
+    Ok(file.display().to_string())
+}
+
 #[tauri::command]
 pub fn tracker_clear(app: AppHandle, state: State<'_, TrackerShared>) -> Result<(), String> {
     let status = {

@@ -1,5 +1,5 @@
 {
-  "version": "0.15.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.15.0.exe",
-  "notes": "v0.15.0: start with your PC (tray autostart) so every match is tracked, the app remembers your window and last format, a heads-up the first time it closes to the tray, and a what's-new note after updates."
+  "version": "0.16.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.16.0.exe",
+  "notes": "v0.16.0: tag opponents and see your real winrate vs every meta archetype — right on the Decks board. Plus today's session, win streaks, a winrate trend line, opponent search, and CSV export."
 }

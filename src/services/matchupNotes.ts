@@ -69,6 +69,28 @@ export function setOpponentNote(
   return next;
 }
 
+/**
+ * Your win/loss record against each archetype tag, keyed by lowercased tag.
+ * Lets the Decks page show "you vs this archetype" when a tag matches a meta
+ * archetype name — the bridge between the meta and your own games.
+ */
+export function recordVsTags(
+  matches: { opponentName?: string; result: string }[],
+): Record<string, { wins: number; losses: number }> {
+  const store = load();
+  const out: Record<string, { wins: number; losses: number }> = {};
+  for (const m of matches) {
+    const tag = store[opponentKey(m.opponentName)]?.tag;
+    if (!tag) continue;
+    const key = tag.trim().toLowerCase();
+    if (!key) continue;
+    const rec = (out[key] ??= { wins: 0, losses: 0 });
+    if (m.result === "win") rec.wins++;
+    else if (m.result === "loss") rec.losses++;
+  }
+  return out;
+}
+
 /** Unique tags the user has assigned (for filter chips / autocomplete). */
 export function listKnownTags(): string[] {
   const tags = new Set<string>();

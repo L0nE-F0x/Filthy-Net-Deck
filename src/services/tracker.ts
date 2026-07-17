@@ -32,6 +32,12 @@ export async function deleteTrackerMatches(matchIds: string[]): Promise<void> {
   await invoke("tracker_delete_matches", { matchIds });
 }
 
+/** Write the full history to a CSV in Downloads; resolves to the file path. */
+export async function exportTrackerCsv(): Promise<string> {
+  if (!isTauri()) throw new Error("CSV export needs the desktop app.");
+  return invoke<string>("tracker_export_csv");
+}
+
 export async function subscribeTracker(handlers: {
   onMatch: (m: TrackedMatch) => void;
   onStatus: (s: TrackerStatus) => void;

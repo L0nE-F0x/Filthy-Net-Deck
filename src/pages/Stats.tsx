@@ -3,6 +3,7 @@ import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
   deckKey,
+  exportTrackerCsv,
   gameScore,
   queueLabel,
   seasonKeyOf,
@@ -211,6 +212,112 @@ function StatusPanel() {
           until Filthy Net Deck updates.
         </p>
       )}
+    </div>
+  );
+}
+
+function isToday(ms: number): boolean {
+  const d = new Date(ms);
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+}
+
+/** Current run of consecutive wins or losses (draws/unknowns skipped). */
+function currentStreak(matches: TrackedMatch[]): { kind: "win" | "loss"; length: number } | null {
+  let kind: "win" | "loss" | null = null;
+  let length = 0;
+  for (const m of matches) {
+    if (m.result !== "win" && m.result !== "loss") continue;
+    if (kind === null) kind = m.result;
+    if (m.result !== kind) break;
+    length++;
+  }
+  return kind && length > 0 ? { kind, length } : null;
+}
+
+/** Rolling win rate over the last N decided matches at each point in time. */
+function rollingWinrate(matches: TrackedMatch[], window = 10): number[] {
+  const decided = [...matches]
+    .filter((m) => m.result === "win" || m.result === "loss")
+    .sort((a, b) => a.endedAt - b.endedAt);
+  const out: number[] = [];
+  for (let i = 0; i < decided.length; i++) {
+    const slice = decided.slice(Math.max(0, i - window + 1), i + 1);
+    const wins = slice.filter((m) => m.result === "win").length;
+    out.push(wins / slice.length);
+  }
+  return out;
+}
+
+function TrendSparkline({ matches }: { matches: TrackedMatch[] }) {
+  const points = useMemo(() => rollingWinrate(matches), [matches]);
+  if (points.length < 5) return null;
+  const w = 220;
+  const h = 44;
+  const pad = 3;
+  const step = (w - pad * 2) / Math.max(1, points.length - 1);
+  const line = points
+    .map(
+      (p, i) =>
+        `${i === 0 ? "M" : "L"} ${(pad + i * step).toFixed(1)} ${(pad + (1 - p) * (h - pad * 2)).toFixed(1)}`,
+    )
+    .join(" ");
+  const last = points[points.length - 1];
+  const midY = pad + 0.5 * (h - pad * 2);
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="wr-spark"
+      role="img"
+      aria-label={`Rolling win rate, currently ${(last * 100).toFixed(0)}%`}
+    >
+      <line x1={pad} x2={w - pad} y1={midY} y2={midY} className="wr-spark-mid" />
+      <path d={line} className={`wr-spark-line favor-${winrateFavor(last)}`} fill="none" />
+    </svg>
+  );
+}
+
+/** Today's session, current streak, and the rolling winrate trend. */
+function FormTiles({ matches }: { matches: TrackedMatch[] }) {
+  const today = useMemo(() => tally(matches.filter((m) => isToday(m.endedAt))), [matches]);
+  const streak = useMemo(() => currentStreak(matches), [matches]);
+
+  if (today.decided === 0 && !streak) return null;
+
+  return (
+    <div className="stat-tiles stat-tiles-3">
+      <div className="panel stat-tile">
+        <span
+          className={`stat-num ${today.rate != null ? `favor-${winrateFavor(today.rate)}` : ""}`}
+        >
+          {today.decided > 0 ? `${today.wins}W ${today.losses}L` : "—"}
+        </span>
+        <span className="stat-label">
+          Today{today.rate != null ? ` · ${(today.rate * 100).toFixed(0)}%` : " · no games yet"}
+        </span>
+      </div>
+      <div className="panel stat-tile">
+        <span
+          className={`stat-num ${streak ? (streak.kind === "win" ? "favor-favored" : "favor-unfavored") : ""}`}
+        >
+          {streak ? `${streak.kind === "win" ? "W" : "L"}${streak.length}` : "—"}
+        </span>
+        <span className="stat-label">
+          {streak
+            ? streak.kind === "win"
+              ? "Win streak — keep it rolling"
+              : "Loss streak — shake it off"
+            : "Streak"}
+        </span>
+      </div>
+      <div className="panel stat-tile stat-tile-spark">
+        <TrendSparkline matches={matches} />
+        <span className="stat-label">Win rate trend · rolling 10</span>
+      </div>
     </div>
   );
 }
@@ -1066,6 +1173,16 @@ export function Stats() {
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
   const [runs, setRuns] = useState<DeckRuns>(() => loadDeckRuns());
   const [confirmClear, setConfirmClear] = useState(false);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
+
+  const onExportCsv = () => {
+    setExportMsg("Exporting…");
+    void exportTrackerCsv()
+      .then((path) => setExportMsg(`Saved to ${path}`))
+      .catch((e) =>
+        setExportMsg(e instanceof Error ? e.message : "Export failed."),
+      );
+  };
 
   // Fresh runs hide a deck's older matches from every stat (never deleted).
   const runFiltered = useMemo(
@@ -1183,6 +1300,7 @@ export function Stats() {
           )}
 
           <SummaryTiles matches={filtered} />
+          <FormTiles matches={filtered} />
           <StatsArsenal decks={decks} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
@@ -1220,13 +1338,26 @@ export function Stats() {
                 </button>
               </span>
             ) : (
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setConfirmClear(true)}
-              >
-                Clear history
-              </button>
+              <span className="flex gap-2 items-center flex-wrap">
+                {exportMsg && (
+                  <span className="text-xs text-muted selectable">{exportMsg}</span>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  title="Save every match as a CSV file in your Downloads folder"
+                  onClick={onExportCsv}
+                >
+                  Export CSV
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setConfirmClear(true)}
+                >
+                  Clear history
+                </button>
+              </span>
             )}
           </div>
         </>

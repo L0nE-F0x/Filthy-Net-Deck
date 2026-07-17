@@ -1,11 +1,11 @@
 {
-  "version": "0.15.0",
-  "notes": "v0.15.0: start with your PC (tray autostart) so every match is tracked, window and last format remembered, tray heads-up on first close, what's-new note after updates.",
-  "pub_date": "2026-07-17T04:37:24Z",
+  "version": "0.16.0",
+  "notes": "v0.16.0: your winrate vs every tagged archetype (Matchup Lab + Decks board), today's session, win streaks, winrate trend, opponent search, CSV export.",
+  "pub_date": "2026-07-17T04:50:53Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjhLbFU3TTFpWUxiTHNVUk9xU004a0Nxa2taa3dHSlJFVXZDSUNQR3RPbERTT3JVOUVIa1JyZnVpR1hUOFI4eHpFT1NsK2ZwOU5kdGdEeWRFT21BNXdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYyODM3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTUuMF94NjQtc2V0dXAuZXhlCkkrT2dUaXFVeXcwU0JJMFI1VHZSdmtrOW5VVmNCSzFXTWhML0ZUT2JSSFZKcjM4T1lxdWU4VlZhZUdrYkdFUGxRNDNFdVNDazRGbkUyVDhwdG4rYkNnPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.15.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFvZHlnTUtzNG01UVdYRHNmeW12VEJrNmdrbDBUNGJiMURzTy9ENzFaUGlyaWloS2s2Z2VXOVIybTUrTVZMV0R4OStXVWlWNjFKOHdDYXR4UEpsMFFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYzODMzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTYuMF94NjQtc2V0dXAuZXhlCmlMY29zZ091VmF2cC8xeStBL3lYVU4reGVicjB0SE5US2t3MWQ0UjYvMWJLRktUZFVDR1FMR3lBVHM5VGVXNTVyb0lzN01oYlZycXhSWXduaHFvOENnPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.16.0.exe"
     }
   }
 }

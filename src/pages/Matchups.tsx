@@ -113,14 +113,92 @@ function RateChip({ wins, losses, rate }: { wins: number; losses: number; rate: 
   );
 }
 
+/** Your record against each archetype tag — the payoff for tagging opponents. */
+function TagMatchupPanel({
+  matches,
+  notes,
+  onPickTag,
+}: {
+  matches: TrackedMatch[];
+  notes: ReturnType<typeof loadAllOpponentNotes>;
+  onPickTag: (tag: string) => void;
+}) {
+  const rows = useMemo(() => {
+    const byTag = new Map<string, { wins: number; losses: number; total: number }>();
+    for (const m of matches) {
+      const tag = notes[opponentKey(m.opponentName)]?.tag;
+      if (!tag) continue;
+      let r = byTag.get(tag);
+      if (!r) {
+        r = { wins: 0, losses: 0, total: 0 };
+        byTag.set(tag, r);
+      }
+      r.total++;
+      if (m.result === "win") r.wins++;
+      else if (m.result === "loss") r.losses++;
+    }
+    return [...byTag.entries()]
+      .map(([tag, r]) => ({
+        tag,
+        ...r,
+        rate: r.wins + r.losses > 0 ? r.wins / (r.wins + r.losses) : null,
+      }))
+      .sort((a, b) => b.total - a.total || a.tag.localeCompare(b.tag));
+  }, [matches, notes]);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="panel">
+      <h3 className="dash-title">Matchups by archetype</h3>
+      <div className="meta-bars">
+        {rows.map((r) => (
+          <button
+            key={r.tag}
+            type="button"
+            className="meta-bar-row deck-wr-row deck-row-btn"
+            title={`Show ${r.tag} opponents`}
+            onClick={() => onPickTag(r.tag)}
+          >
+            <span className="meta-bar-label">
+              <span className="meta-bar-name">{r.tag}</span>
+              <span className="text-muted text-[11px]">{r.total} match{r.total === 1 ? "" : "es"}</span>
+            </span>
+            <span className="mu-track">
+              <span
+                className={`mu-fill favor-${winrateFavor(r.rate ?? 0)}`}
+                style={{ width: `${Math.max(4, (r.rate ?? 0) * 100)}%`, display: "block" }}
+              />
+            </span>
+            <span className="deck-wr-score">
+              {r.wins}W {r.losses}L
+              {r.rate != null && (
+                <strong className={`favor-${winrateFavor(r.rate)}`}>
+                  {" "}
+                  {(r.rate * 100).toFixed(0)}%
+                </strong>
+              )}
+            </span>
+          </button>
+        ))}
+      </div>
+      <p className="text-xs text-muted m-0 mt-2">
+        Built from your archetype tags — tag more opponents to sharpen it. Click a row to filter.
+      </p>
+    </div>
+  );
+}
+
 export function Matchups() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
+  const meta = useAppStore((s) => s.meta);
   const [season, setSeason] = useState<string | null>(null);
   const [deckFilter, setDeckFilter] = useState<string | null>(null);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("recent");
   const [selected, setSelected] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [noteTick, setNoteTick] = useState(0);
 
   const notes = useMemo(() => {
@@ -162,13 +240,36 @@ export function Matchups() {
     let g = groupOpponents(filtered, notes);
     if (tagFilter === "__untagged__") g = g.filter((x) => !x.tag);
     else if (tagFilter) g = g.filter((x) => x.tag === tagFilter);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      g = g.filter(
+        (x) =>
+          x.name.toLowerCase().includes(q) ||
+          (x.tag ?? "").toLowerCase().includes(q) ||
+          (x.notes ?? "").toLowerCase().includes(q),
+      );
+    }
     return sortGroups(g, sort);
-  }, [filtered, notes, tagFilter, sort]);
+  }, [filtered, notes, tagFilter, sort, query]);
 
   const knownTags = useMemo(() => {
     void noteTick;
     return listKnownTags();
   }, [noteTick, matches]);
+
+  // Tag suggestions: your own tags first, then today's meta archetype names.
+  const tagSuggestions = useMemo(() => {
+    const seen = new Set(knownTags.map((t) => t.toLowerCase()));
+    const out = [...knownTags];
+    for (const d of Object.values(meta?.decks ?? {})) {
+      const k = d.archetype.toLowerCase();
+      if (!seen.has(k)) {
+        seen.add(k);
+        out.push(d.archetype);
+      }
+    }
+    return out;
+  }, [knownTags, meta]);
 
   const selectedGroup = groups.find((g) => g.key === selected) ?? null;
 
@@ -342,9 +443,21 @@ export function Matchups() {
         )}
       </div>
 
+      <TagMatchupPanel matches={filtered} notes={notes} onPickTag={setTagFilter} />
+
       <div className={`mu-lab-layout${selectedGroup ? " has-detail" : ""}`}>
         <div className="panel mu-lab-list">
-          <h3 className="dash-title">Opponents · {groups.length}</h3>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h3 className="dash-title">Opponents · {groups.length}</h3>
+            <input
+              type="search"
+              className="mu-lab-search"
+              placeholder="Search opponents, tags, notes…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search opponents"
+            />
+          </div>
           {groups.length === 0 ? (
             <p className="text-sm text-muted m-0">No opponents match these filters.</p>
           ) : (
@@ -411,7 +524,7 @@ export function Matchups() {
                   onBlur={saveNotes}
                 />
                 <datalist id="mu-tag-suggestions">
-                  {knownTags.map((t) => (
+                  {tagSuggestions.map((t) => (
                     <option key={t} value={t} />
                   ))}
                 </datalist>

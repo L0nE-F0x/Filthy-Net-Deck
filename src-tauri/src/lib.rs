@@ -53,6 +53,7 @@ pub fn run() {
             tracker::tracker_matches,
             tracker::tracker_clear,
             tracker::tracker_delete_matches,
+            tracker::tracker_export_csv,
             silent_update::install_update_silent
         ])
         .setup(|app| {

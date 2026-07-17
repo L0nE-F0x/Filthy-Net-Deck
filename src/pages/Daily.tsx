@@ -4,8 +4,26 @@ import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { SpoilerPulse } from "../components/SpoilerPulse";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
+import { recordVsTags } from "../services/matchupNotes";
 import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
+
+type VsRecord = { wins: number; losses: number };
+
+/** "You vs this archetype" chip — appears once opponents are tagged with it. */
+function VsYouChip({ rec }: { rec: VsRecord | undefined }) {
+  if (!rec || rec.wins + rec.losses === 0) return null;
+  const rate = rec.wins / (rec.wins + rec.losses);
+  const favor = rate >= 0.55 ? "favored" : rate >= 0.45 ? "even" : "unfavored";
+  return (
+    <span
+      className={`vs-you-chip favor-${favor}`}
+      title="Your record against opponents you tagged with this archetype (Matchup Lab)"
+    >
+      you {rec.wins}–{rec.losses}
+    </span>
+  );
+}
 
 function filterDecks(
   decks: Deck[],
@@ -28,9 +46,11 @@ function filterDecks(
 
 function DeckMiniCard({
   d,
+  vs,
   onOpen,
 }: {
   d: Deck;
+  vs?: VsRecord;
   onOpen: () => void;
 }) {
   return (
@@ -45,7 +65,10 @@ function DeckMiniCard({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs font-bold text-gold-400">#{d.rank ?? "—"}</span>
-        <TierBadge tier={d.tier} />
+        <span className="flex items-center gap-1.5">
+          <VsYouChip rec={vs} />
+          <TierBadge tier={d.tier} />
+        </span>
       </div>
       <h3 className="flex items-center gap-2 flex-wrap">
         {d.name}
@@ -74,6 +97,12 @@ export function Daily() {
   const metaDiff = useAppStore((s) => s.metaDiff);
   const dailyFormatId = useAppStore((s) => s.dailyFormatId);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
+  const trackerMatches = useAppStore((s) => s.trackerMatches);
+
+  // Your record vs tagged archetypes (Matchup Lab) keyed by lowercased tag.
+  const vsTagMap = useMemo(() => recordVsTags(trackerMatches), [trackerMatches]);
+  const vsFor = (d: Deck): VsRecord | undefined =>
+    vsTagMap[d.name.toLowerCase()] ?? vsTagMap[d.archetype.toLowerCase()];
 
   // Default to featured Standard when meta loads
   useEffect(() => {
@@ -259,7 +288,7 @@ export function Daily() {
             ) : (
               <div className="format-grid">
                 {activeDecks.map((d) => (
-                  <DeckMiniCard key={d.id} d={d} onOpen={() => openDeck(d.id)} />
+                  <DeckMiniCard key={d.id} d={d} vs={vsFor(d)} onOpen={() => openDeck(d.id)} />
                 ))}
               </div>
             )}
