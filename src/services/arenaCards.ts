@@ -12,6 +12,10 @@ import { apiFetch } from "./http";
 export type ArenaCardInfo = {
   name: string;
   scryfallId?: string;
+  /** Full card data (0.19) — older cache entries lack these and re-fetch lazily. */
+  typeLine?: string;
+  manaCost?: string;
+  cmc?: number;
 };
 
 const CACHE_KEY = "bbi.arenaCards.v3";
@@ -78,6 +82,10 @@ type ArenaApiCard = {
   id?: string;
   object?: string;
   status?: number;
+  type_line?: string;
+  mana_cost?: string;
+  cmc?: number;
+  card_faces?: { type_line?: string; mana_cost?: string }[];
 };
 
 async function fetchArenaCard(arenaId: number): Promise<ArenaCardInfo | null> {
@@ -92,7 +100,14 @@ async function fetchArenaCard(arenaId: number): Promise<ArenaCardInfo | null> {
     if (!res.ok) return null;
     const body = (await res.json()) as ArenaApiCard;
     if (!body?.name) return null;
-    return { name: body.name, scryfallId: body.id };
+    const face = body.card_faces?.[0];
+    return {
+      name: body.name,
+      scryfallId: body.id,
+      typeLine: body.type_line || face?.type_line || "",
+      manaCost: body.mana_cost || face?.mana_cost || "",
+      cmc: typeof body.cmc === "number" ? body.cmc : undefined,
+    };
   } catch {
     return null;
   }
@@ -120,10 +135,17 @@ async function mapPool<T, R>(
 
 export async function resolveArenaCards(
   ids: number[],
+  opts?: {
+    /** Require typeLine/cmc — re-fetches pre-0.19 cache entries that lack them. */
+    full?: boolean;
+  },
 ): Promise<Record<number, ArenaCardInfo>> {
   const cache = { ...loadCache() };
   const missing = [...new Set(ids)].filter(
-    (id) => cache[id] === undefined && !notFound.has(id) && Number.isFinite(id),
+    (id) =>
+      (cache[id] === undefined || (opts?.full && cache[id].typeLine === undefined)) &&
+      !notFound.has(id) &&
+      Number.isFinite(id),
   );
 
   if (missing.length > 0) {

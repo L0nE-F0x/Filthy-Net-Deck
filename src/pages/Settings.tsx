@@ -11,6 +11,7 @@ export function Settings() {
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
+  const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const installUpdate = useAppStore((s) => s.installUpdate);
@@ -46,6 +47,24 @@ export function Settings() {
         </p>
         <BoModeToggle mode={prefs.defaultMode} onChange={setDefaultMode} />
       </section>
+
+      {isTauri() && (
+        <section className="panel">
+          <h3 className="text-sm font-semibold m-0 mb-1">Display</h3>
+          <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+            Fill the whole screen — no title bar, no taskbar. Press{" "}
+            <strong className="text-foam">F11</strong> anytime to toggle it on the fly.
+          </p>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={prefs.fullscreen}
+              onChange={(e) => setFullscreenPref(e.target.checked)}
+            />
+            Run Filthy Net Deck in fullscreen
+          </label>
+        </section>
+      )}
 
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-1">Set Radar alerts</h3>

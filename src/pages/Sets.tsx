@@ -12,12 +12,16 @@ import { openExternal } from "../services/openExternal";
 import {
   isFormatLegal,
   setGalleryCards,
+  type BannedCard,
   type DateConfidence,
+  type FormatHub,
+  type FormatSetInfo,
   type SetPreviewCard,
   type SetStatus,
   type UpcomingSet,
 } from "../types/sets";
 import { IconBack } from "../components/NavIcons";
+import { ManaCost } from "../components/ManaCost";
 import { totalNewCount } from "../services/setPulse";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
@@ -159,25 +163,6 @@ function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: 
         Pio {pio ? "legal" : pendingLabel}
       </span>
     </div>
-  );
-}
-
-/** "{2}{U}{U}" → colored mana pips (numbers and odd symbols in neutral pips). */
-function ManaCost({ cost }: { cost: string | undefined }) {
-  if (!cost) return null;
-  const symbols = [...cost.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
-  if (symbols.length === 0) return null;
-  return (
-    <span className="mana-cost" aria-label={`Mana cost ${cost}`}>
-      {symbols.map((s, i) => {
-        const single = /^[WUBRG]$/.test(s) ? s.toLowerCase() : null;
-        return (
-          <span key={i} className={`mana-pip ${single ? `pip-${single}` : "pip-generic"}`}>
-            {single ? "" : s}
-          </span>
-        );
-      })}
-    </span>
   );
 }
 
@@ -606,6 +591,206 @@ function SetGallery({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Format hub — legality, rotation, bans (Standard + Pioneer)
+// ---------------------------------------------------------------------------
+
+/** "Q1 2027" / exact ISO date → sortable number so we can find the next exit. */
+function exitSortKey(s: FormatSetInfo): number {
+  if (s.exitDate) return Number(s.exitDate.replace(/-/g, ""));
+  const m = /Q([1-4])\s+(\d{4})/.exec(s.exitRough || "");
+  if (m) return Number(m[2]) * 10000 + Number(m[1]) * 300;
+  return Number.MAX_SAFE_INTEGER;
+}
+
+function exitLabel(s: FormatSetInfo): string {
+  if (s.exitDate) return formatDate(s.exitDate);
+  return s.exitRough || "TBA";
+}
+
+function FormatSetRow({
+  s,
+  rotatingNext,
+}: {
+  s: FormatSetInfo;
+  rotatingNext?: boolean;
+}) {
+  return (
+    <div className={`fmt-set-row${rotatingNext ? " rotating-next" : ""}`}>
+      {s.iconSvg ? (
+        <img src={s.iconSvg} alt="" className="set-icon fmt-set-icon" width={22} height={22} />
+      ) : (
+        <span className="fmt-set-icon" aria-hidden="true" />
+      )}
+      <span className="fmt-set-name" title={s.name}>
+        {s.name}
+        <span className="fmt-set-code">{s.code.toUpperCase()}</span>
+      </span>
+      <span className="fmt-set-meta">
+        {s.exitRough || s.exitDate ? (
+          <span
+            className={`rot-chip${rotatingNext ? " rot-soon" : ""}`}
+            title={`Leaves Standard ${exitLabel(s)}${rotatingNext ? " — next rotation" : ""}`}
+          >
+            rotates {exitLabel(s)}
+          </span>
+        ) : s.releasedAt ? (
+          <span className="text-muted">{formatDate(s.releasedAt)}</span>
+        ) : null}
+      </span>
+    </div>
+  );
+}
+
+function BanRail({ bans }: { bans: BannedCard[] }) {
+  if (bans.length === 0) {
+    return <p className="text-sm text-good m-0">No banned cards — the format is clean.</p>;
+  }
+  return (
+    <div className="ban-rail" role="list">
+      {bans.map((b) => (
+        <button
+          key={b.name}
+          type="button"
+          role="listitem"
+          className="ban-card"
+          title={`${b.name} — banned${b.reason ? `\n\n${b.reason}` : ""}\nClick for Scryfall`}
+          onClick={() =>
+            void openExternal(
+              b.scryfallId
+                ? `https://scryfall.com/card/${b.scryfallId}`
+                : `https://scryfall.com/search?q=${encodeURIComponent(`!"${b.name}"`)}`,
+            )
+          }
+        >
+          {b.scryfallId ? (
+            <img src={scryfallCdnUrl(b.scryfallId, "small")} alt={b.name} loading="lazy" />
+          ) : (
+            <span className="ban-card-fallback">{b.name.slice(0, 1)}</span>
+          )}
+          <span className="ban-card-name">{b.name}</span>
+          <span className="ban-card-x" aria-hidden="true">
+            banned
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function FormatHubSection({ hub }: { hub: FormatHub }) {
+  const [fmt, setFmt] = useState<"standard" | "pioneer">("standard");
+  const [showAllPio, setShowAllPio] = useState(false);
+
+  const std = hub.standard;
+  const pio = hub.pioneer;
+  if (!std && !pio) return null;
+
+  // Standard: the sets sharing the earliest exit window are "rotating next".
+  const nextExitKey = std?.sets.length
+    ? Math.min(...std.sets.map(exitSortKey))
+    : Number.MAX_SAFE_INTEGER;
+  const rotatingNext = (std?.sets ?? []).filter((s) => exitSortKey(s) === nextExitKey);
+
+  const active = fmt === "standard" ? std : pio;
+  const pioVisible = showAllPio ? (pio?.sets ?? []) : (pio?.sets ?? []).slice(0, 12);
+
+  return (
+    <section>
+      <h3 className="set-section-title">Format hub</h3>
+      <div className="panel flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="eyebrow m-0 mb-1">Legality · rotation · bans</p>
+            <p className="text-sm text-muted m-0 leading-relaxed max-w-2xl">
+              {fmt === "standard" ? (
+                <>
+                  <strong className="text-foam">{std?.sets.length ?? 0} sets</strong> are
+                  Standard-legal right now
+                  {rotatingNext.length > 0 && rotatingNext[0] ? (
+                    <>
+                      {" "}
+                      · next rotation{" "}
+                      <strong className="text-gold-300">{exitLabel(rotatingNext[0])}</strong> (
+                      {rotatingNext.length} set{rotatingNext.length === 1 ? "" : "s"} leave
+                      {rotatingNext.length === 1 ? "s" : ""})
+                    </>
+                  ) : null}
+                  .
+                </>
+              ) : (
+                <>
+                  Pioneer is every expansion since{" "}
+                  <strong className="text-foam">Return to Ravnica</strong>
+                  {pio?.sinceDate ? ` (${formatDate(pio.sinceDate)})` : ""} —{" "}
+                  <strong className="text-foam">{pio?.sets.length ?? 0} sets</strong> and
+                  counting.
+                </>
+              )}
+            </p>
+          </div>
+          <div className="set-rarity-chips" role="tablist" aria-label="Format">
+            {std ? (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={fmt === "standard"}
+                className={`set-rarity-chip${fmt === "standard" ? " active" : ""}`}
+                onClick={() => setFmt("standard")}
+              >
+                Standard
+              </button>
+            ) : null}
+            {pio ? (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={fmt === "pioneer"}
+                className={`set-rarity-chip${fmt === "pioneer" ? " active" : ""}`}
+                onClick={() => setFmt("pioneer")}
+              >
+                Pioneer
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        {active ? (
+          <>
+            <div className="fmt-hub-grid">
+              {(fmt === "standard" ? (std?.sets ?? []) : pioVisible).map((s) => (
+                <FormatSetRow
+                  key={s.code}
+                  s={s}
+                  rotatingNext={fmt === "standard" && exitSortKey(s) === nextExitKey}
+                />
+              ))}
+            </div>
+            {fmt === "pioneer" && (pio?.sets.length ?? 0) > 12 ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm self-start"
+                onClick={() => setShowAllPio((v) => !v)}
+              >
+                {showAllPio
+                  ? "Show fewer"
+                  : `Show all ${pio?.sets.length} Pioneer sets`}
+              </button>
+            ) : null}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-muted m-0 mb-2">
+                Banned in {fmt === "standard" ? "Standard" : "Pioneer"} ·{" "}
+                {active.bans.length}
+              </h4>
+              <BanRail bans={active.bans} />
+            </div>
+          </>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function SetCard({
   set,
   newCount,
@@ -820,7 +1005,8 @@ export function Sets() {
         <p className="eyebrow">Sets</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Set radar</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Arena-first spoilers, full galleries, Std/Pio legality.{" "}
+          Arena-first spoilers, full galleries, plus the format hub — legality, rotation, and
+          ban lists for Standard &amp; Pioneer.{" "}
           <strong className="text-foam">No Alchemy.</strong> Snapshot {sets.date}
           {newTotal > 0 ? (
             <>
@@ -863,6 +1049,8 @@ export function Sets() {
           </div>
         </section>
       ) : null}
+
+      {sets.formats ? <FormatHubSection hub={sets.formats} /> : null}
     </div>
   );
 }

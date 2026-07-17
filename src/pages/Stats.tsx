@@ -19,6 +19,7 @@ import {
   type ArenaCardInfo,
 } from "../services/arenaCards";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
+import { TrackedDecklist } from "../components/TrackedDecklist";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
 function pickArenaPreview(
@@ -46,6 +47,16 @@ function pickArenaPreview(
 function latestMainboard(matches: TrackedMatch[]): number[] | undefined {
   for (const m of matches) {
     if (m.deckMain?.length) return m.deckMain;
+  }
+  return undefined;
+}
+
+/** Latest stored full list (main + side) for a deck group. */
+function latestDecklist(
+  matches: TrackedMatch[],
+): { main: number[]; side?: number[] } | undefined {
+  for (const m of matches) {
+    if (m.deckMain?.length) return { main: m.deckMain, side: m.deckSide };
   }
   return undefined;
 }
@@ -630,7 +641,13 @@ function DeckBreakdown({
 }
 
 /** Hero fan of cards from your most-played decks — livens up the Stats home. */
-function StatsArsenal({ decks }: { decks: DeckGroup[] }) {
+function StatsArsenal({
+  decks,
+  onSelect,
+}: {
+  decks: DeckGroup[];
+  onSelect: (key: string) => void;
+}) {
   const top = useMemo(() => sortDecks(decks, "matches", "desc").slice(0, 4), [decks]);
   const ids = useMemo(() => {
     const out = new Set<number>();
@@ -666,7 +683,13 @@ function StatsArsenal({ decks }: { decks: DeckGroup[] }) {
       </div>
       <div className="stats-arsenal-fans">
         {fans.map(({ deck, arts }) => (
-          <div key={deck.key} className="stats-arsenal-fan" title={deck.name}>
+          <button
+            key={deck.key}
+            type="button"
+            className="stats-arsenal-fan"
+            title={`${deck.name} — open deck stats & decklist`}
+            onClick={() => onSelect(deck.key)}
+          >
             {arts.map((c, i) => (
               <div
                 key={`${c.name}-${i}`}
@@ -683,7 +706,7 @@ function StatsArsenal({ decks }: { decks: DeckGroup[] }) {
               </div>
             ))}
             <span className="stats-arsenal-label">{deck.name}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>
@@ -1056,6 +1079,7 @@ function DeckDetail({
   }, [deck.matches]);
   const cardMap = useArenaCardMap(mainIds);
   const headerArts = pickArenaPreview(latestMainboard(deck.matches), cardMap, 6);
+  const deckList = useMemo(() => latestDecklist(deck.matches), [deck.matches]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -1153,6 +1177,13 @@ function DeckDetail({
       ) : (
         <>
           <SummaryTiles matches={visibleMatches} />
+          {deckList && (
+            <TrackedDecklist
+              deckName={deck.name}
+              main={deckList.main}
+              side={deckList.side}
+            />
+          )}
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory matches={visibleMatches} />
@@ -1326,7 +1357,7 @@ export function Stats() {
               Download week recap
             </button>
           </div>
-          <StatsArsenal decks={decks} />
+          <StatsArsenal decks={decks} onSelect={setSelectedDeck} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
           <MatchHistory matches={filtered} />

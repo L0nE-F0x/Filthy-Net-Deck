@@ -7,7 +7,7 @@ import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { recordVsTags } from "../services/matchupNotes";
-import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
+import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
 
 type VsRecord = { wins: number; losses: number };
@@ -181,38 +181,116 @@ export function Daily() {
       )
     : [];
   const hero = activeFmt ? topDeckForMode(activeFmt, mode, meta.decks) : undefined;
+  const heroArt = hero ? pickPreviewCards(hero)[0] : undefined;
+  const heroVs = hero ? vsFor(hero) : undefined;
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <p className="eyebrow">Today’s lists · {meta.date}</p>
-        <p className="text-sm text-muted m-0 max-w-2xl">
-          Pick a format below — eight ranked decks for the active Bo1/Bo3 mode. Open any deck
-          for the full list, curve, and one-click Arena import.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>
+          <p className="text-sm text-muted m-0 max-w-2xl">
+            Eight ranked decks per format — open any deck for the full list, curve, and
+            one-click Arena import.
+          </p>
+        </div>
+        <div className="format-switcher m-0" role="tablist" aria-label="Format">
+          {meta.formats.map((f) => {
+            const active = f.id === activeFmt?.id;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`format-chip${active ? " active" : ""}`}
+                onClick={() => setDailyFormatId(f.id as FormatId)}
+              >
+                {f.shortLabel || f.name}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <SpoilerPulse />
-      <MetaShareTimeline />
-      <PersonalMetaPanel />
 
-      <div className="format-switcher" role="tablist" aria-label="Format">
-        {meta.formats.map((f) => {
-          const active = f.id === activeFmt?.id;
-          return (
-            <button
-              key={f.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              className={`format-chip${active ? " active" : ""}`}
-              onClick={() => setDailyFormatId(f.id as FormatId)}
-            >
-              {f.shortLabel || f.name}
-            </button>
-          );
-        })}
-      </div>
+      {activeFmt && hero && (
+        <section className="daily-hero" aria-label="Deck to beat">
+          {heroArt && (
+            <div className="daily-hero-art" aria-hidden="true">
+              <CardArt
+                name={heroArt.name}
+                scryfallId={heroArt.scryfallId}
+                size="art_crop"
+                rounded={false}
+                className="daily-hero-img"
+              />
+            </div>
+          )}
+          <div className="daily-hero-scrim" aria-hidden="true" />
+          <div className="daily-hero-body">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="daily-hero-kicker">Deck to beat</span>
+                <span className="text-xs font-bold tracking-widest uppercase text-gold-400">
+                  {activeFmt.name} · {mode.toUpperCase()}
+                </span>
+                <TierBadge tier={hero.tier} />
+                <MovementChip move={movementByName.get(hero.name.toLowerCase())} />
+                {hero.listQuality === "authoritative" && (
+                  <span className="badge-verified">Verified list</span>
+                )}
+              </div>
+              <h2 className="daily-hero-name">
+                {hero.name}
+                <ColorPips colors={hero.colors} />
+              </h2>
+              <p className="daily-hero-desc line-clamp-2">{hero.description}</p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => openDeck(hero.id)}
+                >
+                  Open deck
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => openFormat(activeFmt.id)}
+                >
+                  Format details
+                </button>
+              </div>
+            </div>
+            <div className="daily-hero-stats">
+              {hero.metaShare != null && (
+                <div className="daily-hero-stat">
+                  <strong>{hero.metaShare}%</strong>
+                  <span>of the meta</span>
+                </div>
+              )}
+              <div className="daily-hero-stat">
+                <strong>#{hero.rank ?? 1}</strong>
+                <span>today’s rank</span>
+              </div>
+              {heroVs && heroVs.wins + heroVs.losses > 0 && (
+                <div className="daily-hero-stat">
+                  <strong
+                    className={
+                      heroVs.wins >= heroVs.losses ? "favor-favored" : "favor-unfavored"
+                    }
+                  >
+                    {heroVs.wins}–{heroVs.losses}
+                  </strong>
+                  <span>you vs this deck</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="filter-bar">
         <input
@@ -245,6 +323,34 @@ export function Daily() {
         ))}
       </div>
 
+      {activeFmt && (
+        <section>
+          <h3 className="text-sm font-semibold text-muted uppercase tracking-wide m-0 mb-3">
+            {activeFmt.name} · top {activeDecks.length} · {mode.toUpperCase()}
+          </h3>
+          {activeDecks.length === 0 ? (
+            <p className="text-sm text-muted m-0">No decks match these filters.</p>
+          ) : (
+            <div className="format-grid">
+              {activeDecks.map((d) => (
+                <DeckMiniCard
+                  key={d.id}
+                  d={d}
+                  vs={vsFor(d)}
+                  move={movementByName.get(d.name.toLowerCase())}
+                  onOpen={() => openDeck(d.id)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+        <MetaShareTimeline />
+        <PersonalMetaPanel />
+      </div>
+
       {metaDiff.previousDate && metaDiff.changes.length > 0 && (
         <section className="panel diff-panel">
           <h3 className="text-sm font-semibold m-0 mb-2">
@@ -275,67 +381,6 @@ export function Daily() {
                 </span>
               </div>
             ))}
-          </div>
-        </section>
-      )}
-
-      {activeFmt && hero && (
-        <section className="panel panel-hero">
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="text-xs font-bold tracking-widest uppercase text-gold-400">
-                  {activeFmt.name} · #{hero.rank ?? 1} · {mode.toUpperCase()}
-                </span>
-                <TierBadge tier={hero.tier} />
-                <ColorPips colors={hero.colors} />
-                {hero.metaShare != null && (
-                  <span className="text-xs text-muted">{hero.metaShare}% meta</span>
-                )}
-                {hero.listQuality === "authoritative" && (
-                  <span className="badge-verified">Verified list</span>
-                )}
-              </div>
-              <h2 className="text-2xl font-semibold m-0 tracking-tight">{hero.name}</h2>
-              <p className="text-sm text-muted mt-2 mb-0 leading-relaxed max-w-2xl">
-                {hero.description}
-              </p>
-              {hero.listNote && (
-                <p className="text-xs text-muted mt-2 mb-0 opacity-80">{hero.listNote}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 shrink-0">
-              <button type="button" className="btn btn-primary" onClick={() => openDeck(hero.id)}>
-                Open deck
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => openFormat(activeFmt.id)}
-              >
-                Format details
-              </button>
-            </div>
-          </div>
-          <div className="relative z-10">
-            <h3 className="text-sm font-semibold text-muted uppercase tracking-wide m-0 mb-3">
-              {activeFmt.name} · top {activeDecks.length}
-            </h3>
-            {activeDecks.length === 0 ? (
-              <p className="text-sm text-muted m-0">No decks match these filters.</p>
-            ) : (
-              <div className="format-grid">
-                {activeDecks.map((d) => (
-                  <DeckMiniCard
-                    key={d.id}
-                    d={d}
-                    vs={vsFor(d)}
-                    move={movementByName.get(d.name.toLowerCase())}
-                    onOpen={() => openDeck(d.id)}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </section>
       )}

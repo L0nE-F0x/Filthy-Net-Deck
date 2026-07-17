@@ -58,6 +58,33 @@ export interface UpcomingSet {
   status: SetStatus;
 }
 
+/** One row of a format's set pool (Format hub). */
+export interface FormatSetInfo {
+  code: string;
+  name: string;
+  iconSvg?: string | null;
+  releasedAt?: string | null;
+  cardCount?: number;
+  /** Standard only — from the rotation calendar (whatsinstandard). */
+  enterDate?: string | null;
+  exitDate?: string | null;
+  /** e.g. "Q1 2027" when no exact exit date is published yet. */
+  exitRough?: string | null;
+}
+
+export interface BannedCard {
+  name: string;
+  scryfallId?: string;
+  setCode?: string | null;
+  reason?: string | null;
+}
+
+export interface FormatHub {
+  standard?: { sets: FormatSetInfo[]; bans: BannedCard[] };
+  pioneer?: { sinceDate?: string; sets: FormatSetInfo[]; bans: BannedCard[] };
+  sources?: string[];
+}
+
 export interface SetsBundle {
   generatedAt: string;
   date: string;
@@ -70,6 +97,8 @@ export interface SetsBundle {
   };
   sources: string[];
   sets: UpcomingSet[];
+  /** Legality / rotation / ban hub — null or absent on older feeds. */
+  formats?: FormatHub | null;
 }
 
 /** Prefer full gallery; fall back to previews for older feeds. */

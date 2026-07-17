@@ -2866,3 +2866,287 @@ select,
   border-radius: 2px 2px 0 0;
   opacity: 0.85;
 }
+
+/* Decks home — art-backed marquee for the #1 deck */
+.daily-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 35%, var(--color-ink-600));
+  background: var(--color-ink-900);
+  min-height: 230px;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 12px 44px color-mix(in srgb, black 45%, transparent);
+}
+.daily-hero-art {
+  position: absolute;
+  inset: 0;
+}
+.daily-hero-art .daily-hero-img,
+.daily-hero-art .card-art-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  filter: saturate(1.15);
+  transform: scale(1.03);
+}
+.daily-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--color-ink-950) 96%, transparent) 22%, color-mix(in srgb, var(--color-ink-950) 55%, transparent) 55%, color-mix(in srgb, var(--color-ink-950) 25%, transparent)),
+    linear-gradient(0deg, color-mix(in srgb, var(--color-ink-950) 92%, transparent), transparent 55%);
+}
+.daily-hero-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1.5rem 1.6rem 1.4rem;
+}
+.daily-hero-kicker {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-950);
+  background: var(--color-gold-400);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+.daily-hero-name {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 0;
+  font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 70%);
+}
+.daily-hero-desc {
+  margin: 0.45rem 0 0;
+  max-width: 34rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--color-foam) 85%, transparent);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 65%);
+}
+.daily-hero-stats {
+  display: flex;
+  gap: 1.1rem;
+  flex-shrink: 0;
+  align-items: stretch;
+}
+.daily-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-width: 92px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-ink-950) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 25%, transparent);
+  backdrop-filter: blur(4px);
+}
+.daily-hero-stat strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-gold-300);
+  line-height: 1.1;
+}
+.daily-hero-stat strong.favor-favored { color: var(--color-good); }
+.daily-hero-stat strong.favor-unfavored { color: var(--color-poor); }
+.daily-hero-stat span {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .daily-hero-body { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .daily-hero-stats { width: 100%; }
+  .daily-hero-stat { flex: 1 1 0; }
+}
+
+/* Format hub — legality / rotation / bans on the Sets page */
+.fmt-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.4rem 0.9rem;
+}
+.fmt-set-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-ink-800) 65%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 45%, transparent);
+}
+.fmt-set-row.rotating-next {
+  border-color: color-mix(in srgb, var(--color-fair) 45%, transparent);
+  background: color-mix(in srgb, var(--color-fair) 7%, var(--color-ink-800));
+}
+.fmt-set-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  filter: invert(0.85);
+}
+.fmt-set-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fmt-set-code {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+.fmt-set-meta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+}
+.rot-chip {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  white-space: nowrap;
+}
+.rot-chip.rot-soon {
+  color: var(--color-fair);
+  border-color: color-mix(in srgb, var(--color-fair) 50%, transparent);
+}
+.ban-rail {
+  display: flex;
+  gap: 0.7rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+}
+.ban-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+}
+.ban-card img,
+.ban-card-fallback {
+  width: 92px;
+  height: 128px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--color-poor) 45%, transparent);
+  filter: saturate(0.55);
+  transition: filter 0.15s, transform 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ink-800);
+  color: var(--color-muted);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.ban-card:hover img,
+.ban-card:hover .ban-card-fallback {
+  filter: saturate(1);
+  transform: translateY(-2px);
+}
+.ban-card-name {
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: var(--color-foam);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.ban-card-x {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: color-mix(in srgb, var(--color-poor) 85%, black);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
+}
+
+/* Arsenal fans are buttons now — open the deck when clicked */
+button.stats-arsenal-fan {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button.stats-arsenal-fan:focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Tracked decklist (My Stats deck detail) */
+.tracked-list-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 1024px) {
+  .tracked-list-layout { grid-template-columns: 1.4fr 1fr; }
+}
+.tracked-list-row {
+  align-items: center;
+  gap: 0.55rem;
+}
+.tracked-row-art {
+  width: 42px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 60%, transparent);
+}
+.tracked-row-art-empty {
+  display: inline-block;
+  background: var(--color-ink-800);
+}

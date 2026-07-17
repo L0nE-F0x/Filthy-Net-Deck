@@ -53,6 +53,19 @@ Condensed; detail in git history + `handoff.md`.
 
 ---
 
+## Milestone 7 — Owner refinement batch (source on `main`, unreleased)
+
+Owner requests, 2026-07-17 (Claude Fable 5 session after Grok handoff). Implemented and
+verified in dev; **ships with the next version bump** per the pacing policy — do not cut a
+release for these alone unless the owner asks.
+
+- [x] **Fullscreen mode** — Settings → Display toggle + F11 anywhere (persists in `bbi.prefs.fullscreen`, applied at boot).
+- [x] **Decks home overhaul** — "Deck to beat" art-backed hero with big stat tiles, top-8 grid right below, meta timeline + you-vs-meta demoted to a two-column row underneath, format switcher inline in the header.
+- [x] **Sets → Format hub** — every Standard-legal set with rotation dates ("rotating next" highlighted), full Pioneer set pool, ban lists with card art for both formats. Data via pipeline `formats` section (Scryfall legalities + whatsinstandard rotation calendar); old feeds without it hide the hub.
+- [x] **My Stats decklist** — deck detail now shows the full latest build (type groups, art thumbs, mana pips, mana curve, sideboard) with one-click **Copy decklist** in Arena import format; Your Arsenal card fans click through to the deck.
+
+---
+
 ## Explicit non-goals (do not add)
 
 In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.

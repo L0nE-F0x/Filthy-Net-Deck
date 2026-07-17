@@ -64,6 +64,7 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 ## 3. Immediate next tasks (for Claude / next agent)
 
+0. **A refinement batch is staged on `main`** (fullscreen, Decks hero, Format hub, My Stats decklist — ROADMAP Milestone 7). It ships with the **next version bump**; don't cut that release until the owner asks or the batch grows.
 1. **Nothing blocking ship** for 0.18.0 if mac dmg roll already committed on `main`. Confirm live site mac button points at `Filthy-Net-Deck-0.18.0-universal.dmg` and Netlify has the file.
 2. **If mac roll not yet on `main`:** source-only commit (no version bump):
    - Download: `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v0.18.0/Filthy-Net-Deck-0.18.0-universal.dmg`
@@ -157,6 +158,18 @@ It only downloads **published JSON** from Netlify:
 | 429 policy | `src/services/retryPolicy.ts` (tests) + pipeline `scryfall.mjs` / `sets.mjs` (max 8) |
 | CI failure issues | `.github/workflows/daily-meta.yml` — **title-only** match (no `pipeline-failure` label; label would 422) |
 | Unit tests | `npm test` → `src/services/*.test.ts` |
+
+### Staged on `main` after 0.18.0 (unreleased — ships with next bump)
+
+Owner refinement batch, 2026-07-17 (see ROADMAP Milestone 7):
+
+| Concern | Files |
+|---------|--------|
+| Fullscreen (Settings → Display + F11) | `src/services/windowMode.ts`, prefs `fullscreen` in `useAppStore`, `src-tauri/capabilities/default.json` (`allow-set-fullscreen`) |
+| Decks home hero ("Deck to beat") | `src/pages/Daily.tsx` + `.daily-hero*` in `index.css` — hero first, top-8 grid, insights demoted below |
+| Format hub (legality/rotation/bans) | pipeline `sources/sets.mjs` (`buildFormatHub`, whatsinstandard v6 + Scryfall `banned:` searches, fails soft to `formats: null`), `types/sets.ts` `FormatHub`, `FormatHubSection` in `src/pages/Sets.tsx` |
+| My Stats decklist + copy | `src/components/TrackedDecklist.tsx` (full list, curve, SB, Arena-format copy), `arenaCards.ts` now caches `typeLine`/`manaCost`/`cmc` (`{ full: true }` re-fetches old entries), arsenal fans clickable (`Stats.tsx`) |
+| Shared mana pips | `src/components/ManaCost.tsx` (extracted from Sets) |
 
 ---
 

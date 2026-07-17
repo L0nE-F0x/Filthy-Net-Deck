@@ -33,6 +33,7 @@ import {
   shouldFireArenaNotify,
 } from "../services/setPulse";
 import { notifyDesktop } from "../services/notify";
+import { applyFullscreen } from "../services/windowMode";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
@@ -43,6 +44,8 @@ interface Prefs {
   notifyArenaEve: boolean;
   /** Desktop toast when a match is recorded (opt-in, like Arena-eve). */
   notifyMatchEnd: boolean;
+  /** Launch the app fullscreen (also toggled live with F11). */
+  fullscreen: boolean;
   /** Format shown on the Decks home last time — restored on next launch. */
   lastFormatId?: FormatId;
 }
@@ -55,12 +58,14 @@ function loadPrefs(): Prefs {
         defaultMode?: PlayMode;
         notifyArenaEve?: boolean;
         notifyMatchEnd?: boolean;
+        fullscreen?: boolean;
         lastFormatId?: string;
       };
       return {
         defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1",
         notifyArenaEve: parsed.notifyArenaEve !== false,
         notifyMatchEnd: parsed.notifyMatchEnd === true,
+        fullscreen: parsed.fullscreen === true,
         lastFormatId:
           parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
             ? parsed.lastFormatId
@@ -70,7 +75,12 @@ function loadPrefs(): Prefs {
   } catch {
     /* ignore */
   }
-  return { defaultMode: "bo1", notifyArenaEve: true, notifyMatchEnd: false };
+  return {
+    defaultMode: "bo1",
+    notifyArenaEve: true,
+    notifyMatchEnd: false,
+    fullscreen: false,
+  };
 }
 
 function savePrefs(p: Prefs) {
@@ -154,6 +164,8 @@ interface AppState {
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
+  /** Persist the fullscreen pref and apply it to the window immediately. */
+  setFullscreenPref: (v: boolean) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
@@ -264,6 +276,12 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, notifyMatchEnd };
       savePrefs(next);
       set({ prefs: next });
+    },
+    setFullscreenPref: (fullscreen) => {
+      const next = { ...get().prefs, fullscreen };
+      savePrefs(next);
+      set({ prefs: next });
+      void applyFullscreen(fullscreen);
     },
     clearError: () => set({ error: null }),
 

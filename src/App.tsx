@@ -24,6 +24,7 @@ import {
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
+import { applyFullscreen, toggleFullscreen } from "./services/windowMode";
 import { Sets } from "./pages/Sets";
 
 const NAV: {
@@ -99,7 +100,21 @@ export default function App() {
   useEffect(() => {
     void initTracker();
     void refreshMeta().finally(() => setBootDone(true));
+    if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // F11 toggles fullscreen (and remembers the choice for next launch).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "F11") return;
+      e.preventDefault();
+      void toggleFullscreen().then((now) => {
+        if (now != null) useAppStore.getState().setFullscreenPref(now);
+      });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   // Keyboard shortcuts 1–7 jump to main nav pages (Milestone 6).

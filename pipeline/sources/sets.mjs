@@ -178,6 +178,129 @@ async function fetchAllSetCards(code) {
   return cards;
 }
 
+/** Banned cards straight from Scryfall legalities (empty list = no bans). */
+async function fetchBannedCards(format) {
+  const out = [];
+  let path = `/cards/search?q=${encodeURIComponent(`banned:${format}`)}&unique=cards&order=name`;
+  try {
+    while (path) {
+      await sleep(100);
+      const data = await scryfallGet(path);
+      for (const c of data.data || []) {
+        out.push({ name: c.name, scryfallId: c.id, setCode: c.set || null });
+      }
+      path =
+        data.has_more && data.next_page
+          ? data.next_page.replace(API, "")
+          : null;
+    }
+  } catch (e) {
+    // Scryfall answers 404 for an empty search — that just means "no bans".
+    if (String(e.message).includes("404")) return out;
+    throw e;
+  }
+  return out;
+}
+
+const WIS_API = "https://whatsinstandard.com/api/v6/standard.json";
+
+/**
+ * Sets currently legal in Standard, with rotation dates, from
+ * whatsinstandard.com (community-maintained mirror of WotC's rotation plan).
+ */
+async function fetchStandardRotation() {
+  const res = await fetch(WIS_API, { headers: HEADERS });
+  if (!res.ok) throw new Error(`whatsinstandard → ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data?.sets)) throw new Error("whatsinstandard: bad shape");
+  if (data.deprecated) console.warn("  whatsinstandard v6 is deprecated — check for v7");
+  const now = new Date().toISOString();
+  const current = data.sets.filter((s) => {
+    const enter = s.enterDate?.exact;
+    const exit = s.exitDate?.exact;
+    return enter && enter <= now && (!exit || exit > now);
+  });
+  const sets = current.map((s) => ({
+    code: String(s.code || "").toLowerCase(),
+    name: s.name,
+    enterDate: s.enterDate?.exact ? s.enterDate.exact.slice(0, 10) : null,
+    exitDate: s.exitDate?.exact ? s.exitDate.exact.slice(0, 10) : null,
+    exitRough: s.exitDate?.rough || null,
+  }));
+  const banReasons = new Map(
+    (Array.isArray(data.bans) ? data.bans : [])
+      .filter((b) => b?.cardName)
+      .map((b) => [b.cardName.toLowerCase(), b.reason || null]),
+  );
+  return { sets, banReasons };
+}
+
+const PIONEER_SINCE = "2012-10-05"; // Return to Ravnica
+
+/**
+ * Format hub payload: current Standard sets + rotation, the Pioneer set
+ * pool, and both ban lists. Every entry is sourced (Scryfall legalities,
+ * whatsinstandard rotation calendar) — nothing is invented.
+ *
+ * @param {Array<object>} allScryfallSets raw /sets rows (for icons/dates)
+ * @param {string} today YYYY-MM-DD
+ */
+async function buildFormatHub(allScryfallSets, today) {
+  const byCode = new Map(
+    allScryfallSets.map((s) => [String(s.code).toLowerCase(), s]),
+  );
+
+  const { sets: stdRotation, banReasons } = await fetchStandardRotation();
+  const standardSets = stdRotation
+    .map((s) => {
+      const sf = byCode.get(s.code);
+      return {
+        ...s,
+        name: sf?.name || s.name,
+        iconSvg: sf?.icon_svg_uri || null,
+        releasedAt: sf?.released_at || s.enterDate,
+        cardCount: sf?.card_count || 0,
+      };
+    })
+    .sort((a, b) => String(b.releasedAt).localeCompare(String(a.releasedAt)));
+
+  const pioneerSets = allScryfallSets
+    .filter(
+      (s) =>
+        s.released_at &&
+        s.released_at >= PIONEER_SINCE &&
+        s.released_at <= today &&
+        ALLOWED_TYPES.has(s.set_type) &&
+        s.set_type !== "draft_innovation" && // MH-style sets skip Pioneer
+        !s.digital &&
+        !isAlchemy(s),
+    )
+    .map((s) => ({
+      code: String(s.code).toLowerCase(),
+      name: s.name,
+      iconSvg: s.icon_svg_uri || null,
+      releasedAt: s.released_at,
+    }))
+    .sort((a, b) => b.releasedAt.localeCompare(a.releasedAt));
+
+  console.log("Format hub: fetching ban lists…");
+  const standardBans = (await fetchBannedCards("standard")).map((b) => ({
+    ...b,
+    reason: banReasons.get(b.name.toLowerCase()) || null,
+  }));
+  const pioneerBans = await fetchBannedCards("pioneer");
+
+  console.log(
+    `  standard ${standardSets.length} sets · ${standardBans.length} bans | pioneer ${pioneerSets.length} sets · ${pioneerBans.length} bans`,
+  );
+
+  return {
+    standard: { sets: standardSets, bans: standardBans },
+    pioneer: { sinceDate: PIONEER_SINCE, sets: pioneerSets, bans: pioneerBans },
+    sources: ["scryfall-legalities", "whatsinstandard-v6"],
+  };
+}
+
 /**
  * Build the sets radar payload for the app.
  * @returns {Promise<object>}
@@ -282,10 +405,19 @@ export async function buildSetsBundle() {
     return da.localeCompare(db);
   });
 
+  // Format hub — legality / rotation / bans. Failure here must not sink the
+  // radar itself: warn and ship `formats: null` (the app hides the hub).
+  let formats = null;
+  try {
+    formats = await buildFormatHub(all, today);
+  } catch (e) {
+    console.warn(`  format hub skipped: ${e.message}`);
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     date: today,
-    version: "1.0.0",
+    version: "1.1.0",
     policy: {
       arenaFirst: true,
       noAlchemy: true,
@@ -293,7 +425,8 @@ export async function buildSetsBundle() {
       arenaDates:
         "official overrides when known; otherwise estimated as paper release minus 3 days (labeled)",
     },
-    sources: ["scryfall", "set-calendar-overrides"],
+    sources: ["scryfall", "set-calendar-overrides", "whatsinstandard-v6"],
     sets,
+    formats,
   };
 }
