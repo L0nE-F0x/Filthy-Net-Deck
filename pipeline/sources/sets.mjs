@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const API = "https://api.scryfall.com";
 const HEADERS = {
   Accept: "application/json",
-  "User-Agent": "FilthyNetDeck/0.13 (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
+  "User-Agent": "FilthyNetDeck/0.14 (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
 };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -104,13 +104,30 @@ function computeStatus(set, today) {
 }
 
 function mapCard(c) {
+  const face = c.card_faces?.[0];
+  const legalities = c.legalities || {};
+  const colors = Array.isArray(c.colors)
+    ? c.colors
+    : Array.isArray(face?.colors)
+      ? face.colors
+      : Array.isArray(c.color_identity)
+        ? c.color_identity
+        : [];
   return {
     name: c.name,
     scryfallId: c.id,
     rarity: c.rarity || "common",
     collectorNumber: c.collector_number || "",
-    typeLine: c.type_line || "",
-    manaCost: c.mana_cost || c.card_faces?.[0]?.mana_cost || "",
+    typeLine: c.type_line || face?.type_line || "",
+    manaCost: c.mana_cost || face?.mana_cost || "",
+    cmc: typeof c.cmc === "number" ? c.cmc : undefined,
+    colors,
+    oracleText: c.oracle_text || face?.oracle_text || "",
+    legalities: {
+      standard: legalities.standard || "not_legal",
+      pioneer: legalities.pioneer || "not_legal",
+    },
+    scryfallUri: c.scryfall_uri || null,
   };
 }
 

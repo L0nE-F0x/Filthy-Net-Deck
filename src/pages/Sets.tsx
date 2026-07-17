@@ -3,6 +3,7 @@ import { useAppStore } from "../store/useAppStore";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { openExternal } from "../services/openExternal";
 import {
+  isFormatLegal,
   setGalleryCards,
   type DateConfidence,
   type SetPreviewCard,
@@ -10,8 +11,12 @@ import {
   type UpcomingSet,
 } from "../types/sets";
 import { IconBack } from "../components/NavIcons";
+import { totalNewCount } from "../services/setPulse";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
+type ColorFilter = "all" | "W" | "U" | "B" | "R" | "G" | "C";
+type SortKey = "collector" | "name" | "cmc" | "rarity" | "newest";
+type TypeFilter = "all" | "creature" | "instant" | "sorcery" | "enchantment" | "artifact" | "planeswalker" | "land" | "other";
 
 function statusLabel(s: SetStatus): string {
   switch (s) {
@@ -101,34 +106,173 @@ function rarityClass(r: string): string {
   return "rarity-special";
 }
 
+const RARITY_RANK: Record<string, number> = {
+  mythic: 0,
+  rare: 1,
+  uncommon: 2,
+  common: 3,
+};
+
+function typeBucket(typeLine: string | undefined): TypeFilter {
+  const t = (typeLine || "").toLowerCase();
+  if (t.includes("creature")) return "creature";
+  if (t.includes("planeswalker")) return "planeswalker";
+  if (t.includes("instant")) return "instant";
+  if (t.includes("sorcery")) return "sorcery";
+  if (t.includes("enchantment")) return "enchantment";
+  if (t.includes("artifact")) return "artifact";
+  if (t.includes("land")) return "land";
+  return "other";
+}
+
+function cardIsColorless(c: SetPreviewCard): boolean {
+  return !c.colors?.length;
+}
+
+function cardHasColor(c: SetPreviewCard, col: string): boolean {
+  if (col === "C") return cardIsColorless(c);
+  return (c.colors || []).includes(col);
+}
+
+function LegalBadges({ card }: { card: SetPreviewCard }) {
+  const std = isFormatLegal(card, "standard");
+  const pio = isFormatLegal(card, "pioneer");
+  return (
+    <div className="legal-badges">
+      <span className={`legal-badge${std ? " legal-yes" : " legal-no"}`}>
+        Std {std ? "legal" : "—"}
+      </span>
+      <span className={`legal-badge${pio ? " legal-yes" : " legal-no"}`}>
+        Pio {pio ? "legal" : "—"}
+      </span>
+    </div>
+  );
+}
+
+function CardDetailDrawer({
+  card,
+  onClose,
+}: {
+  card: SetPreviewCard;
+  onClose: () => void;
+}): ReactNode {
+  const uri =
+    card.scryfallUri || `https://scryfall.com/card/${card.scryfallId}`;
+  return (
+    <div
+      className="set-drawer-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={card.name}
+      onClick={onClose}
+    >
+      <div className="set-drawer" onClick={(e) => e.stopPropagation()}>
+        <div className="set-drawer-art">
+          <img src={scryfallCdnUrl(card.scryfallId, "normal")} alt={card.name} />
+        </div>
+        <div className="set-drawer-body">
+          <div className="flex justify-between items-start gap-2">
+            <div>
+              <h3 className="set-drawer-title m-0">{card.name}</h3>
+              <p className="set-drawer-sub m-0">
+                #{card.collectorNumber} · {card.rarity}
+                {card.manaCost ? ` · ${card.manaCost}` : ""}
+                {card.cmc != null ? ` · CMC ${card.cmc}` : ""}
+              </p>
+            </div>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
+              Close
+            </button>
+          </div>
+          {card.typeLine ? (
+            <p className="set-drawer-type m-0">{card.typeLine}</p>
+          ) : null}
+          <LegalBadges card={card} />
+          {card.oracleText ? (
+            <div className="set-drawer-oracle">
+              {card.oracleText.split("\n").map((line, i) => (
+                <p key={i} className="m-0">
+                  {line}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted m-0">No oracle text in feed.</p>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary btn-sm mt-2"
+            onClick={() => void openExternal(uri)}
+          >
+            Open on Scryfall
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SetGallery({
   set,
+  newIds,
   onBack,
 }: {
   set: UpcomingSet;
+  newIds: Set<string>;
   onBack: () => void;
 }): ReactNode {
   const [rarity, setRarity] = useState<RarityFilter>("all");
+  const [color, setColor] = useState<ColorFilter>("all");
+  const [typeF, setTypeF] = useState<TypeFilter>("all");
+  const [sort, setSort] = useState<SortKey>("collector");
   const [query, setQuery] = useState("");
+  const [newOnly, setNewOnly] = useState(false);
   const [focus, setFocus] = useState<SetPreviewCard | null>(null);
 
   const all = useMemo(() => setGalleryCards(set), [set]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return all.filter((c) => {
+    let list = all.filter((c) => {
+      if (newOnly && !newIds.has(c.scryfallId)) return false;
       if (rarity !== "all") {
         const r = (c.rarity || "").toLowerCase();
         if (rarity === "special") {
-          if (r === "mythic" || r === "rare" || r === "uncommon" || r === "common") return false;
+          if (["mythic", "rare", "uncommon", "common"].includes(r)) return false;
         } else if (r !== rarity) return false;
       }
-      if (q && !c.name.toLowerCase().includes(q) && !c.typeLine?.toLowerCase().includes(q)) {
+      if (color !== "all" && !cardHasColor(c, color)) return false;
+      if (typeF !== "all" && typeBucket(c.typeLine) !== typeF) return false;
+      if (
+        q &&
+        !c.name.toLowerCase().includes(q) &&
+        !(c.typeLine || "").toLowerCase().includes(q) &&
+        !(c.oracleText || "").toLowerCase().includes(q)
+      ) {
         return false;
       }
       return true;
     });
-  }, [all, rarity, query]);
+
+    list = [...list];
+    if (sort === "name") {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sort === "cmc") {
+      list.sort((a, b) => (a.cmc ?? 99) - (b.cmc ?? 99) || a.name.localeCompare(b.name));
+    } else if (sort === "rarity") {
+      list.sort(
+        (a, b) =>
+          (RARITY_RANK[a.rarity?.toLowerCase()] ?? 9) -
+            (RARITY_RANK[b.rarity?.toLowerCase()] ?? 9) ||
+          a.name.localeCompare(b.name),
+      );
+    } else if (sort === "newest") {
+      list.reverse();
+    } else {
+      // collector order as shipped
+    }
+    return list;
+  }, [all, rarity, color, typeF, sort, query, newOnly, newIds]);
 
   const counts = useMemo(() => {
     const m = { all: all.length, mythic: 0, rare: 0, uncommon: 0, common: 0, special: 0 };
@@ -142,6 +286,8 @@ function SetGallery({
     }
     return m;
   }, [all]);
+
+  const newCount = newIds.size;
 
   return (
     <div className="set-gallery flex flex-col gap-4 max-w-6xl">
@@ -161,34 +307,60 @@ function SetGallery({
           <p className="text-sm text-muted mt-1 mb-0">
             <span className={statusClass(set.status)}>{statusLabel(set.status)}</span>
             <span className="ml-2">
-              {all.length} card{all.length === 1 ? "" : "s"} on Scryfall
+              {all.length} card{all.length === 1 ? "" : "s"}
               {set.cardCount > 0 && all.length < set.cardCount
                 ? ` · ${set.cardCount} expected`
                 : ""}
+              {newCount > 0 ? ` · ${newCount} new since last visit` : ""}
             </span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => void openExternal(set.scryfallUri)}
-          >
-            Open on Scryfall
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => void openExternal(set.scryfallUri)}
+        >
+          Open on Scryfall
+        </button>
       </div>
 
       <div className="set-gallery-toolbar panel !p-3">
-        <input
-          type="search"
-          className="set-gallery-search"
-          placeholder="Filter by name or type…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Filter cards"
-        />
-        <div className="set-rarity-chips" role="group" aria-label="Rarity filter">
+        <div className="flex flex-wrap gap-2 items-center">
+          <input
+            type="search"
+            className="set-gallery-search"
+            placeholder="Search name, type, or text…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Filter cards"
+          />
+          <label className="set-sort-label">
+            Sort
+            <select
+              className="set-sort-select"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+            >
+              <option value="collector">Collector #</option>
+              <option value="name">Name</option>
+              <option value="cmc">CMC</option>
+              <option value="rarity">Rarity</option>
+              <option value="newest">Newest first</option>
+            </select>
+          </label>
+          {newCount > 0 ? (
+            <button
+              type="button"
+              className={`set-rarity-chip${newOnly ? " active" : ""}`}
+              onClick={() => setNewOnly((v) => !v)}
+            >
+              New only
+              <span className="set-rarity-n">{newCount}</span>
+            </button>
+          ) : null}
+        </div>
+
+        <div className="set-rarity-chips" role="group" aria-label="Rarity">
           {(
             [
               ["all", "All"],
@@ -202,11 +374,58 @@ function SetGallery({
             <button
               key={id}
               type="button"
-              className={`set-rarity-chip${rarity === id ? " active" : ""} ${id !== "all" ? rarityClass(id) : ""}`}
+              className={`set-rarity-chip${rarity === id ? " active" : ""}`}
               onClick={() => setRarity(id)}
             >
               {label}
               <span className="set-rarity-n">{counts[id]}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="set-rarity-chips" role="group" aria-label="Color">
+          {(
+            [
+              ["all", "Any color"],
+              ["W", "W"],
+              ["U", "U"],
+              ["B", "B"],
+              ["R", "R"],
+              ["G", "G"],
+              ["C", "C"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`set-rarity-chip${color === id ? " active" : ""}`}
+              onClick={() => setColor(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="set-rarity-chips" role="group" aria-label="Type">
+          {(
+            [
+              ["all", "Any type"],
+              ["creature", "Creature"],
+              ["instant", "Instant"],
+              ["sorcery", "Sorcery"],
+              ["enchantment", "Ench"],
+              ["artifact", "Art"],
+              ["planeswalker", "PW"],
+              ["land", "Land"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`set-rarity-chip${typeF === id ? " active" : ""}`}
+              onClick={() => setTypeF(id)}
+            >
+              {label}
             </button>
           ))}
         </div>
@@ -218,72 +437,58 @@ function SetGallery({
         </div>
       ) : (
         <div className="set-gallery-grid">
-          {filtered.map((c) => (
-            <button
-              key={c.scryfallId}
-              type="button"
-              className="set-gallery-cell"
-              onClick={() => setFocus(c)}
-              title={c.name}
-            >
-              <img
-                src={scryfallCdnUrl(c.scryfallId, "normal")}
-                alt={c.name}
-                loading="lazy"
-              />
-              <span className={`set-gallery-rarity ${rarityClass(c.rarity)}`} />
-              <span className="set-gallery-caption">
-                <span className="set-gallery-cn">#{c.collectorNumber}</span>
-                <span className="set-gallery-name">{c.name}</span>
-              </span>
-            </button>
-          ))}
+          {filtered.map((c) => {
+            const isNew = newIds.has(c.scryfallId);
+            return (
+              <button
+                key={c.scryfallId}
+                type="button"
+                className={`set-gallery-cell${isNew ? " is-new" : ""}`}
+                onClick={() => setFocus(c)}
+                title={c.name}
+              >
+                {isNew ? <span className="set-new-pill">New</span> : null}
+                <img
+                  src={scryfallCdnUrl(c.scryfallId, "normal")}
+                  alt={c.name}
+                  loading="lazy"
+                />
+                <span className={`set-gallery-rarity ${rarityClass(c.rarity)}`} />
+                <span className="set-gallery-caption">
+                  <span className="set-gallery-cn">
+                    #{c.collectorNumber}
+                    {c.cmc != null ? ` · ${c.cmc}` : ""}
+                  </span>
+                  <span className="set-gallery-name">{c.name}</span>
+                  <span className="set-gallery-legal-mini">
+                    {isFormatLegal(c, "standard") ? "Std" : ""}
+                    {isFormatLegal(c, "standard") && isFormatLegal(c, "pioneer")
+                      ? " · "
+                      : ""}
+                    {isFormatLegal(c, "pioneer") ? "Pio" : ""}
+                    {!isFormatLegal(c, "standard") && !isFormatLegal(c, "pioneer")
+                      ? "—"
+                      : ""}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {focus ? (
-        <div
-          className="set-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label={focus.name}
-          onClick={() => setFocus(null)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setFocus(null);
-          }}
-        >
-          <button
-            type="button"
-            className="set-lightbox-close btn btn-ghost btn-sm"
-            onClick={() => setFocus(null)}
-          >
-            Close
-          </button>
-          <img
-            src={scryfallCdnUrl(focus.scryfallId, "normal")}
-            alt={focus.name}
-            className="set-lightbox-img"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <div className="set-lightbox-meta" onClick={(e) => e.stopPropagation()}>
-            <strong>{focus.name}</strong>
-            <span>
-              #{focus.collectorNumber} · {focus.rarity}
-              {focus.manaCost ? ` · ${focus.manaCost}` : ""}
-            </span>
-            {focus.typeLine ? <span className="text-muted">{focus.typeLine}</span> : null}
-          </div>
-        </div>
-      ) : null}
+      {focus ? <CardDetailDrawer card={focus} onClose={() => setFocus(null)} /> : null}
     </div>
   );
 }
 
 function SetCard({
   set,
+  newCount,
   onOpenGallery,
 }: {
   set: UpcomingSet;
+  newCount: number;
   onOpenGallery: (s: UpcomingSet) => void;
 }) {
   const gallery = setGalleryCards(set);
@@ -355,13 +560,6 @@ function SetCard({
             date={set.dates.tabletop}
             confidence={set.datesConfidence.tabletop}
           />
-          {set.dates.spoilerStart ? (
-            <DateRow
-              label="Spoilers start"
-              date={set.dates.spoilerStart}
-              confidence={set.datesConfidence.spoilerStart}
-            />
-          ) : null}
         </div>
 
         <div className="set-spoiler-meter">
@@ -369,7 +567,8 @@ function SetCard({
             <span>Spoilers</span>
             <span>
               {set.spoiledCount}
-              {set.cardCount > 0 ? ` / ${set.cardCount}` : ""} cards
+              {set.cardCount > 0 ? ` / ${set.cardCount}` : ""}
+              {newCount > 0 ? ` · +${newCount} new` : ""}
             </span>
           </div>
           <div className="set-spoiler-track">
@@ -424,24 +623,24 @@ export function Sets() {
   const sets = useAppStore((s) => s.sets);
   const setsLoading = useAppStore((s) => s.setsLoading);
   const setsError = useAppStore((s) => s.setsError);
+  const setsNewByCode = useAppStore((s) => s.setsNewByCode);
   const refreshSets = useAppStore((s) => s.refreshSets);
   const [openCode, setOpenCode] = useState<string | null>(null);
 
   const { upcoming, live } = useMemo(() => {
     const list = sets?.sets ?? [];
-    const upcoming = list.filter(
-      (s) => s.status === "spoiling" || s.status === "announced",
-    );
-    const live = list.filter(
-      (s) => s.status === "live_on_arena" || s.status === "released",
-    );
-    return { upcoming, live };
+    return {
+      upcoming: list.filter((s) => s.status === "spoiling" || s.status === "announced"),
+      live: list.filter((s) => s.status === "live_on_arena" || s.status === "released"),
+    };
   }, [sets]);
 
   const openSet = useMemo(
-    () => (openCode ? sets?.sets.find((s) => s.code === openCode) ?? null : null),
+    () => (openCode ? (sets?.sets.find((s) => s.code === openCode) ?? null) : null),
     [openCode, sets],
   );
+
+  const newTotal = totalNewCount(setsNewByCode);
 
   if (setsLoading && !sets) {
     return (
@@ -476,7 +675,13 @@ export function Sets() {
   }
 
   if (openSet) {
-    return <SetGallery set={openSet} onBack={() => setOpenCode(null)} />;
+    return (
+      <SetGallery
+        set={openSet}
+        newIds={new Set(setsNewByCode[openSet.code] || [])}
+        onBack={() => setOpenCode(null)}
+      />
+    );
   }
 
   return (
@@ -485,8 +690,15 @@ export function Sets() {
         <p className="eyebrow">Sets</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Set radar</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Arena-first release radar — spoilers, full card galleries, drop dates.{" "}
-          <strong className="text-foam">No Alchemy.</strong> Snapshot {sets.date}.
+          Arena-first spoilers, full galleries, Std/Pio legality.{" "}
+          <strong className="text-foam">No Alchemy.</strong> Snapshot {sets.date}
+          {newTotal > 0 ? (
+            <>
+              {" "}
+              · <strong className="text-gold-300">{newTotal} new</strong> since last visit
+            </>
+          ) : null}
+          .
         </p>
       </div>
 
@@ -495,7 +707,12 @@ export function Sets() {
           <h3 className="set-section-title">Coming to Arena</h3>
           <div className="set-grid">
             {upcoming.map((s) => (
-              <SetCard key={s.code} set={s} onOpenGallery={(x) => setOpenCode(x.code)} />
+              <SetCard
+                key={s.code}
+                set={s}
+                newCount={setsNewByCode[s.code]?.length ?? 0}
+                onOpenGallery={(x) => setOpenCode(x.code)}
+              />
             ))}
           </div>
         </section>
@@ -506,16 +723,16 @@ export function Sets() {
           <h3 className="set-section-title">Recently live</h3>
           <div className="set-grid">
             {live.map((s) => (
-              <SetCard key={s.code} set={s} onOpenGallery={(x) => setOpenCode(x.code)} />
+              <SetCard
+                key={s.code}
+                set={s}
+                newCount={setsNewByCode[s.code]?.length ?? 0}
+                onOpenGallery={(x) => setOpenCode(x.code)}
+              />
             ))}
           </div>
         </section>
       ) : null}
-
-      <p className="text-[11px] text-muted m-0 leading-relaxed max-w-2xl">
-        Full galleries ship from Scryfall via the daily pipeline. Paper dates from Scryfall; Arena
-        dates official when known, otherwise estimated and labeled.
-      </p>
     </div>
   );
 }

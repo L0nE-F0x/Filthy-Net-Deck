@@ -2544,3 +2544,195 @@ select,
   top: 1rem;
   right: 1rem;
 }
+
+/* Spoiler pulse (Decks home) */
+.spoiler-pulse {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 35%, var(--color-ink-600));
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--color-gold-500) 14%, var(--color-ink-900)),
+    var(--color-ink-900) 55%
+  );
+  color: var(--color-foam);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.spoiler-pulse:hover {
+  border-color: color-mix(in srgb, var(--color-gold-400) 55%, transparent);
+  transform: translateY(-1px);
+}
+.spoiler-pulse-badge {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.45rem;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--color-gold-300), var(--color-gold-500));
+  color: #1a1205;
+}
+.spoiler-pulse-copy {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+.spoiler-pulse-detail {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+.spoiler-pulse-cta {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-gold-300);
+}
+
+/* Gallery extras */
+.set-gallery-cell.is-new {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold-400) 55%, transparent),
+    0 8px 22px color-mix(in srgb, var(--color-gold-500) 18%, transparent);
+}
+.set-new-pill {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  background: var(--color-gold-400);
+  color: #1a1205;
+}
+.set-gallery-legal-mini {
+  font-size: 0.58rem;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+}
+.set-sort-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.set-sort-select {
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: var(--color-ink-900);
+  color: var(--color-foam);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+/* Card detail drawer */
+.set-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: color-mix(in srgb, black 72%, transparent);
+  backdrop-filter: blur(10px);
+}
+.set-drawer {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(220px, 1fr);
+  gap: 1.1rem;
+  max-width: min(720px, 96vw);
+  max-height: min(90vh, 640px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--color-ink-900);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 60%, transparent);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+@media (max-width: 640px) {
+  .set-drawer {
+    grid-template-columns: 1fr;
+  }
+}
+.set-drawer-art img {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.set-drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.set-drawer-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-foam);
+}
+.set-drawer-sub {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  margin-top: 0.2rem !important;
+}
+.set-drawer-type {
+  font-size: 0.85rem;
+  color: var(--color-gold-300);
+  font-weight: 600;
+}
+.set-drawer-oracle {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--color-foam);
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-ink-950) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 50%, transparent);
+  white-space: pre-wrap;
+  max-height: 220px;
+  overflow: auto;
+}
+.set-drawer-oracle p + p {
+  margin-top: 0.45rem !important;
+}
+.legal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.legal-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+.legal-yes {
+  color: #052e1a;
+  background: color-mix(in srgb, var(--color-good) 75%, white);
+  border-color: color-mix(in srgb, var(--color-good) 40%, transparent);
+}
+.legal-no {
+  color: var(--color-muted);
+  background: color-mix(in srgb, var(--color-ink-700) 80%, transparent);
+  border-color: color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+}

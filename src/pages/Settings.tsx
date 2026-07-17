@@ -7,6 +7,7 @@ import { downloadInstaller, openExternal } from "../services/openExternal";
 export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
+  const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const installUpdate = useAppStore((s) => s.installUpdate);
@@ -29,6 +30,23 @@ export function Settings() {
           Opens with this mode. Switch Bo1 / Bo3 anytime from the top bar.
         </p>
         <BoModeToggle mode={prefs.defaultMode} onChange={setDefaultMode} />
+      </section>
+
+      <section className="panel">
+        <h3 className="text-sm font-semibold m-0 mb-1">Set Radar alerts</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Optional desktop ping the day before a set drops on{" "}
+          <strong className="text-foam">MTG Arena</strong>. At most once per day; stays on your
+          PC.
+        </p>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={prefs.notifyArenaEve}
+            onChange={(e) => setNotifyArenaEve(e.target.checked)}
+          />
+          Notify me the day before Arena set drops
+        </label>
       </section>
 
       <section className="panel">

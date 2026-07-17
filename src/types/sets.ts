@@ -8,6 +8,8 @@ export type SetStatus =
 
 export type DateConfidence = "official" | "scryfall" | "estimated" | "override" | "unknown";
 
+export type FormatLegality = "legal" | "not_legal" | "banned" | "restricted" | string;
+
 export interface SetPreviewCard {
   name: string;
   scryfallId: string;
@@ -15,6 +17,15 @@ export interface SetPreviewCard {
   collectorNumber?: string;
   typeLine?: string;
   manaCost?: string;
+  cmc?: number;
+  /** WUBRG color identity / face colors */
+  colors?: string[];
+  oracleText?: string;
+  legalities?: {
+    standard?: FormatLegality;
+    pioneer?: FormatLegality;
+  };
+  scryfallUri?: string | null;
 }
 
 export interface UpcomingSet {
@@ -47,12 +58,6 @@ export interface UpcomingSet {
   status: SetStatus;
 }
 
-/** Prefer full gallery; fall back to previews for older feeds. */
-export function setGalleryCards(set: UpcomingSet): SetPreviewCard[] {
-  if (set.cards?.length) return set.cards;
-  return set.previews || [];
-}
-
 export interface SetsBundle {
   generatedAt: string;
   date: string;
@@ -65,4 +70,18 @@ export interface SetsBundle {
   };
   sources: string[];
   sets: UpcomingSet[];
+}
+
+/** Prefer full gallery; fall back to previews for older feeds. */
+export function setGalleryCards(set: UpcomingSet): SetPreviewCard[] {
+  if (set.cards?.length) return set.cards;
+  return set.previews || [];
+}
+
+export function isFormatLegal(
+  card: SetPreviewCard,
+  format: "standard" | "pioneer",
+): boolean {
+  const v = card.legalities?.[format];
+  return v === "legal" || v === "restricted";
 }

@@ -24,25 +24,42 @@ import {
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
 import type { SetsBundle } from "../types/sets";
 import type { TrackedMatch, TrackerStatus } from "../types/tracker";
+import {
+  arenaTomorrowSets,
+  loadCardSnap,
+  markArenaNotifyFired,
+  newCardsBySet,
+  saveCardSnap,
+  shouldFireArenaNotify,
+} from "../services/setPulse";
+import { notifyDesktop } from "../services/notify";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
 
 interface Prefs {
   defaultMode: PlayMode;
+  /** Tray / desktop notify the day before an Arena set drop */
+  notifyArenaEve: boolean;
 }
 
 function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as { defaultMode?: PlayMode };
-      return { defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1" };
+      const parsed = JSON.parse(raw) as {
+        defaultMode?: PlayMode;
+        notifyArenaEve?: boolean;
+      };
+      return {
+        defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1",
+        notifyArenaEve: parsed.notifyArenaEve !== false,
+      };
     }
   } catch {
     /* ignore */
   }
-  return { defaultMode: "bo1" };
+  return { defaultMode: "bo1", notifyArenaEve: true };
 }
 
 function savePrefs(p: Prefs) {
@@ -112,6 +129,8 @@ interface AppState {
   sets: SetsBundle | null;
   setsLoading: boolean;
   setsError: string | null;
+  /** scryfallIds new since last visit, keyed by set code */
+  setsNewByCode: Record<string, string[]>;
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
@@ -119,6 +138,7 @@ interface AppState {
   openFormat: (id: FormatId | string) => void;
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
+  setNotifyArenaEve: (v: boolean) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   clearError: () => void;
@@ -183,6 +203,7 @@ export const useAppStore = create<AppState>((set, get) => {
     sets: null,
     setsLoading: false,
     setsError: null,
+    setsNewByCode: {},
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
@@ -203,6 +224,11 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);
       set({ prefs: next, mode: m });
+    },
+    setNotifyArenaEve: (notifyArenaEve) => {
+      const next = { ...get().prefs, notifyArenaEve };
+      savePrefs(next);
+      set({ prefs: next });
     },
     clearError: () => set({ error: null }),
 
@@ -367,8 +393,29 @@ export const useAppStore = create<AppState>((set, get) => {
     refreshSets: async () => {
       set({ setsLoading: true, setsError: null });
       try {
+        const prevSnap = loadCardSnap();
         const { bundle } = await fetchSetsBundle();
-        set({ sets: bundle, setsLoading: false, setsError: null });
+        const setsNewByCode = newCardsBySet(bundle, prevSnap);
+        saveCardSnap(bundle);
+        set({
+          sets: bundle,
+          setsLoading: false,
+          setsError: null,
+          setsNewByCode,
+        });
+
+        // Opt-in tray/desktop ping the day before Arena drops
+        if (get().prefs.notifyArenaEve && shouldFireArenaNotify()) {
+          const eve = arenaTomorrowSets(bundle);
+          if (eve.length) {
+            const names = eve.map((s) => s.name).join(", ");
+            void notifyDesktop(
+              "Arena drop tomorrow",
+              `${names} hits MTG Arena tomorrow. Open Set Radar for the gallery.`,
+            );
+            markArenaNotifyFired();
+          }
+        }
       } catch (e) {
         set({
           setsLoading: false,

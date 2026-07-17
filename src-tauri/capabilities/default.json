@@ -16,6 +16,7 @@
     "store:default",
     "updater:default",
     "process:default",
+    "notification:default",
     {
       "identifier": "http:default",
       "allow": [

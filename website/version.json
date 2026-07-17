@@ -1,5 +1,5 @@
 {
-  "version": "0.13.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.13.1.exe",
-  "notes": "v0.13.1: Full set card galleries in Set Radar — browse every spoiled card in-app."
+  "version": "0.14.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.14.0.exe",
+  "notes": "v0.14.0: Set Radar pulse — Std/Pio legality, full gallery filters, new-since-last-visit, Decks home banner, Arena-eve notifications."
 }

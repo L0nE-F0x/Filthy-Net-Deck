@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
+import { SpoilerPulse } from "../components/SpoilerPulse";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
@@ -125,6 +126,8 @@ export function Daily() {
           for the full list, curve, and one-click Arena import.
         </p>
       </div>
+
+      <SpoilerPulse />
 
       <div className="format-switcher" role="tablist" aria-label="Format">
         {meta.formats.map((f) => {
