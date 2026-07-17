@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff for whichever agent picks this up next
 
 **Audience:** Any coding agent continuing this project. The owner alternates between **Claude Code** (Fable 5 / Sonnet) and **Grok 4.5** on this repo. Nothing here is model-specific; follow it regardless of which model you are.  
-**Last wrap-up:** 2026-07-17 — Grok 4.5 session after Claude production-polish session; shipped **v0.18.0** end-to-end (Windows signed + macOS dmg rolled).  
+**Last wrap-up:** 2026-07-17 — Claude Fable 5 session after Grok handoff; shipped **v0.19.0** end-to-end (owner refinement batch: fullscreen, Decks hero, Format hub, My Stats decklists — Windows signed + macOS dmg rolled).  
 **Owner product voice:** L0nE-F0x / ApexForge; social: [@MBrewlab](https://x.com/MBrewlab) on X.  
 **Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
 **Live site / downloads / updater:** https://filthy-net-deck.netlify.app/  
@@ -41,13 +41,13 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 | Item | Value |
 |------|--------|
-| **App version** | **0.18.0** — content engine + infra |
-| **Branch / HEAD** | `main` @ `Release v0.18.0 — content engine: diffs, recaps, timeline, match toasts.` (+ follow-up mac roll commit if present) |
-| **Tag** | `v0.18.0` pushed (triggered macOS CI) |
-| **Windows** | Signed installer + `.sig` live: `website/downloads/Filthy-Net-Deck-Setup-0.18.0.exe` · updater `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| **macOS** | **0.18.0** universal dmg on site (CI succeeded; rolled into `website/downloads/`) |
-| **Marketing** | Hero + features + mock match **live app** (Sets / Set Radar in mock nav, no stale “New in v0.12”). OG `?v=0.18.0` |
-| **Netlify** | Publish dir is **`website`**. Confirmed live: `version.json` and `updater/latest.json` → **0.18.0** |
+| **App version** | **0.19.0** — Format hub, decklist sharing, Decks hero, fullscreen |
+| **Branch / HEAD** | `main` @ `Roll v0.19.0 out to macOS; docs to shipped state.` |
+| **Tag** | `v0.19.0` pushed (macOS CI succeeded) |
+| **Windows** | Signed installer + `.sig` live: `website/downloads/Filthy-Net-Deck-Setup-0.19.0.exe` · updater `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` · owner verified in-app **Update & restart** 0.18→0.19 |
+| **macOS** | **0.19.0** universal dmg on site (CI succeeded; rolled into `website/downloads/`) |
+| **Marketing** | Hero/features lead with Format hub + decklist sharing; OG `?v=0.19.0` regenerated |
+| **Netlify** | Publish dir is **`website`**. Confirmed live: `version.json` and `updater/latest.json` → **0.19.0** |
 | **Tests** | `npm test` (vitest) — pure helpers; run after logic changes |
 
 ### Version arc this audit day (do not repeat cadence)
@@ -59,19 +59,15 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **0.16.0** | Matchup intel vs tags, Decks “you X–Y” chips, streaks, CSV |
 | **0.17.0** | Set Radar binder UX, movement chips, hover-art lists, Events filters |
 | **0.18.0** | **Content engine** (diffs, history timeline, you-vs-meta, recap PNG, match toasts) + **infra** (CI alerts, 429 caps, slim feeds, vitest, nav keys 1–7) |
+| **0.19.0** | **Owner refinement batch** (one batched release, per pacing policy): fullscreen (Settings/F11), Decks "Deck to beat" hero, Sets Format hub (rotation + bans), My Stats full decklists + copy |
 
 ---
 
 ## 3. Immediate next tasks (for Claude / next agent)
 
-0. **A refinement batch is staged on `main`** (fullscreen, Decks hero, Format hub, My Stats decklist — ROADMAP Milestone 7). It ships with the **next version bump**; don't cut that release until the owner asks or the batch grows.
-1. **Nothing blocking ship** for 0.18.0 if mac dmg roll already committed on `main`. Confirm live site mac button points at `Filthy-Net-Deck-0.18.0-universal.dmg` and Netlify has the file.
-2. **If mac roll not yet on `main`:** source-only commit (no version bump):
-   - Download: `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v0.18.0/Filthy-Net-Deck-0.18.0-universal.dmg`
-   - Into `website/downloads/`
-   - Fix both mac hrefs + `btn-meta` labels in `website/index.html` (search `0.17.0` / `universal.dmg`)
-   - Commit: `Roll v0.18.0 out to macOS.` · push `main`
-3. **Optional product polish / next milestone** — see `ROADMAP.md` (screenshot carousel deferred; no open M5/M6 checkboxes except owner-decision items).
+1. **Nothing blocking.** v0.19.0 shipped end-to-end on 2026-07-17: signed Windows publish, macOS dmg rolled, marketing + OG live, owner verified the in-app update path.
+2. **Owner marketing push** — X post drafts for v0.19 were delivered; owner posts from [@MBrewlab](https://x.com/MBrewlab). Link unfurls the fresh OG card; no image attachment needed.
+3. **Next product batch** — see `ROADMAP.md` "Suggested next" (screenshot carousel still needs owner assets; signed mac auto-update still an owner decision).
 4. **Do not** cut another app release unless the owner asks or a P0 appears — pacing policy.
 
 ---

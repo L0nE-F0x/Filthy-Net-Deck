@@ -13,6 +13,8 @@
 - [x] Roll v0.17.0 macOS dmg onto the site.
 - [x] **v0.18.0 signed Windows publish** (NSIS + `.sig`, updater, version.json ×2, OG `?v=0.18.0`, tag).
 - [x] **Roll v0.18.0 macOS dmg** onto `website/downloads/` + mac download labels (CI succeeded; asset on GitHub Releases).
+- [x] **v0.19.0 signed Windows publish** (NSIS + `.sig`, updater, version.json ×2, OG `?v=0.19.0`, tag).
+- [x] **Roll v0.19.0 macOS dmg** onto `website/downloads/` + mac download labels.
 
 **Open (low urgency):**
 
@@ -53,11 +55,11 @@ Condensed; detail in git history + `handoff.md`.
 
 ---
 
-## Milestone 7 — Owner refinement batch (source on `main`, unreleased)
+## Milestone 7 — Owner refinement batch — **shipped as v0.19.0** (2026-07-17)
 
-Owner requests, 2026-07-17 (Claude Fable 5 session after Grok handoff). Implemented and
-verified in dev; **ships with the next version bump** per the pacing policy — do not cut a
-release for these alone unless the owner asks.
+Owner requests (Claude Fable 5 session after Grok handoff), released the same day at the
+owner's call: signed Windows publish + updater, macOS dmg rolled, marketing + OG refreshed.
+Owner verified the in-app 0.18→0.19 update.
 
 - [x] **Fullscreen mode** — Settings → Display toggle + F11 anywhere (persists in `bbi.prefs.fullscreen`, applied at boot).
 - [x] **Decks home overhaul** — "Deck to beat" art-backed hero with big stat tiles, top-8 grid right below, meta timeline + you-vs-meta demoted to a two-column row underneath, format switcher inline in the header.
