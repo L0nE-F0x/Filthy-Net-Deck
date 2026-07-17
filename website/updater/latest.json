@@ -1,11 +1,11 @@
 {
-  "version": "0.16.0",
-  "notes": "v0.16.0: your winrate vs every tagged archetype (Matchup Lab + Decks board), today's session, win streaks, winrate trend, opponent search, CSV export.",
-  "pub_date": "2026-07-17T04:50:53Z",
+  "version": "0.17.0",
+  "notes": "v0.17.0: flip through spoilers with arrow keys, Arena drop countdown on the Sets tab, rising/falling deck chips, combinable color filters, hover-art decklists grouped by type, and Events filters.",
+  "pub_date": "2026-07-17T05:08:50Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFvZHlnTUtzNG01UVdYRHNmeW12VEJrNmdrbDBUNGJiMURzTy9ENzFaUGlyaWloS2s2Z2VXOVIybTUrTVZMV0R4OStXVWlWNjFKOHdDYXR4UEpsMFFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYzODMzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTYuMF94NjQtc2V0dXAuZXhlCmlMY29zZ091VmF2cC8xeStBL3lYVU4reGVicjB0SE5US2t3MWQ0UjYvMWJLRktUZFVDR1FMR3lBVHM5VGVXNTVyb0lzN01oYlZycXhSWXduaHFvOENnPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.16.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjVVejU4a3diYnhlZGRHWk1MTVJiSFFYanl2ZUg0dW9uamdQaVVjd0tOVThuOE45ZUxDY2tiYzNyb1ZXK2VNSnhzOVhtNU5jLzlrOThmWTk2NUZ6dGdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjY0NjkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTcuMF94NjQtc2V0dXAuZXhlClNFY1JCd01HSFNxM1pIN3BWSjB3S3FwRzdWdUtBQkpFdXEvMThTN2k3b3BkMUt4TDgzVVcrU3ZLUSt0VjBOMXoxZlFudEtaNGM4OE5vWEdqUWc3VkFRPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.17.0.exe"
     }
   }
 }

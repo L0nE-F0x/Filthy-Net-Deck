@@ -1,5 +1,6 @@
+import { useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import type { TournamentPlatform } from "../types/meta";
+import type { TournamentPlatform, TournamentResult } from "../types/meta";
 import { canShowResultsLink } from "../services/links";
 import { resolveFormatId } from "../services/formatResolve";
 import { openExternal } from "../services/openExternal";
@@ -12,6 +13,22 @@ function platformLabel(p: TournamentPlatform): string {
   if (p === "mtga") return "Arena";
   if (p === "mtgo") return "MTGO";
   return "Paper";
+}
+
+/** "2026-07-15" → "2d ago" / "today" (falls back to the raw date). */
+function relativeDate(iso: string): string {
+  const t = new Date(`${iso}T12:00:00`).getTime();
+  if (Number.isNaN(t)) return iso;
+  const days = Math.round((Date.now() - t) / 86400000);
+  if (days <= 0) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 30) return `${days}d ago`;
+  return iso;
+}
+
+/** Untapped "meta" rows are tracker links, not tournaments — split them out. */
+function isTrackerRow(t: TournamentResult): boolean {
+  return t.source === "untapped" && /-meta$/.test(t.id);
 }
 
 const HIDDEN_SOURCES = new Set(["seed", "spicerack", "placeholder"]);
@@ -30,6 +47,20 @@ export function MetaPulse() {
   const meta = useAppStore((s) => s.meta);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
   const setPage = useAppStore((s) => s.setPage);
+  const [fmtFilter, setFmtFilter] = useState<"all" | "standard" | "pioneer">("all");
+  const [platFilter, setPlatFilter] = useState<"all" | TournamentPlatform>("all");
+
+  const { sorted, trackers } = useMemo(() => {
+    const linked = (meta?.tournaments ?? []).filter((t) => canShowResultsLink(t.url));
+    return {
+      trackers: linked.filter(isTrackerRow),
+      sorted: linked
+        .filter((t) => !isTrackerRow(t))
+        .filter((t) => fmtFilter === "all" || resolveFormatId(String(t.format)) === fmtFilter)
+        .filter((t) => platFilter === "all" || t.platform === platFilter)
+        .sort((a, b) => b.date.localeCompare(a.date)),
+    };
+  }, [meta, fmtFilter, platFilter]);
 
   if (!meta) {
     return (
@@ -43,9 +74,6 @@ export function MetaPulse() {
   const sources = (meta.sources || []).filter(
     (s) => !HIDDEN_SOURCES.has(s.toLowerCase()),
   );
-  const sorted = [...meta.tournaments]
-    .filter((t) => canShowResultsLink(t.url))
-    .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="flex flex-col gap-4 max-w-4xl">
@@ -57,6 +85,63 @@ export function MetaPulse() {
           the official page in your browser. Snapshot {meta.date}.
         </p>
       </div>
+
+      <div className="filter-bar">
+        {(
+          [
+            ["all", "All formats"],
+            ["standard", "Standard"],
+            ["pioneer", "Pioneer"],
+          ] as const
+        ).map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            className={`filter-chip${fmtFilter === k ? " active" : ""}`}
+            onClick={() => setFmtFilter(k)}
+          >
+            {label}
+          </button>
+        ))}
+        <span className="mx-1" />
+        {(
+          [
+            ["all", "All platforms"],
+            ["mtga", "Arena"],
+            ["mtgo", "MTGO"],
+            ["paper", "Paper"],
+          ] as const
+        ).map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            className={`filter-chip${platFilter === k ? " active" : ""}`}
+            onClick={() => setPlatFilter(k)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {trackers.length > 0 && (
+        <section className="panel">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-2">
+            Meta trackers
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {trackers.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className="text-xs px-2.5 py-1 rounded-lg bg-ink-800 border border-ink-600/50 hover:border-gold-500/40 text-foam cursor-pointer"
+                onClick={() => void openExternal(t.url)}
+              >
+                {t.name.replace(/^Untapped\.gg — /, "Untapped.gg · ")}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="panel">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
@@ -113,7 +198,9 @@ export function MetaPulse() {
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className={platformClass(t.platform)}>{platformLabel(t.platform)}</span>
                     <span className="text-xs text-muted uppercase tracking-wide">{t.format}</span>
-                    <span className="text-xs text-muted">{t.date}</span>
+                    <span className="text-xs text-muted" title={t.date}>
+                      {relativeDate(t.date)}
+                    </span>
                     {t.source && (
                       <span className="text-xs text-muted capitalize">· {t.source}</span>
                     )}

@@ -2775,3 +2775,76 @@ select,
   background: color-mix(in srgb, currentColor 10%, transparent);
   white-space: nowrap;
 }
+
+/* --- v0.17: nav countdown badge, mana pips, gallery perf, pending legality --- */
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  color: var(--color-gold-300);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  background: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+}
+.mana-cost { display: inline-flex; gap: 2px; align-items: center; vertical-align: middle; }
+.mana-pip {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #1a1c14;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 25%);
+}
+.mana-pip.pip-generic { background: #b9bdb0; }
+.legal-badge.legal-pending {
+  color: var(--color-fair);
+  border-color: color-mix(in srgb, var(--color-fair) 40%, transparent);
+}
+/* Big galleries: let the browser skip offscreen card cells entirely. */
+.set-gallery-cell { content-visibility: auto; contain-intrinsic-size: 230px 320px; }
+
+/* --- Decks: rank movement chips (v0.17) --- */
+.move-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  white-space: nowrap;
+}
+.move-up { color: var(--color-good); }
+.move-down { color: var(--color-poor); }
+.move-new { color: var(--color-gold-300); }
+
+/* --- Deck view: type group headers + hover art popup (v0.17) --- */
+.card-group-head {
+  margin: 0.6rem 0 0.2rem;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-gold-400);
+}
+.card-list > div:first-child .card-group-head { margin-top: 0; }
+.card-row-hover { position: relative; }
+.card-hover-pop {
+  display: none;
+  position: absolute;
+  left: min(280px, 55%);
+  bottom: 1.4rem;
+  z-index: 40;
+  pointer-events: none;
+  width: 244px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 14px 44px rgb(0 0 0 / 60%);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 30%, transparent);
+}
+.card-hover-pop img { display: block; width: 100%; height: auto; }
+.card-row-hover:hover .card-hover-pop { display: block; }

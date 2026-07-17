@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.16.0";
+export const APP_VERSION = "0.17.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Matchups by archetype: tag opponents and see your real winrate vs each deck",
-  "Decks home shows your record against archetypes you've tagged",
-  "My Stats: today's session, win streak, rolling winrate trend, CSV export",
-  "Plus everything from 0.15: tray autostart, window memory, tray heads-up",
+  "Set Radar: browse spoilers with ← → keys, mana pips, 'at release' legality",
+  "Sets nav shows a countdown when an Arena drop is near",
+  "Decks: rising/falling chips, combine color filters, hover any card for its art",
+  "Deck lists grouped by type with average mana value · Events gets filters",
 ];

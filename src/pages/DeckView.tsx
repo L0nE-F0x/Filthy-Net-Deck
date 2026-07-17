@@ -9,7 +9,86 @@ import { ManaCurve, ColorPie } from "../components/ManaCurve";
 import { IconBack, IconCopy } from "../components/NavIcons";
 import { copyToClipboard } from "../services/arenaImport";
 import { validateDeckNames } from "../services/scryfallValidate";
+import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
+import type { CardEntry } from "../types/meta";
+
+/** One decklist row with a card-art popup on hover (when the id is known). */
+function CardRow({ c, unknown }: { c: CardEntry; unknown: boolean }) {
+  return (
+    <div className={`card-list-row card-row-hover${unknown ? " card-unknown" : ""}`}>
+      <span className="count">{c.count}</span>
+      <span>{c.name}</span>
+      {unknown && <span className="text-[10px] text-poor ml-auto">?</span>}
+      {c.scryfallId ? (
+        <span className="card-hover-pop" aria-hidden="true">
+          <img src={scryfallCdnUrl(c.scryfallId, "normal")} alt="" loading="lazy" />
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+const TYPE_GROUPS: { key: string; label: string }[] = [
+  { key: "creature", label: "Creatures" },
+  { key: "planeswalker", label: "Planeswalkers" },
+  { key: "instant", label: "Instants" },
+  { key: "sorcery", label: "Sorceries" },
+  { key: "enchantment", label: "Enchantments" },
+  { key: "artifact", label: "Artifacts" },
+  { key: "battle", label: "Battles" },
+  { key: "other", label: "Other" },
+  { key: "land", label: "Lands" },
+];
+
+/**
+ * Group the mainboard the way deck sites do. Newer feeds embed a type bucket;
+ * older ones only flag lands (Spells/Lands split); oldest get one flat list.
+ */
+function groupMainboard(
+  cards: CardEntry[],
+): { label: string; cards: CardEntry[]; count: number }[] {
+  const sortGroup = (list: CardEntry[]) =>
+    [...list].sort((a, b) => (a.cmc ?? 99) - (b.cmc ?? 99) || a.name.localeCompare(b.name));
+  const total = (list: CardEntry[]) => list.reduce((n, c) => n + c.count, 0);
+
+  const hasTypeInfo = cards.some((c) => c.type);
+  const hasLandInfo = cards.some((c) => c.land);
+  if (!hasTypeInfo && !hasLandInfo) {
+    return [{ label: "", cards, count: total(cards) }];
+  }
+  if (!hasTypeInfo) {
+    const lands = cards.filter((c) => c.land);
+    const spells = cards.filter((c) => !c.land);
+    return [
+      { label: "Spells", cards: sortGroup(spells), count: total(spells) },
+      { label: "Lands", cards: sortGroup(lands), count: total(lands) },
+    ].filter((g) => g.cards.length > 0);
+  }
+  const byKey = new Map<string, CardEntry[]>();
+  for (const c of cards) {
+    const key = c.land ? "land" : (c.type ?? "other");
+    const list = byKey.get(key) ?? [];
+    list.push(c);
+    byKey.set(key, list);
+  }
+  return TYPE_GROUPS.filter((g) => byKey.has(g.key)).map((g) => {
+    const list = byKey.get(g.key)!;
+    return { label: g.label, cards: sortGroup(list), count: total(list) };
+  });
+}
+
+/** Weighted average mana value of nonland mainboard cards. */
+function averageManaValue(cards: CardEntry[]): number | null {
+  let sum = 0;
+  let n = 0;
+  for (const c of cards) {
+    if (c.land || c.cmc == null) continue;
+    sum += c.cmc * c.count;
+    n += c.count;
+  }
+  return n > 0 ? sum / n : null;
+}
 
 export function DeckView() {
   const meta = useAppStore((s) => s.meta);
@@ -61,11 +140,17 @@ export function DeckView() {
   const mainCount = deck.mainboard.reduce((n, c) => n + c.count, 0);
   const sbCount = deck.sideboard.reduce((n, c) => n + c.count, 0);
   const unknownSet = new Set(unknown.map((n) => n.toLowerCase()));
+  const mainGroups = groupMainboard(deck.mainboard);
+  const avgMv = averageManaValue(deck.mainboard);
 
   const onCopy = async () => {
     const ok = await copyToClipboard(deck.arenaImport);
-    setToast(ok ? "Arena import copied" : "Copy failed — select text manually");
-    setTimeout(() => setToast(null), 2200);
+    setToast(
+      ok
+        ? "Copied! In Arena: Decks → Import Deck"
+        : "Copy failed — select text manually",
+    );
+    setTimeout(() => setToast(null), 3200);
   };
 
   return (
@@ -147,6 +232,12 @@ export function DeckView() {
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0">
                 Mana curve & colors
+                {avgMv != null && (
+                  <span className="text-gold-300 normal-case tracking-normal">
+                    {" "}
+                    · avg MV {avgMv.toFixed(2)}
+                  </span>
+                )}
               </h3>
               <ColorPie colors={deck.colors} />
             </div>
@@ -158,16 +249,16 @@ export function DeckView() {
               Mainboard ({mainCount})
             </h3>
             <div className="card-list selectable">
-              {deck.mainboard.map((c) => (
-                <div
-                  key={c.name}
-                  className={`card-list-row${unknownSet.has(c.name.toLowerCase()) ? " card-unknown" : ""}`}
-                >
-                  <span className="count">{c.count}</span>
-                  <span>{c.name}</span>
-                  {unknownSet.has(c.name.toLowerCase()) && (
-                    <span className="text-[10px] text-poor ml-auto">?</span>
+              {mainGroups.map((g) => (
+                <div key={g.label || "all"}>
+                  {g.label && (
+                    <p className="card-group-head">
+                      {g.label} <span className="text-muted">({g.count})</span>
+                    </p>
                   )}
+                  {g.cards.map((c) => (
+                    <CardRow key={c.name} c={c} unknown={unknownSet.has(c.name.toLowerCase())} />
+                  ))}
                 </div>
               ))}
             </div>
@@ -180,13 +271,7 @@ export function DeckView() {
               </h3>
               <div className="card-list selectable">
                 {deck.sideboard.map((c) => (
-                  <div
-                    key={c.name}
-                    className={`card-list-row${unknownSet.has(c.name.toLowerCase()) ? " card-unknown" : ""}`}
-                  >
-                    <span className="count">{c.count}</span>
-                    <span>{c.name}</span>
-                  </div>
+                  <CardRow key={c.name} c={c} unknown={unknownSet.has(c.name.toLowerCase())} />
                 ))}
               </div>
             </section>

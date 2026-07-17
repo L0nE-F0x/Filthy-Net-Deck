@@ -29,12 +29,14 @@ function filterDecks(
   decks: Deck[],
   q: string,
   tier: 0 | 1 | 2 | 3,
-  color: string | null,
+  colors: string[],
 ): Deck[] {
   const query = q.trim().toLowerCase();
   return decks.filter((d) => {
     if (tier && d.tier !== tier) return false;
-    if (color && !d.colors.includes(color as ManaColor)) return false;
+    // Multi-select colors: the deck must play every selected color.
+    if (colors.length && !colors.every((c) => d.colors.includes(c as ManaColor)))
+      return false;
     if (!query) return true;
     return (
       d.name.toLowerCase().includes(query) ||
@@ -44,13 +46,28 @@ function filterDecks(
   });
 }
 
+type Movement = "up" | "down" | "new";
+
+/** Movement chip (↑ / ↓ / new) from today's meta diff. */
+function MovementChip({ move }: { move: Movement | undefined }) {
+  if (!move) return null;
+  const label = move === "up" ? "↑ rising" : move === "down" ? "↓ falling" : "+ new";
+  return (
+    <span className={`move-chip move-${move}`} title="Rank movement since the previous meta day">
+      {label}
+    </span>
+  );
+}
+
 function DeckMiniCard({
   d,
   vs,
+  move,
   onOpen,
 }: {
   d: Deck;
   vs?: VsRecord;
+  move?: Movement;
   onOpen: () => void;
 }) {
   return (
@@ -64,7 +81,10 @@ function DeckMiniCard({
       tabIndex={0}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold text-gold-400">#{d.rank ?? "—"}</span>
+        <span className="flex items-center gap-1.5">
+          <span className="text-xs font-bold text-gold-400">#{d.rank ?? "—"}</span>
+          <MovementChip move={move} />
+        </span>
         <span className="flex items-center gap-1.5">
           <VsYouChip rec={vs} />
           <TierBadge tier={d.tier} />
@@ -92,8 +112,8 @@ export function Daily() {
   const setSearchQuery = useAppStore((s) => s.setSearchQuery);
   const filterTier = useAppStore((s) => s.filterTier);
   const setFilterTier = useAppStore((s) => s.setFilterTier);
-  const filterColor = useAppStore((s) => s.filterColor);
-  const setFilterColor = useAppStore((s) => s.setFilterColor);
+  const filterColors = useAppStore((s) => s.filterColors);
+  const toggleFilterColor = useAppStore((s) => s.toggleFilterColor);
   const metaDiff = useAppStore((s) => s.metaDiff);
   const dailyFormatId = useAppStore((s) => s.dailyFormatId);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
@@ -121,10 +141,24 @@ export function Daily() {
     () => ({
       q: searchQuery,
       tier: filterTier,
-      color: filterColor,
+      colors: filterColors,
     }),
-    [searchQuery, filterTier, filterColor],
+    [searchQuery, filterTier, filterColors],
   );
+
+  // Deck name → movement for the active format+mode, from today's diff.
+  const activeFmtIdForDiff = activeFmt?.id ?? "";
+  const movementByName = useMemo(() => {
+    const out = new Map<string, Movement>();
+    const ch = metaDiff.changes.find(
+      (c) => c.formatId === activeFmtIdForDiff && c.mode === mode,
+    );
+    if (!ch) return out;
+    for (const n of ch.entered) out.set(n.toLowerCase(), "new");
+    for (const n of ch.rose) out.set(n.toLowerCase(), "up");
+    for (const n of ch.fell) out.set(n.toLowerCase(), "down");
+    return out;
+  }, [metaDiff, activeFmtIdForDiff, mode]);
 
   if (!meta) {
     return (
@@ -141,7 +175,7 @@ export function Daily() {
         decksForMode(activeFmt, mode, meta.decks),
         filterOpts.q,
         filterOpts.tier,
-        filterOpts.color,
+        filterOpts.colors,
       )
     : [];
   const hero = activeFmt ? topDeckForMode(activeFmt, mode, meta.decks) : undefined;
@@ -198,9 +232,9 @@ export function Daily() {
           <button
             key={c}
             type="button"
-            className={`filter-chip${filterColor === c ? " active" : ""}`}
-            onClick={() => setFilterColor(filterColor === c ? null : c)}
-            title={`Filter ${c}`}
+            className={`filter-chip${filterColors.includes(c) ? " active" : ""}`}
+            onClick={() => toggleFilterColor(c)}
+            title={`Filter ${c} — combine colors to find exact pairings`}
           >
             {c}
           </button>
@@ -288,7 +322,13 @@ export function Daily() {
             ) : (
               <div className="format-grid">
                 {activeDecks.map((d) => (
-                  <DeckMiniCard key={d.id} d={d} vs={vsFor(d)} onOpen={() => openDeck(d.id)} />
+                  <DeckMiniCard
+                    key={d.id}
+                    d={d}
+                    vs={vsFor(d)}
+                    move={movementByName.get(d.name.toLowerCase())}
+                    onOpen={() => openDeck(d.id)}
+                  />
                 ))}
               </div>
             )}

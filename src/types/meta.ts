@@ -23,6 +23,16 @@ export interface CardEntry {
   cmc?: number;
   /** True when the card's front face is a land */
   land?: boolean;
+  /** Front-face type bucket from Scryfall (newer feeds only) */
+  type?:
+    | "creature"
+    | "planeswalker"
+    | "instant"
+    | "sorcery"
+    | "enchantment"
+    | "artifact"
+    | "battle"
+    | "other";
 }
 
 export interface Matchup {

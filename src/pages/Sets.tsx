@@ -141,43 +141,79 @@ function cardHasColor(c: SetPreviewCard, col: string): boolean {
   return (c.colors || []).includes(col);
 }
 
-function LegalBadges({ card }: { card: SetPreviewCard }) {
+/** Scryfall marks unreleased cards not_legal until launch day — say so. */
+function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: boolean }) {
   const std = isFormatLegal(card, "standard");
   const pio = isFormatLegal(card, "pioneer");
+  const pendingLabel = unreleased ? "at release" : "—";
   return (
     <div className="legal-badges">
-      <span className={`legal-badge${std ? " legal-yes" : " legal-no"}`}>
-        Std {std ? "legal" : "—"}
+      <span
+        className={`legal-badge${std ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+      >
+        Std {std ? "legal" : pendingLabel}
       </span>
-      <span className={`legal-badge${pio ? " legal-yes" : " legal-no"}`}>
-        Pio {pio ? "legal" : "—"}
+      <span
+        className={`legal-badge${pio ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+      >
+        Pio {pio ? "legal" : pendingLabel}
       </span>
     </div>
+  );
+}
+
+/** "{2}{U}{U}" → colored mana pips (numbers and odd symbols in neutral pips). */
+function ManaCost({ cost }: { cost: string | undefined }) {
+  if (!cost) return null;
+  const symbols = [...cost.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
+  if (symbols.length === 0) return null;
+  return (
+    <span className="mana-cost" aria-label={`Mana cost ${cost}`}>
+      {symbols.map((s, i) => {
+        const single = /^[WUBRG]$/.test(s) ? s.toLowerCase() : null;
+        return (
+          <span key={i} className={`mana-pip ${single ? `pip-${single}` : "pip-generic"}`}>
+            {single ? "" : s}
+          </span>
+        );
+      })}
+    </span>
   );
 }
 
 function CardDetailDrawer({
   card,
   onClose,
+  onStep,
+  position,
+  unreleased,
 }: {
   card: SetPreviewCard;
   onClose: () => void;
+  /** Step to the previous (-1) / next (+1) card in the filtered gallery. */
+  onStep?: (dir: -1 | 1) => void;
+  /** "12 / 250" style position label within the filtered gallery. */
+  position?: string;
+  /** True when the set hasn't launched — legality reads "at release". */
+  unreleased?: boolean;
 }): ReactNode {
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // Modal basics: take focus on open, close on Escape, hand focus back.
+  // Modal basics: take focus on open, Escape closes, ←/→ browse, focus back.
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     drawerRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") onStep?.(-1);
+      else if (e.key === "ArrowRight") onStep?.(1);
     };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       previous?.focus?.();
     };
-  }, [onClose]);
+  }, [onClose, onStep]);
 
   const uri =
     card.scryfallUri || `https://scryfall.com/card/${card.scryfallId}`;
@@ -202,10 +238,15 @@ function CardDetailDrawer({
           <div className="flex justify-between items-start gap-2">
             <div>
               <h3 className="set-drawer-title m-0">{card.name}</h3>
-              <p className="set-drawer-sub m-0">
+              <p className="set-drawer-sub m-0 flex items-center gap-1.5 flex-wrap">
                 #{card.collectorNumber} · {card.rarity}
-                {card.manaCost ? ` · ${card.manaCost}` : ""}
-                {card.cmc != null ? ` · CMC ${card.cmc}` : ""}
+                {card.manaCost ? (
+                  <>
+                    {" · "}
+                    <ManaCost cost={card.manaCost} />
+                  </>
+                ) : null}
+                {card.cmc != null ? ` · MV ${card.cmc}` : ""}
               </p>
             </div>
             <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
@@ -215,7 +256,7 @@ function CardDetailDrawer({
           {card.typeLine ? (
             <p className="set-drawer-type m-0">{card.typeLine}</p>
           ) : null}
-          <LegalBadges card={card} />
+          <LegalBadges card={card} unreleased={unreleased} />
           {card.oracleText ? (
             <div className="set-drawer-oracle">
               {card.oracleText.split("\n").map((line, i) => (
@@ -227,13 +268,40 @@ function CardDetailDrawer({
           ) : (
             <p className="text-xs text-muted m-0">No oracle text in feed.</p>
           )}
-          <button
-            type="button"
-            className="btn btn-primary btn-sm mt-2"
-            onClick={() => void openExternal(uri)}
-          >
-            Open on Scryfall
-          </button>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => void openExternal(uri)}
+            >
+              Open on Scryfall
+            </button>
+            {onStep ? (
+              <span className="flex items-center gap-1 ml-auto">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  aria-label="Previous card"
+                  title="Previous card (←)"
+                  onClick={() => onStep(-1)}
+                >
+                  ‹
+                </button>
+                {position ? (
+                  <span className="text-xs text-muted whitespace-nowrap">{position}</span>
+                ) : null}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  aria-label="Next card"
+                  title="Next card (→)"
+                  onClick={() => onStep(1)}
+                >
+                  ›
+                </button>
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
@@ -260,6 +328,18 @@ function SetGallery({
   const closeFocus = useCallback(() => setFocus(null), []);
 
   const all = useMemo(() => setGalleryCards(set), [set]);
+  const unreleased = set.status === "spoiling" || set.status === "announced";
+  const filteredRef = useRef<SetPreviewCard[]>([]);
+  // ←/→ browse within the CURRENT filter/sort, wrapping at the ends.
+  const stepFocus = useCallback((dir: -1 | 1) => {
+    setFocus((cur) => {
+      const list = filteredRef.current;
+      if (!cur || list.length === 0) return cur;
+      const i = list.findIndex((c) => c.scryfallId === cur.scryfallId);
+      if (i < 0) return list[0];
+      return list[(i + dir + list.length) % list.length];
+    });
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -301,6 +381,7 @@ function SetGallery({
     } else {
       // collector order as shipped
     }
+    filteredRef.current = list;
     return list;
   }, [all, rarity, color, typeF, sort, query, newOnly, newIds]);
 
@@ -497,7 +578,9 @@ function SetGallery({
                       : ""}
                     {isFormatLegal(c, "pioneer") ? "Pio" : ""}
                     {!isFormatLegal(c, "standard") && !isFormatLegal(c, "pioneer")
-                      ? "—"
+                      ? unreleased
+                        ? "at release"
+                        : "—"
                       : ""}
                   </span>
                 </span>
@@ -507,7 +590,18 @@ function SetGallery({
         </div>
       )}
 
-      {focus ? <CardDetailDrawer card={focus} onClose={closeFocus} /> : null}
+      {focus ? (
+        <CardDetailDrawer
+          card={focus}
+          onClose={closeFocus}
+          onStep={stepFocus}
+          unreleased={unreleased}
+          position={(() => {
+            const i = filtered.findIndex((c) => c.scryfallId === focus.scryfallId);
+            return i >= 0 ? `${i + 1} / ${filtered.length}` : undefined;
+          })()}
+        />
+      ) : null}
     </div>
   );
 }

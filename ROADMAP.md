@@ -4,6 +4,15 @@
 **How to use this file:** Work top to bottom. Check items off (`[x]`) as they ship; delete a milestone section once fully shipped. Any user-visible change ships via the **full AGENTS.md release checklist** (version bumps → signed installer → updater/latest.json → version.json ×2 → website links → OG image + meta with `?v=` cache-bust → push → tag → verify live). Source-only pushes are not releases.
 **Handoff note:** If you are a new agent/model picking this up, read `handoff.md` and `AGENTS.md` first. Signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` (ask the owner for the passphrase — never commit it).
 
+> **RELEASE PACING POLICY (owner directive, 2026-07-17):** Version bumps are now
+> **batched into fewer, bigger releases**. 2026-07-17 shipped four versions in one
+> day (0.14.1 → 0.17.0) — do not repeat that cadence. Finish ALL remaining
+> milestone work (5 and 6 below, or whatever remains) on `main`-ready state and
+> cut **one** release when the batch is complete, or when the owner asks for a
+> release for a marketing beat. Data-only refreshes (`npm run meta` / `npm run
+> sets`) still ship anytime without a version bump, and a genuine P0 hotfix may
+> still ship solo.
+
 ---
 
 ## Milestone 1 — v0.14.1 hotfix (IN PROGRESS)
@@ -53,18 +62,19 @@ Remaining correctness/quality items plus the highest-value shell improvements.
 
 ## Milestone 4 — v0.17.0 "Set Radar & Decks upgrades"
 
-- [ ] **Gallery arrow-key navigation** — ←/→ steps through cards while the detail drawer is open; prev/next buttons in the drawer.
-- [ ] **Legality copy for unreleased sets** — "Std — / Pio —" reads as broken pre-release; show "Std at release" for `spoiling`/`announced` sets.
-- [ ] **Render mana costs as colored symbol pips** instead of `{2}{U}` text (drawer + gallery captions).
-- [ ] **"Days until next Arena drop" badge** on the Sets nav item.
-- [ ] **Virtualize the gallery grid** for 300+ card sets (or windowed rendering) — 400 DOM cells with shadows stutter on laptops.
-- [ ] **Decks: per-deck movement chips** (↑2 / ↓1 / new) on deck cards, from the existing metaDiff data.
-- [ ] **Decks: multi-select color filter.**
-- [ ] **Deck view: hover art previews on card rows** (or click → reuse the Sets card drawer with oracle text).
-- [ ] **Deck view: group mainboard by type** (creatures/spells/lands) with counts; show average mana value next to the curve.
-- [ ] **Deck view: post-copy hint** ("paste in Arena → Decks → Import") for newer players.
-- [ ] **Events: format/platform filter chips + relative dates** ("2d ago").
-- [ ] **Events: move Untapped meta-page rows** out of the tournament list into a separate "Meta trackers" strip.
+- [x] **Gallery arrow-key navigation** — ←/→ wraps through the filtered gallery; ‹ › buttons + "n / total" position in the drawer.
+- [x] **Legality copy for unreleased sets** — "Std at release / Pio at release" for `spoiling`/`announced` sets (drawer badges + gallery captions).
+- [x] **Mana costs as colored pips** — `ManaCost` component in the drawer (generic symbols in neutral pips).
+- [x] **"Days until next Arena drop" badge** on the Sets nav item (14-day window, `nextArenaDropInDays`).
+- [x] **Gallery render optimization** — `content-visibility: auto` + intrinsic size on gallery cells (browser skips offscreen cards).
+- [x] **Decks: movement chips** — ↑ rising / ↓ falling / + new from the day's metaDiff.
+- [x] **Decks: multi-select color filter** — AND semantics (deck must play every selected color).
+- [x] **Deck view: hover art previews** on every card row with a known Scryfall id.
+- [x] **Deck view: type grouping + avg MV** — pipeline now embeds a front-face type bucket; older feeds fall back to Spells/Lands, oldest to a flat list.
+- [x] **Deck view: post-copy hint** — "Copied! In Arena: Decks → Import Deck".
+- [x] **Events: format/platform filter chips + relative dates.**
+- [x] **Events: Untapped meta rows moved to a "Meta trackers" strip.**
+- [ ] **Release v0.17.0 end-to-end** (full AGENTS.md checklist; macOS rolls 0.16.0 → 0.17.0 dmg when tag CI finishes — 0.16.0's dmg stays on its GitHub release).
 
 ## Milestone 5 — v0.18.0 "Content engine" (new features)
 

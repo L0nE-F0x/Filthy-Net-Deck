@@ -113,6 +113,18 @@ export function buildSpoilerPulse(
   return items;
 }
 
+/** Days until the nearest upcoming Arena drop (0 = today), or null. */
+export function nextArenaDropInDays(bundle: SetsBundle | null): number | null {
+  if (!bundle?.sets) return null;
+  let best: number | null = null;
+  for (const s of bundle.sets) {
+    const d = daysUntil(s.dates.arena);
+    if (d == null || d < 0) continue;
+    if (best == null || d < best) best = d;
+  }
+  return best;
+}
+
 /** Sets with Arena drop tomorrow (for tray notification). */
 export function arenaTomorrowSets(bundle: SetsBundle | null): UpcomingSet[] {
   if (!bundle?.sets) return [];

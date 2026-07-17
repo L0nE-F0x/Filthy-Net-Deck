@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { nextArenaDropInDays } from "./services/setPulse";
 import { useAppStore } from "./store/useAppStore";
 import { Daily } from "./pages/Daily";
 import { FormatView } from "./pages/FormatView";
@@ -86,7 +87,14 @@ export default function App() {
   const feedStatus = useAppStore((s) => s.feedStatus);
   const lastRefresh = useAppStore((s) => s.lastRefresh);
   const initTracker = useAppStore((s) => s.initTracker);
+  const sets = useAppStore((s) => s.sets);
   const [bootDone, setBootDone] = useState(false);
+
+  // Small countdown chip on the Sets nav item (14-day window, like the pulse).
+  const arenaDropIn = useMemo(() => {
+    const d = nextArenaDropInDays(sets);
+    return d != null && d <= 14 ? d : null;
+  }, [sets]);
 
   useEffect(() => {
     void initTracker();
@@ -142,6 +150,18 @@ export default function App() {
             >
               <item.icon />
               {item.label}
+              {item.id === "sets" && arenaDropIn != null && (
+                <span
+                  className="nav-badge"
+                  title={
+                    arenaDropIn === 0
+                      ? "A set hits Arena today"
+                      : `Next Arena set drop in ${arenaDropIn} day${arenaDropIn === 1 ? "" : "s"}`
+                  }
+                >
+                  {arenaDropIn === 0 ? "now" : `${arenaDropIn}d`}
+                </span>
+              )}
             </button>
           );
         })}

@@ -22,8 +22,21 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function typeBucket(frontTypeLine) {
+  const t = frontTypeLine.toLowerCase();
+  if (t.includes("creature")) return "creature";
+  if (t.includes("planeswalker")) return "planeswalker";
+  if (t.includes("instant")) return "instant";
+  if (t.includes("sorcery")) return "sorcery";
+  if (t.includes("battle")) return "battle";
+  if (t.includes("enchantment")) return "enchantment";
+  if (t.includes("artifact")) return "artifact";
+  return "other";
+}
+
 function keep(card) {
   const typeLine = card.type_line || card.card_faces?.[0]?.type_line || "";
+  const front = typeLine.split("//")[0];
   return {
     name: card.name,
     id: card.id,
@@ -32,7 +45,8 @@ function keep(card) {
     faceName: card.card_faces?.[0]?.name,
     cmc: typeof card.cmc === "number" ? card.cmc : undefined,
     // Front face decides what the card "is" for curve purposes (MDFC lands etc.)
-    isLand: /^[^/]*\bLand\b/.test(typeLine.split("//")[0]),
+    isLand: /^[^/]*\bLand\b/.test(front),
+    type: typeBucket(front),
   };
 }
 
@@ -194,6 +208,7 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
         scryfallId: card.id,
         ...(card.cmc != null ? { cmc: card.cmc } : {}),
         ...(card.isLand ? { land: true } : {}),
+        ...(card.type && !card.isLand ? { type: card.type } : {}),
       });
     }
     return out;

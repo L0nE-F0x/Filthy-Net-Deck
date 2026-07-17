@@ -114,7 +114,8 @@ interface AppState {
   favorites: string[];
   searchQuery: string;
   filterTier: 0 | 1 | 2 | 3;
-  filterColor: string | null;
+  /** Selected color filters — a deck must include EVERY selected color. */
+  filterColors: string[];
   showFavoritesOnly: boolean;
   metaDiff: { previousDate: string | null; changes: MetaChange[] };
   updateAvailable: {
@@ -157,7 +158,8 @@ interface AppState {
   isFavorite: (deckId: string) => boolean;
   setSearchQuery: (q: string) => void;
   setFilterTier: (t: 0 | 1 | 2 | 3) => void;
-  setFilterColor: (c: string | null) => void;
+  toggleFilterColor: (c: string) => void;
+  clearFilterColors: () => void;
   setShowFavoritesOnly: (v: boolean) => void;
   checkForUpdates: () => Promise<VersionCheckResult>;
   installUpdate: () => Promise<void>;
@@ -202,7 +204,7 @@ export const useAppStore = create<AppState>((set, get) => {
     favorites: loadFavorites(),
     searchQuery: "",
     filterTier: 0,
-    filterColor: null,
+    filterColors: [],
     showFavoritesOnly: false,
     metaDiff: { previousDate: null, changes: [] },
     updateAvailable: null,
@@ -267,7 +269,13 @@ export const useAppStore = create<AppState>((set, get) => {
 
     setSearchQuery: (searchQuery) => set({ searchQuery }),
     setFilterTier: (filterTier) => set({ filterTier }),
-    setFilterColor: (filterColor) => set({ filterColor }),
+    toggleFilterColor: (c) => {
+      const cur = get().filterColors;
+      set({
+        filterColors: cur.includes(c) ? cur.filter((x) => x !== c) : [...cur, c],
+      });
+    },
+    clearFilterColors: () => set({ filterColors: [] }),
     setShowFavoritesOnly: (showFavoritesOnly) => set({ showFavoritesOnly }),
 
     checkForUpdates: async () => {
