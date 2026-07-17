@@ -10,16 +10,13 @@ import {
   timeAgo,
 } from "../services/tracker";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
+import { isLandName } from "../services/landNames";
 import {
   resolveArenaCards,
   type ArenaCardInfo,
 } from "../services/arenaCards";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
-
-/** Rough land filter for Arena-id lists (we only have names after Scryfall resolve). */
-const LANDISH =
-  /^(Plains|Island|Swamp|Mountain|Forest|Snow-Covered|Wastes)|Verge$|Pathway$|Canal$|Reef$|Shores$|Coast$|Fountain$|Vents$|Crypt$|Tomb$|Town$|Sewers$|Archive$|Falls$|Theater$|Backstreet$|District$|Maze$|Portico$|Monastery$|Village$|^Restless |^Starting Town|Brushland|Razorverge|Llanowar Wastes|Underground River|Shivan Reef|Adarkar|Battlefield Forge|Caves of Koilos|Concealed Courtyard|Blooming Marsh|Blackcleave|Inspiring Vantage|Spirebluff|Seachrome|Darkslick|Hushwood|Wastewood|Floodfarm|Gloomlake|Commercial District|Hedge Maze|Lush Portico|Meticulous|Shadowy|Undercity|Thundering|Raucous|Boseiju|Otawara|Eiganjo|Takenuma|Sokenzan|Lair of the Hydra|Rockface|Den of the Bugbear|Command Tower|Breeding Pool|Hallowed Fountain|Watery Grave|Overgrown Tomb|Temple Garden|Godless Shrine|Blood Crypt|Steam Vents|Sacred Foundry|Stomping Ground|Flooded Strand|Polluted Delta|Misty Rainforest|Windswept Heath|Wooded Foothills|Bloodstained Mire|Marsh Flats|Scalding Tarn|Arid Mesa|Verdant Catacombs|Fabled Passage|Mana Confluence|Multiversal Passage|Great Hall|Mistrise|Stormcarved|Shattered Sanctum|Cori Mountain/i;
 
 function pickArenaPreview(
   main: number[] | undefined,
@@ -36,7 +33,7 @@ function pickArenaPreview(
     const info = cards[id];
     if (!info?.name) continue;
     const ref: ArtRef = { name: info.name, scryfallId: info.scryfallId };
-    if (LANDISH.test(info.name)) lands.push(ref);
+    if (isLandName(info.name)) lands.push(ref);
     else spells.push(ref);
   }
   return [...spells, ...lands].slice(0, max);

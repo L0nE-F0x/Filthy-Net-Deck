@@ -1,6 +1,7 @@
 import type { MetaBundle } from "../types/meta";
 
 const SNAPSHOT_KEY = "bbi.meta.snapshot";
+const DIFF_KEY = "bbi.meta.lastDiff";
 
 export interface MetaChange {
   formatId: string;
@@ -45,12 +46,44 @@ export function loadPreviousSnapshot(): {
   }
 }
 
+interface StoredDiff {
+  /** Meta date this diff was computed FOR (the newer side). */
+  forDate: string;
+  previousDate: string;
+  changes: MetaChange[];
+}
+
+function loadStoredDiff(): StoredDiff | null {
+  try {
+    const raw = localStorage.getItem(DIFF_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as StoredDiff;
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredDiff(diff: StoredDiff) {
+  try {
+    localStorage.setItem(DIFF_KEY, JSON.stringify(diff));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function computeDiff(current: MetaBundle): {
   previousDate: string | null;
   changes: MetaChange[];
 } {
   const prev = loadPreviousSnapshot();
   if (!prev || prev.date === current.date) {
+    // Same-day re-sync: the snapshot already matches today's feed, but the
+    // day's movement was computed on the first sync — keep showing it instead
+    // of blanking the "Meta moved" panel mid-session.
+    const stored = loadStoredDiff();
+    if (stored && stored.forDate === current.date && stored.changes.length) {
+      return { previousDate: stored.previousDate, changes: stored.changes };
+    }
     return { previousDate: prev?.date ?? null, changes: [] };
   }
 
@@ -89,5 +122,6 @@ export function computeDiff(current: MetaBundle): {
       }
     }
   }
+  saveStoredDiff({ forDate: current.date, previousDate: prev.date, changes });
   return { previousDate: prev.date, changes };
 }

@@ -1,7 +1,34 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { APP_VERSION } from "../version";
+import { APP_VERSION, WHATS_NEW } from "../version";
 import { downloadInstaller } from "../services/openExternal";
+
+const LAST_SEEN_VERSION_KEY = "bbi.lastSeenVersion";
+
+/**
+ * True exactly once per version: when a previously-run version differs from
+ * the current one. Fresh installs record the version silently (no banner).
+ */
+function shouldShowWhatsNew(): boolean {
+  try {
+    const seen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
+    if (!seen) {
+      localStorage.setItem(LAST_SEEN_VERSION_KEY, APP_VERSION);
+      return false;
+    }
+    return seen !== APP_VERSION && WHATS_NEW.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function markWhatsNewSeen() {
+  try {
+    localStorage.setItem(LAST_SEEN_VERSION_KEY, APP_VERSION);
+  } catch {
+    /* ignore */
+  }
+}
 
 export function StatusBanners() {
   const feedStatus = useAppStore((s) => s.feedStatus);
@@ -12,8 +39,31 @@ export function StatusBanners() {
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
   const metaDiff = useAppStore((s) => s.metaDiff);
+  const [showWhatsNew, setShowWhatsNew] = useState(() => shouldShowWhatsNew());
 
   const banners: { key: string; className: string; body: ReactNode }[] = [];
+
+  if (showWhatsNew) {
+    banners.push({
+      key: "whats-new",
+      className: "banner banner-gold",
+      body: (
+        <>
+          <strong>Updated to v{APP_VERSION}</strong> — {WHATS_NEW.join(" · ")}.{" "}
+          <button
+            type="button"
+            className="update-dismiss"
+            onClick={() => {
+              markWhatsNewSeen();
+              setShowWhatsNew(false);
+            }}
+          >
+            Got it
+          </button>
+        </>
+      ),
+    });
+  }
 
   if (feedStatus === "cached") {
     banners.push({

@@ -1,4 +1,5 @@
 /** Validate deck card names against Scryfall (throttled, cached). */
+import { apiFetch } from "./http";
 
 const cache = new Map<string, boolean | "pending">();
 const queue: Array<() => void> = [];
@@ -19,7 +20,7 @@ function runQueue() {
 function throttledFetch(url: string): Promise<Response> {
   return new Promise((resolve, reject) => {
     queue.push(() => {
-      fetch(url, { headers: { Accept: "application/json" } })
+      apiFetch(url, { headers: { Accept: "application/json" } })
         .then((r) => {
           setTimeout(() => {
             active--;

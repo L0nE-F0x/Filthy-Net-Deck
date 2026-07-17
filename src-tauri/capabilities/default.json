@@ -12,6 +12,7 @@
     "core:window:allow-is-visible",
     "core:window:allow-is-minimized",
     "core:tray:default",
+    "autostart:default",
     "opener:default",
     "store:default",
     "updater:default",

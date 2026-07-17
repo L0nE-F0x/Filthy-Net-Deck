@@ -7,6 +7,8 @@
  * work offline after first sight.
  */
 
+import { apiFetch } from "./http";
+
 export type ArenaCardInfo = {
   name: string;
   scryfallId?: string;
@@ -16,8 +18,6 @@ const CACHE_KEY = "bbi.arenaCards.v3";
 const LEGACY_KEYS = ["bbi.arenaCards.v2", "bbi.arenaCardNames"];
 const MAX_CONCURRENT = 4;
 const DELAY_MS = 50;
-/** Scryfall requires a descriptive User-Agent on API calls. */
-const UA = "FilthyNetDeck/0.12 (https://filthy-net-deck.netlify.app; local companion)";
 
 let memCache: Record<number, ArenaCardInfo> | null = null;
 /** Ids Scryfall said it does not know — skip re-fetching every session. */
@@ -82,11 +82,8 @@ type ArenaApiCard = {
 
 async function fetchArenaCard(arenaId: number): Promise<ArenaCardInfo | null> {
   try {
-    const res = await fetch(`https://api.scryfall.com/cards/arena/${arenaId}`, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": UA,
-      },
+    const res = await apiFetch(`https://api.scryfall.com/cards/arena/${arenaId}`, {
+      headers: { Accept: "application/json" },
     });
     if (res.status === 404) {
       notFound.add(arenaId);

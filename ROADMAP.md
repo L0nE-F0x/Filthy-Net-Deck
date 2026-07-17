@@ -25,18 +25,19 @@ Critical fixes before the social-media marketing push.
 
 Remaining correctness/quality items plus the highest-value shell improvements.
 
-- [ ] **Meta-movement panel disappears mid-session** — `computeDiff`/`saveSnapshot` overwrite means the "Meta moved" banner + Decks diff panel vanish on the next hourly sync. Persist the day's diff (e.g. store the last non-empty diff with its date in localStorage) so it survives until the next meta day.
-- [ ] **Events: Limited events mislabeled as Standard** — `mapMeleeFormat` in `pipeline/sources/melee.mjs` defaults unknown formats to "standard"; drop draft/sealed/limited events instead.
-- [ ] **plugin-http decision** — it's initialized (Rust + capabilities + package.json) but unused from TS. Either remove it entirely, or route Scryfall API calls through it so the descriptive `User-Agent` header actually gets sent (browser `fetch` silently drops UA). Remove the misleading UA headers from `src/services/scryfall.ts` / `arenaCards.ts` if staying on plain fetch.
-- [ ] **CSP/capability tightening** — drop unused `frame-src` entries (goldfish/melee/untapped; app renders no iframes); narrow `img-src https://*.netlify.app` to the app's own domain (`src-tauri/tauri.conf.json`).
-- [ ] **Launch at startup (minimized to tray)** — tauri autostart plugin + Settings toggle. Biggest tracker-data-completeness lever: a tracker that isn't running records nothing.
-- [ ] **First-time "still running in the tray" toast/notification** when the user closes the window (close currently hides silently — `hide_to_tray` in `src-tauri/src/lib.rs`). Show once, remember in prefs.
-- [ ] **Window state persistence** (size/position) via `tauri-plugin-window-state`.
-- [ ] **"What's new" panel** — after an update installs, show the release notes once (version delta vs last-seen version in localStorage; notes already ship in `updater/latest.json`).
-- [ ] **Persist last-selected format** on the Decks page (localStorage, like other prefs).
-- [ ] **Dedupe the land-detection regex** — twin 60-line regexes in `src/pages/Stats.tsx` and `src/components/CardArt.tsx`; extract one shared module.
+- [x] **Meta-movement panel disappears mid-session** — the day's diff is persisted (`bbi.meta.lastDiff`) and re-served on same-day re-syncs.
+- [x] **Events: Limited events mislabeled as Standard** — `mapMeleeFormat` now maps draft/sealed/limited/cube/prerelease to "limited" (dropped by build-meta).
+- [x] **plugin-http decision** — Scryfall API calls now route through `apiFetch` (`src/services/http.ts`): Tauri HTTP plugin in the desktop app (real User-Agent), plain fetch fallback in the browser.
+- [x] **CSP/capability tightening** — `frame-src 'none'`, `img-src` narrowed to the app's own Netlify domain.
+- [x] **Launch at startup (minimized to tray)** — tauri-plugin-autostart with `--hidden` flag (boots hidden to tray) + "Start with your PC" toggle in Settings.
+- [x] **First-time "still running in the tray" notification** on close-to-tray (one-time marker file in app data).
+- [x] **Window state persistence** — tauri-plugin-window-state (visibility flag excluded; tray logic owns it).
+- [x] **"What's new" panel** — one-time banner after an update, driven by `WHATS_NEW` in `src/version.ts` vs `bbi.lastSeenVersion`.
+- [x] **Persist last-selected format** — `prefs.lastFormatId`, restored on launch.
+- [x] **Dedupe the land-detection regex** — shared `src/services/landNames.ts`.
+- [ ] **Release v0.15.0 end-to-end** (full AGENTS.md checklist + macOS dmg roll after tag CI).
 - [x] **Marketing site: SmartScreen note** — already present in the download section (audit missed it); nothing to do.
-- [ ] **Marketing site: real screenshot/GIF carousel** (Set Radar gallery, Climb chart, Stats) to replace/augment the CSS mock for video traffic.
+- [ ] **Marketing site: real screenshot/GIF carousel** (Set Radar gallery, Climb chart, Stats) to replace/augment the CSS mock for video traffic. *Deferred: needs real app screenshots from the owner's machine (with tracker data visible) — capture at 1280×860, drop in `website/assets/`, then wire the carousel.*
 
 ## Milestone 3 — v0.16.0 "Stats & Matchup upgrades"
 

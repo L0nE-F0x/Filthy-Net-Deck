@@ -8,6 +8,8 @@
  * which is worse than showing no image at all.
  */
 
+import { apiFetch } from "./http";
+
 export type ArtSize = "small" | "normal" | "art_crop";
 
 /** Direct CDN URL from a scryfall card id — no API round-trip needed. */
@@ -32,17 +34,10 @@ function runQueue() {
   }
 }
 
-const UA = "FilthyNetDeck/0.12 (https://filthy-net-deck.netlify.app; local companion)";
-
 function throttledFetch(url: string): Promise<Response> {
   return new Promise((resolve, reject) => {
     queue.push(() => {
-      fetch(url, {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": UA,
-        },
-      })
+      apiFetch(url, { headers: { Accept: "application/json" } })
         .then((r) => {
           setTimeout(() => {
             active--;

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
+import { isTauri } from "../services/appUpdater";
+import { isAutostartEnabled, setAutostart } from "../services/autostart";
 
 export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
@@ -16,6 +18,18 @@ export function Settings() {
   const meta = useAppStore((s) => s.meta);
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
+  const [autostart, setAutostartState] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!isTauri()) return;
+    let alive = true;
+    void isAutostartEnabled().then((on) => {
+      if (alive) setAutostartState(on);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-4 max-w-xl">
@@ -48,6 +62,29 @@ export function Settings() {
           Notify me the day before Arena set drops
         </label>
       </section>
+
+      {isTauri() && (
+        <section className="panel">
+          <h3 className="text-sm font-semibold m-0 mb-1">Start with your PC</h3>
+          <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+            Launches quietly in the tray when you log in, so your Arena matches are always
+            tracked — even when you forget to open the app first.
+          </p>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autostart === true}
+              disabled={autostart === null}
+              onChange={(e) => {
+                const want = e.target.checked;
+                setAutostartState(want);
+                void setAutostart(want).then((actual) => setAutostartState(actual));
+              }}
+            />
+            Start Filthy Net Deck when I log in
+          </label>
+        </section>
+      )}
 
       <section className="panel">
         <h3 className="text-sm font-semibold m-0 mb-1">Updates</h3>

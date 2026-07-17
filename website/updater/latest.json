@@ -1,11 +1,11 @@
 {
-  "version": "0.14.1",
-  "notes": "v0.14.1: daily meta now syncs reliably on installed apps, new-spoiler badges stick until you visit Set Radar, Esc closes the card viewer, update reminders respect Later.",
-  "pub_date": "2026-07-17T04:11:27Z",
+  "version": "0.15.0",
+  "notes": "v0.15.0: start with your PC (tray autostart) so every match is tracked, window and last format remembered, tray heads-up on first close, what's-new note after updates.",
+  "pub_date": "2026-07-17T04:37:24Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlBMENJaHJiclUwSXFqRkdENGl1TWFpMXk0eU9WN2k2ZU9CWTN4bEszTURLTVFPMTZFYkk1bTBicXprSitFS3hlRE8vNGdNZGdEazVlM2RkUEtZVXdRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYxNDY3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTQuMV94NjQtc2V0dXAuZXhlCkk2YTFKNUUzSjc5TUwrb1NVOE1pVk5LODJIQ1dMd0hnQWFwTVhNck0vWXhzRFpGejlDU0MzRVNaalJQWjNFQm1VZWVnQUpqK2I2b0VaSGpHa05XZ0NBPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.14.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjhLbFU3TTFpWUxiTHNVUk9xU004a0Nxa2taa3dHSlJFVXZDSUNQR3RPbERTT3JVOUVIa1JyZnVpR1hUOFI4eHpFT1NsK2ZwOU5kdGdEeWRFT21BNXdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjYyODM3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTUuMF94NjQtc2V0dXAuZXhlCkkrT2dUaXFVeXcwU0JJMFI1VHZSdmtrOW5VVmNCSzFXTWhML0ZUT2JSSFZKcjM4T1lxdWU4VlZhZUdrYkdFUGxRNDNFdVNDazRGbkUyVDhwdG4rYkNnPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.15.0.exe"
     }
   }
 }

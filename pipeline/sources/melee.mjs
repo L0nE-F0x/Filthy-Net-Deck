@@ -8,6 +8,9 @@ const UA =
 
 function mapMeleeFormat(formatString = "") {
   const f = formatString.toLowerCase();
+  // Limited events must never fall through to the "standard" default —
+  // build-meta only keeps standard/pioneer, so "limited" gets them dropped.
+  if (/draft|sealed|limited|cube|prerelease/.test(f)) return "limited";
   if (f.includes("alchemy")) return "alchemy";
   if (f.includes("historic brawl")) return "historic_brawl";
   if (f.includes("standard brawl") || (f.includes("brawl") && f.includes("standard")))

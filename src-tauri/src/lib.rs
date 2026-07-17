@@ -19,6 +19,27 @@ fn hide_to_tray(window: &tauri::Window) {
     let _ = window.hide();
 }
 
+/// One-time toast the first time the window closes to the tray, so users
+/// know the tracker is still running instead of thinking the app quit.
+fn notify_tray_hint_once(app: &tauri::AppHandle) {
+    use tauri_plugin_notification::NotificationExt;
+    let Ok(dir) = app.path().app_data_dir() else {
+        return;
+    };
+    let marker = dir.join("tray-hint-shown");
+    if marker.exists() {
+        return;
+    }
+    let _ = std::fs::create_dir_all(&dir);
+    let _ = std::fs::write(&marker, b"1");
+    let _ = app
+        .notification()
+        .builder()
+        .title("Still running in the tray")
+        .body("Filthy Net Deck keeps tracking Arena from the system tray. Right-click the tray icon to quit for real.")
+        .show();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -40,6 +61,27 @@ pub fn run() {
                 app.handle()
                     .plugin(tauri_plugin_updater::Builder::new().build())?;
                 app.handle().plugin(tauri_plugin_process::init())?;
+                // "Start with Windows" opt-in (Settings). --hidden boots
+                // straight to the tray so login isn't interrupted.
+                app.handle().plugin(tauri_plugin_autostart::init(
+                    tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+                    Some(vec!["--hidden"]),
+                ))?;
+                // Remember window size/position between launches. Visibility
+                // is excluded: --hidden / tray logic owns that.
+                app.handle().plugin(
+                    tauri_plugin_window_state::Builder::new()
+                        .with_state_flags(
+                            tauri_plugin_window_state::StateFlags::all()
+                                - tauri_plugin_window_state::StateFlags::VISIBLE,
+                        )
+                        .build(),
+                )?;
+                if std::env::args().any(|a| a == "--hidden") {
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.hide();
+                    }
+                }
             }
 
             // Winrate tracker: tail MTG Arena's Player.log in the background.
@@ -93,6 +135,7 @@ pub fn run() {
         .on_window_event(|window, event| match event {
             WindowEvent::CloseRequested { api, .. } => {
                 hide_to_tray(window);
+                notify_tray_hint_once(window.app_handle());
                 api.prevent_close();
             }
             WindowEvent::Resized(_) => {

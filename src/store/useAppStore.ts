@@ -41,6 +41,8 @@ interface Prefs {
   defaultMode: PlayMode;
   /** Tray / desktop notify the day before an Arena set drop */
   notifyArenaEve: boolean;
+  /** Format shown on the Decks home last time — restored on next launch. */
+  lastFormatId?: FormatId;
 }
 
 function loadPrefs(): Prefs {
@@ -50,10 +52,15 @@ function loadPrefs(): Prefs {
       const parsed = JSON.parse(raw) as {
         defaultMode?: PlayMode;
         notifyArenaEve?: boolean;
+        lastFormatId?: string;
       };
       return {
         defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1",
         notifyArenaEve: parsed.notifyArenaEve !== false,
+        lastFormatId:
+          parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
+            ? parsed.lastFormatId
+            : undefined,
       };
     }
   } catch {
@@ -183,7 +190,7 @@ export const useAppStore = create<AppState>((set, get) => {
     page: "daily",
     mode: prefs.defaultMode,
     selectedFormatId: null,
-    dailyFormatId: null,
+    dailyFormatId: prefs.lastFormatId ?? null,
     selectedDeckId: null,
     meta: null,
     metaSource: null,
@@ -212,15 +219,26 @@ export const useAppStore = create<AppState>((set, get) => {
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
-    setDailyFormatId: (dailyFormatId) => set({ dailyFormatId }),
+    setDailyFormatId: (dailyFormatId) => {
+      if (dailyFormatId) {
+        const next = { ...get().prefs, lastFormatId: dailyFormatId };
+        savePrefs(next);
+        set({ dailyFormatId, prefs: next });
+        return;
+      }
+      set({ dailyFormatId });
+    },
     openFormat: (id) => {
       const resolved = resolveFormatId(String(id)) ?? (id as FormatId);
+      const next = { ...get().prefs, lastFormatId: resolved };
+      savePrefs(next);
       set({
         selectedFormatId: resolved,
         dailyFormatId: resolved,
         page: "format",
         selectedDeckId: null,
         showFavoritesOnly: false,
+        prefs: next,
       });
     },
     openDeck: (deckId) =>
