@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "0.17.0",
   "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.17.0.exe",
   "notes": "v0.17.0: flip through spoilers with arrow keys, Arena drop countdown on the Sets tab, rising/falling deck chips, combinable color filters, hover-art decklists grouped by type, and Events filters. v0.18 content-engine is built in source and awaiting signed Windows publish."
