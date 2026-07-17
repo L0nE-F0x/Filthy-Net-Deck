@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +27,12 @@ jobs:
       # published (real) meta stays live rather than shipping anything stale-labeled
       # as fresh or fabricated.
       - name: Build live meta (Standard + Pioneer)
+        id: build_meta
         run: npm run meta
         continue-on-error: true
 
       - name: Build set radar (Arena-first spoilers, no Alchemy)
+        id: build_sets
         run: npm run sets
         continue-on-error: true
 
@@ -44,3 +47,50 @@ jobs:
             git commit -m "chore: daily meta refresh $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      - name: Open/update failure issue when pipeline steps fail
+        if: steps.build_meta.outcome == 'failure' || steps.build_sets.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const metaFail = '${{ steps.build_meta.outcome }}' === 'failure';
+            const setsFail = '${{ steps.build_sets.outcome }}' === 'failure';
+            const title = 'Daily meta pipeline failure';
+            const body = [
+              '## Daily meta pipeline reported a failure',
+              '',
+              `- meta step: **${'${{ steps.build_meta.outcome }}'}**`,
+              `- sets step: **${'${{ steps.build_sets.outcome }}'}**`,
+              `- run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              `- when: ${new Date().toISOString()}`,
+              '',
+              metaFail ? '- `npm run meta` failed (previous latest.json left untouched if abort).' : '',
+              setsFail ? '- `npm run sets` failed (previous sets.json left untouched if abort).' : '',
+              '',
+              '_Auto-opened so silent meta rot is impossible. Close when fixed._',
+            ].filter(Boolean).join('\n');
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'pipeline-failure',
+              per_page: 10,
+            });
+            const existing = issues.data.find((i) => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['pipeline-failure'],
+              });
+            }

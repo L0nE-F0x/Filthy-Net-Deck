@@ -39,11 +39,11 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 | Item | Value |
 |------|--------|
-| **App version** | **0.17.0** (live on Windows + macOS) |
+| **App version** | **Source tree is 0.18.0** (content engine + infra). **Live installers still 0.17.0** until a signed Windows build with passphrase lands. |
 | **Branch** | `main` (releases ship on `main`, not long-lived feature branches) |
-| **Latest release commit** | `Release v0.17.0 — Set Radar spoiler browser, deck movement, hover-art lists.` |
-| **Windows** | Signed installer + updater `latest.json` published under `website/downloads/` and `website/updater/`. Verified live and matches the signed `.sig`. |
-| **macOS** | dmg on the site is **v0.16.0** (one version behind Windows) — the v0.17.0 tag's macOS CI was still running when this session ended. **First task for the next session:** check `https://api.github.com/repos/L0nE-F0x/Filthy-Net-Deck/actions/runs` for the `v0.17.0` macOS build; once it's `completed`/`success`, pull the dmg from the GitHub release and roll it in (same pattern as prior "Roll vX out to macOS" commits — see §5.3 of this doc). This is a **source-only follow-up commit**, not a new version bump. |
+| **Latest published installers** | Windows + macOS **0.17.0** under `website/downloads/`. |
+| **Windows** | Signed 0.17.0 installer + updater live. **0.18.0 signed publish blocked** without Tauri key passphrase. |
+| **macOS** | **v0.17.0** dmg rolled onto the site. v0.18.0 dmg after tag + CI when the signed Windows release is cut. |
 | **Netlify** | Publish dir is **`website`** (not `dist`). Auto-deploys on push to `main`. |
 | **Daily data** | GitHub Action `.github/workflows/daily-meta.yml` runs `npm run meta` + `npm run sets`, commits `website/meta` + `public/meta`. Confirmed live meta feed is current (`2026-07-17`) as of this session. |
 

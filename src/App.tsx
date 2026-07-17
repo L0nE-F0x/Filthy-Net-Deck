@@ -102,6 +102,30 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Keyboard shortcuts 1–7 jump to main nav pages (Milestone 6).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const t = e.target as HTMLElement | null;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.tagName === "SELECT" ||
+          t.isContentEditable)
+      ) {
+        return;
+      }
+      const idx = Number(e.key) - 1;
+      if (idx >= 0 && idx < NAV.length) {
+        e.preventDefault();
+        setPage(NAV[idx].id);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [setPage]);
+
   // No manual Refresh button: the app syncs itself — on launch, on focus or
   // hourly when the copy is >90 min old, and immediately when connectivity
   // returns. The published feed only changes when the daily pipeline runs.

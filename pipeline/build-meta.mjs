@@ -15,7 +15,7 @@
  * Usage: node pipeline/build-meta.mjs
  */
 
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -185,14 +185,74 @@ async function collectTournaments() {
   return merged.slice(0, 40);
 }
 
-function writeMeta(bundle) {
+/** Compact meta-share timeline (last ~45 days) for the app chart. */
+function updateHistory(bundle) {
   const targets = [join(root, "website", "meta"), join(root, "public", "meta")];
-  const json = JSON.stringify(bundle, null, 2);
+  const historyPath = join(targets[0], "history.json");
+  let existing = [];
+  if (existsSync(historyPath)) {
+    try {
+      const raw = JSON.parse(readFileSync(historyPath, "utf8"));
+      existing = Array.isArray(raw?.points) ? raw.points : Array.isArray(raw) ? raw : [];
+    } catch {
+      existing = [];
+    }
+  }
+
+  const dayRows = [];
+  for (const fmt of bundle.formats || []) {
+    for (const mode of ["bo1", "bo3"]) {
+      const ids = mode === "bo1" ? fmt.bo1DeckIds || [] : fmt.bo3DeckIds || [];
+      for (const id of ids) {
+        const d = bundle.decks?.[id];
+        if (!d) continue;
+        dayRows.push({
+          date: bundle.date,
+          format: fmt.id,
+          mode,
+          archetype: d.archetype || d.name,
+          pct: Number(d.metaShare) || 0,
+        });
+      }
+    }
+  }
+
+  // Drop same-day/format/mode rows then append, keep 45 unique dates.
+  const modesTouched = new Set(dayRows.map((r) => `${r.format}|${r.mode}`));
+  const kept = existing.filter(
+    (p) => !(p.date === bundle.date && modesTouched.has(`${p.format}|${p.mode}`)),
+  );
+  const merged = [...kept, ...dayRows];
+  const dates = [...new Set(merged.map((p) => p.date))].sort();
+  const maxDays = 45;
+  const dropBefore = dates.length > maxDays ? dates[dates.length - maxDays] : null;
+  const points = (dropBefore ? merged.filter((p) => p.date >= dropBefore) : merged).sort(
+    (a, b) =>
+      a.date.localeCompare(b.date) ||
+      a.format.localeCompare(b.format) ||
+      a.mode.localeCompare(b.mode) ||
+      String(a.archetype).localeCompare(String(b.archetype)),
+  );
+  const history = { updated: new Date().toISOString(), points };
+  const histJson = JSON.stringify(history);
   for (const dir of targets) {
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "latest.json"), json);
-    writeFileSync(join(dir, `${bundle.date}.json`), json);
+    writeFileSync(join(dir, "history.json"), histJson);
   }
+  console.log(`  history.json · ${points.length} points · ${dates.length} days`);
+}
+
+function writeMeta(bundle) {
+  const targets = [join(root, "website", "meta"), join(root, "public", "meta")];
+  // Minified latest for CDN size; pretty dated archive for human diffs.
+  const latestJson = JSON.stringify(bundle);
+  const archiveJson = JSON.stringify(bundle, null, 2);
+  for (const dir of targets) {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "latest.json"), latestJson);
+    writeFileSync(join(dir, `${bundle.date}.json`), archiveJson);
+  }
+  updateHistory(bundle);
   const deckCount = Object.keys(bundle.decks || {}).length;
   console.log(
     `Wrote meta ${bundle.date} · formats=${bundle.formats.length} · decks=${deckCount} · tournaments=${bundle.tournaments?.length ?? 0}`,

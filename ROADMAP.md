@@ -7,58 +7,47 @@
 > **RELEASE PACING POLICY (owner directive, 2026-07-17):** Version bumps are now
 > **batched into fewer, bigger releases**. 2026-07-17 shipped four versions in one
 > day (0.14.1 → 0.17.0) — do not repeat that cadence. Finish ALL remaining
-> milestone work (5 and 6 below, or whatever remains) on `main`-ready state and
-> cut **one** release when the batch is complete, or when the owner asks for a
-> release for a marketing beat. Data-only refreshes (`npm run meta` / `npm run
-> sets`) still ship anytime without a version bump, and a genuine P0 hotfix may
-> still ship solo.
+> milestone work on `main`-ready state and cut **one** release when the batch is
+> complete, or when the owner asks for a release for a marketing beat. Data-only
+> refreshes (`npm run meta` / `npm run sets`) still ship anytime without a version
+> bump, and a genuine P0 hotfix may still ship solo.
 
 ---
 
-## ⚠️ Immediate next task (source-only, no version bump)
+## Immediate follow-ups (source-only until passphrase / mac CI)
 
-**Roll the v0.17.0 macOS dmg.** Windows shipped v0.17.0; the macOS CI for tag `v0.17.0`
-was still running when the previous session ended, so the site's mac download is
-one version behind (v0.16.0). Steps:
-
-1. Check `https://api.github.com/repos/L0nE-F0x/Filthy-Net-Deck/actions/runs` (filter
-   `head_branch: "v0.17.0"`) — wait for `status: completed` / `conclusion: success`.
-2. Pull the dmg: `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v0.17.0/Filthy-Net-Deck-0.17.0-universal.dmg`
-   into `website/downloads/`.
-3. Update the two mac download links + `btn-meta` version labels in `website/index.html`
-   (search for `0.16.0`).
-4. Commit as `Roll v0.17.0 out to macOS.` (pattern from prior commits), push. **No version bump, no tag** — this just catches mac up to what Windows already has.
+- [x] **Roll v0.17.0 macOS dmg** onto `website/downloads/` + fix mac labels (done; site carried 0.17.0 dmg).
+- [ ] **Finish v0.18.0 signed Windows publish** — code + site + version surfaces are ready; needs `TAURI_SIGNING_PRIVATE_KEY` + passphrase for updater `.sig` + `updater/latest.json`.
+- [ ] **Roll v0.18.0 macOS dmg** after tag `v0.18.0` CI succeeds (same pattern as prior mac rolls).
 
 ## Milestones 1–4 — shipped (2026-07-17, versions 0.14.1 → 0.17.0)
 
-Full detail lives in git history and `handoff.md` §2. Condensed for context:
+Full detail lives in git history and `handoff.md`. Condensed:
 
-- **v0.14.1** — P0 hotfix: installed Windows apps were reading the meta snapshot baked into the installer instead of the live daily feed (never shipped fresh data to real users). Also: new-spoiler badges surviving background syncs, "Later" not sticking, no keyboard support on the Set Radar card viewer, Arena-eve notifications overstating estimated dates. macOS rolled forward from a stale 0.12.0.
-- **v0.15.0** — Tray autostart ("Start with your PC"), window state memory, first-close tray explainer, one-time "what's new" banner, CSP hardening, Scryfall calls through the Tauri HTTP plugin for a real User-Agent.
-- **v0.16.0** — Matchup Lab tag-aggregated winrate table, "you 4–0 vs Izzet Prowess" chips on the Decks board, My Stats today/streak/rolling-winrate tiles, CSV export, opponent search.
-- **v0.17.0** — Set Radar arrow-key browsing + mana pips + honest "at release" legality + Arena-drop countdown badge, Decks rising/falling movement chips + multi-select color filters, deck view grouped by type with avg mana value + hover-art previews, Events filters + relative dates.
+- **v0.14.1** — P0 live-meta feed origin fix + polish; macOS catch-up.
+- **v0.15.0** — Autostart / tray / window memory / trust fixes.
+- **v0.16.0** — Matchup intel, streaks, CSV.
+- **v0.17.0** — Set Radar / Decks / Events upgrade batch.
 
-**Deferred from the original audit list (still open, low priority):**
-- Marketing site real screenshot/GIF carousel — needs actual app screenshots from the owner's machine (tracker data visible, 1280×860) before it can be built; nothing to do until the owner supplies those.
+**Deferred (still open, low priority):**
+- Marketing site real screenshot/GIF carousel — needs owner-supplied 1280×860 captures.
 
-## Milestone 5 — v0.18.0 "Content engine" (new features)
+## Milestone 5 — v0.18.0 "Content engine" — implemented (pending signed publish)
 
-Ranked by impact-per-effort; all desktop-local, real-data-only.
+- [x] **Daily archetype diff** — deck view compares today's mainboard to previous dated meta archive (`fetchDatedMeta` + `diffCardLists`).
+- [x] **Shareable recap card** — My Stats → week recap PNG (`recapStats` + canvas `recapCard`).
+- [x] **Match-end toast** — opt-in pref `notifyMatchEnd` + desktop notify on `tracker:match`.
+- [x] **Meta-share timeline** — pipeline writes `meta/history.json`; Decks home charts series + movers.
+- [x] **Personal vs. meta dashboard** — Decks home table joining pilot WR to ranked board.
 
-- [ ] **Daily archetype diff** — "what changed in Izzet Prowess today": diff today's list vs yesterday's per archetype using the already-archived `website/meta/<date>.json`; reuse the tracker's `DiffArt` card-swap UI. (Pipeline: keep N days of dated JSON; app fetches yesterday's file.)
-- [ ] **Shareable recap card** — render a local PNG ("This week: 62% WR · Diamond 3 → Diamond 1 · best deck …" + card art + branding + download URL) from Stats/Climb. One button; every share is an ad.
-- [ ] **Match-end toast** — desktop notification when a match records ("Win vs Rival · 64% today"). Opt-in like Arena-eve; proves the tracker is alive.
-- [ ] **Meta-share timeline** — pipeline appends each day's `{archetype, pct}` to a compact `history.json`; app charts 30-day archetype trends.
-- [ ] **Personal vs. meta dashboard** — combine the above: your WR piloting the #1 deck vs its meta share, best-performing archetype for *you*.
+## Milestone 6 — Infrastructure — implemented
 
-## Milestone 6 — Infrastructure backlog (no version bump needed unless noted)
-
-- [ ] **CI failure alerting** — `daily-meta.yml` runs with `continue-on-error` and no notification; add a step that opens/updates a GitHub issue (or pings) when `npm run meta`/`npm run sets` fail, so silent meta rot is impossible.
-- [ ] **Cap 429 retry loops in the pipeline** (`scryfallGet`, `fetchAllSetCards` retry forever; a bad Scryfall day hangs CI).
-- [ ] **Slim the feeds** — drop the `previews` array from sets.json when `cards` is present (client already prefers `cards`); write minified JSON (no 2-space indent) for `latest.json` + `sets.json` (~30% smaller).
-- [ ] **JS unit tests** — vitest for the pure logic: `setPulse`, `versionCheck.isNewer`, `metaDiff`, `ranks`, `deckHelpers` (the Rust tracker already has a good suite).
-- [ ] **macOS auto-update path** — either wire updater signing into the macOS CI (key as repo secret — owner decision) or add a mac-specific "new version — download dmg" flow via `version.json`.
-- [ ] **Keyboard shortcuts** for page navigation (1–7).
+- [x] **CI failure alerting** — `daily-meta.yml` opens/updates a `pipeline-failure` issue when meta/sets steps fail.
+- [x] **Cap 429 retry loops** — Scryfall collection + set gallery capped at 8 retries with exponential backoff (`retryPolicy` + pipeline sources).
+- [x] **Slim the feeds** — minified `latest.json` / `sets.json`; drop `previews` when `cards` present; history JSON compact.
+- [x] **JS unit tests** — vitest for `archetypeDiff`, `metaHistory`, `recapStats`, `personalMeta`, `versionCheck`, `setPulse`, `deckHelpers`, `ranks`, `retryPolicy`.
+- [x] **macOS auto-update path** — soft channel: Settings shows dmg download CTA when `version.json` / update URL ends in `.dmg` (full signed mac updater still needs repo secret owner decision).
+- [x] **Keyboard shortcuts** — keys `1`–`7` jump main nav pages (skip when typing in inputs).
 
 ## Explicit non-goals (do not add)
 

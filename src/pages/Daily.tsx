@@ -3,6 +3,8 @@ import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { SpoilerPulse } from "../components/SpoilerPulse";
+import { MetaShareTimeline } from "../components/MetaShareTimeline";
+import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { recordVsTags } from "../services/matchupNotes";
 import { CardArtStrip, pickPreviewCards } from "../components/CardArt";
@@ -191,6 +193,8 @@ export function Daily() {
       </div>
 
       <SpoilerPulse />
+      <MetaShareTimeline />
+      <PersonalMetaPanel />
 
       <div className="format-switcher" role="tablist" aria-label="Format">
         {meta.formats.map((f) => {

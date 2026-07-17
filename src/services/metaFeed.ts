@@ -51,6 +51,17 @@ async function tryFetch(url: string): Promise<MetaBundle | null> {
   }
 }
 
+/** Fetch a single dated archive (`YYYY-MM-DD.json`) from the CDN (or local in dev). */
+export async function fetchDatedMeta(date: string): Promise<MetaBundle | null> {
+  const safe = String(date || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(safe)) return null;
+  const base = import.meta.env.DEV
+    ? "/meta"
+    : "https://filthy-net-deck.netlify.app/meta";
+  const bundle = await tryFetch(`${base}/${safe}.json?t=${Date.now()}`);
+  return bundle ? normalizeMetaBundle(bundle) : null;
+}
+
 /**
  * Fetch the published meta. Order: configured/local URL → Netlify CDN →
  * last good downloaded copy (cached on this machine).

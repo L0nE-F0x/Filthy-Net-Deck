@@ -2848,3 +2848,21 @@ select,
 }
 .card-hover-pop img { display: block; width: 100%; height: auto; }
 .card-row-hover:hover .card-hover-pop { display: block; }
+
+/* Meta-share timeline spark bars */
+.meta-hist-row { min-width: 0; }
+.meta-hist-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 36px;
+  padding: 2px 0;
+}
+.meta-hist-bars i {
+  flex: 1 1 0;
+  min-width: 2px;
+  max-width: 10px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-gold, #c9a227) 80%, white), color-mix(in srgb, var(--color-azure, #5b9fd4) 50%, transparent));
+  border-radius: 2px 2px 0 0;
+  opacity: 0.85;
+}

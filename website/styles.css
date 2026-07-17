@@ -1262,3 +1262,17 @@ main,
   border-radius: inherit;
   background: linear-gradient(90deg, #8fd14f, #c8f060);
 }
+
+/* Hero mock: Sets countdown chip + movement marks */
+.mock-nav.on { position: relative; }
+.mock-nav-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #c9a227 35%, transparent);
+  color: #f0d999;
+}
+.mock-move { color: #34d399; font-style: normal; font-weight: 700; margin-left: 0.25rem; }
+.mock-move.down { color: #f87171; }

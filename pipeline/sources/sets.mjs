@@ -28,11 +28,16 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function scryfallGet(path) {
+const MAX_429_RETRIES = 8;
+
+async function scryfallGet(path, attempt = 0) {
   const res = await fetch(`${API}${path}`, { headers: HEADERS });
   if (res.status === 429) {
-    await sleep(1500);
-    return scryfallGet(path);
+    if (attempt + 1 >= MAX_429_RETRIES) {
+      throw new Error(`Scryfall ${path} → 429 after ${MAX_429_RETRIES} retries`);
+    }
+    await sleep(Math.min(30_000, 1500 * 2 ** attempt));
+    return scryfallGet(path, attempt + 1);
   }
   if (!res.ok) throw new Error(`Scryfall ${path} → ${res.status}`);
   return res.json();
@@ -140,14 +145,26 @@ async function fetchAllSetCards(code) {
       await sleep(100);
       let data;
       if (path.startsWith("http")) {
-        const res = await fetch(path, { headers: HEADERS });
-        if (res.status === 429) {
-          await sleep(1500);
-          continue;
+        let attempt = 0;
+        for (;;) {
+          const res = await fetch(path, { headers: HEADERS });
+          if (res.status === 429) {
+            attempt++;
+            if (attempt >= MAX_429_RETRIES) {
+              throw new Error(`Scryfall page → 429 after ${MAX_429_RETRIES} retries`);
+            }
+            await sleep(Math.min(30_000, 1500 * 2 ** (attempt - 1)));
+            continue;
+          }
+          if (res.status === 404) {
+            data = null;
+            break;
+          }
+          if (!res.ok) throw new Error(`Scryfall page → ${res.status}`);
+          data = await res.json();
+          break;
         }
-        if (res.status === 404) break;
-        if (!res.ok) throw new Error(`Scryfall page → ${res.status}`);
-        data = await res.json();
+        if (!data) break;
       } else {
         data = await scryfallGet(path);
       }

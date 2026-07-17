@@ -41,6 +41,8 @@ interface Prefs {
   defaultMode: PlayMode;
   /** Tray / desktop notify the day before an Arena set drop */
   notifyArenaEve: boolean;
+  /** Desktop toast when a match is recorded (opt-in, like Arena-eve). */
+  notifyMatchEnd: boolean;
   /** Format shown on the Decks home last time — restored on next launch. */
   lastFormatId?: FormatId;
 }
@@ -52,11 +54,13 @@ function loadPrefs(): Prefs {
       const parsed = JSON.parse(raw) as {
         defaultMode?: PlayMode;
         notifyArenaEve?: boolean;
+        notifyMatchEnd?: boolean;
         lastFormatId?: string;
       };
       return {
         defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1",
         notifyArenaEve: parsed.notifyArenaEve !== false,
+        notifyMatchEnd: parsed.notifyMatchEnd === true,
         lastFormatId:
           parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
             ? parsed.lastFormatId
@@ -66,7 +70,7 @@ function loadPrefs(): Prefs {
   } catch {
     /* ignore */
   }
-  return { defaultMode: "bo1", notifyArenaEve: true };
+  return { defaultMode: "bo1", notifyArenaEve: true, notifyMatchEnd: false };
 }
 
 function savePrefs(p: Prefs) {
@@ -149,6 +153,7 @@ interface AppState {
   openDeck: (deckId: string) => void;
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
+  setNotifyMatchEnd: (v: boolean) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
@@ -252,6 +257,11 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     setNotifyArenaEve: (notifyArenaEve) => {
       const next = { ...get().prefs, notifyArenaEve };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setNotifyMatchEnd: (notifyMatchEnd) => {
+      const next = { ...get().prefs, notifyMatchEnd };
       savePrefs(next);
       set({ prefs: next });
     },
@@ -361,6 +371,37 @@ export const useAppStore = create<AppState>((set, get) => {
           const cur = get().trackerMatches;
           if (cur.some((x) => x.matchId === m.matchId)) return;
           set({ trackerMatches: [m, ...cur] });
+          // Opt-in match-end toast — proves the tracker is alive.
+          if (get().prefs.notifyMatchEnd) {
+            const result =
+              m.result === "win"
+                ? "Win"
+                : m.result === "loss"
+                  ? "Loss"
+                  : m.result === "draw"
+                    ? "Draw"
+                    : "Match";
+            const opp = m.opponentName?.trim() || "opponent";
+            // Include the match we just prepended.
+            const withNew = [m, ...cur].filter((x) => {
+              const d = new Date(x.endedAt);
+              const n = new Date();
+              return (
+                d.getFullYear() === n.getFullYear() &&
+                d.getMonth() === n.getMonth() &&
+                (x.result === "win" || x.result === "loss")
+              );
+            });
+            const wins = withNew.filter((x) => x.result === "win").length;
+            const losses = withNew.filter((x) => x.result === "loss").length;
+            const decided = wins + losses;
+            const wr = decided ? Math.round((wins / decided) * 100) : null;
+            const body =
+              wr != null
+                ? `${result} vs ${opp} · ${wr}% this season`
+                : `${result} vs ${opp}`;
+            void notifyDesktop("Filthy Net Deck", body);
+          }
         },
         onStatus: (s) => set({ trackerStatus: s }),
       });

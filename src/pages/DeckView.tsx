@@ -11,6 +11,7 @@ import { copyToClipboard } from "../services/arenaImport";
 import { validateDeckNames } from "../services/scryfallValidate";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
+import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
 import type { CardEntry } from "../types/meta";
 
 /** One decklist row with a card-art popup on hover (when the id is known). */
@@ -225,6 +226,8 @@ export function DeckView() {
           {unknown.length > 8 ? "…" : ""}
         </div>
       )}
+
+      <ArchetypeDiffPanel deck={deck} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
         <div className="flex flex-col gap-4">

@@ -21,7 +21,18 @@ async function main() {
     process.exit(1);
   }
 
-  const json = JSON.stringify(bundle, null, 2);
+  // Slim feed: drop previews when full cards[] is present; minify for CDN size.
+  const slim = {
+    ...bundle,
+    sets: (bundle.sets || []).map((s) => {
+      if (s.cards?.length && s.previews) {
+        const { previews: _drop, ...rest } = s;
+        return rest;
+      }
+      return s;
+    }),
+  };
+  const json = JSON.stringify(slim);
   for (const dir of [join(root, "website", "meta"), join(root, "public", "meta")]) {
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "sets.json"), json);

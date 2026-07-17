@@ -10,6 +10,7 @@ export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
+  const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const installUpdate = useAppStore((s) => s.installUpdate);
@@ -60,6 +61,22 @@ export function Settings() {
             onChange={(e) => setNotifyArenaEve(e.target.checked)}
           />
           Notify me the day before Arena set drops
+        </label>
+      </section>
+
+      <section className="panel">
+        <h3 className="text-sm font-semibold m-0 mb-1">Match-end toasts</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Desktop notification when a match records (&quot;Win vs Rival · 64% this season&quot;).
+          Opt-in like Arena-eve; stays on this PC.
+        </p>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={prefs.notifyMatchEnd}
+            onChange={(e) => setNotifyMatchEnd(e.target.checked)}
+          />
+          Notify me when a match is recorded
         </label>
       </section>
 
@@ -140,7 +157,9 @@ export function Settings() {
                 void downloadInstaller(updateAvailable.downloadUrl!);
               }}
             >
-              Get v{updateAvailable.version}
+              {/\.dmg(\?|$)/i.test(updateAvailable.downloadUrl)
+                ? `Download macOS v${updateAvailable.version}`
+                : `Get v${updateAvailable.version}`}
             </button>
           )}
         </div>
@@ -149,6 +168,15 @@ export function Settings() {
             v{updateAvailable.version} is ready — one click and you’re done.
           </p>
         )}
+        {updateAvailable &&
+          !updateAvailable.canAutoInstall &&
+          updateAvailable.downloadUrl &&
+          /\.dmg(\?|$)/i.test(updateAvailable.downloadUrl) && (
+            <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
+              macOS builds ship as a signed-site dmg (auto-update signing for Apple is a later
+              infra step). Download, open, and replace the app in Applications.
+            </p>
+          )}
         {updateAvailable && !updateAvailable.canAutoInstall && (
           <p className="text-sm text-gold-300 mt-2 mb-0">
             v{updateAvailable.version} is ready — use the button above to get it.

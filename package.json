@@ -1,7 +1,7 @@
 {
   "name": "filthy-net-deck",
   "private": true,
-  "version": "0.17.0",
+  "version": "0.18.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,9 @@
     "tauri:build": "tauri build",
     "pipeline": "node pipeline/build-meta.mjs",
     "meta": "node pipeline/build-meta.mjs",
-    "sets": "node pipeline/build-sets.mjs"
+    "sets": "node pipeline/build-sets.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
@@ -36,6 +38,7 @@
     "tailwindcss": "^4.3.2",
     "tsx": "^4.23.0",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^3.2.4"
   }
 }

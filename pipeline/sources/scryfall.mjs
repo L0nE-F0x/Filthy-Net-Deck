@@ -50,15 +50,20 @@ function keep(card) {
   };
 }
 
-async function postCollection(identifiers) {
+const MAX_429_RETRIES = 8;
+
+async function postCollection(identifiers, attempt = 0) {
   const res = await fetch(`${API}/cards/collection`, {
     method: "POST",
     headers: HEADERS,
     body: JSON.stringify({ identifiers }),
   });
   if (res.status === 429) {
-    await sleep(1500);
-    return postCollection(identifiers);
+    if (attempt + 1 >= MAX_429_RETRIES) {
+      throw new Error(`scryfall collection → 429 after ${MAX_429_RETRIES} retries`);
+    }
+    await sleep(Math.min(30_000, 1500 * 2 ** attempt));
+    return postCollection(identifiers, attempt + 1);
   }
   if (!res.ok) throw new Error(`scryfall collection → ${res.status}`);
   return res.json();

@@ -10,6 +10,8 @@ import {
   seasonLabel,
   timeAgo,
 } from "../services/tracker";
+import { downloadRecapPng, recapFromMatches } from "../services/recapCard";
+import { formatRecapHeadline } from "../services/recapStats";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
 import { isLandName } from "../services/landNames";
 import {
@@ -1174,6 +1176,7 @@ export function Stats() {
   const [runs, setRuns] = useState<DeckRuns>(() => loadDeckRuns());
   const [confirmClear, setConfirmClear] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
+  const [recapMsg, setRecapMsg] = useState<string | null>(null);
 
   const onExportCsv = () => {
     setExportMsg("Exporting…");
@@ -1181,6 +1184,16 @@ export function Stats() {
       .then((path) => setExportMsg(`Saved to ${path}`))
       .catch((e) =>
         setExportMsg(e instanceof Error ? e.message : "Export failed."),
+      );
+  };
+
+  const onShareRecap = () => {
+    const stats = recapFromMatches(matches);
+    setRecapMsg(formatRecapHeadline(stats) + " — rendering…");
+    void downloadRecapPng(matches)
+      .then(() => setRecapMsg("Recap PNG saved to your downloads."))
+      .catch((e) =>
+        setRecapMsg(e instanceof Error ? e.message : "Could not render recap."),
       );
   };
 
@@ -1301,6 +1314,18 @@ export function Stats() {
 
           <SummaryTiles matches={filtered} />
           <FormTiles matches={filtered} />
+          <div className="panel flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="eyebrow m-0 mb-0.5">Shareable recap</p>
+              <p className="text-xs text-muted m-0">
+                One PNG of this week&apos;s WR, rank move, and best deck — every share is an ad.
+              </p>
+              {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
+            </div>
+            <button type="button" className="btn btn-primary btn-sm" onClick={onShareRecap}>
+              Download week recap
+            </button>
+          </div>
           <StatsArsenal decks={decks} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
