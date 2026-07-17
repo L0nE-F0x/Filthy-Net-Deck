@@ -1,11 +1,11 @@
 {
-  "version": "0.17.0",
-  "notes": "v0.17.0: flip through spoilers with arrow keys, Arena drop countdown on the Sets tab, rising/falling deck chips, combinable color filters, hover-art decklists grouped by type, and Events filters.",
-  "pub_date": "2026-07-17T05:08:50Z",
+  "version": "0.18.0",
+  "notes": "v0.18.0: daily archetype list diffs, meta-share timeline, you-vs-the-meta, shareable week recap PNGs, optional match-end toasts, keyboard nav 1-7, pipeline history + CI failure alerts.",
+  "pub_date": "2026-07-17T06:07:19Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjVVejU4a3diYnhlZGRHWk1MTVJiSFFYanl2ZUg0dW9uamdQaVVjd0tOVThuOE45ZUxDY2tiYzNyb1ZXK2VNSnhzOVhtNU5jLzlrOThmWTk2NUZ6dGdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjY0NjkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTcuMF94NjQtc2V0dXAuZXhlClNFY1JCd01HSFNxM1pIN3BWSjB3S3FwRzdWdUtBQkpFdXEvMThTN2k3b3BkMUt4TDgzVVcrU3ZLUSt0VjBOMXoxZlFudEtaNGM4OE5vWEdqUWc3VkFRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.17.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjNyOWJXUHFnVTZNM1ZVSUNTbWFoT1crYkFqYWFFQllKWHE2MFc0ZDg5SisxRjVobFBmTldoMi9Bb1NzOEY5SUVPcXRTd29uU0Y4K2xNeUdJdHRta0EwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MjY4NDE3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMTguMF94NjQtc2V0dXAuZXhlCmwzT2NOM3JBZGMzU3hZcm9MN0U3SWpVUno2T0I4aFBqZkJYbUJEbVdPaTNHQzBCRFFzT3diaGdvRk9XbkVPTUpjSTQ2cyt6aHBUNCtUVjhPK0xhQ0FRPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.18.0.exe"
     }
   }
 }

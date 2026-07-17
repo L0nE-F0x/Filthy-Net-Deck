@@ -14,11 +14,11 @@
 
 ---
 
-## Immediate follow-ups (source-only until passphrase / mac CI)
+## Immediate follow-ups
 
-- [x] **Roll v0.17.0 macOS dmg** onto `website/downloads/` + fix mac labels (done; site carried 0.17.0 dmg).
-- [ ] **Finish v0.18.0 signed Windows publish** — source is 0.18.0 with M5/M6; marketing + soft channel intentionally stay on **downloadable 0.17.0** until passphrase unlocks `%USERPROFILE%\.tauri\filthy-net-deck.key`. Then: signed NSIS + `.sig` → `updater/latest.json` → version.json ×2 → OG `?v=0.18.0` → tag.
-- [ ] **Roll v0.18.0 macOS dmg** after tag `v0.18.0` CI succeeds (same pattern as prior mac rolls).
+- [x] **Roll v0.17.0 macOS dmg** onto `website/downloads/` + fix mac labels.
+- [x] **v0.18.0 signed Windows publish** — NSIS + `.sig`, `updater/latest.json`, version.json ×2, OG `?v=0.18.0`.
+- [ ] **Roll v0.18.0 macOS dmg** after tag `v0.18.0` CI succeeds (site still serves 0.17.0 dmg until then).
 
 ## Milestones 1–4 — shipped (2026-07-17, versions 0.14.1 → 0.17.0)
 

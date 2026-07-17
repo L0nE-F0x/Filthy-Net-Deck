@@ -39,11 +39,11 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 | Item | Value |
 |------|--------|
-| **App version** | **Source tree is 0.18.0** (content engine + infra). **Live installers still 0.17.0** until a signed Windows build with passphrase lands. |
+| **App version** | **0.18.0** (content engine + infra) — Windows signed installer + updater live. |
 | **Branch** | `main` (releases ship on `main`, not long-lived feature branches) |
-| **Latest published installers** | Windows + macOS **0.17.0** under `website/downloads/`. |
-| **Windows** | Signed 0.17.0 installer + updater live. **0.18.0 signed publish blocked** without Tauri key passphrase. |
-| **macOS** | **v0.17.0** dmg rolled onto the site. v0.18.0 dmg after tag + CI when the signed Windows release is cut. |
+| **Latest published installers** | Windows **0.18.0**; macOS still **0.17.0** until tag CI dmg is rolled. |
+| **Windows** | Signed 0.18.0 installer + `updater/latest.json` under `website/downloads/` + `website/updater/`. |
+| **macOS** | **v0.17.0** dmg on the site until `v0.18.0` CI finishes; then roll like prior mac catch-ups. |
 | **Netlify** | Publish dir is **`website`** (not `dist`). Auto-deploys on push to `main`. |
 | **Daily data** | GitHub Action `.github/workflows/daily-meta.yml` runs `npm run meta` + `npm run sets`, commits `website/meta` + `public/meta`. Confirmed live meta feed is current (`2026-07-17`) as of this session. |
 
