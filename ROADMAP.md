@@ -15,66 +15,31 @@
 
 ---
 
-## Milestone 1 — v0.14.1 hotfix (IN PROGRESS)
+## ⚠️ Immediate next task (source-only, no version bump)
 
-Critical fixes before the social-media marketing push.
+**Roll the v0.17.0 macOS dmg.** Windows shipped v0.17.0; the macOS CI for tag `v0.17.0`
+was still running when the previous session ended, so the site's mac download is
+one version behind (v0.16.0). Steps:
 
-- [x] **P0: Feed-origin bug** — fixed: `getMetaUrl()`/`getSetsUrl()` use the relative path only when `import.meta.env.DEV`; installed apps always hit the CDN (`src/services/metaFeed.ts`, `setsFeed.ts`).
-- [x] **P0: macOS downloads stranded at 0.12.0** — v0.14.0 universal dmg pulled from the GitHub release into `website/downloads/`; both mac links + labels updated in `website/index.html`.
-- [x] **P1: "New since last visit" wiped by background sync** — snapshot no longer saved on fetch; `markSetsSeen` baselines it when the user leaves the Sets page.
-- [x] **P1: "Later" on update banner doesn't stick** — `dismissedUpdateVersion` tracked in the store for the session; banner suppressed for that version, Settings still shows the update.
-- [x] **P1: Sets card drawer keyboard support** — Escape closes, drawer takes focus on open, focus returns to the opening card on close.
-- [x] **P1: Arena-eve estimated dates hedged** — "expected on Arena tomorrow (estimated date)" wording in the desktop notification and SpoilerPulse banner when confidence is `estimated`.
-- [x] **Release v0.14.1 end-to-end** — shipped 2026-07-17; live Netlify verified (version.json, updater/latest.json + signature, installer, OG); owner confirmed in-app Update & restart worked.
-- [x] **Roll v0.14.1 dmg to macOS** — CI dmg pulled from the v0.14.1 GitHub release; mac links now at 0.14.1 (parity with Windows).
+1. Check `https://api.github.com/repos/L0nE-F0x/Filthy-Net-Deck/actions/runs` (filter
+   `head_branch: "v0.17.0"`) — wait for `status: completed` / `conclusion: success`.
+2. Pull the dmg: `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v0.17.0/Filthy-Net-Deck-0.17.0-universal.dmg`
+   into `website/downloads/`.
+3. Update the two mac download links + `btn-meta` version labels in `website/index.html`
+   (search for `0.16.0`).
+4. Commit as `Roll v0.17.0 out to macOS.` (pattern from prior commits), push. **No version bump, no tag** — this just catches mac up to what Windows already has.
 
-**Milestone 1 complete — v0.14.1 live on all platforms.**
+## Milestones 1–4 — shipped (2026-07-17, versions 0.14.1 → 0.17.0)
 
-## Milestone 2 — v0.15.0 "Polish & Trust"
+Full detail lives in git history and `handoff.md` §2. Condensed for context:
 
-Remaining correctness/quality items plus the highest-value shell improvements.
+- **v0.14.1** — P0 hotfix: installed Windows apps were reading the meta snapshot baked into the installer instead of the live daily feed (never shipped fresh data to real users). Also: new-spoiler badges surviving background syncs, "Later" not sticking, no keyboard support on the Set Radar card viewer, Arena-eve notifications overstating estimated dates. macOS rolled forward from a stale 0.12.0.
+- **v0.15.0** — Tray autostart ("Start with your PC"), window state memory, first-close tray explainer, one-time "what's new" banner, CSP hardening, Scryfall calls through the Tauri HTTP plugin for a real User-Agent.
+- **v0.16.0** — Matchup Lab tag-aggregated winrate table, "you 4–0 vs Izzet Prowess" chips on the Decks board, My Stats today/streak/rolling-winrate tiles, CSV export, opponent search.
+- **v0.17.0** — Set Radar arrow-key browsing + mana pips + honest "at release" legality + Arena-drop countdown badge, Decks rising/falling movement chips + multi-select color filters, deck view grouped by type with avg mana value + hover-art previews, Events filters + relative dates.
 
-- [x] **Meta-movement panel disappears mid-session** — the day's diff is persisted (`bbi.meta.lastDiff`) and re-served on same-day re-syncs.
-- [x] **Events: Limited events mislabeled as Standard** — `mapMeleeFormat` now maps draft/sealed/limited/cube/prerelease to "limited" (dropped by build-meta).
-- [x] **plugin-http decision** — Scryfall API calls now route through `apiFetch` (`src/services/http.ts`): Tauri HTTP plugin in the desktop app (real User-Agent), plain fetch fallback in the browser.
-- [x] **CSP/capability tightening** — `frame-src 'none'`, `img-src` narrowed to the app's own Netlify domain.
-- [x] **Launch at startup (minimized to tray)** — tauri-plugin-autostart with `--hidden` flag (boots hidden to tray) + "Start with your PC" toggle in Settings.
-- [x] **First-time "still running in the tray" notification** on close-to-tray (one-time marker file in app data).
-- [x] **Window state persistence** — tauri-plugin-window-state (visibility flag excluded; tray logic owns it).
-- [x] **"What's new" panel** — one-time banner after an update, driven by `WHATS_NEW` in `src/version.ts` vs `bbi.lastSeenVersion`.
-- [x] **Persist last-selected format** — `prefs.lastFormatId`, restored on launch.
-- [x] **Dedupe the land-detection regex** — shared `src/services/landNames.ts`.
-- [ ] **Release v0.15.0 end-to-end** (full AGENTS.md checklist + macOS dmg roll after tag CI).
-- [x] **Marketing site: SmartScreen note** — already present in the download section (audit missed it); nothing to do.
-- [ ] **Marketing site: real screenshot/GIF carousel** (Set Radar gallery, Climb chart, Stats) to replace/augment the CSS mock for video traffic. *Deferred: needs real app screenshots from the owner's machine (with tracker data visible) — capture at 1280×860, drop in `website/assets/`, then wire the carousel.*
-
-## Milestone 3 — v0.16.0 "Stats & Matchup upgrades"
-
-- [x] **Session line in My Stats** — "Today" tile (W-L + %) in the new FormTiles row.
-- [x] **Current win/loss streak indicator** — W3/L2 tile with encouraging copy.
-- [x] **Tag-aggregated matchup table** — "Matchups by archetype" panel in Matchup Lab; rows click through to the tag filter.
-- [x] **Seed tag autocomplete with today's meta archetype names** — merged into the datalist after the user's own tags.
-- [x] **CSV export of match history** — `tracker_export_csv` Rust command writes to Downloads and reveals the file; button in My Stats.
-- [x] **Opponent search box** — searches names, tags, and notes in Matchup Lab.
-- [x] **Winrate-over-time sparkline** — rolling-10 trend tile on the Stats home.
-- [x] **Meta ↔ personal bridge** — "you 4–0" chip on Decks-page cards when a Matchup Lab tag matches the archetype (`recordVsTags`).
-- [ ] **Release v0.16.0 end-to-end** (full AGENTS.md checklist; macOS rolls straight from 0.14.1 to 0.16.0 — 0.15.0's dmg stays on the GitHub release only).
-
-## Milestone 4 — v0.17.0 "Set Radar & Decks upgrades"
-
-- [x] **Gallery arrow-key navigation** — ←/→ wraps through the filtered gallery; ‹ › buttons + "n / total" position in the drawer.
-- [x] **Legality copy for unreleased sets** — "Std at release / Pio at release" for `spoiling`/`announced` sets (drawer badges + gallery captions).
-- [x] **Mana costs as colored pips** — `ManaCost` component in the drawer (generic symbols in neutral pips).
-- [x] **"Days until next Arena drop" badge** on the Sets nav item (14-day window, `nextArenaDropInDays`).
-- [x] **Gallery render optimization** — `content-visibility: auto` + intrinsic size on gallery cells (browser skips offscreen cards).
-- [x] **Decks: movement chips** — ↑ rising / ↓ falling / + new from the day's metaDiff.
-- [x] **Decks: multi-select color filter** — AND semantics (deck must play every selected color).
-- [x] **Deck view: hover art previews** on every card row with a known Scryfall id.
-- [x] **Deck view: type grouping + avg MV** — pipeline now embeds a front-face type bucket; older feeds fall back to Spells/Lands, oldest to a flat list.
-- [x] **Deck view: post-copy hint** — "Copied! In Arena: Decks → Import Deck".
-- [x] **Events: format/platform filter chips + relative dates.**
-- [x] **Events: Untapped meta rows moved to a "Meta trackers" strip.**
-- [ ] **Release v0.17.0 end-to-end** (full AGENTS.md checklist; macOS rolls 0.16.0 → 0.17.0 dmg when tag CI finishes — 0.16.0's dmg stays on its GitHub release).
+**Deferred from the original audit list (still open, low priority):**
+- Marketing site real screenshot/GIF carousel — needs actual app screenshots from the owner's machine (tracker data visible, 1280×860) before it can be built; nothing to do until the owner supplies those.
 
 ## Milestone 5 — v0.18.0 "Content engine" (new features)
 

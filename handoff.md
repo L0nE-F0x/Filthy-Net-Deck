@@ -1,13 +1,15 @@
-# Filthy Net Deck — handoff for audit / Claude Code
+# Filthy Net Deck — handoff for whichever agent picks this up next
 
-**Audience:** Claude Code (or similar) running a **preproduction audit** (e.g. Fable 5, max effort).  
-**Owner product voice:** L0nE-F0x / ApexForge; social: [@MBrewlab](https://x.com/MBrewlab) on X.  
-**Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
-**Live site / downloads / updater:** https://filthy-net-deck.netlify.app/  
+**Audience:** Any coding agent continuing this project — this session was run by Claude (Fable 5, then Sonnet 5); the owner alternates between Claude Code and Grok 4.5 sessions on this repo. Nothing here is Claude-specific; follow it regardless of which model you are.
+**Owner product voice:** L0nE-F0x / ApexForge; social: [@MBrewlab](https://x.com/MBrewlab) on X.
+**Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck
+**Live site / downloads / updater:** https://filthy-net-deck.netlify.app/
 **Studio:** https://ame-apexforge.org/
 
 Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not invent process that contradicts either.
-**Active work queue:** **`ROADMAP.md`** — the prioritized milestone list from the 2026-07 preproduction audit. Work it top to bottom; check items off as they ship.
+**Active work queue:** **`ROADMAP.md`** — the prioritized milestone list from the 2026-07 preproduction audit, kept up to date as work ships. Work it top to bottom; check items off (`[x]`) as they ship.
+
+> **⚠️ Release pacing changed 2026-07-17 (owner directive):** the previous session shipped four versions in one day (0.14.1 → 0.17.0). The owner asked for this to stop. **From now on, batch multiple roadmap items into fewer, larger releases.** Finish a full milestone (or a meaningful chunk of one) before bumping the version and running the release checklist — do not cut a release per individual checkbox. See `ROADMAP.md` for the exact policy note and current milestone.
 
 ---
 
@@ -33,23 +35,29 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 ---
 
-## 2. Current ship status (as of handoff)
+## 2. Current ship status (as of 2026-07-17, end of session)
 
 | Item | Value |
 |------|--------|
-| **App version** | **0.14.0** |
+| **App version** | **0.17.0** (live on Windows + macOS) |
 | **Branch** | `main` (releases ship on `main`, not long-lived feature branches) |
-| **Latest release commit** | `Release v0.14.0 — Set Radar Spoiler Pulse` |
-| **Windows** | Signed installer + updater `latest.json` published under `website/downloads/` and `website/updater/` |
-| **macOS** | Built via CI on tags `v*`; often lagged (Windows-first). Look for “Roll vX out to macOS” commits. |
+| **Latest release commit** | `Release v0.17.0 — Set Radar spoiler browser, deck movement, hover-art lists.` |
+| **Windows** | Signed installer + updater `latest.json` published under `website/downloads/` and `website/updater/`. Verified live and matches the signed `.sig`. |
+| **macOS** | dmg on the site is **v0.16.0** (one version behind Windows) — the v0.17.0 tag's macOS CI was still running when this session ended. **First task for the next session:** check `https://api.github.com/repos/L0nE-F0x/Filthy-Net-Deck/actions/runs` for the `v0.17.0` macOS build; once it's `completed`/`success`, pull the dmg from the GitHub release and roll it in (same pattern as prior "Roll vX out to macOS" commits — see §5.3 of this doc). This is a **source-only follow-up commit**, not a new version bump. |
 | **Netlify** | Publish dir is **`website`** (not `dist`). Auto-deploys on push to `main`. |
-| **Daily data** | GitHub Action `.github/workflows/daily-meta.yml` runs `npm run meta` + `npm run sets`, commits `website/meta` + `public/meta`. |
+| **Daily data** | GitHub Action `.github/workflows/daily-meta.yml` runs `npm run meta` + `npm run sets`, commits `website/meta` + `public/meta`. Confirmed live meta feed is current (`2026-07-17`) as of this session. |
 
-### Recent feature arc (context for audit)
+### Recent feature arc (context for whoever picks this up)
 
-- **0.12.x** — Matchup Lab, Climb Tracker, signed updates restored, ApexForge credit, launch splash, simplified Settings  
-- **0.13.x** — Set Radar (Arena-first, no Alchemy), full Scryfall set galleries  
-- **0.14.0** — Spoiler Pulse: Std/Pio legality, gallery filters/sort, new-since-last-visit, Decks home banner, Arena-eve desktop notifications  
+- **0.12.x** — Matchup Lab, Climb Tracker, signed updates restored, ApexForge credit, launch splash, simplified Settings
+- **0.13.x** — Set Radar (Arena-first, no Alchemy), full Scryfall set galleries
+- **0.14.0** — Spoiler Pulse: Std/Pio legality, gallery filters/sort, new-since-last-visit, Decks home banner, Arena-eve desktop notifications
+- **0.14.1** (2026-07-17) — **P0 hotfix** from a full preproduction audit: installed Windows apps were reading the meta snapshot baked into the installer instead of the live daily feed (Tauri's `http://tauri.localhost` production origin tripped a dev/prod URL check). Also fixed: new-spoiler badges surviving background syncs, "Later" on the update banner not sticking, no keyboard support on the Set Radar card viewer, Arena-eve notifications stating estimated dates as fact. macOS rolled forward from a stale 0.12.0.
+- **0.15.0** (2026-07-17) — Tray autostart ("Start with your PC"), window size/position memory, first-close tray explainer notification, one-time "what's new" banner after updates, CSP hardening, Scryfall calls routed through the Tauri HTTP plugin for a real User-Agent.
+- **0.16.0** (2026-07-17) — Matchup Lab tag-aggregated winrate table, "you 4–0 vs Izzet Prowess" chips on the Decks board (bridges tracker data to the meta), My Stats today/streak/rolling-winrate tiles, one-click CSV export of match history, opponent search.
+- **0.17.0** (2026-07-17) — Set Radar arrow-key spoiler browsing, mana-cost pips, honest "at release" legality copy for unreleased sets, Arena-drop countdown badge on the Sets nav item, Decks rising/falling movement chips, multi-select color filters, deck view grouped by card type with average mana value and hover-art previews, Events format/platform filters + relative dates.
+
+**Full details, findings, and the reasoning behind every fix above are in `ROADMAP.md`** (Milestones 1–4, all checked off) — read it before touching anything, so you don't redo work or reintroduce a fixed bug.
 
 ---
 
@@ -164,8 +172,10 @@ Daily CI already does this. Manual runs are fine for hotfixes.
 
 ### 5.3 App feature → version bump → **full end-to-end ship**
 
-**Source-only push is NOT a release.** Users run installers; X previews use OG tags.  
+**Source-only push is NOT a release.** Users run installers; X previews use OG tags.
 Follow **`AGENTS.md`** checklist every time.
+
+> **Pacing (owner directive, 2026-07-17):** batch several roadmap items into one release rather than bumping the version per item. Work through `ROADMAP.md` and only run this whole section once a milestone (or a substantial chunk of one) is done. A genuine P0 bug is the one exception — ship that alone immediately.
 
 #### Version files to bump together
 
@@ -255,9 +265,9 @@ Implementation: `src/services/appUpdater.ts`, `src/store/useAppStore.ts` (`check
 
 ---
 
-## 6. Product / quality bar for preproduction audit
+## 6. Product / quality bar (reusable — not just for the original audit)
 
-Use this as the audit charter.
+The 2026-07-17 preproduction audit that produced `ROADMAP.md` is done and its findings are either shipped (Milestones 1–4) or queued (Milestones 5–6). This section's *rules* stay evergreen — re-check them any time you touch a related area, not just during a formal audit pass.
 
 ### 6.1 Must not regress
 
@@ -339,9 +349,9 @@ If a build needs signing and password is unavailable → **ask human**, do not f
 
 ---
 
-## 9. Suggested Fable 5 / max-effort audit deliverables
+## 9. Suggested audit report format (for future full audits only)
 
-Produce a structured audit report, e.g.:
+Not needed for normal roadmap work — `ROADMAP.md` already tracks the open items. Use this format only if the owner asks for a fresh full audit later:
 
 1. **Executive summary** — ship readiness (green / yellow / red) for public marketing of 0.14.x.  
 2. **Findings** — severity (blocker / major / minor / nit), file paths, repro steps.  
@@ -370,13 +380,15 @@ Produce a structured audit report, e.g.:
 
 After any change batch:
 
-- [ ] `npx tsc --noEmit` clean  
-- [ ] `npm run tauri:dev` boots splash → Decks  
-- [ ] Meta loads (or clear offline error)  
-- [ ] Sets page loads galleries; no Alchemy sets  
-- [ ] Spoiler pulse appears when applicable  
-- [ ] Settings: update check + Arena-eve toggle  
-- [ ] If releasing: full AGENTS.md checklist + live Netlify verification  
+- [ ] `npx tsc --noEmit` clean
+- [ ] `cd src-tauri && cargo test` clean (tracker has a real test suite — keep it green)
+- [ ] `npm run tauri:dev` boots splash → Decks
+- [ ] Meta loads (or clear offline error)
+- [ ] Sets page loads galleries; no Alchemy sets
+- [ ] Spoiler pulse appears when applicable
+- [ ] Settings: update check + Arena-eve toggle + "Start with your PC" toggle
+- [ ] `ROADMAP.md` reflects what you actually shipped (check off items, don't let it drift)
+- [ ] If releasing: full AGENTS.md checklist + live Netlify verification — but see the pacing note in §5.3 before deciding to cut a release at all
 
 ---
 
