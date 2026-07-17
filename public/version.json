@@ -1,5 +1,5 @@
 {
-  "version": "0.18.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.18.0.exe",
-  "notes": "v0.18.0: daily archetype list diffs, meta-share timeline, you-vs-the-meta, shareable week recap PNGs, optional match-end toasts, keyboard nav 1-7, pipeline history + CI failure alerts."
+  "version": "0.19.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.19.0.exe",
+  "notes": "v0.19.0: Format hub on Sets (Standard rotation dates + ban lists with card art, full Pioneer pool), full tracked decklists in My Stats with one-click copy, redesigned Decks home with 'Deck to beat' hero, fullscreen mode (Settings/F11)."
 }

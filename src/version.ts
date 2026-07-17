@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.18.0";
+export const APP_VERSION = "0.19.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Daily archetype diffs — see what changed in a list vs yesterday",
-  "Meta-share timeline + you-vs-the-meta on the Decks home",
-  "Shareable week recap PNG from My Stats · optional match-end toasts",
-  "Keyboard shortcuts 1–7 jump nav pages · pipeline history + CI alerts",
+  "Decks home redesign — 'Deck to beat' hero with big stats, top 8 front and center",
+  "Format hub on Sets — Standard rotation dates, Pioneer pool, ban lists with card art",
+  "Full decklists in My Stats — curve, sideboard, card art, one-click copy for sharing",
+  "Fullscreen mode — Settings → Display or F11 anytime",
 ];
