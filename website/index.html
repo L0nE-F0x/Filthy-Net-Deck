@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Filthy Net Deck — Content engine: diffs, recaps &amp; Set Radar</title>
+    <title>Filthy Net Deck — Set Radar, matchup intel &amp; local winrates</title>
     <meta
       name="description"
-      content="Free MTG Arena companion for Windows &amp; macOS. Daily archetype diffs, meta-share timeline, shareable week recaps, match-end toasts, Set Radar spoilers, matchup intel, local winrates. 100% local."
+      content="Free MTG Arena companion for Windows &amp; macOS. Set Radar spoilers (no Alchemy), daily Standard &amp; Pioneer boards, matchup intel vs tagged archetypes, streaks, CSV, tray autostart. 100% local."
     />
     <meta name="theme-color" content="#070806" />
     <meta name="color-scheme" content="dark" />
@@ -19,33 +19,33 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta property="og:title" content="Filthy Net Deck v0.18 — Daily diffs, week recaps &amp; Set Radar" />
+    <meta property="og:title" content="Filthy Net Deck v0.17 — Flip through spoilers like a binder" />
     <meta
       property="og:description"
-      content="NEW: archetype list diffs, 30-day meta timeline, you-vs-meta, shareable recap PNGs, match-end toasts, Set Radar, matchup intel. Free Windows &amp; macOS. 100% local."
+      content="Set Radar with arrow-key browsing, Arena drop countdowns, rising/falling deck chips, hover-art lists, matchup intel vs every tagged archetype. Free Windows &amp; macOS. 100% local."
     />
-    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.18.0" />
-    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.18.0" />
+    <meta property="og:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.17.0" />
+    <meta property="og:image:secure_url" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.17.0" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Filthy Net Deck v0.18 — daily archetype diffs, week recaps, Set Radar, matchup intel — free for Windows + macOS"
+      content="Filthy Net Deck v0.17 — Set Radar spoilers, Arena drop countdowns, daily Standard &amp; Pioneer lists, matchup intel — free for Windows + macOS"
     />
 
     <!-- X / Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://filthy-net-deck.netlify.app/" />
-    <meta name="twitter:title" content="Filthy Net Deck v0.18 — Daily diffs, week recaps &amp; Set Radar" />
+    <meta name="twitter:title" content="Filthy Net Deck v0.17 — Flip through spoilers like a binder" />
     <meta
       name="twitter:description"
-      content="Archetype diffs, meta timeline, shareable recaps, match toasts, Set Radar, matchup intel. Free · Windows + macOS · 100% local."
+      content="Arrow-key spoiler browsing, drop countdowns, rising/falling decks, hover-art lists, matchup intel. Free · Windows + macOS · 100% local."
     />
-    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.18.0" />
+    <meta name="twitter:image" content="https://filthy-net-deck.netlify.app/assets/og-image.png?v=0.17.0" />
     <meta
       name="twitter:image:alt"
-      content="Filthy Net Deck v0.18 — daily archetype diffs, week recaps, Set Radar, matchup intel — free for Windows + macOS"
+      content="Filthy Net Deck v0.17 — Set Radar spoilers, Arena drop countdowns, daily Standard &amp; Pioneer lists, matchup intel — free for Windows + macOS"
     />
 
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
@@ -95,8 +95,8 @@
             <strong>real ranked lists only</strong>, Scryfall-verified — with
             <strong>Set Radar</strong> spoilers (no Alchemy), rising/falling deck chips, and
             hover-art lists. Private tracker: <strong>matchup intel vs tagged archetypes</strong>,
-            streaks &amp; CSV, shareable week recaps, and optional match-end toasts. Start with your
-            PC, tray-ready. Bo1/Bo3 · one-click Arena import. Nothing leaves your machine.
+            streaks &amp; CSV export, Climb Tracker, and tray autostart so matches never slip by.
+            Bo1/Bo3 · one-click Arena import. Nothing leaves your machine.
           </p>
           <div class="hero-actions">
             <a
@@ -214,7 +214,7 @@
                     <ul>
                       <li><i class="t1"></i> you 4–0 vs Izzet</li>
                       <li><i class="t2"></i> Streak W3 · 62% wk</li>
-                      <li><i class="t3"></i> CSV + recap PNG</li>
+                      <li><i class="t3"></i> CSV export · local</li>
                     </ul>
                   </div>
                 </div>
@@ -251,8 +251,8 @@
           <h2>Everything you need to stay filthy-current</h2>
           <p class="section-lede">
             Set Radar spoilers, daily meta boards with movement chips, matchup intel vs every tagged
-            archetype, streaks &amp; shareable recaps, Climb Tracker, and a private winrate tracker —
-            one native app. Only real data. Your history never leaves this PC.
+            archetype, streaks &amp; CSV, Climb Tracker, tray autostart, and a private winrate
+            tracker — one native app. Only real data. Your history never leaves this PC.
           </p>
         </div>
         <div class="feature-bento">
@@ -308,7 +308,7 @@
                 <span>Streak W3 · rolling WR sparkline</span><i style="--w: 72%"></i><b>hot</b>
               </div>
               <div class="stats-mock-row">
-                <span>One-click CSV · week recap PNG</span><i style="--w: 60%"></i><b>share</b>
+                <span>One-click CSV export of match history</span><i style="--w: 60%"></i><b>local</b>
               </div>
             </div>
           </article>
@@ -318,9 +318,8 @@
               <h3>Standard &amp; Pioneer — movement included</h3>
               <p>
                 Eight full lists per format from live metagame share. Rising/falling chips from the
-                daily diff, multi-select color filters, deck view grouped by type with avg mana
-                value and hover-art rows, plus a 30-day meta-share timeline and “you vs the meta”
-                table.
+                daily diff, multi-select color filters, and deck view grouped by type with avg mana
+                value and hover-art on every card row.
               </p>
             </div>
             <div class="fb-visual fb-decks">
@@ -344,7 +343,7 @@
           <article class="fb reveal delay-1">
             <div class="fb-icon">📊</div>
             <h3>My Stats</h3>
-            <p>Today / streak / rolling WR, seasons, fresh runs, CSV export, shareable week recap.</p>
+            <p>Today / streak / rolling WR, seasons, fresh runs, mini card-art diffs, CSV export.</p>
           </article>
           <article class="fb reveal delay-2">
             <div class="fb-icon">🖥️</div>
