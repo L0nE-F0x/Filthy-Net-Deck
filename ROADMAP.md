@@ -16,8 +16,10 @@ Critical fixes before the social-media marketing push.
 - [x] **P1: "Later" on update banner doesn't stick** — `dismissedUpdateVersion` tracked in the store for the session; banner suppressed for that version, Settings still shows the update.
 - [x] **P1: Sets card drawer keyboard support** — Escape closes, drawer takes focus on open, focus returns to the opening card on close.
 - [x] **P1: Arena-eve estimated dates hedged** — "expected on Arena tomorrow (estimated date)" wording in the desktop notification and SpoilerPulse banner when confidence is `estimated`.
-- [ ] **Release v0.14.1 end-to-end** (bump ×4, signed build, downloads + .sig, updater/latest.json, version.json ×2, index.html, OG regen + cache-bust, push, tag, verify live Netlify).
-- [ ] **Roll v0.14.1 dmg to macOS** once the tag's CI build finishes (update index.html mac links again).
+- [x] **Release v0.14.1 end-to-end** — shipped 2026-07-17; live Netlify verified (version.json, updater/latest.json + signature, installer, OG); owner confirmed in-app Update & restart worked.
+- [x] **Roll v0.14.1 dmg to macOS** — CI dmg pulled from the v0.14.1 GitHub release; mac links now at 0.14.1 (parity with Windows).
+
+**Milestone 1 complete — v0.14.1 live on all platforms.**
 
 ## Milestone 2 — v0.15.0 "Polish & Trust"
 
