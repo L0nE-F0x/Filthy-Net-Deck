@@ -193,6 +193,27 @@ interface AppState {
   /** Pending tracker deck key for Stats detail; cleared when Stats applies it. */
   statsFocusDeckKey: string | null;
   clearStatsFocusDeck: () => void;
+  /** Pending second deck for Stats compare (S5). */
+  statsCompareDeckKey: string | null;
+  clearStatsCompareDeck: () => void;
+  openStatsCompare: (keyA: string, keyB: string) => void;
+  /** Matchup Lab focus: opponent key and/or tag filter. */
+  matchupsFocusOpponent: string | null;
+  matchupsFocusTag: string | null;
+  clearMatchupsFocus: () => void;
+  openMatchupOpponent: (opponentName: string) => void;
+  openMatchupTag: (tag: string) => void;
+  /** Optional Format Hub tab preference. */
+  formatsFocusTab: "standard" | "pioneer" | null;
+  openFormatHub: (tab?: "standard" | "pioneer") => void;
+  clearFormatsFocus: () => void;
+  /** Pending nudge to tag last opponent (M2). */
+  tagNudgeOpponent: string | null;
+  clearTagNudge: () => void;
+  /** Climb focus: highlight a tracker deck on the climb path. */
+  climbFocusDeckKey: string | null;
+  openClimbDeck: (trackerDeckKey: string) => void;
+  clearClimbFocus: () => void;
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
@@ -255,6 +276,12 @@ export const useAppStore = create<AppState>((set, get) => {
     dailyFormatId: prefs.lastFormatId ?? null,
     selectedDeckId: null,
     statsFocusDeckKey: null,
+    statsCompareDeckKey: null,
+    matchupsFocusOpponent: null,
+    matchupsFocusTag: null,
+    formatsFocusTab: null,
+    tagNudgeOpponent: null,
+    climbFocusDeckKey: null,
     meta: null,
     metaSource: null,
     feedStatus: null,
@@ -310,10 +337,47 @@ export const useAppStore = create<AppState>((set, get) => {
     openStatsDeck: (trackerDeckKey) =>
       set({
         statsFocusDeckKey: trackerDeckKey,
+        statsCompareDeckKey: null,
         page: "stats",
         showFavoritesOnly: false,
       }),
     clearStatsFocusDeck: () => set({ statsFocusDeckKey: null }),
+    clearStatsCompareDeck: () => set({ statsCompareDeckKey: null }),
+    openStatsCompare: (keyA, keyB) =>
+      set({
+        statsFocusDeckKey: keyA,
+        statsCompareDeckKey: keyB,
+        page: "stats",
+        showFavoritesOnly: false,
+      }),
+    openMatchupOpponent: (opponentName) =>
+      set({
+        matchupsFocusOpponent: opponentName,
+        matchupsFocusTag: null,
+        page: "matchups",
+        tagNudgeOpponent: null,
+      }),
+    openMatchupTag: (tag) =>
+      set({
+        matchupsFocusTag: tag,
+        matchupsFocusOpponent: null,
+        page: "matchups",
+      }),
+    clearMatchupsFocus: () =>
+      set({ matchupsFocusOpponent: null, matchupsFocusTag: null }),
+    openFormatHub: (tab) =>
+      set({
+        formatsFocusTab: tab ?? "standard",
+        page: "formats",
+      }),
+    clearFormatsFocus: () => set({ formatsFocusTab: null }),
+    clearTagNudge: () => set({ tagNudgeOpponent: null }),
+    openClimbDeck: (trackerDeckKey) =>
+      set({
+        climbFocusDeckKey: trackerDeckKey,
+        page: "climb",
+      }),
+    clearClimbFocus: () => set({ climbFocusDeckKey: null }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);
@@ -462,7 +526,11 @@ export const useAppStore = create<AppState>((set, get) => {
         onMatch: (m) => {
           const cur = get().trackerMatches;
           if (cur.some((x) => x.matchId === m.matchId)) return;
-          set({ trackerMatches: [m, ...cur] });
+          set({
+            trackerMatches: [m, ...cur],
+            // M2: offer tagging when we know the opponent name
+            tagNudgeOpponent: m.opponentName?.trim() || get().tagNudgeOpponent,
+          });
           // Opt-in match-end toast — proves the tracker is alive.
           if (get().prefs.notifyMatchEnd) {
             const result =

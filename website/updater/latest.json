@@ -1,11 +1,11 @@
 {
-  "version": "0.26.0",
-  "notes": "v0.26.0: Climb Tracker overhaul — climb path shows which deck carried each stretch of the ladder; rank chart colors by deck; hover shows rank + deck; click any stretch or deck row to open full My Stats for that list.",
-  "pub_date": "2026-07-18T19:08:16.388Z",
+  "version": "1.0.0",
+  "notes": "v1.0.0: First major release — app-wide deep links (meta to Stats to Matchups to Format Hub), My Stats season story and two-deck compare, Format Hub rotation war room, Sets drop-day focus and rotation flags, Settings tracker health and keyboard shortcuts. 100% local.",
+  "pub_date": "2026-07-18T20:18:26.268Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjV1RnNxMFk3ZXgyQXBuWldrc0E2N1g1dExPaWlrMkV2RHBLZzhFRDErb1pRTWZsVU1lSG9CaDYvWUVJUjV2L1VSOVB4QjhwQ1Z1c2VSWGpDaXhzMFFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDAxNjg0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjYuMF94NjQtc2V0dXAuZXhlCnJhakV0b1JocGk2WG15dkZ4SjdSajZFTXdyYTFZemdDNFVRV3Z0NUtkTTJqK0ZsMHRrd0ZvUUxrTmdTQ2plVWpqYkZmKzhWUkpsYUdUbmgvb2VlK0NnPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.26.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJtOVNPNUJscFoyTXBoVnJrZEUvK01rcytUVU4yZE1TVjVjaTRvc2EyL0ZxaDFOV1ZSa0xjV1RrQ09hck8vWThmWHd6SzJwY04xekdYc29ndTRLUEFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDA1ODc3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuMC4wX3g2NC1zZXR1cC5leGUKek5GMVU1aklUOStRMXFQKzVzV3MySjljc25vZXowbzhaQ1hHUnYrUUxsWmJhSDJOR3BvZzJ5aTIyS1B3dHVJT2h1bVlnZzF0OHJXRHVLa3Y2SXE1Qmc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.0.0.exe"
     }
   }
 }

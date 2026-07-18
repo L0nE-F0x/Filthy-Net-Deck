@@ -16,6 +16,7 @@ import {
   setOpponentNote,
 } from "../services/matchupNotes";
 import { winrateFavor } from "../services/ranks";
+import { resolveMetaDeckByTag } from "../services/deepLinks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
@@ -188,10 +189,17 @@ export function Matchups() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
+  const meta = useAppStore((s) => s.meta);
+  const openDeck = useAppStore((s) => s.openDeck);
+  const openStatsDeck = useAppStore((s) => s.openStatsDeck);
+  const matchupsFocusOpponent = useAppStore((s) => s.matchupsFocusOpponent);
+  const matchupsFocusTag = useAppStore((s) => s.matchupsFocusTag);
+  const clearMatchupsFocus = useAppStore((s) => s.clearMatchupsFocus);
+  const tagNudgeOpponent = useAppStore((s) => s.tagNudgeOpponent);
+  const clearTagNudge = useAppStore((s) => s.clearTagNudge);
   useEffect(() => {
     void refreshTracker();
   }, [refreshTracker]);
-  const meta = useAppStore((s) => s.meta);
   const [season, setSeason] = useState<string | null>(null);
   const [deckFilter, setDeckFilter] = useState<string | null>(null);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
@@ -285,6 +293,44 @@ export function Matchups() {
     setEditingKey(g.key);
   };
 
+  // Deep links from Stats / Daily / tag nudge (I1, M2)
+  useEffect(() => {
+    if (matchupsFocusTag) {
+      setTagFilter(matchupsFocusTag);
+      clearMatchupsFocus();
+    }
+  }, [matchupsFocusTag, clearMatchupsFocus]);
+
+  useEffect(() => {
+    if (!matchupsFocusOpponent) return;
+    const key = opponentKey(matchupsFocusOpponent);
+    const g = groups.find((x) => x.key === key);
+    if (g) openOpponent(g);
+    else {
+      setSelected(key);
+      setTagDraft("");
+      setNotesDraft("");
+      setEditingKey(key);
+    }
+    clearMatchupsFocus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchupsFocusOpponent, groups.length]);
+
+  useEffect(() => {
+    if (!tagNudgeOpponent) return;
+    const key = opponentKey(tagNudgeOpponent);
+    const g = groups.find((x) => x.key === key);
+    if (g) openOpponent(g);
+    else {
+      setSelected(key);
+      setTagDraft("");
+      setNotesDraft("");
+      setEditingKey(key);
+    }
+    // leave nudge until dismissed so banner can show
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tagNudgeOpponent]);
+
   const saveNotes = (tag: string, notes: string) => {
     if (!selectedGroup) return;
     setOpponentNote(selectedGroup.name, { tag, notes });
@@ -324,6 +370,41 @@ export function Matchups() {
 
   return (
     <div className="flex flex-col gap-3">
+      {tagNudgeOpponent && (
+        <div className="panel tag-nudge" role="status">
+          <div>
+            <p className="eyebrow m-0 mb-1">Tag last opponent</p>
+            <p className="text-sm m-0">
+              You just played <strong className="text-foam">{tagNudgeOpponent}</strong> — add an
+              archetype tag so Decks can show your record vs them.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                const key = opponentKey(tagNudgeOpponent);
+                const g = groups.find((x) => x.key === key);
+                if (g) openOpponent(g);
+                else {
+                  setSelected(key);
+                  setTagDraft("");
+                  setNotesDraft("");
+                  setEditingKey(key);
+                }
+                clearTagNudge();
+              }}
+            >
+              Tag now
+            </button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => clearTagNudge()}>
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="panel lab-intro">
         <div>
           <p className="eyebrow m-0">Matchup Lab</p>
@@ -546,15 +627,56 @@ export function Matchups() {
               <p className="text-[11px] text-muted m-0">Tags and notes save as you type.</p>
             </div>
 
+            {(selectedGroup.tag || tagDraft.trim()) && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(() => {
+                  const tag = (editingKey === selectedGroup.key ? tagDraft : selectedGroup.tag) ?? "";
+                  const hit = resolveMetaDeckByTag(meta, tag);
+                  if (!hit) {
+                    return (
+                      <p className="text-xs text-muted m-0">
+                        No ranked meta list matches tag &quot;{tag.trim() || "…"}&quot; today.
+                      </p>
+                    );
+                  }
+                  const rec = selectedGroup;
+                  const rate =
+                    rec.wins + rec.losses > 0
+                      ? Math.round((rec.wins / (rec.wins + rec.losses)) * 100)
+                      : null;
+                  return (
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => openDeck(hit.deckId)}
+                    >
+                      Open meta: {hit.deck.name}
+                      {rate != null ? ` · you ${rec.wins}–${rec.losses} (${rate}%)` : ""}
+                    </button>
+                  );
+                })()}
+              </div>
+            )}
+
             {selectedGroup.decks.length > 0 && (
               <div className="mt-3">
                 <h4 className="dash-title">Your decks vs them</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {selectedGroup.decks.map((d) => (
-                    <span key={d} className="filter-chip active" style={{ cursor: "default" }}>
-                      {d}
-                    </span>
-                  ))}
+                  {selectedGroup.decks.map((d) => {
+                    const sample = selectedGroup.matches.find((m) => m.deckName === d);
+                    const key = sample ? deckKey(sample) : d;
+                    return (
+                      <button
+                        key={d}
+                        type="button"
+                        className="filter-chip active"
+                        title="Open in My Stats"
+                        onClick={() => openStatsDeck(key)}
+                      >
+                        {d} →
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -567,12 +689,16 @@ export function Matchups() {
                   .map((m) => (
                     <div key={m.matchId} className="mu-lab-match">
                       <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
-                      <span className="truncate">
+                      <button
+                        type="button"
+                        className="truncate link-btn text-left"
+                        onClick={() => openStatsDeck(deckKey(m))}
+                      >
                         {m.deckName ?? "Unknown deck"}
                         {m.games.length > 1 && (
                           <span className="text-muted"> · {gameScore(m)}</span>
                         )}
-                      </span>
+                      </button>
                       <span className="text-xs text-muted whitespace-nowrap">
                         {timeAgo(m.endedAt)}
                       </span>

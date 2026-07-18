@@ -5,6 +5,10 @@
  *
  * Also mirrored into the sets feed when the pipeline has set-trailers.json;
  * this client map is the fallback for older feeds and offline.
+ *
+ * Z5 upkeep: when WotC posts a new announce trailer, add it to BY_CODE and/or
+ * BY_NAME here (and pipeline set-trailers.json when the feed should carry it).
+ * Run setTrailers.test.ts after edits — never invent IDs.
  */
 
 export interface SetTrailer {

@@ -1,5 +1,5 @@
 {
-  "version": "0.26.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.26.0.exe",
-  "notes": "v0.26.0: Climb Tracker overhaul — climb path shows which deck carried each stretch of the ladder; rank chart colors by deck; hover shows rank + deck; click any stretch or deck row to open full My Stats for that list."
+  "version": "1.0.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.0.0.exe",
+  "notes": "v1.0.0: First major release — app-wide deep links (meta to Stats to Matchups to Format Hub), My Stats season story and two-deck compare, Format Hub rotation war room, Sets drop-day focus and rotation flags, Settings tracker health and keyboard shortcuts. 100% local."
 }

@@ -2,6 +2,7 @@
 
 **Created:** 2026-07-19 (after Climb Tracker v0.26.0 overhaul)  
 **Owner picks locked:** 2026-07-19 (see **Approved queue** below).  
+**Shipped:** **v1.0.0** (2026-07-19) — all four batches (WANT tickets) in a signed Windows release.  
 **How to use:** Each page is graded against the **Climb bar**. Work is **batched** (see `AGENTS.md` pacing). Check items off when they ship in a real version bump — source-only is not done.
 
 ### The Climb bar (what “10×” means here)

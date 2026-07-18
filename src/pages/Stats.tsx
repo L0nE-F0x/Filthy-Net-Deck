@@ -14,12 +14,18 @@ import { downloadRecapPng, recapFromMatches } from "../services/recapCard";
 import { formatRecapHeadline } from "../services/recapStats";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
 import { isLandName } from "../services/landNames";
-import { winrateFavor } from "../services/ranks";
+import { formatRank, winrateFavor } from "../services/ranks";
 import { currentStreak } from "../services/climbStats";
 import {
   resolveArenaCards,
   type ArenaCardInfo,
 } from "../services/arenaCards";
+import {
+  buildInsightChips,
+  buildSeasonStory,
+  compareDecks,
+} from "../services/statsInsights";
+import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
@@ -907,16 +913,35 @@ function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
   );
 }
 
-function MatchRow({ m }: { m: TrackedMatch }) {
+function MatchRow({
+  m,
+  onOpponent,
+  onDeck,
+}: {
+  m: TrackedMatch;
+  onOpponent: (name: string) => void;
+  onDeck: (key: string) => void;
+}) {
   const onPlay = m.games.length === 1 ? m.games[0]?.onPlay : undefined;
   return (
     <div className="match-row">
       <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
-      <span className="match-opponent" title={m.opponentPlatform ?? undefined}>
+      <button
+        type="button"
+        className="match-opponent link-btn text-left"
+        title={m.opponentPlatform ?? "Open in Matchup Lab"}
+        onClick={() => onOpponent(m.opponentName ?? "Unknown")}
+      >
         vs {m.opponentName ?? "Unknown"}
-      </span>
+      </button>
       <span className="match-detail">
-        {m.deckName ?? "Unknown deck"}
+        <button
+          type="button"
+          className="link-btn"
+          onClick={() => onDeck(deckKey(m))}
+        >
+          {m.deckName ?? "Unknown deck"}
+        </button>
         <span className="text-muted"> · {queueLabel(m.eventId)}</span>
         {m.games.length > 1 && <span className="text-muted"> · {gameScore(m)}</span>}
         {onPlay !== undefined && (
@@ -970,7 +995,15 @@ function sortMatches(matches: TrackedMatch[], key: MatchSortKey, dir: SortDir): 
   });
 }
 
-function MatchHistory({ matches }: { matches: TrackedMatch[] }) {
+function MatchHistory({
+  matches,
+  onOpponent,
+  onDeck,
+}: {
+  matches: TrackedMatch[];
+  onOpponent: (name: string) => void;
+  onDeck: (key: string) => void;
+}) {
   const [visible, setVisible] = useState(30);
   const [sort, setSort] = useState<{ key: MatchSortKey; dir: SortDir }>({
     key: "when",
@@ -1016,7 +1049,7 @@ function MatchHistory({ matches }: { matches: TrackedMatch[] }) {
           />
         </div>
         {sorted.slice(0, visible).map((m) => (
-          <MatchRow key={m.matchId} m={m} />
+          <MatchRow key={m.matchId} m={m} onOpponent={onOpponent} onDeck={onDeck} />
         ))}
       </div>
       {sorted.length > visible && (
@@ -1037,15 +1070,36 @@ function DeckDetail({
   runs,
   setRuns,
   onBack,
+  allMatches,
 }: {
   deck: DeckGroup;
   runs: DeckRuns;
   setRuns: (r: DeckRuns) => void;
   onBack: () => void;
+  allMatches: TrackedMatch[];
 }) {
   const deleteMatches = useAppStore((s) => s.deleteMatches);
+  const meta = useAppStore((s) => s.meta);
+  const openDeck = useAppStore((s) => s.openDeck);
+  const openMatchupOpponent = useAppStore((s) => s.openMatchupOpponent);
+  const openClimbDeck = useAppStore((s) => s.openClimbDeck);
+  const openStatsCompare = useAppStore((s) => s.openStatsCompare);
+  const openStatsDeck = useAppStore((s) => s.openStatsDeck);
+  const setPage = useAppStore((s) => s.setPage);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [compareKey, setCompareKey] = useState<string>("");
+
+  const metaHit = resolveMetaDeck(meta, deck.name);
+  const otherDecks = useMemo(() => {
+    const keys = new Map<string, string>();
+    for (const m of allMatches) {
+      const k = deckKey(m);
+      if (k === deck.key) continue;
+      if (!keys.has(k) && m.deckName) keys.set(k, m.deckName);
+    }
+    return [...keys.entries()].map(([key, name]) => ({ key, name }));
+  }, [allMatches, deck.key]);
 
   const runStart = runs[deck.key];
   const hiddenByRun =
@@ -1135,6 +1189,55 @@ function DeckDetail({
             <CardArtStrip cards={headerArts} max={6} />
           </div>
         )}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {metaHit ? (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => openDeck(metaHit.deckId)}
+            >
+              Open meta list
+            </button>
+          ) : (
+            <span className="text-xs text-muted self-center">No matching meta list today</span>
+          )}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => openClimbDeck(deck.key)}
+          >
+            Climb path
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            title="Tag and note opponents in Matchup Lab"
+            onClick={() => setPage("matchups")}
+          >
+            Opponents
+          </button>
+          {otherDecks.length > 0 && (
+            <span className="flex items-center gap-1.5 text-xs">
+              <label className="text-muted">Compare</label>
+              <select
+                className="settings-select"
+                value={compareKey}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setCompareKey(v);
+                  if (v) openStatsCompare(deck.key, v);
+                }}
+              >
+                <option value="">Pick deck…</option>
+                {otherDecks.map((d) => (
+                  <option key={d.key} value={d.key}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </span>
+          )}
+        </div>
         {runStart !== undefined && (
           <p className="run-banner">
             Fresh run since {new Date(runStart).toLocaleDateString()} — {hiddenByRun} earlier
@@ -1169,7 +1272,13 @@ function DeckDetail({
           )}
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <VersionHistory deckMatches={deck.matches} />
-          <MatchHistory matches={visibleMatches} />
+          <MatchHistory
+            matches={visibleMatches}
+            onOpponent={(name) => openMatchupOpponent(name)}
+            onDeck={(key) => {
+              if (key !== deck.key) openStatsDeck(key);
+            }}
+          />
         </>
       )}
     </div>
@@ -1186,10 +1295,14 @@ export function Stats() {
   const clearTracker = useAppStore((s) => s.clearTracker);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const statsFocusDeckKey = useAppStore((s) => s.statsFocusDeckKey);
+  const statsCompareDeckKey = useAppStore((s) => s.statsCompareDeckKey);
   const clearStatsFocusDeck = useAppStore((s) => s.clearStatsFocusDeck);
+  const clearStatsCompareDeck = useAppStore((s) => s.clearStatsCompareDeck);
+  const openMatchupOpponent = useAppStore((s) => s.openMatchupOpponent);
   const [queue, setQueue] = useState<string | null>(null);
   const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
+  const [compareWith, setCompareWith] = useState<string | null>(null);
   const [runs, setRuns] = useState<DeckRuns>(() => loadDeckRuns());
   const [confirmClear, setConfirmClear] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
@@ -1200,12 +1313,20 @@ export function Stats() {
     void refreshTracker();
   }, [refreshTracker]);
 
-  // Climb / Matchups can deep-link into a deck detail.
+  // Climb / Matchups can deep-link into a deck detail or compare view.
   useEffect(() => {
     if (!statsFocusDeckKey) return;
     setSelectedDeck(statsFocusDeckKey);
+    if (statsCompareDeckKey) setCompareWith(statsCompareDeckKey);
+    else setCompareWith(null);
     clearStatsFocusDeck();
-  }, [statsFocusDeckKey, clearStatsFocusDeck]);
+    clearStatsCompareDeck();
+  }, [
+    statsFocusDeckKey,
+    statsCompareDeckKey,
+    clearStatsFocusDeck,
+    clearStatsCompareDeck,
+  ]);
 
   const onExportCsv = () => {
     setExportMsg("Exporting…");
@@ -1270,13 +1391,94 @@ export function Stats() {
     return groups[0] ?? null;
   }, [selectedDeck, matches, runs]);
 
+  const insights = useMemo(
+    () => buildInsightChips(matches, { seasonKey: season === "all" ? null : season }),
+    [matches, season],
+  );
+  const seasonStory = useMemo(
+    () => buildSeasonStory(matches, season),
+    [matches, season],
+  );
+  const comparison =
+    selectedDeck && compareWith
+      ? compareDecks(matches, selectedDeck, compareWith)
+      : null;
+
+  if (selected && comparison && compareWith) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="panel">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mb-2"
+            onClick={() => {
+              setCompareWith(null);
+            }}
+          >
+            ‹ Back to deck
+          </button>
+          <h3 className="dash-title m-0 mb-3">Deck compare</h3>
+          <div className="deck-compare-grid">
+            {[comparison.a, comparison.b].map((side) => (
+              <div key={side.key} className="panel deck-compare-card">
+                <h4 className="m-0 text-sm font-semibold">{side.name}</h4>
+                <p className="text-xs text-muted m-0 mt-1">
+                  {side.wins}W {side.losses}L
+                  {side.rate != null && (
+                    <strong className={`favor-${winrateFavor(side.rate)}`}>
+                      {" "}
+                      {(side.rate * 100).toFixed(0)}%
+                    </strong>
+                  )}
+                </p>
+                <ul className="text-xs m-0 mt-2 pl-4 text-muted">
+                  <li>
+                    Play WR:{" "}
+                    {side.playRate != null
+                      ? `${(side.playRate * 100).toFixed(0)}%`
+                      : "—"}
+                  </li>
+                  <li>
+                    Draw WR:{" "}
+                    {side.drawRate != null
+                      ? `${(side.drawRate * 100).toFixed(0)}%`
+                      : "—"}
+                  </li>
+                  <li>
+                    Last 10:{" "}
+                    {side.form10 != null ? `${(side.form10 * 100).toFixed(0)}%` : "—"}
+                  </li>
+                  <li>Peak: {side.peakRank ? formatRank(side.peakRank) : "—"}</li>
+                </ul>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm mt-2"
+                  onClick={() => {
+                    setCompareWith(null);
+                    setSelectedDeck(side.key);
+                  }}
+                >
+                  Open {side.name}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (selected) {
     return (
       <DeckDetail
         deck={selected}
         runs={runs}
         setRuns={setRuns}
-        onBack={() => setSelectedDeck(null)}
+        onBack={() => {
+          setSelectedDeck(null);
+          setCompareWith(null);
+        }}
+        allMatches={matches}
       />
     );
   }
@@ -1341,6 +1543,63 @@ export function Stats() {
             </div>
           )}
 
+          <div className="panel season-story">
+            <p className="eyebrow m-0 mb-1">Season story</p>
+            <p className="text-sm m-0">
+              {seasonStory.wins}W {seasonStory.losses}L
+              {seasonStory.rate != null && (
+                <strong className={`favor-${winrateFavor(seasonStory.rate)}`}>
+                  {" "}
+                  {(seasonStory.rate * 100).toFixed(0)}%
+                </strong>
+              )}
+              {seasonStory.peakRank && (
+                <>
+                  {" "}
+                  · peak <strong className="text-gold-300">{formatRank(seasonStory.peakRank)}</strong>
+                </>
+              )}
+              {seasonStory.bestDeckName && (
+                <>
+                  {" "}
+                  · best{" "}
+                  <button
+                    type="button"
+                    className="link-btn text-foam"
+                    onClick={() =>
+                      seasonStory.bestDeckKey && setSelectedDeck(seasonStory.bestDeckKey)
+                    }
+                  >
+                    {seasonStory.bestDeckName}
+                  </button>
+                  {seasonStory.bestDeckRate != null && (
+                    <span className="text-muted">
+                      {" "}
+                      ({(seasonStory.bestDeckRate * 100).toFixed(0)}%)
+                    </span>
+                  )}
+                </>
+              )}
+            </p>
+          </div>
+
+          {insights.length > 0 && (
+            <div className="insight-chips">
+              {insights.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`insight-chip insight-${c.kind}${c.deckKey ? "" : " no-nav"}`}
+                  onClick={() => c.deckKey && setSelectedDeck(c.deckKey)}
+                  disabled={!c.deckKey}
+                >
+                  <strong>{c.label}</strong>
+                  <span>{c.detail}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           <SummaryTiles matches={filtered} />
           <FormTiles matches={filtered} />
           <div className="panel flex flex-wrap items-center justify-between gap-2">
@@ -1358,7 +1617,11 @@ export function Stats() {
           <StatsArsenal decks={decks} onSelect={setSelectedDeck} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
-          <MatchHistory matches={filtered} />
+          <MatchHistory
+            matches={filtered}
+            onOpponent={(name) => openMatchupOpponent(name)}
+            onDeck={(key) => setSelectedDeck(key)}
+          />
 
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="text-xs text-muted m-0">

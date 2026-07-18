@@ -2,6 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { openExternal } from "../services/openExternal";
+import { decksForMode } from "../services/deckHelpers";
+import {
+  arsenalRiskFromNamedLists,
+  buildNearRotationHero,
+  buildRotationRoster,
+} from "../services/formatHubExtras";
+import { metaOccurrencesForCard } from "../services/deepLinks";
+import { deckKey } from "../services/tracker";
+import { EntityChip } from "../components/EntityChip";
 import type { BannedCard, FormatHub as FormatHubData, FormatSetInfo } from "../types/sets";
 
 function formatDate(iso: string | null | undefined): string {
@@ -64,7 +73,13 @@ function FormatSetRow({
   );
 }
 
-function BanRail({ bans }: { bans: BannedCard[] }) {
+function BanRail({
+  bans,
+  onMetaClick,
+}: {
+  bans: BannedCard[];
+  onMetaClick?: (cardName: string) => void;
+}) {
   if (bans.length === 0) {
     return <p className="text-sm text-good m-0">No banned cards — the format is clean.</p>;
   }
@@ -76,14 +91,18 @@ function BanRail({ bans }: { bans: BannedCard[] }) {
           type="button"
           role="listitem"
           className="ban-card"
-          title={`${b.name} — banned${b.reason ? `\n\n${b.reason}` : ""}\nClick for Scryfall`}
-          onClick={() =>
+          title={`${b.name} — banned${b.reason ? `\n\n${b.reason}` : ""}\nClick for Scryfall · shift-click for meta`}
+          onClick={(e) => {
+            if (e.shiftKey && onMetaClick) {
+              onMetaClick(b.name);
+              return;
+            }
             void openExternal(
               b.scryfallId
                 ? `https://scryfall.com/card/${b.scryfallId}`
                 : `https://scryfall.com/search?q=${encodeURIComponent(`!"${b.name}"`)}`,
-            )
-          }
+            );
+          }}
         >
           {b.scryfallId ? (
             <img src={scryfallCdnUrl(b.scryfallId, "small")} alt={b.name} loading="lazy" />
@@ -100,12 +119,83 @@ function BanRail({ bans }: { bans: BannedCard[] }) {
   );
 }
 
-function HubBody({ hub }: { hub: FormatHubData }) {
-  const [fmt, setFmt] = useState<"standard" | "pioneer">("standard");
+function HubBody({
+  hub,
+  initialTab,
+}: {
+  hub: FormatHubData;
+  initialTab?: "standard" | "pioneer" | null;
+}) {
+  const meta = useAppStore((s) => s.meta);
+  const mode = useAppStore((s) => s.mode);
+  const openDeck = useAppStore((s) => s.openDeck);
+  const trackerMatches = useAppStore((s) => s.trackerMatches);
+  const [fmt, setFmt] = useState<"standard" | "pioneer">(
+    initialTab === "pioneer" ? "pioneer" : "standard",
+  );
   const [showAllPio, setShowAllPio] = useState(false);
+  const [banMetaMsg, setBanMetaMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialTab === "pioneer" || initialTab === "standard") setFmt(initialTab);
+  }, [initialTab]);
 
   const std = hub.standard;
   const pio = hub.pioneer;
+
+  const stdDecks = useMemo(() => {
+    if (!meta) return [];
+    const f = meta.formats.find((x) => x.id === "standard");
+    if (!f) return [];
+    return decksForMode(f, mode, meta.decks);
+  }, [meta, mode]);
+
+  const rotationRoster = useMemo(
+    () => buildRotationRoster(stdDecks, std?.rotation),
+    [stdDecks, std?.rotation],
+  );
+  const nearHero = useMemo(
+    () => buildNearRotationHero(std?.rotation, rotationRoster),
+    [std?.rotation, rotationRoster],
+  );
+
+  const arsenalRisk = useMemo(() => {
+    const byKey = new Map<string, { name: string; games: number; cards: string[] }>();
+    for (const m of trackerMatches) {
+      const k = deckKey(m);
+      const row = byKey.get(k) ?? {
+        name: m.deckName?.trim() || "Unknown",
+        games: 0,
+        cards: [] as string[],
+      };
+      row.games++;
+      if (m.deckName?.trim()) row.name = m.deckName.trim();
+      byKey.set(k, row);
+    }
+    for (const [, row] of byKey) {
+      const hit = stdDecks.find(
+        (d) =>
+          d.name.toLowerCase() === row.name.toLowerCase() ||
+          d.archetype.toLowerCase() === row.name.toLowerCase(),
+      );
+      if (hit) {
+        row.cards = [
+          ...hit.mainboard.map((c) => c.name),
+          ...hit.sideboard.map((c) => c.name),
+        ];
+      }
+    }
+    return arsenalRiskFromNamedLists(
+      [...byKey.entries()].map(([key, v]) => ({
+        key,
+        name: v.name,
+        games: v.games,
+        cardNames: v.cards,
+      })),
+      std?.rotation,
+    );
+  }, [trackerMatches, stdDecks, std?.rotation]);
+
   if (!std && !pio) return null;
 
   const nextExitKey = std?.sets.length
@@ -202,10 +292,99 @@ function HubBody({ hub }: { hub: FormatHubData }) {
             <h4 className="text-xs font-semibold uppercase tracking-wide text-muted m-0 mb-2">
               Banned in {fmt === "standard" ? "Standard" : "Pioneer"} · {active.bans.length}
             </h4>
-            <BanRail bans={active.bans} />
+            <BanRail
+              bans={active.bans}
+              onMetaClick={(name) => {
+                const occ = metaOccurrencesForCard(meta, name);
+                if (!occ.length) {
+                  setBanMetaMsg(`“${name}” is not on today’s meta board.`);
+                  return;
+                }
+                setBanMetaMsg(
+                  `${name}: ${occ.length} listing${occ.length === 1 ? "" : "s"} — opening top deck.`,
+                );
+                openDeck(occ[0].deckId);
+              }}
+            />
+            {banMetaMsg && <p className="text-xs text-muted m-0 mt-2">{banMetaMsg}</p>}
+            <p className="text-[11px] text-muted m-0 mt-1">
+              Click ban art for Scryfall · Shift-click for a meta listing if any remain on board.
+            </p>
           </div>
         </>
       ) : null}
+
+      {fmt === "standard" && nearHero.active && (
+        <div className="rotation-hero">
+          <p className="eyebrow m-0 mb-1">Rotation approaching</p>
+          <h3 className="text-base font-semibold m-0">
+            {nearHero.nextDate
+              ? formatDate(nearHero.nextDate)
+              : nearHero.roughLabel || "Soon"}
+            {nearHero.daysUntil != null && nearHero.daysUntil >= 0 && (
+              <span className="text-muted font-normal"> · {nearHero.daysUntil}d</span>
+            )}
+          </h3>
+          <p className="text-sm text-muted m-0 mt-1">
+            {nearHero.cardCount} cards leave Standard
+            {nearHero.topThreatened.length > 0 && (
+              <>
+                {" "}
+                · most exposed: {nearHero.topThreatened.map((r) => r.deckName).join(", ")}
+              </>
+            )}
+          </p>
+        </div>
+      )}
+
+      {fmt === "standard" && rotationRoster.length > 0 && (
+        <div>
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-muted m-0 mb-2">
+            Meta decks at rotation · {rotationRoster.length}
+          </h4>
+          <div className="fmt-rot-roster">
+            {rotationRoster.slice(0, 12).map((r) => (
+              <button
+                key={r.deckId}
+                type="button"
+                className="fmt-rot-row"
+                onClick={() => openDeck(r.deckId)}
+              >
+                <span className="fmt-rot-name">
+                  <EntityChip
+                    label={r.rank != null ? `#${r.rank} ${r.deckName}` : r.deckName}
+                  />
+                </span>
+                <span className="fmt-rot-lost">−{r.cardsLost}</span>
+                <span className="fmt-rot-sample text-muted">
+                  {r.sampleNames.slice(0, 2).join(", ")}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {fmt === "standard" && arsenalRisk.length > 0 && (
+        <div>
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-muted m-0 mb-2">
+            Your arsenal at risk
+          </h4>
+          <div className="fmt-rot-roster">
+            {arsenalRisk.map((r) => (
+              <div key={r.deckKey} className="fmt-rot-row is-static">
+                <span className="fmt-rot-name">{r.deckName}</span>
+                <span className="fmt-rot-lost">
+                  −{r.cardsAtRisk} · {r.games}g
+                </span>
+                <span className="fmt-rot-sample text-muted">
+                  {r.sampleNames.join(", ") || "via meta list join"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {hub.sources?.length ? (
         <p className="text-[11px] text-muted m-0 leading-relaxed">
@@ -226,11 +405,17 @@ export function FormatHubPage() {
   const setsError = useAppStore((s) => s.setsError);
   const refreshSets = useAppStore((s) => s.refreshSets);
   const markBansSeen = useAppStore((s) => s.markBansSeen);
+  const formatsFocusTab = useAppStore((s) => s.formatsFocusTab);
+  const clearFormatsFocus = useAppStore((s) => s.clearFormatsFocus);
 
   // Visiting Format Hub acknowledges the current ban lists (clears B&R pulse).
   useEffect(() => {
     markBansSeen();
   }, [markBansSeen]);
+
+  useEffect(() => {
+    if (formatsFocusTab) clearFormatsFocus();
+  }, [formatsFocusTab, clearFormatsFocus]);
 
   const hub = sets?.formats ?? null;
   const hasHub = Boolean(hub && (hub.standard || hub.pioneer));
@@ -302,7 +487,7 @@ export function FormatHubPage() {
         </p>
       </div>
 
-      <HubBody hub={hub} />
+      <HubBody hub={hub} initialTab={formatsFocusTab} />
     </div>
   );
 }

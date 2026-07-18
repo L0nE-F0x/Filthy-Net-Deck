@@ -177,7 +177,7 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 | **3** | Hub war room | F1–F5, I4 |
 | **4** | Sets + deck compare | Z2–Z5, S5 |
 
-**Next to implement when owner says go:** Batch **1**.
+**Shipped v1.0.0 (2026-07-19):** batches **1–4** (25 WANT tickets) — signed Windows installer + updater + site.
 
 ### Explicitly deferred
 

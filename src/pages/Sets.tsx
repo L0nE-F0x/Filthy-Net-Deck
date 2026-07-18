@@ -145,25 +145,38 @@ function cardHasColor(c: SetPreviewCard, col: string): boolean {
   return (c.colors || []).includes(col);
 }
 
-/** Scryfall marks unreleased cards not_legal until launch day — say so. */
+/** Scryfall marks unreleased cards not_legal until launch day — say so. Z3: badges open Format Hub. */
 function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: boolean }) {
+  const openFormatHub = useAppStore((s) => s.openFormatHub);
   const std = isFormatLegal(card, "standard");
   const pio = isFormatLegal(card, "pioneer");
   const pendingLabel = unreleased ? "at release" : "—";
   return (
     <div className="legal-badges">
-      <span
-        className={`legal-badge${std ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+      <button
+        type="button"
+        className={`legal-badge legal-badge-btn${std ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+        title="Open Format Hub · Standard"
+        onClick={() => openFormatHub("standard")}
       >
         Std {std ? "legal" : pendingLabel}
-      </span>
-      <span
-        className={`legal-badge${pio ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+      </button>
+      <button
+        type="button"
+        className={`legal-badge legal-badge-btn${pio ? " legal-yes" : unreleased ? " legal-pending" : " legal-no"}`}
+        title="Open Format Hub · Pioneer"
+        onClick={() => openFormatHub("pioneer")}
       >
         Pio {pio ? "legal" : pendingLabel}
-      </span>
+      </button>
     </div>
   );
+}
+
+/** Z2 — Arena drop within ±1 calendar day. */
+function isArenaDropWindow(iso: string | null | undefined): boolean {
+  const d = daysUntil(iso);
+  return d != null && d >= -1 && d <= 1;
 }
 
 function CardDetailDrawer({
@@ -297,17 +310,22 @@ function SetGallery({
   set,
   newIds,
   onBack,
+  preferNewFilter,
 }: {
   set: UpcomingSet;
   newIds: Set<string>;
   onBack: () => void;
+  /** Z2 drop-day: open with "new" filter when there are new cards. */
+  preferNewFilter?: boolean;
 }): ReactNode {
   const [rarity, setRarity] = useState<RarityFilter>("all");
   const [color, setColor] = useState<ColorFilter>("all");
   const [typeF, setTypeF] = useState<TypeFilter>("all");
   const [sort, setSort] = useState<SortKey>("collector");
   const [query, setQuery] = useState("");
-  const [newOnly, setNewOnly] = useState(false);
+  const [newOnly, setNewOnly] = useState(
+    () => Boolean(preferNewFilter && newIds.size > 0),
+  );
   const [focus, setFocus] = useState<SetPreviewCard | null>(null);
   // Stable ref so the drawer's focus/Escape effect doesn't re-run per render.
   const closeFocus = useCallback(() => setFocus(null), []);
@@ -675,11 +693,19 @@ function SetCard({
   newCount,
   onOpenGallery,
   onPlayTrailer,
+  dropDay,
+  rotationDays,
+  rotationLabel,
 }: {
   set: UpcomingSet;
   newCount: number;
   onOpenGallery: (s: UpcomingSet) => void;
   onPlayTrailer: (setName: string, trailer: SetTrailer) => void;
+  /** Z2 — Arena ±1d pin badge. */
+  dropDay?: boolean;
+  /** Z4 — days until Standard exit when ≤45. */
+  rotationDays?: number | null;
+  rotationLabel?: string | null;
 }) {
   const trailer = trailerForSet({
     code: set.code,
@@ -700,9 +726,11 @@ function SetCard({
       : set.spoiledCount > 0
         ? 100
         : 0;
+  const nearRotation =
+    rotationDays != null && rotationDays >= 0 && rotationDays <= 45;
 
   return (
-    <article className="set-card">
+    <article className={`set-card${dropDay ? " set-card-drop-day" : ""}${nearRotation ? " set-card-rotating" : ""}`}>
       <div className="set-card-hero">
         {heroUrl ? (
           <img src={heroUrl} alt="" className="set-card-hero-img" />
@@ -712,6 +740,27 @@ function SetCard({
         <div className="set-card-hero-fade" />
         <div className="set-card-hero-top">
           <span className={statusClass(set.status)}>{statusLabel(set.status)}</span>
+          {dropDay ? (
+            <span className="set-drop-day-badge" title="Arena drop window (±1 day)">
+              Drop day
+            </span>
+          ) : null}
+          {nearRotation ? (
+            <span
+              className="set-rot-flag"
+              title={
+                rotationLabel
+                  ? `Leaves Standard ${rotationLabel}`
+                  : "Leaving Standard soon"
+              }
+            >
+              {rotationDays === 0
+                ? "Rotates today"
+                : rotationDays === 1
+                  ? "Rotates tomorrow"
+                  : `Rotates ${rotationDays}d`}
+            </span>
+          ) : null}
           {set.iconSvg ? (
             <img src={set.iconSvg} alt="" className="set-icon" width={28} height={28} />
           ) : null}
@@ -813,6 +862,14 @@ function SetCard({
           <button
             type="button"
             className="btn btn-ghost btn-sm"
+            title="Format legality & rotation"
+            onClick={() => useAppStore.getState().openFormatHub("standard")}
+          >
+            Format Hub
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
             onClick={() => void openExternal(set.scryfallUri)}
           >
             Scryfall
@@ -829,6 +886,7 @@ export function Sets() {
   const setsError = useAppStore((s) => s.setsError);
   const setsNewByCode = useAppStore((s) => s.setsNewByCode);
   const refreshSets = useAppStore((s) => s.refreshSets);
+  const openFormatHub = useAppStore((s) => s.openFormatHub);
   const [openCode, setOpenCode] = useState<string | null>(null);
   const [playing, setPlaying] = useState<{ setName: string; trailer: SetTrailer } | null>(
     null,
@@ -844,21 +902,48 @@ export function Sets() {
     setPlaying({ setName, trailer });
   }, []);
 
-  const { upcoming, live } = useMemo(() => {
+  /** Z4 — Standard exit window by set code from Format Hub feed. */
+  const stdExitByCode = useMemo(() => {
+    const m = new Map<string, { days: number | null; label: string | null }>();
+    for (const s of sets?.formats?.standard?.sets ?? []) {
+      const days = daysUntil(s.exitDate);
+      const label = s.exitDate
+        ? formatDate(s.exitDate)
+        : s.exitRough || null;
+      m.set(s.code.toLowerCase(), { days, label });
+    }
+    return m;
+  }, [sets]);
+
+  const { upcoming, live, dropDaySets } = useMemo(() => {
     const list = sets?.sets ?? [];
-    const upcoming = list.filter(
-      (s) => s.status === "spoiling" || s.status === "announced",
-    );
+    const dropDaySets = list.filter((s) => isArenaDropWindow(s.dates.arena));
+    // Z2: pin Arena drop-window sets to the front of the radar list.
+    const upcoming = list
+      .filter((s) => s.status === "spoiling" || s.status === "announced")
+      .slice()
+      .sort((a, b) => {
+        const da = isArenaDropWindow(a.dates.arena) ? 0 : 1;
+        const db = isArenaDropWindow(b.dates.arena) ? 0 : 1;
+        if (da !== db) return da - db;
+        const ta = a.dates.arena || a.dates.tabletop || "";
+        const tb = b.dates.arena || b.dates.tabletop || "";
+        return ta.localeCompare(tb);
+      });
     // Newest Arena (or paper) drop first — Marvel / Strix / TMNT before rotating-out sets.
+    // Z2 also pins live sets that just dropped (±1d) first.
     const live = list
       .filter((s) => s.status === "live_on_arena" || s.status === "released")
       .slice()
       .sort((a, b) => {
-        const da = a.dates.arena || a.dates.tabletop || "";
-        const db = b.dates.arena || b.dates.tabletop || "";
-        return db.localeCompare(da);
+        const da = isArenaDropWindow(a.dates.arena) ? 0 : 1;
+        const db = isArenaDropWindow(b.dates.arena) ? 0 : 1;
+        if (da !== db) return da - db;
+        const ta = a.dates.arena || a.dates.tabletop || "";
+        const tb = b.dates.arena || b.dates.tabletop || "";
+        return tb.localeCompare(ta);
       });
-    return { upcoming, live };
+    return { upcoming, live, dropDaySets };
   }, [sets]);
 
   const openSet = useMemo(
@@ -906,6 +991,7 @@ export function Sets() {
         set={openSet}
         newIds={new Set(setsNewByCode[openSet.code] || [])}
         onBack={() => setOpenCode(null)}
+        preferNewFilter={isArenaDropWindow(openSet.dates.arena)}
       />
     );
   }
@@ -917,8 +1003,14 @@ export function Sets() {
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Set radar</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
           Arena-first spoilers and full galleries. Legality, rotation, and ban lists live on{" "}
-          <strong className="text-foam">Format Hub</strong>.{" "}
-          <strong className="text-foam">No Alchemy.</strong> Snapshot {sets.date}
+          <button
+            type="button"
+            className="link-btn text-foam font-semibold"
+            onClick={() => openFormatHub("standard")}
+          >
+            Format Hub
+          </button>
+          . <strong className="text-foam">No Alchemy.</strong> Snapshot {sets.date}
           {newTotal > 0 ? (
             <>
               {" "}
@@ -929,6 +1021,35 @@ export function Sets() {
         </p>
       </div>
 
+      {dropDaySets.length > 0 ? (
+        <div className="panel set-drop-day-hero">
+          <p className="eyebrow m-0 mb-1">Arena drop window</p>
+          <p className="text-sm m-0">
+            {dropDaySets.map((s) => s.name).join(" · ")}
+            {" — "}
+            <span className="text-muted">
+              pinned on the radar
+              {dropDaySets.some((s) => (setsNewByCode[s.code] || []).length > 0)
+                ? " · gallery defaults to new cards"
+                : ""}
+              .
+            </span>
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {dropDaySets.map((s) => (
+              <button
+                key={s.code}
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setOpenCode(s.code)}
+              >
+                Open {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {upcoming.length > 0 ? (
         <section>
           <h3 className="set-section-title">Coming to Arena</h3>
@@ -937,6 +1058,7 @@ export function Sets() {
               <SetCard
                 key={s.code}
                 set={s}
+                dropDay={isArenaDropWindow(s.dates.arena)}
                 newCount={setsNewByCode[s.code]?.length ?? 0}
                 onOpenGallery={(x) => setOpenCode(x.code)}
                 onPlayTrailer={playTrailer}
@@ -955,15 +1077,21 @@ export function Sets() {
             quiet down.
           </p>
           <div className="set-grid">
-            {live.map((s) => (
-              <SetCard
-                key={s.code}
-                set={s}
-                newCount={setsNewByCode[s.code]?.length ?? 0}
-                onOpenGallery={(x) => setOpenCode(x.code)}
-                onPlayTrailer={playTrailer}
-              />
-            ))}
+            {live.map((s) => {
+              const rot = stdExitByCode.get(s.code.toLowerCase());
+              return (
+                <SetCard
+                  key={s.code}
+                  set={s}
+                  newCount={setsNewByCode[s.code]?.length ?? 0}
+                  onOpenGallery={(x) => setOpenCode(x.code)}
+                  onPlayTrailer={playTrailer}
+                  dropDay={isArenaDropWindow(s.dates.arena)}
+                  rotationDays={rot?.days ?? null}
+                  rotationLabel={rot?.label ?? null}
+                />
+              );
+            })}
           </div>
         </section>
       ) : null}

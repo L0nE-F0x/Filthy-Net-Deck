@@ -7,6 +7,97 @@ import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 
+/** X1 — compact tracker health for Settings (mirrors My Stats status facts). */
+function TrackerHealthCard() {
+  const status = useAppStore((s) => s.trackerStatus);
+  const matches = useAppStore((s) => s.trackerMatches);
+  const setPage = useAppStore((s) => s.setPage);
+  const lastMatch = matches.length
+    ? [...matches].sort((a, b) => b.endedAt - a.endedAt)[0]
+    : null;
+
+  let headline = "Desktop app only";
+  let detail =
+    "Win-rate tracking needs the Filthy Net Deck desktop app reading Arena’s Player.log on this PC.";
+  let ok: "good" | "warn" | "off" = "off";
+
+  if (status) {
+    if (!status.logFound) {
+      headline = "Waiting for MTG Arena";
+      detail = `No Player.log yet. Launch Arena once. Looking at: ${status.logPath}`;
+      ok = "warn";
+    } else if (status.detailedLogs === false) {
+      headline = "Detailed logs off";
+      detail =
+        "In Arena: Options → Account → enable Detailed Logs (Plugin Support), then restart Arena.";
+      ok = "warn";
+    } else {
+      headline = status.localPlayer
+        ? `Tracking · ${status.localPlayer}`
+        : "Tracking Arena matches";
+      detail = `${status.matchesRecorded} match${status.matchesRecorded === 1 ? "" : "es"} on this PC${
+        lastMatch
+          ? ` · last ${new Date(lastMatch.endedAt).toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}`
+          : ""
+      }.`;
+      ok = "good";
+    }
+  }
+
+  return (
+    <section className="panel settings-card settings-card-span2">
+      <h3 className="settings-card-title">Tracker health</h3>
+      <p className="settings-card-desc mb-2">
+        Local only — nothing leaves this machine. Open My Stats for full history.
+      </p>
+      <p className="text-sm m-0 mb-1">
+        <span
+          className={`feed-dot ${ok === "good" ? "live" : ok === "warn" ? "offline" : "offline"}`}
+        />
+        {headline}
+      </p>
+      <p className="text-xs text-muted m-0 leading-relaxed selectable">{detail}</p>
+      <button
+        type="button"
+        className="btn btn-ghost btn-sm mt-2 self-start"
+        onClick={() => setPage("stats")}
+      >
+        Open My Stats →
+      </button>
+    </section>
+  );
+}
+
+/** X2 — discoverability for 1–8 / Ctrl+K / F11. */
+function KeyboardCheatSheet() {
+  const rows: { keys: string; action: string }[] = [
+    { keys: "1–8", action: "Jump nav: Decks · Stats · Climb · Matchups · Sets · Events · Format Hub · Settings" },
+    { keys: "Ctrl+K", action: "Command palette — search cards, decks, pages" },
+    { keys: "F11", action: "Toggle fullscreen (also in Display above)" },
+  ];
+  return (
+    <section className="panel settings-card settings-card-span2">
+      <h3 className="settings-card-title">Keyboard shortcuts</h3>
+      <p className="settings-card-desc mb-2">
+        Numbers work when you&apos;re not typing in a field.
+      </p>
+      <ul className="settings-kb-list">
+        {rows.map((r) => (
+          <li key={r.keys}>
+            <kbd className="settings-kbd">{r.keys}</kbd>
+            <span>{r.action}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function Settings() {
   const prefs = useAppStore((s) => s.prefs);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
@@ -99,6 +190,9 @@ export function Settings() {
             </label>
           </section>
         )}
+
+        <TrackerHealthCard />
+        <KeyboardCheatSheet />
 
         {/* —— Notifications (stacked compact rows) —— */}
         <section className="panel settings-card settings-card-span2">

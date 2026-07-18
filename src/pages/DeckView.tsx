@@ -13,6 +13,8 @@ import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
 import { deckRotationImpact, rotationWhen } from "../services/rotationImpact";
+import { recordVsArchetypeTag } from "../services/statsInsights";
+import { loadAllOpponentNotes } from "../services/matchupNotes";
 import type { CardEntry } from "../types/meta";
 
 /** One decklist row with a card-art popup on hover (when the id is known). */
@@ -111,6 +113,8 @@ export function DeckView() {
   const deckId = useAppStore((s) => s.selectedDeckId);
   const setPage = useAppStore((s) => s.setPage);
   const openFormat = useAppStore((s) => s.openFormat);
+  const openMatchupTag = useAppStore((s) => s.openMatchupTag);
+  const trackerMatches = useAppStore((s) => s.trackerMatches);
   const [toast, setToast] = useState<string | null>(null);
   const [unknown, setUnknown] = useState<string[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
@@ -161,6 +165,14 @@ export function DeckView() {
   const rotation = deckRotationImpact(deck, sets?.formats?.standard?.rotation);
   const rotatingNames = new Set(
     (rotation?.hits ?? []).map((h) => h.name.toLowerCase()),
+  );
+
+  // D3: real tagged record vs this archetype (Matchup Lab tags only)
+  const yourRecord = recordVsArchetypeTag(
+    trackerMatches,
+    (deck.archetype || deck.name).trim(),
+    loadAllOpponentNotes(),
+    (n) => (n ?? "").trim().toLowerCase() || "unknown",
   );
 
   // Always rebuild (or sanitize) so "Front // Back" names never hit Arena's importer.
@@ -350,10 +362,46 @@ export function DeckView() {
             </section>
           )}
 
+          <section className="panel">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-2">
+              Your record
+            </h3>
+            {yourRecord.wins + yourRecord.losses > 0 ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm m-0">
+                  vs opponents tagged{" "}
+                  <strong className="text-foam">{deck.archetype || deck.name}</strong>:{" "}
+                  <strong>
+                    {yourRecord.wins}–{yourRecord.losses}
+                  </strong>
+                  {yourRecord.rate != null && (
+                    <span className="text-muted">
+                      {" "}
+                      ({Math.round(yourRecord.rate * 100)}%)
+                    </span>
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => openMatchupTag(deck.archetype || deck.name)}
+                >
+                  Matchup Lab →
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-muted m-0 leading-relaxed">
+                No tagged games yet against this archetype. In Matchup Lab, tag opponents with
+                &quot;{deck.archetype || deck.name}&quot; after you play them — records stay on
+                this PC.
+              </p>
+            )}
+          </section>
+
           {deck.matchups.length > 0 && (
             <section className="panel">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted m-0 mb-3">
-                Matchups
+                Published matchups
               </h3>
               <MatchupTable matchups={deck.matchups} />
             </section>

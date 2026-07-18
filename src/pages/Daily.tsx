@@ -13,18 +13,31 @@ import type { Deck, FormatId, ManaColor } from "../types/meta";
 
 type VsRecord = { wins: number; losses: number };
 
-/** "You vs this archetype" chip — appears once opponents are tagged with it. */
-function VsYouChip({ rec }: { rec: VsRecord | undefined }) {
+/** "You vs this archetype" chip — opens Matchup Lab filtered by tag (D2). */
+function VsYouChip({
+  rec,
+  tag,
+  onOpenTag,
+}: {
+  rec: VsRecord | undefined;
+  tag: string;
+  onOpenTag: (tag: string) => void;
+}) {
   if (!rec || rec.wins + rec.losses === 0) return null;
   const rate = rec.wins / (rec.wins + rec.losses);
   const favor = rate >= 0.55 ? "favored" : rate >= 0.45 ? "even" : "unfavored";
   return (
-    <span
-      className={`vs-you-chip favor-${favor}`}
-      title="Your record against opponents you tagged with this archetype (Matchup Lab)"
+    <button
+      type="button"
+      className={`vs-you-chip favor-${favor} vs-you-chip-btn`}
+      title="Open Matchup Lab for this tag"
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpenTag(tag);
+      }}
     >
       you {rec.wins}–{rec.losses}
-    </span>
+    </button>
   );
 }
 
@@ -67,11 +80,13 @@ function DeckMiniCard({
   vs,
   move,
   onOpen,
+  onOpenTag,
 }: {
   d: Deck;
   vs?: VsRecord;
   move?: Movement;
   onOpen: () => void;
+  onOpenTag: (tag: string) => void;
 }) {
   return (
     <article
@@ -89,7 +104,7 @@ function DeckMiniCard({
           <MovementChip move={move} />
         </span>
         <span className="flex items-center gap-1.5">
-          <VsYouChip rec={vs} />
+          <VsYouChip rec={vs} tag={d.archetype || d.name} onOpenTag={onOpenTag} />
           <TierBadge tier={d.tier} />
         </span>
       </div>
@@ -111,6 +126,7 @@ export function Daily() {
   const mode = useAppStore((s) => s.mode);
   const openFormat = useAppStore((s) => s.openFormat);
   const openDeck = useAppStore((s) => s.openDeck);
+  const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const searchQuery = useAppStore((s) => s.searchQuery);
   const setSearchQuery = useAppStore((s) => s.setSearchQuery);
   const filterTier = useAppStore((s) => s.filterTier);
@@ -278,7 +294,12 @@ export function Daily() {
                 <span>today’s rank</span>
               </div>
               {heroVs && heroVs.wins + heroVs.losses > 0 && (
-                <div className="daily-hero-stat">
+                <button
+                  type="button"
+                  className="daily-hero-stat daily-hero-stat-btn"
+                  onClick={() => openMatchupTag(hero.archetype || hero.name)}
+                  title="Open Matchup Lab for this tag"
+                >
                   <strong
                     className={
                       heroVs.wins >= heroVs.losses ? "favor-favored" : "favor-unfavored"
@@ -287,7 +308,7 @@ export function Daily() {
                     {heroVs.wins}–{heroVs.losses}
                   </strong>
                   <span>you vs this deck</span>
-                </div>
+                </button>
               )}
             </div>
           </div>
@@ -341,6 +362,7 @@ export function Daily() {
                   vs={vsFor(d)}
                   move={movementByName.get(d.name.toLowerCase())}
                   onOpen={() => openDeck(d.id)}
+                  onOpenTag={(tag) => openMatchupTag(tag)}
                 />
               ))}
             </div>
@@ -366,19 +388,55 @@ export function Daily() {
                 </span>
                 <span>
                   {ch.rose.slice(0, 2).map((n) => (
-                    <span key={n} className="diff-up mr-2">
+                    <button
+                      key={n}
+                      type="button"
+                      className="diff-up mr-2 link-btn"
+                      onClick={() => {
+                        const d = Object.values(meta.decks).find(
+                          (x) =>
+                            x.name.toLowerCase() === n.toLowerCase() ||
+                            x.archetype.toLowerCase() === n.toLowerCase(),
+                        );
+                        if (d) openDeck(d.id);
+                      }}
+                    >
                       ↑ {n}
-                    </span>
+                    </button>
                   ))}
                   {ch.fell.slice(0, 2).map((n) => (
-                    <span key={n} className="diff-down mr-2">
+                    <button
+                      key={n}
+                      type="button"
+                      className="diff-down mr-2 link-btn"
+                      onClick={() => {
+                        const d = Object.values(meta.decks).find(
+                          (x) =>
+                            x.name.toLowerCase() === n.toLowerCase() ||
+                            x.archetype.toLowerCase() === n.toLowerCase(),
+                        );
+                        if (d) openDeck(d.id);
+                      }}
+                    >
                       ↓ {n}
-                    </span>
+                    </button>
                   ))}
                   {ch.entered.slice(0, 2).map((n) => (
-                    <span key={n} className="diff-new mr-2">
+                    <button
+                      key={n}
+                      type="button"
+                      className="diff-new mr-2 link-btn"
+                      onClick={() => {
+                        const d = Object.values(meta.decks).find(
+                          (x) =>
+                            x.name.toLowerCase() === n.toLowerCase() ||
+                            x.archetype.toLowerCase() === n.toLowerCase(),
+                        );
+                        if (d) openDeck(d.id);
+                      }}
+                    >
                       + {n}
-                    </span>
+                    </button>
                   ))}
                 </span>
               </div>
