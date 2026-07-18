@@ -68,6 +68,24 @@ Owner verified the in-app 0.18→0.19 update.
 
 ---
 
+## Milestone 8 — v0.21.0 "Current events" — shipped (2026-07-18)
+
+Batched release (owner directive: fewer, bigger). Theme: the app reacts to
+real-world MTG events with minimal lag, and self-maintains.
+
+- [x] **Pipeline: 4×/day set radar** — Scryfall-only fast lane
+  (`sets-refresh.yml`, 00/12/18 UTC) beside the daily meta job; ship first-look
+  panel spoilers (dropped the <5-card "stub" skip) and undated Scryfall set rows.
+- [x] **B&R pulse** — diff feed ban lists vs a local snapshot; banner on Decks +
+  opt-in desktop toast on a real Banned & Restricted update
+  (`banPulse.ts`, `BanPulse.tsx`, Settings `notifyBanlist`).
+- [x] **Rotation impact** — pipeline `formats.standard.rotation` (cards leaving
+  Standard next); DeckView "loses N cards at rotation" panel + per-card markers;
+  Sets format hub card count (`rotationImpact.ts`, `buildRotationImpact`).
+- [x] **Climb polish** — win/loss streak chips + loss-streak note; season-vs-
+  previous-season comparison (WR, peak, games) (`climbStats.ts`).
+- [x] **Docs** — `docs/MAINTENANCE.md` (self-maintains vs. monthly checklist).
+
 ## Explicit non-goals (do not add)
 
 In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.

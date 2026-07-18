@@ -41,14 +41,14 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 | Item | Value |
 |------|--------|
-| **App version** | **0.19.0** — Format hub, decklist sharing, Decks hero, fullscreen |
-| **Branch / HEAD** | `main` @ `Roll v0.19.0 out to macOS; docs to shipped state.` |
-| **Tag** | `v0.19.0` pushed (macOS CI succeeded) |
-| **Windows** | Signed installer + `.sig` live: `website/downloads/Filthy-Net-Deck-Setup-0.19.0.exe` · updater `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` · owner verified in-app **Update & restart** 0.18→0.19 |
-| **macOS** | **0.19.0** universal dmg on site (CI succeeded; rolled into `website/downloads/`) |
-| **Marketing** | Hero/features lead with Format hub + decklist sharing; OG `?v=0.19.0` regenerated |
-| **Netlify** | Publish dir is **`website`**. Confirmed live: `version.json` and `updater/latest.json` → **0.19.0** |
-| **Tests** | `npm test` (vitest) — pure helpers; run after logic changes |
+| **App version** | **0.21.0** — B&R pulse, rotation impact, Climb streaks + season compare (0.20.0 shipped the Climb chart redesign / fullscreen tray / single-instance) |
+| **Branch / HEAD** | `main` @ `Release v0.21.0` |
+| **Tag** | `v0.21.0` pushed (macOS CI) |
+| **Windows** | Signed installer + `.sig`: `website/downloads/Filthy-Net-Deck-Setup-0.21.0.exe` · updater `website/updater/latest.json` (sig key id **67FCA9900F523D49** verified) · soft channel `website/version.json` + `public/version.json`. In-app path is the signed plugin-updater. **Owner: verify Update & restart 0.20→0.21.** |
+| **macOS** | dmg link still points at **0.20.0** (last built). **Follow-up: roll 0.21.0 dmg** after the tag's macOS CI finishes, then bump the two `index.html` mac links to 0.21.0. |
+| **Marketing** | Hero/OG lead with B&R alerts + rotation impact; OG `?v=0.21.0` regenerated. |
+| **Netlify** | Publish dir is **`website`**. Verify live `version.json` / `updater/latest.json` → **0.21.0** after push. |
+| **Tests** | `npm test` (vitest) — 47 pass; new suites banPulse/rotationImpact/climbStats. |
 
 ### Version arc this audit day (do not repeat cadence)
 
@@ -60,6 +60,8 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **0.17.0** | Set Radar binder UX, movement chips, hover-art lists, Events filters |
 | **0.18.0** | **Content engine** (diffs, history timeline, you-vs-meta, recap PNG, match toasts) + **infra** (CI alerts, 429 caps, slim feeds, vitest, nav keys 1–7) |
 | **0.19.0** | **Owner refinement batch** (one batched release, per pacing policy): fullscreen (Settings/F11), Decks "Deck to beat" hero, Sets Format hub (rotation + bans), My Stats full decklists + copy |
+| **0.20.0** | Climb chart redesign (smooth curve, peak marker, hover), fullscreen tray controls, single-instance guard |
+| **0.21.0** | **Current-events batch**: B&R pulse (ban-list diff → banner + toast), rotation impact (per-deck cards leaving Standard), Climb streaks + season-vs-season; pipeline 4×/day set radar + `MAINTENANCE.md` |
 
 ---
 

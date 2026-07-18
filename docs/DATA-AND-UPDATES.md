@@ -93,6 +93,13 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 | `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
 | App page **Sets** | Countdown (Arena emphasized), spoiler rail, Scryfall link |
 
+The sets feed also carries a `formats` hub (Standard/Pioneer legality, rotation
+calendar, ban lists) built from Scryfall legalities + whatsinstandard. Since 0.21
+it includes `formats.standard.rotation` (`{ nextDate, roughLabel, setCodes,
+cardNames }`) — the cards leaving Standard at the next rotation, computed by
+diffing `f:standard` cards in rotating vs staying sets. The app uses it for the
+per-deck rotation impact panel and the B&R pulse diffs the `bans` arrays.
+
 CI refreshes the set radar **4× per day**: the daily meta job (06:00 UTC) plus the
 Scryfall-only fast lane `.github/workflows/sets-refresh.yml` (00/12/18 UTC). Arena
 dates are `official` when overridden, otherwise `estimated` (paper − 3 days) and

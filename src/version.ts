@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.20.0";
+export const APP_VERSION = "0.21.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Climb chart glow-up — smooth curve, peak marker, hover any point for exact rank + time",
-  "Fullscreen controls — exit or close to tray from the top-right corner, no more alt-tab",
-  "One app, one tray icon — relaunching now focuses the running app instead of opening a duplicate",
+  "B&R alerts — a banner (and optional desktop ping) the moment a Banned & Restricted update changes the Standard or Pioneer ban list",
+  "Rotation impact — every Standard deck now shows exactly which cards it loses at the next rotation",
+  "Climb upgrades — win/loss streak tracking and a this-season-vs-last comparison of win rate, peak rank, and games",
 ];

@@ -1,11 +1,11 @@
 {
-    "version":  "0.20.0",
-    "notes":  "v0.20.0: Redesigned Climb chart (smooth curve, peak marker, hover for exact rank + time), fullscreen exit/close-to-tray controls, and a single-instance fix - relaunching the app now focuses the running window instead of opening a second copy.",
-    "pub_date":  "2026-07-18T04:19:26Z",
-    "platforms":  {
-                      "windows-x86_64":  {
-                                             "signature":  "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitCelpZeFBZZ3JEVDNXTTRadm5DSlpqUXpFa0tvd3I5dE0vaVJwVnpOakF0amhrSlFuL05Qc0RSZHFoOGM4WTZ0allHVndIWm5NczYrTGlNYlcvOVFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzQ4MzM4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjAuMF94NjQtc2V0dXAuZXhlCjdlaUUzT1hPcnRhMFh6akZWaklwOUpjT0Q1YkdLa1Z1MEFaRmhlWTB2bkhLQStEUFRpTkFqR09LamFiRTZHQWlnV2FFM2RYd3d1TkFJTndCd3lwVkRnPT0K",
-                                             "url":  "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.20.0.exe"
-                                         }
-                  }
+    "version": "0.21.0",
+    "notes": "v0.21.0: B&R alerts - a banner (and optional desktop ping) the moment a Banned & Restricted update changes the Standard or Pioneer ban list. Rotation impact - every Standard deck now shows exactly which cards it loses at the next rotation. Climb upgrades - win/loss streak tracking plus a this-season-vs-last comparison of win rate, peak rank, and games.",
+    "pub_date": "2026-07-18T07:41:49Z",
+    "platforms": {
+        "windows-x86_64": {
+            "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjc5alZzdWNWdDJwNm1xTGhwdndMVkRya0RHS2pXRXREc01QQWgvTFBGNFlzeUxyOGI0YmV4S0xSclJoVUcyVGs3c1dTeXVOQXY2Z2M5cUp3RE5DcXdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzYwNDUyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjEuMF94NjQtc2V0dXAuZXhlCm9WRnNjdlZMTERtRjBicnFUdEp5U0xzdUJUYlNaVzRsZmR0eSt6Yk1FK1h4WmxabENvZHhkd1NORXJEVTFVQnlZcVNnNXNUV2VFRWh5OFYvWWhmQ0JnPT0K",
+            "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.21.0.exe"
+        }
+    }
 }

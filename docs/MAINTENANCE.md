@@ -10,6 +10,8 @@ This page says exactly which parts run themselves and which need a human.
 | New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (00/12/18 UTC) + daily meta job (06:00 UTC) rebuild `sets.json` → Netlify → apps auto-sync | Hours (Scryfall) + ≤6h (CI) + ≤90min (app) |
 | Deck meta (Standard + Pioneer 8×8) | `daily-meta.yml` scrapes magic.gg / MTGO / Goldfish / Melee / Untapped, Scryfall-validates, commits `latest.json` | ≤24h |
 | Bans / restrictions | Scryfall `banned:` searches in the sets build — the moment Scryfall applies a B&R update, the next radar run ships it | Hours–1 day |
+| **B&R announcement alerts** (0.21) | The app diffs each feed's ban lists against a local snapshot; a real Banned & Restricted update raises a banner on Decks + an opt-in desktop toast. No code change per announcement | Feed lag + ≤90 min app sync |
+| **Rotation impact** (0.21) | The sets build computes which Standard cards leave at the next rotation (Scryfall `f:standard` set-diff + whatsinstandard exit dates). Every Standard deck shows what it loses; the card list refreshes itself as sets rotate in/out | Automatic |
 | Standard rotation calendar | whatsinstandard.com v6 API | Automatic |
 | New-card legality in decklists | Scryfall `/cards/collection` at pipeline time — new cards are on Scryfall well before they're tournament-playable, so validation never lags reality | None |
 | Pipeline failures | Both workflows auto-open/refresh a GitHub issue on failure (**"Daily meta pipeline failure"** / **"Set radar refresh failure"**) — silent rot is impossible | Immediate |

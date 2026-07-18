@@ -1,5 +1,5 @@
 {
-  "version": "0.20.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.20.0.exe",
-  "notes": "v0.20.0: Redesigned Climb chart (smooth curve, peak marker, hover for exact rank + time), fullscreen exit/close-to-tray controls, and a single-instance fix — relaunching the app now focuses the running window instead of opening a second copy."
+  "version": "0.21.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.21.0.exe",
+  "notes": "v0.21.0: B&R alerts — a banner (and optional desktop ping) the moment a Banned & Restricted update changes the Standard or Pioneer ban list. Rotation impact — every Standard deck now shows exactly which cards it loses at the next rotation. Climb upgrades — win/loss streak tracking plus a this-season-vs-last comparison of win rate, peak rank, and games."
 }
