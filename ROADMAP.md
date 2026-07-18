@@ -127,14 +127,13 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
   fallback); sleek in-app player (youtube-nocookie); View trailer on set cards /
   Future Standard when known (Nauctis, Titanbreach at ship).
 
-## In progress — next app batch (not version-bumped yet)
+## Milestone 11 — v0.24.0 "Polish batch" — shipping (2026-07-18)
 
-Owner polish started 2026-07-18 (Grok). Ship together when the batch is ready.
-
-- [x] **Fullscreen topbar collision** — Exit fullscreen / Close to tray moved into the topbar action row (no more overlap with theme toggle + Search).
-- [x] **Search label** — topbar `Ctrl K` chip → clear **Search** button (shortcut still Ctrl+K in tooltip + palette).
-- [x] **Recently live expands** — sets pipeline ships full current Standard pool (Foundations → latest) + slim previews for older sets; full galleries for ~90d / spoiling. Live feed already updated via `npm run sets`.
-- [ ] Cut **v0.24.0** (or next) when owner is happy with the batch — full AGENTS.md checklist.
+- [x] **Fullscreen topbar collision** — Exit fullscreen / Close to tray in the topbar action row.
+- [x] **Search label** — topbar **Search** button (Ctrl+K still the shortcut).
+- [x] **Recently live expands** — full current Standard pool on Sets (slim previews for older sets).
+- [x] **Settings denser layout** — two-column grid + compact notification rows (uses empty right side).
+- [x] **v0.24.0** full AGENTS.md release (Windows signed + marketing/OG; macOS roll after tag CI).
 
 ## Suggested next product batch (ideas)
 

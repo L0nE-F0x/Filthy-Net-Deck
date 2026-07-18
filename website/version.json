@@ -1,5 +1,5 @@
 {
-  "version": "0.23.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.23.0.exe",
-  "notes": "v0.23.0: Light mode — discreet dark/light toggle in the top bar and Settings. Arena import fix — double-faced cards (Unholy Annex // Ritual Chamber) copy as front-face only so Arena accepts the list. Set trailers — official WotC announce trailers play in a sleek in-app player from Sets / Future Standard."
+  "version": "0.24.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.24.0.exe",
+  "notes": "v0.24.0: Fullscreen controls live in the top bar (no overlap with Search or theme). Clear Search button (Ctrl+K still works). Recently live shows the full current Standard pool on Sets. Denser two-column Settings with compact notification toggles."
 }
