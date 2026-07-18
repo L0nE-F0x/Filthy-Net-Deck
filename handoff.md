@@ -19,5 +19,6 @@
 | Tag | v0.26.0 |
 
 ## Next
-- Owner: Update & restart; climb with 2+ decks and click through
-- Limited backburner
+- **10× page program:** `docs/PAGE-10X.md` (Climb is the bar). Default next batch = **deep-link lattice** (Decks/Stats/Matchups/Events click-through).
+- Owner: verify Climb 0.26; pick Batch A / B / C from PAGE-10X
+- Limited still backburner

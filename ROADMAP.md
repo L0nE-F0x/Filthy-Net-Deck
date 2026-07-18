@@ -135,16 +135,50 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 - [x] **Settings denser layout** — two-column grid + compact notification rows (uses empty right side).
 - [x] **v0.24.0** full AGENTS.md release (Windows signed + marketing/OG; macOS roll after tag CI).
 
-## In progress — nav + Format Hub standalone
+## Milestone 12 — v0.25.0 nav + Format Hub — shipped
 
 - [x] **Nav reorder** — Decks · My Stats · Climb · Matchups · Sets · Events · Format Hub · Settings (keys 1–8).
-- [x] **Format Hub page** — legality / rotation / bans promoted off Sets into its own nav item (`formats`).
-- [ ] Ship in next version bump when owner asks (with marketing if user-visible).
+- [x] **Format Hub page** — legality / rotation / bans as `formats` (not buried under Sets).
 
-## Suggested next product batch (ideas)
+## Milestone 13 — v0.26.0 Climb 10× — shipped (reference bar)
 
-- **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days.
-- Performance / feed size — full galleries for recent sets still dominate `sets.json`; slim path helps older Standard.
-- Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
-- More curated set trailers as WotC posts them.
-- Limited still backburner.
+- [x] **Climb path by deck** — chronological legs, chart by deck, click-through to My Stats (`openStatsDeck`).
+- **Bar for every other page:** path/story + identity on data + deep links + honest empties.  
+  Full plan: **`docs/PAGE-10X.md`**.
+
+---
+
+## 10× page program (post-Climb)
+
+**Canonical doc:** [`docs/PAGE-10X.md`](docs/PAGE-10X.md) — per-page gaps, upgrade IDs (D/S/M/Z/E/F/X/I), effort, definition of done.
+
+### Climb bar (do not ship “more panels” without these)
+
+1. **Narrative path** (what happened / what next)  
+2. **Entity identity** (deck, opponent, card, set on every row)  
+3. **Deep links both ways** (meta ↔ personal ↔ prep)  
+4. **Honest empty states** (never invent data)
+
+### Suggested batches (owner picks order)
+
+| Batch | Theme | First tickets from PAGE-10X |
+|-------|--------|-----------------------------|
+| **A — Deep-link lattice** | Glue the app like Climb | D2, S1, S3, M1, M4, E1, I1 |
+| **B — Daily plan loop** | Open every morning | D1, D3, M2, M5, S2 |
+| **C — Rotation war room** | When exit ≤ ~45d | F1, F2, Z1, Z2, F3 |
+| **D — Trust polish** | Setup & power users | X1–X3, E2 |
+
+**Default next:** Batch **A** (highest 10× feel per line of code after Climb).
+
+### Explicitly deferred
+
+Limited/Draft hub · overlay · AI without grounded local data · prices · cloud sync.
+
+### Other backlog (low urgency)
+
+- Roll latest macOS dmg when tag CI finishes (any recent tag).
+- Marketing screenshot carousel (needs owner 1280×860 assets).
+- Full mac signed auto-update (owner decision).
+- `whatsinstandard` v7 when v6 dies.
+- More set trailers in `set-trailers.json`.
+- Feed size / slim galleries (already partly done for older Standard).
