@@ -127,12 +127,18 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
   fallback); sleek in-app player (youtube-nocookie); View trailer on set cards /
   Future Standard when known (Nauctis, Titanbreach at ship).
 
-## Suggested next product batch (not started — batch before next version bump)
+## In progress — next app batch (not version-bumped yet)
 
-Ideas only; owner prioritizes. Do **not** ship one release per bullet.
+Owner polish started 2026-07-18 (Grok). Ship together when the batch is ready.
 
-- **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days (the per-deck panel + Sets count already ship; badges were left out since Q1 2027 is far off and couldn't be visually verified now).
-- Performance / feed size — the Marvel gallery alone is ~248KB of `sets.json`; Netlify gzips it, so low urgency.
+- [x] **Fullscreen topbar collision** — Exit fullscreen / Close to tray moved into the topbar action row (no more overlap with theme toggle + Search).
+- [x] **Search label** — topbar `Ctrl K` chip → clear **Search** button (shortcut still Ctrl+K in tooltip + palette).
+- [x] **Recently live expands** — sets pipeline ships full current Standard pool (Foundations → latest) + slim previews for older sets; full galleries for ~90d / spoiling. Live feed already updated via `npm run sets`.
+- [ ] Cut **v0.24.0** (or next) when owner is happy with the batch — full AGENTS.md checklist.
+
+## Suggested next product batch (ideas)
+
+- **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days.
+- Performance / feed size — full galleries for recent sets still dominate `sets.json`; slim path helps older Standard.
 - Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
 - More curated set trailers as WotC posts them.
-- Anything owner requests on return from the Claude ↔ Grok ↔ Kimi rotation.

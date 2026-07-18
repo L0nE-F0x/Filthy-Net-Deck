@@ -93,6 +93,12 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 | `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
 | App page **Sets** | Countdown (Arena emphasized), spoiler rail, Scryfall link |
 
+**Recently live window.** The radar ships (1) all future/spoiling constructed
+products and anything released in the last ~90 days with **full** Scryfall
+galleries, plus (2) every expansion still legal in Standard (whatsinstandard
+pool — Foundations through current) with a **slim** mythic/rare sample so the
+feed stays small. Older feeds without those rows just show fewer live cards.
+
 The sets feed also carries a `formats` hub (Standard/Pioneer legality, rotation
 calendar, ban lists) built from Scryfall legalities + whatsinstandard. Since 0.21
 it includes `formats.standard.rotation` (`{ nextDate, roughLabel, setCodes,

@@ -233,12 +233,21 @@ function mapCard(c) {
   };
 }
 
-/** Full set gallery — paginate Scryfall until has_more is false. */
-async function fetchAllSetCards(code) {
+/**
+ * Fetch set cards from Scryfall.
+ * @param {string} code
+ * @param {{ maxCards?: number, order?: string, dir?: string }} [opts]
+ *   maxCards — stop after this many (omit for full gallery). Slim samples use
+ *   rarity order so the rail/hero still look good without shipping 300+ cards.
+ */
+async function fetchAllSetCards(code, opts = {}) {
+  const maxCards = typeof opts.maxCards === "number" ? opts.maxCards : Infinity;
+  const order = opts.order || "set";
+  const dir = opts.dir || "asc";
   const cards = [];
-  let path = `/cards/search?q=${encodeURIComponent(`set:${code}`)}&unique=prints&order=set&dir=asc`;
+  let path = `/cards/search?q=${encodeURIComponent(`set:${code}`)}&unique=prints&order=${order}&dir=${dir}`;
   try {
-    while (path) {
+    while (path && cards.length < maxCards) {
       await sleep(100);
       let data;
       if (path.startsWith("http")) {
@@ -265,8 +274,14 @@ async function fetchAllSetCards(code) {
       } else {
         data = await scryfallGet(path);
       }
-      for (const c of data.data || []) cards.push(mapCard(c));
-      path = data.has_more && data.next_page ? data.next_page : null;
+      for (const c of data.data || []) {
+        cards.push(mapCard(c));
+        if (cards.length >= maxCards) break;
+      }
+      path =
+        cards.length < maxCards && data.has_more && data.next_page
+          ? data.next_page
+          : null;
     }
   } catch (e) {
     if (String(e.message).includes("404")) return cards;
@@ -502,18 +517,44 @@ export async function buildSetsBundle() {
   const list = await scryfallGet("/sets");
   const all = list.data || [];
 
-  // Window: recently released (60d) + future. Sets Scryfall has announced but
-  // not yet dated (released_at null) are upcoming by definition — keep them so
-  // roadmap reveals appear the day Scryfall creates the row.
-  const windowStart = addDays(today, -60);
+  // Current Standard codes (Foundations → latest) expand "Recently live" beyond
+  // the short spoilers window. Fail-soft: if whatsinstandard is down, keep the
+  // recent window only.
+  let standardCodes = new Set();
+  try {
+    const { sets: stdRotation } = await fetchStandardRotation();
+    standardCodes = new Set(
+      stdRotation.map((s) => String(s.code || "").toLowerCase()).filter(Boolean),
+    );
+    console.log(
+      `  Standard pool (${standardCodes.size}): ${[...standardCodes].join(", ") || "—"}`,
+    );
+  } catch (e) {
+    console.warn(`  Standard pool skipped for radar expand: ${e.message}`);
+  }
+
+  // Full galleries for future/spoiling + ~90 days of new releases. Older
+  // Standard-legal expansions ship a slim mythic/rare sample so the feed stays
+  // downloadable (Marvel alone is already ~half the payload).
+  const fullGalleryStart = addDays(today, -90);
   const candidates = all
-    .filter((s) => !s.released_at || s.released_at >= windowStart)
     .filter(isConstructedProduct)
+    .filter((s) => {
+      const code = String(s.code).toLowerCase();
+      // Undated Scryfall rows = roadmap reveals — always keep.
+      if (!s.released_at) return true;
+      // Upcoming + recent window (full galleries).
+      if (s.released_at >= fullGalleryStart) return true;
+      // Still-legal Standard expansions (Foundations through current).
+      return standardCodes.has(code);
+    })
     .sort((a, b) =>
       String(a.released_at || "9999").localeCompare(String(b.released_at || "9999")),
     );
 
-  console.log(`  ${candidates.length} constructed products in window (no Alchemy)`);
+  console.log(
+    `  ${candidates.length} constructed products (recent + Standard pool, no Alchemy)`,
+  );
 
   const sets = [];
   for (const s of candidates) {
@@ -523,8 +564,6 @@ export async function buildSetsBundle() {
 
     // First-look reveals (panel spoilers) often land on Scryfall as a future
     // set with only 1–4 cards. Those are real preview cards — ship them.
-    // (An earlier version skipped these as "stubs", which hid exactly the
-    // freshest announcements.)
     const tabletop = s.released_at || null;
     let arena = ov.arena || null;
     let arenaConfidence = ov.arena ? "official" : "unknown";
@@ -535,11 +574,27 @@ export async function buildSetsBundle() {
       arena = addDays(tabletop, -3);
       arenaConfidence = "estimated";
     }
+    // Past Standard sets with no Arena override: paper date is a fine proxy
+    // for "live" once the set has released (Arena usually lands same week).
+    if (!arena && tabletop && tabletop <= today) {
+      arena = tabletop;
+      arenaConfidence = "estimated";
+    }
 
-    const cards = await fetchAllSetCards(code);
-    const spoiledCount = cards.length;
-    // Newest spoilers first for the compact rail
-    const previews = [...cards].reverse().slice(0, 14);
+    const isFuture = !tabletop || tabletop > today;
+    const isRecent = Boolean(tabletop && tabletop >= fullGalleryStart);
+    const fullGallery = isFuture || isRecent;
+
+    const cards = fullGallery
+      ? await fetchAllSetCards(code)
+      : await fetchAllSetCards(code, { maxCards: 16, order: "rarity", dir: "desc" });
+
+    // spoiledCount: full gallery uses actual pull; slim uses Scryfall card_count
+    // so the meter doesn't read "16 / 286" as if only 16 are spoiled.
+    const spoiledCount = fullGallery ? cards.length : s.card_count || cards.length;
+    const previews = fullGallery
+      ? [...cards].reverse().slice(0, 14)
+      : cards.slice(0, 14);
 
     const hero =
       cards.find((c) => c.rarity === "mythic") ||
@@ -568,20 +623,25 @@ export async function buildSetsBundle() {
         prerelease: tabletop ? "estimated" : "unknown",
       },
       heroScryfallId: hero?.scryfallId || null,
-      /** Compact rail (newest first) */
+      /** Compact rail */
       previews,
-      /** Full set gallery (collector order) */
-      cards,
       overrideSource: ov.source || null,
       notes: ov.notes || null,
       status: "announced",
     };
+    // Full gallery only when we actually paginated the whole set.
+    if (fullGallery) {
+      entry.cards = cards;
+    }
     const trailer = resolveTrailer(trailers, code, s.name);
     if (trailer) entry.trailer = trailer;
     entry.status = computeStatus(entry, today);
     sets.push(entry);
+    const galLabel = fullGallery
+      ? `gallery ${cards.length}/${entry.cardCount}`
+      : `slim ${cards.length} (Standard pool)`;
     console.log(
-      `  ${code} · ${s.name} · ${entry.status} · gallery ${spoiledCount}/${entry.cardCount} · arena ${arena || "—"} (${arenaConfidence})`,
+      `  ${code} · ${s.name} · ${entry.status} · ${galLabel} · arena ${arena || "—"} (${arenaConfidence})`,
     );
     await sleep(80);
   }

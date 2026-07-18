@@ -242,22 +242,67 @@ export default function App() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="topbar-actions">
             {(page === "daily" || page === "format" || page === "deck") && (
               <BoModeToggle mode={mode} onChange={setMode} />
+            )}
+            {fullscreen && isTauri() && (
+              <>
+                <button
+                  type="button"
+                  className="fs-btn"
+                  title="Exit fullscreen (F11)"
+                  onClick={() =>
+                    void toggleFullscreen().then((now) => {
+                      if (now != null) useAppStore.getState().setFullscreenPref(now);
+                    })
+                  }
+                >
+                  <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                    <path
+                      d="M5.5 1.5v4h-4M10.5 1.5v4h4M5.5 14.5v-4h-4M10.5 14.5v-4h4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Exit fullscreen
+                </button>
+                <button
+                  type="button"
+                  className="fs-btn"
+                  title="Close to system tray — the tracker keeps running"
+                  onClick={() => void closeToTray()}
+                >
+                  <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                    <path
+                      d="M3 3l10 10M13 3L3 13"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Close to tray
+                </button>
+              </>
             )}
             <ThemeToggle />
             <button
               type="button"
               className="palette-hint"
-              title="Search cards, decks, pages"
-              aria-label="Open card watch search (Control K)"
+              title="Search cards, decks, pages (Ctrl+K)"
+              aria-label="Search cards, decks, and pages"
               onClick={() =>
                 window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))
               }
             >
-              <kbd>Ctrl</kbd>
-              <kbd>K</kbd>
+              <span className="palette-hint-ico" aria-hidden="true">
+                ⌕
+              </span>
+              Search
             </button>
           </div>
         </header>
@@ -307,49 +352,6 @@ export default function App() {
         </main>
       </div>
 
-      {fullscreen && isTauri() && (
-        <div className="fs-controls" role="toolbar" aria-label="Fullscreen window controls">
-          <button
-            type="button"
-            className="fs-btn"
-            title="Exit fullscreen (F11)"
-            onClick={() =>
-              void toggleFullscreen().then((now) => {
-                if (now != null) useAppStore.getState().setFullscreenPref(now);
-              })
-            }
-          >
-            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-              <path
-                d="M5.5 1.5v4h-4M10.5 1.5v4h4M5.5 14.5v-4h-4M10.5 14.5v-4h4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Exit fullscreen
-          </button>
-          <button
-            type="button"
-            className="fs-btn"
-            title="Close to system tray — the tracker keeps running"
-            onClick={() => void closeToTray()}
-          >
-            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-              <path
-                d="M3 3l10 10M13 3L3 13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-            Close to tray
-          </button>
-        </div>
-      )}
     </div>
     </SplashScreen>
   );

@@ -896,6 +896,8 @@ function SetCard({
       : null,
   });
   const gallery = setGalleryCards(set);
+  /** Slim Standard-pool rows ship previews only (no full cards[]) to keep the feed small. */
+  const hasFullGallery = Boolean(set.cards?.length);
   const heroUrl = set.heroScryfallId
     ? scryfallCdnUrl(set.heroScryfallId, "art_crop")
     : null;
@@ -1010,7 +1012,9 @@ function SetCard({
               className="btn btn-primary btn-sm"
               onClick={() => onOpenGallery(set)}
             >
-              Browse full gallery ({gallery.length})
+              {hasFullGallery
+                ? `Browse full gallery (${gallery.length})`
+                : `Browse previews (${gallery.length})`}
             </button>
           ) : null}
           <button
@@ -1049,10 +1053,19 @@ export function Sets() {
 
   const { upcoming, live } = useMemo(() => {
     const list = sets?.sets ?? [];
-    return {
-      upcoming: list.filter((s) => s.status === "spoiling" || s.status === "announced"),
-      live: list.filter((s) => s.status === "live_on_arena" || s.status === "released"),
-    };
+    const upcoming = list.filter(
+      (s) => s.status === "spoiling" || s.status === "announced",
+    );
+    // Newest Arena (or paper) drop first — Marvel / Strix / TMNT before rotating-out sets.
+    const live = list
+      .filter((s) => s.status === "live_on_arena" || s.status === "released")
+      .slice()
+      .sort((a, b) => {
+        const da = a.dates.arena || a.dates.tabletop || "";
+        const db = b.dates.arena || b.dates.tabletop || "";
+        return db.localeCompare(da);
+      });
+    return { upcoming, live };
   }, [sets]);
 
   const openSet = useMemo(
@@ -1143,6 +1156,11 @@ export function Sets() {
       {live.length > 0 ? (
         <section>
           <h3 className="set-section-title">Recently live</h3>
+          <p className="text-xs text-muted m-0 mb-3 max-w-2xl leading-relaxed">
+            Current Standard-legal expansions (Foundations through the latest Arena drop)
+            plus anything that just hit the client — so the radar stays useful after spoilers
+            quiet down.
+          </p>
           <div className="set-grid">
             {live.map((s) => (
               <SetCard
