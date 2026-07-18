@@ -49,15 +49,20 @@ export function personalVsMeta(
   const rows: PersonalMetaRow[] = rankedDecks.map((d, idx) => {
     const arch = d.archetype || d.name;
     const key = normalizeName(arch);
-    // Prefer exact name match; also accept when personal deck name contains archetype
+    // Prefer exact name match; else substring in either direction. Among
+    // substring candidates the longest key wins (most specific), so a generic
+    // name like "control" can't steal "Azorius Control v2"'s record.
+    // Alphabetical tie-break keeps the choice deterministic.
     let you = byName.get(key);
     if (!you) {
-      for (const [k, v] of byName) {
-        if (k.includes(key) || key.includes(k)) {
-          you = v;
-          break;
+      let best: string | null = null;
+      for (const k of byName.keys()) {
+        if (!k.includes(key) && !key.includes(k)) continue;
+        if (best === null || k.length > best.length || (k.length === best.length && k < best)) {
+          best = k;
         }
       }
+      if (best !== null) you = byName.get(best);
     }
     const yourWins = you?.wins ?? 0;
     const yourLosses = you?.losses ?? 0;

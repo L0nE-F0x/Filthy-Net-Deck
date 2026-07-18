@@ -10,6 +10,7 @@ import { Matchups } from "./pages/Matchups";
 import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
+import { CommandPalette } from "./components/CommandPalette";
 import { StatusBanners } from "./components/StatusBanners";
 import { SplashScreen } from "./components/SplashScreen";
 import {
@@ -240,12 +241,28 @@ export default function App() {
               )}
             </p>
           </div>
-          {(page === "daily" || page === "format" || page === "deck") && (
-            <BoModeToggle mode={mode} onChange={setMode} />
-          )}
+          <div className="flex items-center gap-2">
+            {(page === "daily" || page === "format" || page === "deck") && (
+              <BoModeToggle mode={mode} onChange={setMode} />
+            )}
+            <button
+              type="button"
+              className="palette-hint"
+              title="Search cards, decks, pages"
+              aria-label="Open card watch search (Control K)"
+              onClick={() =>
+                window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))
+              }
+            >
+              <kbd>Ctrl</kbd>
+              <kbd>K</kbd>
+            </button>
+          </div>
         </header>
 
         <StatusBanners />
+
+        <CommandPalette />
 
         {error && (
           <div className="mx-5 mt-2 px-3 py-2 rounded-lg bg-poor/10 border border-poor/30 text-sm text-poor flex justify-between gap-2">

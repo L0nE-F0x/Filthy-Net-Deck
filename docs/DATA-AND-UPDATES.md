@@ -109,8 +109,17 @@ labeled in the UI.
 event, Scryfall catalogs them (usually within hours); the next radar run picks up
 the new set row and every spoiled card — including first-look sets with only 1–4
 cards and sets Scryfall hasn't dated yet. No code change needed for new sets.
-The only manual piece is `set-calendar-overrides.json` (official Arena dates /
-spoiler-season starts, which have no API).
+The only manual pieces are `set-calendar-overrides.json` (official Arena dates /
+spoiler-season starts, which have no API) and `future-sets.json` below.
+
+**Roadmap sets (`futureSets`).** Sets announced at preview panels / in press
+*before Scryfall has a set row* (e.g. next year's Standard sets) are curated by
+hand in `pipeline/sources/future-sets.json` — name, kind, date/window label,
+confidence (`official`/`reported`), notes, and a **source URL** (nothing is
+invented). The build reconciles automatically: an entry drops out the moment
+Scryfall catalogs the set (name match → it becomes a normal radar row) or when
+an exact-dated entry's day has passed. The app's Sets page renders them as the
+**Future Standard** section; older feeds simply lack the key and hide it.
 
 ---
 

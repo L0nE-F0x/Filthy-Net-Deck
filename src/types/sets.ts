@@ -106,11 +106,34 @@ export interface SetsBundle {
     noAlchemy?: boolean;
     formats?: string;
     arenaDates?: string;
+    futureSets?: string;
   };
   sources: string[];
   sets: UpcomingSet[];
   /** Legality / rotation / ban hub — null or absent on older feeds. */
   formats?: FormatHub | null;
+  /**
+   * Roadmap-announced sets Scryfall hasn't cataloged yet (curated in the
+   * pipeline's future-sets.json, each with a source link). Absent on older
+   * feeds — hide the section then.
+   */
+  futureSets?: FutureSet[];
+}
+
+/** A roadmap-announced set with no Scryfall row yet (curated + sourced). */
+export interface FutureSet {
+  name: string;
+  /** "multiverse" = Magic IP; "universes-beyond" = outside IP. */
+  kind: "multiverse" | "universes-beyond";
+  /** ISO date or YYYY-MM when only the month is known — used for sorting. */
+  sortDate: string | null;
+  /** Display label, e.g. "February 5, 2027" or "April 2027". */
+  dateLabel: string | null;
+  /** official = WotC announced it; reported = press/inferred from schedule. */
+  confidence: "official" | "reported";
+  notes: string | null;
+  sourceName: string | null;
+  sourceUrl: string;
 }
 
 /** Prefer full gallery; fall back to previews for older feeds. */

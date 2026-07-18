@@ -1,11 +1,11 @@
 {
-    "version": "0.21.0",
-    "notes": "v0.21.0: B&R alerts - a banner (and optional desktop ping) the moment a Banned & Restricted update changes the Standard or Pioneer ban list. Rotation impact - every Standard deck now shows exactly which cards it loses at the next rotation. Climb upgrades - win/loss streak tracking plus a this-season-vs-last comparison of win rate, peak rank, and games.",
-    "pub_date": "2026-07-18T07:41:49Z",
+    "version": "0.22.0",
+    "notes": "v0.22.0: Future Standard - announced sets with no spoiled cards yet (Nauctis: The Sunken Realm, Kamigawa: Titanbreach, Zhalfir, plus the 2027 Universes Beyond slots) on the Sets page, each linked to its official announcement. Card watch - Ctrl+K anywhere to see every meta deck playing a card, with copies and board. Matchup Lab - opponent tags and notes save as you type.",
+    "pub_date": "2026-07-18T09:19:14Z",
     "platforms": {
         "windows-x86_64": {
-            "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjc5alZzdWNWdDJwNm1xTGhwdndMVkRya0RHS2pXRXREc01QQWgvTFBGNFlzeUxyOGI0YmV4S0xSclJoVUcyVGs3c1dTeXVOQXY2Z2M5cUp3RE5DcXdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzYwNDUyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjEuMF94NjQtc2V0dXAuZXhlCm9WRnNjdlZMTERtRjBicnFUdEp5U0xzdUJUYlNaVzRsZmR0eSt6Yk1FK1h4WmxabENvZHhkd1NORXJEVTFVQnlZcVNnNXNUV2VFRWh5OFYvWWhmQ0JnPT0K",
-            "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.21.0.exe"
+            "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnl5MndLWWR1c2l5Um9SZ3BNclN3d25XN3NuZ3RZb1huYkVJWGhUM1hITE1GLzh2aC9SUVkwSTVvOElsSVAzZENLTVM5c1ArT2FyUzVPeGxZaVBxR1FJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzY2MjYzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjIuMF94NjQtc2V0dXAuZXhlCllPd1pKY25xdTBpZmtjR2x5SmFSWjdXRWFQY2lxL3Mza1VDY2pvSDBQTGFWK1U5YUljazNIQ21WYmZ2YkU0QWRLYXRTbmgzZ3FIczRtTFVqZ3g3ckRBPT0K",
+            "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.22.0.exe"
         }
     }
 }

@@ -1,0 +1,75 @@
+{
+  "_readme": [
+    "Roadmap-announced Standard sets that Scryfall has NOT cataloged yet.",
+    "Curated by hand from trusted announcements (magic.wizards.com first, then",
+    "reputable press). The pipeline drops an entry automatically once Scryfall",
+    "creates the set row (name match) or when its exact date has passed — so",
+    "stale entries never linger. Keep entries verifiable: every one needs a",
+    "sourceName + sourceUrl. confidence: official = WotC gave it (name/date);",
+    "reported = press/inferred from the announced schedule.",
+    "sortDate: ISO date when known, else YYYY-MM (lexicographic sort still works).",
+    "kind: multiverse | universes-beyond."
+  ],
+  "sets": [
+    {
+      "name": "Nauctis: The Sunken Realm",
+      "kind": "multiverse",
+      "sortDate": "2027-02-05",
+      "dateLabel": "February 5, 2027",
+      "confidence": "official",
+      "notes": "Magic's first undersea plane — merfolk, seals, homarids, and gods who command the currents, with two warring kingdoms pushing the realm toward the abyss. Opens the 2027 story arc.",
+      "sourceName": "magic.wizards.com",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/everything-announced-for-the-magic-multiverse-in-2027"
+    },
+    {
+      "name": "Universes Beyond (unannounced)",
+      "kind": "universes-beyond",
+      "sortDate": "2027-04",
+      "dateLabel": "April 2027",
+      "confidence": "reported",
+      "notes": "WotC confirmed three Universes Beyond sets for 2027, alternating with the Magic Multiverse sets; the IP is still under wraps. Press reporting places the first in April.",
+      "sourceName": "Variety",
+      "sourceUrl": "https://variety.com/2026/gaming/news/magic-the-gathering-2027-sets-magiccon-schedule-1236813984/"
+    },
+    {
+      "name": "Kamigawa: Titanbreach",
+      "kind": "multiverse",
+      "sortDate": "2027-06-04",
+      "dateLabel": "June 4, 2027",
+      "confidence": "official",
+      "notes": "An Omenpath opens above Towashi and drops a mass of Ikoria onto neon Kamigawa — next-generation mechs versus the behemoths of Ikoria.",
+      "sourceName": "magic.wizards.com",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/everything-announced-for-the-magic-multiverse-in-2027"
+    },
+    {
+      "name": "Universes Beyond (unannounced)",
+      "kind": "universes-beyond",
+      "sortDate": "2027-08",
+      "dateLabel": "August 2027",
+      "confidence": "reported",
+      "notes": "Second of the three confirmed 2027 Universes Beyond sets; the IP is still under wraps. Press reporting places it in August.",
+      "sourceName": "Variety",
+      "sourceUrl": "https://variety.com/2026/gaming/news/magic-the-gathering-2027-sets-magiccon-schedule-1236813984/"
+    },
+    {
+      "name": "Zhalfir",
+      "kind": "multiverse",
+      "sortDate": "2027-10-01",
+      "dateLabel": "October 1, 2027",
+      "confidence": "official",
+      "notes": "Zhalfir stands as its own plane for the first time — afrofantasy visual design honoring its storied past, with Teferi Akosa returning home.",
+      "sourceName": "magic.wizards.com",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/everything-announced-for-the-magic-multiverse-in-2027"
+    },
+    {
+      "name": "Universes Beyond (unannounced)",
+      "kind": "universes-beyond",
+      "sortDate": "2027-11",
+      "dateLabel": "November 2027",
+      "confidence": "reported",
+      "notes": "Third of the three confirmed 2027 Universes Beyond sets; the IP is still under wraps. Press reporting places it in November.",
+      "sourceName": "Variety",
+      "sourceUrl": "https://variety.com/2026/gaming/news/magic-the-gathering-2027-sets-magiccon-schedule-1236813984/"
+    }
+  ]
+}

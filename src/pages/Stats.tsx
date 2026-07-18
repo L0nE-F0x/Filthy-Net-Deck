@@ -14,6 +14,8 @@ import { downloadRecapPng, recapFromMatches } from "../services/recapCard";
 import { formatRecapHeadline } from "../services/recapStats";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
 import { isLandName } from "../services/landNames";
+import { winrateFavor } from "../services/ranks";
+import { currentStreak } from "../services/climbStats";
 import {
   resolveArenaCards,
   type ArenaCardInfo,
@@ -87,12 +89,6 @@ const RESULT_LABEL: Record<MatchResult, string> = {
   draw: "Draw",
   unknown: "?",
 };
-
-function winrateFavor(rate: number): "favored" | "even" | "unfavored" {
-  if (rate >= 0.55) return "favored";
-  if (rate >= 0.45) return "even";
-  return "unfavored";
-}
 
 type SortDir = "asc" | "desc";
 
@@ -239,19 +235,6 @@ function isToday(ms: number): boolean {
   );
 }
 
-/** Current run of consecutive wins or losses (draws/unknowns skipped). */
-function currentStreak(matches: TrackedMatch[]): { kind: "win" | "loss"; length: number } | null {
-  let kind: "win" | "loss" | null = null;
-  let length = 0;
-  for (const m of matches) {
-    if (m.result !== "win" && m.result !== "loss") continue;
-    if (kind === null) kind = m.result;
-    if (m.result !== kind) break;
-    length++;
-  }
-  return kind && length > 0 ? { kind, length } : null;
-}
-
 /** Rolling win rate over the last N decided matches at each point in time. */
 function rollingWinrate(matches: TrackedMatch[], window = 10): number[] {
   const decided = [...matches]
@@ -299,7 +282,7 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
   const today = useMemo(() => tally(matches.filter((m) => isToday(m.endedAt))), [matches]);
   const streak = useMemo(() => currentStreak(matches), [matches]);
 
-  if (today.decided === 0 && !streak) return null;
+  if (today.decided === 0 && streak.type === null) return null;
 
   return (
     <div className="stat-tiles stat-tiles-3">
@@ -315,13 +298,13 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
       </div>
       <div className="panel stat-tile">
         <span
-          className={`stat-num ${streak ? (streak.kind === "win" ? "favor-favored" : "favor-unfavored") : ""}`}
+          className={`stat-num ${streak.type ? (streak.type === "win" ? "favor-favored" : "favor-unfavored") : ""}`}
         >
-          {streak ? `${streak.kind === "win" ? "W" : "L"}${streak.length}` : "—"}
+          {streak.type ? `${streak.type === "win" ? "W" : "L"}${streak.length}` : "—"}
         </span>
         <span className="stat-label">
-          {streak
-            ? streak.kind === "win"
+          {streak.type
+            ? streak.type === "win"
               ? "Win streak — keep it rolling"
               : "Loss streak — shake it off"
             : "Streak"}

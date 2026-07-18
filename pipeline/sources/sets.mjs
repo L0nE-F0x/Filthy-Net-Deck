@@ -58,6 +58,59 @@ function loadOverrides() {
   }
 }
 
+/** Curated roadmap sets (future-sets.json) — the only hand-maintained input. */
+function loadFutureSets() {
+  try {
+    const raw = readFileSync(join(__dirname, "future-sets.json"), "utf8");
+    const data = JSON.parse(raw);
+    return Array.isArray(data?.sets) ? data.sets : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeSetName(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Roadmap-announced sets Scryfall hasn't cataloged yet (e.g. next year's
+ * Standard sets revealed at a preview panel). Curated in future-sets.json —
+ * every entry carries a source URL, nothing is invented.
+ *
+ * Self-healing: an entry is dropped the moment Scryfall catalogs the set
+ * (normalized name match against the radar window), and exact-dated entries
+ * are dropped once their date has passed (stale curation can't linger).
+ *
+ * @param {Array<{name:string}>} radarSets sets already on the Scryfall radar
+ * @param {string} today YYYY-MM-DD
+ */
+function buildFutureSets(radarSets, today) {
+  const known = new Set(radarSets.map((s) => normalizeSetName(s.name)));
+  return loadFutureSets()
+    .filter((f) => f && f.name && f.sourceUrl)
+    .filter((f) => !known.has(normalizeSetName(f.name)))
+    .filter((f) => {
+      const sd = String(f.sortDate || "");
+      // Full ISO date in the past → stale curation, drop it.
+      return !(sd.length === 10 && sd < today);
+    })
+    .sort((a, b) => String(a.sortDate || "9999").localeCompare(String(b.sortDate || "9999")))
+    .map((f) => ({
+      name: f.name,
+      kind: f.kind === "universes-beyond" ? "universes-beyond" : "multiverse",
+      sortDate: f.sortDate || null,
+      dateLabel: f.dateLabel || null,
+      confidence: f.confidence === "official" ? "official" : "reported",
+      notes: f.notes || null,
+      sourceName: f.sourceName || null,
+      sourceUrl: f.sourceUrl,
+    }));
+}
+
 function isAlchemy(set) {
   if (set.set_type === "alchemy") return true;
   if (set.digital && /alchemy/i.test(set.name || "")) return true;
@@ -506,19 +559,30 @@ export async function buildSetsBundle() {
     console.warn(`  format hub skipped: ${e.message}`);
   }
 
+  // Roadmap sets beyond Scryfall's catalog (curated, source-linked).
+  const futureSets = buildFutureSets(sets, today);
+  if (futureSets.length) {
+    console.log(
+      `  future radar: ${futureSets.map((f) => `${f.name} (${f.dateLabel || f.sortDate})`).join(" · ")}`,
+    );
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     date: today,
-    version: "1.1.0",
+    version: "1.2.0",
     policy: {
       arenaFirst: true,
       noAlchemy: true,
       formats: "Standard/Pioneer-facing expansions only",
       arenaDates:
         "official overrides when known; otherwise estimated as paper release minus 3 days (labeled)",
+      futureSets:
+        "roadmap-announced sets from curated, source-linked entries (future-sets.json); dropped automatically once Scryfall catalogs the set",
     },
-    sources: ["scryfall", "set-calendar-overrides", "whatsinstandard-v6"],
+    sources: ["scryfall", "set-calendar-overrides", "whatsinstandard-v6", "future-sets"],
     sets,
     formats,
+    futureSets,
   };
 }

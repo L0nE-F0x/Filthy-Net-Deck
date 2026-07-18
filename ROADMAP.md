@@ -10,15 +10,15 @@
 
 ## Immediate follow-ups
 
-Releases 0.17.0 → **0.21.0** are all shipped end-to-end (signed Windows publish +
+Releases 0.17.0 → **0.22.0** are all shipped end-to-end (signed Windows publish +
 macOS dmg rolled + marketing/OG). Detail in git history + `handoff.md` §2.
 
-- [x] **v0.21.0 signed Windows publish** (NSIS + `.sig`, sig key id verified, updater, version.json ×2, OG `?v=0.21.0`, tag).
-- [x] **Roll v0.21.0 macOS dmg** onto `website/downloads/` + mac download labels.
+- [x] **v0.22.0 signed Windows publish** (NSIS + `.sig`, sig key id verified, updater, version.json ×2, OG `?v=0.22.0`, tag).
+- [x] **Roll v0.22.0 macOS dmg** onto `website/downloads/` + mac download labels.
 
 **Open (low urgency):**
 
-- [ ] **Owner:** verify in-app **Update & restart** 0.20→0.21 from an installed build (couldn't be exercised from the dev env; everything it needs is live + signed).
+- [ ] **Owner:** verify in-app **Update & restart** 0.21→0.22 from an installed build (couldn't be exercised from the dev env; everything it needs is live + signed).
 - [ ] Marketing screenshot/GIF carousel — needs owner-supplied 1280×860 captures with real tracker data.
 - [ ] Full macOS **signed** auto-update in CI (owner decision: store key as repo secret) — soft dmg CTA already works when download URL ends in `.dmg`.
 - [ ] `whatsinstandard` v6 is deprecated — build warns; migrate `fetchStandardRotation` to v7 when it lands (also see `docs/MAINTENANCE.md` item 5).
@@ -88,6 +88,26 @@ real-world MTG events with minimal lag, and self-maintains.
   previous-season comparison (WR, peak, games) (`climbStats.ts`).
 - [x] **Docs** — `docs/MAINTENANCE.md` (self-maintains vs. monthly checklist).
 
+## Milestone 9 — v0.22.0 "Roadmap + card watch" — shipped (2026-07-18)
+
+Owner-directed batch (Kimi). Theme: see further ahead, find cards faster.
+
+- [x] **Future Standard** — roadmap-announced sets with no Scryfall row yet
+  (Nauctis: The Sunken Realm 2027-02-05, Kamigawa: Titanbreach 2027-06-04,
+  Zhalfir 2027-10-01, + the three 2027 Universes Beyond slots) render on the
+  Sets page with dates, notes, and announcement source links. Curated in
+  `pipeline/sources/future-sets.json` (every entry source-linked, nothing
+  invented); the build auto-drops entries once Scryfall catalogs the set or an
+  exact date passes. Feed `sets.json` → `futureSets`, version 1.2.0.
+- [x] **Card watch / Ctrl+K palette** — `cardWatch.ts` indexes every meta
+  decklist (both formats × both modes, main + side); Ctrl+K anywhere opens the
+  palette: card search → which decks play it (copies, board, rank), deck jump,
+  page nav. Topbar Ctrl-K hint button for discovery. 14 unit tests.
+- [x] **Matchup Lab QoL** — tags + notes save on every keystroke (no more lost
+  edits on opponent switch); helper dedupe (`winrateFavor` → `ranks.ts`,
+  `currentStreak` → `climbStats.ts`); `personalMeta` fuzzy join now picks the
+  longest, most specific archetype key instead of first-iteration.
+
 ## Explicit non-goals (do not add)
 
 In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.
@@ -98,9 +118,7 @@ In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking prom
 
 Ideas only; owner prioritizes. Do **not** ship one release per bullet.
 
-- **Card watch / Ctrl+K palette** — scoped in the 0.21 planning but deferred. "Which meta decks play this card, how many copies, which format" — all computable locally from `latest.json`, no new feed data. Strong during spoiler season.
 - **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days (the per-deck panel + Sets count already ship; badges were left out since Q1 2027 is far off and couldn't be visually verified now).
-- Matchup Lab quality-of-life.
 - Performance / feed size — the Marvel gallery alone is ~248KB of `sets.json`; Netlify gzips it, so low urgency.
 - Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
 - Anything owner requests on return from the Claude ↔ Grok ↔ Kimi rotation.

@@ -15,6 +15,7 @@ import {
   opponentKey,
   setOpponentNote,
 } from "../services/matchupNotes";
+import { winrateFavor } from "../services/ranks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
@@ -23,12 +24,6 @@ const RESULT_LABEL: Record<MatchResult, string> = {
   draw: "Draw",
   unknown: "?",
 };
-
-function winrateFavor(rate: number): "favored" | "even" | "unfavored" {
-  if (rate >= 0.55) return "favored";
-  if (rate >= 0.45) return "even";
-  return "unfavored";
-}
 
 interface OppGroup {
   key: string;
@@ -286,9 +281,9 @@ export function Matchups() {
     setEditingKey(g.key);
   };
 
-  const saveNotes = () => {
+  const saveNotes = (tag: string, notes: string) => {
     if (!selectedGroup) return;
-    setOpponentNote(selectedGroup.name, { tag: tagDraft, notes: notesDraft });
+    setOpponentNote(selectedGroup.name, { tag, notes });
     setNoteTick((t) => t + 1);
   };
 
@@ -520,8 +515,9 @@ export function Matchups() {
                   onChange={(e) => {
                     setEditingKey(selectedGroup.key);
                     setTagDraft(e.target.value);
+                    saveNotes(e.target.value, notesDraft);
                   }}
-                  onBlur={saveNotes}
+                  onBlur={() => saveNotes(tagDraft, notesDraft)}
                 />
                 <datalist id="mu-tag-suggestions">
                   {tagSuggestions.map((t) => (
@@ -538,11 +534,12 @@ export function Matchups() {
                   onChange={(e) => {
                     setEditingKey(selectedGroup.key);
                     setNotesDraft(e.target.value);
+                    saveNotes(tagDraft, e.target.value);
                   }}
-                  onBlur={saveNotes}
+                  onBlur={() => saveNotes(tagDraft, notesDraft)}
                 />
               </label>
-              <p className="text-[11px] text-muted m-0">Notes save automatically when you leave a field.</p>
+              <p className="text-[11px] text-muted m-0">Tags and notes save as you type.</p>
             </div>
 
             {selectedGroup.decks.length > 0 && (

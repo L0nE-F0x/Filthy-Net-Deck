@@ -33,18 +33,25 @@ never silently stale-as-fresh).
    magic.gg announcements and add the official date + source URL. This is the
    only data with no API. Also fill `spoilerStart` when preview seasons are
    announced.
-3. **Winrate tracker vs. Arena updates** — after any Arena client update, open
+3. **Roadmap sets** — `pipeline/sources/future-sets.json` (Future Standard
+   section): after any WotC preview panel / roadmap announcement, add newly
+   revealed sets with `sourceUrl` links (magic.wizards.com preferred).
+   Entries **drop out automatically** once Scryfall catalogs the set or an
+   exact date passes — but if WotC *changes* a date or name, edit the entry by
+   hand. When an unannounced Universes Beyond slot gets its name, replace it
+   (new name + `official` confidence + WotC source).
+4. **Winrate tracker vs. Arena updates** — after any Arena client update, open
    My Stats; if the parse-error warning shows, run the replay harness
    (`FND_REPLAY_LOG=<Player.log> cargo test replay_real_log -- --nocapture
    --ignored` in `src-tauri`) and fix `tracker.rs`.
-4. **Source quality spot-check** — in the app, glance at deck `listQuality`
+5. **Source quality spot-check** — in the app, glance at deck `listQuality`
    badges / Settings sources. If everything degraded to Goldfish-only or
    `partial`, a scraper (magic.gg / MTGO) probably changed its HTML — check the
    latest CI run logs even if it "succeeded".
-5. **whatsinstandard API** — the build warns if v6 reports itself deprecated;
+6. **whatsinstandard API** — the build warns if v6 reports itself deprecated;
    check the CI log for `check for v7` and migrate `fetchStandardRotation` in
    `pipeline/sources/sets.mjs` if so.
-6. **Netlify + updater** — confirm `https://filthy-net-deck.netlify.app/version.json`
+7. **Netlify + updater** — confirm `https://filthy-net-deck.netlify.app/version.json`
    and `updater/latest.json` are live and match the shipped version (critical if
    a custom domain migration happens — installed apps pin the netlify URL).
 

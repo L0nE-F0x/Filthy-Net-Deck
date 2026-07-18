@@ -79,4 +79,46 @@ describe("personalVsMeta", () => {
     const best = bestPersonalArchetype(rows, 3);
     expect(best?.archetype).toBe("Izzet Prowess");
   });
+
+  it("substring fallback prefers the most specific (longest) personal deck name", () => {
+    const azorius: Deck = {
+      ...decks[1],
+      id: "3",
+      name: "Azorius Control",
+      archetype: "Azorius Control",
+      rank: 3,
+    };
+    const rows = personalVsMeta(
+      [
+        // Generic name tracked first — first-iteration would wrongly pick it.
+        m("Control", "win", "a"),
+        m("Azorius Control V2", "loss", "b"),
+        m("Azorius Control V2", "loss", "c"),
+      ],
+      [azorius],
+    );
+    const row = rows.find((r) => r.archetype === "Azorius Control")!;
+    expect(row.yourWins).toBe(0);
+    expect(row.yourLosses).toBe(2);
+  });
+
+  it("breaks length ties alphabetically so the fallback is deterministic", () => {
+    const monoRed: Deck = {
+      ...decks[1],
+      id: "4",
+      name: "Mono Red",
+      archetype: "Mono Red",
+      rank: 4,
+    };
+    const rows = personalVsMeta(
+      [
+        m("Mono Red Y", "win", "a"),
+        m("Mono Red X", "loss", "b"),
+      ],
+      [monoRed],
+    );
+    const row = rows.find((r) => r.archetype === "Mono Red")!;
+    expect(row.yourWins).toBe(0);
+    expect(row.yourLosses).toBe(1);
+  });
 });

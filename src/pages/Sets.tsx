@@ -16,6 +16,7 @@ import {
   type DateConfidence,
   type FormatHub,
   type FormatSetInfo,
+  type FutureSet,
   type SetPreviewCard,
   type SetStatus,
   type UpcomingSet,
@@ -678,6 +679,68 @@ function BanRail({ bans }: { bans: BannedCard[] }) {
   );
 }
 
+/**
+ * Roadmap-announced sets with no Scryfall row yet (curated in the pipeline —
+ * every row links to its announcement source). Hidden on older feeds.
+ */
+function FutureStandardSection({ futureSets }: { futureSets: FutureSet[] }) {
+  if (!futureSets.length) return null;
+  return (
+    <section>
+      <h3 className="set-section-title">Future Standard</h3>
+      <div className="panel flex flex-col gap-3">
+        <div>
+          <p className="eyebrow m-0 mb-1">On the roadmap · no cards spoiled yet</p>
+          <p className="text-sm text-muted m-0 leading-relaxed max-w-2xl">
+            Announced sets beyond the radar, each linked to its announcement source. They
+            graduate to the radar above — dates, galleries, countdowns — the moment Scryfall
+            catalogs them.
+          </p>
+        </div>
+        <div className="future-set-list">
+          {futureSets.map((f) => (
+            <div className="future-set-row" key={`${f.name}-${f.sortDate ?? ""}`}>
+              <span className="future-set-glyph" aria-hidden="true">
+                {f.kind === "universes-beyond" && /^universes beyond/i.test(f.name)
+                  ? "UB"
+                  : f.name.slice(0, 1)}
+              </span>
+              <div className="future-set-body">
+                <div className="flex flex-wrap items-center gap-2">
+                  <strong className="text-sm">{f.name}</strong>
+                  <span className={`future-set-kind kind-${f.kind}`}>
+                    {f.kind === "universes-beyond" ? "Universes Beyond" : "Magic Multiverse"}
+                  </span>
+                  {f.confidence === "reported" && (
+                    <span
+                      className="future-set-reported"
+                      title="Slot confirmed by WotC; timing from press reports — not yet officially dated"
+                    >
+                      reported
+                    </span>
+                  )}
+                </div>
+                {f.notes && <p className="future-set-notes">{f.notes}</p>}
+              </div>
+              <div className="future-set-side">
+                {f.dateLabel && <span className="future-set-date">{f.dateLabel}</span>}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  title={f.sourceName ? `Announcement source: ${f.sourceName}` : "Announcement source"}
+                  onClick={() => void openExternal(f.sourceUrl)}
+                >
+                  Source{f.sourceName ? `: ${f.sourceName}` : ""}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FormatHubSection({ hub }: { hub: FormatHub }) {
   const [fmt, setFmt] = useState<"standard" | "pioneer">("standard");
   const [showAllPio, setShowAllPio] = useState(false);
@@ -1053,6 +1116,8 @@ export function Sets() {
           </div>
         </section>
       ) : null}
+
+      {sets.futureSets?.length ? <FutureStandardSection futureSets={sets.futureSets} /> : null}
 
       {sets.formats ? <FormatHubSection hub={sets.formats} /> : null}
     </div>
