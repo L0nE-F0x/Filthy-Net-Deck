@@ -32,6 +32,17 @@ import {
   saveCardSnap,
   shouldFireArenaNotify,
 } from "../services/setPulse";
+import {
+  banChangeSignature,
+  diffBans,
+  loadBanSnap,
+  markBanNotifyFired,
+  needsBaseline,
+  saveBanSnap,
+  shouldFireBanNotify,
+  summarizeBanChanges,
+  type BanChange,
+} from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
 import { applyFullscreen } from "../services/windowMode";
 
@@ -44,6 +55,8 @@ interface Prefs {
   notifyArenaEve: boolean;
   /** Desktop toast when a match is recorded (opt-in, like Arena-eve). */
   notifyMatchEnd: boolean;
+  /** Desktop toast when a B&R announcement changes the ban lists (default on). */
+  notifyBanlist: boolean;
   /** Launch the app fullscreen (also toggled live with F11). */
   fullscreen: boolean;
   /** Format shown on the Decks home last time — restored on next launch. */
@@ -58,6 +71,7 @@ function loadPrefs(): Prefs {
         defaultMode?: PlayMode;
         notifyArenaEve?: boolean;
         notifyMatchEnd?: boolean;
+        notifyBanlist?: boolean;
         fullscreen?: boolean;
         lastFormatId?: string;
       };
@@ -65,6 +79,7 @@ function loadPrefs(): Prefs {
         defaultMode: parsed.defaultMode === "bo3" ? "bo3" : "bo1",
         notifyArenaEve: parsed.notifyArenaEve !== false,
         notifyMatchEnd: parsed.notifyMatchEnd === true,
+        notifyBanlist: parsed.notifyBanlist !== false,
         fullscreen: parsed.fullscreen === true,
         lastFormatId:
           parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
@@ -79,6 +94,7 @@ function loadPrefs(): Prefs {
     defaultMode: "bo1",
     notifyArenaEve: true,
     notifyMatchEnd: false,
+    notifyBanlist: true,
     fullscreen: false,
   };
 }
@@ -155,6 +171,8 @@ interface AppState {
   setsError: string | null;
   /** scryfallIds new since last visit, keyed by set code */
   setsNewByCode: Record<string, string[]>;
+  /** Ban-list changes vs the last-acknowledged snapshot (B&R pulse). */
+  banChanges: BanChange[];
 
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
@@ -164,12 +182,15 @@ interface AppState {
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
+  setNotifyBanlist: (v: boolean) => void;
   /** Persist the fullscreen pref and apply it to the window immediately. */
   setFullscreenPref: (v: boolean) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
   markSetsSeen: () => void;
+  /** Acknowledge the current ban lists — clears the B&R pulse. */
+  markBansSeen: () => void;
   clearError: () => void;
   toggleFavorite: (deckId: string) => void;
   isFavorite: (deckId: string) => boolean;
@@ -235,6 +256,7 @@ export const useAppStore = create<AppState>((set, get) => {
     setsLoading: false,
     setsError: null,
     setsNewByCode: {},
+    banChanges: [],
 
     setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
@@ -274,6 +296,11 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     setNotifyMatchEnd: (notifyMatchEnd) => {
       const next = { ...get().prefs, notifyMatchEnd };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setNotifyBanlist: (notifyBanlist) => {
+      const next = { ...get().prefs, notifyBanlist };
       savePrefs(next);
       set({ prefs: next });
     },
@@ -488,6 +515,12 @@ export const useAppStore = create<AppState>((set, get) => {
       set({ setsNewByCode: {} });
     },
 
+    markBansSeen: () => {
+      const bundle = get().sets;
+      if (bundle?.formats) saveBanSnap(bundle.formats);
+      set({ banChanges: [] });
+    },
+
     refreshSets: async () => {
       set({ setsLoading: true, setsError: null });
       try {
@@ -498,12 +531,33 @@ export const useAppStore = create<AppState>((set, get) => {
         // badges; the snapshot is baselined by markSetsSeen when the user
         // actually leaves the Sets page.
         const setsNewByCode = newCardsBySet(bundle, prevSnap);
+
+        // B&R pulse: diff ban lists against the last-acknowledged snapshot.
+        // First sight of a format's list is a baseline, not an announcement.
+        const banSnap = loadBanSnap();
+        const banChanges = diffBans(bundle.formats, banSnap);
+        if (!banChanges.length && needsBaseline(bundle.formats, banSnap)) {
+          saveBanSnap(bundle.formats);
+        }
+
         set({
           sets: bundle,
           setsLoading: false,
           setsError: null,
           setsNewByCode,
+          banChanges,
         });
+
+        if (banChanges.length && get().prefs.notifyBanlist) {
+          const sig = banChangeSignature(banChanges);
+          if (shouldFireBanNotify(sig)) {
+            void notifyDesktop(
+              "Banned & Restricted update",
+              `${summarizeBanChanges(banChanges)}. Open Filthy Net Deck for the full lists.`,
+            );
+            markBanNotifyFired(sig);
+          }
+        }
 
         // Opt-in tray/desktop ping the day before Arena drops
         if (get().prefs.notifyArenaEve && shouldFireArenaNotify()) {

@@ -777,6 +777,48 @@ select,
   color: var(--color-poor);
 }
 
+/* Rotation impact flag (DeckView) */
+.rotation-flag {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-fair) 12%, var(--color-ink-900));
+  border: 1px solid color-mix(in srgb, var(--color-fair) 35%, transparent);
+}
+.rotation-flag-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.86rem;
+  color: var(--color-foam);
+}
+.rotation-flag-badge {
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 0.24rem 0.42rem;
+  border-radius: 6px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-fair) 85%, #fff), var(--color-fair));
+  color: #2a1c02;
+}
+.rotation-flag-cards {
+  margin: 0.4rem 0 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+.card-rotating {
+  margin-left: auto;
+  color: var(--color-fair);
+  font-size: 0.85rem;
+  cursor: default;
+}
+/* When both the rotation marker and QA "?" show, keep them side by side. */
+.card-rotating + .text-poor {
+  margin-left: 0.4rem;
+}
+
 .diff-panel .diff-row {
   display: grid;
   grid-template-columns: 100px 1fr;
@@ -1167,6 +1209,54 @@ select,
 .wl-dot.loss { background: var(--color-poor); }
 .wl-dot.draw { background: var(--color-fair); }
 .wl-dot.unknown { background: var(--color-ink-600); }
+
+.climb-streak {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.climb-streak.streak-win {
+  color: var(--color-good);
+  border-color: color-mix(in srgb, var(--color-good) 40%, transparent);
+  background: color-mix(in srgb, var(--color-good) 12%, transparent);
+}
+.climb-streak.streak-loss {
+  color: var(--color-poor);
+  border-color: color-mix(in srgb, var(--color-poor) 40%, transparent);
+  background: color-mix(in srgb, var(--color-poor) 12%, transparent);
+}
+
+.season-compare {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+.season-compare-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: var(--color-ink-900);
+  border: 1px solid var(--color-ink-700);
+}
+.season-compare-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+}
+.season-compare-now {
+  font-size: 1.05rem;
+  color: var(--color-foam);
+}
+.season-compare-delta {
+  font-size: 0.76rem;
+  font-weight: 600;
+}
 
 .deck-wr-row {
   grid-template-columns: minmax(110px, 1.1fr) 1.4fr 110px;
@@ -2689,6 +2779,59 @@ select,
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--color-gold-300);
+}
+
+/* B&R pulse — red-accented sibling of the spoiler pulse */
+.ban-pulse {
+  border-color: color-mix(in srgb, var(--color-poor) 45%, var(--color-ink-600));
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--color-poor) 16%, var(--color-ink-900)),
+    var(--color-ink-900) 55%
+  );
+  cursor: default;
+  padding: 0;
+}
+.ban-pulse:hover {
+  border-color: color-mix(in srgb, var(--color-poor) 65%, transparent);
+  transform: none;
+}
+.ban-pulse-badge {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-poor) 80%, #fff), var(--color-poor));
+  color: #2a0a0a;
+  margin-left: 0.9rem;
+}
+.ban-pulse-open {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.9rem 0.7rem 0.75rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ban-pulse-open .spoiler-pulse-cta {
+  color: color-mix(in srgb, var(--color-poor) 70%, #fff);
+}
+.ban-pulse-dismiss {
+  flex-shrink: 0;
+  margin-right: 0.6rem;
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.ban-pulse-dismiss:hover {
+  background: color-mix(in srgb, var(--color-poor) 20%, transparent);
+  color: var(--color-foam);
 }
 
 /* Gallery extras */

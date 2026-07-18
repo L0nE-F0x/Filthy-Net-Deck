@@ -12,14 +12,28 @@ import { validateDeckNames } from "../services/scryfallValidate";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
+import { deckRotationImpact, rotationWhen } from "../services/rotationImpact";
 import type { CardEntry } from "../types/meta";
 
 /** One decklist row with a card-art popup on hover (when the id is known). */
-function CardRow({ c, unknown }: { c: CardEntry; unknown: boolean }) {
+function CardRow({
+  c,
+  unknown,
+  rotating,
+}: {
+  c: CardEntry;
+  unknown: boolean;
+  rotating?: boolean;
+}) {
   return (
     <div className={`card-list-row card-row-hover${unknown ? " card-unknown" : ""}`}>
       <span className="count">{c.count}</span>
       <span>{c.name}</span>
+      {rotating && (
+        <span className="card-rotating" title="Rotates out of Standard at the next rotation">
+          ⟳
+        </span>
+      )}
       {unknown && <span className="text-[10px] text-poor ml-auto">?</span>}
       {c.scryfallId ? (
         <span className="card-hover-pop" aria-hidden="true">
@@ -93,6 +107,7 @@ function averageManaValue(cards: CardEntry[]): number | null {
 
 export function DeckView() {
   const meta = useAppStore((s) => s.meta);
+  const sets = useAppStore((s) => s.sets);
   const deckId = useAppStore((s) => s.selectedDeckId);
   const setPage = useAppStore((s) => s.setPage);
   const openFormat = useAppStore((s) => s.openFormat);
@@ -143,6 +158,10 @@ export function DeckView() {
   const unknownSet = new Set(unknown.map((n) => n.toLowerCase()));
   const mainGroups = groupMainboard(deck.mainboard);
   const avgMv = averageManaValue(deck.mainboard);
+  const rotation = deckRotationImpact(deck, sets?.formats?.standard?.rotation);
+  const rotatingNames = new Set(
+    (rotation?.hits ?? []).map((h) => h.name.toLowerCase()),
+  );
 
   const onCopy = async () => {
     const ok = await copyToClipboard(deck.arenaImport);
@@ -227,6 +246,38 @@ export function DeckView() {
         </div>
       )}
 
+      {rotation && rotation.distinct > 0 && (
+        <div className="rotation-flag">
+          <div className="rotation-flag-head">
+            <span className="rotation-flag-badge">Rotation</span>
+            <strong>
+              Loses {rotation.distinct} card{rotation.distinct === 1 ? "" : "s"} (
+              {rotation.mainCopies} main
+              {rotation.sideCopies > 0 ? ` · ${rotation.sideCopies} SB` : ""}) at{" "}
+              {rotationWhen(rotation)}
+            </strong>
+          </div>
+          <p className="rotation-flag-cards">
+            {rotation.hits
+              .filter((h) => h.board === "main")
+              .map((h) => `${h.count} ${h.name}`)
+              .join(" · ")}
+            {rotation.hits.some((h) => h.board === "side") && (
+              <>
+                {" "}
+                <span className="text-muted">
+                  · SB:{" "}
+                  {rotation.hits
+                    .filter((h) => h.board === "side")
+                    .map((h) => `${h.count} ${h.name}`)
+                    .join(", ")}
+                </span>
+              </>
+            )}
+          </p>
+        </div>
+      )}
+
       <ArchetypeDiffPanel deck={deck} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
@@ -260,7 +311,12 @@ export function DeckView() {
                     </p>
                   )}
                   {g.cards.map((c) => (
-                    <CardRow key={c.name} c={c} unknown={unknownSet.has(c.name.toLowerCase())} />
+                    <CardRow
+                      key={c.name}
+                      c={c}
+                      unknown={unknownSet.has(c.name.toLowerCase())}
+                      rotating={rotatingNames.has(c.name.toLowerCase())}
+                    />
                   ))}
                 </div>
               ))}
@@ -274,7 +330,12 @@ export function DeckView() {
               </h3>
               <div className="card-list selectable">
                 {deck.sideboard.map((c) => (
-                  <CardRow key={c.name} c={c} unknown={unknownSet.has(c.name.toLowerCase())} />
+                  <CardRow
+                    key={c.name}
+                    c={c}
+                    unknown={unknownSet.has(c.name.toLowerCase())}
+                    rotating={rotatingNames.has(c.name.toLowerCase())}
+                  />
                 ))}
               </div>
             </section>

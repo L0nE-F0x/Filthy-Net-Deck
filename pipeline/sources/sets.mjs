@@ -202,6 +202,82 @@ async function fetchBannedCards(format) {
   return out;
 }
 
+/** All card names matching a Scryfall search (unique cards, 404 = none). */
+async function searchCardNames(query) {
+  const out = [];
+  let path = `/cards/search?q=${encodeURIComponent(query)}&unique=cards&order=name`;
+  try {
+    while (path) {
+      await sleep(100);
+      const data = await scryfallGet(path);
+      for (const c of data.data || []) out.push(c.name);
+      path =
+        data.has_more && data.next_page
+          ? data.next_page.replace(API, "")
+          : null;
+    }
+  } catch (e) {
+    if (String(e.message).includes("404")) return out;
+    throw e;
+  }
+  return out;
+}
+
+/**
+ * Which Standard cards leave at the next rotation. A card rotates out only
+ * when it is Standard-legal via rotating sets alone — any printing in a
+ * staying Standard set keeps it (Scryfall legality is set-based, so bonus
+ * sheets that never granted legality can't wrongly save a card).
+ *
+ * @param {Array<{code:string,name:string,enterDate:string|null,exitDate:string|null,exitRough:string|null}>} stdRotation
+ * @param {string} today YYYY-MM-DD
+ * @returns {Promise<object|null>} rotation payload or null when undeterminable
+ */
+async function buildRotationImpact(stdRotation, today) {
+  const exact = stdRotation
+    .map((s) => s.exitDate)
+    .filter((d) => d && d > today)
+    .sort();
+  let rotating;
+  let nextDate = null;
+  let roughLabel = null;
+  if (exact.length) {
+    nextDate = exact[0];
+    rotating = stdRotation.filter((s) => s.exitDate === nextDate);
+  } else {
+    // No exact date published yet — group by the rough label of the
+    // earliest-entered set that has one ("Q1 2027" style).
+    const withRough = stdRotation
+      .filter((s) => s.exitRough)
+      .sort((a, b) => String(a.enterDate).localeCompare(String(b.enterDate)));
+    if (!withRough.length) return null;
+    roughLabel = withRough[0].exitRough;
+    rotating = stdRotation.filter((s) => s.exitRough === roughLabel);
+  }
+  const rotatingCodes = rotating.map((s) => s.code).filter(Boolean);
+  const stayingCodes = stdRotation
+    .map((s) => s.code)
+    .filter((c) => c && !rotatingCodes.includes(c));
+  if (!rotatingCodes.length || !stayingCodes.length) return null;
+
+  const inSets = (codes) => codes.map((c) => `e:${c}`).join(" or ");
+  const [rotatingNames, stayingNames] = [
+    await searchCardNames(`f:standard (${inSets(rotatingCodes)})`),
+    await searchCardNames(`f:standard (${inSets(stayingCodes)})`),
+  ];
+  const staying = new Set(stayingNames.map((n) => n.toLowerCase()));
+  const cardNames = [...new Set(rotatingNames.map((n) => n.toLowerCase()))]
+    .filter((n) => !staying.has(n))
+    .sort();
+
+  return {
+    nextDate,
+    roughLabel,
+    setCodes: rotatingCodes,
+    cardNames,
+  };
+}
+
 const WIS_API = "https://whatsinstandard.com/api/v6/standard.json";
 
 /**
@@ -294,8 +370,23 @@ async function buildFormatHub(allScryfallSets, today) {
     `  standard ${standardSets.length} sets · ${standardBans.length} bans | pioneer ${pioneerSets.length} sets · ${pioneerBans.length} bans`,
   );
 
+  // Rotation impact — which cards leave Standard next. Fail-soft: the hub
+  // ships without it rather than sinking bans/rotation dates with it.
+  let rotation = null;
+  try {
+    rotation = await buildRotationImpact(stdRotation, today);
+    if (rotation) {
+      console.log(
+        `  rotation: ${rotation.setCodes.join(",")} → ${rotation.cardNames.length} cards leave ` +
+          `(${rotation.nextDate || rotation.roughLabel || "date TBA"})`,
+      );
+    }
+  } catch (e) {
+    console.warn(`  rotation impact skipped: ${e.message}`);
+  }
+
   return {
-    standard: { sets: standardSets, bans: standardBans },
+    standard: { sets: standardSets, bans: standardBans, rotation },
     pioneer: { sinceDate: PIONEER_SINCE, sets: pioneerSets, bans: pioneerBans },
     sources: ["scryfall-legalities", "whatsinstandard-v6"],
   };

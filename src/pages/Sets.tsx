@@ -713,7 +713,11 @@ function FormatHubSection({ hub }: { hub: FormatHub }) {
                       · next rotation{" "}
                       <strong className="text-gold-300">{exitLabel(rotatingNext[0])}</strong> (
                       {rotatingNext.length} set{rotatingNext.length === 1 ? "" : "s"} leave
-                      {rotatingNext.length === 1 ? "s" : ""})
+                      {rotatingNext.length === 1 ? "s" : ""}
+                      {std?.rotation?.cardNames?.length
+                        ? `, ${std.rotation.cardNames.length} cards`
+                        : ""}
+                      )
                     </>
                   ) : null}
                   .

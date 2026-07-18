@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
+import { BanPulse } from "../components/BanPulse";
 import { SpoilerPulse } from "../components/SpoilerPulse";
 import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
@@ -213,6 +214,7 @@ export function Daily() {
         </div>
       </div>
 
+      <BanPulse />
       <SpoilerPulse />
 
       {activeFmt && hero && (

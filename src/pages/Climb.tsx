@@ -17,6 +17,11 @@ import {
   winrateFavor,
   type RankPoint,
 } from "../services/ranks";
+import {
+  currentStreak,
+  longestStreak,
+  previousSeasonSummary,
+} from "../services/climbStats";
 import type { TrackedMatch } from "../types/tracker";
 
 function tally(matches: TrackedMatch[]) {
@@ -323,6 +328,37 @@ function deckClimbStats(matches: TrackedMatch[]): DeckClimb[] {
   return out.sort((a, b) => b.delta - a.delta || (b.rate ?? 0) - (a.rate ?? 0));
 }
 
+/** One metric in the season-over-season comparison row. */
+function SeasonCompareCell({
+  label,
+  now,
+  deltaNum,
+  deltaSuffix,
+}: {
+  label: string;
+  now: string;
+  deltaNum: number | null;
+  deltaSuffix: string;
+}) {
+  const cls =
+    deltaNum == null || deltaNum === 0
+      ? "text-muted"
+      : deltaNum > 0
+        ? "favor-favored"
+        : "favor-unfavored";
+  const delta =
+    deltaNum == null
+      ? "—"
+      : `${deltaNum > 0 ? "+" : ""}${deltaNum}${deltaSuffix ? ` ${deltaSuffix}` : ""}`;
+  return (
+    <div className="season-compare-cell">
+      <span className="season-compare-label">{label}</span>
+      <strong className="season-compare-now">{now}</strong>
+      <span className={`season-compare-delta ${cls}`}>{delta}</span>
+    </div>
+  );
+}
+
 export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
@@ -370,6 +406,17 @@ export function Climb() {
     .filter((m) => m.result === "win" || m.result === "loss")
     .slice(0, 10);
   const form = tally(last10);
+
+  const streak = useMemo(() => currentStreak(seasonMatches), [seasonMatches]);
+  const bestWinStreak = useMemo(
+    () => longestStreak(seasonMatches, "win"),
+    [seasonMatches],
+  );
+  // Season-over-season: only meaningful for a specific month, not "all".
+  const prevSeason = useMemo(
+    () => (seasonKey === "all" ? null : previousSeasonSummary(matches, seasonKey)),
+    [matches, seasonKey],
+  );
 
   if (matches.length === 0) {
     return (
@@ -543,6 +590,63 @@ export function Climb() {
                 </strong>
               )}
             </span>
+            {streak.length >= 2 && (
+              <span
+                className={`climb-streak ${streak.type === "win" ? "streak-win" : "streak-loss"}`}
+              >
+                {streak.length}
+                {streak.type === "win" ? "W" : "L"} streak
+              </span>
+            )}
+          </div>
+          {streak.type === "loss" && streak.length >= 3 && (
+            <p className="text-xs text-muted m-0 mt-2 leading-relaxed">
+              {streak.length} losses in a row — the ladder protects your rank inside a tier, but a
+              short break or a deck switch often resets tilt better than one more queue.
+            </p>
+          )}
+          {streak.type === "win" &&
+            bestWinStreak >= 3 &&
+            streak.length === bestWinStreak && (
+              <p className="text-xs text-muted m-0 mt-2 leading-relaxed">
+                {streak.length}-win streak — your best run this range. Ride it.
+              </p>
+            )}
+        </div>
+      )}
+
+      {prevSeason && (overall.decided > 0 || prevSeason.rate != null) && (
+        <div className="panel">
+          <h3 className="dash-title">
+            {seasonLabel(seasonKey)} vs {seasonLabel(prevSeason.seasonKey)}
+          </h3>
+          <div className="season-compare">
+            <SeasonCompareCell
+              label="Win rate"
+              now={overall.rate != null ? `${(overall.rate * 100).toFixed(0)}%` : "—"}
+              deltaNum={
+                overall.rate != null && prevSeason.rate != null
+                  ? Math.round((overall.rate - prevSeason.rate) * 100)
+                  : null
+              }
+              deltaSuffix="pts"
+            />
+            <SeasonCompareCell
+              label="Peak rank"
+              now={peak ? formatRank(peak) : "—"}
+              deltaNum={
+                peak && prevSeason.peakScore != null
+                  ? Math.round((peak.score - prevSeason.peakScore) * 10) / 10
+                  : null
+              }
+              deltaSuffix="steps"
+            />
+            <SeasonCompareCell
+              label="Games"
+              now={String(overall.decided)}
+              deltaNum={overall.decided - (prevSeason.wins + prevSeason.losses)}
+              deltaSuffix=""
+            />
           </div>
         </div>
       )}

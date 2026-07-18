@@ -79,8 +79,20 @@ export interface BannedCard {
   reason?: string | null;
 }
 
+/** Which cards leave Standard at the next rotation (Standard only). */
+export interface RotationImpact {
+  /** Exact rotation date (YYYY-MM-DD) when whatsinstandard has one. */
+  nextDate: string | null;
+  /** Rough label ("Q1 2027") used only when no exact date is published yet. */
+  roughLabel: string | null;
+  /** Scryfall set codes rotating out together. */
+  setCodes: string[];
+  /** Lowercased canonical names of cards that leave Standard. */
+  cardNames: string[];
+}
+
 export interface FormatHub {
-  standard?: { sets: FormatSetInfo[]; bans: BannedCard[] };
+  standard?: { sets: FormatSetInfo[]; bans: BannedCard[]; rotation?: RotationImpact | null };
   pioneer?: { sinceDate?: string; sets: FormatSetInfo[]; bans: BannedCard[] };
   sources?: string[];
 }

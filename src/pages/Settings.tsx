@@ -11,6 +11,7 @@ export function Settings() {
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
+  const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
@@ -80,6 +81,23 @@ export function Settings() {
             onChange={(e) => setNotifyArenaEve(e.target.checked)}
           />
           Notify me the day before Arena set drops
+        </label>
+      </section>
+
+      <section className="panel">
+        <h3 className="text-sm font-semibold m-0 mb-1">B&amp;R announcements</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Desktop notification when a{" "}
+          <strong className="text-foam">Banned &amp; Restricted</strong> update changes the
+          Standard or Pioneer ban lists. Fires once per announcement; stays on this PC.
+        </p>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={prefs.notifyBanlist}
+            onChange={(e) => setNotifyBanlist(e.target.checked)}
+          />
+          Notify me when the ban lists change
         </label>
       </section>
 
