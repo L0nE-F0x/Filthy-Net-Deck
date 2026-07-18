@@ -1184,6 +1184,7 @@ export function Stats() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
   const clearTracker = useAppStore((s) => s.clearTracker);
+  const refreshTracker = useAppStore((s) => s.refreshTracker);
   const [queue, setQueue] = useState<string | null>(null);
   const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
@@ -1191,6 +1192,11 @@ export function Stats() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [recapMsg, setRecapMsg] = useState<string | null>(null);
+
+  // Re-sync from disk when opening My Stats (covers tray-missed live events).
+  useEffect(() => {
+    void refreshTracker();
+  }, [refreshTracker]);
 
   const onExportCsv = () => {
     setExportMsg("Exporting…");
