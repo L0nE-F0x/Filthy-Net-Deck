@@ -23,6 +23,8 @@ import {
 } from "../types/sets";
 import { IconBack } from "../components/NavIcons";
 import { ManaCost } from "../components/ManaCost";
+import { TrailerButton, TrailerPlayer } from "../components/TrailerPlayer";
+import { trailerForSet, type SetTrailer } from "../services/setTrailers";
 import { totalNewCount } from "../services/setPulse";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
@@ -683,7 +685,13 @@ function BanRail({ bans }: { bans: BannedCard[] }) {
  * Roadmap-announced sets with no Scryfall row yet (curated in the pipeline —
  * every row links to its announcement source). Hidden on older feeds.
  */
-function FutureStandardSection({ futureSets }: { futureSets: FutureSet[] }) {
+function FutureStandardSection({
+  futureSets,
+  onPlayTrailer,
+}: {
+  futureSets: FutureSet[];
+  onPlayTrailer: (setName: string, trailer: SetTrailer) => void;
+}) {
   if (!futureSets.length) return null;
   return (
     <section>
@@ -698,43 +706,54 @@ function FutureStandardSection({ futureSets }: { futureSets: FutureSet[] }) {
           </p>
         </div>
         <div className="future-set-list">
-          {futureSets.map((f) => (
-            <div className="future-set-row" key={`${f.name}-${f.sortDate ?? ""}`}>
-              <span className="future-set-glyph" aria-hidden="true">
-                {f.kind === "universes-beyond" && /^universes beyond/i.test(f.name)
-                  ? "UB"
-                  : f.name.slice(0, 1)}
-              </span>
-              <div className="future-set-body">
-                <div className="flex flex-wrap items-center gap-2">
-                  <strong className="text-sm">{f.name}</strong>
-                  <span className={`future-set-kind kind-${f.kind}`}>
-                    {f.kind === "universes-beyond" ? "Universes Beyond" : "Magic Multiverse"}
-                  </span>
-                  {f.confidence === "reported" && (
-                    <span
-                      className="future-set-reported"
-                      title="Slot confirmed by WotC; timing from press reports — not yet officially dated"
-                    >
-                      reported
+          {futureSets.map((f) => {
+            const trailer = trailerForSet({
+              name: f.name,
+              feedTrailer: f.trailer
+                ? { youtubeId: f.trailer.youtubeId, title: f.trailer.title || f.name }
+                : null,
+            });
+            return (
+              <div className="future-set-row" key={`${f.name}-${f.sortDate ?? ""}`}>
+                <span className="future-set-glyph" aria-hidden="true">
+                  {f.kind === "universes-beyond" && /^universes beyond/i.test(f.name)
+                    ? "UB"
+                    : f.name.slice(0, 1)}
+                </span>
+                <div className="future-set-body">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <strong className="text-sm">{f.name}</strong>
+                    <span className={`future-set-kind kind-${f.kind}`}>
+                      {f.kind === "universes-beyond" ? "Universes Beyond" : "Magic Multiverse"}
                     </span>
-                  )}
+                    {f.confidence === "reported" && (
+                      <span
+                        className="future-set-reported"
+                        title="Slot confirmed by WotC; timing from press reports — not yet officially dated"
+                      >
+                        reported
+                      </span>
+                    )}
+                  </div>
+                  {f.notes && <p className="future-set-notes">{f.notes}</p>}
                 </div>
-                {f.notes && <p className="future-set-notes">{f.notes}</p>}
+                <div className="future-set-side">
+                  {f.dateLabel && <span className="future-set-date">{f.dateLabel}</span>}
+                  {trailer ? (
+                    <TrailerButton onClick={() => onPlayTrailer(f.name, trailer)} />
+                  ) : null}
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    title={f.sourceName ? `Announcement source: ${f.sourceName}` : "Announcement source"}
+                    onClick={() => void openExternal(f.sourceUrl)}
+                  >
+                    Source{f.sourceName ? `: ${f.sourceName}` : ""}
+                  </button>
+                </div>
               </div>
-              <div className="future-set-side">
-                {f.dateLabel && <span className="future-set-date">{f.dateLabel}</span>}
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  title={f.sourceName ? `Announcement source: ${f.sourceName}` : "Announcement source"}
-                  onClick={() => void openExternal(f.sourceUrl)}
-                >
-                  Source{f.sourceName ? `: ${f.sourceName}` : ""}
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -862,11 +881,20 @@ function SetCard({
   set,
   newCount,
   onOpenGallery,
+  onPlayTrailer,
 }: {
   set: UpcomingSet;
   newCount: number;
   onOpenGallery: (s: UpcomingSet) => void;
+  onPlayTrailer: (setName: string, trailer: SetTrailer) => void;
 }) {
+  const trailer = trailerForSet({
+    code: set.code,
+    name: set.name,
+    feedTrailer: set.trailer
+      ? { youtubeId: set.trailer.youtubeId, title: set.trailer.title || set.name }
+      : null,
+  });
   const gallery = setGalleryCards(set);
   const heroUrl = set.heroScryfallId
     ? scryfallCdnUrl(set.heroScryfallId, "art_crop")
@@ -973,6 +1001,9 @@ function SetCard({
         )}
 
         <div className="set-card-actions">
+          {trailer ? (
+            <TrailerButton onClick={() => onPlayTrailer(set.name, trailer)} />
+          ) : null}
           {gallery.length > 0 ? (
             <button
               type="button"
@@ -1002,11 +1033,18 @@ export function Sets() {
   const setsNewByCode = useAppStore((s) => s.setsNewByCode);
   const refreshSets = useAppStore((s) => s.refreshSets);
   const [openCode, setOpenCode] = useState<string | null>(null);
+  const [playing, setPlaying] = useState<{ setName: string; trailer: SetTrailer } | null>(
+    null,
+  );
 
   // Leaving the page baselines "new since last visit" — badges survive
   // background syncs but reset once the user has actually seen the radar.
   useEffect(() => {
     return () => useAppStore.getState().markSetsSeen();
+  }, []);
+
+  const playTrailer = useCallback((setName: string, trailer: SetTrailer) => {
+    setPlaying({ setName, trailer });
   }, []);
 
   const { upcoming, live } = useMemo(() => {
@@ -1095,6 +1133,7 @@ export function Sets() {
                 set={s}
                 newCount={setsNewByCode[s.code]?.length ?? 0}
                 onOpenGallery={(x) => setOpenCode(x.code)}
+                onPlayTrailer={playTrailer}
               />
             ))}
           </div>
@@ -1111,15 +1150,26 @@ export function Sets() {
                 set={s}
                 newCount={setsNewByCode[s.code]?.length ?? 0}
                 onOpenGallery={(x) => setOpenCode(x.code)}
+                onPlayTrailer={playTrailer}
               />
             ))}
           </div>
         </section>
       ) : null}
 
-      {sets.futureSets?.length ? <FutureStandardSection futureSets={sets.futureSets} /> : null}
+      {sets.futureSets?.length ? (
+        <FutureStandardSection futureSets={sets.futureSets} onPlayTrailer={playTrailer} />
+      ) : null}
 
       {sets.formats ? <FormatHubSection hub={sets.formats} /> : null}
+
+      {playing ? (
+        <TrailerPlayer
+          trailer={playing.trailer}
+          setName={playing.setName}
+          onClose={() => setPlaying(null)}
+        />
+      ) : null}
     </div>
   );
 }

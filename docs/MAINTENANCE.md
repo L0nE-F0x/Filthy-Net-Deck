@@ -40,6 +40,12 @@ never silently stale-as-fresh).
    exact date passes — but if WotC *changes* a date or name, edit the entry by
    hand. When an unannounced Universes Beyond slot gets its name, replace it
    (new name + `official` confidence + WotC source).
+3b. **Set announce trailers** — `pipeline/sources/set-trailers.json` (+ client
+   fallback `src/services/setTrailers.ts`): when WotC drops an official
+   YouTube announce trailer, add the 11-char `youtubeId` under `byName`
+   (and `byCode` once Scryfall has a code). Never invent IDs. Prefer the
+   Magic: The Gathering channel. Run `npm run sets` so the feed attaches
+   `trailer` on set cards / Future Standard rows.
 4. **Winrate tracker vs. Arena updates** — after any Arena client update, open
    My Stats; if the parse-error warning shows, run the replay harness
    (`FND_REPLAY_LOG=<Player.log> cargo test replay_real_log -- --nocapture

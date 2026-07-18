@@ -1,0 +1,20 @@
+{
+  "_readme": [
+    "Official WotC / Magic: The Gathering YouTube announce trailers.",
+    "Curated only — never invent a video ID. Prefer the official MTG channel.",
+    "Match by Scryfall set code (byCode) and/or exact set name (byName, case-insensitive).",
+    "Future Standard sets usually only have a byName entry until Scryfall catalogs them.",
+    "youtubeId is the 11-char watch?v= value (e.g. jPaHUxive30)."
+  ],
+  "byCode": {},
+  "byName": {
+    "Nauctis: The Sunken Realm": {
+      "youtubeId": "jPaHUxive30",
+      "title": "Nauctis: Sunken Realm Announce Trailer"
+    },
+    "Kamigawa: Titanbreach": {
+      "youtubeId": "cC6ebvZg-_Q",
+      "title": "Kamigawa: Titanbreach Announce Trailer"
+    }
+  }
+}

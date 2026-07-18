@@ -7,7 +7,7 @@ import { SideboardGuide } from "../components/SideboardGuide";
 import { SourceFooter } from "../components/SourceFooter";
 import { ManaCurve, ColorPie } from "../components/ManaCurve";
 import { IconBack, IconCopy } from "../components/NavIcons";
-import { copyToClipboard } from "../services/arenaImport";
+import { buildArenaImport, copyToClipboard, sanitizeArenaImportText } from "../services/arenaImport";
 import { validateDeckNames } from "../services/scryfallValidate";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
@@ -163,8 +163,17 @@ export function DeckView() {
     (rotation?.hits ?? []).map((h) => h.name.toLowerCase()),
   );
 
+  // Always rebuild (or sanitize) so "Front // Back" names never hit Arena's importer.
+  const arenaText = sanitizeArenaImportText(
+    buildArenaImport({
+      mainboard: deck.mainboard,
+      sideboard: deck.sideboard,
+      commander: deck.commander,
+    }),
+  );
+
   const onCopy = async () => {
-    const ok = await copyToClipboard(deck.arenaImport);
+    const ok = await copyToClipboard(arenaText);
     setToast(
       ok
         ? "Copied! In Arena: Decks → Import Deck"
@@ -381,7 +390,7 @@ export function DeckView() {
               Arena import
             </h4>
             <pre className="selectable text-[11px] leading-relaxed m-0 p-2 rounded-lg bg-ink-950/80 border border-ink-700/50 overflow-auto max-h-64 whitespace-pre-wrap font-mono text-muted">
-              {deck.arenaImport}
+              {arenaText}
             </pre>
           </div>
         </aside>

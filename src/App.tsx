@@ -11,6 +11,7 @@ import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { StatusBanners } from "./components/StatusBanners";
 import { SplashScreen } from "./components/SplashScreen";
 import {
@@ -245,6 +246,7 @@ export default function App() {
             {(page === "daily" || page === "format" || page === "deck") && (
               <BoModeToggle mode={mode} onChange={setMode} />
             )}
+            <ThemeToggle />
             <button
               type="button"
               className="palette-hint"

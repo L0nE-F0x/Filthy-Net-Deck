@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { BoModeToggle } from "../components/BoModeToggle";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
@@ -47,6 +48,15 @@ export function Settings() {
           Opens with this mode. Switch Bo1 / Bo3 anytime from the top bar.
         </p>
         <BoModeToggle mode={prefs.defaultMode} onChange={setDefaultMode} />
+      </section>
+
+      <section className="panel">
+        <h3 className="text-sm font-semibold m-0 mb-1">Appearance</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Dark is the default look. Switch to light for a brighter screen — the toggle also
+          lives discreetly in the top bar.
+        </p>
+        <ThemeToggle showLabels />
       </section>
 
       {isTauri() && (

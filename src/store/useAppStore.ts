@@ -45,6 +45,7 @@ import {
 } from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
 import { applyFullscreen } from "../services/windowMode";
+import { applyTheme, type ThemeMode } from "../services/theme";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
@@ -59,6 +60,8 @@ interface Prefs {
   notifyBanlist: boolean;
   /** Launch the app fullscreen (also toggled live with F11). */
   fullscreen: boolean;
+  /** Appearance — dark is the product default. */
+  theme: ThemeMode;
   /** Format shown on the Decks home last time — restored on next launch. */
   lastFormatId?: FormatId;
 }
@@ -73,6 +76,7 @@ function loadPrefs(): Prefs {
         notifyMatchEnd?: boolean;
         notifyBanlist?: boolean;
         fullscreen?: boolean;
+        theme?: string;
         lastFormatId?: string;
       };
       return {
@@ -81,6 +85,7 @@ function loadPrefs(): Prefs {
         notifyMatchEnd: parsed.notifyMatchEnd === true,
         notifyBanlist: parsed.notifyBanlist !== false,
         fullscreen: parsed.fullscreen === true,
+        theme: parsed.theme === "light" ? "light" : "dark",
         lastFormatId:
           parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
             ? parsed.lastFormatId
@@ -96,6 +101,7 @@ function loadPrefs(): Prefs {
     notifyMatchEnd: false,
     notifyBanlist: true,
     fullscreen: false,
+    theme: "dark",
   };
 }
 
@@ -185,6 +191,8 @@ interface AppState {
   setNotifyBanlist: (v: boolean) => void;
   /** Persist the fullscreen pref and apply it to the window immediately. */
   setFullscreenPref: (v: boolean) => void;
+  /** Persist appearance and apply it to the document immediately. */
+  setTheme: (theme: ThemeMode) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
@@ -220,6 +228,7 @@ declare global {
 
 export const useAppStore = create<AppState>((set, get) => {
   const prefs = loadPrefs();
+  applyTheme(prefs.theme);
   // The test-only meta URL override was removed in 0.8.3 — clear any leftover.
   try {
     localStorage.removeItem("bbi.metaUrl");
@@ -309,6 +318,12 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       void applyFullscreen(fullscreen);
+    },
+    setTheme: (theme) => {
+      const next = { ...get().prefs, theme };
+      savePrefs(next);
+      set({ prefs: next });
+      applyTheme(theme);
     },
     clearError: () => set({ error: null }),
 

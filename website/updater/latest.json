@@ -1,11 +1,11 @@
-{
-    "version": "0.22.0",
-    "notes": "v0.22.0: Future Standard - announced sets with no spoiled cards yet (Nauctis: The Sunken Realm, Kamigawa: Titanbreach, Zhalfir, plus the 2027 Universes Beyond slots) on the Sets page, each linked to its official announcement. Card watch - Ctrl+K anywhere to see every meta deck playing a card, with copies and board. Matchup Lab - opponent tags and notes save as you type.",
-    "pub_date": "2026-07-18T09:19:14Z",
-    "platforms": {
-        "windows-x86_64": {
-            "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnl5MndLWWR1c2l5Um9SZ3BNclN3d25XN3NuZ3RZb1huYkVJWGhUM1hITE1GLzh2aC9SUVkwSTVvOElsSVAzZENLTVM5c1ArT2FyUzVPeGxZaVBxR1FJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzY2MjYzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjIuMF94NjQtc2V0dXAuZXhlCllPd1pKY25xdTBpZmtjR2x5SmFSWjdXRWFQY2lxL3Mza1VDY2pvSDBQTGFWK1U5YUljazNIQ21WYmZ2YkU0QWRLYXRTbmgzZ3FIczRtTFVqZ3g3ckRBPT0K",
-            "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.22.0.exe"
-        }
-    }
+﻿{
+    "platforms":  {
+                      "windows-x86_64":  {
+                                             "signature":  "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnlOSmM1Z0w1VW5iZFFrMzhCQVk1bnBVUE5VMWFxaW90Q3d2VHBydFhVNEN6YjBCTmE1a05ZajU4Vzk2YlpybytwdUdjL01Kb284K0lxV0NCblhnb1FNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzY4MzkzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjMuMF94NjQtc2V0dXAuZXhlCmFRYnJKTEN4SGR3aTdWbHUxYW9iY3pvd1FqRnA1MmdsdUs0bmM3bGVveFBJU3d3U3Z0ZjkxTWx3ZWYxejdqbEorTWpNY3k2MjRPT1FJN3M2OVhSa0FnPT0K",
+                                             "url":  "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.23.0.exe"
+                                         }
+                  },
+    "pub_date":  "2026-07-18T09:53:30Z",
+    "version":  "0.23.0",
+    "notes":  "v0.23.0: Light mode — discreet dark/light toggle in the top bar and Settings. Arena import fix — double-faced cards (Unholy Annex // Ritual Chamber) copy as front-face only so Arena accepts the list. Set trailers — official WotC announce trailers play in a sleek in-app player from Sets / Future Standard."
 }

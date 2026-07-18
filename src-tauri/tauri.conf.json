@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Filthy Net Deck",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "identifier": "com.filthynetdeck.desktop",
   "plugins": {
     "updater": {
@@ -30,7 +30,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://filthy-net-deck.netlify.app; img-src 'self' data: blob: asset: https://asset.localhost https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://c1.scryfall.com https://c2.scryfall.com https://filthy-net-deck.netlify.app; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src 'none'"
+      "csp": "default-src 'self'; connect-src 'self' https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://filthy-net-deck.netlify.app https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: blob: asset: https://asset.localhost https://api.scryfall.com https://*.scryfall.io https://cards.scryfall.io https://c1.scryfall.com https://c2.scryfall.com https://filthy-net-deck.netlify.app https://i.ytimg.com https://*.ytimg.com; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://*.googlevideo.com; child-src 'self' https://www.youtube-nocookie.com https://www.youtube.com"
     }
   },
   "bundle": {

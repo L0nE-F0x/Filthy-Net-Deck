@@ -69,6 +69,46 @@ function loadFutureSets() {
   }
 }
 
+/**
+ * Official WotC YouTube announce trailers (set-trailers.json).
+ * Match by Scryfall code and/or exact set name — never invent IDs.
+ */
+function loadTrailers() {
+  try {
+    const raw = readFileSync(join(__dirname, "set-trailers.json"), "utf8");
+    const data = JSON.parse(raw);
+    const byCode = {};
+    const byName = {};
+    for (const [k, v] of Object.entries(data?.byCode || {})) {
+      if (k.startsWith("_") || !v?.youtubeId) continue;
+      byCode[k.toLowerCase()] = {
+        youtubeId: String(v.youtubeId),
+        title: v.title || null,
+      };
+    }
+    for (const [k, v] of Object.entries(data?.byName || {})) {
+      if (k.startsWith("_") || !v?.youtubeId) continue;
+      byName[normalizeSetName(k)] = {
+        youtubeId: String(v.youtubeId),
+        title: v.title || null,
+      };
+    }
+    return { byCode, byName };
+  } catch {
+    return { byCode: {}, byName: {} };
+  }
+}
+
+function resolveTrailer(trailers, code, name) {
+  if (code && trailers.byCode[String(code).toLowerCase()]) {
+    return trailers.byCode[String(code).toLowerCase()];
+  }
+  if (name && trailers.byName[normalizeSetName(name)]) {
+    return trailers.byName[normalizeSetName(name)];
+  }
+  return null;
+}
+
 function normalizeSetName(name) {
   return String(name || "")
     .toLowerCase()
@@ -88,7 +128,7 @@ function normalizeSetName(name) {
  * @param {Array<{name:string}>} radarSets sets already on the Scryfall radar
  * @param {string} today YYYY-MM-DD
  */
-function buildFutureSets(radarSets, today) {
+function buildFutureSets(radarSets, today, trailers) {
   const known = new Set(radarSets.map((s) => normalizeSetName(s.name)));
   return loadFutureSets()
     .filter((f) => f && f.name && f.sourceUrl)
@@ -99,16 +139,20 @@ function buildFutureSets(radarSets, today) {
       return !(sd.length === 10 && sd < today);
     })
     .sort((a, b) => String(a.sortDate || "9999").localeCompare(String(b.sortDate || "9999")))
-    .map((f) => ({
-      name: f.name,
-      kind: f.kind === "universes-beyond" ? "universes-beyond" : "multiverse",
-      sortDate: f.sortDate || null,
-      dateLabel: f.dateLabel || null,
-      confidence: f.confidence === "official" ? "official" : "reported",
-      notes: f.notes || null,
-      sourceName: f.sourceName || null,
-      sourceUrl: f.sourceUrl,
-    }));
+    .map((f) => {
+      const trailer = resolveTrailer(trailers, null, f.name);
+      return {
+        name: f.name,
+        kind: f.kind === "universes-beyond" ? "universes-beyond" : "multiverse",
+        sortDate: f.sortDate || null,
+        dateLabel: f.dateLabel || null,
+        confidence: f.confidence === "official" ? "official" : "reported",
+        notes: f.notes || null,
+        sourceName: f.sourceName || null,
+        sourceUrl: f.sourceUrl,
+        ...(trailer ? { trailer } : {}),
+      };
+    });
 }
 
 function isAlchemy(set) {
@@ -452,6 +496,7 @@ async function buildFormatHub(allScryfallSets, today) {
 export async function buildSetsBundle() {
   const today = new Date().toISOString().slice(0, 10);
   const overrides = loadOverrides();
+  const trailers = loadTrailers();
 
   console.log("Sets radar: fetching Scryfall /sets…");
   const list = await scryfallGet("/sets");
@@ -531,6 +576,8 @@ export async function buildSetsBundle() {
       notes: ov.notes || null,
       status: "announced",
     };
+    const trailer = resolveTrailer(trailers, code, s.name);
+    if (trailer) entry.trailer = trailer;
     entry.status = computeStatus(entry, today);
     sets.push(entry);
     console.log(
@@ -560,17 +607,22 @@ export async function buildSetsBundle() {
   }
 
   // Roadmap sets beyond Scryfall's catalog (curated, source-linked).
-  const futureSets = buildFutureSets(sets, today);
+  const futureSets = buildFutureSets(sets, today, trailers);
   if (futureSets.length) {
     console.log(
       `  future radar: ${futureSets.map((f) => `${f.name} (${f.dateLabel || f.sortDate})`).join(" · ")}`,
     );
   }
+  const trailerCount =
+    sets.filter((s) => s.trailer).length + futureSets.filter((f) => f.trailer).length;
+  if (trailerCount) {
+    console.log(`  trailers attached: ${trailerCount}`);
+  }
 
   return {
     generatedAt: new Date().toISOString(),
     date: today,
-    version: "1.2.0",
+    version: "1.3.0",
     policy: {
       arenaFirst: true,
       noAlchemy: true,
@@ -580,7 +632,13 @@ export async function buildSetsBundle() {
       futureSets:
         "roadmap-announced sets from curated, source-linked entries (future-sets.json); dropped automatically once Scryfall catalogs the set",
     },
-    sources: ["scryfall", "set-calendar-overrides", "whatsinstandard-v6", "future-sets"],
+    sources: [
+      "scryfall",
+      "set-calendar-overrides",
+      "whatsinstandard-v6",
+      "future-sets",
+      "set-trailers",
+    ],
     sets,
     formats,
     futureSets,

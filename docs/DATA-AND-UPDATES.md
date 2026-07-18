@@ -121,6 +121,13 @@ Scryfall catalogs the set (name match → it becomes a normal radar row) or when
 an exact-dated entry's day has passed. The app's Sets page renders them as the
 **Future Standard** section; older feeds simply lack the key and hide it.
 
+**Announce trailers.** Official WotC YouTube trailers are curated in
+`pipeline/sources/set-trailers.json` (by set code and/or exact name). The sets
+build attaches a `trailer: { youtubeId, title }` field when known; the app also
+keeps a client fallback map so older feeds still show trailers for Nauctis /
+Titanbreach etc. The Sets page plays them in an in-app player
+(youtube-nocookie embed). Never invent video IDs.
+
 ---
 
 ## Built-in app updater

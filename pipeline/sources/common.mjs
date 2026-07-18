@@ -17,16 +17,27 @@ export function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/**
+ * Arena rejects full "Front // Back" names on import (rooms, MDFCs, adventures,
+ * transform). Export the front face only — same as Arena's own export format.
+ */
+export function arenaCardName(name) {
+  if (!name) return name;
+  const idx = String(name).indexOf(" // ");
+  if (idx === -1) return name;
+  return String(name).slice(0, idx).trimEnd();
+}
+
 export function buildArenaImport(deck) {
   const lines = [];
   if (deck.commander) {
-    lines.push("Commander", `1 ${deck.commander}`, "");
+    lines.push("Commander", `1 ${arenaCardName(deck.commander)}`, "");
   }
   lines.push("Deck");
-  for (const c of deck.mainboard || []) lines.push(`${c.count} ${c.name}`);
+  for (const c of deck.mainboard || []) lines.push(`${c.count} ${arenaCardName(c.name)}`);
   if (deck.sideboard?.length) {
     lines.push("", "Sideboard");
-    for (const c of deck.sideboard) lines.push(`${c.count} ${c.name}`);
+    for (const c of deck.sideboard) lines.push(`${c.count} ${arenaCardName(c.name)}`);
   }
   return lines.join("\n");
 }

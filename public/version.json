@@ -1,5 +1,5 @@
-{
-  "version": "0.22.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.22.0.exe",
-  "notes": "v0.22.0: Future Standard — announced sets with no spoiled cards yet (Nauctis: The Sunken Realm, Kamigawa: Titanbreach, Zhalfir, plus the 2027 Universes Beyond slots) on the Sets page, each linked to its official announcement. Card watch — Ctrl+K anywhere to see every meta deck playing a card, with copies and board. Matchup Lab — opponent tags and notes save as you type."
+﻿{
+    "version":  "0.23.0",
+    "downloadUrl":  "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.23.0.exe",
+    "notes":  "v0.23.0: Light mode — discreet dark/light toggle in the top bar and Settings. Arena import fix — double-faced cards (Unholy Annex // Ritual Chamber) copy as front-face only so Arena accepts the list. Set trailers — official WotC announce trailers play in a sleek in-app player from Sets / Future Standard."
 }

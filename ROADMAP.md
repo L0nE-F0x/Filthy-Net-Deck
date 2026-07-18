@@ -10,18 +10,19 @@
 
 ## Immediate follow-ups
 
-Releases 0.17.0 → **0.22.0** are all shipped end-to-end (signed Windows publish +
-macOS dmg rolled + marketing/OG). Detail in git history + `handoff.md` §2.
+Releases 0.17.0 → **0.23.0** shipped (Windows signed + marketing/OG). macOS dmg for
+0.23 rolls after tag CI. Detail in git history + `handoff.md` §2.
 
-- [x] **v0.22.0 signed Windows publish** (NSIS + `.sig`, sig key id verified, updater, version.json ×2, OG `?v=0.22.0`, tag).
-- [x] **Roll v0.22.0 macOS dmg** onto `website/downloads/` + mac download labels.
+- [x] **v0.23.0 signed Windows publish** (light mode, Arena // import fix, set trailers; NSIS + `.sig`, updater, version.json ×2, OG `?v=0.23.0`).
+- [ ] **Roll v0.23.0 macOS dmg** onto `website/downloads/` + mac download labels (after tag CI).
 
 **Open (low urgency):**
 
-- [ ] **Owner:** verify in-app **Update & restart** 0.21→0.22 from an installed build (couldn't be exercised from the dev env; everything it needs is live + signed).
+- [ ] **Owner:** verify in-app **Update & restart** 0.22→0.23 from an installed build.
 - [ ] Marketing screenshot/GIF carousel — needs owner-supplied 1280×860 captures with real tracker data.
 - [ ] Full macOS **signed** auto-update in CI (owner decision: store key as repo secret) — soft dmg CTA already works when download URL ends in `.dmg`.
 - [ ] `whatsinstandard` v6 is deprecated — build warns; migrate `fetchStandardRotation` to v7 when it lands (also see `docs/MAINTENANCE.md` item 5).
+- [ ] More set trailers in `set-trailers.json` as WotC posts them (Hobbit, Reality Fracture, etc.).
 
 ---
 
@@ -114,6 +115,18 @@ In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking prom
 
 ---
 
+## Milestone 10 — v0.23.0 "Polish + trailers" — shipped (2026-07-18)
+
+Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
+
+- [x] **Light / dark mode** — CSS token flip via `data-theme`, prefs `theme`, discreet
+  top-bar pill + Settings Appearance section (`theme.ts`, `ThemeToggle.tsx`).
+- [x] **Arena import // fix** — front-face only for DFC / adventure / room names so
+  Arena accepts lists (`arenaCardName` client + pipeline; DeckView rebuilds on copy).
+- [x] **Set trailers** — curated WotC YouTube ids (`set-trailers.json` + client
+  fallback); sleek in-app player (youtube-nocookie); View trailer on set cards /
+  Future Standard when known (Nauctis, Titanbreach at ship).
+
 ## Suggested next product batch (not started — batch before next version bump)
 
 Ideas only; owner prioritizes. Do **not** ship one release per bullet.
@@ -121,4 +134,5 @@ Ideas only; owner prioritizes. Do **not** ship one release per bullet.
 - **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days (the per-deck panel + Sets count already ship; badges were left out since Q1 2027 is far off and couldn't be visually verified now).
 - Performance / feed size — the Marvel gallery alone is ~248KB of `sets.json`; Netlify gzips it, so low urgency.
 - Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
+- More curated set trailers as WotC posts them.
 - Anything owner requests on return from the Claude ↔ Grok ↔ Kimi rotation.

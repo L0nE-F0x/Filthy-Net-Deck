@@ -10,6 +10,12 @@ export type DateConfidence = "official" | "scryfall" | "estimated" | "override" 
 
 export type FormatLegality = "legal" | "not_legal" | "banned" | "restricted" | string;
 
+/** Official WotC YouTube announce trailer (curated in set-trailers.json). */
+export interface SetTrailerInfo {
+  youtubeId: string;
+  title?: string | null;
+}
+
 export interface SetPreviewCard {
   name: string;
   scryfallId: string;
@@ -56,6 +62,8 @@ export interface UpcomingSet {
   overrideSource: string | null;
   notes: string | null;
   status: SetStatus;
+  /** Official announce trailer when curated — absent on older feeds / unknown sets. */
+  trailer?: SetTrailerInfo | null;
 }
 
 /** One row of a format's set pool (Format hub). */
@@ -134,6 +142,8 @@ export interface FutureSet {
   notes: string | null;
   sourceName: string | null;
   sourceUrl: string;
+  /** Official announce trailer when curated. */
+  trailer?: SetTrailerInfo | null;
 }
 
 /** Prefer full gallery; fall back to previews for older feeds. */

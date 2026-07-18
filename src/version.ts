@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.22.0";
+export const APP_VERSION = "0.23.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Future Standard — announced sets with no spoiled cards yet (Nauctis: The Sunken Realm, Kamigawa: Titanbreach, Zhalfir, plus the 2027 Universes Beyond slots) now sit on the Sets page, each linked to its official announcement",
-  "Card watch — press Ctrl+K anywhere and type a card name to see every meta deck playing it, with copies and board, then jump straight to the list",
-  "Matchup Lab — opponent tags and prep notes now save as you type, so nothing is lost when you switch opponents",
+  "Light mode — a discreet dark/light toggle in the top bar and Settings, for a brighter screen when you want one",
+  "Arena import fix — double-faced cards like Unholy Annex // Ritual Chamber now copy as front-face only so Arena accepts the list",
+  "Set trailers — official WotC announce trailers (Nauctis, Titanbreach, …) play in a sleek in-app player from Sets / Future Standard",
 ];
