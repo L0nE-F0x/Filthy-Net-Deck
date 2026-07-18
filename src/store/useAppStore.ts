@@ -45,7 +45,13 @@ import {
 } from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
 import { applyFullscreen } from "../services/windowMode";
-import { applyTheme, type ThemeMode } from "../services/theme";
+import {
+  applyAppearance,
+  applyTheme,
+  isSkinId,
+  type SkinId,
+  type ThemeMode,
+} from "../services/theme";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
@@ -62,6 +68,8 @@ interface Prefs {
   fullscreen: boolean;
   /** Appearance — dark is the product default. */
   theme: ThemeMode;
+  /** Planeswalker accent skin — orthogonal to dark/light. */
+  skin: SkinId;
   /** Format shown on the Decks home last time — restored on next launch. */
   lastFormatId?: FormatId;
 }
@@ -77,6 +85,7 @@ function loadPrefs(): Prefs {
         notifyBanlist?: boolean;
         fullscreen?: boolean;
         theme?: string;
+        skin?: string;
         lastFormatId?: string;
       };
       return {
@@ -86,6 +95,7 @@ function loadPrefs(): Prefs {
         notifyBanlist: parsed.notifyBanlist !== false,
         fullscreen: parsed.fullscreen === true,
         theme: parsed.theme === "light" ? "light" : "dark",
+        skin: isSkinId(parsed.skin) ? parsed.skin : "classic",
         lastFormatId:
           parsed.lastFormatId === "standard" || parsed.lastFormatId === "pioneer"
             ? parsed.lastFormatId
@@ -102,6 +112,7 @@ function loadPrefs(): Prefs {
     notifyBanlist: true,
     fullscreen: false,
     theme: "dark",
+    skin: "classic",
   };
 }
 
@@ -222,6 +233,8 @@ interface AppState {
   setFullscreenPref: (v: boolean) => void;
   /** Persist appearance and apply it to the document immediately. */
   setTheme: (theme: ThemeMode) => void;
+  /** Persist planeswalker accent skin (keeps current dark/light). */
+  setSkin: (skin: SkinId) => void;
   refreshMeta: () => Promise<void>;
   refreshSets: () => Promise<void>;
   /** Baseline the "new since last visit" snapshot — call when leaving the Sets page. */
@@ -262,7 +275,7 @@ declare global {
 
 export const useAppStore = create<AppState>((set, get) => {
   const prefs = loadPrefs();
-  applyTheme(prefs.theme);
+  applyAppearance(prefs.theme, prefs.skin);
   // The test-only meta URL override was removed in 0.8.3 — clear any leftover.
   try {
     localStorage.removeItem("bbi.metaUrl");
@@ -409,6 +422,12 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       applyTheme(theme);
+    },
+    setSkin: (skin) => {
+      const next = { ...get().prefs, skin };
+      savePrefs(next);
+      set({ prefs: next });
+      applyAppearance(next.theme, skin);
     },
     clearError: () => set({ error: null }),
 

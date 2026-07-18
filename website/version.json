@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.0.0.exe",
-  "notes": "v1.0.0: First major release — app-wide deep links (meta to Stats to Matchups to Format Hub), My Stats season story and two-deck compare, Format Hub rotation war room, Sets drop-day focus and rotation flags, Settings tracker health and keyboard shortcuts. 100% local."
+  "version": "1.1.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.1.0.exe",
+  "notes": "v1.1.0: Planeswalker themes — Chandra, Teferi, Liliana, Ajani, and Elspeth accent skins from the sidebar Themes control. Dark and Light modes still stack with every theme. 100% local."
 }

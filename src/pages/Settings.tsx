@@ -146,7 +146,9 @@ export function Settings() {
         <section className="panel settings-card">
           <h3 className="settings-card-title">Appearance</h3>
           <p className="settings-card-desc">
-            Dark is the default. Light lives here and on the top bar.
+            Dark is the default. Light lives here and on the top bar. Planeswalker
+            color themes are on the sidebar <strong className="text-foam">Themes</strong>{" "}
+            control — they stack with dark/light.
           </p>
           <ThemeToggle showLabels />
         </section>

@@ -12,6 +12,7 @@ import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { PlaneswalkerThemes } from "./components/PlaneswalkerThemes";
 import { StatusBanners } from "./components/StatusBanners";
 import { SplashScreen } from "./components/SplashScreen";
 import {
@@ -256,6 +257,7 @@ export default function App() {
           );
         })}
         <div className="mt-auto pt-4 px-1 flex flex-col gap-1.5">
+          <PlaneswalkerThemes />
           <p className="text-[10px] text-muted leading-relaxed m-0">
             Not affiliated with Wizards of the Coast.
           </p>
