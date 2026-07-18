@@ -68,3 +68,4 @@ npm run tauri:build   # installers (set TAURI_SIGNING_* for updater artifacts)
 ## Docs
 
 - Data sources + updater overview: `docs/DATA-AND-UPDATES.md` (keep in sync when release process changes).
+- Self-maintenance vs. monthly manual checklist: `docs/MAINTENANCE.md` (keep in sync when pipeline automation changes).

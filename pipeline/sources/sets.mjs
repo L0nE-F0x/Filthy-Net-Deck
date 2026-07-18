@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const API = "https://api.scryfall.com";
 const HEADERS = {
   Accept: "application/json",
-  "User-Agent": "FilthyNetDeck/0.14 (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
+  "User-Agent": "FilthyNetDeck/pipeline (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
 };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -313,12 +313,16 @@ export async function buildSetsBundle() {
   const list = await scryfallGet("/sets");
   const all = list.data || [];
 
-  // Window: recently released (60d) + future
+  // Window: recently released (60d) + future. Sets Scryfall has announced but
+  // not yet dated (released_at null) are upcoming by definition — keep them so
+  // roadmap reveals appear the day Scryfall creates the row.
   const windowStart = addDays(today, -60);
   const candidates = all
-    .filter((s) => s.released_at && s.released_at >= windowStart)
+    .filter((s) => !s.released_at || s.released_at >= windowStart)
     .filter(isConstructedProduct)
-    .sort((a, b) => a.released_at.localeCompare(b.released_at));
+    .sort((a, b) =>
+      String(a.released_at || "9999").localeCompare(String(b.released_at || "9999")),
+    );
 
   console.log(`  ${candidates.length} constructed products in window (no Alchemy)`);
 
@@ -328,14 +332,11 @@ export async function buildSetsBundle() {
     const code = String(s.code).toLowerCase();
     const ov = overrides[code] || {};
 
-    // Skip Scryfall stub rows (1–2 card pre-catalog shells), not early spoiler sets
-    const count = s.card_count || 0;
-    const isFuture = s.released_at > today;
-    if (isFuture && count > 0 && count < 5 && !ov.arena && !ov.spoilerStart) {
-      console.log(`  skip stub ${code} · ${s.name} · ${count} cards`);
-      continue;
-    }
-    const tabletop = s.released_at;
+    // First-look reveals (panel spoilers) often land on Scryfall as a future
+    // set with only 1–4 cards. Those are real preview cards — ship them.
+    // (An earlier version skipped these as "stubs", which hid exactly the
+    // freshest announcements.)
+    const tabletop = s.released_at || null;
     let arena = ov.arena || null;
     let arenaConfidence = ov.arena ? "official" : "unknown";
     let spoilerStart = ov.spoilerStart || null;

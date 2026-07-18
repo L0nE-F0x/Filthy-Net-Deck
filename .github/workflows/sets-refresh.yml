@@ -1,14 +1,15 @@
-# Publish fresh meta to the repo daily (Netlify redeploys on push).
-name: Daily meta pipeline
+# Fast lane for the set radar only (Scryfall + whatsinstandard — no scraping),
+# so panel spoilers reach the app within hours instead of next-day.
+# The full daily-meta workflow still covers 06:00 UTC; together: 4 refreshes/day.
+name: Set radar refresh
 
 on:
   schedule:
-    # 06:00 UTC every day
-    - cron: "0 6 * * *"
+    - cron: "0 0,12,18 * * *"
   workflow_dispatch:
 
 jobs:
-  meta:
+  sets:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,55 +24,43 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # Aborts without writing when live data is unavailable — the previously
-      # published (real) meta stays live rather than shipping anything stale-labeled
-      # as fresh or fabricated.
-      - name: Build live meta (Standard + Pioneer)
-        id: build_meta
-        run: npm run meta
-        continue-on-error: true
-
+      # Aborts without writing when Scryfall is unavailable — the previously
+      # published sets.json stays live.
       - name: Build set radar (Arena-first spoilers, no Alchemy)
         id: build_sets
         run: npm run sets
         continue-on-error: true
 
-      - name: Commit meta if changed
+      - name: Commit sets.json if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add website/meta public/meta || true
+          git add website/meta/sets.json public/meta/sets.json || true
           if git diff --staged --quiet; then
-            echo "No meta changes"
+            echo "No set radar changes"
           else
-            git commit -m "chore: daily meta refresh $(date -u +%Y-%m-%d)"
+            git commit -m "chore: set radar refresh $(date -u +%Y-%m-%dT%H:%M)"
             git pull --rebase origin main
             git push
           fi
 
-      - name: Open/update failure issue when pipeline steps fail
-        if: steps.build_meta.outcome == 'failure' || steps.build_sets.outcome == 'failure'
+      - name: Open/update failure issue when the sets build fails
+        if: steps.build_sets.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
-            const metaFail = '${{ steps.build_meta.outcome }}' === 'failure';
-            const setsFail = '${{ steps.build_sets.outcome }}' === 'failure';
-            const title = 'Daily meta pipeline failure';
+            const title = 'Set radar refresh failure';
             const body = [
-              '## Daily meta pipeline reported a failure',
+              '## Set radar refresh reported a failure',
               '',
-              `- meta step: **${'${{ steps.build_meta.outcome }}'}**`,
-              `- sets step: **${'${{ steps.build_sets.outcome }}'}**`,
               `- run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               `- when: ${new Date().toISOString()}`,
               '',
-              metaFail ? '- `npm run meta` failed (previous latest.json left untouched if abort).' : '',
-              setsFail ? '- `npm run sets` failed (previous sets.json left untouched if abort).' : '',
+              '- `npm run sets` failed (previous sets.json left untouched if abort).',
               '',
-              '_Auto-opened so silent meta rot is impossible. Close when fixed._',
-            ].filter(Boolean).join('\n');
+              '_Auto-opened so silent set-radar rot is impossible. Close when fixed._',
+            ].join('\n');
 
-            // Match by title only — do not require a repo label (missing labels 422 create).
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,

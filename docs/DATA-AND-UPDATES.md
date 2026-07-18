@@ -93,7 +93,17 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 | `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
 | App page **Sets** | Countdown (Arena emphasized), spoiler rail, Scryfall link |
 
-Daily CI runs `npm run sets` after the deck meta job. Arena dates are `official` when overridden, otherwise `estimated` (paper − 3 days) and labeled in the UI.
+CI refreshes the set radar **4× per day**: the daily meta job (06:00 UTC) plus the
+Scryfall-only fast lane `.github/workflows/sets-refresh.yml` (00/12/18 UTC). Arena
+dates are `official` when overridden, otherwise `estimated` (paper − 3 days) and
+labeled in the UI.
+
+**New announcements are automatic.** When WotC reveals a set or spoils cards at an
+event, Scryfall catalogs them (usually within hours); the next radar run picks up
+the new set row and every spoiled card — including first-look sets with only 1–4
+cards and sets Scryfall hasn't dated yet. No code change needed for new sets.
+The only manual piece is `set-calendar-overrides.json` (official Arena dates /
+spoiler-season starts, which have no API).
 
 ---
 

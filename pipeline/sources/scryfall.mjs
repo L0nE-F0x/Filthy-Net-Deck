@@ -12,7 +12,7 @@ const API = "https://api.scryfall.com";
 const HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json",
-  "User-Agent": "FilthyNetDeck/0.8 (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
+  "User-Agent": "FilthyNetDeck/pipeline (+https://github.com/L0nE-F0x/Filthy-Net-Deck)",
 };
 
 /** cache: lowercased input name → card object | null */
