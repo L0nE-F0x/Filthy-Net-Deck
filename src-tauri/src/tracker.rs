@@ -432,6 +432,9 @@ impl LogParser {
         }
 
         // Header lines name the local account: "Match to <accountId>: ..."
+        // Most payloads sit on the *next* line as bare JSON, but some Arena
+        // builds paste the JSON on the same line after the logger prefix —
+        // don't drop those.
         if line.contains("[UnityCrossThreadLogger]") {
             if let Some(at) = line.find("Match to ") {
                 let rest = &line[at + "Match to ".len()..];
@@ -442,6 +445,11 @@ impl LogParser {
                     }
                 }
             }
+            if let Some(brace) = line.find('{') {
+                // Fall through and parse the JSON tail of this line.
+                let tail = line[brace..].trim_start();
+                return self.feed_json_payload(tail);
+            }
             return Vec::new();
         }
 
@@ -449,6 +457,11 @@ impl LogParser {
         if !trimmed.starts_with('{') {
             return Vec::new();
         }
+        self.feed_json_payload(trimmed)
+    }
+
+    /// Route a bare-JSON Arena payload (match room, GRE, auth, courses, rank).
+    fn feed_json_payload(&mut self, trimmed: &str) -> Vec<TrackedMatch> {
 
         // Cheap substring routing before paying for a JSON parse.
         if trimmed.contains("\"matchGameRoomStateChangedEvent\"") {

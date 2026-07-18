@@ -1,11 +1,11 @@
 {
-  "version": "0.24.0",
-  "notes": "v0.24.0: Fullscreen controls live in the top bar (no overlap with Search or theme). Clear Search button (Ctrl+K still works). Recently live shows the full current Standard pool on Sets. Denser two-column Settings with compact notification toggles.",
-  "pub_date": "2026-07-18T10:44:42.237Z",
+  "version": "0.24.1",
+  "notes": "v0.24.1: HOTFIX — matches recorded while the app is minimized to the tray now appear in My Stats / Matchups / Climb. The UI re-syncs from disk on focus, when you open those pages, and every 20s so it cannot stay stale while Rust keeps writing.",
+  "pub_date": "2026-07-18T14:13:56.277Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9ZUE1UZEZIV1JKY0V3SjE0TnN5MmxXS0pUTVB5V2NmM3I1amF0b0g1ZWljSFptZUgzUjMyY2lyUzhadk9xc2dmZG9leVNRamJPWG95V0FRN3N1NFFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MzcxNDcwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjQuMF94NjQtc2V0dXAuZXhlCldjWm9IL3IvbGZMVUFMckpUSkdSblhDcGIzUE51QzZHMzQvdE5aczZRcXdzQ2FuNW8xN3NJUXNvOXl1cFRqb0xVS0lYbThldDVXNFVoQXZhN2hYWERRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.24.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjU1MzdwcHRKZ3lLZFN4WWllT1JFZkR6VTNCcHdlUHVGL3V4SG13bjZPbXJlSHZKOXZsOTNsc2libG56UnQyVHNWVGt2dlNmZVM1YzhlZnZjYmYvMUF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0Mzg0MDIxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjQuMV94NjQtc2V0dXAuZXhlCjNpcUNYSTVaMjBMMGZ6U2xCSUJIb3V2UEsrQXUvZWJQbTV1ZG5QMEFiYjNaREtVS3pNU3pDNmw5RDgwb2g1QzllMStKQ2lzSzRPWWdoRHc4ZkdjRUR3PT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.24.1.exe"
     }
   }
 }

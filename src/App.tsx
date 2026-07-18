@@ -108,6 +108,47 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Tracker recovery: while the window is hidden in the tray, WebView can miss
+  // live `tracker:match` events even though Rust is still writing matches to
+  // disk. Re-pull from Rust whenever we become visible/focused, and poll lightly.
+  useEffect(() => {
+    if (!isTauri()) return;
+    let cancelled = false;
+    const pull = () => {
+      if (!cancelled) void useAppStore.getState().refreshTracker();
+    };
+
+    const onVis = () => {
+      if (document.visibilityState === "visible") pull();
+    };
+    const onFocus = () => pull();
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onFocus);
+
+    // Lightweight safety net if focus events are flaky after tray restore.
+    const poll = window.setInterval(pull, 20_000);
+
+    let unFocus: (() => void) | undefined;
+    void (async () => {
+      try {
+        const { getCurrentWindow } = await import("@tauri-apps/api/window");
+        unFocus = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+          if (focused) pull();
+        });
+      } catch {
+        /* browser / API unavailable */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
+      window.clearInterval(poll);
+      unFocus?.();
+    };
+  }, []);
+
   // F11 toggles fullscreen (and remembers the choice for next launch).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

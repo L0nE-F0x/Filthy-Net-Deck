@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "filthy-net-deck"
-version = "0.24.0"
+version = "0.24.1"
 dependencies = [
  "reqwest 0.12.28",
  "serde",

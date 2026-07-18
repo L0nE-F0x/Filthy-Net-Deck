@@ -211,6 +211,11 @@ interface AppState {
   installUpdate: () => Promise<void>;
   dismissUpdate: () => void;
   initTracker: () => Promise<void>;
+  /**
+   * Re-pull status + matches from Rust. Call when the window is shown again
+   * after tray hide — WebView can miss live `tracker:match` events while hidden.
+   */
+  refreshTracker: () => Promise<void>;
   clearTracker: () => Promise<void>;
   deleteMatches: (matchIds: string[]) => Promise<void>;
 }
@@ -418,14 +423,25 @@ export const useAppStore = create<AppState>((set, get) => {
     dismissUpdate: () =>
       set({ dismissedUpdateVersion: get().updateAvailable?.version ?? null }),
 
+    refreshTracker: async () => {
+      if (!isTauri()) return;
+      try {
+        const [status, matches] = await Promise.all([
+          fetchTrackerStatus(),
+          fetchTrackerMatches(),
+        ]);
+        // Rust is the source of truth — replace, don't merge (avoids stale gaps
+        // after the WebView missed live events while the window was hidden).
+        set({ trackerStatus: status, trackerMatches: matches });
+      } catch {
+        /* keep prior UI state */
+      }
+    },
+
     initTracker: async () => {
       if (get().trackerReady) return;
       set({ trackerReady: true });
-      const [status, matches] = await Promise.all([
-        fetchTrackerStatus(),
-        fetchTrackerMatches(),
-      ]);
-      set({ trackerStatus: status, trackerMatches: matches });
+      await get().refreshTracker();
       await subscribeTracker({
         onMatch: (m) => {
           const cur = get().trackerMatches;
@@ -463,7 +479,29 @@ export const useAppStore = create<AppState>((set, get) => {
             void notifyDesktop("Filthy Net Deck", body);
           }
         },
-        onStatus: (s) => set({ trackerStatus: s }),
+        onStatus: (s) => {
+          const prev = get().trackerStatus;
+          set({ trackerStatus: s });
+          // If Rust has more matches than the UI (events dropped while tray-
+          // hidden), re-pull the full list. This is the main recovery path.
+          const local = get().trackerMatches.length;
+          if (
+            typeof s.matchesRecorded === "number" &&
+            s.matchesRecorded > local
+          ) {
+            void get().refreshTracker();
+            return;
+          }
+          // Also re-pull if last_event_at jumped but we didn't get a match event.
+          if (
+            s.lastEventAt != null &&
+            prev?.lastEventAt != null &&
+            s.lastEventAt > prev.lastEventAt &&
+            s.matchesRecorded !== local
+          ) {
+            void get().refreshTracker();
+          }
+        },
       });
     },
 

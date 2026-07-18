@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
@@ -187,6 +187,10 @@ function TagMatchupPanel({
 export function Matchups() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
+  const refreshTracker = useAppStore((s) => s.refreshTracker);
+  useEffect(() => {
+    void refreshTracker();
+  }, [refreshTracker]);
   const meta = useAppStore((s) => s.meta);
   const [season, setSeason] = useState<string | null>(null);
   const [deckFilter, setDeckFilter] = useState<string | null>(null);

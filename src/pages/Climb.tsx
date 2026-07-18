@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
@@ -362,7 +362,12 @@ function SeasonCompareCell({
 export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
+  const refreshTracker = useAppStore((s) => s.refreshTracker);
   const [season, setSeason] = useState<string | null>(null);
+
+  useEffect(() => {
+    void refreshTracker();
+  }, [refreshTracker]);
 
   const seasons = useMemo(
     () => [...new Set(matches.map((m) => seasonKeyOf(m.endedAt)))].sort().reverse(),
