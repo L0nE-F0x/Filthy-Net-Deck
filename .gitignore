@@ -17,3 +17,9 @@ public/downloads/
 # Tauri updater signing keys — never commit these
 *.key
 *.key.pub
+
+# Remotion marketing video — source is committed, renders / audio artifacts are not
+marketing-video/out/
+marketing-video/.remotion/
+marketing-video/public/*.wav
+
