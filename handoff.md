@@ -194,10 +194,14 @@ npm run sets
 
 #### Signing (Windows)
 
-- Private key: `%USERPROFILE%\.tauri\filthy-net-deck.key` (**encrypted**)
+- Private key: `%USERPROFILE%\.tauri\filthy-net-deck.key` (**encrypted**) — the ONLY valid signing key (minisign id `67FCA9900F523D49`, matches `tauri.conf.json` pubkey)
 - Password file (local only, **never commit**): `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt`  
   (Owner also knows the passphrase; if file missing, **ask** — do not ship unsigned and call it done.)
 - Public key already in `tauri.conf.json` → `plugins.updater.pubkey`
+- A **retired** key pair (id `65CB5BD2EA8C8ACB`) that used to sit in the repo root was moved to
+  `%USERPROFILE%\.tauri\retired-keys\` on 2026-07-18. It does NOT match the shipped pubkey —
+  signatures from it look valid but break auto-update. Never sign with it. After signing, sanity-check
+  the `.sig`'s key id equals `67FCA9900F523D49`.
 
 ```powershell
 $key = ([IO.File]::ReadAllText("$env:USERPROFILE\.tauri\filthy-net-deck.key") -replace '\s','').Trim()
