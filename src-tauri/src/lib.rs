@@ -42,7 +42,20 @@ fn notify_tray_hint_once(app: &tauri::AppHandle) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    #[allow(unused_mut)]
+    let mut builder = tauri::Builder::default();
+
+    // Single-instance must be the first plugin registered. A second launch
+    // (taskbar shortcut, double-clicked exe) surfaces the running window
+    // instead of spawning a duplicate app + second tray icon.
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_main_window(app);
+        }));
+    }
+
+    builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_store::Builder::new().build())

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
@@ -26,7 +26,57 @@ function tally(matches: TrackedMatch[]) {
   return { wins, losses, decided, rate: decided > 0 ? wins / decided : null };
 }
 
+/**
+ * Monotone cubic (Fritsch–Carlson) path through points. Smooths the curve
+ * without overshooting past any data point, so ranks never appear to dip
+ * below/above values that were actually hit.
+ */
+function monotonePath(pts: { x: number; y: number }[]): string {
+  const n = pts.length;
+  if (n === 0) return "";
+  if (n === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  const dx: number[] = [];
+  const slope: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    const d = pts[i + 1].x - pts[i].x || 1e-6;
+    dx.push(d);
+    slope.push((pts[i + 1].y - pts[i].y) / d);
+  }
+  const tan: number[] = [slope[0]];
+  for (let i = 1; i < n - 1; i++) {
+    tan.push(slope[i - 1] * slope[i] <= 0 ? 0 : (slope[i - 1] + slope[i]) / 2);
+  }
+  tan.push(slope[n - 2]);
+  for (let i = 0; i < n - 1; i++) {
+    if (slope[i] === 0) {
+      tan[i] = 0;
+      tan[i + 1] = 0;
+      continue;
+    }
+    const a = tan[i] / slope[i];
+    const b = tan[i + 1] / slope[i];
+    const s = a * a + b * b;
+    if (s > 9) {
+      const tau = 3 / Math.sqrt(s);
+      tan[i] = tau * a * slope[i];
+      tan[i + 1] = tau * b * slope[i];
+    }
+  }
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) {
+    const h = dx[i] / 3;
+    d +=
+      ` C ${(pts[i].x + h).toFixed(1)} ${(pts[i].y + tan[i] * h).toFixed(1)}` +
+      ` ${(pts[i + 1].x - h).toFixed(1)} ${(pts[i + 1].y - tan[i + 1] * h).toFixed(1)}` +
+      ` ${pts[i + 1].x.toFixed(1)} ${pts[i + 1].y.toFixed(1)}`;
+  }
+  return d;
+}
+
 function RankChart({ series }: { series: RankPoint[] }) {
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [hover, setHover] = useState<number | null>(null);
+
   if (series.length === 0) {
     return (
       <div className="climb-chart empty">
@@ -38,77 +88,186 @@ function RankChart({ series }: { series: RankPoint[] }) {
     );
   }
 
-  const padX = 28;
-  const padY = 18;
-  const w = 640;
-  const h = 200;
+  const w = 680;
+  const h = 250;
+  const padL = 66;
+  const padR = 18;
+  const padT = 16;
+  const padB = 26;
+
   const scores = series.map((p) => p.rank.score);
-  let minS = Math.min(...scores);
-  let maxS = Math.max(...scores);
-  if (maxS - minS < 1) {
-    minS = Math.max(0, minS - 1);
-    maxS = maxS + 1;
+  let lo = Math.floor(Math.min(...scores));
+  let hi = Math.ceil(Math.max(...scores));
+  if (hi - lo < 2) {
+    lo = Math.max(0, lo - 1);
+    hi = lo + 2;
   }
+
   const minT = series[0].at;
   const maxT = series[series.length - 1].at;
   const spanT = Math.max(1, maxT - minT);
 
-  const xOf = (t: number) => padX + ((t - minT) / spanT) * (w - padX * 2);
-  const yOf = (s: number) => padY + (1 - (s - minS) / (maxS - minS)) * (h - padY * 2);
+  const xOf = (t: number) => padL + ((t - minT) / spanT) * (w - padL - padR);
+  const yOf = (s: number) => padT + (1 - (s - lo) / (hi - lo)) * (h - padT - padB);
 
-  const line = series
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${xOf(p.at).toFixed(1)} ${yOf(p.rank.score).toFixed(1)}`)
-    .join(" ");
-
-  // Area under the curve
+  const pts = series.map((p) => ({ x: xOf(p.at), y: yOf(p.rank.score) }));
+  const line = monotonePath(pts);
+  const baseline = h - padB;
   const area =
-    line +
-    ` L ${xOf(series[series.length - 1].at).toFixed(1)} ${(h - padY).toFixed(1)}` +
-    ` L ${xOf(series[0].at).toFixed(1)} ${(h - padY).toFixed(1)} Z`;
+    series.length > 1
+      ? `${line} L ${pts[pts.length - 1].x.toFixed(1)} ${baseline.toFixed(1)}` +
+        ` L ${pts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`
+      : "";
 
-  const yTicks = 4;
-  const ticks = Array.from({ length: yTicks + 1 }, (_, i) => {
-    const s = minS + ((maxS - minS) * i) / yTicks;
-    return { s, label: rankLabelFromScore(s), y: yOf(s) };
+  // One label per whole rank step; thin them out when the range is tall.
+  let step = 1;
+  while ((hi - lo) / step > 6) step *= 2;
+  const yTicks: { s: number; label: string; y: number }[] = [];
+  for (let s = lo; s <= hi; s += step) {
+    if (s > 20) break; // no labels above Mythic
+    yTicks.push({ s, label: rankLabelFromScore(s), y: yOf(s) });
+  }
+
+  // 4 date ticks across the time span (fewer when everything is one day).
+  const dayMs = 86_400_000;
+  const nX = spanT < dayMs ? 2 : 4;
+  const xTicks = Array.from({ length: nX }, (_, i) => {
+    const t = minT + (spanT * i) / (nX - 1);
+    return { t, x: xOf(t), label: new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }) };
   });
+
+  // Dots only where the rank actually changed (plus endpoints) — a plateau
+  // of identical samples reads as a clean line instead of a bead chain.
+  const dotIdx: number[] = [];
+  for (let i = 0; i < series.length; i++) {
+    if (
+      i === 0 ||
+      i === series.length - 1 ||
+      series[i].rank.score !== series[i - 1].rank.score
+    ) {
+      dotIdx.push(i);
+    }
+  }
+  const dotR = dotIdx.length > 40 ? 2 : 3;
+
+  let peakIdx = 0;
+  for (let i = 1; i < series.length; i++) {
+    if (series[i].rank.score > series[peakIdx].rank.score) peakIdx = i;
+  }
+  const lastIdx = series.length - 1;
+
+  const onMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const mx = ((e.clientX - rect.left) / rect.width) * w;
+    let best = 0;
+    let bestD = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const d = Math.abs(pts[i].x - mx);
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    }
+    setHover(best);
+  };
+
+  const hovered = hover != null ? series[hover] : null;
+  const hoverPt = hover != null ? pts[hover] : null;
+  const tipText = hovered
+    ? `${formatRank(hovered.rank)} · ${new Date(hovered.at).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })}`
+    : "";
+  const tipW = tipText.length * 6.4 + 16;
+  const tipX = hoverPt ? Math.min(Math.max(hoverPt.x - tipW / 2, padL), w - padR - tipW) : 0;
+  const tipY = hoverPt ? (hoverPt.y - 34 < padT ? hoverPt.y + 14 : hoverPt.y - 34) : 0;
 
   return (
     <div className="climb-chart">
-      <svg viewBox={`0 0 ${w} ${h}`} className="climb-svg" role="img" aria-label="Rank over time">
-        {ticks.map((t) => (
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${w} ${h}`}
+        className="climb-svg"
+        role="img"
+        aria-label="Rank over time"
+        onMouseMove={onMove}
+        onMouseLeave={() => setHover(null)}
+      >
+        <defs>
+          <linearGradient id="climbFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" className="climb-fill-hi" />
+            <stop offset="100%" className="climb-fill-lo" />
+          </linearGradient>
+        </defs>
+
+        {yTicks.map((t) => (
           <g key={t.s}>
-            <line
-              x1={padX}
-              x2={w - padX}
-              y1={t.y}
-              y2={t.y}
-              className="climb-grid"
-            />
-            <text x={4} y={t.y + 3} className="climb-axis">
+            <line x1={padL} x2={w - padR} y1={t.y} y2={t.y} className="climb-grid" />
+            <text x={padL - 8} y={t.y + 3} className="climb-axis" textAnchor="end">
               {t.label}
             </text>
           </g>
         ))}
-        <path d={area} className="climb-area" />
-        <path d={line} className="climb-line" fill="none" />
-        {series.map((p) => (
-          <circle
-            key={p.matchId}
-            cx={xOf(p.at)}
-            cy={yOf(p.rank.score)}
-            r={series.length > 40 ? 2.5 : 3.5}
-            className="climb-dot"
-          >
-            <title>
-              {formatRank(p.rank)} · {new Date(p.at).toLocaleString()}
-            </title>
-          </circle>
+        {xTicks.map((t, i) => (
+          <g key={i}>
+            <line x1={t.x} x2={t.x} y1={padT} y2={baseline} className="climb-grid-v" />
+            <text
+              x={t.x}
+              y={h - 8}
+              className="climb-axis"
+              textAnchor={i === 0 ? "start" : i === xTicks.length - 1 ? "end" : "middle"}
+            >
+              {t.label}
+            </text>
+          </g>
         ))}
+
+        {area && <path d={area} className="climb-area" fill="url(#climbFill)" />}
+        <path d={line} className="climb-line" fill="none" />
+
+        {dotIdx.map((i) =>
+          i === lastIdx ? null : (
+            <circle
+              key={series[i].matchId}
+              cx={pts[i].x}
+              cy={pts[i].y}
+              r={dotR}
+              className="climb-dot"
+            />
+          ),
+        )}
+
+        {peakIdx !== lastIdx && (
+          <g className="climb-peak">
+            <circle cx={pts[peakIdx].x} cy={pts[peakIdx].y} r={4.5} />
+            <text x={pts[peakIdx].x} y={pts[peakIdx].y - 9} textAnchor="middle">
+              peak
+            </text>
+          </g>
+        )}
+
+        <g className="climb-now">
+          <circle className="climb-now-pulse" cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={5} />
+          <circle className="climb-now-dot" cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={4} />
+        </g>
+
+        {hoverPt && (
+          <g className="climb-hover">
+            <line x1={hoverPt.x} x2={hoverPt.x} y1={padT} y2={baseline} className="climb-cross" />
+            <circle cx={hoverPt.x} cy={hoverPt.y} r={4.5} className="climb-hover-dot" />
+            <g transform={`translate(${tipX.toFixed(1)} ${tipY.toFixed(1)})`}>
+              <rect width={tipW} height={20} rx={6} className="climb-tip-bg" />
+              <text x={tipW / 2} y={13.5} textAnchor="middle" className="climb-tip-text">
+                {tipText}
+              </text>
+            </g>
+          </g>
+        )}
       </svg>
-      <div className="climb-chart-foot">
-        <span>{new Date(series[0].at).toLocaleDateString()}</span>
-        <span>{new Date(series[series.length - 1].at).toLocaleDateString()}</span>
-      </div>
     </div>
   );
 }

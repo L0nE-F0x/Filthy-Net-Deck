@@ -15,6 +15,21 @@ export async function applyFullscreen(on: boolean): Promise<void> {
   }
 }
 
+/**
+ * Ask the window to close. The Rust CloseRequested handler intercepts this
+ * and hides to the system tray (same path as clicking the titlebar ✕), so
+ * the tracker keeps running.
+ */
+export async function closeToTray(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    await getCurrentWindow().close();
+  } catch {
+    /* window API unavailable — ignore */
+  }
+}
+
 export async function toggleFullscreen(): Promise<boolean | null> {
   if (!isTauri()) return null;
   try {

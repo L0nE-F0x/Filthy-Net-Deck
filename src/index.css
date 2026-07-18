@@ -1837,37 +1837,131 @@ select,
   width: 100%;
   height: auto;
   display: block;
+  cursor: crosshair;
 }
 .climb-grid {
-  stroke: color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  stroke: color-mix(in srgb, var(--color-ink-600) 45%, transparent);
   stroke-width: 1;
-  stroke-dasharray: 3 4;
+  stroke-dasharray: 2 5;
+}
+.climb-grid-v {
+  stroke: color-mix(in srgb, var(--color-ink-600) 25%, transparent);
+  stroke-width: 1;
 }
 .climb-axis {
   fill: var(--color-muted);
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
-.climb-area {
-  fill: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+.climb-fill-hi {
+  stop-color: color-mix(in srgb, var(--color-gold-500) 26%, transparent);
+}
+.climb-fill-lo {
+  stop-color: transparent;
 }
 .climb-line {
   stroke: var(--color-gold-300);
-  stroke-width: 2.2;
+  stroke-width: 2.4;
   stroke-linejoin: round;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-gold-500) 55%, transparent));
 }
 .climb-dot {
   fill: var(--color-gold-300);
   stroke: var(--color-ink-950);
+  stroke-width: 1.2;
+}
+.climb-peak circle {
+  fill: none;
+  stroke: var(--color-gold-300);
+  stroke-width: 1.5;
+}
+.climb-peak text {
+  fill: var(--color-gold-300);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.climb-now-dot {
+  fill: var(--color-gold-300);
+  stroke: var(--color-ink-950);
+  stroke-width: 1.2;
+}
+.climb-now-pulse {
+  fill: none;
+  stroke: var(--color-gold-300);
+  stroke-width: 1.5;
+  animation: climb-pulse 2.4s ease-out infinite;
+}
+@keyframes climb-pulse {
+  0% {
+    r: 5;
+    opacity: 0.9;
+  }
+  70% {
+    r: 12;
+    opacity: 0;
+  }
+  100% {
+    r: 12;
+    opacity: 0;
+  }
+}
+.climb-cross {
+  stroke: color-mix(in srgb, var(--color-foam) 35%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.climb-hover-dot {
+  fill: var(--color-foam);
+  stroke: var(--color-ink-950);
+  stroke-width: 1.2;
+}
+.climb-tip-bg {
+  fill: color-mix(in srgb, var(--color-ink-900) 92%, transparent);
+  stroke: color-mix(in srgb, var(--color-ink-600) 80%, transparent);
   stroke-width: 1;
 }
-.climb-chart-foot {
+.climb-tip-text {
+  fill: var(--color-foam);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Floating window controls shown only in fullscreen (no titlebar there). */
+.fs-controls {
+  position: fixed;
+  top: 10px;
+  right: 12px;
   display: flex;
-  justify-content: space-between;
-  padding: 0.15rem 0.5rem 0.25rem;
-  font-size: 0.65rem;
-  color: var(--color-muted);
+  gap: 6px;
+  z-index: 60;
+  opacity: 0.35;
+  transition: opacity 0.18s ease;
+}
+.fs-controls:hover,
+.fs-controls:focus-within {
+  opacity: 1;
+}
+.fs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 80%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 88%, transparent);
+  color: var(--color-foam);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.fs-btn:hover {
+  border-color: color-mix(in srgb, var(--color-gold-500) 55%, transparent);
+  color: var(--color-gold-200);
 }
 .climb-deck-row .meta-bar-label {
   flex-direction: column;

@@ -24,7 +24,8 @@ import {
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
-import { applyFullscreen, toggleFullscreen } from "./services/windowMode";
+import { applyFullscreen, closeToTray, toggleFullscreen } from "./services/windowMode";
+import { isTauri } from "./services/appUpdater";
 import { Sets } from "./pages/Sets";
 
 const NAV: {
@@ -90,6 +91,7 @@ export default function App() {
   const initTracker = useAppStore((s) => s.initTracker);
   const sets = useAppStore((s) => s.sets);
   const [bootDone, setBootDone] = useState(false);
+  const fullscreen = useAppStore((s) => s.prefs.fullscreen);
 
   // Small countdown chip on the Sets nav item (14-day window, like the pulse).
   const arenaDropIn = useMemo(() => {
@@ -285,6 +287,50 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {fullscreen && isTauri() && (
+        <div className="fs-controls" role="toolbar" aria-label="Fullscreen window controls">
+          <button
+            type="button"
+            className="fs-btn"
+            title="Exit fullscreen (F11)"
+            onClick={() =>
+              void toggleFullscreen().then((now) => {
+                if (now != null) useAppStore.getState().setFullscreenPref(now);
+              })
+            }
+          >
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+              <path
+                d="M5.5 1.5v4h-4M10.5 1.5v4h4M5.5 14.5v-4h-4M10.5 14.5v-4h4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Exit fullscreen
+          </button>
+          <button
+            type="button"
+            className="fs-btn"
+            title="Close to system tray — the tracker keeps running"
+            onClick={() => void closeToTray()}
+          >
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+              <path
+                d="M3 3l10 10M13 3L3 13"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+            Close to tray
+          </button>
+        </div>
+      )}
     </div>
     </SplashScreen>
   );
