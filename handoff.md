@@ -45,7 +45,7 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **Branch / HEAD** | `main` @ `Release v0.21.0` |
 | **Tag** | `v0.21.0` pushed (macOS CI) |
 | **Windows** | Signed installer + `.sig`: `website/downloads/Filthy-Net-Deck-Setup-0.21.0.exe` · updater `website/updater/latest.json` (sig key id **67FCA9900F523D49** verified) · soft channel `website/version.json` + `public/version.json`. In-app path is the signed plugin-updater. **Owner: verify Update & restart 0.20→0.21.** |
-| **macOS** | dmg link still points at **0.20.0** (last built). **Follow-up: roll 0.21.0 dmg** after the tag's macOS CI finishes, then bump the two `index.html` mac links to 0.21.0. |
+| **macOS** | **0.21.0** universal dmg on site (tag CI succeeded; rolled into `website/downloads/`, both `index.html` mac links → 0.21.0). |
 | **Marketing** | Hero/OG lead with B&R alerts + rotation impact; OG `?v=0.21.0` regenerated. |
 | **Netlify** | Publish dir is **`website`**. Verify live `version.json` / `updater/latest.json` → **0.21.0** after push. |
 | **Tests** | `npm test` (vitest) — 47 pass; new suites banPulse/rotationImpact/climbStats. |
