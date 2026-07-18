@@ -1,6 +1,7 @@
 # Filthy Net Deck — 10× page roadmap
 
 **Created:** 2026-07-19 (after Climb Tracker v0.26.0 overhaul)  
+**Owner picks locked:** 2026-07-19 (see **Approved queue** below).  
 **How to use:** Each page is graded against the **Climb bar**. Work is **batched** (see `AGENTS.md` pacing). Check items off when they ship in a real version bump — source-only is not done.
 
 ### The Climb bar (what “10×” means here)
@@ -21,14 +22,40 @@ Climb succeeded because it is not a dump of stats — it is a **story + actions*
 
 ---
 
-## Priority overview (suggested batch order)
+## Approved queue (owner 2026-07-19)
 
-| Batch | Theme | Pages | Why first |
-|-------|--------|-------|-----------|
-| **A** | **Deep-link lattice** | Decks, Stats, Matchups, Events | Climb proved the pattern; max product glue for least new data |
-| **B** | **Meta ↔ personal fusion** | Decks, DeckView, Matchups | Turns tracker + board into a daily plan |
-| **C** | **World events as decisions** | Format Hub, Sets | Rotation / spoilers / bans that change what you play |
-| **D** | **Trust & power** | Settings, Events polish | Setup health, discoverability |
+### WANT (build these)
+
+| Area | IDs | Notes |
+|------|-----|--------|
+| **Infra** | **I1, I2, I3, I4** | Full deep-link + chips + cardWatch outside palette |
+| **Decks** | **D2, D3** | Click-through + DeckView your record |
+| **My Stats** | **S1, S2, S3, S4, S5** | Full Stats 10× including two-deck compare |
+| **Matchups** | **M1, M2, M4** | Tag→meta, post-match nudge, deck chips → Stats |
+| **Sets** | **Z2, Z3, Z4, Z5** | Drop-day, hub links, rotation flags, trailers |
+| **Format Hub** | **F1, F2, F3, F4, F5** | Entire Hub war-room set (loved) |
+| **Settings** | **X1, X2** | Tracker health + keyboard cheat sheet |
+
+**Count:** 4 infra + 2 Decks + 5 Stats + 3 Matchups + 4 Sets + 5 Hub + 2 Settings = **25 tickets**.
+
+### SKIP (do not build unless owner reopens)
+
+| Area | IDs | Why (owner) |
+|------|-----|-------------|
+| **Decks** | D1, D4, D5 | No “Today’s plan” strip; leave FormatView alone; no pin |
+| **Matchups** | M3, M5 | No prep-mode aggregate; no untagged queue sticky |
+| **Sets** | Z1 | No “In today’s meta” on card drawer |
+| **Events** | **E1–E5 all** | Leave Events as-is |
+| **Settings** | X3, X4 | No local-path essay; no test toast |
+
+### Build order (batched releases — not one version per ID)
+
+| Ship batch | Theme | Tickets |
+|------------|--------|---------|
+| **1 — Lattice** | Glue the app | I1, I2, I3, D2, S1, S3, M1, M4 |
+| **2 — Personal loop** | Stats + Matchups depth | S2, S4, D3, M2, X1, X2 |
+| **3 — Hub war room** | Format Hub love | F1, F2, F3, F4, F5, I4 |
+| **4 — Sets + power Stats** | Drop/rotation + compare | Z2, Z3, Z4, Z5, S5 |
 
 Do **not** ship one micro-release per bullet. Finish a batch on `main`, then one version cut.
 

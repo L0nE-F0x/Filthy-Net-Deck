@@ -150,7 +150,8 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 
 ## 10× page program (post-Climb)
 
-**Canonical doc:** [`docs/PAGE-10X.md`](docs/PAGE-10X.md) — per-page gaps, upgrade IDs (D/S/M/Z/E/F/X/I), effort, definition of done.
+**Canonical doc:** [`docs/PAGE-10X.md`](docs/PAGE-10X.md)  
+**Owner picks locked 2026-07-19** — full WANT/SKIP tables live there.
 
 ### Climb bar (do not ship “more panels” without these)
 
@@ -159,20 +160,28 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 3. **Deep links both ways** (meta ↔ personal ↔ prep)  
 4. **Honest empty states** (never invent data)
 
-### Suggested batches (owner picks order)
+### Approved WANT (build)
 
-| Batch | Theme | First tickets from PAGE-10X |
-|-------|--------|-----------------------------|
-| **A — Deep-link lattice** | Glue the app like Climb | D2, S1, S3, M1, M4, E1, I1 |
-| **B — Daily plan loop** | Open every morning | D1, D3, M2, M5, S2 |
-| **C — Rotation war room** | When exit ≤ ~45d | F1, F2, Z1, Z2, F3 |
-| **D — Trust polish** | Setup & power users | X1–X3, E2 |
+- **I1–I4** · **D2, D3** · **S1–S5** · **M1, M2, M4** · **Z2–Z5** · **F1–F5** · **X1, X2**
 
-**Default next:** Batch **A** (highest 10× feel per line of code after Climb).
+### Approved SKIP
+
+- **D1, D4, D5** · **M3, M5** · **Z1** · **all Events (E\*)** · **X3, X4**
+
+### Ship batches (order)
+
+| # | Theme | Tickets |
+|---|--------|---------|
+| **1** | Lattice | I1, I2, I3, D2, S1, S3, M1, M4 |
+| **2** | Personal loop | S2, S4, D3, M2, X1, X2 |
+| **3** | Hub war room | F1–F5, I4 |
+| **4** | Sets + deck compare | Z2–Z5, S5 |
+
+**Next to implement when owner says go:** Batch **1**.
 
 ### Explicitly deferred
 
-Limited/Draft hub · overlay · AI without grounded local data · prices · cloud sync.
+Limited/Draft hub · overlay · AI without grounded local data · prices · cloud sync · Events overhaul.
 
 ### Other backlog (low urgency)
 
