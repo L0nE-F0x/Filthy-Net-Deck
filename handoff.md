@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff for whichever agent picks this up next
 
 **Audience:** Any coding agent continuing this project. The owner rotates between **Claude Code** (Fable 5 / Sonnet), **Grok 4.5**, and **Kimi**. Nothing here is model-specific; follow it regardless of which model you are.  
-**Last wrap-up:** 2026-07-18 — Claude Fable 5; shipped **v0.21.0** end-to-end (current-events batch: B&R pulse, rotation impact, Climb streaks + season-vs-season — Windows signed + macOS dmg rolled, both live). Also hardened the set-radar pipeline: first-look spoilers now ship, 4×/day refresh, `docs/MAINTENANCE.md` added.  
+**Last wrap-up:** 2026-07-18 — Kimi; shipped **v0.22.0** end-to-end (Future Standard roadmap sets + Ctrl+K card watch + Matchup Lab QoL — Windows signed live, macOS dmg via tag CI). Also: sets feed v1.2.0 (`futureSets`), 63 tests green.  
 **Owner product voice:** L0nE-F0x / ApexForge; social: [@MBrewlab](https://x.com/MBrewlab) on X.  
 **Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
 **Live site / downloads / updater:** https://filthy-net-deck.netlify.app/  
@@ -25,7 +25,8 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **My Stats** | Local winrate tracker by tailing Arena `Player.log` (never leaves the PC) |
 | **Matchup Lab** | Opponent tags / prep notes + WR vs tagged archetypes |
 | **Climb Tracker** | Season rank graph, games-to-next-rank, win/loss streaks, season-vs-season (0.21) |
-| **Set Radar** | Arena-first spoilers, galleries, legality, spoiler + B&R pulse banners, Arena-eve notify |
+| **Set Radar** | Arena-first spoilers, galleries, legality, spoiler + B&R pulse banners, Arena-eve notify, **Future Standard** roadmap sets (0.22) |
+| **Card watch (0.22)** | Ctrl+K palette — which meta decks play any card (copies/board), deck jump, page nav |
 | **Format hub (0.19/0.21)** | Standard rotation + ban lists, Pioneer pool; **rotation impact** per deck (0.21) |
 | **Updates** | Signed in-app Update & restart (+ silent NSIS fallback on Windows) |
 
@@ -42,14 +43,14 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 | Item | Value |
 |------|--------|
-| **App version** | **0.21.0** — B&R pulse, rotation impact, Climb streaks + season compare (0.20.0 shipped the Climb chart redesign / fullscreen tray / single-instance) |
-| **Branch / HEAD** | `main` @ `Release v0.21.0` |
-| **Tag** | `v0.21.0` pushed (macOS CI) |
-| **Windows** | Signed installer + `.sig`: `website/downloads/Filthy-Net-Deck-Setup-0.21.0.exe` · updater `website/updater/latest.json` (sig key id **67FCA9900F523D49** verified) · soft channel `website/version.json` + `public/version.json`. In-app path is the signed plugin-updater. **Owner: verify Update & restart 0.20→0.21.** |
-| **macOS** | **0.21.0** universal dmg on site (tag CI succeeded; rolled into `website/downloads/`, both `index.html` mac links → 0.21.0). |
-| **Marketing** | Hero/OG lead with B&R alerts + rotation impact; OG `?v=0.21.0` regenerated. |
-| **Netlify** | Publish dir is **`website`**. Verify live `version.json` / `updater/latest.json` → **0.21.0** after push. |
-| **Tests** | `npm test` (vitest) — 47 pass; new suites banPulse/rotationImpact/climbStats. |
+| **App version** | **0.22.0** — Future Standard roadmap sets, Ctrl+K card watch, Matchup Lab save-as-you-type (0.21.0 shipped B&R pulse / rotation impact / Climb compare) |
+| **Branch / HEAD** | `main` @ `Release v0.22.0` |
+| **Tag** | `v0.22.0` pushed (macOS CI) |
+| **Windows** | Signed installer + `.sig`: `website/downloads/Filthy-Net-Deck-Setup-0.22.0.exe` · updater `website/updater/latest.json` (sig key id **67FCA9900F523D49** verified) · soft channel `website/version.json` + `public/version.json`. In-app path is the signed plugin-updater. **Owner: verify Update & restart 0.21→0.22.** |
+| **macOS** | **0.22.0** universal dmg on site (tag CI succeeded; rolled into `website/downloads/`, both `index.html` mac links → 0.22.0). |
+| **Marketing** | Hero/OG lead with Future Standard + Ctrl+K card watch; OG `?v=0.22.0` regenerated. |
+| **Netlify** | Publish dir is **`website`**. Live `version.json` / `updater/latest.json` / `meta/sets.json` (feed v1.2.0, `futureSets` ×6) / og-image / installer all confirmed **0.22.0** on 2026-07-18. |
+| **Tests** | `npm test` (vitest) — 63 pass; new suite cardWatch (14), personalMeta +2. |
 
 ### Version arc this audit day (do not repeat cadence)
 
@@ -63,16 +64,17 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **0.19.0** | **Owner refinement batch** (one batched release, per pacing policy): fullscreen (Settings/F11), Decks "Deck to beat" hero, Sets Format hub (rotation + bans), My Stats full decklists + copy |
 | **0.20.0** | Climb chart redesign (smooth curve, peak marker, hover), fullscreen tray controls, single-instance guard |
 | **0.21.0** | **Current-events batch**: B&R pulse (ban-list diff → banner + toast), rotation impact (per-deck cards leaving Standard), Climb streaks + season-vs-season; pipeline 4×/day set radar + `MAINTENANCE.md` |
+| **0.22.0** | **Roadmap + card watch batch**: Future Standard (curated source-linked roadmap sets, auto-reconciled vs Scryfall), Ctrl+K card watch palette, Matchup Lab save-on-type + helper dedupe |
 
 ---
 
 ## 3. Immediate next tasks (for the next agent)
 
-1. **Nothing blocking.** v0.21.0 shipped end-to-end on 2026-07-18: signed Windows publish (sig key id verified), macOS dmg built by tag CI + rolled, marketing + OG live. All live endpoints confirmed 0.21.0.
-2. **One unverified check (owner):** the in-app **Update & restart** path from an *installed* 0.20.0 → 0.21.0 could not be exercised from the dev environment (needs a running installed 0.20.0 build). Everything it depends on is live and correctly signed. Worth a manual click when convenient.
-3. **Owner marketing push** — a v0.21 X post draft was delivered; owner posts from [@MBrewlab](https://x.com/MBrewlab). Link unfurls the fresh OG card; no image attachment needed.
-4. **B&R pulse will go live for real** the next time WotC issues a Banned & Restricted update — the app diffs the feed's ban lists automatically. No code action needed; just be aware that's the first real-world firing.
-5. **Next product batch** — see `ROADMAP.md` "Suggested next" (Card watch / Ctrl+K palette was scoped but not built this batch; screenshot carousel still needs owner assets; signed mac auto-update still an owner decision).
+1. **Nothing blocking.** v0.22.0 shipped end-to-end on 2026-07-18: signed Windows publish (sig key id verified), macOS dmg built by tag CI + rolled, marketing + OG live. All live endpoints confirmed 0.22.0 (version.json, updater, sets.json `futureSets` ×6, og-image 200, installer 200).
+2. **One unverified check (owner):** the in-app **Update & restart** path from an *installed* 0.21.0 → 0.22.0 could not be exercised from the dev environment. Everything it depends on is live and correctly signed. Worth a manual click when convenient.
+3. **Owner marketing push** — post from [@MBrewlab](https://x.com/MBrewlab); the link unfurls the fresh OG card (`?v=0.22.0`), no image attachment needed.
+4. **Future Standard upkeep** — `pipeline/sources/future-sets.json` is the one curated input: after each WotC roadmap reveal, add/replace entries (they auto-drop once Scryfall catalogs the set or an exact date passes). `docs/MAINTENANCE.md` monthly item 3.
+5. **Next product batch** — see `ROADMAP.md` "Suggested next" (rotation badges as the date nears; screenshot carousel still needs owner assets; signed mac auto-update still an owner decision).
 6. **Do not** cut another app release unless the owner asks or a P0 appears — pacing policy.
 
 ---
@@ -97,8 +99,8 @@ Filthy Net Deck/
 ├── src-tauri/                # Tauri + Rust tracker / tray / silent update
 ├── pipeline/                 # Node ESM builders (CI + local)
 │   ├── build-meta.mjs        # latest.json + dated archives + history.json
-│   ├── build-sets.mjs        # sets.json (slimmed) — formats hub incl. rotation impact (0.21)
-│   └── sources/              # goldfish, scryfall (429 caps), sets.mjs (buildRotationImpact), …
+│   ├── build-sets.mjs        # sets.json (slimmed) — formats hub incl. rotation impact (0.21) + futureSets (0.22)
+│   └── sources/              # goldfish, scryfall (429 caps), sets.mjs (buildRotationImpact, buildFutureSets), future-sets.json (0.22), …
 ├── .github/workflows/        # daily-meta.yml (06:00 UTC) + sets-refresh.yml (00/12/18 UTC, 0.21)
 ├── website/                  # Netlify publish root
 │   ├── index.html            # marketing + OG
@@ -183,7 +185,15 @@ It only downloads **published JSON** from Netlify:
 | **Climb polish** | `src/services/climbStats.ts` (+ test) `currentStreak` / `longestStreak` / `seasonSummaries` / `previousSeasonSummary`; `src/pages/Climb.tsx` streak chips + loss-streak note + `SeasonCompareCell` row; `.climb-streak` / `.season-compare*` in `index.css`. |
 | **Pipeline hardening** | `sources/sets.mjs`: ship future sets with <5 spoiled cards (first-looks) + undated Scryfall rows; `.github/workflows/sets-refresh.yml` (00/12/18 UTC, own failure issue); `daily-meta.yml` rebase-before-push. `docs/MAINTENANCE.md` = self-maintains vs. monthly checklist. |
 
-> **Data feeds vs. app releases:** `formats.standard.rotation` and the ban lists ride the **sets pipeline** (`npm run sets`, 4×/day CI) — they refresh with no app bump. The app just reads them. New sets/spoilers/bans appear automatically once Scryfall catalogs them; see `docs/MAINTENANCE.md`.
+### v0.22.0 roadmap + card watch batch (shipped — Kimi session)
+
+| Concern | Files |
+|---------|--------|
+| **Future Standard** | `pipeline/sources/future-sets.json` (curated, every entry source-linked); `sources/sets.mjs` `buildFutureSets` (drops entries on normalized-name match vs Scryfall rows, or when an exact date passes) → `SetsBundle.futureSets`; `types/sets.ts` `FutureSet`; `FutureStandardSection` in `src/pages/Sets.tsx`; `.future-set-*` in `index.css`. Feed `sets.json` version 1.2.0. |
+| **Card watch / Ctrl+K** | `src/services/cardWatch.ts` (+ 14 tests) — indexes every meta decklist (format × mode × main/side); `src/components/CommandPalette.tsx` (self-managed open via Ctrl/Cmd+K, Escape, arrow nav, occurrence cap); mounted in `App.tsx` + topbar `.palette-hint` button (dispatches a synthetic Ctrl+K); `.cp-*` in `index.css`. |
+| **Matchup Lab QoL** | `src/pages/Matchups.tsx` — tag/notes save on every keystroke (no blur-loss); `winrateFavor` deduped into `ranks.ts` (was ×3); `currentStreak` deduped into `climbStats.ts` (`Stats.tsx` call-site adapted to `{type,length}`); `personalMeta.ts` substring join now longest-key-wins (+ 2 tests). |
+
+> **Data feeds vs. app releases:** `formats.standard.rotation` and the ban lists ride the **sets pipeline** (`npm run sets`, 4×/day CI) — they refresh with no app bump. The app just reads them. New sets/spoilers/bans appear automatically once Scryfall catalogs them; see `docs/MAINTENANCE.md`. `futureSets` rides the same feed — but its *entries* are curated by hand in `future-sets.json` (no API exists for roadmap-only announcements).
 
 ---
 
@@ -274,11 +284,12 @@ In-game overlay (ToS), price tracking, cloud sync, mobile/APK tracking promises,
 
 ---
 
-## 9. Session notes (handoff out — 2026-07-18, Claude Fable 5)
+## 9. Session notes (handoff out — 2026-07-18, Kimi)
 
-- Owner may pick this up next with **Grok or Kimi** later today. This file + `AGENTS.md` are model-agnostic — follow them as written.
-- **`main` is clean** after wrap-up commits (`HEAD = Roll v0.21.0 out to macOS`). Nothing staged or half-done. 47 tests pass, `tsc` clean, `npm run build` clean.
-- This session (started from the "will new Magicon cards auto-appear?" question): hardened the set pipeline (first-look spoilers, 4×/day), then built + shipped the **v0.21.0** batch (B&R pulse, rotation impact, Climb polish) end-to-end.
+- Owner picked this up with **Kimi** after the Claude wrap-up: built + shipped the **v0.22.0** batch (Future Standard roadmap sets, Ctrl+K card watch, Matchup Lab QoL) end-to-end the same day. 63 tests pass, `tsc` clean, `npm run build` clean, signed build key id verified.
+- **`main` is clean** after wrap-up commits. Two coder subagents built the palette + Matchup Lab fixes in parallel (zero-context briefings, verified reports); pipeline, UI, integration, and release by the main agent.
+- **Feed v1.2.0:** sets.json now carries `futureSets` — curated in `pipeline/sources/future-sets.json` (the only hand-maintained roadmap input; WotC's 2027 announcement + Variety are the current sources). Self-heals: entries drop on Scryfall name-match or when an exact date passes. New reveals need a human entry — `docs/MAINTENANCE.md` monthly item 3.
+- **2027 roadmap data (verified 2026-07-18):** Nauctis: The Sunken Realm 2027-02-05, Kamigawa: Titanbreach 2027-06-04, Zhalfir 2027-10-01 (all official, magic.wizards.com), + three unannounced Universes Beyond slots ~Apr/Aug/Nov (Variety). Already on the Scryfall radar and *not* in future-sets: `hob` 2026-08-11, `fra` (Reality Fracture) ~2026-09-29, `sds`/`trk` ~2026-11-10.
 - **Watch for the cron push-race:** `sets-refresh.yml` (00/12/18 UTC) + `daily-meta.yml` (06:00 UTC) both commit `sets.json` to `main`. If your release also regenerated the feed, rebase will conflict on `website/meta/sets.json` + `public/meta/sets.json` — resolve by re-running `npm run sets`, `git add` both, `git rebase --continue`.
 - Prefer **batched** product work over micro-releases; prefer **signed Update & restart** over browser `.exe`.
 - When in doubt: **`AGENTS.md` > handoff > ROADMAP`.**
