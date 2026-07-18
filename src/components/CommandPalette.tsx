@@ -18,11 +18,12 @@ import type { Page, PlayMode } from "../types/meta";
 
 const PALETTE_PAGES: { id: Page; label: string }[] = [
   { id: "daily", label: "Decks" },
-  { id: "meta", label: "Events" },
-  { id: "sets", label: "Sets" },
   { id: "stats", label: "My Stats" },
-  { id: "matchups", label: "Matchups" },
   { id: "climb", label: "Climb" },
+  { id: "matchups", label: "Matchups" },
+  { id: "sets", label: "Sets" },
+  { id: "meta", label: "Events" },
+  { id: "formats", label: "Format Hub" },
   { id: "settings", label: "Settings" },
 ];
 

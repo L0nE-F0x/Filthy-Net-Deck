@@ -4,8 +4,7 @@ import { headlineCards, summarizeBanChanges } from "../services/banPulse";
 
 /**
  * Decks-home banner for a real-world B&R announcement. Shows until the user
- * opens the Format hub (Sets page) or dismisses it — both acknowledge the
- * new ban lists as seen.
+ * opens Format Hub or dismisses it — both acknowledge the new ban lists as seen.
  */
 export function BanPulse() {
   const banChanges = useAppStore((s) => s.banChanges);
@@ -31,7 +30,7 @@ export function BanPulse() {
         className="ban-pulse-open"
         onClick={() => {
           markBansSeen();
-          setPage("sets");
+          setPage("formats");
         }}
       >
         <span className="spoiler-pulse-copy">
@@ -42,7 +41,7 @@ export function BanPulse() {
             {cardBit}
           </span>
         </span>
-        <span className="spoiler-pulse-cta">Ban lists →</span>
+        <span className="spoiler-pulse-cta">Format Hub →</span>
       </button>
       <button
         type="button"

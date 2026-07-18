@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.24.1";
+export const APP_VERSION = "0.25.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Tracker fix — matches recorded while the app is minimized to the tray now appear in My Stats / Matchups / Climb when you open the window again",
-  "Tracker re-syncs on focus, when you open those pages, and every 20s so the UI can’t stay stale while Rust keeps writing matches",
+  "New nav order — Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1–8)",
+  "Format Hub — legality, rotation, and ban lists for Standard & Pioneer as their own page (no longer buried under Sets)",
+  "B&R pulse opens Format Hub so ban list changes land where you expect",
 ];

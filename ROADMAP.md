@@ -135,9 +135,16 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 - [x] **Settings denser layout** — two-column grid + compact notification rows (uses empty right side).
 - [x] **v0.24.0** full AGENTS.md release (Windows signed + marketing/OG; macOS roll after tag CI).
 
+## In progress — nav + Format Hub standalone
+
+- [x] **Nav reorder** — Decks · My Stats · Climb · Matchups · Sets · Events · Format Hub · Settings (keys 1–8).
+- [x] **Format Hub page** — legality / rotation / bans promoted off Sets into its own nav item (`formats`).
+- [ ] Ship in next version bump when owner asks (with marketing if user-visible).
+
 ## Suggested next product batch (ideas)
 
 - **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days.
 - Performance / feed size — full galleries for recent sets still dominate `sets.json`; slim path helps older Standard.
 - Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
 - More curated set trailers as WotC posts them.
+- Limited still backburner.

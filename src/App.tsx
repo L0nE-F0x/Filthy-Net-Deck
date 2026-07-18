@@ -22,6 +22,7 @@ import {
   IconMatchups,
   IconClimb,
   IconSets,
+  IconFormatHub,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
@@ -29,23 +30,26 @@ import { openExternal } from "./services/openExternal";
 import { applyFullscreen, closeToTray, toggleFullscreen } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
 import { Sets } from "./pages/Sets";
+import { FormatHubPage } from "./pages/FormatHub";
 
+/** Nav order: Decks → personal loop → world → Format Hub → Settings. Keys 1–8. */
 const NAV: {
   id: Page;
   label: string;
   icon: (p: { className?: string }) => ReactNode;
 }[] = [
   { id: "daily", label: "Decks", icon: IconDaily },
-  { id: "meta", label: "Events", icon: IconMeta },
-  { id: "sets", label: "Sets", icon: IconSets },
   { id: "stats", label: "My Stats", icon: IconStats },
-  { id: "matchups", label: "Matchups", icon: IconMatchups },
   { id: "climb", label: "Climb", icon: IconClimb },
+  { id: "matchups", label: "Matchups", icon: IconMatchups },
+  { id: "sets", label: "Sets", icon: IconSets },
+  { id: "meta", label: "Events", icon: IconMeta },
+  { id: "formats", label: "Format Hub", icon: IconFormatHub },
   { id: "settings", label: "Settings", icon: IconSettings },
 ];
 
 /** Pages that work offline / without a meta download. */
-const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb", "sets"];
+const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb", "sets", "formats"];
 
 function pageTitle(page: Page): string {
   switch (page) {
@@ -65,6 +69,8 @@ function pageTitle(page: Page): string {
       return "Matchup Lab";
     case "climb":
       return "Climb Tracker";
+    case "formats":
+      return "Format Hub";
     case "settings":
       return "Settings";
     default:
@@ -162,7 +168,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Keyboard shortcuts 1–7 jump to main nav pages (Milestone 6).
+  // Keyboard shortcuts 1–8 jump to main nav pages (order matches NAV).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -387,6 +393,7 @@ export default function App() {
               {page === "stats" && <Stats />}
               {page === "matchups" && <Matchups />}
               {page === "climb" && <Climb />}
+              {page === "formats" && <FormatHubPage />}
               {page === "settings" && <Settings />}
             </>
           )}

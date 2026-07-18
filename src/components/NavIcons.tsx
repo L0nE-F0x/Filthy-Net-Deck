@@ -110,3 +110,15 @@ export function IconSets({ className }: IconProps): ReactNode {
     </svg>
   );
 }
+
+/** Format Hub — legality / rotation / bans */
+export function IconFormatHub({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 3.5v17M3.5 12h17" />
+      <path d="M6.2 6.2c2.4 1.6 4.4 1.6 5.8 0s3.4-1.6 5.8 0" />
+      <path d="M6.2 17.8c2.4-1.6 4.4-1.6 5.8 0s3.4 1.6 5.8 0" />
+    </svg>
+  );
+}

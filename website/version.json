@@ -1,5 +1,5 @@
 {
-  "version": "0.24.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.24.1.exe",
-  "notes": "v0.24.1: HOTFIX — matches recorded while the app is minimized to the tray now appear in My Stats / Matchups / Climb. The UI re-syncs from disk on focus, when you open those pages, and every 20s so it cannot stay stale while Rust keeps writing."
+  "version": "0.25.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.25.0.exe",
+  "notes": "v0.25.0: Format Hub is its own page (Standard & Pioneer legality, rotation, bans). New nav order: Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1-8). B&R pulse opens Format Hub."
 }

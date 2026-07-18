@@ -1,11 +1,11 @@
 {
-  "version": "0.24.1",
-  "notes": "v0.24.1: HOTFIX — matches recorded while the app is minimized to the tray now appear in My Stats / Matchups / Climb. The UI re-syncs from disk on focus, when you open those pages, and every 20s so it cannot stay stale while Rust keeps writing.",
-  "pub_date": "2026-07-18T14:13:56.277Z",
+  "version": "0.25.0",
+  "notes": "v0.25.0: Format Hub is its own page (Standard & Pioneer legality, rotation, bans). New nav order: Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1-8). B&R pulse opens Format Hub.",
+  "pub_date": "2026-07-18T18:48:27.636Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjU1MzdwcHRKZ3lLZFN4WWllT1JFZkR6VTNCcHdlUHVGL3V4SG13bjZPbXJlSHZKOXZsOTNsc2libG56UnQyVHNWVGt2dlNmZVM1YzhlZnZjYmYvMUF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0Mzg0MDIxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjQuMV94NjQtc2V0dXAuZXhlCjNpcUNYSTVaMjBMMGZ6U2xCSUJIb3V2UEsrQXUvZWJQbTV1ZG5QMEFiYjNaREtVS3pNU3pDNmw5RDgwb2g1QzllMStKQ2lzSzRPWWdoRHc4ZkdjRUR3PT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.24.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFlZUpRbkZWRG5YOVhTOVNGWERDZHRpTmNBakt6THZrLzhjQXU4cWt5cVMzWHNsam5CWnBISEFTUGhyVjFsTGpwM3ZDcEkvaE5nZk1sWHh3SDlORFFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDAwNDk2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjUuMF94NjQtc2V0dXAuZXhlCkZ0Q1ZJdnBFdFByYUFFRjREMDVid1hqek1BWHhaRGxKYmpQTGo0UjBMRldvM3lzTjNqSTFVS3FNNDM4TTd2YlE1K2lCSDkxRk9LVUtabTNyU0UvWERRPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.25.0.exe"
     }
   }
 }

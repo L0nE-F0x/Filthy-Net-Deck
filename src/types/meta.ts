@@ -13,6 +13,8 @@ export type Page =
   | "stats"
   | "matchups"
   | "climb"
+  /** Standalone Format Hub (legality / rotation / bans). Not FormatView. */
+  | "formats"
   | "settings";
 
 export interface CardEntry {
