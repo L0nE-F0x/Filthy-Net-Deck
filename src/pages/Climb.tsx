@@ -12,17 +12,35 @@ import {
   estimateMatchesPerStep,
   formatRank,
   nextRankLabel,
-  parseRank,
   rankLabelFromScore,
   winrateFavor,
   type RankPoint,
 } from "../services/ranks";
 import {
+  buildClimbLegs,
   currentStreak,
+  deckClimbSummaries,
+  deckColorIndex,
   longestStreak,
   previousSeasonSummary,
+  type ClimbLeg,
+  type DeckClimbSummary,
 } from "../services/climbStats";
 import type { TrackedMatch } from "../types/tracker";
+
+/** Chart / legend palette — distinct enough on dark and light themes. */
+const DECK_PALETTE = [
+  "#d4a84b",
+  "#4a7fd4",
+  "#34d399",
+  "#f87171",
+  "#a78bfa",
+  "#fbbf24",
+  "#2dd4bf",
+  "#fb7185",
+  "#60a5fa",
+  "#c084fc",
+];
 
 function tally(matches: TrackedMatch[]) {
   const wins = matches.filter((m) => m.result === "win").length;
@@ -31,10 +49,13 @@ function tally(matches: TrackedMatch[]) {
   return { wins, losses, decided, rate: decided > 0 ? wins / decided : null };
 }
 
+function deckSwatch(key: string): string {
+  return DECK_PALETTE[deckColorIndex(key, DECK_PALETTE.length)];
+}
+
 /**
  * Monotone cubic (Fritsch–Carlson) path through points. Smooths the curve
- * without overshooting past any data point, so ranks never appear to dip
- * below/above values that were actually hit.
+ * without overshooting past any data point.
  */
 function monotonePath(pts: { x: number; y: number }[]): string {
   const n = pts.length;
@@ -78,7 +99,15 @@ function monotonePath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-function RankChart({ series }: { series: RankPoint[] }) {
+function RankChart({
+  series,
+  highlightDeckKey,
+  onOpenDeck,
+}: {
+  series: RankPoint[];
+  highlightDeckKey: string | null;
+  onOpenDeck: (deckKey: string) => void;
+}) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hover, setHover] = useState<number | null>(null);
 
@@ -124,36 +153,37 @@ function RankChart({ series }: { series: RankPoint[] }) {
         ` L ${pts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`
       : "";
 
-  // One label per whole rank step; thin them out when the range is tall.
   let step = 1;
   while ((hi - lo) / step > 6) step *= 2;
   const yTicks: { s: number; label: string; y: number }[] = [];
   for (let s = lo; s <= hi; s += step) {
-    if (s > 20) break; // no labels above Mythic
+    if (s > 20) break;
     yTicks.push({ s, label: rankLabelFromScore(s), y: yOf(s) });
   }
 
-  // 4 date ticks across the time span (fewer when everything is one day).
   const dayMs = 86_400_000;
   const nX = spanT < dayMs ? 2 : 4;
   const xTicks = Array.from({ length: nX }, (_, i) => {
     const t = minT + (spanT * i) / (nX - 1);
-    return { t, x: xOf(t), label: new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }) };
+    return {
+      t,
+      x: xOf(t),
+      label: new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    };
   });
 
-  // Dots only where the rank actually changed (plus endpoints) — a plateau
-  // of identical samples reads as a clean line instead of a bead chain.
   const dotIdx: number[] = [];
   for (let i = 0; i < series.length; i++) {
     if (
       i === 0 ||
       i === series.length - 1 ||
-      series[i].rank.score !== series[i - 1].rank.score
+      series[i].rank.score !== series[i - 1].rank.score ||
+      series[i].deckKey !== series[i - 1].deckKey
     ) {
       dotIdx.push(i);
     }
   }
-  const dotR = dotIdx.length > 40 ? 2 : 3;
+  const dotR = dotIdx.length > 40 ? 2.5 : 3.5;
 
   let peakIdx = 0;
   for (let i = 1; i < series.length; i++) {
@@ -179,17 +209,26 @@ function RankChart({ series }: { series: RankPoint[] }) {
 
   const hovered = hover != null ? series[hover] : null;
   const hoverPt = hover != null ? pts[hover] : null;
-  const tipText = hovered
-    ? `${formatRank(hovered.rank)} · ${new Date(hovered.at).toLocaleString(undefined, {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      })}`
-    : "";
-  const tipW = tipText.length * 6.4 + 16;
+  const tipLines = hovered
+    ? [
+        formatRank(hovered.rank),
+        hovered.deckName || "Unknown deck",
+        new Date(hovered.at).toLocaleString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+      ]
+    : [];
+  const tipW = Math.max(120, ...tipLines.map((t) => t.length * 6.6 + 16));
+  const tipH = tipLines.length * 14 + 12;
   const tipX = hoverPt ? Math.min(Math.max(hoverPt.x - tipW / 2, padL), w - padR - tipW) : 0;
-  const tipY = hoverPt ? (hoverPt.y - 34 < padT ? hoverPt.y + 14 : hoverPt.y - 34) : 0;
+  const tipY = hoverPt
+    ? hoverPt.y - tipH - 10 < padT
+      ? hoverPt.y + 14
+      : hoverPt.y - tipH - 10
+    : 0;
 
   return (
     <div className="climb-chart">
@@ -198,7 +237,7 @@ function RankChart({ series }: { series: RankPoint[] }) {
         viewBox={`0 0 ${w} ${h}`}
         className="climb-svg"
         role="img"
-        aria-label="Rank over time"
+        aria-label="Rank over time by deck"
         onMouseMove={onMove}
         onMouseLeave={() => setHover(null)}
       >
@@ -234,17 +273,51 @@ function RankChart({ series }: { series: RankPoint[] }) {
         {area && <path d={area} className="climb-area" fill="url(#climbFill)" />}
         <path d={line} className="climb-line" fill="none" />
 
-        {dotIdx.map((i) =>
-          i === lastIdx ? null : (
+        {/* Per-segment colored underlines between consecutive samples */}
+        {pts.slice(0, -1).map((p, i) => {
+          const a = series[i];
+          const b = series[i + 1];
+          const q = pts[i + 1];
+          const key = a.deckKey || b.deckKey || "?";
+          const faded = highlightDeckKey && key !== highlightDeckKey;
+          return (
+            <line
+              key={`${a.matchId}-${b.matchId}`}
+              x1={p.x}
+              y1={p.y}
+              x2={q.x}
+              y2={q.y}
+              stroke={deckSwatch(key)}
+              strokeWidth={faded ? 1.5 : 3}
+              strokeOpacity={faded ? 0.25 : 0.9}
+              strokeLinecap="round"
+            />
+          );
+        })}
+
+        {dotIdx.map((i) => {
+          const p = series[i];
+          const key = p.deckKey || "?";
+          const faded = highlightDeckKey != null && key !== highlightDeckKey;
+          const isNow = i === lastIdx;
+          if (isNow) return null;
+          return (
             <circle
-              key={series[i].matchId}
+              key={p.matchId}
               cx={pts[i].x}
               cy={pts[i].y}
               r={dotR}
-              className="climb-dot"
+              fill={deckSwatch(key)}
+              opacity={faded ? 0.3 : 1}
+              className="climb-dot-deck"
+              style={{ cursor: p.deckKey ? "pointer" : "default" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (p.deckKey) onOpenDeck(p.deckKey);
+              }}
             />
-          ),
-        )}
+          );
+        })}
 
         {peakIdx !== lastIdx && (
           <g className="climb-peak">
@@ -257,75 +330,190 @@ function RankChart({ series }: { series: RankPoint[] }) {
 
         <g className="climb-now">
           <circle className="climb-now-pulse" cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={5} />
-          <circle className="climb-now-dot" cx={pts[lastIdx].x} cy={pts[lastIdx].y} r={4} />
+          <circle
+            className="climb-now-dot"
+            cx={pts[lastIdx].x}
+            cy={pts[lastIdx].y}
+            r={4}
+            fill={series[lastIdx].deckKey ? deckSwatch(series[lastIdx].deckKey) : undefined}
+            style={{ cursor: series[lastIdx].deckKey ? "pointer" : "default" }}
+            onClick={() => {
+              if (series[lastIdx].deckKey) onOpenDeck(series[lastIdx].deckKey!);
+            }}
+          />
         </g>
 
-        {hoverPt && (
+        {hoverPt && hovered && (
           <g className="climb-hover">
             <line x1={hoverPt.x} x2={hoverPt.x} y1={padT} y2={baseline} className="climb-cross" />
-            <circle cx={hoverPt.x} cy={hoverPt.y} r={4.5} className="climb-hover-dot" />
+            <circle
+              cx={hoverPt.x}
+              cy={hoverPt.y}
+              r={5}
+              fill={hovered.deckKey ? deckSwatch(hovered.deckKey) : "var(--color-gold-400)"}
+              className="climb-hover-dot"
+            />
             <g transform={`translate(${tipX.toFixed(1)} ${tipY.toFixed(1)})`}>
-              <rect width={tipW} height={20} rx={6} className="climb-tip-bg" />
-              <text x={tipW / 2} y={13.5} textAnchor="middle" className="climb-tip-text">
-                {tipText}
-              </text>
+              <rect width={tipW} height={tipH} rx={6} className="climb-tip-bg" />
+              {tipLines.map((line, i) => (
+                <text
+                  key={i}
+                  x={tipW / 2}
+                  y={14 + i * 14}
+                  textAnchor="middle"
+                  className={i === 0 ? "climb-tip-text" : "climb-tip-sub"}
+                >
+                  {line}
+                </text>
+              ))}
             </g>
           </g>
         )}
       </svg>
+      {hovered?.deckKey && (
+        <button
+          type="button"
+          className="climb-chart-cta"
+          onClick={() => onOpenDeck(hovered.deckKey!)}
+        >
+          Open {hovered.deckName || "deck"} stats →
+        </button>
+      )}
     </div>
   );
 }
 
-interface DeckClimb {
-  key: string;
-  name: string;
-  matches: number;
-  wins: number;
-  losses: number;
-  rate: number | null;
-  /** Net rank score change across matches with this deck that had rank stamps nearby. */
-  delta: number;
+function LegCard({
+  leg,
+  index,
+  onOpen,
+  highlighted,
+  onHover,
+}: {
+  leg: ClimbLeg;
+  index: number;
+  onOpen: () => void;
+  highlighted: boolean;
+  onHover: (on: boolean) => void;
+}) {
+  const rankTrail =
+    leg.startRank && leg.endRank
+      ? `${formatRank(leg.startRank)} → ${formatRank(leg.endRank)}`
+      : leg.endRank
+        ? formatRank(leg.endRank)
+        : "No rank stamp";
+
+  return (
+    <button
+      type="button"
+      className={`climb-leg${highlighted ? " is-hot" : ""}`}
+      onClick={onOpen}
+      onMouseEnter={() => onHover(true)}
+      onMouseLeave={() => onHover(false)}
+      title="Open this deck in My Stats"
+    >
+      <span className="climb-leg-idx" style={{ background: deckSwatch(leg.deckKey) }}>
+        {index + 1}
+      </span>
+      <span className="climb-leg-body">
+        <span className="climb-leg-name">{leg.deckName}</span>
+        <span className="climb-leg-rank">{rankTrail}</span>
+        <span className="climb-leg-meta">
+          {leg.wins}W {leg.losses}L
+          {leg.rate != null && (
+            <strong className={`favor-${winrateFavor(leg.rate)}`}>
+              {" "}
+              {(leg.rate * 100).toFixed(0)}%
+            </strong>
+          )}
+          {" · "}
+          {leg.matches} game{leg.matches === 1 ? "" : "s"}
+          {" · "}
+          {timeAgo(leg.endAt)}
+        </span>
+      </span>
+      <span
+        className={`climb-leg-delta${
+          leg.delta == null
+            ? " muted"
+            : leg.delta > 0
+              ? " up"
+              : leg.delta < 0
+                ? " down"
+                : " muted"
+        }`}
+      >
+        {leg.delta == null
+          ? "—"
+          : leg.delta === 0
+            ? "flat"
+            : `${leg.delta > 0 ? "▲" : "▼"} ${Math.abs(leg.delta).toFixed(leg.delta % 1 ? 1 : 0)}`}
+      </span>
+    </button>
+  );
 }
 
-function deckClimbStats(matches: TrackedMatch[]): DeckClimb[] {
-  // Assign each rank sample to the deck of that match; delta = score change to next sample overall
-  // attributed proportionally is hard — simpler: for each deck, score of last ranked match with
-  // that deck minus first ranked match with that deck, plus winrate as secondary.
-  const byDeck = new Map<string, TrackedMatch[]>();
-  for (const m of matches) {
-    const k = deckKey(m);
-    let list = byDeck.get(k);
-    if (!list) {
-      list = [];
-      byDeck.set(k, list);
-    }
-    list.push(m);
-  }
-
-  const out: DeckClimb[] = [];
-  for (const [key, list] of byDeck) {
-    const t = tally(list);
-    const ranked = list
-      .filter((m) => parseRank(m.myRank))
-      .sort((a, b) => a.endedAt - b.endedAt);
-    let delta = 0;
-    if (ranked.length >= 2) {
-      const first = parseRank(ranked[0].myRank)!;
-      const last = parseRank(ranked[ranked.length - 1].myRank)!;
-      delta = last.score - first.score;
-    }
-    out.push({
-      key,
-      name: list.find((m) => m.deckName)?.deckName ?? "Unknown deck",
-      matches: list.length,
-      wins: t.wins,
-      losses: t.losses,
-      rate: t.rate,
-      delta,
-    });
-  }
-  return out.sort((a, b) => b.delta - a.delta || (b.rate ?? 0) - (a.rate ?? 0));
+function DeckClimbRow({
+  d,
+  onOpen,
+  highlighted,
+  onHover,
+}: {
+  d: DeckClimbSummary;
+  onOpen: () => void;
+  highlighted: boolean;
+  onHover: (on: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`climb-deck-card${highlighted ? " is-hot" : ""}`}
+      onClick={onOpen}
+      onMouseEnter={() => onHover(true)}
+      onMouseLeave={() => onHover(false)}
+    >
+      <span className="climb-deck-swatch" style={{ background: deckSwatch(d.key) }} />
+      <span className="climb-deck-main">
+        <span className="climb-deck-title">{d.name}</span>
+        <span className="climb-deck-sub">
+          {d.startRank && d.endRank
+            ? `${formatRank(d.startRank)} → ${formatRank(d.endRank)}`
+            : d.endRank
+              ? formatRank(d.endRank)
+              : "No rank stamps"}
+          {d.legs > 1 ? ` · ${d.legs} stretches` : ""}
+        </span>
+      </span>
+      <span className="climb-deck-wr">
+        <span className="mu-track climb-deck-track">
+          <span
+            className={`mu-fill favor-${winrateFavor(d.rate ?? 0)}`}
+            style={{ width: `${Math.max(4, (d.rate ?? 0) * 100)}%` }}
+          />
+        </span>
+        <span>
+          {d.wins}W {d.losses}L
+          {d.rate != null && (
+            <strong className={`favor-${winrateFavor(d.rate)}`}>
+              {" "}
+              {(d.rate * 100).toFixed(0)}%
+            </strong>
+          )}
+        </span>
+      </span>
+      <span
+        className={`climb-deck-delta${
+          d.delta > 0 ? " up" : d.delta < 0 ? " down" : " muted"
+        }`}
+      >
+        {d.delta > 0 ? "▲" : d.delta < 0 ? "▼" : "·"}{" "}
+        {d.delta === 0
+          ? "flat"
+          : `${Math.abs(d.delta).toFixed(d.delta % 1 ? 1 : 0)} step`}
+      </span>
+      <span className="climb-deck-go">Stats →</span>
+    </button>
+  );
 }
 
 /** One metric in the season-over-season comparison row. */
@@ -363,7 +551,9 @@ export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
+  const openStatsDeck = useAppStore((s) => s.openStatsDeck);
   const [season, setSeason] = useState<string | null>(null);
+  const [hoverDeck, setHoverDeck] = useState<string | null>(null);
 
   useEffect(() => {
     void refreshTracker();
@@ -384,29 +574,38 @@ export function Climb() {
     [matches, seasonKey],
   );
 
-  const series = useMemo(() => buildRankSeries(seasonMatches), [seasonMatches]);
+  // Rank series with deck identity attached for chart color + tooltips.
+  const series = useMemo(() => {
+    const enriched = seasonMatches.map((m) => ({
+      endedAt: m.endedAt,
+      matchId: m.matchId,
+      myRank: m.myRank,
+      deckKey: deckKey(m),
+      deckName: m.deckName,
+      result: m.result,
+    }));
+    return buildRankSeries(enriched);
+  }, [seasonMatches]);
+
   const overall = useMemo(() => tally(seasonMatches), [seasonMatches]);
   const estimate = useMemo(
     () => estimateMatchesPerStep(seasonMatches),
     [seasonMatches],
   );
-  const decks = useMemo(() => deckClimbStats(seasonMatches), [seasonMatches]);
+  const decks = useMemo(() => deckClimbSummaries(seasonMatches), [seasonMatches]);
+  const legs = useMemo(() => buildClimbLegs(seasonMatches), [seasonMatches]);
 
   const current = series.length ? series[series.length - 1].rank : null;
   const peak = series.length
     ? series.reduce((best, p) => (p.rank.score > best.rank.score ? p : best), series[0]).rank
     : null;
   const start = series.length ? series[0].rank : null;
-  const seasonDelta =
-    current && start ? current.score - start.score : null;
+  const seasonDelta = current && start ? current.score - start.score : null;
 
   const nextLabel = current ? nextRankLabel(current) : null;
   const matchesToNext =
-    current && nextLabel
-      ? Math.max(1, Math.ceil(estimate.matchesPerStep))
-      : null;
+    current && nextLabel ? Math.max(1, Math.ceil(estimate.matchesPerStep)) : null;
 
-  // Recent form (last 10 decided)
   const last10 = seasonMatches
     .filter((m) => m.result === "win" || m.result === "loss")
     .slice(0, 10);
@@ -417,28 +616,31 @@ export function Climb() {
     () => longestStreak(seasonMatches, "win"),
     [seasonMatches],
   );
-  // Season-over-season: only meaningful for a specific month, not "all".
   const prevSeason = useMemo(
     () => (seasonKey === "all" ? null : previousSeasonSummary(matches, seasonKey)),
     [matches, seasonKey],
   );
+
+  const goDeck = (key: string) => openStatsDeck(key);
 
   if (matches.length === 0) {
     return (
       <div className="flex flex-col gap-3">
         <div className="panel">
           <p className="eyebrow">Climb Tracker</p>
-          <h2 className="text-xl font-semibold m-0 tracking-tight">Watch the rank move</h2>
+          <h2 className="text-xl font-semibold m-0 tracking-tight">Climb with a deck story</h2>
           <p className="text-sm text-muted m-0 mt-2 leading-relaxed max-w-xl">
-            Season rank graph, peak vs current, games-to-next-rank estimates, and which of your
-            decks actually push you up the ladder. Built from Arena ranks stamped on your matches.
+            See which list carried each stretch of the ladder — then open that deck in My Stats
+            with one click. Rank graph, peak vs current, and games-to-next-rank from your own
+            history.
           </p>
         </div>
         {status?.logFound && status.detailedLogs !== false ? (
           <div className="empty-state">
             <h2 className="text-lg font-semibold m-0 mb-2">No matches yet</h2>
             <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-              Play ranked with Filthy Net Deck open — rank samples appear as matches complete.
+              Play ranked with Filthy Net Deck open — rank samples and deck labels appear as
+              matches complete.
             </p>
           </div>
         ) : (
@@ -458,10 +660,10 @@ export function Climb() {
       <div className="panel lab-intro">
         <div>
           <p className="eyebrow m-0">Climb Tracker</p>
-          <h2 className="text-lg font-semibold m-0 tracking-tight">Rank path this season</h2>
+          <h2 className="text-lg font-semibold m-0 tracking-tight">Rank path by deck</h2>
           <p className="text-sm text-muted m-0 mt-1 leading-relaxed">
-            Every rank Arena stamps on a match becomes a point on the curve. Estimates use your
-            own step history when possible — not a global formula.
+            Hover the curve for rank + deck. Click a stretch or deck row to open{" "}
+            <strong className="text-foam">My Stats</strong> for that list.
           </p>
         </div>
         <div className="lab-intro-stats">
@@ -556,7 +758,11 @@ export function Climb() {
 
       <div className="panel">
         <h3 className="dash-title">Rank over time</h3>
-        <RankChart series={series} />
+        <RankChart
+          series={series}
+          highlightDeckKey={hoverDeck}
+          onOpenDeck={goDeck}
+        />
         {start && current && (
           <p className="text-xs text-muted m-0 mt-2">
             Started at <strong className="text-foam">{formatRank(start)}</strong>
@@ -567,11 +773,40 @@ export function Climb() {
                 {seasonDelta != null && seasonDelta >= 0 ? "up" : "down"}{" "}
                 {seasonDelta != null ? Math.abs(seasonDelta).toFixed(seasonDelta % 1 ? 1 : 0) : "0"}{" "}
                 step{Math.abs(seasonDelta ?? 0) === 1 ? "" : "s"}
+                {legs.length > 0 && (
+                  <>
+                    {" "}
+                    · {legs.length} deck stretch{legs.length === 1 ? "" : "es"}
+                  </>
+                )}
               </>
             )}
           </p>
         )}
       </div>
+
+      {legs.length > 0 && (
+        <div className="panel">
+          <h3 className="dash-title">Climb path</h3>
+          <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+            Chronological stretches on each deck — what you piloted from{" "}
+            {start ? formatRank(start) : "start"} to{" "}
+            {current ? formatRank(current) : "now"}. Click any stretch for full deck stats.
+          </p>
+          <div className="climb-leg-list">
+            {legs.map((leg, i) => (
+              <LegCard
+                key={`${leg.deckKey}-${leg.startAt}-${i}`}
+                leg={leg}
+                index={i}
+                onOpen={() => goDeck(leg.deckKey)}
+                highlighted={hoverDeck === leg.deckKey}
+                onHover={(on) => setHoverDeck(on ? leg.deckKey : null)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {form.decided > 0 && (
         <div className="panel">
@@ -579,10 +814,12 @@ export function Climb() {
           <div className="flex items-center gap-3 flex-wrap">
             <span className="wl-dots">
               {last10.map((m) => (
-                <span
+                <button
                   key={m.matchId}
-                  className={`wl-dot ${m.result}`}
-                  title={`${m.result} · ${m.deckName ?? "?"} · ${timeAgo(m.endedAt)}`}
+                  type="button"
+                  className={`wl-dot ${m.result} climb-form-dot`}
+                  title={`${m.result} · ${m.deckName ?? "?"} · ${m.myRank ?? "no rank"} · ${timeAgo(m.endedAt)} — open deck`}
+                  onClick={() => goDeck(deckKey(m))}
                 />
               ))}
             </span>
@@ -658,58 +895,25 @@ export function Climb() {
 
       <div className="panel">
         <h3 className="dash-title">Decks that climb</h3>
+        <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
+          Rank step change is first→last stamp while on that deck. Click a row to open full deck
+          stats (curve, list, match history).
+        </p>
         {decks.length === 0 ? (
           <p className="text-sm text-muted m-0">No deck data in this range.</p>
         ) : (
-          <div className="meta-bars">
+          <div className="climb-deck-list">
             {decks.map((d) => (
-              <div key={d.key} className="meta-bar-row deck-wr-row climb-deck-row">
-                <span className="meta-bar-label">
-                  <span className="meta-bar-name" title={d.name}>
-                    {d.name}
-                  </span>
-                  <span className="text-muted text-[11px]">{d.matches} games</span>
-                </span>
-                <span className="mu-track">
-                  <span
-                    className={`mu-fill favor-${winrateFavor(d.rate ?? 0)}`}
-                    style={{
-                      width: `${Math.max(4, (d.rate ?? 0) * 100)}%`,
-                      display: "block",
-                    }}
-                  />
-                </span>
-                <span className="deck-wr-score">
-                  {d.wins}W {d.losses}L
-                  {d.rate != null && (
-                    <strong className={`favor-${winrateFavor(d.rate)}`}>
-                      {" "}
-                      {(d.rate * 100).toFixed(0)}%
-                    </strong>
-                  )}
-                  <span
-                    className={
-                      d.delta > 0
-                        ? "favor-favored"
-                        : d.delta < 0
-                          ? "favor-unfavored"
-                          : "text-muted"
-                    }
-                    style={{ marginLeft: "0.35rem" }}
-                  >
-                    {d.delta > 0 ? "▲" : d.delta < 0 ? "▼" : "·"}{" "}
-                    {d.delta === 0
-                      ? "flat"
-                      : `${Math.abs(d.delta).toFixed(d.delta % 1 ? 1 : 0)} step`}
-                  </span>
-                </span>
-              </div>
+              <DeckClimbRow
+                key={d.key}
+                d={d}
+                onOpen={() => goDeck(d.key)}
+                highlighted={hoverDeck === d.key}
+                onHover={(on) => setHoverDeck(on ? d.key : null)}
+              />
             ))}
           </div>
         )}
-        <p className="text-xs text-muted m-0 mt-2">
-          Step change is first→last rank sample while on that deck. Win rate fills the bar.
-        </p>
       </div>
     </div>
   );

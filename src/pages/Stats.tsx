@@ -1185,6 +1185,8 @@ export function Stats() {
   const status = useAppStore((s) => s.trackerStatus);
   const clearTracker = useAppStore((s) => s.clearTracker);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
+  const statsFocusDeckKey = useAppStore((s) => s.statsFocusDeckKey);
+  const clearStatsFocusDeck = useAppStore((s) => s.clearStatsFocusDeck);
   const [queue, setQueue] = useState<string | null>(null);
   const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
@@ -1197,6 +1199,13 @@ export function Stats() {
   useEffect(() => {
     void refreshTracker();
   }, [refreshTracker]);
+
+  // Climb / Matchups can deep-link into a deck detail.
+  useEffect(() => {
+    if (!statsFocusDeckKey) return;
+    setSelectedDeck(statsFocusDeckKey);
+    clearStatsFocusDeck();
+  }, [statsFocusDeckKey, clearStatsFocusDeck]);
 
   const onExportCsv = () => {
     setExportMsg("Exporting…");

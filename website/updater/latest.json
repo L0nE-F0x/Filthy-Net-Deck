@@ -1,11 +1,11 @@
 {
-  "version": "0.25.0",
-  "notes": "v0.25.0: Format Hub is its own page (Standard & Pioneer legality, rotation, bans). New nav order: Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1-8). B&R pulse opens Format Hub.",
-  "pub_date": "2026-07-18T18:48:27.636Z",
+  "version": "0.26.0",
+  "notes": "v0.26.0: Climb Tracker overhaul — climb path shows which deck carried each stretch of the ladder; rank chart colors by deck; hover shows rank + deck; click any stretch or deck row to open full My Stats for that list.",
+  "pub_date": "2026-07-18T19:08:16.388Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFlZUpRbkZWRG5YOVhTOVNGWERDZHRpTmNBakt6THZrLzhjQXU4cWt5cVMzWHNsam5CWnBISEFTUGhyVjFsTGpwM3ZDcEkvaE5nZk1sWHh3SDlORFFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDAwNDk2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjUuMF94NjQtc2V0dXAuZXhlCkZ0Q1ZJdnBFdFByYUFFRjREMDVid1hqek1BWHhaRGxKYmpQTGo0UjBMRldvM3lzTjNqSTFVS3FNNDM4TTd2YlE1K2lCSDkxRk9LVUtabTNyU0UvWERRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.25.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjV1RnNxMFk3ZXgyQXBuWldrc0E2N1g1dExPaWlrMkV2RHBLZzhFRDErb1pRTWZsVU1lSG9CaDYvWUVJUjV2L1VSOVB4QjhwQ1Z1c2VSWGpDaXhzMFFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDAxNjg0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzAuMjYuMF94NjQtc2V0dXAuZXhlCnJhakV0b1JocGk2WG15dkZ4SjdSajZFTXdyYTFZemdDNFVRV3Z0NUtkTTJqK0ZsMHRrd0ZvUUxrTmdTQ2plVWpqYkZmKzhWUkpsYUdUbmgvb2VlK0NnPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.26.0.exe"
     }
   }
 }

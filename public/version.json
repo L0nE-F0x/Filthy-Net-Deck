@@ -1,5 +1,5 @@
 {
-  "version": "0.25.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.25.0.exe",
-  "notes": "v0.25.0: Format Hub is its own page (Standard & Pioneer legality, rotation, bans). New nav order: Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1-8). B&R pulse opens Format Hub."
+  "version": "0.26.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-0.26.0.exe",
+  "notes": "v0.26.0: Climb Tracker overhaul — climb path shows which deck carried each stretch of the ladder; rank chart colors by deck; hover shows rank + deck; click any stretch or deck row to open full My Stats for that list."
 }

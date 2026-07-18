@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildClimbLegs,
   currentStreak,
+  deckClimbSummaries,
   longestStreak,
   previousSeasonSummary,
   seasonSummaries,
 } from "./climbStats";
+import { parseRank } from "./ranks";
 import type { TrackedMatch } from "../types/tracker";
 
 let id = 0;
@@ -12,12 +15,21 @@ function match(
   result: TrackedMatch["result"],
   endedAt: number,
   myRank?: string,
+  deckName?: string,
+  deckId?: string,
 ): TrackedMatch {
   return {
     matchId: `m${id++}`,
+    startedAt: endedAt - 600_000,
     endedAt,
     result,
     myRank,
+    deckName,
+    deckId,
+    eventId: "Ladder",
+    bestOf: 1,
+    myTeamId: 1,
+    games: [],
   } as TrackedMatch;
 }
 
@@ -97,5 +109,48 @@ describe("seasonSummaries + previousSeasonSummary", () => {
     const s = seasonSummaries(noRanks);
     expect(s[0].peakScore).toBeNull();
     expect(s[0].delta).toBeNull();
+  });
+});
+
+describe("buildClimbLegs", () => {
+  it("groups consecutive matches on the same deck", () => {
+    const matches = [
+      match("win", JUL(1), "Gold 4", "Mono Red", "d-red"),
+      match("win", JUL(2), "Gold 3", "Mono Red", "d-red"),
+      match("loss", JUL(3), "Gold 3", "Dimir", "d-dimir"),
+      match("win", JUL(4), "Gold 2", "Dimir", "d-dimir"),
+      match("win", JUL(5), "Gold 1", "Mono Red", "d-red"),
+    ];
+    const legs = buildClimbLegs(matches);
+    expect(legs).toHaveLength(3);
+    expect(legs[0]).toMatchObject({
+      deckName: "Mono Red",
+      matches: 2,
+      wins: 2,
+      losses: 0,
+    });
+    expect(legs[0].startRank?.score).toBe(parseRank("Gold 4")!.score);
+    expect(legs[0].endRank?.score).toBe(parseRank("Gold 3")!.score);
+    expect(legs[0].delta).toBe(1);
+    expect(legs[1].deckName).toBe("Dimir");
+    expect(legs[1].matches).toBe(2);
+    expect(legs[2].deckName).toBe("Mono Red");
+    expect(legs[2].matches).toBe(1);
+  });
+});
+
+describe("deckClimbSummaries", () => {
+  it("aggregates per deck and sorts by rank delta", () => {
+    const matches = [
+      match("win", JUL(1), "Platinum 4", "A", "a"),
+      match("win", JUL(2), "Platinum 2", "A", "a"),
+      match("loss", JUL(3), "Platinum 2", "B", "b"),
+      match("loss", JUL(4), "Platinum 3", "B", "b"),
+    ];
+    const decks = deckClimbSummaries(matches);
+    expect(decks[0].name).toBe("A");
+    expect(decks[0].delta).toBeGreaterThan(0);
+    expect(decks[1].name).toBe("B");
+    expect(decks[1].delta).toBeLessThan(0);
   });
 });

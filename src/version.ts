@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.25.0";
+export const APP_VERSION = "0.26.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "New nav order — Decks, My Stats, Climb, Matchups, Sets, Events, Format Hub, Settings (keys 1–8)",
-  "Format Hub — legality, rotation, and ban lists for Standard & Pioneer as their own page (no longer buried under Sets)",
-  "B&R pulse opens Format Hub so ban list changes land where you expect",
+  "Climb overhaul — see which deck carried each stretch of the ladder (climb path diary)",
+  "Rank chart colors by deck; hover shows rank + deck; click opens that deck in My Stats",
+  "Decks that climb are fully clickable cards with rank trail (start → end) and Stats jump",
 ];

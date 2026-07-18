@@ -89,18 +89,36 @@ export interface RankPoint {
   at: number;
   rank: ParsedRank;
   matchId: string;
+  /** Stable tracker deck key when known (for climb-by-deck chart). */
+  deckKey?: string;
+  deckName?: string;
+  result?: string;
 }
 
 /** Chronological rank samples from matches that recorded myRank. */
 export function buildRankSeries(
-  matches: { endedAt: number; matchId: string; myRank?: string }[],
+  matches: {
+    endedAt: number;
+    matchId: string;
+    myRank?: string;
+    deckKey?: string;
+    deckName?: string;
+    result?: string;
+  }[],
 ): RankPoint[] {
   const asc = [...matches].sort((a, b) => a.endedAt - b.endedAt);
   const out: RankPoint[] = [];
   for (const m of asc) {
     const rank = parseRank(m.myRank);
     if (!rank) continue;
-    out.push({ at: m.endedAt, rank, matchId: m.matchId });
+    out.push({
+      at: m.endedAt,
+      rank,
+      matchId: m.matchId,
+      deckKey: m.deckKey,
+      deckName: m.deckName,
+      result: m.result,
+    });
   }
   return out;
 }

@@ -185,6 +185,14 @@ interface AppState {
   setDailyFormatId: (id: FormatId | null) => void;
   openFormat: (id: FormatId | string) => void;
   openDeck: (deckId: string) => void;
+  /**
+   * Jump to My Stats with a tracker deck detail open (from Climb / Matchups).
+   * Consumed once by Stats on mount/page show.
+   */
+  openStatsDeck: (trackerDeckKey: string) => void;
+  /** Pending tracker deck key for Stats detail; cleared when Stats applies it. */
+  statsFocusDeckKey: string | null;
+  clearStatsFocusDeck: () => void;
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
@@ -246,6 +254,7 @@ export const useAppStore = create<AppState>((set, get) => {
     selectedFormatId: null,
     dailyFormatId: prefs.lastFormatId ?? null,
     selectedDeckId: null,
+    statsFocusDeckKey: null,
     meta: null,
     metaSource: null,
     feedStatus: null,
@@ -298,6 +307,13 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     openDeck: (deckId) =>
       set({ selectedDeckId: deckId, page: "deck", showFavoritesOnly: false }),
+    openStatsDeck: (trackerDeckKey) =>
+      set({
+        statsFocusDeckKey: trackerDeckKey,
+        page: "stats",
+        showFavoritesOnly: false,
+      }),
+    clearStatsFocusDeck: () => set({ statsFocusDeckKey: null }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);

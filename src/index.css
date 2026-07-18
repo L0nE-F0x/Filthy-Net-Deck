@@ -2284,6 +2284,205 @@ select,
   gap: 0.1rem;
 }
 
+/* Climb path-by-deck overhaul */
+.climb-chart-cta {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 35%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-gold-500) 12%, var(--color-ink-850));
+  color: var(--color-gold-300);
+  font-size: 0.72rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.climb-chart-cta:hover {
+  border-color: color-mix(in srgb, var(--color-gold-500) 55%, transparent);
+  color: var(--color-gold-200);
+}
+.climb-tip-sub {
+  fill: var(--color-muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+.climb-dot-deck {
+  stroke: color-mix(in srgb, var(--color-ink-950) 50%, transparent);
+  stroke-width: 1;
+}
+
+.climb-leg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.climb-leg {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 55%, transparent);
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.12s ease;
+}
+.climb-leg:hover,
+.climb-leg.is-hot {
+  border-color: color-mix(in srgb, var(--color-gold-500) 40%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-gold-500) 8%, var(--color-ink-850));
+}
+.climb-leg-idx {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #0a0b10;
+}
+.climb-leg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+.climb-leg-name {
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--color-foam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.climb-leg-rank {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gold-300);
+}
+.climb-leg-meta {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+}
+.climb-leg-delta {
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.climb-leg-delta.up,
+.climb-deck-delta.up {
+  color: var(--color-good);
+}
+.climb-leg-delta.down,
+.climb-deck-delta.down {
+  color: var(--color-poor);
+}
+.climb-leg-delta.muted,
+.climb-deck-delta.muted {
+  color: var(--color-muted);
+}
+
+.climb-deck-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.climb-deck-card {
+  display: grid;
+  grid-template-columns: 0.45rem minmax(0, 1.4fr) minmax(7rem, 1fr) auto auto;
+  gap: 0.65rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 45%, transparent);
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.climb-deck-card:hover,
+.climb-deck-card.is-hot {
+  border-color: color-mix(in srgb, var(--color-gold-500) 38%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-gold-500) 7%, var(--color-ink-850));
+}
+.climb-deck-swatch {
+  width: 0.35rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  justify-self: center;
+}
+.climb-deck-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.climb-deck-title {
+  font-size: 0.86rem;
+  font-weight: 650;
+  color: var(--color-foam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.climb-deck-sub {
+  font-size: 0.68rem;
+  color: var(--color-muted);
+}
+.climb-deck-wr {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  min-width: 0;
+}
+.climb-deck-track {
+  height: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.climb-deck-delta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.climb-deck-go {
+  font-size: 0.7rem;
+  font-weight: 650;
+  color: var(--color-gold-300);
+  white-space: nowrap;
+}
+.climb-form-dot {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.climb-form-dot:hover {
+  transform: scale(1.25);
+}
+
+@media (max-width: 900px) {
+  .climb-deck-card {
+    grid-template-columns: 0.4rem 1fr auto;
+    grid-template-areas:
+      "swatch main go"
+      "swatch wr delta";
+  }
+  .climb-deck-swatch { grid-area: swatch; }
+  .climb-deck-main { grid-area: main; }
+  .climb-deck-wr { grid-area: wr; }
+  .climb-deck-delta { grid-area: delta; }
+  .climb-deck-go { grid-area: go; }
+}
+
 @media (max-width: 960px) {
   .stat-tiles { grid-template-columns: repeat(2, 1fr); }
   .match-row { grid-template-columns: 52px 1fr auto; }
