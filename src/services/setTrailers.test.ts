@@ -6,11 +6,13 @@ import {
 } from "./setTrailers";
 
 describe("trailerForSet", () => {
-  it("matches Nauctis and Titanbreach by name", () => {
+  it("matches Nauctis, Titanbreach, and Zhalfir by name", () => {
     const n = trailerForSet({ name: "Nauctis: The Sunken Realm" });
     expect(n?.youtubeId).toBe("jPaHUxive30");
     const k = trailerForSet({ name: "Kamigawa: Titanbreach" });
     expect(k?.youtubeId).toBe("cC6ebvZg-_Q");
+    const z = trailerForSet({ name: "Zhalfir" });
+    expect(z?.youtubeId).toBe("ZaUhdKIc-yQ");
   });
 
   it("prefers feed trailer over client map", () => {

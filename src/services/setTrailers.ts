@@ -26,6 +26,10 @@ const BY_NAME: Record<string, SetTrailer> = {
     youtubeId: "cC6ebvZg-_Q",
     title: "Kamigawa: Titanbreach Announce Trailer",
   },
+  zhalfir: {
+    youtubeId: "ZaUhdKIc-yQ",
+    title: "Zhalfir Announce Trailer",
+  },
 };
 
 function normName(name: string): string {
