@@ -10,16 +10,18 @@
 
 ## Immediate follow-ups
 
-- [x] Roll v0.17.0 macOS dmg onto the site.
-- [x] **v0.18.0 signed Windows publish** (NSIS + `.sig`, updater, version.json ×2, OG `?v=0.18.0`, tag).
-- [x] **Roll v0.18.0 macOS dmg** onto `website/downloads/` + mac download labels (CI succeeded; asset on GitHub Releases).
-- [x] **v0.19.0 signed Windows publish** (NSIS + `.sig`, updater, version.json ×2, OG `?v=0.19.0`, tag).
-- [x] **Roll v0.19.0 macOS dmg** onto `website/downloads/` + mac download labels.
+Releases 0.17.0 → **0.21.0** are all shipped end-to-end (signed Windows publish +
+macOS dmg rolled + marketing/OG). Detail in git history + `handoff.md` §2.
+
+- [x] **v0.21.0 signed Windows publish** (NSIS + `.sig`, sig key id verified, updater, version.json ×2, OG `?v=0.21.0`, tag).
+- [x] **Roll v0.21.0 macOS dmg** onto `website/downloads/` + mac download labels.
 
 **Open (low urgency):**
 
+- [ ] **Owner:** verify in-app **Update & restart** 0.20→0.21 from an installed build (couldn't be exercised from the dev env; everything it needs is live + signed).
 - [ ] Marketing screenshot/GIF carousel — needs owner-supplied 1280×860 captures with real tracker data.
 - [ ] Full macOS **signed** auto-update in CI (owner decision: store key as repo secret) — soft dmg CTA already works when download URL ends in `.dmg`.
+- [ ] `whatsinstandard` v6 is deprecated — build warns; migrate `fetchStandardRotation` to v7 when it lands (also see `docs/MAINTENANCE.md` item 5).
 
 ---
 
@@ -96,8 +98,9 @@ In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking prom
 
 Ideas only; owner prioritizes. Do **not** ship one release per bullet.
 
-- Deeper Climb / rank UX polish
-- Matchup Lab quality-of-life
-- Performance / feed size further
-- Screenshot-driven marketing carousel (when assets exist)
-- Anything owner requests on return from Claude ↔ Grok rotation
+- **Card watch / Ctrl+K palette** — scoped in the 0.21 planning but deferred. "Which meta decks play this card, how many copies, which format" — all computable locally from `latest.json`, no new feed data. Strong during spoiler season.
+- **Rotation UI as the date nears** — deck-tile badges once rotation is within ~30–45 days (the per-deck panel + Sets count already ship; badges were left out since Q1 2027 is far off and couldn't be visually verified now).
+- Matchup Lab quality-of-life.
+- Performance / feed size — the Marvel gallery alone is ~248KB of `sets.json`; Netlify gzips it, so low urgency.
+- Screenshot-driven marketing carousel (when owner supplies 1280×860 captures).
+- Anything owner requests on return from the Claude ↔ Grok ↔ Kimi rotation.

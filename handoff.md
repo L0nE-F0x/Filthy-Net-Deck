@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff for whichever agent picks this up next
 
-**Audience:** Any coding agent continuing this project. The owner alternates between **Claude Code** (Fable 5 / Sonnet) and **Grok 4.5** on this repo. Nothing here is model-specific; follow it regardless of which model you are.  
-**Last wrap-up:** 2026-07-17 — Claude Fable 5 session after Grok handoff; shipped **v0.19.0** end-to-end (owner refinement batch: fullscreen, Decks hero, Format hub, My Stats decklists — Windows signed + macOS dmg rolled).  
+**Audience:** Any coding agent continuing this project. The owner rotates between **Claude Code** (Fable 5 / Sonnet), **Grok 4.5**, and **Kimi**. Nothing here is model-specific; follow it regardless of which model you are.  
+**Last wrap-up:** 2026-07-18 — Claude Fable 5; shipped **v0.21.0** end-to-end (current-events batch: B&R pulse, rotation impact, Climb streaks + season-vs-season — Windows signed + macOS dmg rolled, both live). Also hardened the set-radar pipeline: first-look spoilers now ship, 4×/day refresh, `docs/MAINTENANCE.md` added.  
 **Owner product voice:** L0nE-F0x / ApexForge; social: [@MBrewlab](https://x.com/MBrewlab) on X.  
 **Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
 **Live site / downloads / updater:** https://filthy-net-deck.netlify.app/  
@@ -24,8 +24,9 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 | **Content engine (0.18)** | Daily archetype list diffs, meta-share timeline, you-vs-meta, week recap PNG, match-end toasts |
 | **My Stats** | Local winrate tracker by tailing Arena `Player.log` (never leaves the PC) |
 | **Matchup Lab** | Opponent tags / prep notes + WR vs tagged archetypes |
-| **Climb Tracker** | Season rank graph, games-to-next-rank |
-| **Set Radar** | Arena-first spoilers, galleries, legality, pulse banner, Arena-eve notify |
+| **Climb Tracker** | Season rank graph, games-to-next-rank, win/loss streaks, season-vs-season (0.21) |
+| **Set Radar** | Arena-first spoilers, galleries, legality, spoiler + B&R pulse banners, Arena-eve notify |
+| **Format hub (0.19/0.21)** | Standard rotation + ban lists, Pioneer pool; **rotation impact** per deck (0.21) |
 | **Updates** | Signed in-app Update & restart (+ silent NSIS fallback on Windows) |
 
 **Not:** mobile, Alchemy, seed/placeholder decks, cloud accounts, or “guessed” meta.
@@ -37,7 +38,7 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 ---
 
-## 2. Current ship status (as of 2026-07-17 wrap-up)
+## 2. Current ship status (as of 2026-07-18 wrap-up)
 
 | Item | Value |
 |------|--------|
@@ -65,12 +66,14 @@ Read this file first, then **`AGENTS.md`** (authoritative release rules). Do not
 
 ---
 
-## 3. Immediate next tasks (for Claude / next agent)
+## 3. Immediate next tasks (for the next agent)
 
-1. **Nothing blocking.** v0.19.0 shipped end-to-end on 2026-07-17: signed Windows publish, macOS dmg rolled, marketing + OG live, owner verified the in-app update path.
-2. **Owner marketing push** — X post drafts for v0.19 were delivered; owner posts from [@MBrewlab](https://x.com/MBrewlab). Link unfurls the fresh OG card; no image attachment needed.
-3. **Next product batch** — see `ROADMAP.md` "Suggested next" (screenshot carousel still needs owner assets; signed mac auto-update still an owner decision).
-4. **Do not** cut another app release unless the owner asks or a P0 appears — pacing policy.
+1. **Nothing blocking.** v0.21.0 shipped end-to-end on 2026-07-18: signed Windows publish (sig key id verified), macOS dmg built by tag CI + rolled, marketing + OG live. All live endpoints confirmed 0.21.0.
+2. **One unverified check (owner):** the in-app **Update & restart** path from an *installed* 0.20.0 → 0.21.0 could not be exercised from the dev environment (needs a running installed 0.20.0 build). Everything it depends on is live and correctly signed. Worth a manual click when convenient.
+3. **Owner marketing push** — a v0.21 X post draft was delivered; owner posts from [@MBrewlab](https://x.com/MBrewlab). Link unfurls the fresh OG card; no image attachment needed.
+4. **B&R pulse will go live for real** the next time WotC issues a Banned & Restricted update — the app diffs the feed's ban lists automatically. No code action needed; just be aware that's the first real-world firing.
+5. **Next product batch** — see `ROADMAP.md` "Suggested next" (Card watch / Ctrl+K palette was scoped but not built this batch; screenshot carousel still needs owner assets; signed mac auto-update still an owner decision).
+6. **Do not** cut another app release unless the owner asks or a P0 appears — pacing policy.
 
 ---
 
@@ -88,14 +91,15 @@ Filthy Net Deck/
 │   ├── App.tsx               # shell, NAV, keyboard 1–7, splash
 │   ├── version.ts            # APP_VERSION + WHATS_NEW
 │   ├── pages/                # Daily, DeckView, Stats, Matchups, Climb, Sets, Settings, …
-│   ├── components/           # ArchetypeDiffPanel, MetaShareTimeline, PersonalMetaPanel, SpoilerPulse, …
-│   ├── services/             # pure logic + I/O (see §6 for 0.18 modules)
-│   └── store/useAppStore.ts  # prefs (notifyArenaEve, notifyMatchEnd), tracker, meta, sets
+│   ├── components/           # ArchetypeDiffPanel, MetaShareTimeline, SpoilerPulse, BanPulse (0.21), …
+│   ├── services/             # pure logic + I/O (see §6 for feature-module map)
+│   └── store/useAppStore.ts  # prefs (notifyArenaEve, notifyMatchEnd, notifyBanlist), tracker, meta, sets, banChanges
 ├── src-tauri/                # Tauri + Rust tracker / tray / silent update
 ├── pipeline/                 # Node ESM builders (CI + local)
 │   ├── build-meta.mjs        # latest.json + dated archives + history.json
-│   ├── build-sets.mjs        # sets.json (slimmed)
-│   └── sources/              # goldfish, scryfall (429 caps), sets.mjs, …
+│   ├── build-sets.mjs        # sets.json (slimmed) — formats hub incl. rotation impact (0.21)
+│   └── sources/              # goldfish, scryfall (429 caps), sets.mjs (buildRotationImpact), …
+├── .github/workflows/        # daily-meta.yml (06:00 UTC) + sets-refresh.yml (00/12/18 UTC, 0.21)
 ├── website/                  # Netlify publish root
 │   ├── index.html            # marketing + OG
 │   ├── downloads/            # .exe / .dmg / .sig
@@ -109,13 +113,13 @@ Filthy Net Deck/
 
 | Key | Nav id | Label | Notes |
 |-----|--------|--------|--------|
-| `1` | `daily` | Decks | Meta + SpoilerPulse + timeline + you-vs-meta |
+| `1` | `daily` | Decks | Meta + BanPulse (0.21) + SpoilerPulse + timeline + you-vs-meta |
 | `2` | `meta` | Events | Tournament links |
 | `3` | `sets` | Sets | Set Radar + galleries (+ drop badge) |
 | `4` | `stats` | My Stats | Tracker + week recap PNG |
 | `5` | `matchups` | Matchups | Matchup Lab |
 | `6` | `climb` | Climb | Climb Tracker |
-| `7` | `settings` | Settings | Mode, Arena-eve, **match-end toasts**, autostart, updates |
+| `7` | `settings` | Settings | Mode, Arena-eve, match-end toasts, **B&R alerts** (0.21), autostart, updates |
 
 ---
 
@@ -129,7 +133,7 @@ It only downloads **published JSON** from Netlify:
 | Deck meta | `/meta/latest.json` | `npm run meta` (minified) |
 | Dated archive | `/meta/YYYY-MM-DD.json` | same (pretty; used for list diffs) |
 | Meta history | `/meta/history.json` | same (`updateHistory` in build-meta) |
-| Set radar | `/meta/sets.json` | `npm run sets` (minified; drops `previews` if `cards` present) |
+| Set radar | `/meta/sets.json` | `npm run sets` (minified; `formats` hub carries `standard.rotation` + `bans`, 0.21) |
 | Soft updates | `/version.json` | app release |
 | Hard updates | `/updater/latest.json` | app release (signed) |
 
@@ -137,14 +141,17 @@ It only downloads **published JSON** from Netlify:
 
 **Local-only client state (prefs key `bbi.prefs`):**
 
-- `defaultMode`, `notifyArenaEve`, **`notifyMatchEnd`** (0.18, default off)
+- `defaultMode`, `notifyArenaEve`, `notifyMatchEnd` (0.18, default off), **`notifyBanlist`** (0.21, default **on**), `fullscreen`, `lastFormatId`
 - Tracker matches (JSONL via Rust)
-- Set card snapshot for “new since last visit”
+- Set card snapshot for “new since last visit” (`bbi.sets.cardSnap`)
+- Ban-list snapshot for the B&R pulse (`bbi.bans.snap`, 0.21) — first sight is a baseline, not an alert
 - Last-good meta/sets caches
 
 ---
 
-## 6. v0.18.0 modules (don’t reimplement)
+## 6. Feature module map (don’t reimplement)
+
+### v0.18.0 content engine + infra
 
 | Concern | Files |
 |---------|--------|
@@ -157,17 +164,26 @@ It only downloads **published JSON** from Netlify:
 | CI failure issues | `.github/workflows/daily-meta.yml` — **title-only** match (no `pipeline-failure` label; label would 422) |
 | Unit tests | `npm test` → `src/services/*.test.ts` |
 
-### Staged on `main` after 0.18.0 (unreleased — ships with next bump)
-
-Owner refinement batch, 2026-07-17 (see ROADMAP Milestone 7):
+### v0.19.0 owner refinement batch (shipped)
 
 | Concern | Files |
 |---------|--------|
 | Fullscreen (Settings → Display + F11) | `src/services/windowMode.ts`, prefs `fullscreen` in `useAppStore`, `src-tauri/capabilities/default.json` (`allow-set-fullscreen`) |
 | Decks home hero ("Deck to beat") | `src/pages/Daily.tsx` + `.daily-hero*` in `index.css` — hero first, top-8 grid, insights demoted below |
 | Format hub (legality/rotation/bans) | pipeline `sources/sets.mjs` (`buildFormatHub`, whatsinstandard v6 + Scryfall `banned:` searches, fails soft to `formats: null`), `types/sets.ts` `FormatHub`, `FormatHubSection` in `src/pages/Sets.tsx` |
-| My Stats decklist + copy | `src/components/TrackedDecklist.tsx` (full list, curve, SB, Arena-format copy), `arenaCards.ts` now caches `typeLine`/`manaCost`/`cmc` (`{ full: true }` re-fetches old entries), arsenal fans clickable (`Stats.tsx`) |
+| My Stats decklist + copy | `src/components/TrackedDecklist.tsx` (full list, curve, SB, Arena-format copy), `arenaCards.ts` caches `typeLine`/`manaCost`/`cmc` (`{ full: true }` re-fetches old entries), arsenal fans clickable (`Stats.tsx`) |
 | Shared mana pips | `src/components/ManaCost.tsx` (extracted from Sets) |
+
+### v0.21.0 current-events batch (shipped — this session)
+
+| Concern | Files |
+|---------|--------|
+| **B&R pulse** | `src/services/banPulse.ts` (+ test) diffs feed `formats.*.bans` vs localStorage `bbi.bans.snap`; `src/components/BanPulse.tsx` banner on Daily; `useAppStore` `banChanges` + `markBansSeen` + `notifyBanlist`; Settings checkbox. Baseline-not-alert on first sight; toast fires once per change signature (`bbi.bans.notifiedSig`). |
+| **Rotation impact** | Pipeline `sources/sets.mjs` `buildRotationImpact` (Scryfall `f:standard` rotating-vs-staying set diff, whatsinstandard exit dates) → `formats.standard.rotation` `{nextDate, roughLabel, setCodes, cardNames}`; `types/sets.ts` `RotationImpact`; `src/services/rotationImpact.ts` (+ test) `deckRotationImpact`; DeckView panel + per-card ⟳ markers; Sets hub card count. Basic lands excluded. |
+| **Climb polish** | `src/services/climbStats.ts` (+ test) `currentStreak` / `longestStreak` / `seasonSummaries` / `previousSeasonSummary`; `src/pages/Climb.tsx` streak chips + loss-streak note + `SeasonCompareCell` row; `.climb-streak` / `.season-compare*` in `index.css`. |
+| **Pipeline hardening** | `sources/sets.mjs`: ship future sets with <5 spoiled cards (first-looks) + undated Scryfall rows; `.github/workflows/sets-refresh.yml` (00/12/18 UTC, own failure issue); `daily-meta.yml` rebase-before-push. `docs/MAINTENANCE.md` = self-maintains vs. monthly checklist. |
+
+> **Data feeds vs. app releases:** `formats.standard.rotation` and the ban lists ride the **sets pipeline** (`npm run sets`, 4×/day CI) — they refresh with no app bump. The app just reads them. New sets/spoilers/bans appear automatically once Scryfall catalogs them; see `docs/MAINTENANCE.md`.
 
 ---
 
@@ -258,14 +274,15 @@ In-game overlay (ToS), price tracking, cloud sync, mobile/APK tracking promises,
 
 ---
 
-## 9. Session notes for Claude Code (this handoff)
+## 9. Session notes (handoff out — 2026-07-18, Claude Fable 5)
 
-- Owner is switching **from Grok → Claude Fable 5** for the next stretch; will return to Grok later.  
-- Prefer continuing from **`main`** (clean after wrap-up commits).  
-- Prefer **batched** product work over micro-releases.  
-- Prefer **signed Update & restart** over browser `.exe` download.  
-- When in doubt: **`AGENTS.md` > handoff > ROADMAP`.**  
-- Do not commit signing keys or passphrases. Password lives only under `%USERPROFILE%\.tauri\`.
+- Owner may pick this up next with **Grok or Kimi** later today. This file + `AGENTS.md` are model-agnostic — follow them as written.
+- **`main` is clean** after wrap-up commits (`HEAD = Roll v0.21.0 out to macOS`). Nothing staged or half-done. 47 tests pass, `tsc` clean, `npm run build` clean.
+- This session (started from the "will new Magicon cards auto-appear?" question): hardened the set pipeline (first-look spoilers, 4×/day), then built + shipped the **v0.21.0** batch (B&R pulse, rotation impact, Climb polish) end-to-end.
+- **Watch for the cron push-race:** `sets-refresh.yml` (00/12/18 UTC) + `daily-meta.yml` (06:00 UTC) both commit `sets.json` to `main`. If your release also regenerated the feed, rebase will conflict on `website/meta/sets.json` + `public/meta/sets.json` — resolve by re-running `npm run sets`, `git add` both, `git rebase --continue`.
+- Prefer **batched** product work over micro-releases; prefer **signed Update & restart** over browser `.exe`.
+- When in doubt: **`AGENTS.md` > handoff > ROADMAP`.**
+- Do not commit signing keys or passphrases. Password lives only under `%USERPROFILE%\.tauri\`. Verify any `.sig`'s key id = `67FCA9900F523D49` (not the retired `65CB5BD2EA8C8ACB`).
 
 ---
 
