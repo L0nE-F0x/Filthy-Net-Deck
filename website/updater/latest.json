@@ -1,11 +1,11 @@
 {
-  "version": "1.1.0",
-  "notes": "v1.1.0: Planeswalker themes — Chandra, Teferi, Liliana, Ajani, and Elspeth accent skins from the sidebar Themes control. Dark and Light modes still stack with every theme. 100% local.",
-  "pub_date": "2026-07-18T20:45:58.182Z",
+  "version": "1.1.1",
+  "notes": "v1.1.1: Themes picker redesign — expands inside the sidebar only (no more overlap with the main view). Dark/Light still stack with every planeswalker skin.",
+  "pub_date": "2026-07-18T21:03:26.199Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFpb1VyUFdrODJzTjl2VHNad0RrOWVUWUZPZllWcjh0M3MrTkowaUV1SFBOQVJsbXhZV0ozdW1UdzV6S0VVeDRvTjNtR05uWnVlcFBueHdpZ1A4Y1FvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDA3NTQ5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuMS4wX3g2NC1zZXR1cC5leGUKQW9vU0RnQkFoNjUxYkRRK29XQ21aYldFSjBXOFRpTnJPVDVIZkFMS0RZZmQ4ZEY4ZFNiVnpwNEVaVFZxUWxmSWxzeWxzU3hDQUllQ0tiV3B3dXErQ3c9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.1.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjRsSnZseE1NK2dXRVo2b3NJTGtKK0NpK0RBYytsUWJtR0JiVnJ4aWVtb0ZwTkN4eWxweElqZU5PVTZvQlRGSitQT0h4UCtsVlRZYlY1YjM1aVlLVkFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDA4NTg3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuMS4xX3g2NC1zZXR1cC5leGUKQm5XeElZaTQxbnc5MXN3TjZ1d1lEd29pRUtMQjhFRTJjY0srcjlaS0h3ZXN5UXJneTJOMWxrWjdySU5XN0VKZDhkVHAxNjgxSVFYaWtlZWl0VkdXRHc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.1.1.exe"
     }
   }
 }

@@ -256,7 +256,7 @@ export default function App() {
             </button>
           );
         })}
-        <div className="mt-auto pt-4 px-1 flex flex-col gap-1.5">
+        <div className="sidebar-footer mt-auto pt-4 px-1 flex flex-col gap-1.5 min-w-0">
           <PlaneswalkerThemes />
           <p className="text-[10px] text-muted leading-relaxed m-0">
             Not affiliated with Wizards of the Coast.

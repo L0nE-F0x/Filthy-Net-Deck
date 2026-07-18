@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.1.1";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Planeswalker themes — Chandra, Teferi, Liliana, Ajani, Elspeth (sidebar Themes)",
-  "Each skin retints the whole app; Dark/Light still work on top",
-  "Classic remains the default ink-and-gold look"
+  "Themes menu stays in the sidebar — no more covering Decks / My Stats",
+  "Compact planeswalker list with Dark/Light still on top",
+  "Classic · Chandra · Teferi · Liliana · Ajani · Elspeth"
 ];

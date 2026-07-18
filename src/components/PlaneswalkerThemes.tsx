@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { SKINS, type SkinId } from "../services/theme";
 
-/** Tiny sidebar control → planeswalker accent skins (orthogonal to dark/light). */
+/**
+ * Sidebar themes control. Expands inline inside the sidebar only —
+ * never as a floating panel over the main content.
+ */
 export function PlaneswalkerThemes() {
   const skin = useAppStore((s) => s.prefs.skin);
   const setSkin = useAppStore((s) => s.setSkin);
@@ -33,12 +36,12 @@ export function PlaneswalkerThemes() {
   const current = SKINS.find((s) => s.id === skin) ?? SKINS[0];
 
   return (
-    <div className="pw-themes" ref={rootRef}>
+    <div className={`pw-themes${open ? " is-open" : ""}`} ref={rootRef}>
       <button
         type="button"
         className={`pw-themes-btn${open ? " is-open" : ""}`}
-        aria-haspopup="menu"
         aria-expanded={open}
+        aria-controls="pw-themes-panel"
         title={`Themes · ${current.name}`}
         onClick={() => setOpen((v) => !v)}
       >
@@ -47,15 +50,23 @@ export function PlaneswalkerThemes() {
             <i key={c} style={{ background: c }} />
           ))}
         </span>
-        Themes
+        <span className="pw-themes-btn-label">
+          Themes
+          <em>{current.name}</em>
+        </span>
+        <span className="pw-themes-chevron" aria-hidden="true">
+          {open ? "▾" : "▴"}
+        </span>
       </button>
 
       {open && (
-        <div className="pw-themes-menu" role="menu" aria-label="Planeswalker themes">
-          <p className="pw-themes-menu-head">
-            Planeswalker themes
-            <span>Dark / Light still apply</span>
-          </p>
+        <div
+          id="pw-themes-panel"
+          className="pw-themes-panel"
+          role="listbox"
+          aria-label="Planeswalker themes"
+        >
+          <p className="pw-themes-hint">Dark / Light still apply</p>
           <ul className="pw-themes-list">
             {SKINS.map((s) => {
               const active = s.id === skin;
@@ -63,9 +74,10 @@ export function PlaneswalkerThemes() {
                 <li key={s.id}>
                   <button
                     type="button"
-                    role="menuitemradio"
-                    aria-checked={active}
+                    role="option"
+                    aria-selected={active}
                     className={`pw-themes-option${active ? " is-active" : ""}`}
+                    title={s.blurb}
                     onClick={() => pick(s.id)}
                   >
                     <span className="pw-themes-option-swatches" aria-hidden="true">
@@ -74,11 +86,12 @@ export function PlaneswalkerThemes() {
                       ))}
                     </span>
                     <span className="pw-themes-option-copy">
-                      <strong>{s.name}</strong>
-                      <em>{s.walker}</em>
-                      <span>{s.blurb}</span>
+                      <strong>
+                        {s.name}
+                        {active ? <span className="pw-themes-check"> ✓</span> : null}
+                      </strong>
+                      <span className="pw-themes-option-blurb">{s.blurb}</span>
                     </span>
-                    {active ? <span className="pw-themes-check">✓</span> : null}
                   </button>
                 </li>
               );
