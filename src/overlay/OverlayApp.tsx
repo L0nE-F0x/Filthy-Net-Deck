@@ -338,10 +338,14 @@ export function OverlayApp() {
     };
   }, []);
 
-  // Live-follow the Settings opacity slider via the shared prefs blob.
+  // Live-follow Settings via the shared prefs blob: opacity slider *and* the
+  // chosen Planeswalker skin, so the overlay recolors the instant you switch
+  // theme in the main app (no need to restart the match window).
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === PREFS_KEY) setOpacity(readOverlayPrefs().opacity);
+      if (e.key !== PREFS_KEY) return;
+      setOpacity(readOverlayPrefs().opacity);
+      bootThemeFromStorage(); // re-apply data-theme + data-skin
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);

@@ -4909,12 +4909,16 @@ html.overlay-macos .overlay-shell {
   flex-direction: column;
   border-radius: 9px;
   overflow: hidden;
+  /* Accent rides the active Planeswalker skin — skins retint --color-gold/azure,
+     so Chandra→ember, Teferi→azure, etc. carry into the overlay automatically. */
+  --ov-accent: var(--color-gold-500, #d4a84b);
+  --ov-accent-2: var(--color-azure-400, #6b9aeb);
   background: linear-gradient(
     180deg,
     rgba(17, 20, 30, var(--ov-alpha, 0.92)) 0%,
     rgba(9, 11, 17, var(--ov-alpha, 0.92)) 100%
   );
-  border: 1px solid rgba(212, 168, 75, 0.16);
+  border: 1px solid color-mix(in srgb, var(--ov-accent) 16%, transparent);
   box-shadow:
     0 8px 28px rgba(0, 0, 0, 0.55),
     0 1px 4px rgba(0, 0, 0, 0.45);
@@ -4923,7 +4927,7 @@ html.overlay-macos .overlay-shell {
   font-size: 11px;
 }
 .overlay-shell.is-ended {
-  border-color: rgba(212, 168, 75, 0.34);
+  border-color: color-mix(in srgb, var(--ov-accent) 34%, transparent);
 }
 .overlay-shell.is-ended.is-win {
   border-color: rgba(52, 211, 153, 0.4);
@@ -4938,8 +4942,8 @@ html.overlay-macos .overlay-shell {
   flex-shrink: 0;
   background: linear-gradient(
     90deg,
-    rgba(212, 168, 75, 0.8) 0%,
-    rgba(107, 154, 235, 0.5) 55%,
+    color-mix(in srgb, var(--ov-accent) 80%, transparent) 0%,
+    color-mix(in srgb, var(--ov-accent-2) 50%, transparent) 55%,
     transparent 96%
   );
 }
@@ -4968,8 +4972,10 @@ html.overlay-macos .overlay-shell {
   cursor: se-resize;
   background: linear-gradient(
     135deg,
-    transparent 52%, rgba(212, 168, 75, 0.28) 52%, rgba(212, 168, 75, 0.28) 60%,
-    transparent 60%, transparent 70%, rgba(212, 168, 75, 0.28) 70%, rgba(212, 168, 75, 0.28) 78%,
+    transparent 52%, color-mix(in srgb, var(--ov-accent) 30%, transparent) 52%,
+    color-mix(in srgb, var(--ov-accent) 30%, transparent) 60%,
+    transparent 60%, transparent 70%, color-mix(in srgb, var(--ov-accent) 30%, transparent) 70%,
+    color-mix(in srgb, var(--ov-accent) 30%, transparent) 78%,
     transparent 78%
   );
 }
@@ -5108,7 +5114,7 @@ html.overlay-macos .overlay-shell {
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.02em;
-  color: rgba(240, 217, 153, 0.92);
+  color: color-mix(in srgb, var(--color-gold-300, #f0d999) 92%, transparent);
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
