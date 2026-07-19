@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 — **Grok 4.5 shipped through v1.4.4** (tooltips + Events/Stats polish on the v1.4.0 Bells & Whistles line).
-**Next agent:** Confirm live Netlify + macOS **1.4.4** dmg at parity if CI was rolled; owner feedback / deferred only. Read **`AGENTS.md`** first.
+**Last wrap-up:** 2026-07-20 — **Grok 4.5 shipped v1.5.0 Brew Lab** (pure meta list clinic, no AI).
+**Next agent:** Smoke Brew Lab on a real tracked deck with a list; roll **1.5.0** macOS dmg after tag CI if not already. Read **`AGENTS.md`** first.
 
 ---
 
@@ -9,44 +9,37 @@
 
 | Item | Value |
 |------|--------|
-| Version | **1.4.4** (Windows signed + macOS universal dmg at parity) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.4.4.exe` (+ `.sig`) |
-| macOS | `website/downloads/Filthy-Net-Deck-1.4.4-universal.dmg` |
-| Soft / updater | `version.json` + `updater/latest.json` → **1.4.4** |
+| Version | **1.5.0** (Windows signed; macOS via tag CI) |
+| Headline | **Brew Lab** — shape/staples clinic vs ranked Bo1/Bo3 peers |
+| Soft / updater | `version.json` + `updater/latest.json` → **1.5.0** |
 | Live site | https://filthy-net-deck.netlify.app/ |
-| Tag | `v1.4.4` |
 
 Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local only — never commit.
 
 ---
 
-## Line since v1.4.0 (condensed)
+## Brew Lab (v1.5.0)
 
-| Ver | Theme |
-|-----|--------|
-| **1.4.0** | Bells & Whistles: share, overlay harden, a11y, opt-in sound |
-| **1.4.1** | Events freshness, share UX, Soundscape, Ugin & Garruk |
-| **1.4.2** | Events: allow magic.gg + MTGO hosts (empty list fix) |
-| **1.4.3** | Drop Meta Trackers; deck table last-played sort + tooltips |
-| **1.4.4** | Tooltip pass: Climb, Matchups, Decks, Deck detail |
+| Piece | Path |
+|-------|------|
+| Pure logic | `src/services/brewLab.ts` (+ tests) |
+| UI | `src/components/BrewLabPanel.tsx` |
+| Entry | My Stats → deck detail (below tracked list) |
+
+**Rules:** no LLM, no invented cards. Staples only from today’s ranked meta mains/sides. Uses existing Arena id → name resolve (same as Stats art). Mode toggle Bo1/Bo3; format Auto/Standard/Pioneer.
 
 ---
 
 ## Must not regress
 
 - Never `set_focus` overlay · Rust owns show/hide · dirty-only `tracker:live`
-- No backdrop-filter · local-only tracking · no draft helper · ApexForge credit
-- Sound **opt-in / OFF by default** · never in overlay
-- Events: freshness ~120d + allowlist includes **magic.gg** and **mtgo.com**
-
----
-
-## Housekeeping / uncommitted local noise
-
-Owner YouTube marketing assets + optional marketing-video work may sit uncommitted — **do not delete**. Ship product via AGENTS checklist only.
+- No backdrop-filter · local-only · ApexForge credit
+- Sound opt-in OFF · never in overlay
+- Events: freshness + magic.gg/mtgo allowlist
+- Brew Lab: **no AI / no hallucinated card names**
 
 ---
 
 ## One-liner
 
-> **v1.4.4 is current** at full Win + macOS parity. AGENTS release surfaces aligned (OG, site, updater, dmg).
+> **v1.5.0 = Brew Lab** (deterministic peer-shape clinic on My Stats deck detail). Full AGENTS ship.

@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.4.exe",
-  "notes": "v1.4.4: Richer hover tooltips across Climb, Matchup Lab, Decks, and Deck detail."
+  "version": "1.5.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.5.0.exe",
+  "notes": "v1.5.0 Brew Lab: pure list clinic — compare your Arena main/side to today’s ranked Bo1/Bo3 peers (shape, curve, staples). No AI, no invented cards."
 }

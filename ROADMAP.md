@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.4.4** (tooltips + Events/Stats polish; Windows signed + macOS universal dmg at parity).  
+**Current release:** **v1.5.0** (Brew Lab — pure list clinic vs ranked peers; Windows signed — macOS dmg via tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -8,16 +8,16 @@
 
 ---
 
-## Next chapter — post-v1.4.4 (owner 2026-07-20)
+## Next chapter — post-v1.5.0 (owner 2026-07-20)
 
 Canonical checklist: **`handoff.md`**.
 
-1. ~~**v1.4.0 "Bells & Whistles"**~~ — shipped  
-2. ~~**v1.4.1–1.4.4 polish**~~ — Events, share, Soundscape, themes, tooltips, last-played  
-3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
-4. Owner ladder feedback only  
+1. ~~**v1.4.x Bells & polish**~~ — shipped  
+2. ~~**v1.5.0 Brew Lab**~~ — pure meta list clinic (no AI)  
+3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices, free-form LLM coach)  
+4. Owner ladder feedback / Brew Lab iteration  
 
-**Shipped:** **v1.4.4** on the Bells & Whistles line.
+**Shipped:** **v1.5.0 Brew Lab**.
 
 ### Explicitly deferred
 
@@ -44,6 +44,7 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test
 
 | Version | Theme |
 |---------|--------|
+| **v1.5.0** | Brew Lab: pure list clinic vs ranked Bo1/Bo3 peers (no AI) |
 | **v1.4.4** | Tooltip polish: Climb, Matchups, Decks, Deck detail |
 | **v1.4.3** | Drop Meta Trackers; deck table last-played + tooltips |
 | **v1.4.2** | Events fix: magic.gg + MTGO allowlist |

@@ -1,11 +1,11 @@
 {
-  "version": "1.4.4",
-  "notes": "v1.4.4: Richer hover tooltips across Climb, Matchup Lab, Decks, and Deck detail.",
-  "pub_date": "2026-07-19T16:23:21.147Z",
+  "version": "1.5.0",
+  "notes": "v1.5.0 Brew Lab: pure list clinic — compare your Arena main/side to today’s ranked Bo1/Bo3 peers (shape, curve, staples). No AI, no invented cards.",
+  "pub_date": "2026-07-19T16:55:02.431Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WndpTWZYZGdDOE1jVlFsZGx3MHp6bkwxSndzZy9QcFdMUVVOK0YvSld0UCt5d1VEcUxYQitOMjNreEMrVXh1dkhjcXdaMkNYclZ6UjlxeE1RMVpWelFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc4MTkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC40X3g2NC1zZXR1cC5leGUKVjByMnhHLytRRnY5Mmk3RWI1V0N4Rk5vaFBrQTNPdDJBV0wvSFlvS2gwZWNHTUxMMm5Sck1icEppRnRPbWJZcmc2WU95bWJyWFNtM3JjMlQ5aU5mQmc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.4.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnhmVEN5dTFYVVQzaVQ4eVI4d3B1V0ZrakJwZzU3Q2ErcTM5blVsQ3lERzdnWVpRWjluS0xyMzRoYWd2b3RPRUlHMFEyMFhlVjlLazFCQWxrMEtjUmdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDgwMDkzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNS4wX3g2NC1zZXR1cC5leGUKQWJ1T0lXWTFPYXVicWNWSXMwMDNSUjNJMVNwQ1psZTZPM3l4cDlUamlZRHcwM21lOUlHZHF4a2p1NTFJTkRsMExMQklYckJ0QWtGNlg5bk9kM0NXQUE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.5.0.exe"
     }
   }
 }

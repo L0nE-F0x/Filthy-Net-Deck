@@ -37,6 +37,7 @@ import { TrackedDecklist } from "../components/TrackedDecklist";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
 import { ShareActionButton, ShareMenu } from "../components/ShareMenu";
+import { BrewLabPanel } from "../components/BrewLabPanel";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
@@ -1552,6 +1553,11 @@ function DeckDetail({
               side={deckList.side}
             />
           )}
+          <BrewLabPanel
+            deckName={deck.name}
+            mainIds={deckList?.main}
+            sideIds={deckList?.side}
+          />
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory

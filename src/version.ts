@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.4.4";
+export const APP_VERSION = "1.5.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Hover help on Climb stretches, form dots, and rank tiles",
-  "Matchup Lab: sort/filter/opponent rows explain themselves",
-  "Decks board + deck detail: clearer titles on ranks, filters, import"
+  "Brew Lab on My Stats deck detail — meta-grounded clinic",
+  "Shape vs peers: lands, creatures, instants/sorceries, curve",
+  "Staple copy nudges only from real ranked lists (no AI)",
+  "Bo3 sideboard staple gaps when peer SB data exists"
 ];
