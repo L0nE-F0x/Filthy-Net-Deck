@@ -13,7 +13,7 @@ describe("isNewer", () => {
 describe("versionJsonUrl", () => {
   it("points at the official CDN path", () => {
     expect(versionJsonUrl()).toBe(
-      "https://filthy-net-deck.netlify.app/version.json",
+      "https://filthy-net-deck.com/version.json",
     );
     expect(versionJsonUrl("https://example.com/")).toBe(
       "https://example.com/version.json",

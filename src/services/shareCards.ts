@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Brand share cards (PNG) for Climb season story and Planeswalker themes.
- * Canvas-only — no network; safe for local export.
+ * Canvas-only â€” no network; safe for local export.
  */
 
 import type { TrackedMatch } from "../types/tracker";
@@ -58,7 +58,7 @@ export interface ClimbShareInput {
   seasonKey: string;
 }
 
-/** 1080×1080 climb story card for the selected season. */
+/** 1080Ã—1080 climb story card for the selected season. */
 export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob> {
   const { matches, seasonKey } = input;
   const seasonMatches =
@@ -85,7 +85,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
     seasonKey === "all"
       ? "All-time climb"
       : seasonKey === currentSeasonKey()
-        ? "This season’s climb"
+        ? "This seasonâ€™s climb"
         : seasonLabel(seasonKey);
 
   const size = 1080;
@@ -110,7 +110,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
   ctx.fillText("Filthy Net Deck", 64, 96);
   ctx.fillStyle = "#9aa38a";
   ctx.font = "500 26px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("Climb story · local only", 64, 142);
+  ctx.fillText("Climb story Â· local only", 64, 142);
 
   ctx.fillStyle = "#b8f000";
   ctx.font = "800 52px Segoe UI, system-ui, sans-serif";
@@ -121,7 +121,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
   ctx.font = "700 44px Segoe UI, system-ui, sans-serif";
   const line1 =
     wr != null
-      ? `${wins}–${losses} · ${wr}% WR · ${seasonMatches.length} games`
+      ? `${wins}â€“${losses} Â· ${wr}% WR Â· ${seasonMatches.length} games`
       : `${seasonMatches.length} games recorded`;
   ctx.fillText(line1, 64, y);
   y += 70;
@@ -133,7 +133,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
       current ? `Now ${formatRank(current)}` : null,
       peak ? `Peak ${formatRank(peak)}` : null,
     ].filter(Boolean);
-    ctx.fillText(bits.join("  ·  "), 64, y);
+    ctx.fillText(bits.join("  Â·  "), 64, y);
     y += 64;
   }
 
@@ -141,7 +141,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
     ctx.fillStyle = streak.type === "win" ? "#34d399" : "#f87171";
     ctx.font = "600 30px Segoe UI, system-ui, sans-serif";
     ctx.fillText(
-      `Current ${streak.type} streak ×${streak.length} · best win run ${bestWin}`,
+      `Current ${streak.type} streak Ã—${streak.length} Â· best win run ${bestWin}`,
       64,
       y,
     );
@@ -159,7 +159,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
       const decided = d.wins + d.losses;
       const pct = decided ? Math.round((d.wins / decided) * 100) : null;
       const line =
-        pct != null ? `${d.name} · ${pct}% (${d.wins}–${d.losses})` : d.name;
+        pct != null ? `${d.name} Â· ${pct}% (${d.wins}â€“${d.losses})` : d.name;
       ctx.fillText(line, 64, y);
       y += 42;
     }
@@ -167,7 +167,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
 
   ctx.fillStyle = "#5a6b5e";
   ctx.font = "400 22px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("filthy-net-deck.netlify.app · Built by ApexForge", 64, size - 56);
+  ctx.fillText("filthy-net-deck.com · Built by ApexForge", 64, size - 56);
 
   return canvasToPng(canvas);
 }
@@ -183,7 +183,7 @@ export async function downloadClimbSharePng(
   downloadBlob(blob, filename ?? `filthy-net-deck-climb-${slug}.png`);
 }
 
-/** Theme skin marketing card — exact palette from SKINS, no fake UI. */
+/** Theme skin marketing card â€” exact palette from SKINS, no fake UI. */
 export async function renderThemeSharePng(skinId: SkinId): Promise<Blob> {
   const skin = SKINS.find((s) => s.id === skinId) ?? SKINS[0];
   const [ink, accent, bright] = skin.swatches;
@@ -254,15 +254,15 @@ export async function renderThemeSharePng(skinId: SkinId): Promise<Blob> {
 
   ctx.fillStyle = "#9aa38a";
   ctx.font = "500 26px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("Sidebar → Themes · Dark & Light still stack", 64, 780);
+  ctx.fillText("Sidebar â†’ Themes Â· Dark & Light still stack", 64, 780);
 
   ctx.fillStyle = accent;
   ctx.font = "700 28px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("Free · Windows + macOS", 64, 860);
+  ctx.fillText("Free Â· Windows + macOS", 64, 860);
 
   ctx.fillStyle = "#5a6b5e";
   ctx.font = "400 22px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("filthy-net-deck.netlify.app · Built by ApexForge", 64, size - 56);
+  ctx.fillText("filthy-net-deck.com · Built by ApexForge", 64, size - 56);
 
   return canvasToPng(canvas);
 }

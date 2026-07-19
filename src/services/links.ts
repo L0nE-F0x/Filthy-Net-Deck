@@ -18,6 +18,8 @@ const ALLOWED_HOSTS = [
   "www.aetherhub.com",
   "mtgdecks.net",
   "www.mtgdecks.net",
+  "filthy-net-deck.com",
+  "www.filthy-net-deck.com",
   "filthy-net-deck.netlify.app",
   "banbasicisland.netlify.app",
   "github.com",

@@ -9,8 +9,9 @@
  */
 import { isTauri } from "./appUpdater";
 import { APP_VERSION } from "../version";
+import { SITE_ORIGIN } from "./site";
 
-export const API_USER_AGENT = `FilthyNetDeck/${APP_VERSION} (https://filthy-net-deck.netlify.app; local companion)`;
+export const API_USER_AGENT = `FilthyNetDeck/${APP_VERSION} (${SITE_ORIGIN}; local companion)`;
 
 let tauriFetch: typeof fetch | null = null;
 

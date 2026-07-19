@@ -1,8 +1,10 @@
 import type { MetaBundle } from "../types/meta";
 import { normalizeMetaBundle } from "./deckHelpers";
+import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
-/** Primary feed URL — the app always syncs from the official CDN. */
-const DEFAULT_META_URL = "https://filthy-net-deck.netlify.app/meta/latest.json";
+/** Primary feed URL — official custom domain (legacy Netlify host is fallback). */
+const DEFAULT_META_URL = `${SITE_ORIGIN}/meta/latest.json`;
+const META_URLS = SITE_ORIGINS.map((o) => `${o}/meta/latest.json`);
 
 const LOCAL_META_PATH = "/meta/latest.json";
 const CACHE_KEY = "bbi.meta.lastGood";
@@ -55,11 +57,15 @@ async function tryFetch(url: string): Promise<MetaBundle | null> {
 export async function fetchDatedMeta(date: string): Promise<MetaBundle | null> {
   const safe = String(date || "").slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(safe)) return null;
-  const base = import.meta.env.DEV
-    ? "/meta"
-    : "https://filthy-net-deck.netlify.app/meta";
-  const bundle = await tryFetch(`${base}/${safe}.json?t=${Date.now()}`);
-  return bundle ? normalizeMetaBundle(bundle) : null;
+  if (import.meta.env.DEV) {
+    const bundle = await tryFetch(`/meta/${safe}.json?t=${Date.now()}`);
+    return bundle ? normalizeMetaBundle(bundle) : null;
+  }
+  for (const origin of SITE_ORIGINS) {
+    const bundle = await tryFetch(`${origin}/meta/${safe}.json?t=${Date.now()}`);
+    if (bundle) return normalizeMetaBundle(bundle);
+  }
+  return null;
 }
 
 /**
@@ -76,8 +82,12 @@ export async function fetchMetaBundle(): Promise<{
 }> {
   const primary = getMetaUrl();
   let bundle = await tryFetch(primary);
-  if (!bundle && primary !== DEFAULT_META_URL) {
-    bundle = await tryFetch(DEFAULT_META_URL);
+  if (!bundle) {
+    for (const url of META_URLS) {
+      if (url === primary) continue;
+      bundle = await tryFetch(url);
+      if (bundle) break;
+    }
   }
   if (bundle) {
     saveLastGood(bundle);

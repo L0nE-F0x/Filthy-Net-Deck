@@ -78,7 +78,7 @@ export async function renderRecapPng(stats: RecapStats): Promise<Blob> {
 
   ctx.fillStyle = "#5a6b5e";
   ctx.font = "400 24px system-ui, Segoe UI, sans-serif";
-  ctx.fillText("filthy-net-deck.netlify.app · Built by ApexForge", 64, size - 64);
+  ctx.fillText("filthy-net-deck.com · Built by ApexForge", 64, size - 64);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(

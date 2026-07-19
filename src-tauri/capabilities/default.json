@@ -42,6 +42,8 @@
         { "url": "https://cards.scryfall.io/**" },
         { "url": "https://c1.scryfall.com/**" },
         { "url": "https://c2.scryfall.com/**" },
+        { "url": "https://filthy-net-deck.com/**" },
+        { "url": "https://www.filthy-net-deck.com/**" },
         { "url": "https://filthy-net-deck.netlify.app/**" }
       ]
     }

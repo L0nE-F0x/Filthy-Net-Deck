@@ -8,7 +8,7 @@ Since v0.8.2 the app has no manual Refresh button. It re-downloads the published
 
 | Step | What happens |
 |------|----------------|
-| 1 | `GET https://filthy-net-deck.netlify.app/meta/latest.json` (fixed — the URL-override setting was removed in v0.8.3) |
+| 1 | `GET https://filthy-net-deck.com/meta/latest.json` (primary; falls back to `filthy-net-deck.netlify.app` — URL-override setting was removed in v0.8.3) |
 | 2 | Parse that JSON (formats, 8×8 decks, tournaments, sources) |
 | 3 | Diff vs last snapshot (meta movement) |
 | 4 | Cache in memory + local snapshot for offline/diff |
@@ -34,6 +34,15 @@ If the Netlify JSON cannot be fetched, the app shows the **last successfully dow
 ```
 
 **Cutting-edge accuracy depends on how often the pipeline runs and how good its sources are.** The app only ever re-downloads whatever is already published on Netlify.
+
+### Dual host (custom domain + legacy)
+
+| Host | Role |
+|------|------|
+| `https://filthy-net-deck.com` | **Primary** — Netlify DNS, marketing, OG, app defaults (v1.5.1+) |
+| `https://filthy-net-deck.netlify.app` | **Legacy** — same deploy; kept in CSP, HTTP allowlist, silent-update allowlist, and as fetch fallback so already-installed clients keep working |
+
+Installer URLs in `version.json` / `updater/latest.json` may stay on the legacy host so older binaries that only allow `netlify.app` can still silent-update. Both hosts serve identical `website/` content after Netlify deploy.
 
 ---
 

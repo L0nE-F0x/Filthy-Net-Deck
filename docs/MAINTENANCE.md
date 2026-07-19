@@ -57,7 +57,7 @@ never silently stale-as-fresh).
 6. **whatsinstandard API** — the build warns if v6 reports itself deprecated;
    check the CI log for `check for v7` and migrate `fetchStandardRotation` in
    `pipeline/sources/sets.mjs` if so.
-7. **Netlify + updater** — confirm `https://filthy-net-deck.netlify.app/version.json`
+7. **Netlify + updater** — confirm `https://filthy-net-deck.com/version.json` (and legacy `https://filthy-net-deck.netlify.app/version.json`)
    and `updater/latest.json` are live and match the shipped version (critical if
    a custom domain migration happens — installed apps pin the netlify URL).
 

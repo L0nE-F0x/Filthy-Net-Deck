@@ -520,7 +520,7 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
   ctx.fillStyle = FAINT;
   ctx.font = fontStack("400 23px");
   ctx.fillText(
-    "filthy-net-deck.netlify.app · Built by ApexForge",
+    "filthy-net-deck.com · Built by ApexForge",
     PAD,
     H - 52,
   );

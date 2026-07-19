@@ -1,4 +1,5 @@
 import { APP_VERSION } from "../version";
+import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
 export interface RemoteVersion {
   version: string;
@@ -13,15 +14,15 @@ export type VersionCheckResult =
   | { status: "latest"; remote: RemoteVersion }
   | { status: "error"; message: string };
 
-const DEFAULT_BASE = "https://filthy-net-deck.netlify.app";
+const DEFAULT_BASE = SITE_ORIGIN;
 
-/** Resolve version.json URL — always the official CDN. */
+/** Resolve version.json URL — official CDN (primary custom domain). */
 export function versionJsonUrl(baseUrl = DEFAULT_BASE): string {
   return `${baseUrl.replace(/\/$/, "")}/version.json`;
 }
 
-export async function fetchRemoteVersion(
-  baseUrl = DEFAULT_BASE,
+async function fetchVersionFromBase(
+  baseUrl: string,
 ): Promise<RemoteVersion | null> {
   const url = `${versionJsonUrl(baseUrl)}?t=${Date.now()}`;
   try {
@@ -38,25 +39,31 @@ export async function fetchRemoteVersion(
   }
 }
 
+export async function fetchRemoteVersion(
+  baseUrl = DEFAULT_BASE,
+): Promise<RemoteVersion | null> {
+  const first = await fetchVersionFromBase(baseUrl);
+  if (first) return first;
+  for (const origin of SITE_ORIGINS) {
+    if (origin === baseUrl.replace(/\/$/, "")) continue;
+    const alt = await fetchVersionFromBase(origin);
+    if (alt) return alt;
+  }
+  return null;
+}
+
 /** Full check with distinct outcomes for Settings UI. */
 export async function checkRemoteVersion(
   local: string = APP_VERSION,
 ): Promise<VersionCheckResult> {
-  const url = versionJsonUrl();
   try {
-    const res = await fetch(`${url}?t=${Date.now()}`, {
-      cache: "no-store",
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) {
+    const remote = await fetchRemoteVersion();
+    if (!remote?.version) {
       return {
         status: "error",
-        message: `Could not reach version.json (${res.status}). Check network / CORS.`,
+        message:
+          "Could not reach version.json on filthy-net-deck.com (or legacy Netlify host). Check network / CORS.",
       };
-    }
-    const remote = (await res.json()) as RemoteVersion;
-    if (!remote?.version) {
-      return { status: "error", message: "version.json missing a version field." };
     }
     if (isNewer(remote.version, local)) {
       return { status: "update", remote };

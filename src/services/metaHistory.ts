@@ -3,6 +3,8 @@
  * Pipeline writes website/meta/history.json; the app charts the last N days.
  */
 
+import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
+
 export interface HistoryPoint {
   date: string;
   format: string;
@@ -119,10 +121,10 @@ export function topMovers(
   return movers.slice(0, opts.limit ?? 8);
 }
 
-const DEFAULT_BASE = "https://filthy-net-deck.netlify.app";
+const DEFAULT_BASE = SITE_ORIGIN;
 
-export async function fetchMetaHistory(
-  baseUrl = DEFAULT_BASE,
+async function fetchHistoryFromBase(
+  baseUrl: string,
 ): Promise<HistoryBundle | null> {
   const url = `${baseUrl.replace(/\/$/, "")}/meta/history.json?t=${Date.now()}`;
   try {
@@ -137,4 +139,17 @@ export async function fetchMetaHistory(
   } catch {
     return null;
   }
+}
+
+export async function fetchMetaHistory(
+  baseUrl = DEFAULT_BASE,
+): Promise<HistoryBundle | null> {
+  const first = await fetchHistoryFromBase(baseUrl);
+  if (first) return first;
+  for (const origin of SITE_ORIGINS) {
+    if (origin === baseUrl.replace(/\/$/, "")) continue;
+    const alt = await fetchHistoryFromBase(origin);
+    if (alt) return alt;
+  }
+  return null;
 }

@@ -7,12 +7,23 @@
 use std::process::Command;
 use tauri::{AppHandle, Emitter};
 
-const ALLOWED_HOST_PREFIX: &str = "https://filthy-net-deck.netlify.app/";
+/// Official installer hosts (primary custom domain + legacy Netlify subdomain).
+const ALLOWED_HOST_PREFIXES: &[&str] = &[
+    "https://filthy-net-deck.com/",
+    "https://www.filthy-net-deck.com/",
+    "https://filthy-net-deck.netlify.app/",
+];
+
+fn is_allowed_update_url(url: &str) -> bool {
+    ALLOWED_HOST_PREFIXES.iter().any(|p| url.starts_with(p))
+}
 
 #[tauri::command]
 pub async fn install_update_silent(app: AppHandle, url: String) -> Result<(), String> {
-    if !url.starts_with(ALLOWED_HOST_PREFIX) {
-        return Err("Update URL must be from filthy-net-deck.netlify.app.".into());
+    if !is_allowed_update_url(&url) {
+        return Err(
+            "Update URL must be from filthy-net-deck.com (or legacy Netlify host).".into(),
+        );
     }
     let lower = url.to_ascii_lowercase();
     if !lower.ends_with(".exe") {

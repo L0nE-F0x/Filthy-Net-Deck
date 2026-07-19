@@ -1,6 +1,8 @@
 import type { SetsBundle } from "../types/sets";
+import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
-const DEFAULT_SETS_URL = "https://filthy-net-deck.netlify.app/meta/sets.json";
+const DEFAULT_SETS_URL = `${SITE_ORIGIN}/meta/sets.json`;
+const SETS_URLS = SITE_ORIGINS.map((o) => `${o}/meta/sets.json`);
 const LOCAL_SETS_PATH = "/meta/sets.json";
 const CACHE_KEY = "bbi.sets.lastGood";
 
@@ -57,8 +59,12 @@ export async function fetchSetsBundle(): Promise<{
 }> {
   const primary = getSetsUrl();
   let bundle = await tryFetch(primary);
-  if (!bundle && primary !== DEFAULT_SETS_URL) {
-    bundle = await tryFetch(DEFAULT_SETS_URL);
+  if (!bundle) {
+    for (const url of SETS_URLS) {
+      if (url === primary) continue;
+      bundle = await tryFetch(url);
+      if (bundle) break;
+    }
   }
   if (bundle) {
     saveLastGood(bundle);

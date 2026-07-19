@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.5.0.exe",
-  "notes": "v1.5.0 Brew Lab: pure list clinic — compare your Arena main/side to today’s ranked Bo1/Bo3 peers (shape, curve, staples). No AI, no invented cards."
+  "version": "1.5.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.5.1.exe",
+  "notes": "v1.5.1 Custom domain: filthy-net-deck.com is primary (Netlify DNS). Legacy netlify.app host still works for installed clients. Meta, updates, and share branding prefer .com."
 }

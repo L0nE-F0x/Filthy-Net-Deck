@@ -14,7 +14,7 @@
 | macOS | `website/downloads/Filthy-Net-Deck-1.5.0-universal.dmg` |
 | Headline | **Brew Lab** — shape/staples clinic vs ranked Bo1/Bo3 peers |
 | Soft / updater | `version.json` + `updater/latest.json` → **1.5.0** |
-| Live site | https://filthy-net-deck.netlify.app/ |
+| Live site | https://filthy-net-deck.com/ (legacy: https://filthy-net-deck.netlify.app/) |
 
 Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local only — never commit.
 
