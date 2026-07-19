@@ -50,11 +50,11 @@ See earlier sections in git history / prior handoff revisions.
 [x] OG / Twitter meta titles + descriptions match this release
 [x] website/assets/_gen_og.py updated + og-image.png regenerated
 [x] og-image.png?v=1.4.0 cache-bust on og:image + twitter:image
-[ ] Pushed main; Netlify live version.json matches  (this session)
-[ ] Tag v1.4.0 (macOS CI) when appropriate
+[x] Pushed main; Netlify live version.json matches
+[x] Tag v1.4.0 (macOS CI success)
 [ ] Verified: in-app Check for updates offers Update & restart
 [ ] Verified: link share preview shows new OG card
-[ ] Roll macOS dmg into website/downloads/ after CI
+[x] Roll macOS dmg into website/downloads/ after CI
 ```
 
 ### Smoke-test still recommended on a real Windows install

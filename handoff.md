@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff
 
 **Last wrap-up:** 2026-07-19 — **Grok 4.5 shipped v1.4.0 "Bells & Whistles"** (#5 sound + full AGENTS Windows release). Prior: Kimi #1–#4 on `release/v1.4.0`.
-**Next agent:** Confirm Netlify live `version.json` / `updater/latest.json` = **1.4.0**; smoke-test Update & restart + sound prefs; **tag `v1.4.0`** and roll macOS dmg when CI finishes. Then owner ladder feedback / deferred work only.
+**Next agent:** Smoke-test Update & restart + sound prefs on Windows; macOS dmg already rolled. Owner ladder feedback / deferred work only.
 
 ➡️ Canonical batch detail: [`HANDOFF-v1.4.0.md`](HANDOFF-v1.4.0.md). Read **`AGENTS.md`** before any user-visible change.
 
@@ -11,11 +11,12 @@
 
 | Item | Value |
 |------|--------|
-| Version | **1.4.0** (Windows signed; macOS dmg via tag CI) |
+| Version | **1.4.0** (Windows signed + macOS universal dmg at parity) |
 | Theme | Bells & Whistles — share cards, overlay harden, a11y, opt-in sound |
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-1.4.0.exe` (+ `.sig`) |
+| macOS | `website/downloads/Filthy-Net-Deck-1.4.0-universal.dmg` (CI on `v1.4.0`) |
 | Soft / updater | `version.json` + `updater/latest.json` → **1.4.0** |
-| Live site | https://filthy-net-deck.netlify.app/ (after `main` push) |
+| Live site | https://filthy-net-deck.netlify.app/ |
 
 Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local only — never commit.
 

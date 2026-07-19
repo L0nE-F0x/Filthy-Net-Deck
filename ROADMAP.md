@@ -14,11 +14,10 @@ Canonical checklist: **`handoff.md`**.
 
 1. ~~**Overlay polish**~~ — **shipped in v1.3.5**  
 2. ~~**macOS roll (1.3.5)**~~ — done  
-3. ~~**v1.4.0 "Bells & Whistles"**~~ — **shipped** (Windows signed + site + OG; macOS dmg after `v1.4.0` tag CI)  
+3. ~~**v1.4.0 "Bells & Whistles"**~~ — **shipped** (Windows signed + macOS universal dmg + site + OG)  
 4. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
-5. **Follow-up:** roll **1.4.0** macOS dmg into `website/downloads/` when CI finishes  
 
-**Shipped:** **v1.4.0** Bells & Whistles (share, overlay harden, a11y, opt-in sound).
+**Shipped:** **v1.4.0** Bells & Whistles (share, overlay harden, a11y, opt-in sound; Win + macOS parity).
 
 ### Explicitly deferred
 
