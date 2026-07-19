@@ -102,22 +102,29 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
         .unwrap_or((DEFAULT_W, DEFAULT_H));
 
     let url = WebviewUrl::App("index.html#/overlay".into());
-    let mut builder = WebviewWindowBuilder::new(app, OVERLAY_LABEL, url)
+    let builder = WebviewWindowBuilder::new(app, OVERLAY_LABEL, url)
         .title("Filthy Net Deck — Overlay")
         .inner_size(w, h)
         .min_inner_size(MIN_W, MIN_H)
         .max_inner_size(MAX_W, MAX_H)
         .resizable(true)
         .decorations(false)
-        .transparent(true)
         .always_on_top(true)
         .skip_taskbar(true)
         .visible(false)
         .focused(false);
 
-    if let Some(g) = geo {
-        builder = builder.position(g.x, g.y);
-    }
+    // `transparent` is Windows/Linux-only in Tauri 2 — macOS has no such
+    // builder method (this exact call broke the v1.3.x dmg CI builds).
+    // macOS gets a square, opaque panel via the .overlay-macos CSS instead.
+    #[cfg(not(target_os = "macos"))]
+    let builder = builder.transparent(true);
+
+    let builder = if let Some(g) = geo {
+        builder.position(g.x, g.y)
+    } else {
+        builder
+    };
 
     builder.build().map_err(|e| e.to_string())?;
     Ok(())

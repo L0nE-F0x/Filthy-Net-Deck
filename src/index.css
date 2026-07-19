@@ -4890,6 +4890,15 @@ html.overlay-root #root {
   background: transparent;
 }
 
+/* macOS: no transparent window support — opaque square panel instead. */
+html.overlay-macos,
+html.overlay-macos body.overlay-body {
+  background: #0a0c12 !important;
+}
+html.overlay-macos .overlay-shell {
+  border-radius: 0;
+}
+
 /* -- Shell: dark glass panel, brand hairline, opacity user-tunable -- */
 .overlay-shell {
   position: relative;

@@ -326,9 +326,15 @@ export function OverlayApp() {
     bootThemeFromStorage();
     document.documentElement.classList.add("overlay-root");
     document.body.classList.add("overlay-body");
+    // macOS overlay windows can't be transparent (see overlay.rs) — paint the
+    // whole webview dark and square off the shell instead of floating corners.
+    if (/Mac OS X|Macintosh/.test(navigator.userAgent)) {
+      document.documentElement.classList.add("overlay-macos");
+    }
     return () => {
       document.documentElement.classList.remove("overlay-root");
       document.body.classList.remove("overlay-body");
+      document.documentElement.classList.remove("overlay-macos");
     };
   }, []);
 
