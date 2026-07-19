@@ -1,20 +1,25 @@
 # Filthy Net Deck — v1.4.0 "Bells & Whistles" handoff
 
-**Wrapped:** 2026-07-19 by **Claude Code**. **Next agent:** Kimi K3 / Grok 4.5 — continue **#2 → #4**.
+**Wrapped:** 2026-07-19 (pass 2) by **Kimi**. **Next agent:** **Grok 4.5 — #5 Sound + micro-interactions** (owner taste gate below), then the owner-gated release step.
 **Read first:** `AGENTS.md` (release rules), this file, the v1.3.5 audit note in `handoff.md` (overlay invariants). Memory: `v1.4.0-bells-and-whistles`.
 
 > **The batch:** finishing touches to take FND from fan project → production-grade companion the owner will promote hard (YouTube + X **@MBrewlab**). Ship as **ONE** v1.4.0 via the full AGENTS.md checklist. **Owner runs the signed build themselves** (has the passphrase — do not handle it in plaintext).
 
 ---
 
-## Where things are
+## Where things are — updated 2026-07-19 (Kimi, pass 2)
 
-**Branch: `release/v1.4.0` (LOCAL, UNPUSHED).** `npx tsc --noEmit` clean · `npm test` = **120 green**.
+**Branch: `release/v1.4.0` (LOCAL, UNPUSHED).** `npx tsc --noEmit` clean · `npm test` = **120 green** · `npm run build` clean (0 chunk warnings) · `cargo check --lib` clean.
+
+**#1–#4 are DONE and committed on this branch.** What remains: **#5** (sound — owner taste gate, assigned to Grok 4.5) → smoke-test on a real Windows build → **release step** (owner-gated).
+
+⚠️ Working tree also has **unrelated owner marketing assets** (`website/assets/_gen_youtube.py` mods, `youtube-post.png`, untracked `youtube-community-*` / `app-screenshot-decks.png`) — **not part of this batch, do not commit or delete them with the code changes.**
 
 ⚠️ If you're in a fresh/cloud env, the branch may not exist yet — have the owner `git push -u origin release/v1.4.0` first, or work locally.
 
 ### Commits so far (newest last)
 ```
+(pass 2)  feat(overlay) hardening (#2) + feat(a11y/empty-states) (#3, #4) — see git log
 8a5ca5f  merge null-cache fix (fix/arena-meta-null-cache) into the batch
 d1756ae  feat(share): deck share cards — decklist + WR + FND branding (#1)
 8cc1eb9  feat(share): embed FND fox logo mark on the card header
@@ -43,24 +48,37 @@ af856f4  feat(share): Share deck-card control in My Stats deck detail (#1)
 
 ---
 
-## 🔜 TO DO — #2 → #4
+## ✅ DONE (pass 2 — Kimi, 2026-07-19, uncommitted)
 
-### #2 Overlay hardening (low-taste, do first)
-1. **Extract `MatchClock` (Grok P1-1).** OverlayApp re-renders every second while playing because `now`/`setNow` live in `OverlayApp` (search `setNow`, `const playing`, the `useInterval`-style effect ~L461, and `formatClock(live.startedAt, now)` ~L700). Move the 1 Hz `setInterval`+`now` into a tiny `<MatchClock startedAt={live.startedAt} />` child that renders `formatClock`. Delete `now`/`setNow` + the clock effect from OverlayApp. Groups/rows are already memoized, so this removes the last per-second re-render.
-2. **Reliable cross-webview prefs (Grok P1-2/P1-3).** Opacity + skin currently propagate via the `window` `storage` event, which may not fire across WebView2 windows on all setups; `startExpanded` only reads at mount. Add a Tauri event as the reliable path: emit `prefs:overlay` from the main webview when prefs change (`useAppStore` setters: `setOverlayOpacity`, `setOverlayStartExpanded`, `setSkin`, `setTheme`) via `import { emit } from "@tauri-apps/api/event"`; in `OverlayApp` `listen("prefs:overlay")` → `setOpacity(readOverlayPrefs().opacity)` + `bootThemeFromStorage()` (+ re-read `startExpanded`). Keep the `storage` listener as fallback. The overlay is a **persistent** webview (Rust show/hides it), so mid-session changes must be pushed to it.
-3. **Click-through toggle (optional).** New pref `overlayClickThrough` (default false) in `useAppStore` + Settings; Tauri command calling `window.set_ignore_cursor_events(bool)` on the `overlay` window; apply on show. Lets players make the HUD purely passive.
+### #2 Overlay hardening — done
+1. **`MatchClock` extracted (Grok P1-1).** The 1 Hz `setInterval` + `now` state moved out of `OverlayApp` into a memoized `<MatchClock startedAt>` child (`src/overlay/OverlayApp.tsx` ~L329). Per-second tick now repaints only the clock span; groups/rows were already memoized.
+2. **Reliable cross-webview prefs (Grok P1-2/P1-3).** New `pushOverlayPrefs()` in `src/services/overlay.ts` emits Tauri event `prefs:overlay`; called from `useAppStore` setters `setOverlayOpacity`, `setOverlayStartExpanded`, `setOverlayClickThrough`, `setTheme`, `setSkin`. `OverlayApp` listens (`listen("prefs:overlay")`) → opacity + `bootThemeFromStorage()` + `startExpandedRef` + click-through; the `storage` listener stays as fallback. **startExpanded** is refreshed into `startExpandedRef` live and applied **once per new match** (keyed on `matchId`, via new `setCompactMode`) — never mid-match, so a manual collapse survives Bo3 sideboarding.
+3. **Click-through toggle.** New pref `overlayClickThrough` (default false) in `useAppStore` + Settings toggle; Rust command `overlay_set_click_through` (`src-tauri/src/overlay.rs`, registered in `lib.rs`) calls `set_ignore_cursor_events` on the overlay window; the overlay applies it on mount and on every prefs push. Passive HUD; Settings is the way back out.
 
-**Overlay invariants — MUST NOT regress** (from the v1.3.5 audit): never `set_focus` the overlay; Rust owns show/hide; dirty-only `tracker:live`; no `backdrop-filter`/heavy blur; local-only; ApexForge credit stays. Don't reintroduce per-frame re-renders.
+**Invariants held:** no `set_focus`, Rust owns show/hide, dirty-only `tracker:live`, no backdrop-filter, local-only, ApexForge credit untouched.
 
-### #3 A11y / reduced-motion
-- **Zero `prefers-reduced-motion` today** (`grep prefers-reduced-motion src/index.css` = 0). Add a global `@media (prefers-reduced-motion: reduce)` block neutralizing transitions/animations. Motion lives in: `SplashScreen`, `BanPulse`, `SpoilerPulse`, `PlaneswalkerThemes`, `StatusBanners`, and skin/hover transitions.
-- Add `:focus-visible` rings, `aria-live` on toasts/insight chips, quick keyboard-nav pass. Polish pass — CSS/markup, no unit tests expected.
+### #3 A11y / reduced-motion — done
+- Global `@media (prefers-reduced-motion: reduce)` block in `src/index.css` (after the `:focus-visible` rule) nukes animation/transition durations + delays everywhere (covers SplashScreen, BanPulse, SpoilerPulse, PlaneswalkerThemes, StatusBanners, skin/hover transitions). No `scroll-behavior: smooth` in CSS or JS to gate.
+- `role="status"` on the in-app toasts (`DeckView.tsx`, `TrackedDecklist.tsx`); `aria-live="polite"` on the Stats insight-chips container.
+- Keyboard pass: only one non-actionable `div onClick` in the app (CommandPalette backdrop stopPropagation; palette already has Escape + `role="dialog"`/`listbox`/`option` + focus restore). Global `:focus-visible` ring already existed.
 
-### #4 Empty-state & first-run
-- New users have no `Player.log` data (that's the "Desktop app only / First 5 minutes" onboarding you'll see on My Stats). Give every data-dependent page an intentional branded empty/loading state with honest CTAs ("play a ranked game and it shows here"). Reuse `TrackerOnboarding` + `SplashScreen` patterns. Pages to cover: DeckView, Climb, Matchups, and any other tracker-fed surface.
+### #4 Empty-state & first-run — done
+- Climb, Matchups, Stats already shipped branded empties + `TrackerOnboarding`; FormatHub arsenal-at-risk hides gracefully (verified).
+- **DeckView** "Your record" section now renders compact `TrackerOnboarding` (no health detail) when the desktop app has **zero tracked matches**, instead of the tag-your-opponents copy that presupposed matches. With matches but no tag vs the archetype → original copy. Browser/dev unchanged.
+
+---
+
+## 🔜 TO DO — what remains
 
 ### ⏸️ #5 Sound + micro-interactions — GET OWNER'S TASTE FIRST
 No audio anywhere today. Owner: **"do sound well, bad sound ruins an app."** Constraints: **opt-in, OFF by default**, Settings toggle, **not in the overlay**. Bring 2–3 candidate cue sets to the owner *before* committing. Micro-interactions: stat count-ups, rank-up moment, toast slide-ins.
+
+### Smoke-test on a real Windows build (before release)
+- Overlay: opacity slider + skin switch update the **open** overlay live via `prefs:overlay` (storage event is only the fallback now).
+- Overlay: toggle **Start expanded** → next match opens expanded/collapsed accordingly; manual collapse mid-match survives between Bo3 games.
+- Overlay: **Click-through** makes the HUD passive; Settings toggle brings it back.
+- Overlay: match clock still ticks (now an isolated `MatchClock`).
+- Deck share card (#1) end-to-end from My Stats deck detail with real Arena data (still open from pass 1).
 
 ---
 

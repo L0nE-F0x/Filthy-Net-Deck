@@ -1,8 +1,8 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-19 — **Grok review of Kimi’s v1.3.5 overlay polish** (already live on Windows + Netlify).  
-**Next agent:** **v1.4.0 "Bells & Whistles" batch is IN PROGRESS on branch `release/v1.4.0`.**
-➡️ **Read [`HANDOFF-v1.4.0.md`](HANDOFF-v1.4.0.md) first** — it has exactly what to do next (**#2** overlay hardening → **#3** a11y/reduced-motion → **#4** empty states). #1 share cards + overlay theme sync are already done & committed on that branch.
+**Last wrap-up:** 2026-07-19 — **Kimi finished v1.4.0 batch #2–#4** (overlay hardening, a11y, empty states) on branch `release/v1.4.0`.
+**Next agent:** **Grok 4.5 — v1.4.0 #5 "Sound + micro-interactions"** (owner taste gate: opt-in, OFF by default, not in the overlay; bring 2–3 cue sets before committing).
+➡️ **Read [`HANDOFF-v1.4.0.md`](HANDOFF-v1.4.0.md) first** — batch status, smoke-test list, and the owner-gated release step. #1 share cards, overlay theme sync, and #2–#4 are done & committed on that branch.
 
 Read **`AGENTS.md`** first. User-visible changes still need the full release checklist if you fix anything that ships. The v1.3.5 audit note below stays valid for the overlay invariants.
 

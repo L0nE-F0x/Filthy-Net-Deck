@@ -14,7 +14,8 @@ Canonical checklist: **`handoff.md`**.
 
 1. ~~**Overlay polish**~~ — **shipped in v1.3.5** (grouped sections, art crops, mana pips, true slim bar, opacity + start-expanded settings)  
 2. ~~**macOS roll**~~ — **done**: `v1.3.5` universal dmg in `website/downloads/` + site links (fixed CI: `transparent()` is Windows/Linux-only)  
-3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
+3. **v1.4.0 "Bells & Whistles"** — in progress on `release/v1.4.0` (checklist: `HANDOFF-v1.4.0.md`). #1 share cards, overlay theme sync, #2 overlay hardening, #3 a11y, #4 empty states **done**; **#5 sound + micro-interactions → Grok 4.5** (owner taste gate); release is one signed cut, owner-gated  
+4. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
 **Shipped:** **v1.3.5** overlay refinement + macOS parity (installer + dmg + updater + site + OG).
 
