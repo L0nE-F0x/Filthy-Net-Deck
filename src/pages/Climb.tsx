@@ -28,6 +28,7 @@ import {
 } from "../services/climbStats";
 import type { TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { CountUp } from "../components/CountUp";
 import { downloadClimbSharePng } from "../services/shareCards";
 
 /** Chart / legend palette — distinct enough on dark and light themes. */
@@ -735,11 +736,16 @@ export function Climb() {
           <span className="stat-label">Peak in range</span>
         </div>
         <div className="panel stat-tile">
-          <span
-            className={`stat-num ${overall.rate != null ? `favor-${winrateFavor(overall.rate)}` : ""}`}
-          >
-            {overall.rate != null ? `${(overall.rate * 100).toFixed(0)}%` : "—"}
-          </span>
+          {overall.rate != null ? (
+            <CountUp
+              className={`stat-num favor-${winrateFavor(overall.rate)}`}
+              value={overall.rate * 100}
+              decimals={0}
+              suffix="%"
+            />
+          ) : (
+            <span className="stat-num">—</span>
+          )}
           <span className="stat-label">
             Season WR · {overall.wins}W {overall.losses}L
           </span>

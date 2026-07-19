@@ -695,12 +695,23 @@ select,
   font-weight: 600;
   box-shadow: 0 8px 24px black;
   z-index: 50;
-  animation: fadeIn 0.2s ease;
+  animation: toast-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(18px, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .empty-state {
@@ -803,6 +814,10 @@ select,
 .banner-gold {
   background: color-mix(in srgb, var(--color-gold-500) 14%, transparent);
   border-color: color-mix(in srgb, var(--color-gold-500) 35%, transparent);
+}
+.banner-rank-up {
+  animation: toast-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold-500) 25%, transparent);
 }
 .banner-update {
   background: linear-gradient(
@@ -4007,6 +4022,50 @@ select,
   font-size: 0.84rem;
   font-weight: 650;
   color: var(--color-foam);
+}
+.settings-sfx-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+.settings-sfx-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  background: color-mix(in srgb, var(--color-ink-900) 70%, transparent);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.settings-sfx-card:hover {
+  border-color: color-mix(in srgb, var(--color-gold-500) 35%, transparent);
+}
+.settings-sfx-card.is-active {
+  border-color: color-mix(in srgb, var(--color-gold-500) 55%, transparent);
+  background: color-mix(in srgb, var(--color-gold-500) 10%, transparent);
+}
+.settings-sfx-card input {
+  margin: 0;
+}
+.settings-sfx-card-body strong {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--color-foam);
+}
+.settings-sfx-card-body em {
+  display: block;
+  margin-top: 0.1rem;
+  font-style: normal;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--color-muted);
 }
 .settings-toggle-row em {
   display: block;

@@ -35,6 +35,7 @@ import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { CountUp } from "../components/CountUp";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
@@ -443,13 +444,20 @@ function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
   return (
     <div className="stat-tiles">
       <div className="panel stat-tile">
-        <span className="stat-num">{matches.length}</span>
+        <CountUp className="stat-num" value={matches.length} />
         <span className="stat-label">Matches</span>
       </div>
       <div className="panel stat-tile">
-        <span className={`stat-num ${rate != null ? `favor-${winrateFavor(rate)}` : ""}`}>
-          {rate != null ? `${(rate * 100).toFixed(1)}%` : "—"}
-        </span>
+        {rate != null ? (
+          <CountUp
+            className={`stat-num favor-${winrateFavor(rate)}`}
+            value={rate * 100}
+            decimals={1}
+            suffix="%"
+          />
+        ) : (
+          <span className="stat-num">—</span>
+        )}
         <span className="stat-label">
           Win rate · {wins}W {losses}L
         </span>
