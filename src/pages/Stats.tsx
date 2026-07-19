@@ -1702,7 +1702,7 @@ export function Stats() {
           </div>
 
           {insights.length > 0 && (
-            <div className="insight-chips">
+            <div className="insight-chips" aria-live="polite">
               {insights.map((c) => (
                 <button
                   key={c.id}

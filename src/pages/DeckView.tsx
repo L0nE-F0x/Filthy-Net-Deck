@@ -15,6 +15,7 @@ import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
 import { deckRotationImpact, rotationWhen } from "../services/rotationImpact";
 import { recordVsArchetypeTag } from "../services/statsInsights";
 import { loadAllOpponentNotes } from "../services/matchupNotes";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import type { CardEntry } from "../types/meta";
 
 /** One decklist row with a card-art popup on hover (when the id is known). */
@@ -115,6 +116,7 @@ export function DeckView() {
   const openFormat = useAppStore((s) => s.openFormat);
   const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const trackerMatches = useAppStore((s) => s.trackerMatches);
+  const trackerStatus = useAppStore((s) => s.trackerStatus);
   const [toast, setToast] = useState<string | null>(null);
   const [unknown, setUnknown] = useState<string[]>([]);
   const [qaLoading, setQaLoading] = useState(false);
@@ -389,6 +391,10 @@ export function DeckView() {
                   Matchup Lab →
                 </button>
               </div>
+            ) : trackerMatches.length === 0 && trackerStatus ? (
+              // No tracked matches yet on the desktop app — coach the first-run
+              // loop (log → first match → first tag) instead of the tag copy.
+              <TrackerOnboarding compact showHealthDetail={false} />
             ) : (
               <p className="text-xs text-muted m-0 leading-relaxed">
                 No tagged games yet against this archetype. In Matchup Lab, tag opponents with
@@ -458,7 +464,7 @@ export function DeckView() {
         </div>
       </div>
 
-      {toast && <div className="toast">{toast}</div>}
+      {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   );
 }
