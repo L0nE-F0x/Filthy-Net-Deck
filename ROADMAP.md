@@ -10,10 +10,10 @@
 
 ## Next chapter — post-v1.3 (owner 2026-07-19)
 
-Canonical checklist: **`handoff.md`**.
+Canonical checklist: **`handoff.md`** (detailed overlay map for polish agents, e.g. Kimi K3).
 
-1. **Listen / polish** — overlay feedback from real ladder sessions  
-2. **macOS roll** — tag CI dmg for 1.3.0 when cutting the tag  
+1. **Overlay polish** — beauty, density, odds/art UX; keep discreet + FPS-safe (release build)  
+2. **macOS roll** — pull `v1.3.0` CI dmg into `website/downloads/` + site links  
 3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
 **Shipped:** **v1.3.0** in-game overlay + match-end notify defaults (installer + updater + site).
