@@ -31,7 +31,9 @@ function loadDisk(): void {
     const obj = JSON.parse(raw) as Record<string, ArenaCardMeta | null>;
     for (const [k, v] of Object.entries(obj)) {
       const id = Number(k);
-      if (Number.isFinite(id)) mem.set(id, v);
+      // Skip nulls (failed/absent lookups) so they retry this session rather
+      // than staying poisoned. Tolerates older blobs that persisted nulls.
+      if (Number.isFinite(id) && v) mem.set(id, v);
     }
   } catch {
     /* ignore */
@@ -43,10 +45,15 @@ function schedulePersist(): void {
   window.clearTimeout(persistTimer);
   persistTimer = window.setTimeout(() => {
     try {
-      const obj: Record<string, ArenaCardMeta | null> = {};
+      const obj: Record<string, ArenaCardMeta> = {};
       // Cap cache size so localStorage stays small.
       let n = 0;
       for (const [id, meta] of mem) {
+        // Persist only successful resolves. A null is a failed/absent lookup
+        // (often a transient offline hit at match start) — keep it in memory
+        // for this session, never on disk, so the next session retries instead
+        // of showing "Card {grpId}" until a cache-key bump.
+        if (!meta) continue;
         if (n++ > 4000) break;
         obj[String(id)] = meta;
       }
@@ -131,7 +138,8 @@ export async function resolveArenaMeta(
       schedulePersist();
       return meta;
     } catch {
-      // Don't cache hard-fail forever — allow retry next session only after null write.
+      // Session-only negative cache: null avoids re-hitting this id now, but
+      // schedulePersist() never writes nulls, so the next session retries.
       mem.set(grpId, null);
       schedulePersist();
       return null;
