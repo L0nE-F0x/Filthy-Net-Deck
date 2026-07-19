@@ -50,3 +50,34 @@ export interface TrackerStatus {
   localPlayer: string | null;
   backfillDone: boolean;
 }
+
+/** In-match snapshot for the always-on-top HUD (mirrors Rust LiveMatch). */
+export type LiveMatchPhase = "playing" | "ended" | "idle";
+
+export interface LiveCardCount {
+  /** Arena grpId. */
+  grpId: number;
+  remaining: number;
+  total: number;
+}
+
+export interface LiveMatch {
+  matchId: string;
+  phase: LiveMatchPhase;
+  /** Unix ms. */
+  startedAt: number;
+  eventId: string;
+  bestOf: number;
+  opponentName?: string;
+  opponentPlatform?: string;
+  myPlayerName?: string;
+  myRank?: string;
+  deckName?: string;
+  deckId?: string;
+  deckHash?: string;
+  /** Present when phase is "ended". */
+  result?: MatchResult;
+  /** Cards still in library (mainboard). */
+  library?: LiveCardCount[];
+  libraryTotal?: number;
+}

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @theme {
   --color-ink-950: #07080c;
@@ -23,7 +23,7 @@
   --font-mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
 }
 
-/* Light appearance — same tokens, inverted surfaces. Dark remains default. */
+/* Light appearance â€” same tokens, inverted surfaces. Dark remains default. */
 html[data-theme="light"] {
   --color-ink-950: #f3f4f8;
   --color-ink-900: #e8eaef;
@@ -72,7 +72,7 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--color-ink-600) 55%, transparent);
 }
 
-/* Theme toggle — discreet pill in the topbar / Settings */
+/* Theme toggle â€” discreet pill in the topbar / Settings */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -410,7 +410,7 @@ select,
   border-bottom: 1px solid color-mix(in srgb, var(--color-ink-600) 45%, transparent);
   background: color-mix(in srgb, var(--color-ink-900) 60%, transparent);
   backdrop-filter: blur(10px);
-  /* Fullscreen window buttons live in the topbar — keep them from colliding. */
+  /* Fullscreen window buttons live in the topbar â€” keep them from colliding. */
   flex-wrap: wrap;
   row-gap: 0.45rem;
 }
@@ -723,7 +723,7 @@ select,
   }
 }
 
-/* ——— v0.4 polish ——— */
+/* â€”â€”â€” v0.4 polish â€”â€”â€” */
 .panel {
   transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -988,7 +988,7 @@ select,
   color: var(--color-muted);
 }
 
-/* Scrolls with deck content — do not sticky/fixed (was overlapping mainboard). */
+/* Scrolls with deck content â€” do not sticky/fixed (was overlapping mainboard). */
 .deck-import-bar {
   position: relative;
   z-index: 1;
@@ -1136,7 +1136,7 @@ select,
 .feed-dot.offline { background: var(--color-fair); }
 .feed-dot.cached { background: var(--color-azure-400); }
 
-/* ——— v0.5 visual suite ——— */
+/* â€”â€”â€” v0.5 visual suite â€”â€”â€” */
 .card-art {
   display: block;
   object-fit: cover;
@@ -1404,7 +1404,7 @@ select,
   letter-spacing: -0.03em;
 }
 
-/* ——— v0.9 winrate tracker ——— */
+/* â€”â€”â€” v0.9 winrate tracker â€”â€”â€” */
 .stat-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1569,7 +1569,7 @@ select,
   border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
 }
 
-/* ——— v0.10 deck drill-down ——— */
+/* â€”â€”â€” v0.10 deck drill-down â€”â€”â€” */
 .deck-row-btn {
   background: none;
   border: none;
@@ -1592,7 +1592,7 @@ select,
   line-height: 1;
 }
 
-/* ——— sortable column headers (My Stats) ——— */
+/* â€”â€”â€” sortable column headers (My Stats) â€”â€”â€” */
 .sort-head-btn {
   appearance: none;
   background: none;
@@ -1730,7 +1730,7 @@ select,
   border: 1px solid color-mix(in srgb, var(--color-poor) 28%, transparent);
 }
 
-/* ——— version history mini card art ——— */
+/* â€”â€”â€” version history mini card art â€”â€”â€” */
 .diff-art-row {
   display: flex;
   flex-wrap: wrap;
@@ -1852,7 +1852,7 @@ select,
   height: 50px;
 }
 
-/* ——— My Stats arsenal + deck row art ——— */
+/* â€”â€”â€” My Stats arsenal + deck row art â€”â€”â€” */
 .stats-arsenal {
   display: flex;
   flex-wrap: wrap;
@@ -1972,7 +1972,7 @@ select,
   height: 62px;
 }
 
-/* ——— Matchup Lab + Climb Tracker ——— */
+/* â€”â€”â€” Matchup Lab + Climb Tracker â€”â€”â€” */
 .lab-intro {
   display: flex;
   flex-wrap: wrap;
@@ -2258,7 +2258,7 @@ select,
   font-weight: 600;
 }
 
-/* Fullscreen window controls — sit in the topbar action row (never float over it). */
+/* Fullscreen window controls â€” sit in the topbar action row (never float over it). */
 .fs-btn {
   display: inline-flex;
   align-items: center;
@@ -2500,7 +2500,7 @@ select,
   }
   .mu-lab-meta { grid-column: 1 / -1; }
 }
-/* ——— Launch splash ——— */
+/* â€”â€”â€” Launch splash â€”â€”â€” */
 .splash-root {
   position: fixed;
   inset: 0;
@@ -2729,7 +2729,7 @@ select,
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-/* ——— Set radar ——— */
+/* â€”â€”â€” Set radar â€”â€”â€” */
 .set-section-title {
   margin: 0 0 0.85rem;
   font-size: 0.72rem;
@@ -2994,7 +2994,7 @@ select,
   padding-top: 0.15rem;
 }
 
-/* ——— Set gallery (full set) ——— */
+/* â€”â€”â€” Set gallery (full set) â€”â€”â€” */
 .set-gallery-toolbar {
   display: flex;
   flex-direction: column;
@@ -3205,7 +3205,7 @@ select,
   color: var(--color-gold-300);
 }
 
-/* B&R pulse — red-accented sibling of the spoiler pulse */
+/* B&R pulse â€” red-accented sibling of the spoiler pulse */
 .ban-pulse {
   border-color: color-mix(in srgb, var(--color-poor) 45%, var(--color-ink-600));
   background: linear-gradient(
@@ -3528,7 +3528,7 @@ select,
   opacity: 0.85;
 }
 
-/* Decks home — art-backed marquee for the #1 deck */
+/* Decks home â€” art-backed marquee for the #1 deck */
 .daily-hero {
   position: relative;
   overflow: hidden;
@@ -3641,7 +3641,7 @@ select,
   .daily-hero-stat { flex: 1 1 0; }
 }
 
-/* Format hub — legality / rotation / bans on the Sets page */
+/* Format hub â€” legality / rotation / bans on the Sets page */
 .fmt-hub-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -3923,7 +3923,7 @@ select,
   opacity: 0.9;
 }
 
-/* Settings — two-column grid so prefs fill the page instead of a long single rail */
+/* Settings â€” two-column grid so prefs fill the page instead of a long single rail */
 .settings-page {
   display: flex;
   flex-direction: column;
@@ -4078,7 +4078,7 @@ select,
   box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
 }
 
-/* Arsenal fans are buttons now — open the deck when clicked */
+/* Arsenal fans are buttons now â€” open the deck when clicked */
 button.stats-arsenal-fan {
   background: transparent;
   border: 0;
@@ -4119,7 +4119,7 @@ button.stats-arsenal-fan:focus-visible {
   background: var(--color-ink-800);
 }
 
-/* �� 10� page program (batches 1�4) �� */
+/* ï¿½ï¿½ 10ï¿½ page program (batches 1ï¿½4) ï¿½ï¿½ */
 .entity-chip {
   display: inline-flex;
   align-items: center;
@@ -4350,12 +4350,12 @@ button.stats-arsenal-fan:focus-visible {
   background: color-mix(in srgb, var(--color-ink-700) 40%, transparent);
 }
 
-/* —— Planeswalker accent skins (data-skin) ——
+/* â€”â€” Planeswalker accent skins (data-skin) â€”â€”
    Orthogonal to data-theme light/dark. Classic = no attribute.
    Each skin retints gold (accent), azure (secondary), and warm/cool inks.
 */
 
-/* Chandra — fire */
+/* Chandra â€” fire */
 html[data-skin="chandra"] {
   --color-ink-950: #120605;
   --color-ink-900: #1a0a08;
@@ -4397,7 +4397,7 @@ html[data-theme="light"][data-skin="chandra"] {
   --color-poor: #b91c1c;
 }
 
-/* Teferi — time / island */
+/* Teferi â€” time / island */
 html[data-skin="teferi"] {
   --color-ink-950: #050a12;
   --color-ink-900: #081018;
@@ -4439,7 +4439,7 @@ html[data-theme="light"][data-skin="teferi"] {
   --color-poor: #dc2626;
 }
 
-/* Liliana — swamp / void */
+/* Liliana â€” swamp / void */
 html[data-skin="liliana"] {
   --color-ink-950: #0a0610;
   --color-ink-900: #100818;
@@ -4481,7 +4481,7 @@ html[data-theme="light"][data-skin="liliana"] {
   --color-poor: #be123c;
 }
 
-/* Ajani — leonin white / gold */
+/* Ajani â€” leonin white / gold */
 html[data-skin="ajani"] {
   --color-ink-950: #100e08;
   --color-ink-900: #16140c;
@@ -4523,7 +4523,7 @@ html[data-theme="light"][data-skin="ajani"] {
   --color-poor: #dc2626;
 }
 
-/* Elspeth — sun's champion / steel */
+/* Elspeth â€” sun's champion / steel */
 html[data-skin="elspeth"] {
   --color-ink-950: #0a0c10;
   --color-ink-900: #10141a;
@@ -4573,7 +4573,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
     var(--color-ink-950);
 }
 
-/* Planeswalker Themes — inline accordion inside sidebar (never floats over main) */
+/* Planeswalker Themes â€” inline accordion inside sidebar (never floats over main) */
 .pw-themes {
   display: flex;
   flex-direction: column-reverse; /* button at bottom; panel grows upward in footer */
@@ -4649,7 +4649,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   border-radius: 50%;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-foam) 15%, transparent);
 }
-/* Panel lives in the sidebar column only — no absolute positioning into main pane */
+/* Panel lives in the sidebar column only â€” no absolute positioning into main pane */
 .pw-themes-panel {
   width: 100%;
   max-width: 100%;
@@ -4745,7 +4745,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   max-width: 100%;
 }
 
-/* �� Tracker onboarding / health (v1.2) �� */
+/* —— Tracker onboarding / health (v1.2) —— */
 .tracker-onboarding {
   display: flex;
   flex-direction: column;
@@ -4823,4 +4823,229 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
 .pw-themes-share-msg {
   font-size: 11px;
   color: var(--color-muted);
+}
+
+
+
+/* -- In-game overlay HUD (second webview #/overlay) -- */
+/* Perf: no backdrop-filter/blur — expensive with always-on-top transparent HWND */
+html.overlay-root,
+html.overlay-root body.overlay-body {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+html.overlay-root #root {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+.overlay-empty {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+.overlay-shell {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  overflow: hidden;
+  /* Solid-ish dark glass without GPU blur */
+  background: rgba(10, 12, 18, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  color: rgba(232, 234, 240, 0.92);
+  font-family: var(--font-display);
+  font-size: 11px;
+}
+.overlay-shell.is-ended {
+  border-color: rgba(107, 154, 235, 0.35);
+}
+.overlay-shell.is-compact {
+  /* bar only — minimal footprint */
+}
+.overlay-resize { position: absolute; z-index: 5; }
+.overlay-resize-n { top: 0; left: 6px; right: 6px; height: 3px; cursor: n-resize; }
+.overlay-resize-s { bottom: 0; left: 6px; right: 6px; height: 4px; cursor: s-resize; }
+.overlay-resize-e { top: 6px; right: 0; bottom: 6px; width: 4px; cursor: e-resize; }
+.overlay-resize-w { top: 6px; left: 0; bottom: 6px; width: 3px; cursor: w-resize; }
+.overlay-resize-se {
+  right: 0; bottom: 0; width: 12px; height: 12px; cursor: se-resize;
+  background: linear-gradient(135deg, transparent 55%, rgba(255,255,255,0.12) 55%);
+}
+.overlay-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.28rem 0.2rem 0.4rem;
+  background: rgba(0, 0, 0, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: grab;
+  min-height: 1.55rem;
+}
+.overlay-bar-main {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  flex: 1;
+}
+.overlay-opp-line {
+  font-weight: 650;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.overlay-bar-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.overlay-stat {
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 0.04rem 0.28rem;
+  border-radius: 999px;
+  background: rgba(74, 127, 212, 0.22);
+  color: #9bb8f0;
+}
+.overlay-stat--land {
+  background: rgba(52, 211, 153, 0.14);
+  color: #6ee7b7;
+}
+.overlay-stat--land em {
+  font-style: normal;
+  opacity: 0.75;
+  margin-left: 0.15rem;
+  font-weight: 600;
+}
+.overlay-icon-btn {
+  border: 0;
+  background: transparent;
+  color: #8b93a7;
+  cursor: pointer;
+  font-size: 0.65rem;
+  line-height: 1;
+  padding: 0.12rem 0.2rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.overlay-icon-btn:hover {
+  color: #e8eaf0;
+  background: rgba(255, 255, 255, 0.08);
+}
+.overlay-pill {
+  flex-shrink: 0;
+  font-size: 0.58rem;
+  font-weight: 800;
+  padding: 0.04rem 0.28rem;
+  border-radius: 3px;
+}
+.overlay-pill--win { background: #34d399; color: #06120c; }
+.overlay-pill--loss { background: #f87171; color: #fff; }
+.overlay-pill--draw,
+.overlay-pill--unknown { background: #fbbf24; color: #1a1204; }
+.overlay-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.4rem;
+  padding: 0.22rem 0.4rem 0.12rem;
+  cursor: grab;
+}
+.overlay-deck-line {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: rgba(240, 217, 153, 0.9);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.overlay-wr-line {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #34d399;
+  font-variant-numeric: tabular-nums;
+}
+.overlay-decklist {
+  list-style: none;
+  margin: 0;
+  padding: 0.05rem 0.2rem 0.3rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+  content-visibility: auto;
+}
+.overlay-card-row {
+  display: grid;
+  grid-template-columns: 1.1rem 28px minmax(0, 1fr) 2.4rem;
+  gap: 0.28rem;
+  align-items: center;
+  padding: 0.08rem 0.15rem;
+  border-radius: 3px;
+  font-size: 0.66rem;
+  line-height: 1.15;
+  contain: layout paint;
+}
+.overlay-card-row.is-land .overlay-card-name {
+  color: #a7f3d0;
+}
+.overlay-card-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.overlay-card-qty {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: rgba(232, 234, 240, 0.9);
+}
+.overlay-card-art {
+  width: 28px;
+  height: 40px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.overlay-card-art--empty {
+  display: block;
+  width: 28px;
+  height: 40px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.overlay-card-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(232, 234, 240, 0.88);
+}
+.overlay-card-pct {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.6rem;
+  font-weight: 650;
+  text-align: right;
+  color: #9bb8f0;
+}
+.overlay-hint {
+  margin: 0.35rem 0.45rem;
+  font-size: 0.62rem;
+  color: #8b93a7;
+  line-height: 1.35;
 }

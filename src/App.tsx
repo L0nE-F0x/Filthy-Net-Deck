@@ -112,6 +112,24 @@ export default function App() {
     void initTracker();
     void refreshMeta().finally(() => setBootDone(true));
     if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
+    // Overlay enable flag is owned by Rust (tray can toggle while main is hidden).
+    // Pull that flag first, then mirror into prefs so Settings stays honest.
+    void import("./services/overlay").then(async (m) => {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const rustOn = await invoke<boolean>("overlay_is_enabled");
+        const local = useAppStore.getState().prefs.overlayEnabled;
+        if (rustOn !== local) {
+          useAppStore.getState().setOverlayEnabled(rustOn);
+        } else {
+          await m.syncOverlayPrefFromStore(local);
+        }
+      } catch {
+        await m.syncOverlayPrefFromStore(
+          useAppStore.getState().prefs.overlayEnabled,
+        );
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -1,8 +1,9 @@
+mod overlay;
 mod silent_update;
 mod tracker;
 
 use tauri::{
-    menu::{Menu, MenuItem, PredefinedMenuItem},
+    menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Manager, WindowEvent,
 };
@@ -64,9 +65,14 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             tracker::tracker_status,
             tracker::tracker_matches,
+            tracker::tracker_live,
             tracker::tracker_clear,
             tracker::tracker_delete_matches,
             tracker::tracker_export_csv,
+            overlay::overlay_set_enabled,
+            overlay::overlay_is_enabled,
+            overlay::overlay_get_geometry,
+            overlay::overlay_save_geometry,
             silent_update::install_update_silent
         ])
         .setup(|app| {
@@ -82,13 +88,15 @@ pub fn run() {
                     Some(vec!["--hidden"]),
                 ))?;
                 // Remember window size/position between launches. Visibility
-                // is excluded: --hidden / tray logic owns that.
+                // is excluded: --hidden / tray logic owns that. Overlay is
+                // denylisted so its position is not restored over the main UI.
                 app.handle().plugin(
                     tauri_plugin_window_state::Builder::new()
                         .with_state_flags(
                             tauri_plugin_window_state::StateFlags::all()
                                 - tauri_plugin_window_state::StateFlags::VISIBLE,
                         )
+                        .with_denylist(&["overlay"])
                         .build(),
                 )?;
                 if std::env::args().any(|a| a == "--hidden") {
@@ -98,14 +106,24 @@ pub fn run() {
                 }
             }
 
+            overlay::load_enabled(app.handle());
+
             // Winrate tracker: tail MTG Arena's Player.log in the background.
             tracker::start(app.handle().clone());
 
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;
+            let overlay_i = CheckMenuItem::with_id(
+                app,
+                "overlay",
+                "In-game overlay",
+                true,
+                overlay::is_enabled(),
+                None::<&str>,
+            )?;
             let sep = PredefinedMenuItem::separator(app)?;
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show_i, &sep, &quit_i])?;
+            let menu = Menu::with_items(app, &[&show_i, &overlay_i, &sep, &quit_i])?;
 
             let icon = app
                 .default_window_icon()
@@ -119,6 +137,10 @@ pub fn run() {
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => show_main_window(app),
+                    "overlay" => {
+                        let next = !overlay::is_enabled();
+                        overlay::set_enabled(app, next);
+                    }
                     "quit" => {
                         app.exit(0);
                     }

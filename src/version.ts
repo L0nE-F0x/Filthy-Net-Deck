@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.2.0";
+export const APP_VERSION = "1.3.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "First-session coach: log found → first match → first opponent tag",
-  "Deeper tracker health + clearer Arena parse warnings",
-  "Share cards: week recap, climb story, and theme PNGs",
-  "Update UX: signed Update & restart stays primary",
+  "In-game overlay: library tracker with mini art & draw odds",
+  "Land count + slim collapsible bar (less invasive)",
+  "Resize, edge-snap, and persist overlay position",
+  "Match-end toasts default ON + Settings test notification"
 ];

@@ -116,6 +116,52 @@ pub struct TrackerStatus {
     pub backfill_done: bool,
 }
 
+/// One mainboard line still in (or known for) the library tracker.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveCardCount {
+    /// Arena grpId / card id.
+    pub grp_id: u32,
+    /// Copies still believed to be in the library.
+    pub remaining: u32,
+    /// Copies registered in the opening mainboard for this game.
+    pub total: u32,
+}
+
+/// Live in-match snapshot for the always-on-top HUD.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveMatch {
+    pub match_id: String,
+    /// "playing" | "ended" | "idle"
+    pub phase: String,
+    pub started_at: u64,
+    pub event_id: String,
+    pub best_of: u8,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opponent_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opponent_platform: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub my_player_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub my_rank: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deck_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deck_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deck_hash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result: Option<String>,
+    /// Cards still in library (mainboard tracker). Empty when unknown.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub library: Vec<LiveCardCount>,
+    /// Sum of `library.remaining` (quick badge).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub library_total: Option<u32>,
+}
+
 // ---------------------------------------------------------------------------
 // Shared state
 // ---------------------------------------------------------------------------
@@ -124,6 +170,8 @@ pub struct TrackerStatus {
 pub struct TrackerData {
     pub status: TrackerStatus,
     pub matches: Vec<TrackedMatch>,
+    /// Last emitted live snapshot (for mid-match overlay open).
+    pub live: Option<LiveMatch>,
     recorded_ids: HashSet<String>,
     data_file: Option<PathBuf>,
     deleted_file: Option<PathBuf>,
@@ -146,6 +194,11 @@ pub fn tracker_matches(state: State<'_, TrackerShared>) -> Vec<TrackedMatch> {
     let mut out = data.matches.clone();
     out.sort_by(|a, b| b.started_at.cmp(&a.started_at));
     out
+}
+
+#[tauri::command]
+pub fn tracker_live(state: State<'_, TrackerShared>) -> Option<LiveMatch> {
+    state.0.lock().expect("tracker lock").live.clone()
 }
 
 /// Export the full match history as CSV into the user's Downloads folder and
@@ -379,6 +432,163 @@ struct PendingMatch {
     awaiting_first_turn: bool,
 }
 
+/// Live mainboard-in-library tracker driven by GRE zone + gameObject diffs.
+#[derive(Debug, Default, Clone)]
+struct DeckTracker {
+    remaining: HashMap<u32, u32>,
+    totals: HashMap<u32, u32>,
+    /// Instance ids already counted as having left the library.
+    left_instances: HashSet<u32>,
+    /// zoneId -> ZoneType_* string
+    zone_types: HashMap<u32, String>,
+    last_lib_count: Option<u32>,
+}
+
+impl DeckTracker {
+    fn reset_from_main(&mut self, cards: &[u32]) {
+        self.remaining.clear();
+        self.totals.clear();
+        self.left_instances.clear();
+        self.last_lib_count = None;
+        for &id in cards {
+            *self.remaining.entry(id).or_default() += 1;
+            *self.totals.entry(id).or_default() += 1;
+        }
+    }
+
+    fn clear(&mut self) {
+        self.remaining.clear();
+        self.totals.clear();
+        self.left_instances.clear();
+        self.zone_types.clear();
+        self.last_lib_count = None;
+    }
+
+    fn snapshot(&self) -> (Vec<LiveCardCount>, Option<u32>) {
+        if self.totals.is_empty() {
+            return (Vec::new(), None);
+        }
+        let mut rows: Vec<LiveCardCount> = self
+            .totals
+            .iter()
+            .filter_map(|(&grp_id, &total)| {
+                let remaining = self.remaining.get(&grp_id).copied().unwrap_or(0);
+                if remaining == 0 && total == 0 {
+                    return None;
+                }
+                // Keep exhausted lines out of the live list to stay compact.
+                if remaining == 0 {
+                    return None;
+                }
+                Some(LiveCardCount {
+                    grp_id,
+                    remaining,
+                    total,
+                })
+            })
+            .collect();
+        rows.sort_by(|a, b| b.remaining.cmp(&a.remaining).then(a.grp_id.cmp(&b.grp_id)));
+        let sum: u32 = self.remaining.values().sum();
+        (rows, Some(sum))
+    }
+
+    /// Apply one GRE GameStateMessage. Returns true when remaining counts changed.
+    fn apply_game_state(&mut self, gsm: &serde_json::Value, my_seat: u32) -> bool {
+        let mut changed = false;
+
+        if let Some(zones) = gsm.get("zones").and_then(|z| z.as_array()) {
+            let mut my_lib_count: Option<u32> = None;
+            for z in zones {
+                let Some(zid) = z.get("zoneId").and_then(|x| x.as_u64()).map(|x| x as u32) else {
+                    continue;
+                };
+                if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
+                    self.zone_types.insert(zid, ty.to_string());
+                }
+                let owner = z.get("ownerSeatId").and_then(|o| o.as_u64()).map(|o| o as u32);
+                let ty = z.get("type").and_then(|t| t.as_str()).unwrap_or("");
+                if ty == "ZoneType_Library" && owner == Some(my_seat) {
+                    let n = z
+                        .get("objectInstanceIds")
+                        .and_then(|a| a.as_array())
+                        .map(|a| a.len() as u32)
+                        .unwrap_or(0);
+                    my_lib_count = Some(n);
+                }
+            }
+            if let Some(n) = my_lib_count {
+                if let Some(prev) = self.last_lib_count {
+                    // Library grew → mulligan / reshuffle put cards back. Re-baseline.
+                    if n > prev && !self.totals.is_empty() {
+                        self.remaining = self.totals.clone();
+                        self.left_instances.clear();
+                        changed = true;
+                    }
+                }
+                self.last_lib_count = Some(n);
+            }
+        }
+
+        let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) else {
+            return changed;
+        };
+        for go in gos {
+            let ty = go.get("type").and_then(|t| t.as_str()).unwrap_or("");
+            if ty != "GameObjectType_Card" {
+                continue;
+            }
+            let owner = go
+                .get("ownerSeatId")
+                .and_then(|o| o.as_u64())
+                .map(|o| o as u32);
+            if owner != Some(my_seat) {
+                continue;
+            }
+            let Some(instance) = go
+                .get("instanceId")
+                .and_then(|i| i.as_u64())
+                .map(|i| i as u32)
+            else {
+                continue;
+            };
+            if self.left_instances.contains(&instance) {
+                continue;
+            }
+            let zone_id = go
+                .get("zoneId")
+                .and_then(|z| z.as_u64())
+                .map(|z| z as u32);
+            let zone_ty = zone_id
+                .and_then(|z| self.zone_types.get(&z))
+                .map(|s| s.as_str())
+                .unwrap_or("");
+            // Still in deck areas — not drawn/milled yet.
+            if matches!(
+                zone_ty,
+                "ZoneType_Library" | "ZoneType_Sideboard" | "ZoneType_Pending" | ""
+            ) {
+                // Unknown zone: if we have no type yet, skip rather than false-draw.
+                continue;
+            }
+            // Limbo is used during mulligan animations — don't count until a real zone.
+            if zone_ty == "ZoneType_Limbo" {
+                continue;
+            }
+            let Some(grp) = go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32) else {
+                continue;
+            };
+            self.left_instances.insert(instance);
+            if let Some(slot) = self.remaining.get_mut(&grp) {
+                if *slot > 0 {
+                    *slot -= 1;
+                    changed = true;
+                }
+            }
+        }
+        changed
+    }
+}
+
 #[derive(Default)]
 pub struct LogParser {
     local_user_id: Option<String>,
@@ -392,6 +602,10 @@ pub struct LogParser {
     current_season: Option<u32>,
     pending: HashMap<String, PendingMatch>,
     current_match_id: Option<String>,
+    /// Live library counts for the current match/game.
+    deck_tracker: DeckTracker,
+    /// Set when the live HUD snapshot needs re-emit (avoids spamming every GRE tick).
+    live_dirty: bool,
     pub parse_errors: u64,
     pub events_seen: u64,
     pub last_event_at: Option<u64>,
@@ -408,6 +622,15 @@ impl LogParser {
     pub fn reset_session(&mut self) {
         self.pending.clear();
         self.current_match_id = None;
+        self.deck_tracker.clear();
+        self.live_dirty = true;
+    }
+
+    /// Whether the overlay should re-emit after this batch of log lines.
+    pub fn consume_live_dirty(&mut self) -> bool {
+        let d = self.live_dirty;
+        self.live_dirty = false;
+        d
     }
 
     pub fn detailed_logs(&self) -> Option<bool> {
@@ -416,6 +639,44 @@ impl LogParser {
 
     pub fn local_player_name(&self) -> Option<String> {
         self.local_player_name.clone()
+    }
+
+    /// Snapshot of the current in-progress match (if any) for the overlay HUD.
+    pub fn live_match(&self) -> Option<LiveMatch> {
+        let match_id = self.current_match_id.as_ref()?;
+        let pending = self.pending.get(match_id)?;
+        let event_id = if pending.event_id.is_empty() {
+            "Unknown".to_string()
+        } else {
+            pending.event_id.clone()
+        };
+        let best_of = if event_id.contains("Traditional") {
+            3
+        } else {
+            1
+        };
+        let (library, library_total) = self.deck_tracker.snapshot();
+        Some(LiveMatch {
+            match_id: match_id.clone(),
+            phase: "playing".to_string(),
+            started_at: if pending.started_at == 0 {
+                now_ms()
+            } else {
+                pending.started_at
+            },
+            event_id,
+            best_of,
+            opponent_name: pending.opponent_name.clone(),
+            opponent_platform: pending.opponent_platform.clone(),
+            my_player_name: pending.my_player_name.clone(),
+            my_rank: pending.my_rank.clone(),
+            deck_name: pending.deck_name.clone(),
+            deck_id: pending.deck_id.clone(),
+            deck_hash: pending.deck_hash.clone(),
+            result: None,
+            library,
+            library_total,
+        })
     }
 
     /// Feed one log line; returns matches completed by this line.
@@ -549,36 +810,43 @@ impl LogParser {
     fn on_gre(&mut self, line: &str) {
         let has_deck = line.contains("\"deckMessage\"");
         let turn1_active = find_turn1_active_player(line);
-        if !has_deck && turn1_active.is_none() {
+        let has_gsm = line.contains("\"gameStateMessage\"");
+        if !has_deck && turn1_active.is_none() && !has_gsm {
             return;
         }
         let Some(match_id) = self.current_match_id.clone() else {
             return;
         };
-        let Some(pending) = self.pending.get_mut(&match_id) else {
-            return;
-        };
+        // Seat needed for library tracking.
+        let my_seat = self
+            .pending
+            .get(&match_id)
+            .and_then(|p| p.my_seat_id);
 
         if has_deck {
             if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
                 if let Some((cards, side)) = find_deck_message(&v) {
-                    // New GRE connection = new game; expect its turn-1 info next.
-                    pending.game_on_play.push(None);
-                    pending.awaiting_first_turn = true;
-                    // Only game 1 identifies the registered deck; later games
-                    // are post-sideboard lists.
-                    if pending.deck_hash.is_none() {
-                        let hash = fingerprint(&cards);
-                        if let Some((deck_id, deck_name)) = self.courses_by_hash.get(&hash) {
-                            // Exact list match beats the per-queue course lookup.
-                            pending.deck_id = deck_id.clone();
-                            if deck_name.is_some() {
-                                pending.deck_name = deck_name.clone();
+                    // Opening list for this game — seed / re-seed the library tracker.
+                    self.deck_tracker.reset_from_main(&cards);
+                    self.live_dirty = true;
+                    if let Some(pending) = self.pending.get_mut(&match_id) {
+                        // New GRE connection = new game; expect its turn-1 info next.
+                        pending.game_on_play.push(None);
+                        pending.awaiting_first_turn = true;
+                        // Only game 1 identifies the registered deck; later games
+                        // are post-sideboard lists.
+                        if pending.deck_hash.is_none() {
+                            let hash = fingerprint(&cards);
+                            if let Some((deck_id, deck_name)) = self.courses_by_hash.get(&hash) {
+                                pending.deck_id = deck_id.clone();
+                                if deck_name.is_some() {
+                                    pending.deck_name = deck_name.clone();
+                                }
                             }
+                            pending.deck_hash = Some(hash);
+                            pending.deck_main = Some(cards);
+                            pending.deck_side = Some(side);
                         }
-                        pending.deck_hash = Some(hash);
-                        pending.deck_main = Some(cards);
-                        pending.deck_side = Some(side);
                     }
                 }
             } else {
@@ -586,12 +854,42 @@ impl LogParser {
             }
         }
 
+        // Cheap gate: most GRE spam has neither library zones nor objects.
+        if has_gsm
+            && my_seat.is_some()
+            && (line.contains("\"gameObjects\"") || line.contains("ZoneType_Library"))
+        {
+            if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
+                if let Some(my_seat) = my_seat {
+                    let mut changed = false;
+                    if let Some(msgs) = v
+                        .get("greToClientEvent")
+                        .and_then(|e| e.get("greToClientMessages"))
+                        .and_then(|m| m.as_array())
+                    {
+                        for msg in msgs {
+                            if let Some(gsm) = msg.get("gameStateMessage") {
+                                changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
+                            }
+                        }
+                    } else if let Some(gsm) = v.get("gameStateMessage") {
+                        changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
+                    }
+                    if changed {
+                        self.live_dirty = true;
+                    }
+                }
+            }
+        }
+
         if let Some(active_seat) = turn1_active {
-            if pending.awaiting_first_turn {
-                pending.awaiting_first_turn = false;
-                if let Some(my_seat) = pending.my_seat_id {
-                    if let Some(slot) = pending.game_on_play.last_mut() {
-                        *slot = Some(active_seat == my_seat);
+            if let Some(pending) = self.pending.get_mut(&match_id) {
+                if pending.awaiting_first_turn {
+                    pending.awaiting_first_turn = false;
+                    if let Some(my_seat) = pending.my_seat_id {
+                        if let Some(slot) = pending.game_on_play.last_mut() {
+                            *slot = Some(active_seat == my_seat);
+                        }
                     }
                 }
             }
@@ -637,6 +935,7 @@ impl LogParser {
             "MatchGameRoomStateType_Playing" => {
                 self.upsert_pending(&match_id, ts, &players);
                 self.current_match_id = Some(match_id);
+                self.live_dirty = true;
                 Vec::new()
             }
             "MatchGameRoomStateType_MatchCompleted" => {
@@ -646,6 +945,8 @@ impl LogParser {
                 if self.current_match_id.as_deref() == Some(match_id.as_str()) {
                     self.current_match_id = None;
                 }
+                self.deck_tracker.clear();
+                self.live_dirty = true;
                 let pending = self.pending.remove(&match_id).unwrap_or_default();
                 let result_list = room
                     .get("finalMatchResult")
@@ -1021,6 +1322,7 @@ fn run_loop(app: AppHandle) {
                 if len < pos {
                     // Arena restarted and truncated the log.
                     parser.reset_session();
+                    publish_live(&app, None);
                     pos = 0;
                     carry.clear();
                 }
@@ -1030,7 +1332,13 @@ fn run_loop(app: AppHandle) {
                             pos = len;
                             carry.push_str(&chunk);
                             let completed = drain_complete_lines(&mut carry, &mut parser);
+                            let live_needed = parser.consume_live_dirty() || !completed.is_empty();
                             record_matches(&app, completed);
+                            // Only re-push overlay state when match/library actually moved —
+                            // GRE spam otherwise burns CPU on JSON + WebView re-renders.
+                            if live_needed {
+                                sync_live(&app, &parser);
+                            }
                         }
                         Err(_) => {
                             // Transient read failure (AV scan, etc.) — retry next tick.
@@ -1104,9 +1412,78 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
         data.status.matches_recorded = data.matches.len();
     }
     for m in fresh {
+        // Brief "ended" live frame so the overlay can flash the result, then idle.
+        let ended = LiveMatch {
+            match_id: m.match_id.clone(),
+            phase: "ended".to_string(),
+            started_at: m.started_at,
+            event_id: m.event_id.clone(),
+            best_of: m.best_of,
+            opponent_name: m.opponent_name.clone(),
+            opponent_platform: m.opponent_platform.clone(),
+            my_player_name: m.my_player_name.clone(),
+            my_rank: m.my_rank.clone(),
+            deck_name: m.deck_name.clone(),
+            deck_id: m.deck_id.clone(),
+            deck_hash: m.deck_hash.clone(),
+            result: Some(m.result.clone()),
+            library: Vec::new(),
+            library_total: None,
+        };
+        let mid = ended.match_id.clone();
+        publish_live(app, Some(ended));
+        schedule_clear_ended(app, mid);
         let _ = app.emit("tracker:match", &m);
     }
     emit_status(app);
+}
+
+fn publish_live(app: &AppHandle, live: Option<LiveMatch>) {
+    let changed = {
+        let shared = app.state::<TrackerShared>();
+        let mut data = shared.0.lock().expect("tracker lock");
+        if data.live == live {
+            false
+        } else {
+            data.live = live.clone();
+            true
+        }
+    };
+    if !changed {
+        return;
+    }
+    let _ = app.emit("tracker:live", &live);
+    // Rust-driven show/hide so tray-hidden main WebView is not required.
+    match live.as_ref().map(|l| l.phase.as_str()) {
+        Some("playing") | Some("ended") => crate::overlay::show(app),
+        _ => crate::overlay::hide(app),
+    }
+}
+
+/// Sync overlay live state from the parser while a match is in progress.
+/// Match-end flash + hide is handled in `record_matches` (with a one-shot delay).
+fn sync_live(app: &AppHandle, parser: &LogParser) {
+    if let Some(live) = parser.live_match() {
+        publish_live(app, Some(live));
+    }
+}
+
+fn schedule_clear_ended(app: &AppHandle, match_id: String) {
+    let app2 = app.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(2800));
+        let still = {
+            let shared = app2.state::<TrackerShared>();
+            let data = shared.0.lock().expect("tracker lock");
+            data.live
+                .as_ref()
+                .map(|l| l.phase == "ended" && l.match_id == match_id)
+                .unwrap_or(false)
+        };
+        if still {
+            publish_live(&app2, None);
+        }
+    });
 }
 
 fn sync_status(app: &AppHandle, parser: &LogParser, log_found: bool, backfill_done: bool) {
@@ -1264,6 +1641,63 @@ mod tests {
             2,
         )));
         out
+    }
+
+    #[test]
+    fn live_snapshot_while_playing_then_clears() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(RANK);
+        p.feed_line(COURSES);
+        p.feed_line(&room_playing("m-live", "Ladder"));
+        let live = p.live_match().expect("playing");
+        assert_eq!(live.match_id, "m-live");
+        assert_eq!(live.phase, "playing");
+        assert_eq!(live.opponent_name.as_deref(), Some("Rival"));
+        assert_eq!(live.deck_name.as_deref(), Some("Izzet Cauldron"));
+        assert_eq!(live.my_rank.as_deref(), Some("Diamond 1"));
+        p.feed_line(GRE_CONNECT);
+        let live2 = p.live_match().expect("still playing");
+        assert!(live2.deck_hash.is_some());
+        assert_eq!(live2.library_total, Some(6)); // GRE_CONNECT deckCards length
+        p.feed_line(&room_completed(
+            "m-live",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert!(p.live_match().is_none());
+    }
+
+    #[test]
+    fn library_tracker_decrements_on_hand_draw() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-lib", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        let before = p.live_match().unwrap().library_total.unwrap();
+        assert_eq!(before, 6);
+        // Diff: my seat is 2; hand zone 35, two cards leave library.
+        let gsm = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [1, 2] },
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [3,4,5,6] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 1, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 2, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(gsm);
+        let live = p.live_match().unwrap();
+        assert_eq!(live.library_total, Some(4));
+        let c101 = live.library.iter().find(|c| c.grp_id == 101).unwrap();
+        assert_eq!(c101.remaining, 2); // started 4, drew 2
+        assert_eq!(c101.total, 4);
     }
 
     #[test]

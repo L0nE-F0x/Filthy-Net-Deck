@@ -7,6 +7,12 @@ import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
+import {
+  getNotifyPermission,
+  requestNotifyPermission,
+  sendTestNotification,
+  type NotifyPermission,
+} from "../services/notify";
 
 /** X1 + v1.2 — tracker health + first-session coach. */
 function TrackerHealthCard() {
@@ -67,6 +73,7 @@ export function Settings() {
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
+  const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
@@ -77,12 +84,17 @@ export function Settings() {
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
   const [autostart, setAutostartState] = useState<boolean | null>(null);
+  const [notifyPerm, setNotifyPerm] = useState<NotifyPermission>("unknown");
+  const [testMsg, setTestMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isTauri()) return;
     let alive = true;
     void isAutostartEnabled().then((on) => {
       if (alive) setAutostartState(on);
+    });
+    void getNotifyPermission().then((p) => {
+      if (alive) setNotifyPerm(p);
     });
     return () => {
       alive = false;
@@ -159,11 +171,39 @@ export function Settings() {
         <TrackerHealthCard />
         <KeyboardCheatSheet />
 
+        {/* —— In-game overlay —— */}
+        {isTauri() && (
+          <section className="panel settings-card settings-card-span2">
+            <h3 className="settings-card-title">In-game overlay</h3>
+            <p className="settings-card-desc mb-2">
+              Slim always-on-top deck tracker: mini art, draw odds, land count. Starts
+              collapsed (bar only) — expand with ▾. Drag/resize; snaps to edges.
+              Local only. For best Arena FPS use a{" "}
+              <strong className="text-foam">release build</strong> (not tauri:dev) and
+              avoid running a second tracker at the same time. Prefer borderless windowed
+              if exclusive fullscreen hides the panel.
+            </p>
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.overlayEnabled}
+                onChange={(e) => setOverlayEnabled(e.target.checked)}
+              />
+              <span>
+                <strong>Show match overlay</strong>
+                <em>Auto show/hide with match · ▾ expands full list</em>
+              </span>
+            </label>
+          </section>
+        )}
+
         {/* —— Notifications (stacked compact rows) —— */}
         <section className="panel settings-card settings-card-span2">
           <h3 className="settings-card-title">Notifications</h3>
           <p className="settings-card-desc mb-2">
-            Desktop toasts stay on this PC. Turn each one on only if you want it.
+            Desktop toasts stay on this PC. Match-end is on by default. If you never
+            see toasts, check Windows → Notifications and Focus Assist for Filthy Net
+            Deck.
           </p>
           <div className="settings-toggle-list">
             <label className="settings-toggle-row">
@@ -200,6 +240,54 @@ export function Settings() {
               </span>
             </label>
           </div>
+          {isTauri() && (
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  void (async () => {
+                    const ok = await sendTestNotification();
+                    const p = await getNotifyPermission();
+                    setNotifyPerm(p);
+                    setTestMsg(
+                      ok
+                        ? "Test toast sent — check the Windows notification area."
+                        : "Permission not granted. Allow notifications for Filthy Net Deck in Windows Settings.",
+                    );
+                  })();
+                }}
+              >
+                Send test notification
+              </button>
+              {notifyPerm !== "granted" && (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => {
+                    void requestNotifyPermission().then((p) => setNotifyPerm(p));
+                  }}
+                >
+                  Request permission
+                </button>
+              )}
+              <span className="text-muted text-xs">
+                OS permission:{" "}
+                <strong className="text-foam">
+                  {notifyPerm === "granted"
+                    ? "granted"
+                    : notifyPerm === "denied"
+                      ? "denied"
+                      : notifyPerm === "default"
+                        ? "not asked yet"
+                        : "unknown"}
+                </strong>
+              </span>
+              {testMsg && (
+                <span className="text-muted text-xs w-full">{testMsg}</span>
+              )}
+            </div>
+          )}
         </section>
 
         {/* —— Updates —— */}

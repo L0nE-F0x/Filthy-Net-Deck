@@ -18,7 +18,7 @@ Climb succeeded because it is not a dump of stats — it is a **story + actions*
 | **Hover density** | Rank + deck + time on chart | Tooltips carry the next click, not decoration |
 | **Honest empties** | No rank stamps → clear copy | Never invent matchups, SB guides, or lists |
 
-**Non-goals stay closed:** in-game overlay, Alchemy/Historic, cloud sync, mobile tracking promises, price tracking, fabricated matchup/sideboard content.
+**Non-goals stay closed:** in-draft overlay, Alchemy/Historic, cloud sync, mobile tracking promises, price tracking, fabricated matchup/sideboard content. Constructed match HUD is in progress (v1.3).
 
 **Climb (v0.26) is the reference implementation — not on this list.**
 
@@ -301,7 +301,7 @@ P0 hotfixes (tracker, import) still ship solo.
 | Idea | Why deferred |
 |------|----------------|
 | Limited / Draft hub | Large data surface; owner parked |
-| In-draft overlay | ToS |
+| In-draft overlay | ToS (constructed library tracker ships in overlay) |
 | AI coach without grounded local data | Hallucination risk |
 | Price / collection vault | Non-goal / high complexity |
 | Cloud sync of notes/matches | Privacy promise |

@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.1.1** (Planeswalker themes + sidebar Themes fix; Windows + macOS on site).  
+**Current release:** **v1.3.0** (in-game overlay deck tracker; Windows signed on site; macOS dmg may lag until tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -8,24 +8,23 @@
 
 ---
 
-## Next chapter — post-v1 (owner 2026-07-19)
+## Next chapter — post-v1.3 (owner 2026-07-19)
 
-Canonical checklist: **`handoff.md` → Next chapter**. Themes (not a second 25-ticket bomb):
+Canonical checklist: **`handoff.md`**.
 
-1. **Reliability theater** — tracker edge cases, Arena parse resilience, update UX honesty  
-2. **Onboarding** — first 5 minutes: log found → first match → first opponent tag  
-3. **Shareable moments** — climb / week recap / theme skins for social  
-4. **Listen** — ship only real user gaps that fit Climb bar + SKIP list  
+1. **Listen / polish** — overlay feedback from real ladder sessions  
+2. **macOS roll** — tag CI dmg for 1.3.0 when cutting the tag  
+3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
-**Target product version:** **v1.2.x** when this batch ships end-to-end (installer + updater + site).
+**Shipped:** **v1.3.0** in-game overlay + match-end notify defaults (installer + updater + site).
 
 ### Explicitly deferred
 
-Limited/Draft hub · in-game overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data · monetization (tip jar / Pro until usage justifies).
+Limited/Draft hub · **in-draft** overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data · monetization (tip jar / Pro until usage justifies).
 
 ### 10× SKIP (still closed)
 
-D1, D4, D5 · M3, M5 · Z1 · all E\* · X3, X4 — see `docs/PAGE-10X.md`.
+D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test toast ships with v1.3.)
 
 ---
 
@@ -45,6 +44,8 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3, X4 — see `docs/PAGE-10X.md`.
 
 | Version | Theme |
 |---------|--------|
+| **v1.3.0** | In-game overlay deck tracker + notify defaults |
+| **v1.2.0** | First-session coach, share cards, update UX |
 | **v1.1.1** | Themes accordion sidebar-only |
 | **v1.1.0** | Planeswalker accent skins |
 | **v1.0.0** | 10× batches 1–4 (deep links, personal loop, Format Hub, Sets/compare) |
@@ -60,4 +61,4 @@ Detail lives in git history. Older “roll v0.23 macOS / verify 0.22→0.23” f
 
 ## Non-goals (do not add)
 
-In-game overlay (ToS), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.
+In-draft overlay (ToS), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.
