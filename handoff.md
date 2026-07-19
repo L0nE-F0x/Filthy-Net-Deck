@@ -1,9 +1,9 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-19 — **v1.3.5 fully live** (Windows signed installer + Netlify + tag `v1.3.5`).  
-**Next agent charter:** **macOS roll** (pull `v1.3.5` CI dmg into `website/downloads/` + site links), then further overlay/UX polish only if owner asks.
+**Last wrap-up:** 2026-07-19 — **Grok review of Kimi’s v1.3.5 overlay polish** (already live on Windows + Netlify).  
+**Next agent:** **Claude Code — final audit** (correctness / perf / edge cases / ship hygiene). Not a redesign pass unless audit finds ship-blockers.
 
-Read **`AGENTS.md`** first. Any user-visible change is incomplete until the **full release checklist** ships (version bump, signed build, updater, site, OG). Source-only is not a release.
+Read **`AGENTS.md`** first. User-visible changes still need the full release checklist if you fix anything that ships.
 
 ---
 
@@ -12,141 +12,153 @@ Read **`AGENTS.md`** first. Any user-visible change is incomplete until the **fu
 | Item | Value |
 |------|--------|
 | Version | **1.3.5** (Windows) |
+| Release commit | `5868c34` — *Release v1.3.5: in-game overlay, refined* |
+| Tag | Expect **`v1.3.5`** if Kimi pushed it (confirm with `git tag -l 'v1.3*'`). |
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-1.3.5.exe` (+ `.sig`) |
-| macOS | **1.1.1** dmg still on site until tag CI dmg is rolled |
-| Soft / updater | `website/version.json` + `public/version.json` + `website/updater/latest.json` → **1.3.5** |
+| macOS | **1.1.1** dmg still on site until CI dmg rolled |
+| Soft / updater | `version.json` + `updater/latest.json` → **1.3.5** (live verified) |
 | Live site | https://filthy-net-deck.netlify.app/ |
 
-Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted; password in `filthy-net-deck-key-password.txt` next to it — local only, never commit).
+Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password is **local only** — never commit. (If a `filthy-net-deck-key-password.txt` sits next to the key, keep it gitignored.)
 
 ---
 
-## What just shipped (v1.3.5) — overlay polish pass (Kimi)
+## Lineage (session stack)
 
-Frontend refinement of the v1.3.0 in-game overlay, per this handoff's charter:
+| Step | Who | Outcome |
+|------|-----|---------|
+| **v1.3.0** | Grok | Overlay MVP: GRE library tracker, live window, art/odds/lands, notify defaults, perf invariants, full AGENTS ship |
+| Polish charter | Grok | `handoff.md` pointed Kimi at beauty + density without FPS regression |
+| **v1.3.5** | Kimi | Frontend refinement + full release ship (already on Netlify) |
+| **This note** | Grok | Code review + audit checklist for Claude Code |
+
+---
+
+## What Kimi shipped in v1.3.5 (summary)
 
 | Area | Change |
 |------|--------|
-| **Information design** | Library now groups into **Lands / Creatures / Spells** sections (type-line driven), sorted by cmc; each row shows **mana pips** + next-draw % with a subtle heat wash. |
-| **Art** | Rows use Scryfall **art_crop** (was full-card `small` — looked like unreadable shrunken cards). `arenaMeta` cache bumped to `bbi.arenaMeta.v2` and now also stores `cmc` + `manaCost`. |
-| **Collapsed bar** | **Real slim strip** — window shrinks to 34px (Rust `MIN_H` 120→32); expanding restores the remembered height and clamps on-screen. N/S/SE resize handles hidden while collapsed. |
-| **Bar content** | `vs` micro-label, opp, library chip, land chip (`16L 45.7%`), expand chevron. Ended: **Victory/Defeat/Draw pill**. |
-| **Sub row** | Deck name, season record, Bo1/Bo3 chip, **match clock** (1 Hz text tick only while playing — no continuous animation). |
-| **Settings** | New **opacity slider** (55–100%) + **Start expanded** toggle (prefs `overlayOpacity` / `overlayStartExpanded` in `bbi.prefs`, read live by overlay webview via `storage` events). Copy de-dev-ified (no more `tauri:dev` mention). |
-| **Pure logic** | `src/overlay/overlayModel.ts` (group/sort/pips/clock/opacity) + `overlayModel.test.ts` (112 vitest tests total, 16 Rust tests — all green). |
+| **Information design** | Library grouped **Lands / Creatures / Spells** (type-line), sorted by CMC; rows show **mana pips** + next-draw % with heat wash (`--int`) |
+| **Art** | Scryfall **`art_crop`** (was full-card `small`); cache key `bbi.arenaMeta.v2` + `cmc` / `manaCost` |
+| **Collapsed bar** | Real slim strip — window → **34px** (`MIN_H` 32 in Rust); expand restores remembered height; N/S/SE resize hidden when collapsed |
+| **Bar / end state** | vs + opp, library chip, land chip; **Victory/Defeat/Draw** pills |
+| **Sub row** | Deck, season record, Bo chip, **match clock** (1 Hz while playing) |
+| **Settings** | **Opacity 55–100%**, **Start expanded**; prefs in `bbi.prefs`; overlay reads via `storage` events |
+| **Pure logic** | `src/overlay/overlayModel.ts` + `overlayModel.test.ts` |
 
-Perf/privacy invariants kept: no backdrop-filter, dirty-only `tracker:live` emits, rAF-coalesced updates, Rust owns show/hide, never `set_focus`, memoized rows.
-
----
-
-## What shipped before (v1.3.0) — context
-
-### Product
-
-Desktop MTG Arena companion (Tauri 2 + React + TypeScript). **Desktop only.** Formats: **Standard + Pioneer** only. Tracker is **local `Player.log` tail** — nothing leaves the machine.
-
-### Headline feature: **in-game overlay deck tracker**
-
-Always-on-top transparent window during ranked/play matches:
-
-| Capability | Behavior |
-|------------|----------|
-| Show / hide | Auto on match start (`Playing`), brief result flash on end, then hide |
-| Default UI | **Collapsed slim bar** (less invasive); expand with ▾ |
-| Library list | Remaining mainboard cards, mini Scryfall art, **next-draw %**, land rows sorted first |
-| Lands | Bar badge e.g. `14L` + % of library |
-| Geometry | Drag top bar, resize edges, **edge-snap**, persist to app-data `overlay-geometry.json` |
-| Control | Settings toggle + tray “In-game overlay” |
-| Privacy | Local GRE parse only; no Arena injection |
-
-### Also in 1.3.0
-
-- **Match-end desktop toasts** default **ON** (were OFF — why users never saw them)
-- Settings: **Send test notification** + OS permission status
-- Overlay **perf work**: dirty-only `tracker:live` emits, skip full GRE JSON unless `gameObjects` / library zones, **no CSS backdrop-filter blur**, rAF-coalesced React updates, Scryfall meta cached in `localStorage`
-
-### Owner feedback trail (why polish still matters)
-
-1. First HUD was “premium but invasive” and low-info → added deck tracker + collapse.
-2. Still not Untapped-level (art, odds, lands) → added those; default collapsed; denser column.
-3. Arena lag with `tauri:dev` ± Untapped → perf passes above; **always judge FPS on release build**, not dev.
-4. Owner was happy enough to **ship 1.3.0 live** — next step is **visual/UX refinement**, not a greenfield rewrite.
-
-**Untapped bar to chase (inspiration, not clone):** denser mini-art column, clearer odds, land stats, low visual noise, zero Arena focus steal.
+Grok verification (this review): **`tsc` clean**, **112 vitest tests green** (incl. 14 overlay model), live **version.json / updater = 1.3.5**.
 
 ---
 
-## Architecture (overlay)
+## Grok review (for Claude Code)
+
+### Verdict
+
+**Approve with notes — not a rewrite.** Kimi delivered a coherent polish pass that matches the charter: denser Untapped-adjacent information design, true collapse, Settings affordances, pure logic extracted + tested, release path completed. Safe for Claude to **audit for bugs/hygiene** rather than redesign.
+
+### What looks solid
+
+1. **`overlayModel.ts` split** — group/sort/pips/clock/opacity are unit-tested; right place for pure functions.
+2. **Collapse geometry** — `programmaticResize` guard + `expandedH` + not persisting collapsed height as “real” geometry is thoughtful.
+3. **art_crop** — correct call for mini row art; v2 cache bump avoids stale small-card thumbs.
+4. **Perf invariants mostly held** — no backdrop-filter; rAF live coalesce; dirty GRE path from 1.3.0 still in Rust (Kimi didn’t reintroduce per-line spam in tracker).
+5. **Ship discipline** — installer + updater + site + OG bumped (version jump 1.3.0 → **1.3.5** is a bit odd numbering-wise, but consistent end-to-end).
+
+### Issues / audit targets (priority order)
+
+#### P1 — worth confirming or fixing
+
+1. **1 Hz match clock re-renders the whole `OverlayApp`**  
+   `setNow` every second while `playing` re-renders groups + all rows. Prefer extracting a tiny `MatchClock` child so only the clock node updates, or drive clock from a ref/DOM text update.
+
+2. **`storage` event for opacity may not fire in all Tauri setups**  
+   Overlay listens to `window.storage` for main-window prefs. Same-origin multi-webview usually works; if opacity slider doesn’t live-update the open overlay, add a Tauri event (`prefs:overlay`) or re-read prefs on focus/visibility. Verify on real Windows build.
+
+3. **`startExpanded` only applies at overlay mount**  
+   Changing Settings mid-session won’t re-expand an already-open overlay until next match window create. Acceptable if documented; otherwise re-read on `tracker:live` playing transition.
+
+4. **Layering: `useAppStore` imports `overlay/overlayModel`**  
+   Store → overlay presentation util couples main app to overlay module. Fine short-term; if you move files, consider `src/services/overlayPrefs.ts` for `normalizeOpacity` only.
+
+5. **Null Scryfall meta cached permanently**  
+   Failed resolves store `null` in v2 cache → card stays “Card {grpId}” until cache clear. Consider TTL or not persisting nulls (retry next session).
+
+#### P2 — polish / edge cases
+
+6. **Hybrid mana** — `pipTone("W/U")` uses first letter only; `pipText` → `"WU"`. Acceptable; dual-color pip styling optional.
+7. **Pips dropped when >5 symbols** — intentional to avoid clutter; rare (e.g. huge green stompy costs).
+8. **Heat wash (`--int`)** — verify CSS doesn’t look like a loud bar under gold theme; should stay subtle mid-match.
+9. **Collapsed 34px vs Windows min window chrome** — if some OS builds clamp taller than 34, bar may clip; smoke-test on owner machine.
+10. **Version skip 1.3.1–1.3.4** — cosmetic; next patch can be 1.3.6 or 1.4.0.
+
+#### P3 — out of scope unless owner asks
+
+- Click-through, sideboard between Bo3 games, WUBRG deck pips  
+- GRE parser changes (only if tracking wrong mid-match)  
+- Draft overlay  
+
+### Must not regress
+
+- Never `set_focus` overlay  
+- Rust owns show/hide  
+- Dirty-only `tracker:live`  
+- No backdrop-filter / heavy blur  
+- Local-only tracking; no draft helper  
+- ApexForge credit stays  
+
+### Suggested Claude Code pass
 
 ```
-Player.log ──tail──► LogParser (Rust tracker.rs)
-                        │
-                        ├─ tracker:match      → main UI + match-end notify
-                        ├─ tracker:status
-                        └─ tracker:live       → overlay webview (show/hide owned by Rust)
+1. Read AGENTS.md + this handoff.
+2. Smoke-read: OverlayApp.tsx, overlayModel.ts, arenaMeta.ts, overlay.rs, Settings overlay section, useAppStore prefs.
+3. Run: npm test && npx tsc --noEmit  (and cargo test --lib if touching Rust).
+4. Fix only P1 items that reproduce, or clear ship-hygiene gaps (gitignore password file, tag check, macOS note).
+5. If UI changes ship → full AGENTS checklist (do not claim live after source-only).
+6. Leave a short audit note in handoff.md when done.
 ```
 
-| Layer | Path | Role |
-|-------|------|------|
-| Rust window | `src-tauri/src/overlay.rs` | Create/show/hide overlay webview; enable flag; geometry persist |
-| Rust live data | `src-tauri/src/tracker.rs` | `LiveMatch`, `LiveCardCount`, `DeckTracker` (library remaining from GRE) |
-| App wiring | `src-tauri/src/lib.rs` | Commands + tray check item |
-| Capabilities | `src-tauri/capabilities/default.json` | `main` + `overlay` window perms |
-| Entry | `src/main.tsx` | `#/overlay` → `OverlayApp` (not full `App`) |
-| UI | `src/overlay/OverlayApp.tsx` | Bar, list, art, %, snap/resize handlers |
-| Styles | `src/index.css` (section `In-game overlay HUD`) | No blur; solid-ish dark glass |
-| Card meta | `src/services/arenaMeta.ts` | Arena grpId → Scryfall name/type/land/art; disk cache |
-| Pref bridge | `src/services/overlay.ts` + `useAppStore` `overlayEnabled` | Settings ↔ Rust |
-| Notify | `src/services/notify.ts` | Test toast + permission helpers |
-| Types | `src/types/tracker.ts` | `LiveMatch`, `LiveCardCount` |
+---
 
-### Key behaviors to preserve when polishing
+## Architecture map (current)
 
-- **Never `set_focus` on overlay** (Arena input).
-- **Rust owns show/hide** so tray-hidden main WebView can miss events.
-- **Emit `tracker:live` only when dirty** (`live_dirty` / library change) — do not reintroduce per-GRE-line WebView thrash.
-- **No backdrop-filter / heavy blur** on always-on-top HWND (GPU cost).
-- Prefer **borderless windowed** Arena if exclusive fullscreen covers the panel (document in Settings if you touch copy).
-- **Draft overlay stays out of scope** (ToS risk). Constructed library tracker is in.
+| Layer | Path |
+|-------|------|
+| Rust window | `src-tauri/src/overlay.rs` |
+| GRE + live | `src-tauri/src/tracker.rs` (`LiveMatch`, `DeckTracker`) |
+| UI | `src/overlay/OverlayApp.tsx` |
+| Pure model + tests | `src/overlay/overlayModel.ts`, `overlayModel.test.ts` |
+| Styles | `src/index.css` (`In-game overlay HUD`) |
+| Meta/art | `src/services/arenaMeta.ts` (`bbi.arenaMeta.v2`) |
+| Prefs | `useAppStore` + Settings; overlay reads `bbi.prefs` |
+| Entry | `src/main.tsx` → `#/overlay` |
 
-### Dev commands
+### Dev
 
 ```bash
 npm install
-npm run tauri:dev    # heavy — not for FPS judgment
-npm run tauri:build  # set TAURI_SIGNING_* for updater artifacts
+npm run tauri:dev    # not for FPS judgment
+npm run tauri:build  # TAURI_SIGNING_* for real updater artifacts
 npm test
 ```
 
-Arena: enable **Detailed Logs (Plugin Support)**. Overlay needs a finished GRE `deckMessage` + hand/library zone diffs.
+Arena: **Detailed Logs (Plugin Support)** on.
 
 ---
 
-## Next work
+## Next product work (after audit)
 
-1. **macOS roll** — after GH Actions builds the `v1.3.5` dmg, pull it into `website/downloads/` and fix macOS download links (pattern from past "Roll vX out to macOS" commits).
-2. **Further overlay ideas (only if owner asks):** click-through mode, per-deck art size, sideboard view between Bo3 games, WUBRG deck-color pips. Keep the perf/privacy invariants.
-3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices, Events overhaul).
-
-### When the next UI change ships
-
-Full checklist in **`AGENTS.md`**: bump `package.json` / `src/version.ts` / `src-tauri/{Cargo.toml,tauri.conf.json}`, signed Windows build, `website/downloads/*`, `updater/latest.json`, both `version.json`, `website/index.html` + OG image `?v=`, push `main` (+ tag if macOS).
-
----
-
-## Session leftovers (ignore unless needed)
-
-- Untracked: `goal/`, `website/_raw_git.bin` — not part of release; do not commit junk.
-- macOS: after GH Actions dmg for `v1.3.0`, roll into `website/downloads/` and fix macOS links (pattern from past “Roll vX out to macOS” commits).
+1. **macOS roll** for latest Windows line when dmg exists  
+2. Owner ladder feedback only  
+3. Deferred: draft hub, cloud, Alchemy, prices  
 
 ---
 
 ## Branding
 
-ApexForge credit (“Built by ApexForge” → https://ame-apexforge.org/) on marketing footer and in-app sidebar/Settings About — keep on every release.
+ApexForge (“Built by ApexForge” → https://ame-apexforge.org/) on footer + sidebar/Settings About.
 
 ---
 
-## One-liner for the next agent
+## One-liner for Claude Code
 
-> **v1.3.0 is live with a working in-game overlay deck tracker (Rust GRE + Tauri second window + React `#/overlay`). Your job is frontend refinement: make it as beautiful and information-dense as Untapped’s bar, without invasiveness or FPS regressions. Start at `src/overlay/OverlayApp.tsx` + overlay CSS in `src/index.css`; respect AGENTS.md release rules before claiming shipped.**
+> **v1.3.5 is already live** (Kimi polish of Grok’s v1.3.0 overlay). **Audit, don’t redesign.** Confirm P1 items (clock re-render, opacity cross-webview prefs, null Scryfall cache); keep perf/privacy invariants; full AGENTS ship only if you change user-visible behavior.
