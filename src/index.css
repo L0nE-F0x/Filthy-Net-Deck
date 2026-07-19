@@ -1534,6 +1534,29 @@ select,
 }
 .deck-wr-score strong { margin-left: 0.15rem; }
 
+/* Your decks table — art · name · record · games · last played · chevron */
+.deck-row-rich {
+  grid-template-columns: 118px minmax(90px, 1.15fr) minmax(130px, 1.35fr) 48px 92px 14px !important;
+}
+.deck-row-record {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem;
+  align-items: center;
+  min-width: 0;
+}
+.deck-row-games {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.deck-row-last {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-weight: 550;
+}
+
 .match-rows {
   display: flex;
   flex-direction: column;
@@ -1966,6 +1989,9 @@ select,
   grid-template-columns: 118px minmax(90px, 1.1fr) 1.4fr 110px 14px !important;
   align-items: center;
   min-height: 52px;
+}
+.deck-row-with-art.deck-row-rich {
+  grid-template-columns: 118px minmax(90px, 1.15fr) minmax(130px, 1.35fr) 48px 92px 14px !important;
 }
 .deck-row-art {
   display: flex;
@@ -2519,6 +2545,10 @@ select,
   .deck-row-with-art {
     grid-template-columns: 88px minmax(70px, 1fr) 1fr 90px 14px !important;
   }
+  .deck-row-with-art.deck-row-rich {
+    grid-template-columns: 72px minmax(60px, 1fr) minmax(90px, 1.1fr) 36px 72px 12px !important;
+  }
+  .deck-row-last { font-size: 0.65rem; }
   .deck-row-art .card-art-thumb { width: 24px; height: 34px; }
   .stats-arsenal { flex-direction: column; align-items: flex-start; }
   .stats-arsenal-fans { justify-content: flex-start; }

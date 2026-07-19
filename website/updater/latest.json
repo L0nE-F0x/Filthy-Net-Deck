@@ -1,11 +1,11 @@
 {
-  "version": "1.4.2",
-  "notes": "v1.4.2: Events page works again — allow magic.gg and MTGO tournament links (they were filtered out after the Melee freshness scrub).",
-  "pub_date": "2026-07-19T16:03:41.196Z",
+  "version": "1.4.3",
+  "notes": "v1.4.3: Events drops the old Meta Trackers strip; My Stats deck table sorts by last played (and more) with richer hover tooltips.",
+  "pub_date": "2026-07-19T16:16:52.851Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFhRVIwLzdyc01JUmlqN1RTaVI2b3UyQmxlTTc4NlR4UHZvWkxsZkpENHF3bVd4ZXlOMUd1UnRVajRGZjRBVDh4VmVJZmNMVndkdjdJUUZsQmV3U1FFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc3MDExCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC4yX3g2NC1zZXR1cC5leGUKK0pia2NyS0lnRHpud2lHTVY4R0tmZ2QvUTRlckNldk1XRVJSNnBoelJKQ2xvS1krTnZHc3Njamc2cDQyY1BEVThtSXBaZXlvemJBSVM4WXIrK2VyQWc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZZOUFaTjZ3WGhwQm1MQ2dWb2IxbWJ2dHVpazhEM0o5NDRYRzc1NXZnZFZoQVRBR0xjc2grR2orc1NuUWtXZmJyS0lCVlEzU2dpMGx6VWlOQXorTVFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc3ODAzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC4zX3g2NC1zZXR1cC5leGUKM3kzS3Y2RTVwWXNPMExJZkNFY2dUb1BEUHpGditlNldwcWpWVE42YStEY2E5SVBGWkxaR05xR2NnUGNGMmNCTG5uSzNLMzlXbC9RSXpkTGJzZnFxQUE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.3.exe"
     }
   }
 }

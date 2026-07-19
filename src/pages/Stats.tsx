@@ -262,6 +262,7 @@ function SortHeaderBtn({
   align = "left",
   onClick,
   className = "",
+  tip,
 }: {
   label: string;
   active: boolean;
@@ -269,14 +270,21 @@ function SortHeaderBtn({
   align?: "left" | "right" | "center";
   onClick: () => void;
   className?: string;
+  /** Longer hover help (defaults to sort-by label). */
+  tip?: string;
 }) {
   const marker = active ? (dir === "asc" ? "▲" : "▼") : "";
+  const sortState = active
+    ? dir === "asc"
+      ? "ascending — click to reverse"
+      : "descending — click to reverse"
+    : "click to sort";
   return (
     <button
       type="button"
       className={`sort-head-btn align-${align}${active ? " active" : ""}${className ? ` ${className}` : ""}`}
       onClick={onClick}
-      title={`Sort by ${label}${active ? ` (${dir === "asc" ? "ascending" : "descending"})` : ""}`}
+      title={tip ? `${tip} (${sortState})` : `Sort by ${label} (${sortState})`}
       aria-sort={active ? (dir === "asc" ? "ascending" : "descending") : "none"}
     >
       {label}
@@ -418,7 +426,14 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
 
   return (
     <div className="stat-tiles stat-tiles-3">
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title={
+          today.decided > 0
+            ? `Today: ${today.wins}W–${today.losses}L${today.rate != null ? ` · ${Math.round(today.rate * 100)}%` : ""}`
+            : "No decided games today yet"
+        }
+      >
         <span
           className={`stat-num ${today.rate != null ? `favor-${winrateFavor(today.rate)}` : ""}`}
         >
@@ -428,7 +443,14 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
           Today{today.rate != null ? ` · ${(today.rate * 100).toFixed(0)}%` : " · no games yet"}
         </span>
       </div>
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title={
+          streak.type
+            ? `Current ${streak.type} streak of ${streak.length} (most recent match first)`
+            : "No active win/loss streak"
+        }
+      >
         <span
           className={`stat-num ${streak.type ? (streak.type === "win" ? "favor-favored" : "favor-unfavored") : ""}`}
         >
@@ -442,7 +464,10 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
             : "Streak"}
         </span>
       </div>
-      <div className="panel stat-tile stat-tile-spark">
+      <div
+        className="panel stat-tile stat-tile-spark"
+        title="Rolling win rate over your last 10 decided games"
+      >
         <TrendSparkline matches={matches} />
         <span className="stat-label">Win rate trend · rolling 10</span>
       </div>
@@ -457,11 +482,21 @@ function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
 
   return (
     <div className="stat-tiles">
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title={`${matches.length} matches in the current season / queue filter`}
+      >
         <CountUp className="stat-num" value={matches.length} />
         <span className="stat-label">Matches</span>
       </div>
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title={
+          rate != null
+            ? `${wins}W–${losses}L · ${(rate * 100).toFixed(1)}% of decided games`
+            : "No decided wins/losses yet"
+        }
+      >
         {rate != null ? (
           <CountUp
             className={`stat-num favor-${winrateFavor(rate)}`}
@@ -476,20 +511,30 @@ function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
           Win rate · {wins}W {losses}L
         </span>
       </div>
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title="Most recent results left-to-right (newest first). Hover a dot for opponent."
+      >
         <span className="wl-dots">
           {last10.length === 0 && <span className="text-muted text-sm">—</span>}
           {last10.map((m) => (
             <span
               key={m.matchId}
               className={`wl-dot ${m.result}`}
-              title={`${RESULT_LABEL[m.result]} vs ${m.opponentName ?? "?"}`}
+              title={`${RESULT_LABEL[m.result]} vs ${m.opponentName ?? "?"} · ${new Date(m.endedAt).toLocaleString()}${m.deckName ? ` · ${m.deckName}` : ""}`}
             />
           ))}
         </span>
         <span className="stat-label">Last {Math.min(10, matches.length) || 10} · newest first</span>
       </div>
-      <div className="panel stat-tile">
+      <div
+        className="panel stat-tile"
+        title={
+          latestRank
+            ? `Constructed rank stamp from your latest ranked match: ${latestRank}`
+            : "No rank stamp on recent matches yet"
+        }
+      >
         <span className="stat-num text-gold-300">{latestRank ?? "—"}</span>
         <span className="stat-label">Rank at last match</span>
       </div>
@@ -498,21 +543,33 @@ function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
 }
 
 /** One labelled winrate bar — shared by deck rows and the splits panel. */
-function RateBar({ wins, losses }: { wins: number; losses: number }) {
+function RateBar({
+  wins,
+  losses,
+  tip,
+}: {
+  wins: number;
+  losses: number;
+  tip?: string;
+}) {
   const decided = wins + losses;
   const rate = decided > 0 ? wins / decided : 0;
+  const defaultTip =
+    decided > 0
+      ? `${wins}W–${losses}L · ${Math.round(rate * 100)}% of decided games`
+      : "No decided games yet";
   return (
     <>
-      <span className="mu-track">
+      <span className="mu-track" title={tip ?? defaultTip}>
         <span
           className={`mu-fill favor-${winrateFavor(rate)}`}
           style={{ width: `${Math.max(4, rate * 100)}%`, display: "block" }}
         />
       </span>
-      <span className="deck-wr-score">
+      <span className="deck-wr-score" title={tip ?? defaultTip}>
         {wins}W {losses}L
         <strong className={`favor-${winrateFavor(rate)}`}>
-          {decided > 0 ? ` ${((rate) * 100).toFixed(0)}%` : " —"}
+          {decided > 0 ? ` ${(rate * 100).toFixed(0)}%` : " —"}
         </strong>
       </span>
     </>
@@ -609,6 +666,10 @@ interface DeckGroup {
   name: string;
   matches: TrackedMatch[];
   runActive: boolean;
+  /** Newest match end time (ms) on this deck. */
+  lastPlayedAt: number;
+  /** Oldest match end time (ms) on this deck. */
+  firstPlayedAt: number;
 }
 
 /** Group matches by deck (newest deckName wins as the display name). Unsorted. */
@@ -618,10 +679,19 @@ function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[] {
     const key = deckKey(m);
     let g = byKey.get(key);
     if (!g) {
-      g = { key, name: "", matches: [], runActive: runs[key] !== undefined };
+      g = {
+        key,
+        name: "",
+        matches: [],
+        runActive: runs[key] !== undefined,
+        lastPlayedAt: m.endedAt,
+        firstPlayedAt: m.endedAt,
+      };
       byKey.set(key, g);
     }
     g.matches.push(m);
+    if (m.endedAt > g.lastPlayedAt) g.lastPlayedAt = m.endedAt;
+    if (m.endedAt < g.firstPlayedAt) g.firstPlayedAt = m.endedAt;
     // trackerMatches is newest-first, so keep the first name we see.
     if (!g.name && m.deckName) g.name = m.deckName;
   }
@@ -631,11 +701,13 @@ function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[] {
   return [...byKey.values()];
 }
 
-type DeckSortKey = "name" | "matches" | "rate";
+type DeckSortKey = "name" | "matches" | "rate" | "last" | "first";
 const DECK_SORT_DEFAULTS: Record<DeckSortKey, SortDir> = {
   name: "asc",
   matches: "desc",
   rate: "desc",
+  last: "desc",
+  first: "asc",
 };
 
 function sortDecks(decks: DeckGroup[], key: DeckSortKey, dir: SortDir): DeckGroup[] {
@@ -643,20 +715,28 @@ function sortDecks(decks: DeckGroup[], key: DeckSortKey, dir: SortDir): DeckGrou
   return [...decks].sort((a, b) => {
     if (key === "name") {
       const cmp = a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-      return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
+      return cmp !== 0 ? cmp * mul : b.lastPlayedAt - a.lastPlayedAt;
     }
     if (key === "matches") {
       const cmp = a.matches.length - b.matches.length;
-      return cmp !== 0 ? cmp * mul : a.name.localeCompare(b.name);
+      return cmp !== 0 ? cmp * mul : b.lastPlayedAt - a.lastPlayedAt;
+    }
+    if (key === "last") {
+      const cmp = a.lastPlayedAt - b.lastPlayedAt;
+      return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
+    }
+    if (key === "first") {
+      const cmp = a.firstPlayedAt - b.firstPlayedAt;
+      return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
     }
     // rate — nulls always last
     const ra = tally(a.matches).rate;
     const rb = tally(b.matches).rate;
-    if (ra == null && rb == null) return a.name.localeCompare(b.name);
+    if (ra == null && rb == null) return b.lastPlayedAt - a.lastPlayedAt;
     if (ra == null) return 1;
     if (rb == null) return -1;
     const cmp = ra - rb;
-    return cmp !== 0 ? cmp * mul : b.matches.length - a.matches.length;
+    return cmp !== 0 ? cmp * mul : b.lastPlayedAt - a.lastPlayedAt;
   });
 }
 
@@ -667,8 +747,9 @@ function DeckBreakdown({
   decks: DeckGroup[];
   onSelect: (key: string) => void;
 }) {
+  // Default: most recently played first — the table people open mid-session.
   const [sort, setSort] = useState<{ key: DeckSortKey; dir: SortDir }>({
-    key: "matches",
+    key: "last",
     dir: "desc",
   });
   const sorted = useMemo(
@@ -701,42 +782,73 @@ function DeckBreakdown({
 
   return (
     <div className="panel">
-      <h3 className="dash-title">Your decks</h3>
+      <h3 className="dash-title" title="Every deck you’ve piloted in the current filter">
+        Your decks
+      </h3>
       <div className="meta-bars deck-bars-art">
-        <div className="meta-bar-row deck-wr-row deck-row-btn deck-sort-head deck-row-with-art" role="row">
+        <div
+          className="meta-bar-row deck-wr-row deck-row-btn deck-sort-head deck-row-with-art deck-row-rich"
+          role="row"
+        >
           <span className="deck-row-art-spacer" aria-hidden="true" />
           <SortHeaderBtn
             label="Deck"
             active={sort.key === "name"}
             dir={sort.dir}
+            tip="Sort alphabetically by deck name"
             onClick={() => setCol("name")}
           />
           <SortHeaderBtn
-            label="Matches"
+            label="Record"
+            active={sort.key === "rate"}
+            dir={sort.dir}
+            align="center"
+            tip="Sort by win rate (W–L of decided games)"
+            onClick={() => setCol("rate")}
+          />
+          <SortHeaderBtn
+            label="Games"
             active={sort.key === "matches"}
             dir={sort.dir}
             align="center"
+            tip="Sort by number of matches on this deck"
             onClick={() => setCol("matches")}
           />
           <SortHeaderBtn
-            label="Win rate"
-            active={sort.key === "rate"}
+            label="Last played"
+            active={sort.key === "last"}
             dir={sort.dir}
             align="right"
-            onClick={() => setCol("rate")}
+            tip="Sort by most recent match on this deck"
+            onClick={() => setCol("last")}
           />
           <span className="deck-row-chevron" aria-hidden="true" />
         </div>
         {sorted.map((d) => {
           const t = tally(d.matches);
           const arts = pickArenaPreview(latestMainboard(d.matches), cards, 4);
+          const lastAbs = new Date(d.lastPlayedAt).toLocaleString();
+          const firstAbs = new Date(d.firstPlayedAt).toLocaleString();
+          const rowTip = [
+            d.name,
+            t.decided > 0
+              ? `${t.wins}W–${t.losses}L · ${Math.round((t.rate ?? 0) * 100)}%`
+              : "No decided games",
+            `${d.matches.length} match${d.matches.length === 1 ? "" : "es"}`,
+            `Last played ${lastAbs}`,
+            `First seen ${firstAbs}`,
+            d.runActive ? "Fresh run active" : null,
+            "Click for full breakdown",
+          ]
+            .filter(Boolean)
+            .join(" · ");
           return (
             <button
               key={d.key}
               type="button"
-              className="meta-bar-row deck-wr-row deck-row-btn deck-row-with-art"
+              className="meta-bar-row deck-wr-row deck-row-btn deck-row-with-art deck-row-rich"
               onClick={() => onSelect(d.key)}
-              title={`${d.name} — open deck stats`}
+              title={rowTip}
             >
               <span className="deck-row-art" aria-hidden="true">
                 {arts.length > 0 ? (
@@ -747,16 +859,44 @@ function DeckBreakdown({
               </span>
               <span className="meta-bar-label">
                 <span className="meta-bar-name">{d.name}</span>
-                {d.runActive && <span className="run-badge">run</span>}
+                {d.runActive && (
+                  <span
+                    className="run-badge"
+                    title="Fresh run is on — older matches for this deck are hidden from stats"
+                  >
+                    run
+                  </span>
+                )}
               </span>
-              <RateBar wins={t.wins} losses={t.losses} />
-              <span className="deck-row-chevron">›</span>
+              <span className="deck-row-record">
+                <RateBar
+                  wins={t.wins}
+                  losses={t.losses}
+                  tip={`${d.name}: ${t.wins}W–${t.losses}L of ${t.decided} decided · ${d.matches.length} total matches`}
+                />
+              </span>
+              <span
+                className="deck-row-games text-xs text-muted"
+                title={`${d.matches.length} match${d.matches.length === 1 ? "" : "es"} on this list (including draws / unknowns)`}
+              >
+                {d.matches.length}
+              </span>
+              <span
+                className="deck-row-last text-xs text-muted"
+                title={`Last match: ${lastAbs}\nFirst seen: ${firstAbs}`}
+              >
+                {timeAgo(d.lastPlayedAt)}
+              </span>
+              <span className="deck-row-chevron" title="Open deck detail">
+                ›
+              </span>
             </button>
           );
         })}
       </div>
-      <p className="text-xs text-muted m-0 mt-2">
-        Click a column header to sort · click a deck for its full breakdown.
+      <p className="text-xs text-muted m-0 mt-2" title="Column headers toggle sort direction">
+        Click a column header to sort · default is last played (newest first) · click a deck for
+        its full breakdown.
       </p>
     </div>
   );

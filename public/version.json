@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.2.exe",
-  "notes": "v1.4.2: Events page works again — allow magic.gg and MTGO tournament links (they were filtered out after the Melee freshness scrub)."
+  "version": "1.4.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.3.exe",
+  "notes": "v1.4.3: Events drops the old Meta Trackers strip; My Stats deck table sorts by last played (and more) with richer hover tooltips."
 }
