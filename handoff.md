@@ -9,7 +9,9 @@
 
 | Item | Value |
 |------|--------|
-| Version | **1.5.0** (Windows signed; macOS via tag CI) |
+| Version | **1.5.0** (Windows signed + macOS universal dmg) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.5.0.exe` |
+| macOS | `website/downloads/Filthy-Net-Deck-1.5.0-universal.dmg` |
 | Headline | **Brew Lab** — shape/staples clinic vs ranked Bo1/Bo3 peers |
 | Soft / updater | `version.json` + `updater/latest.json` → **1.5.0** |
 | Live site | https://filthy-net-deck.netlify.app/ |
