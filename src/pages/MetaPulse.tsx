@@ -190,7 +190,11 @@ export function MetaPulse() {
 
       <section className="flex flex-col gap-3">
         {sorted.length === 0 && (
-          <div className="empty-state">No verified tournament links in this feed.</div>
+          <div className="empty-state">
+            {trackers.length > 0
+              ? "No recent Standard/Pioneer tournament results in this snapshot — meta tracker links are above."
+              : "No verified tournament links in this feed. The app re-syncs meta automatically; check back after the next daily publish."}
+          </div>
         )}
         {sorted.map((t) => {
           const fid = resolveFormatId(String(t.format));

@@ -1,11 +1,11 @@
 {
-  "version": "1.4.1",
-  "notes": "v1.4.1: Events freshness (no more ancient Melee noise), share menus that work in dark mode, Soundscape with per-cue previews, plus Ugin & Garruk themes (carry into the overlay).",
-  "pub_date": "2026-07-19T15:38:30.561Z",
+  "version": "1.4.2",
+  "notes": "v1.4.2: Events page works again — allow magic.gg and MTGO tournament links (they were filtered out after the Melee freshness scrub).",
+  "pub_date": "2026-07-19T16:03:41.196Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjVaRzY4TGlQVW90MzVOUTlGQ2Vhc20xejBFTXVZOS96U21nRVl2TGUxRlQzMzYyU3pEeEZodFNOL2NaZndFeU0xemIxSTdsT3NIMW9pL1kwTS9McmdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc1NDkzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC4xX3g2NC1zZXR1cC5leGUKaUttUDZhWWlEOFVjc05BdHEwN2RwLzRLdWI3dURLeGlyajRhTmhUMGozOGV0Qjg5eUo4aE9lYzcvSDc4M1ZNQUVPSXR5ckRCY3RkWHo4OUwrZ1JFQmc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFhRVIwLzdyc01JUmlqN1RTaVI2b3UyQmxlTTc4NlR4UHZvWkxsZkpENHF3bVd4ZXlOMUd1UnRVajRGZjRBVDh4VmVJZmNMVndkdjdJUUZsQmV3U1FFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc3MDExCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC4yX3g2NC1zZXR1cC5leGUKK0pia2NyS0lnRHpud2lHTVY4R0tmZ2QvUTRlckNldk1XRVJSNnBoelJKQ2xvS1krTnZHc3Njamc2cDQyY1BEVThtSXBaZXlvemJBSVM4WXIrK2VyQWc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.2.exe"
     }
   }
 }

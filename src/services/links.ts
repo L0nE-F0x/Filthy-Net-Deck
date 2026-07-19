@@ -3,6 +3,12 @@ const ALLOWED_HOSTS = [
   "www.mtggoldfish.com",
   "melee.gg",
   "www.melee.gg",
+  // Official WotC / Arena ranked + championship decklist posts (Events feed).
+  "magic.gg",
+  "www.magic.gg",
+  // MTGO Challenges / Showcase results.
+  "mtgo.com",
+  "www.mtgo.com",
   "mtga.untapped.gg",
   "untapped.gg",
   "magic.wizards.com",
