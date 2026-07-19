@@ -1,9 +1,10 @@
 # Filthy Net Deck — handoff
 
 **Last wrap-up:** 2026-07-19 — **Grok review of Kimi’s v1.3.5 overlay polish** (already live on Windows + Netlify).  
-**Next agent:** **Claude Code — final audit** (correctness / perf / edge cases / ship hygiene). Not a redesign pass unless audit finds ship-blockers.
+**Next agent:** **v1.4.0 "Bells & Whistles" batch is IN PROGRESS on branch `release/v1.4.0`.**
+➡️ **Read [`HANDOFF-v1.4.0.md`](HANDOFF-v1.4.0.md) first** — it has exactly what to do next (**#2** overlay hardening → **#3** a11y/reduced-motion → **#4** empty states). #1 share cards + overlay theme sync are already done & committed on that branch.
 
-Read **`AGENTS.md`** first. User-visible changes still need the full release checklist if you fix anything that ships.
+Read **`AGENTS.md`** first. User-visible changes still need the full release checklist if you fix anything that ships. The v1.3.5 audit note below stays valid for the overlay invariants.
 
 ---
 
