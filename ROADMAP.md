@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.4.0** (Bells & Whistles: share cards, overlay harden, a11y, opt-in sound; Windows signed — macOS dmg via tag CI).  
+**Current release:** **v1.4.1** (polish: fresh Events, share UX, Soundscape, Ugin & Garruk; Windows signed — macOS dmg via tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -14,10 +14,11 @@ Canonical checklist: **`handoff.md`**.
 
 1. ~~**Overlay polish**~~ — **shipped in v1.3.5**  
 2. ~~**macOS roll (1.3.5)**~~ — done  
-3. ~~**v1.4.0 "Bells & Whistles"**~~ — **shipped** (Windows signed + macOS universal dmg + site + OG)  
-4. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
+3. ~~**v1.4.0 "Bells & Whistles"**~~ — **shipped**  
+4. ~~**v1.4.1 polish**~~ — **shipped** (Events freshness, share menus, Soundscape, Ugin & Garruk)  
+5. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
-**Shipped:** **v1.4.0** Bells & Whistles (share, overlay harden, a11y, opt-in sound; Win + macOS parity).
+**Shipped:** **v1.4.1** polish on Bells & Whistles.
 
 ### Explicitly deferred
 
@@ -45,6 +46,7 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test
 
 | Version | Theme |
 |---------|--------|
+| **v1.4.1** | Polish: fresh Events, share UX, Soundscape, Ugin & Garruk |
 | **v1.4.0** | Bells & Whistles: share cards, overlay harden, a11y, opt-in sound |
 | **v1.3.5** | Overlay polish: grouped list, art crops, mana pips, slim bar, settings |
 | **v1.3.0** | In-game overlay deck tracker + notify defaults |

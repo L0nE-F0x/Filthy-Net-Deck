@@ -13,7 +13,13 @@ import {
   sendTestNotification,
   type NotifyPermission,
 } from "../services/notify";
-import { previewSfx, SOUND_CUE_SETS, type SoundCueSet } from "../services/sfx";
+import {
+  previewSfx,
+  previewSoundPack,
+  SFX_EVENTS,
+  SOUND_CUE_SETS,
+  type SoundCueSet,
+} from "../services/sfx";
 
 /** X1 + v1.2 — tracker health + first-session coach. */
 function TrackerHealthCard() {
@@ -247,16 +253,17 @@ export function Settings() {
           </section>
         )}
 
-        {/* —— Sound (opt-in, main app only) —— */}
-        <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">Sound</h3>
-          <p className="settings-card-desc mb-2">
-            Soft match-end and rank-up cues in the main app only — never in the
-            overlay, never by default. Short synthesized tones (no sample packs).
-            Pick a set and preview before you leave it on.
-          </p>
-          <div className="settings-toggle-list">
-            <label className="settings-toggle-row">
+        {/* —— Soundscape (opt-in, main app only) —— */}
+        <section className="panel settings-card settings-card-span2 soundscape">
+          <div className="soundscape-head">
+            <div>
+              <h3 className="settings-card-title">Soundscape</h3>
+              <p className="settings-card-desc mb-0">
+                Soft match sounds in the main app — never in the overlay, never
+                on by default. Pick a pack, then try each cue.
+              </p>
+            </div>
+            <label className="soundscape-master">
               <input
                 type="checkbox"
                 checked={prefs.soundEnabled}
@@ -266,48 +273,63 @@ export function Settings() {
                   if (on) previewSfx(prefs.soundCueSet, "win");
                 }}
               />
-              <span>
-                <strong>UI sound cues</strong>
-                <em>Win / loss / draw + rank-up · off by default</em>
-              </span>
+              <span>{prefs.soundEnabled ? "On" : "Off"}</span>
             </label>
           </div>
-          <div className="settings-sfx-sets" role="radiogroup" aria-label="Sound cue set">
+
+          <div className="soundscape-packs" role="listbox" aria-label="Sound packs">
             {SOUND_CUE_SETS.map((set) => {
               const active = prefs.soundCueSet === set.id;
               return (
-                <label
+                <button
                   key={set.id}
-                  className={`settings-sfx-card${active ? " is-active" : ""}`}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  className={`soundscape-pack${active ? " is-active" : ""}`}
+                  onClick={() => {
+                    setSoundCueSet(set.id as SoundCueSet);
+                    previewSfx(set.id, "win");
+                  }}
                 >
-                  <input
-                    type="radio"
-                    name="soundCueSet"
-                    value={set.id}
-                    checked={active}
-                    onChange={() => {
-                      setSoundCueSet(set.id as SoundCueSet);
-                      previewSfx(set.id, "win");
-                    }}
-                  />
-                  <span className="settings-sfx-card-body">
-                    <strong>{set.label}</strong>
-                    <em>{set.blurb}</em>
-                  </span>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSoundCueSet(set.id as SoundCueSet);
-                      previewSfx(set.id, "rankup");
-                    }}
-                  >
-                    Preview
-                  </button>
-                </label>
+                  <span className="soundscape-pack-vibe">{set.vibe}</span>
+                  <strong>{set.label}</strong>
+                  <em>{set.blurb}</em>
+                  {active && (
+                    <span className="soundscape-pack-check" aria-hidden="true">
+                      ✓ Active
+                    </span>
+                  )}
+                </button>
               );
             })}
+          </div>
+
+          <div className="soundscape-cues">
+            <div className="soundscape-cues-head">
+              <span>Try each cue</span>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => void previewSoundPack(prefs.soundCueSet)}
+              >
+                Play pack demo
+              </button>
+            </div>
+            <div className="soundscape-cue-grid" role="group" aria-label="Preview cues">
+              {SFX_EVENTS.map((ev) => (
+                <button
+                  key={ev.id}
+                  type="button"
+                  className="soundscape-cue"
+                  title={ev.blurb}
+                  onClick={() => previewSfx(prefs.soundCueSet, ev.id)}
+                >
+                  <strong>{ev.label}</strong>
+                  <em>{ev.blurb}</em>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 

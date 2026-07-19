@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isSkinId, SKINS } from "./theme";
 
 describe("planeswalker skins", () => {
-  it("lists Classic plus five walkers", () => {
+  it("lists Classic plus seven walkers", () => {
     expect(SKINS.map((s) => s.id)).toEqual([
       "classic",
       "chandra",
@@ -10,12 +10,16 @@ describe("planeswalker skins", () => {
       "liliana",
       "ajani",
       "elspeth",
+      "ugin",
+      "garruk",
     ]);
   });
 
   it("validates skin ids", () => {
     expect(isSkinId("chandra")).toBe(true);
     expect(isSkinId("classic")).toBe(true);
+    expect(isSkinId("ugin")).toBe(true);
+    expect(isSkinId("garruk")).toBe(true);
     expect(isSkinId("jace")).toBe(false);
     expect(isSkinId("")).toBe(false);
   });

@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.0.exe",
-  "notes": "v1.4.0 Bells & Whistles: deck share cards, overlay theme sync + hardening (MatchClock, live prefs, click-through), a11y & empty states, and opt-in soft UI sound (3 cue sets) with rank-up moments & micro-interactions."
+  "version": "1.4.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.1.exe",
+  "notes": "v1.4.1: Events freshness (no more ancient Melee noise), share menus that work in dark mode, Soundscape with per-cue previews, plus Ugin & Garruk themes (carry into the overlay)."
 }

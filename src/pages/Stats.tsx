@@ -36,6 +36,7 @@ import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
+import { ShareActionButton, ShareMenu } from "../components/ShareMenu";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
@@ -186,37 +187,50 @@ function ShareDeckButton(props: {
   runStart: number | undefined;
 }) {
   const { deckName, deckList, matches, runStart } = props;
-  const [busy, setBusy] = useState(false);
   if (!deckList) return null;
-  const pick = (scope: DeckShareScope) => {
-    setBusy(true);
-    void shareDeckCard(scope, deckName, deckList, matches, runStart)
-      .catch(() => {})
-      .finally(() => setBusy(false));
-  };
+  const options = [
+    {
+      id: "all" as const,
+      label: "All-time on this deck",
+      detail: "Full history · list + W–L + peak rank",
+    },
+    {
+      id: "season" as const,
+      label: "This ranked season",
+      detail: "Current month ladder window",
+    },
+    ...(runStart !== undefined
+      ? [
+          {
+            id: "run" as const,
+            label: "This fresh run",
+            detail: "Since you started the run",
+          },
+        ]
+      : []),
+    {
+      id: "session" as const,
+      label: "This session",
+      detail: "Today’s play block",
+    },
+    {
+      id: "day" as const,
+      label: "Today",
+      detail: "Calendar day so far",
+    },
+    {
+      id: "week" as const,
+      label: "Last 7 days",
+      detail: "Rolling week on this deck",
+    },
+  ];
   return (
-    <span className="flex items-center gap-1.5 text-xs">
-      <label className="text-muted">Share</label>
-      <select
-        className="settings-select"
-        value=""
-        disabled={busy}
-        title="Download a branded PNG (decklist + record + FND logo) to post"
-        onChange={(e) => {
-          const v = e.target.value as DeckShareScope | "";
-          e.currentTarget.value = "";
-          if (v) pick(v);
-        }}
-      >
-        <option value="">{busy ? "Rendering…" : "Deck card…"}</option>
-        <option value="all">This deck · all-time</option>
-        <option value="season">This season</option>
-        {runStart !== undefined && <option value="run">This run</option>}
-        <option value="session">This session</option>
-        <option value="day">Today</option>
-        <option value="week">Last 7 days</option>
-      </select>
-    </span>
+    <ShareMenu
+      label="Share deck card"
+      hint="Branded PNG — decklist, record, FND mark. Pick a time window."
+      options={options}
+      onPick={(id) => shareDeckCard(id as DeckShareScope, deckName, deckList, matches, runStart)}
+    />
   );
 }
 
@@ -1342,10 +1356,13 @@ function DeckDetail({
             runStart={runStart}
           />
           {otherDecks.length > 0 && (
-            <span className="flex items-center gap-1.5 text-xs">
-              <label className="text-muted">Compare</label>
+            <span className="flex items-center gap-1.5 text-xs compare-select-wrap">
+              <label className="text-muted" htmlFor="stats-compare-deck">
+                Compare
+              </label>
               <select
-                className="settings-select"
+                id="stats-compare-deck"
+                className="fnd-select"
                 value={compareKey}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -1459,16 +1476,6 @@ export function Stats() {
       .then((path) => setExportMsg(`Saved to ${path}`))
       .catch((e) =>
         setExportMsg(e instanceof Error ? e.message : "Export failed."),
-      );
-  };
-
-  const onShareRecap = () => {
-    const stats = recapFromMatches(matches);
-    setRecapMsg(formatRecapHeadline(stats) + " — rendering…");
-    void downloadRecapPng(matches)
-      .then(() => setRecapMsg("Recap PNG saved to your downloads."))
-      .catch((e) =>
-        setRecapMsg(e instanceof Error ? e.message : "Could not render recap."),
       );
   };
 
@@ -1736,9 +1743,24 @@ export function Stats() {
               </p>
               {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
             </div>
-            <button type="button" className="btn btn-primary btn-sm" onClick={onShareRecap}>
-              Download week recap
-            </button>
+            <ShareActionButton
+              label="Share week recap"
+              detail="WR, rank move, best deck — branded PNG"
+              variant="primary"
+              onShare={async () => {
+                const stats = recapFromMatches(matches);
+                setRecapMsg(formatRecapHeadline(stats) + " — rendering…");
+                try {
+                  await downloadRecapPng(matches);
+                  setRecapMsg("Recap PNG saved to your downloads.");
+                } catch (e) {
+                  setRecapMsg(
+                    e instanceof Error ? e.message : "Could not render recap.",
+                  );
+                  throw e;
+                }
+              }}
+            />
           </div>
           <StatsArsenal decks={decks} onSelect={setSelectedDeck} />
           <SplitsPanel matches={filtered} />

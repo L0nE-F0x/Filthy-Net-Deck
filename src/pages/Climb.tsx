@@ -29,6 +29,7 @@ import {
 import type { TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
+import { ShareActionButton } from "../components/ShareMenu";
 import { downloadClimbSharePng } from "../services/shareCards";
 
 /** Chart / legend palette — distinct enough on dark and light themes. */
@@ -624,15 +625,6 @@ export function Climb() {
   );
 
   const goDeck = (key: string) => openStatsDeck(key);
-  const [shareMsg, setShareMsg] = useState<string | null>(null);
-  const onShareClimb = () => {
-    setShareMsg("Rendering…");
-    void downloadClimbSharePng(matches, seasonKey)
-      .then(() => setShareMsg("Saved climb story PNG."))
-      .catch((e) =>
-        setShareMsg(e instanceof Error ? e.message : "Could not render climb card."),
-      );
-  };
 
   if (matches.length === 0) {
     return (
@@ -664,10 +656,11 @@ export function Climb() {
             <strong className="text-foam">My Stats</strong> for that list.
           </p>
           <div className="share-row mt-2">
-            <button type="button" className="btn btn-ghost btn-sm" onClick={onShareClimb}>
-              Download climb story
-            </button>
-            {shareMsg && <span className="text-xs text-muted">{shareMsg}</span>}
+            <ShareActionButton
+              label="Share climb story"
+              detail="Rank path card for this season — branded PNG"
+              onShare={() => downloadClimbSharePng(matches, seasonKey)}
+            />
           </div>
         </div>
         <div className="lab-intro-stats">

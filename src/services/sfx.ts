@@ -1,36 +1,50 @@
 /**
- * Opt-in UI sound cues (main app only — never the overlay).
+ * Opt-in match soundscape (main app only — never the overlay).
  *
- * All tones are synthesized with the Web Audio API so we ship zero audio
- * assets and keep the installer small. Bad sound ruins an app, so:
- *  - OFF by default
- *  - soft, short, low-volume cues only
- *  - three tasteful sets the player can preview in Settings
+ * Web Audio synthesized packs — zero sample assets. OFF by default.
+ * Each pack has distinct Victory / Defeat / Draw / Rank-up / Soft click cues.
  */
 
 export type SoundCueSet = "soft" | "crystal" | "tabletop";
 
 export type SfxEvent = "win" | "loss" | "draw" | "rankup" | "ui";
 
+export const SFX_EVENTS: {
+  id: SfxEvent;
+  label: string;
+  blurb: string;
+}[] = [
+  { id: "win", label: "Victory", blurb: "Match win" },
+  { id: "loss", label: "Defeat", blurb: "Match loss" },
+  { id: "draw", label: "Draw", blurb: "Drawn game" },
+  { id: "rankup", label: "Rank up", blurb: "Ladder step" },
+  { id: "ui", label: "Soft click", blurb: "Light UI tick" },
+];
+
 export const SOUND_CUE_SETS: {
   id: SoundCueSet;
   label: string;
   blurb: string;
+  /** Short vibe tag for the pack card. */
+  vibe: string;
 }[] = [
   {
     id: "soft",
     label: "Arena Soft",
-    blurb: "Quiet sine taps — polite, sits under the game",
+    blurb: "Quiet sine taps that sit under the game",
+    vibe: "Polite",
   },
   {
     id: "crystal",
     label: "Crystal Chimes",
     blurb: "Glassier bells — clearer pitch, still short",
+    vibe: "Bright",
   },
   {
     id: "tabletop",
     label: "Tabletop Thunk",
     blurb: "Muted wood-pluck feel — less digital",
+    vibe: "Warm",
   },
 ];
 
@@ -44,62 +58,114 @@ type Tone = {
   delay: number;
   type: OscillatorType;
   gain: number;
-  /** Optional detuned second partial (0 = none). */
   partial?: number;
+  noise?: boolean;
 };
 
 /** Pure cue maps — unit-tested; no AudioContext here. */
 export function tonesFor(set: SoundCueSet, event: SfxEvent): Tone[] {
-  const base = BASE[set];
-  switch (event) {
-    case "win":
-      return [
-        { ...base, freq: base.freq * 1.0, dur: 0.09, delay: 0, gain: base.gain * 0.9 },
-        { ...base, freq: base.freq * 1.25, dur: 0.11, delay: 0.07, gain: base.gain },
-        { ...base, freq: base.freq * 1.5, dur: 0.14, delay: 0.15, gain: base.gain * 0.85 },
-      ];
-    case "loss":
-      return [
-        { ...base, freq: base.freq * 1.12, dur: 0.1, delay: 0, gain: base.gain * 0.75 },
-        { ...base, freq: base.freq * 0.84, dur: 0.16, delay: 0.08, gain: base.gain * 0.65 },
-      ];
-    case "draw":
-      return [
-        { ...base, freq: base.freq * 1.0, dur: 0.1, delay: 0, gain: base.gain * 0.7 },
-        { ...base, freq: base.freq * 1.0, dur: 0.1, delay: 0.12, gain: base.gain * 0.55 },
-      ];
-    case "rankup":
-      return [
-        { ...base, freq: base.freq * 1.0, dur: 0.08, delay: 0, gain: base.gain * 0.85 },
-        { ...base, freq: base.freq * 1.25, dur: 0.09, delay: 0.06, gain: base.gain },
-        { ...base, freq: base.freq * 1.5, dur: 0.1, delay: 0.13, gain: base.gain },
-        {
-          ...base,
-          freq: base.freq * 2.0,
-          dur: 0.18,
-          delay: 0.22,
-          gain: base.gain * 0.9,
-          partial: 0.5,
-        },
-      ];
-    case "ui":
-      return [
-        {
-          ...base,
-          freq: base.freq * 1.5,
-          dur: 0.045,
-          delay: 0,
-          gain: base.gain * 0.45,
-        },
-      ];
+  switch (set) {
+    case "soft":
+      return softPack(event);
+    case "crystal":
+      return crystalPack(event);
+    case "tabletop":
+      return tabletopPack(event);
   }
 }
 
-const BASE: Record<SoundCueSet, Tone> = {
-  soft: { freq: 440, dur: 0.1, delay: 0, type: "sine", gain: 0.07 },
-  crystal: { freq: 660, dur: 0.1, delay: 0, type: "triangle", gain: 0.055 },
-  tabletop: { freq: 220, dur: 0.08, delay: 0, type: "triangle", gain: 0.08 },
-};
+function softPack(event: SfxEvent): Tone[] {
+  const b = { type: "sine" as const, gain: 0.07 };
+  switch (event) {
+    case "win":
+      return [
+        { ...b, freq: 392, dur: 0.08, delay: 0, gain: 0.06 },
+        { ...b, freq: 494, dur: 0.1, delay: 0.07, gain: 0.07 },
+        { ...b, freq: 587, dur: 0.14, delay: 0.15, gain: 0.065 },
+      ];
+    case "loss":
+      return [
+        { ...b, freq: 349, dur: 0.1, delay: 0, gain: 0.055 },
+        { ...b, freq: 277, dur: 0.16, delay: 0.09, gain: 0.05 },
+      ];
+    case "draw":
+      return [
+        { ...b, freq: 440, dur: 0.09, delay: 0, gain: 0.05 },
+        { ...b, freq: 440, dur: 0.09, delay: 0.14, gain: 0.04 },
+      ];
+    case "rankup":
+      return [
+        { ...b, freq: 392, dur: 0.07, delay: 0, gain: 0.06 },
+        { ...b, freq: 494, dur: 0.08, delay: 0.06, gain: 0.07 },
+        { ...b, freq: 587, dur: 0.09, delay: 0.13, gain: 0.07 },
+        { ...b, freq: 784, dur: 0.18, delay: 0.22, gain: 0.065, partial: 0.4 },
+      ];
+    case "ui":
+      return [{ ...b, freq: 660, dur: 0.04, delay: 0, gain: 0.035 }];
+  }
+}
+
+function crystalPack(event: SfxEvent): Tone[] {
+  const b = { type: "triangle" as const, gain: 0.055 };
+  switch (event) {
+    case "win":
+      return [
+        { ...b, freq: 659, dur: 0.08, delay: 0, gain: 0.05 },
+        { ...b, freq: 831, dur: 0.1, delay: 0.06, gain: 0.055 },
+        { ...b, freq: 988, dur: 0.14, delay: 0.13, gain: 0.05, partial: 0.6 },
+      ];
+    case "loss":
+      return [
+        { ...b, freq: 740, dur: 0.09, delay: 0, gain: 0.045 },
+        { ...b, freq: 554, dur: 0.15, delay: 0.08, gain: 0.04 },
+      ];
+    case "draw":
+      return [
+        { ...b, freq: 698, dur: 0.08, delay: 0, gain: 0.04 },
+        { ...b, freq: 698, dur: 0.1, delay: 0.12, gain: 0.035, partial: 0.3 },
+      ];
+    case "rankup":
+      return [
+        { ...b, freq: 659, dur: 0.06, delay: 0, gain: 0.05 },
+        { ...b, freq: 831, dur: 0.07, delay: 0.05, gain: 0.055 },
+        { ...b, freq: 988, dur: 0.08, delay: 0.11, gain: 0.055 },
+        { ...b, freq: 1319, dur: 0.2, delay: 0.2, gain: 0.05, partial: 0.7 },
+      ];
+    case "ui":
+      return [{ ...b, freq: 1047, dur: 0.035, delay: 0, gain: 0.03 }];
+  }
+}
+
+function tabletopPack(event: SfxEvent): Tone[] {
+  const b = { type: "triangle" as const, gain: 0.08, noise: true };
+  switch (event) {
+    case "win":
+      return [
+        { ...b, freq: 196, dur: 0.07, delay: 0, gain: 0.07 },
+        { ...b, freq: 247, dur: 0.09, delay: 0.07, gain: 0.08 },
+        { ...b, freq: 294, dur: 0.12, delay: 0.15, gain: 0.07 },
+      ];
+    case "loss":
+      return [
+        { ...b, freq: 220, dur: 0.09, delay: 0, gain: 0.065 },
+        { ...b, freq: 165, dur: 0.15, delay: 0.09, gain: 0.06 },
+      ];
+    case "draw":
+      return [
+        { ...b, freq: 185, dur: 0.08, delay: 0, gain: 0.055 },
+        { ...b, freq: 185, dur: 0.08, delay: 0.13, gain: 0.045 },
+      ];
+    case "rankup":
+      return [
+        { ...b, freq: 196, dur: 0.06, delay: 0, gain: 0.07 },
+        { ...b, freq: 247, dur: 0.07, delay: 0.06, gain: 0.08 },
+        { ...b, freq: 294, dur: 0.08, delay: 0.13, gain: 0.08 },
+        { ...b, freq: 392, dur: 0.16, delay: 0.22, gain: 0.075, noise: true },
+      ];
+    case "ui":
+      return [{ ...b, freq: 330, dur: 0.04, delay: 0, gain: 0.04, noise: true }];
+  }
+}
 
 let ctx: AudioContext | null = null;
 
@@ -125,7 +191,6 @@ function scheduleTone(audio: AudioContext, t: Tone, when: number): void {
   osc.type = t.type;
   osc.frequency.setValueAtTime(t.freq, when);
 
-  // Soft attack / release — no clicks.
   const peak = Math.max(0.001, t.gain);
   const attack = 0.008;
   const release = Math.max(0.04, t.dur * 0.55);
@@ -153,8 +218,7 @@ function scheduleTone(audio: AudioContext, t: Tone, when: number): void {
     osc2.stop(end + release);
   }
 
-  // Tabletop: slight noise “body” for wood-pluck character.
-  if (t.type === "triangle" && t.freq < 300) {
+  if (t.noise || (t.type === "triangle" && t.freq < 300)) {
     try {
       const n = Math.floor(audio.sampleRate * Math.min(0.04, t.dur));
       const buf = audio.createBuffer(1, n, audio.sampleRate);
@@ -167,8 +231,8 @@ function scheduleTone(audio: AudioContext, t: Tone, when: number): void {
       const ng = audio.createGain();
       const filter = audio.createBiquadFilter();
       filter.type = "lowpass";
-      filter.frequency.value = 900;
-      ng.gain.setValueAtTime(peak * 0.55, when);
+      filter.frequency.value = t.noise ? 1200 : 900;
+      ng.gain.setValueAtTime(peak * 0.5, when);
       ng.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
       src.connect(filter);
       filter.connect(ng);
@@ -180,10 +244,6 @@ function scheduleTone(audio: AudioContext, t: Tone, when: number): void {
   }
 }
 
-/**
- * Play a cue. No-ops safely if Web Audio is unavailable or the context is suspended
- * and resume fails (autoplay policy). Call from a user gesture for previews.
- */
 export async function playSfx(
   event: SfxEvent,
   opts: { set: SoundCueSet; force?: boolean } = { set: "soft" },
@@ -207,4 +267,11 @@ export async function playSfx(
 /** Settings preview — always plays regardless of the master toggle. */
 export function previewSfx(set: SoundCueSet, event: SfxEvent = "win"): void {
   void playSfx(event, { set, force: true });
+}
+
+/** Play the full pack demo (win → short gap → rankup) for “try pack”. */
+export async function previewSoundPack(set: SoundCueSet): Promise<void> {
+  await playSfx("win", { set, force: true });
+  await new Promise((r) => setTimeout(r, 420));
+  await playSfx("rankup", { set, force: true });
 }

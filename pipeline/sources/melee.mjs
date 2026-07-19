@@ -67,27 +67,42 @@ export async function collectMelee() {
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    // Prefer last ~18 months; drop alpha tests
-    const cutoff = "2025-01-01";
+    // Rolling ~120-day window — never ship 2020-era SearchResults noise.
+    const cutoffMs = Date.now() - 120 * 86400000;
+    const cutoff = new Date(cutoffMs).toISOString().slice(0, 10);
+    const isRecent = (row) => {
+      const d = String(row.startDate || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+      return d >= cutoff;
+    };
     const cleaned = rows
       .filter((row) => {
         if (!row?.id || !row?.name) return false;
-        if (/alpha test|test tournament/i.test(row.name) && (row.enrolledPlayerCount || 0) < 50)
-          return false;
-        const d = String(row.startDate || "").slice(0, 10);
-        if (d && d < cutoff) return false;
-        return (row.enrolledPlayerCount || 0) >= 8 || /rcq|regional|championship|showcase|pro tour|arena championship/i.test(row.name);
+        if (/alpha test|test tournament|test event/i.test(row.name)) return false;
+        if (!isRecent(row)) return false;
+        return (
+          (row.enrolledPlayerCount || 0) >= 8 ||
+          /rcq|regional|championship|showcase|pro tour|arena championship/i.test(
+            row.name,
+          )
+        );
       })
       .sort((a, b) =>
         String(b.startDate || "").localeCompare(String(a.startDate || "")),
       );
 
-    // If filter too strict (empty), fall back to highest player counts overall
+    // Fallback: still date-gated (never reintroduce ancient rows by player count).
     const pool =
       cleaned.length >= 5
         ? cleaned
         : [...rows]
-            .filter((r) => r?.id && r?.name && !/alpha test/i.test(r.name || ""))
+            .filter(
+              (r) =>
+                r?.id &&
+                r?.name &&
+                !/alpha test|test event/i.test(r.name || "") &&
+                isRecent(r),
+            )
             .sort(
               (a, b) =>
                 (b.enrolledPlayerCount || 0) - (a.enrolledPlayerCount || 0),

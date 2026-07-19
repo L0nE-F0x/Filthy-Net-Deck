@@ -11,7 +11,9 @@ export type SkinId =
   | "teferi"
   | "liliana"
   | "ajani"
-  | "elspeth";
+  | "elspeth"
+  | "ugin"
+  | "garruk";
 
 export interface SkinMeta {
   id: SkinId;
@@ -64,6 +66,20 @@ export const SKINS: SkinMeta[] = [
     walker: "Elspeth Tirel",
     blurb: "Steel white & noble gold",
     swatches: ["#0c0e14", "#f0e6c8", "#d4af37"],
+  },
+  {
+    id: "ugin",
+    name: "Ugin",
+    walker: "Ugin, the Spirit Dragon",
+    blurb: "Slate, ash & pale spirit-fire",
+    swatches: ["#0c0e12", "#94a3b8", "#e2e8f0"],
+  },
+  {
+    id: "garruk",
+    name: "Garruk",
+    walker: "Garruk Wildspeaker",
+    blurb: "Deep forest greens & moss",
+    swatches: ["#061208", "#3d8b4f", "#a3e635"],
   },
 ];
 

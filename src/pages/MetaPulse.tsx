@@ -4,6 +4,7 @@ import type { TournamentPlatform, TournamentResult } from "../types/meta";
 import { canShowResultsLink } from "../services/links";
 import { resolveFormatId } from "../services/formatResolve";
 import { openExternal } from "../services/openExternal";
+import { filterFreshTournaments } from "../services/eventFreshness";
 
 function platformClass(p: TournamentPlatform): string {
   return `platform-chip platform-${p}`;
@@ -52,9 +53,11 @@ export function MetaPulse() {
 
   const { sorted, trackers } = useMemo(() => {
     const linked = (meta?.tournaments ?? []).filter((t) => canShowResultsLink(t.url));
+    // Drop ancient Melee/etc. rows (e.g. 2020 test events) even if the feed still carries them.
+    const fresh = filterFreshTournaments(linked);
     return {
-      trackers: linked.filter(isTrackerRow),
-      sorted: linked
+      trackers: fresh.filter(isTrackerRow),
+      sorted: fresh
         .filter((t) => !isTrackerRow(t))
         .filter((t) => fmtFilter === "all" || resolveFormatId(String(t.format)) === fmtFilter)
         .filter((t) => platFilter === "all" || t.platform === platFilter)
@@ -81,8 +84,9 @@ export function MetaPulse() {
         <p className="eyebrow">Events</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament results</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Recent paper, MTGO, and Arena events. <strong className="text-foam">Open</strong> loads
-          the official page in your browser. Snapshot {meta.date}.
+          Recent paper, MTGO, and Arena events (last ~4 months).{" "}
+          <strong className="text-foam">Open</strong> loads the official page in your browser.
+          Snapshot {meta.date}.
         </p>
       </div>
 
