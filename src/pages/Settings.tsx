@@ -74,6 +74,8 @@ export function Settings() {
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
+  const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
+  const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
@@ -176,24 +178,54 @@ export function Settings() {
           <section className="panel settings-card settings-card-span2">
             <h3 className="settings-card-title">In-game overlay</h3>
             <p className="settings-card-desc mb-2">
-              Slim always-on-top deck tracker: mini art, draw odds, land count. Starts
-              collapsed (bar only) — expand with ▾. Drag/resize; snaps to edges.
-              Local only. For best Arena FPS use a{" "}
-              <strong className="text-foam">release build</strong> (not tauri:dev) and
-              avoid running a second tracker at the same time. Prefer borderless windowed
-              if exclusive fullscreen hides the panel.
+              Slim always-on-top deck tracker: mini art, mana pips, next-draw
+              odds, land count. Starts collapsed (bar only) — expand with ▾.
+              Drag to move, resize from the edges, snaps to screen edges.
+              Everything is read from Arena's own log on this PC — nothing
+              leaves it. If exclusive fullscreen hides the panel, switch Arena
+              to borderless windowed. Running a second tracker at the same time
+              can cost Arena FPS.
             </p>
-            <label className="settings-toggle-row">
-              <input
-                type="checkbox"
-                checked={prefs.overlayEnabled}
-                onChange={(e) => setOverlayEnabled(e.target.checked)}
-              />
-              <span>
-                <strong>Show match overlay</strong>
-                <em>Auto show/hide with match · ▾ expands full list</em>
-              </span>
-            </label>
+            <div className="settings-toggle-list">
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayEnabled}
+                  onChange={(e) => setOverlayEnabled(e.target.checked)}
+                />
+                <span>
+                  <strong>Show match overlay</strong>
+                  <em>Auto show/hide with match · ▾ expands full list</em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayStartExpanded}
+                  onChange={(e) => setOverlayStartExpanded(e.target.checked)}
+                />
+                <span>
+                  <strong>Start expanded</strong>
+                  <em>Open with the full deck list instead of the slim bar</em>
+                </span>
+              </label>
+              <label className="settings-slider-row">
+                <span>
+                  <strong>Panel opacity</strong>
+                  <em>How solid the overlay background is over the game</em>
+                </span>
+                <output>{Math.round(prefs.overlayOpacity * 100)}%</output>
+                <input
+                  type="range"
+                  min={55}
+                  max={100}
+                  step={1}
+                  value={Math.round(prefs.overlayOpacity * 100)}
+                  onChange={(e) => setOverlayOpacity(Number(e.target.value) / 100)}
+                  aria-label="Overlay panel opacity"
+                />
+              </label>
+            </div>
           </section>
         )}
 

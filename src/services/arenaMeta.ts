@@ -12,9 +12,14 @@ export type ArenaCardMeta = {
   scryfallId: string;
   /** Small face art CDN URL (or null if unknown). */
   artUrl: string | null;
+  /** Converted mana cost (null when Scryfall has none, e.g. some tokens). */
+  cmc: number | null;
+  /** Front-face mana cost string, e.g. "{2}{U}{U}" (null when unknown). */
+  manaCost: string | null;
 };
 
-const LS_KEY = "bbi.arenaMeta.v1";
+/** v2: adds cmc + manaCost for overlay grouping / mana pips. */
+const LS_KEY = "bbi.arenaMeta.v2";
 const mem = new Map<number, ArenaCardMeta | null>();
 const inflight = new Map<number, Promise<ArenaCardMeta | null>>();
 
@@ -56,7 +61,14 @@ type ScryfallArenaCard = {
   id?: string;
   name?: string;
   type_line?: string;
-  card_faces?: { name?: string; type_line?: string; image_uris?: Record<string, string> }[];
+  mana_cost?: string;
+  cmc?: number;
+  card_faces?: {
+    name?: string;
+    type_line?: string;
+    mana_cost?: string;
+    image_uris?: Record<string, string>;
+  }[];
   image_uris?: Record<string, string>;
 };
 
@@ -74,13 +86,18 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
     data.card_faces?.[0]?.type_line?.trim() ||
     "";
   const scryfallId = data.id?.trim() || "";
-  const artUrl = scryfallId ? scryfallCdnUrl(scryfallId, "small") : null;
+  const artUrl = scryfallId ? scryfallCdnUrl(scryfallId, "art_crop") : null;
+  const cmc = typeof data.cmc === "number" && Number.isFinite(data.cmc) ? data.cmc : null;
+  const manaCost =
+    data.mana_cost?.trim() || data.card_faces?.[0]?.mana_cost?.trim() || null;
   return {
     name,
     typeLine,
     isLand: isLandType(typeLine),
     scryfallId,
     artUrl,
+    cmc,
+    manaCost,
   };
 }
 

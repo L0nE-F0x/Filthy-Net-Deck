@@ -1,7 +1,7 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-19 — **v1.3.0 fully live** (Windows signed installer + Netlify + tag `v1.3.0`).  
-**Next agent charter:** **Polish the in-game overlay** (beauty + UX + density) without regressing perf or privacy. Owner may hand this to **Kimi K3** (frontend-focused).
+**Last wrap-up:** 2026-07-19 — **v1.3.5 fully live** (Windows signed installer + Netlify + tag `v1.3.5`).  
+**Next agent charter:** **macOS roll** (pull `v1.3.5` CI dmg into `website/downloads/` + site links), then further overlay/UX polish only if owner asks.
 
 Read **`AGENTS.md`** first. Any user-visible change is incomplete until the **full release checklist** ships (version bump, signed build, updater, site, OG). Source-only is not a release.
 
@@ -11,18 +11,35 @@ Read **`AGENTS.md`** first. Any user-visible change is incomplete until the **fu
 
 | Item | Value |
 |------|--------|
-| Version | **1.3.0** (Windows) |
-| Commit / tag | `8bd7fac` / `v1.3.0` |
+| Version | **1.3.5** (Windows) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.3.5.exe` (+ `.sig`) |
 | macOS | **1.1.1** dmg still on site until tag CI dmg is rolled |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.3.0.exe` (+ `.sig`) |
-| Soft / updater | `website/version.json` + `public/version.json` + `website/updater/latest.json` → **1.3.0** |
+| Soft / updater | `website/version.json` + `public/version.json` + `website/updater/latest.json` → **1.3.5** |
 | Live site | https://filthy-net-deck.netlify.app/ |
 
-Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password is local-only — never commit.
+Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted; password in `filthy-net-deck-key-password.txt` next to it — local only, never commit).
 
 ---
 
-## What just shipped (v1.3.0) — context for the next model
+## What just shipped (v1.3.5) — overlay polish pass (Kimi)
+
+Frontend refinement of the v1.3.0 in-game overlay, per this handoff's charter:
+
+| Area | Change |
+|------|--------|
+| **Information design** | Library now groups into **Lands / Creatures / Spells** sections (type-line driven), sorted by cmc; each row shows **mana pips** + next-draw % with a subtle heat wash. |
+| **Art** | Rows use Scryfall **art_crop** (was full-card `small` — looked like unreadable shrunken cards). `arenaMeta` cache bumped to `bbi.arenaMeta.v2` and now also stores `cmc` + `manaCost`. |
+| **Collapsed bar** | **Real slim strip** — window shrinks to 34px (Rust `MIN_H` 120→32); expanding restores the remembered height and clamps on-screen. N/S/SE resize handles hidden while collapsed. |
+| **Bar content** | `vs` micro-label, opp, library chip, land chip (`16L 45.7%`), expand chevron. Ended: **Victory/Defeat/Draw pill**. |
+| **Sub row** | Deck name, season record, Bo1/Bo3 chip, **match clock** (1 Hz text tick only while playing — no continuous animation). |
+| **Settings** | New **opacity slider** (55–100%) + **Start expanded** toggle (prefs `overlayOpacity` / `overlayStartExpanded` in `bbi.prefs`, read live by overlay webview via `storage` events). Copy de-dev-ified (no more `tauri:dev` mention). |
+| **Pure logic** | `src/overlay/overlayModel.ts` (group/sort/pips/clock/opacity) + `overlayModel.test.ts` (112 vitest tests total, 16 Rust tests — all green). |
+
+Perf/privacy invariants kept: no backdrop-filter, dirty-only `tracker:live` emits, rAF-coalesced updates, Rust owns show/hide, never `set_focus`, memoized rows.
+
+---
+
+## What shipped before (v1.3.0) — context
 
 ### Product
 
@@ -105,26 +122,13 @@ Arena: enable **Detailed Logs (Plugin Support)**. Overlay needs a finished GRE `
 
 ---
 
-## Next work (for Kimi / frontend polish)
+## Next work
 
-**Primary goal:** Make the overlay **more beautiful and more usable** while staying **discreet** and **cheap**.
+1. **macOS roll** — after GH Actions builds the `v1.3.5` dmg, pull it into `website/downloads/` and fix macOS download links (pattern from past "Roll vX out to macOS" commits).
+2. **Further overlay ideas (only if owner asks):** click-through mode, per-deck art size, sideboard view between Bo3 games, WUBRG deck-color pips. Keep the perf/privacy invariants.
+3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices, Events overhaul).
 
-Suggested direction (owner-aligned):
-
-1. **Visual system** — typography, spacing, art framing, qty/% columns, land vs spell hierarchy; match Filthy Net Deck acid/gold brand without loud chrome.
-2. **Information design** — clearer next-draw %, optional land line, maybe CMC grouping or mana pips if free/local; avoid clutter.
-3. **Collapsed bar** — even smarter one-line status (opp · library · lands) when collapsed.
-4. **Motion** — subtle only; no continuous animations that burn GPU mid-match.
-5. **Settings** — opacity slider, default expanded/collapsed, optional click-through later (only if solid).
-6. **Do not** rebuild the GRE parser unless a real tracking bug is found; fix bugs with fixtures in `tracker.rs` tests.
-
-### Explicit non-goals this pass
-
-- Cloud sync, mobile, Alchemy/Historic, price tracking, draft helper  
-- Fabricated matchup/sideboard advice  
-- Claiming ship complete without AGENTS.md full release if UI changes ship  
-
-### When polish is ready to ship
+### When the next UI change ships
 
 Full checklist in **`AGENTS.md`**: bump `package.json` / `src/version.ts` / `src-tauri/{Cargo.toml,tauri.conf.json}`, signed Windows build, `website/downloads/*`, `updater/latest.json`, both `version.json`, `website/index.html` + OG image `?v=`, push `main` (+ tag if macOS).
 

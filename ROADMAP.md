@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.3.0** (in-game overlay deck tracker; Windows signed on site; macOS dmg may lag until tag CI).  
+**Current release:** **v1.3.5** (in-game overlay polish: grouped list, art crops, mana pips, true slim bar; Windows signed on site; macOS dmg may lag until tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -8,15 +8,15 @@
 
 ---
 
-## Next chapter — post-v1.3 (owner 2026-07-19)
+## Next chapter — post-v1.3.5 (owner 2026-07-19)
 
-Canonical checklist: **`handoff.md`** (detailed overlay map for polish agents, e.g. Kimi K3).
+Canonical checklist: **`handoff.md`**.
 
-1. **Overlay polish** — beauty, density, odds/art UX; keep discreet + FPS-safe (release build)  
-2. **macOS roll** — pull `v1.3.0` CI dmg into `website/downloads/` + site links  
+1. ~~**Overlay polish**~~ — **shipped in v1.3.5** (grouped sections, art crops, mana pips, true slim bar, opacity + start-expanded settings)  
+2. **macOS roll** — pull `v1.3.5` CI dmg into `website/downloads/` + site links  
 3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
-**Shipped:** **v1.3.0** in-game overlay + match-end notify defaults (installer + updater + site).
+**Shipped:** **v1.3.5** overlay refinement (installer + updater + site + OG).
 
 ### Explicitly deferred
 
@@ -44,6 +44,7 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test
 
 | Version | Theme |
 |---------|--------|
+| **v1.3.5** | Overlay polish: grouped list, art crops, mana pips, slim bar, settings |
 | **v1.3.0** | In-game overlay deck tracker + notify defaults |
 | **v1.2.0** | First-session coach, share cards, update UX |
 | **v1.1.1** | Themes accordion sidebar-only |

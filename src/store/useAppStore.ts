@@ -44,6 +44,7 @@ import {
   type BanChange,
 } from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
+import { normalizeOpacity } from "../overlay/overlayModel";
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
@@ -66,6 +67,10 @@ interface Prefs {
   notifyBanlist: boolean;
   /** Always-on-top match HUD during Arena games (default on). */
   overlayEnabled: boolean;
+  /** Overlay panel background opacity (0.55–1, default 0.92). */
+  overlayOpacity: number;
+  /** Overlay starts expanded (full list) instead of collapsed bar. */
+  overlayStartExpanded: boolean;
   /** Launch the app fullscreen (also toggled live with F11). */
   fullscreen: boolean;
   /** Appearance — dark is the product default. */
@@ -86,6 +91,8 @@ function loadPrefs(): Prefs {
         notifyMatchEnd?: boolean;
         notifyBanlist?: boolean;
         overlayEnabled?: boolean;
+        overlayOpacity?: number;
+        overlayStartExpanded?: boolean;
         fullscreen?: boolean;
         theme?: string;
         skin?: string;
@@ -98,6 +105,8 @@ function loadPrefs(): Prefs {
         notifyMatchEnd: parsed.notifyMatchEnd !== false,
         notifyBanlist: parsed.notifyBanlist !== false,
         overlayEnabled: parsed.overlayEnabled !== false,
+        overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
+        overlayStartExpanded: parsed.overlayStartExpanded === true,
         fullscreen: parsed.fullscreen === true,
         theme: parsed.theme === "light" ? "light" : "dark",
         skin: isSkinId(parsed.skin) ? parsed.skin : "classic",
@@ -116,6 +125,8 @@ function loadPrefs(): Prefs {
     notifyMatchEnd: true,
     notifyBanlist: true,
     overlayEnabled: true,
+    overlayOpacity: 0.92,
+    overlayStartExpanded: false,
     fullscreen: false,
     theme: "dark",
     skin: "classic",
@@ -236,6 +247,10 @@ interface AppState {
   setNotifyMatchEnd: (v: boolean) => void;
   setNotifyBanlist: (v: boolean) => void;
   setOverlayEnabled: (v: boolean) => void;
+  /** Overlay panel opacity (0.55–1) — read live by the overlay window. */
+  setOverlayOpacity: (v: number) => void;
+  /** Start overlay expanded instead of collapsed bar. */
+  setOverlayStartExpanded: (v: boolean) => void;
   /** Persist the fullscreen pref and apply it to the window immediately. */
   setFullscreenPref: (v: boolean) => void;
   /** Persist appearance and apply it to the document immediately. */
@@ -425,6 +440,16 @@ export const useAppStore = create<AppState>((set, get) => {
       void import("../services/overlay").then((m) =>
         m.setOverlayEnabled(overlayEnabled),
       );
+    },
+    setOverlayOpacity: (overlayOpacity) => {
+      const next = { ...get().prefs, overlayOpacity: normalizeOpacity(overlayOpacity) };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setOverlayStartExpanded: (overlayStartExpanded) => {
+      const next = { ...get().prefs, overlayStartExpanded };
+      savePrefs(next);
+      set({ prefs: next });
     },
     setFullscreenPref: (fullscreen) => {
       const next = { ...get().prefs, fullscreen };

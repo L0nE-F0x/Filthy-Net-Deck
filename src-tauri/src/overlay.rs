@@ -16,7 +16,8 @@ const GEOMETRY_FILE: &str = "overlay-geometry.json";
 const DEFAULT_W: f64 = 228.0;
 const DEFAULT_H: f64 = 168.0;
 const MIN_W: f64 = 180.0;
-const MIN_H: f64 = 120.0;
+/// Collapsed bar = 2px accent + 30px bar + border — allow the JS shrink.
+const MIN_H: f64 = 32.0;
 const MAX_W: f64 = 420.0;
 const MAX_H: f64 = 900.0;
 

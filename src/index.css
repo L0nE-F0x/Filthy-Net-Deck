@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @theme {
   --color-ink-950: #07080c;
@@ -4003,6 +4003,45 @@ select,
   line-height: 1.4;
   color: var(--color-muted);
 }
+.settings-slider-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0.45rem;
+  border-radius: 10px;
+}
+.settings-slider-row:hover {
+  background: color-mix(in srgb, var(--color-ink-700) 55%, transparent);
+}
+.settings-slider-row strong {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--color-foam);
+}
+.settings-slider-row em {
+  display: block;
+  margin-top: 0.12rem;
+  font-style: normal;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+.settings-slider-row output {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-gold-300);
+  min-width: 2.6rem;
+  text-align: right;
+}
+.settings-slider-row input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--color-gold-400);
+  cursor: pointer;
+}
 @media (max-width: 900px) {
   .settings-grid {
     grid-template-columns: 1fr;
@@ -4828,7 +4867,8 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
 
 
 /* -- In-game overlay HUD (second webview #/overlay) -- */
-/* Perf: no backdrop-filter/blur — expensive with always-on-top transparent HWND */
+/* Perf: no backdrop-filter/blur, no continuous animation — expensive on an
+   always-on-top transparent HWND mid-match. All motion is one-shot transitions. */
 html.overlay-root,
 html.overlay-root body.overlay-body {
   margin: 0;
@@ -4849,6 +4889,8 @@ html.overlay-root #root {
   height: 100%;
   background: transparent;
 }
+
+/* -- Shell: dark glass panel, brand hairline, opacity user-tunable -- */
 .overlay-shell {
   position: relative;
   box-sizing: border-box;
@@ -4856,51 +4898,109 @@ html.overlay-root #root {
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 6px;
+  border-radius: 9px;
   overflow: hidden;
-  /* Solid-ish dark glass without GPU blur */
-  background: rgba(10, 12, 18, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-  color: rgba(232, 234, 240, 0.92);
+  background: linear-gradient(
+    180deg,
+    rgba(17, 20, 30, var(--ov-alpha, 0.92)) 0%,
+    rgba(9, 11, 17, var(--ov-alpha, 0.92)) 100%
+  );
+  border: 1px solid rgba(212, 168, 75, 0.16);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.45);
+  color: rgba(232, 234, 240, 0.94);
   font-family: var(--font-display);
   font-size: 11px;
 }
 .overlay-shell.is-ended {
-  border-color: rgba(107, 154, 235, 0.35);
+  border-color: rgba(212, 168, 75, 0.34);
 }
-.overlay-shell.is-compact {
-  /* bar only — minimal footprint */
+.overlay-shell.is-ended.is-win {
+  border-color: rgba(52, 211, 153, 0.4);
 }
+.overlay-shell.is-ended.is-loss {
+  border-color: rgba(248, 113, 113, 0.38);
+}
+
+/* Brand accent line across the top — result-colored when the match ends. */
+.overlay-accent {
+  height: 2px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(212, 168, 75, 0.8) 0%,
+    rgba(107, 154, 235, 0.5) 55%,
+    transparent 96%
+  );
+}
+.overlay-shell.is-win .overlay-accent {
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.9), rgba(52, 211, 153, 0.2) 70%, transparent);
+}
+.overlay-shell.is-loss .overlay-accent {
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.9), rgba(248, 113, 113, 0.2) 70%, transparent);
+}
+.overlay-shell.is-draw .overlay-accent,
+.overlay-shell.is-unknown .overlay-accent {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.9), rgba(251, 191, 36, 0.2) 70%, transparent);
+}
+
+/* -- Resize edges (East/West always; N/S/SE only while expanded) -- */
 .overlay-resize { position: absolute; z-index: 5; }
-.overlay-resize-n { top: 0; left: 6px; right: 6px; height: 3px; cursor: n-resize; }
-.overlay-resize-s { bottom: 0; left: 6px; right: 6px; height: 4px; cursor: s-resize; }
-.overlay-resize-e { top: 6px; right: 0; bottom: 6px; width: 4px; cursor: e-resize; }
-.overlay-resize-w { top: 6px; left: 0; bottom: 6px; width: 3px; cursor: w-resize; }
+.overlay-resize-n { top: 0; left: 8px; right: 8px; height: 3px; cursor: n-resize; }
+.overlay-resize-s { bottom: 0; left: 8px; right: 8px; height: 4px; cursor: s-resize; }
+.overlay-resize-e { top: 8px; right: 0; bottom: 8px; width: 4px; cursor: e-resize; }
+.overlay-resize-w { top: 8px; left: 0; bottom: 8px; width: 3px; cursor: w-resize; }
 .overlay-resize-se {
-  right: 0; bottom: 0; width: 12px; height: 12px; cursor: se-resize;
-  background: linear-gradient(135deg, transparent 55%, rgba(255,255,255,0.12) 55%);
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+  background: linear-gradient(
+    135deg,
+    transparent 52%, rgba(212, 168, 75, 0.28) 52%, rgba(212, 168, 75, 0.28) 60%,
+    transparent 60%, transparent 70%, rgba(212, 168, 75, 0.28) 70%, rgba(212, 168, 75, 0.28) 78%,
+    transparent 78%
+  );
 }
+
+/* -- Title bar (30px; + 2px accent + 2px shell border = 34px collapsed) -- */
 .overlay-bar {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.28rem 0.2rem 0.4rem;
-  background: rgba(0, 0, 0, 0.28);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 5px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 4px 0 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
   cursor: grab;
-  min-height: 1.55rem;
+  flex-shrink: 0;
+}
+.overlay-shell.is-compact .overlay-bar {
+  border-bottom-color: transparent;
 }
 .overlay-bar-main {
   display: flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 5px;
   min-width: 0;
   flex: 1;
 }
+.overlay-vs {
+  flex-shrink: 0;
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+  opacity: 0.85;
+}
 .overlay-opp-line {
   font-weight: 650;
-  font-size: 0.72rem;
+  font-size: 12px;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4908,144 +5008,305 @@ html.overlay-root #root {
 .overlay-bar-stats {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 4px;
   flex-shrink: 0;
 }
 .overlay-stat {
-  font-size: 0.62rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
   font-weight: 700;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
-  padding: 0.04rem 0.28rem;
+  padding: 2px 7px;
   border-radius: 999px;
-  background: rgba(74, 127, 212, 0.22);
-  color: #9bb8f0;
+  border: 1px solid transparent;
+}
+.overlay-stat--lib {
+  background: rgba(74, 127, 212, 0.16);
+  border-color: rgba(107, 154, 235, 0.24);
+  color: var(--color-azure-300);
+}
+/* Mini library glyph */
+.overlay-stat--lib::before {
+  content: "";
+  width: 6px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 1.5px;
+  opacity: 0.75;
 }
 .overlay-stat--land {
-  background: rgba(52, 211, 153, 0.14);
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.22);
   color: #6ee7b7;
 }
 .overlay-stat--land em {
   font-style: normal;
-  opacity: 0.75;
-  margin-left: 0.15rem;
+  opacity: 0.72;
+  margin-left: 1px;
   font-weight: 600;
+  font-size: 8.5px;
 }
 .overlay-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
   border: 0;
   background: transparent;
-  color: #8b93a7;
+  color: var(--color-muted);
   cursor: pointer;
-  font-size: 0.65rem;
+  font-size: 9px;
   line-height: 1;
-  padding: 0.12rem 0.2rem;
-  border-radius: 3px;
+  padding: 0;
+  border-radius: 4px;
   flex-shrink: 0;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 .overlay-icon-btn:hover {
-  color: #e8eaf0;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-foam);
+  background: rgba(255, 255, 255, 0.09);
 }
+
+/* Result pill — word form, brand-coded */
 .overlay-pill {
   flex-shrink: 0;
-  font-size: 0.58rem;
+  font-size: 8px;
   font-weight: 800;
-  padding: 0.04rem 0.28rem;
-  border-radius: 3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2.5px 7px;
+  border-radius: 4px;
 }
-.overlay-pill--win { background: #34d399; color: #06120c; }
-.overlay-pill--loss { background: #f87171; color: #fff; }
+.overlay-pill--win { background: var(--color-good); color: #06120c; }
+.overlay-pill--loss { background: var(--color-poor); color: #fff; }
 .overlay-pill--draw,
-.overlay-pill--unknown { background: #fbbf24; color: #1a1204; }
+.overlay-pill--unknown { background: var(--color-fair); color: #1a1204; }
+
+/* -- Sub line: deck, season record, mode, clock -- */
 .overlay-sub {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.2rem 0.4rem;
-  padding: 0.22rem 0.4rem 0.12rem;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 9px 2px;
   cursor: grab;
+  flex-shrink: 0;
 }
 .overlay-deck-line {
-  font-size: 0.64rem;
-  font-weight: 600;
-  color: rgba(240, 217, 153, 0.9);
-  max-width: 100%;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: rgba(240, 217, 153, 0.92);
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.overlay-sub-right {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-shrink: 0;
+}
 .overlay-wr-line {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: #34d399;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--color-good);
   font-variant-numeric: tabular-nums;
 }
+.overlay-mode-chip {
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 1px 5px;
+}
+.overlay-clock {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- Library list: grouped sections -- */
 .overlay-decklist {
-  list-style: none;
-  margin: 0;
-  padding: 0.05rem 0.2rem 0.3rem;
-  overflow-y: auto;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  padding: 1px 4px 7px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.15) transparent;
-  content-visibility: auto;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
 }
-.overlay-card-row {
-  display: grid;
-  grid-template-columns: 1.1rem 28px minmax(0, 1fr) 2.4rem;
-  gap: 0.28rem;
-  align-items: center;
-  padding: 0.08rem 0.15rem;
+.overlay-decklist::-webkit-scrollbar { width: 5px; }
+.overlay-decklist::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 3px;
-  font-size: 0.66rem;
-  line-height: 1.15;
-  contain: layout paint;
 }
-.overlay-card-row.is-land .overlay-card-name {
-  color: #a7f3d0;
+.overlay-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 6px 2px;
+  cursor: grab;
 }
-.overlay-card-row:hover {
-  background: rgba(255, 255, 255, 0.04);
+.overlay-group-label {
+  flex-shrink: 0;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
-.overlay-card-qty {
+.overlay-group--land .overlay-group-label {
+  color: rgba(110, 231, 183, 0.62);
+}
+.overlay-group-head::before {
+  content: "";
+  order: 2;
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.overlay-group-count {
+  order: 3;
+  flex-shrink: 0;
+  font-size: 8.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+  opacity: 0.85;
+}
+.overlay-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* -- Card rows: qty · art · name · pips · next-draw % -- */
+.overlay-card-row {
+  display: grid;
+  grid-template-columns: 12px 30px minmax(0, 1fr) auto 27px;
+  gap: 6px;
+  align-items: center;
+  padding: 1.5px 5px 1.5px 6px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  contain: layout paint;
+  /* Draw-odds heat wash — static gradient, repainted only on data change */
+  background: linear-gradient(
+    90deg,
+    rgba(107, 154, 235, calc(var(--int, 0) * 0.13)),
+    rgba(107, 154, 235, 0) 68%
+  );
+}
+.overlay-card-row.is-land {
+  background: linear-gradient(
+    90deg,
+    rgba(52, 211, 153, calc(var(--int, 0) * 0.1)),
+    rgba(52, 211, 153, 0) 68%
+  );
+}
+.overlay-card-row:hover {
+  background-color: rgba(255, 255, 255, 0.045);
+}
+.overlay-card-qty {
+  font-size: 10px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
   text-align: right;
-  color: rgba(232, 234, 240, 0.9);
+  color: rgba(232, 234, 240, 0.88);
 }
 .overlay-card-art {
-  width: 28px;
-  height: 40px;
+  width: 30px;
+  height: 42px;
   object-fit: cover;
-  object-position: top center;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  object-position: center;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.overlay-card-row.is-land .overlay-card-art {
+  border-color: rgba(52, 211, 153, 0.28);
 }
 .overlay-card-art--empty {
   display: block;
-  width: 28px;
-  height: 40px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 30px;
+  height: 42px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
 }
 .overlay-card-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: rgba(232, 234, 240, 0.88);
+  font-weight: 550;
+  color: rgba(232, 234, 240, 0.9);
 }
+.overlay-card-row.is-land .overlay-card-name {
+  color: #a7f3d0;
+}
+
+/* Mana pips — colored cost dots (hidden on very narrow panels) */
+.overlay-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.overlay-pip {
+  display: inline-grid;
+  place-items: center;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  font-size: 7px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.pip-w { background: #f8e7b9; color: #4d3f1a; }
+.pip-u { background: #0e68ab; color: #fff; }
+.pip-b { background: #2b2320; color: #d8ccc4; }
+.pip-r { background: #d3202a; color: #fff; }
+.pip-g { background: #00733d; color: #fff; }
+.pip-c { background: #ccc2c0; color: #241f1d; }
+.pip-x { background: #8b93a7; color: #0a0b10; }
+@media (max-width: 214px) {
+  .overlay-pips { display: none; }
+}
+
 .overlay-card-pct {
   font-variant-numeric: tabular-nums;
-  font-size: 0.6rem;
-  font-weight: 650;
+  font-size: 9.5px;
+  font-weight: 700;
   text-align: right;
-  color: #9bb8f0;
+  color: var(--color-azure-300);
 }
+.overlay-card-row.is-land .overlay-card-pct {
+  color: rgba(110, 231, 183, 0.8);
+}
+
+/* Waiting state */
 .overlay-hint {
-  margin: 0.35rem 0.45rem;
-  font-size: 0.62rem;
-  color: #8b93a7;
-  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 10px 12px;
+  font-size: 10px;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+.overlay-hint span {
+  font-size: 8.5px;
+  opacity: 0.7;
 }
