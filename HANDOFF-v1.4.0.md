@@ -66,4 +66,4 @@ See earlier sections in git history / prior handoff revisions.
 
 ## Housekeeping
 - Untracked owner YouTube marketing assets: leave alone.
-- macOS: tag `v1.4.0` → CI dmg → copy to `website/downloads/Filthy-Net-Deck-1.4.0-universal.dmg` (site already points there).
+- macOS: **rolled** — `Filthy-Net-Deck-1.4.0-universal.dmg` on site (from GH release after CI).
