@@ -1,11 +1,11 @@
 {
-  "version": "1.4.3",
-  "notes": "v1.4.3: Events drops the old Meta Trackers strip; My Stats deck table sorts by last played (and more) with richer hover tooltips.",
-  "pub_date": "2026-07-19T16:16:52.851Z",
+  "version": "1.4.4",
+  "notes": "v1.4.4: Richer hover tooltips across Climb, Matchup Lab, Decks, and Deck detail.",
+  "pub_date": "2026-07-19T16:23:21.147Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZZOUFaTjZ3WGhwQm1MQ2dWb2IxbWJ2dHVpazhEM0o5NDRYRzc1NXZnZFZoQVRBR0xjc2grR2orc1NuUWtXZmJyS0lCVlEzU2dpMGx6VWlOQXorTVFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc3ODAzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC4zX3g2NC1zZXR1cC5leGUKM3kzS3Y2RTVwWXNPMExJZkNFY2dUb1BEUHpGditlNldwcWpWVE42YStEY2E5SVBGWkxaR05xR2NnUGNGMmNCTG5uSzNLMzlXbC9RSXpkTGJzZnFxQUE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WndpTWZYZGdDOE1jVlFsZGx3MHp6bkwxSndzZy9QcFdMUVVOK0YvSld0UCt5d1VEcUxYQitOMjNreEMrVXh1dkhjcXdaMkNYclZ6UjlxeE1RMVpWelFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDc4MTkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNC40X3g2NC1zZXR1cC5leGUKVjByMnhHLytRRnY5Mmk3RWI1V0N4Rk5vaFBrQTNPdDJBV0wvSFlvS2gwZWNHTUxMMm5Sck1icEppRnRPbWJZcmc2WU95bWJyWFNtM3JjMlQ5aU5mQmc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.4.exe"
     }
   }
 }

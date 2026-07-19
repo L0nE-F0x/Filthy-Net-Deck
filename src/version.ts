@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.4.3";
+export const APP_VERSION = "1.4.4";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Events: Meta Trackers residue removed",
-  "My Stats decks: sort by last played, games, record",
-  "Richer hover tooltips on stats + events"
+  "Hover help on Climb stretches, form dots, and rank tiles",
+  "Matchup Lab: sort/filter/opponent rows explain themselves",
+  "Decks board + deck detail: clearer titles on ranks, filters, import"
 ];

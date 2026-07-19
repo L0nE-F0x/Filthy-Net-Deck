@@ -414,15 +414,31 @@ function LegCard({
       onClick={onOpen}
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
-      title="Open this deck in My Stats"
+      title={[
+        leg.deckName,
+        rankTrail,
+        `${leg.wins}W–${leg.losses}L${leg.rate != null ? ` · ${Math.round(leg.rate * 100)}%` : ""}`,
+        `${leg.matches} game${leg.matches === 1 ? "" : "s"} this stretch`,
+        `Ended ${new Date(leg.endAt).toLocaleString()}`,
+        "Click to open this deck in My Stats",
+      ].join(" · ")}
     >
-      <span className="climb-leg-idx" style={{ background: deckSwatch(leg.deckKey) }}>
+      <span
+        className="climb-leg-idx"
+        style={{ background: deckSwatch(leg.deckKey) }}
+        title={`Stretch #${index + 1}`}
+      >
         {index + 1}
       </span>
       <span className="climb-leg-body">
         <span className="climb-leg-name">{leg.deckName}</span>
-        <span className="climb-leg-rank">{rankTrail}</span>
-        <span className="climb-leg-meta">
+        <span className="climb-leg-rank" title="Rank stamps at the start and end of this stretch">
+          {rankTrail}
+        </span>
+        <span
+          className="climb-leg-meta"
+          title={`${leg.matches} game${leg.matches === 1 ? "" : "s"} · last ${new Date(leg.endAt).toLocaleString()}`}
+        >
           {leg.wins}W {leg.losses}L
           {leg.rate != null && (
             <strong className={`favor-${winrateFavor(leg.rate)}`}>
@@ -437,6 +453,13 @@ function LegCard({
         </span>
       </span>
       <span
+        title={
+          leg.delta == null
+            ? "No rank delta for this stretch"
+            : leg.delta === 0
+              ? "Rank flat across this stretch"
+              : `${leg.delta > 0 ? "Gained" : "Lost"} ${Math.abs(leg.delta).toFixed(leg.delta % 1 ? 1 : 0)} rank step${Math.abs(leg.delta) === 1 ? "" : "s"}`
+        }
         className={`climb-leg-delta${
           leg.delta == null
             ? " muted"
@@ -468,6 +491,12 @@ function DeckClimbRow({
   highlighted: boolean;
   onHover: (on: boolean) => void;
 }) {
+  const trail =
+    d.startRank && d.endRank
+      ? `${formatRank(d.startRank)} → ${formatRank(d.endRank)}`
+      : d.endRank
+        ? formatRank(d.endRank)
+        : "No rank stamps";
   return (
     <button
       type="button"
@@ -475,20 +504,39 @@ function DeckClimbRow({
       onClick={onOpen}
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
+      title={[
+        d.name,
+        trail,
+        `${d.wins}W–${d.losses}L${d.rate != null ? ` · ${Math.round(d.rate * 100)}%` : ""}`,
+        d.delta === 0
+          ? "Rank flat on this deck"
+          : `${d.delta > 0 ? "+" : ""}${d.delta.toFixed(d.delta % 1 ? 1 : 0)} rank steps`,
+        d.legs > 1 ? `${d.legs} separate stretches` : null,
+        "Open full deck stats",
+      ]
+        .filter(Boolean)
+        .join(" · ")}
     >
-      <span className="climb-deck-swatch" style={{ background: deckSwatch(d.key) }} />
+      <span
+        className="climb-deck-swatch"
+        style={{ background: deckSwatch(d.key) }}
+        title="Deck color mark on the climb chart"
+      />
       <span className="climb-deck-main">
         <span className="climb-deck-title">{d.name}</span>
-        <span className="climb-deck-sub">
-          {d.startRank && d.endRank
-            ? `${formatRank(d.startRank)} → ${formatRank(d.endRank)}`
-            : d.endRank
-              ? formatRank(d.endRank)
-              : "No rank stamps"}
+        <span className="climb-deck-sub" title="First → last rank stamp while on this deck">
+          {trail}
           {d.legs > 1 ? ` · ${d.legs} stretches` : ""}
         </span>
       </span>
-      <span className="climb-deck-wr">
+      <span
+        className="climb-deck-wr"
+        title={
+          d.rate != null
+            ? `${d.wins}W–${d.losses}L · ${Math.round(d.rate * 100)}% on this deck`
+            : `${d.wins}W–${d.losses}L`
+        }
+      >
         <span className="mu-track climb-deck-track">
           <span
             className={`mu-fill favor-${winrateFavor(d.rate ?? 0)}`}
@@ -509,13 +557,16 @@ function DeckClimbRow({
         className={`climb-deck-delta${
           d.delta > 0 ? " up" : d.delta < 0 ? " down" : " muted"
         }`}
+        title="Net rank step change from first to last stamp on this deck"
       >
         {d.delta > 0 ? "▲" : d.delta < 0 ? "▼" : "·"}{" "}
         {d.delta === 0
           ? "flat"
           : `${Math.abs(d.delta).toFixed(d.delta % 1 ? 1 : 0)} step`}
       </span>
-      <span className="climb-deck-go">Stats →</span>
+      <span className="climb-deck-go" title="Open My Stats for this deck">
+        Stats →
+      </span>
     </button>
   );
 }
@@ -543,7 +594,10 @@ function SeasonCompareCell({
       ? "—"
       : `${deltaNum > 0 ? "+" : ""}${deltaNum}${deltaSuffix ? ` ${deltaSuffix}` : ""}`;
   return (
-    <div className="season-compare-cell">
+    <div
+      className="season-compare-cell"
+      title={`${label}: ${now}${deltaNum != null ? ` (${delta} vs previous season)` : ""}`}
+    >
       <span className="season-compare-label">{label}</span>
       <strong className="season-compare-now">{now}</strong>
       <span className={`season-compare-delta ${cls}`}>{delta}</span>
@@ -664,15 +718,21 @@ export function Climb() {
           </div>
         </div>
         <div className="lab-intro-stats">
-          <div>
+          <div title={current ? `Current rank: ${formatRank(current)}` : "No current rank stamp"}>
             <strong className="text-gold-300">{current ? formatRank(current) : "—"}</strong>
             <span>current</span>
           </div>
-          <div>
+          <div title={peak ? `Best rank in this range: ${formatRank(peak)}` : "No peak rank yet"}>
             <strong>{peak ? formatRank(peak) : "—"}</strong>
             <span>peak</span>
           </div>
-          <div>
+          <div
+            title={
+              seasonDelta == null
+                ? "Not enough rank samples to measure steps"
+                : `Net rank steps this range: ${seasonDelta > 0 ? "+" : ""}${seasonDelta.toFixed(seasonDelta % 1 ? 1 : 0)}`
+            }
+          >
             <strong
               className={
                 seasonDelta == null
@@ -700,6 +760,7 @@ export function Climb() {
               key={s}
               type="button"
               className={`filter-chip${seasonKey === s ? " active" : ""}`}
+              title={`Show climb for ${seasonLabel(s)}`}
               onClick={() => setSeason(s)}
             >
               {seasonLabel(s)}
@@ -708,6 +769,7 @@ export function Climb() {
           <button
             type="button"
             className={`filter-chip${seasonKey === "all" ? " active" : ""}`}
+            title="Show climb across all seasons"
             onClick={() => setSeason("all")}
           >
             All time
@@ -716,7 +778,14 @@ export function Climb() {
       )}
 
       <div className="stat-tiles climb-tiles">
-        <div className="panel stat-tile">
+        <div
+          className="panel stat-tile"
+          title={
+            current
+              ? `Latest rank stamp: ${formatRank(current)}${series.length ? ` · ${timeAgo(series[series.length - 1].at)}` : ""}`
+              : "Arena only stamps rank on some matches"
+          }
+        >
           <span className="stat-num text-gold-300">
             {current ? formatRank(current) : "—"}
           </span>
@@ -724,11 +793,21 @@ export function Climb() {
             Current{series.length ? ` · ${timeAgo(series[series.length - 1].at)}` : ""}
           </span>
         </div>
-        <div className="panel stat-tile">
+        <div
+          className="panel stat-tile"
+          title={peak ? `Highest rank in this filter: ${formatRank(peak)}` : "No peak yet"}
+        >
           <span className="stat-num">{peak ? formatRank(peak) : "—"}</span>
           <span className="stat-label">Peak in range</span>
         </div>
-        <div className="panel stat-tile">
+        <div
+          className="panel stat-tile"
+          title={
+            overall.rate != null
+              ? `Season record ${overall.wins}W–${overall.losses}L · ${Math.round(overall.rate * 100)}%`
+              : "No decided games in this range"
+          }
+        >
           {overall.rate != null ? (
             <CountUp
               className={`stat-num favor-${winrateFavor(overall.rate)}`}
@@ -743,7 +822,16 @@ export function Climb() {
             Season WR · {overall.wins}W {overall.losses}L
           </span>
         </div>
-        <div className="panel stat-tile">
+        <div
+          className="panel stat-tile"
+          title={
+            current?.tier === "Mythic"
+              ? "Mythic has no fixed next step"
+              : nextLabel
+                ? `Rough estimate to ${nextLabel}${estimate.source === "history" ? " from your own rank samples" : " (default pace)"}`
+                : "Need a current rank stamp to estimate"
+          }
+        >
           <span className="stat-num">
             {matchesToNext != null ? `~${matchesToNext}` : current?.tier === "Mythic" ? "∞" : "—"}
           </span>
@@ -820,12 +908,15 @@ export function Climb() {
                   key={m.matchId}
                   type="button"
                   className={`wl-dot ${m.result} climb-form-dot`}
-                  title={`${m.result} · ${m.deckName ?? "?"} · ${m.myRank ?? "no rank"} · ${timeAgo(m.endedAt)} — open deck`}
+                  title={`${m.result === "win" ? "Win" : m.result === "loss" ? "Loss" : m.result} · ${m.deckName ?? "?"} · ${m.myRank ?? "no rank"} · ${new Date(m.endedAt).toLocaleString()} — open deck`}
                   onClick={() => goDeck(deckKey(m))}
                 />
               ))}
             </span>
-            <span className="text-sm">
+            <span
+              className="text-sm"
+              title={`Last ${form.decided} decided: ${form.wins}W–${form.losses}L${form.rate != null ? ` · ${Math.round(form.rate * 100)}%` : ""}`}
+            >
               {form.wins}W {form.losses}L
               {form.rate != null && (
                 <strong className={`favor-${winrateFavor(form.rate)}`}>
@@ -837,6 +928,7 @@ export function Climb() {
             {streak.length >= 2 && (
               <span
                 className={`climb-streak ${streak.type === "win" ? "streak-win" : "streak-loss"}`}
+                title={`Current ${streak.type} streak of ${streak.length}`}
               >
                 {streak.length}
                 {streak.type === "win" ? "W" : "L"} streak

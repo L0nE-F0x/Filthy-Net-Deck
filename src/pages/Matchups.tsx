@@ -99,9 +99,24 @@ function sortGroups(groups: OppGroup[], key: SortKey): OppGroup[] {
   });
 }
 
-function RateChip({ wins, losses, rate }: { wins: number; losses: number; rate: number | null }) {
+function RateChip({
+  wins,
+  losses,
+  rate,
+  tip,
+}: {
+  wins: number;
+  losses: number;
+  rate: number | null;
+  tip?: string;
+}) {
+  const decided = wins + losses;
+  const defaultTip =
+    decided > 0
+      ? `${wins}W–${losses}L · ${rate != null ? `${Math.round(rate * 100)}%` : "—"} of decided games`
+      : "No decided games yet";
   return (
-    <span className="mu-lab-score">
+    <span className="mu-lab-score" title={tip ?? defaultTip}>
       {wins}W {losses}L
       {rate != null && (
         <strong className={`favor-${winrateFavor(rate)}`}> {(rate * 100).toFixed(0)}%</strong>
@@ -147,27 +162,42 @@ function TagMatchupPanel({
 
   return (
     <div className="panel">
-      <h3 className="dash-title">Matchups by archetype</h3>
+      <h3
+        className="dash-title"
+        title="Aggregated from opponents you’ve tagged with an archetype"
+      >
+        Matchups by archetype
+      </h3>
       <div className="meta-bars">
         {rows.map((r) => (
           <button
             key={r.tag}
             type="button"
             className="meta-bar-row deck-wr-row deck-row-btn"
-            title={`Show ${r.tag} opponents`}
+            title={`${r.tag}: ${r.wins}W–${r.losses}L of ${r.total} · ${r.rate != null ? `${Math.round(r.rate * 100)}%` : "—"} — filter opponents with this tag`}
             onClick={() => onPickTag(r.tag)}
           >
             <span className="meta-bar-label">
               <span className="meta-bar-name">{r.tag}</span>
               <span className="text-muted text-[11px]">{r.total} match{r.total === 1 ? "" : "es"}</span>
             </span>
-            <span className="mu-track">
+            <span
+              className="mu-track"
+              title={`${r.wins}W–${r.losses}L vs ${r.tag}`}
+            >
               <span
                 className={`mu-fill favor-${winrateFavor(r.rate ?? 0)}`}
                 style={{ width: `${Math.max(4, (r.rate ?? 0) * 100)}%`, display: "block" }}
               />
             </span>
-            <span className="deck-wr-score">
+            <span
+              className="deck-wr-score"
+              title={
+                r.rate != null
+                  ? `${Math.round(r.rate * 100)}% vs ${r.tag}`
+                  : `No decided games vs ${r.tag}`
+              }
+            >
               {r.wins}W {r.losses}L
               {r.rate != null && (
                 <strong className={`favor-${winrateFavor(r.rate)}`}>
@@ -402,15 +432,17 @@ export function Matchups() {
           </p>
         </div>
         <div className="lab-intro-stats">
-          <div>
+          <div title={`${groups.length} unique opponents in this filter`}>
             <strong>{groups.length}</strong>
             <span>opponents</span>
           </div>
-          <div>
+          <div title={`${groups.filter((g) => g.tag).length} opponents with an archetype tag`}>
             <strong>{groups.filter((g) => g.tag).length}</strong>
             <span>tagged</span>
           </div>
-          <div>
+          <div
+            title="Opponents with ≥2 matches and under 45% WR — your problem matchups"
+          >
             <strong>{groups.filter((g) => (g.rate ?? 1) < 0.45 && g.matches.length >= 2).length}</strong>
             <span>trouble</span>
           </div>
@@ -424,6 +456,7 @@ export function Matchups() {
               key={s}
               type="button"
               className={`filter-chip${seasonKey === s ? " active" : ""}`}
+              title={`Show opponents from ${seasonLabel(s)}`}
               onClick={() => setSeason(s)}
             >
               {seasonLabel(s)}
@@ -432,6 +465,7 @@ export function Matchups() {
           <button
             type="button"
             className={`filter-chip${seasonKey === "all" ? " active" : ""}`}
+            title="Show opponents across all seasons"
             onClick={() => setSeason("all")}
           >
             All time
@@ -443,6 +477,7 @@ export function Matchups() {
         <button
           type="button"
           className={`filter-chip${deckFilter === null ? " active" : ""}`}
+          title="Show matches on every deck you piloted"
           onClick={() => setDeckFilter(null)}
         >
           All decks
@@ -452,6 +487,7 @@ export function Matchups() {
             key={d.key}
             type="button"
             className={`filter-chip${deckFilter === d.key ? " active" : ""}`}
+            title={`Only when you piloted ${d.name}`}
             onClick={() => setDeckFilter(d.key)}
           >
             {d.name}
@@ -460,20 +496,23 @@ export function Matchups() {
       </div>
 
       <div className="filter-bar mb-0">
-        <span className="text-xs text-muted self-center mr-1">Sort</span>
+        <span className="text-xs text-muted self-center mr-1" title="Order the opponent list">
+          Sort
+        </span>
         {(
           [
-            ["recent", "Recent"],
-            ["matches", "Most played"],
-            ["losses", "Most losses"],
-            ["rate", "Worst rate"],
-            ["name", "Name"],
+            ["recent", "Recent", "Most recently played first"],
+            ["matches", "Most played", "Most matches against first"],
+            ["losses", "Most losses", "Opponents who beat you most"],
+            ["rate", "Worst rate", "Lowest win rate first (needs decided games)"],
+            ["name", "Name", "Alphabetical"],
           ] as const
-        ).map(([k, label]) => (
+        ).map(([k, label, tip]) => (
           <button
             key={k}
             type="button"
             className={`filter-chip${sort === k ? " active" : ""}`}
+            title={tip}
             onClick={() => setSort(k)}
           >
             {label}
@@ -481,10 +520,13 @@ export function Matchups() {
         ))}
         {(knownTags.length > 0 || tagFilter) && (
           <>
-            <span className="text-xs text-muted self-center ml-2 mr-1">Tag</span>
+            <span className="text-xs text-muted self-center ml-2 mr-1" title="Filter by archetype tag">
+              Tag
+            </span>
             <button
               type="button"
               className={`filter-chip${tagFilter === null ? " active" : ""}`}
+              title="Show all tags"
               onClick={() => setTagFilter(null)}
             >
               All
@@ -492,6 +534,7 @@ export function Matchups() {
             <button
               type="button"
               className={`filter-chip${tagFilter === "__untagged__" ? " active" : ""}`}
+              title="Opponents you haven’t tagged yet"
               onClick={() => setTagFilter("__untagged__")}
             >
               Untagged
@@ -501,6 +544,7 @@ export function Matchups() {
                 key={t}
                 type="button"
                 className={`filter-chip${tagFilter === t ? " active" : ""}`}
+                title={`Only opponents tagged “${t}”`}
                 onClick={() => setTagFilter(t)}
               >
                 {t}
@@ -523,6 +567,7 @@ export function Matchups() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search opponents"
+              title="Search by name, tag, or note text"
             />
           </div>
           {groups.length === 0 ? (
@@ -535,17 +580,37 @@ export function Matchups() {
                   type="button"
                   className={`mu-lab-row${selected === g.key ? " active" : ""}`}
                   onClick={() => openOpponent(g)}
+                  title={[
+                    g.name,
+                    g.tag ? `Tag: ${g.tag}` : "Untagged",
+                    `${g.wins}W–${g.losses}L${g.rate != null ? ` · ${Math.round(g.rate * 100)}%` : ""}`,
+                    `${g.matches.length} match${g.matches.length === 1 ? "" : "es"}`,
+                    `Last played ${new Date(g.lastAt).toLocaleString()}`,
+                    g.notes?.trim() ? "Has prep notes" : null,
+                    "Click to open detail",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 >
                   <span className="mu-lab-name">
                     <strong>{g.name}</strong>
                     {g.tag ? (
-                      <em className="mu-lab-tag">{g.tag}</em>
+                      <em className="mu-lab-tag" title={`Archetype tag: ${g.tag}`}>
+                        {g.tag}
+                      </em>
                     ) : (
-                      <em className="mu-lab-tag ghost">untagged</em>
+                      <em className="mu-lab-tag ghost" title="No archetype tag yet">
+                        untagged
+                      </em>
                     )}
-                    {g.notes?.trim() && <span className="mu-lab-note-dot" title="Has notes" />}
+                    {g.notes?.trim() && (
+                      <span className="mu-lab-note-dot" title="Has prep notes" />
+                    )}
                   </span>
-                  <span className="mu-lab-meta text-muted">
+                  <span
+                    className="mu-lab-meta text-muted"
+                    title={`Last match ${new Date(g.lastAt).toLocaleString()}`}
+                  >
                     {g.matches.length} match{g.matches.length === 1 ? "" : "es"}
                     {g.decks[0] ? ` · ${g.decks[0]}${g.decks.length > 1 ? "…" : ""}` : ""}
                     {" · "}
@@ -562,8 +627,13 @@ export function Matchups() {
           <div className="panel mu-lab-detail">
             <div className="flex items-start justify-between gap-2 flex-wrap mb-3">
               <div>
-                <h3 className="text-lg font-semibold m-0">{selectedGroup.name}</h3>
-                <p className="text-xs text-muted m-0 mt-1">
+                <h3 className="text-lg font-semibold m-0" title={selectedGroup.name}>
+                  {selectedGroup.name}
+                </h3>
+                <p
+                  className="text-xs text-muted m-0 mt-1"
+                  title={`Last match ${new Date(selectedGroup.lastAt).toLocaleString()}`}
+                >
                   {selectedGroup.matches.length} match
                   {selectedGroup.matches.length === 1 ? "" : "es"} · last{" "}
                   {timeAgo(selectedGroup.lastAt)}
@@ -573,16 +643,18 @@ export function Matchups() {
                 wins={selectedGroup.wins}
                 losses={selectedGroup.losses}
                 rate={selectedGroup.rate}
+                tip={`Your record vs ${selectedGroup.name}`}
               />
             </div>
 
             <div className="mu-lab-fields">
-              <label className="mu-lab-field">
+              <label className="mu-lab-field" title="Powers Matchup Lab filters and Decks “you vs” chips">
                 <span>Archetype tag</span>
                 <input
                   type="text"
                   list="mu-tag-suggestions"
                   placeholder="e.g. Domain, Izzet Prowess…"
+                  title="Tag this opponent with a meta archetype (saved locally)"
                   value={editingKey === selectedGroup.key ? tagDraft : selectedGroup.tag ?? ""}
                   onChange={(e) => {
                     setEditingKey(selectedGroup.key);
@@ -597,11 +669,12 @@ export function Matchups() {
                   ))}
                 </datalist>
               </label>
-              <label className="mu-lab-field">
+              <label className="mu-lab-field" title="Private prep notes — never leave this PC">
                 <span>Prep notes</span>
                 <textarea
                   rows={4}
                   placeholder="Sideboard plan, tells, keep priorities…"
+                  title="Sideboard plans, tells, keep priorities — saved as you type"
                   value={editingKey === selectedGroup.key ? notesDraft : selectedGroup.notes ?? ""}
                   onChange={(e) => {
                     setEditingKey(selectedGroup.key);
@@ -611,7 +684,9 @@ export function Matchups() {
                   onBlur={() => saveNotes(tagDraft, notesDraft)}
                 />
               </label>
-              <p className="text-[11px] text-muted m-0">Tags and notes save as you type.</p>
+              <p className="text-[11px] text-muted m-0" title="Nothing is uploaded — notes stay in local storage">
+                Tags and notes save as you type.
+              </p>
             </div>
 
             {(selectedGroup.tag || tagDraft.trim()) && (

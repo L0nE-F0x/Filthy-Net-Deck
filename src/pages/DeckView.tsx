@@ -201,13 +201,19 @@ export function DeckView() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap gap-2 mb-2">
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("daily")}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              title="Back to today’s Decks board"
+              onClick={() => setPage("daily")}
+            >
               <IconBack className="w-4 h-4" /> Decks
             </button>
             {fmt && (
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
+                title={`Open ${fmt.name} format hub view`}
                 onClick={() => openFormat(fmt.id)}
               >
                 {fmt.name}
@@ -215,17 +221,27 @@ export function DeckView() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wide text-azure-300">
+            <span
+              className="text-xs font-bold uppercase tracking-wide text-azure-300"
+              title={`${fmt?.name ?? deck.format} · ${deck.mode.toUpperCase()}${deck.rank != null ? ` · rank #${deck.rank}` : ""}`}
+            >
               {fmt?.name ?? deck.format} · {deck.mode.toUpperCase()}
               {deck.rank != null ? ` · #${deck.rank}` : ""}
             </span>
             <TierBadge tier={deck.tier} />
             <ColorPips colors={deck.colors} />
             {deck.metaShare != null && (
-              <span className="text-xs text-muted">{deck.metaShare}% meta</span>
+              <span
+                className="text-xs text-muted"
+                title={`Estimated share of the ${fmt?.name ?? deck.format} ${deck.mode.toUpperCase()} board`}
+              >
+                {deck.metaShare}% meta
+              </span>
             )}
           </div>
-          <h2 className="text-2xl font-semibold m-0 tracking-tight">{deck.name}</h2>
+          <h2 className="text-2xl font-semibold m-0 tracking-tight" title={deck.archetype || deck.name}>
+            {deck.name}
+          </h2>
           {deck.commander && (
             <p className="text-sm text-gold-300 mt-1 mb-0">Commander: {deck.commander}</p>
           )}
@@ -386,6 +402,7 @@ export function DeckView() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
+                  title={`Open Matchup Lab filtered to tag “${deck.archetype || deck.name}”`}
                   onClick={() => openMatchupTag(deck.archetype || deck.name)}
                 >
                   Matchup Lab →
@@ -458,7 +475,12 @@ export function DeckView() {
           </span>
         </div>
         <div className="flex gap-2">
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => void onCopy()}>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            title="Copy Arena deck import text to clipboard (Decks → Import Deck)"
+            onClick={() => void onCopy()}
+          >
             <IconCopy className="w-4 h-4" /> Copy Arena import
           </button>
         </div>

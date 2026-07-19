@@ -30,7 +30,7 @@ function VsYouChip({
     <button
       type="button"
       className={`vs-you-chip favor-${favor} vs-you-chip-btn`}
-      title="Open Matchup Lab for this tag"
+      title={`Your record vs “${tag}”: ${rec.wins}–${rec.losses} (${Math.round(rate * 100)}%) — open Matchup Lab`}
       onClick={(e) => {
         e.stopPropagation();
         onOpenTag(tag);
@@ -68,8 +68,14 @@ type Movement = "up" | "down" | "new";
 function MovementChip({ move }: { move: Movement | undefined }) {
   if (!move) return null;
   const label = move === "up" ? "↑ rising" : move === "down" ? "↓ falling" : "+ new";
+  const tip =
+    move === "up"
+      ? "Rank improved vs the previous meta day"
+      : move === "down"
+        ? "Rank fell vs the previous meta day"
+        : "New on today’s top board (wasn’t ranked yesterday)";
   return (
-    <span className={`move-chip move-${move}`} title="Rank movement since the previous meta day">
+    <span className={`move-chip move-${move}`} title={tip}>
       {label}
     </span>
   );
@@ -88,6 +94,16 @@ function DeckMiniCard({
   onOpen: () => void;
   onOpenTag: (tag: string) => void;
 }) {
+  const cardTip = [
+    `#${d.rank ?? "—"} ${d.name}`,
+    d.metaShare != null ? `${d.metaShare}% meta` : null,
+    `Tier ${d.tier}`,
+    d.archetype,
+    vs && vs.wins + vs.losses > 0 ? `You ${vs.wins}–${vs.losses} vs this tag` : null,
+    "Click to open decklist",
+  ]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <article
       className="panel deck-card"
@@ -97,10 +113,13 @@ function DeckMiniCard({
       }}
       role="button"
       tabIndex={0}
+      title={cardTip}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-gold-400">#{d.rank ?? "—"}</span>
+          <span className="text-xs font-bold text-gold-400" title={`Meta rank #${d.rank ?? "—"}`}>
+            #{d.rank ?? "—"}
+          </span>
           <MovementChip move={move} />
         </span>
         <span className="flex items-center gap-1.5">
@@ -112,7 +131,7 @@ function DeckMiniCard({
         {d.name}
         <ColorPips colors={d.colors} />
       </h3>
-      <p className="line-clamp-2">
+      <p className="line-clamp-2" title={d.description || d.archetype}>
         {d.metaShare != null ? `${d.metaShare}% · ` : ""}
         {d.archetype}
       </p>
@@ -269,6 +288,7 @@ export function Daily() {
                 <button
                   type="button"
                   className="btn btn-primary"
+                  title={`Open full list for ${hero.name}`}
                   onClick={() => openDeck(hero.id)}
                 >
                   Open deck
@@ -276,6 +296,7 @@ export function Daily() {
                 <button
                   type="button"
                   className="btn btn-ghost"
+                  title={`Open ${activeFmt.name} format charts and stack`}
                   onClick={() => openFormat(activeFmt.id)}
                 >
                   Format details
@@ -284,12 +305,15 @@ export function Daily() {
             </div>
             <div className="daily-hero-stats">
               {hero.metaShare != null && (
-                <div className="daily-hero-stat">
+                <div
+                  className="daily-hero-stat"
+                  title={`Estimated share of the ${activeFmt.name} ${mode.toUpperCase()} board`}
+                >
                   <strong>{hero.metaShare}%</strong>
                   <span>of the meta</span>
                 </div>
               )}
-              <div className="daily-hero-stat">
+              <div className="daily-hero-stat" title="Rank on today’s 8-deck board">
                 <strong>#{hero.rank ?? 1}</strong>
                 <span>today’s rank</span>
               </div>
@@ -322,12 +346,18 @@ export function Daily() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           aria-label="Search decks"
+          title="Search by deck name, archetype, or description"
         />
         {([0, 1, 2, 3] as const).map((t) => (
           <button
             key={t}
             type="button"
             className={`filter-chip${filterTier === t ? " active" : ""}`}
+            title={
+              t === 0
+                ? "Show all tiers"
+                : `Only tier ${t} decks (T1 = highest meta presence)`
+            }
             onClick={() => setFilterTier(t)}
           >
             {t === 0 ? "All tiers" : `T${t}`}
@@ -339,7 +369,7 @@ export function Daily() {
             type="button"
             className={`filter-chip${filterColors.includes(c) ? " active" : ""}`}
             onClick={() => toggleFilterColor(c)}
-            title={`Filter ${c} — combine colors to find exact pairings`}
+            title={`Require ${c} in the deck’s colors — stack colors for exact pairings`}
           >
             {c}
           </button>
