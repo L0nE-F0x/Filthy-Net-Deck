@@ -73,6 +73,7 @@ pub fn run() {
             overlay::overlay_is_enabled,
             overlay::overlay_get_geometry,
             overlay::overlay_save_geometry,
+            overlay::overlay_set_click_through,
             silent_update::install_update_silent
         ])
         .setup(|app| {

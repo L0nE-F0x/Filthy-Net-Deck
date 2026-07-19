@@ -76,6 +76,7 @@ export function Settings() {
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
   const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
+  const setOverlayClickThrough = useAppStore((s) => s.setOverlayClickThrough);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
@@ -207,6 +208,20 @@ export function Settings() {
                 <span>
                   <strong>Start expanded</strong>
                   <em>Open with the full deck list instead of the slim bar</em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayClickThrough}
+                  onChange={(e) => setOverlayClickThrough(e.target.checked)}
+                />
+                <span>
+                  <strong>Click-through</strong>
+                  <em>
+                    Overlay ignores the mouse — purely passive over the game.
+                    Turn off here to move or resize it again
+                  </em>
                 </span>
               </label>
               <label className="settings-slider-row">

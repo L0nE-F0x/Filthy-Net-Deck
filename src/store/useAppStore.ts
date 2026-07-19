@@ -45,6 +45,7 @@ import {
 } from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
 import { normalizeOpacity } from "../overlay/overlayModel";
+import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
@@ -71,6 +72,8 @@ interface Prefs {
   overlayOpacity: number;
   /** Overlay starts expanded (full list) instead of collapsed bar. */
   overlayStartExpanded: boolean;
+  /** Overlay ignores mouse input — purely passive HUD (default off). */
+  overlayClickThrough: boolean;
   /** Launch the app fullscreen (also toggled live with F11). */
   fullscreen: boolean;
   /** Appearance — dark is the product default. */
@@ -93,6 +96,7 @@ function loadPrefs(): Prefs {
         overlayEnabled?: boolean;
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
+        overlayClickThrough?: boolean;
         fullscreen?: boolean;
         theme?: string;
         skin?: string;
@@ -107,6 +111,7 @@ function loadPrefs(): Prefs {
         overlayEnabled: parsed.overlayEnabled !== false,
         overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
         overlayStartExpanded: parsed.overlayStartExpanded === true,
+        overlayClickThrough: parsed.overlayClickThrough === true,
         fullscreen: parsed.fullscreen === true,
         theme: parsed.theme === "light" ? "light" : "dark",
         skin: isSkinId(parsed.skin) ? parsed.skin : "classic",
@@ -127,6 +132,7 @@ function loadPrefs(): Prefs {
     overlayEnabled: true,
     overlayOpacity: 0.92,
     overlayStartExpanded: false,
+    overlayClickThrough: false,
     fullscreen: false,
     theme: "dark",
     skin: "classic",
@@ -251,6 +257,8 @@ interface AppState {
   setOverlayOpacity: (v: number) => void;
   /** Start overlay expanded instead of collapsed bar. */
   setOverlayStartExpanded: (v: boolean) => void;
+  /** Overlay ignores mouse input (passive HUD) — re-applied live. */
+  setOverlayClickThrough: (v: boolean) => void;
   /** Persist the fullscreen pref and apply it to the window immediately. */
   setFullscreenPref: (v: boolean) => void;
   /** Persist appearance and apply it to the document immediately. */
@@ -437,19 +445,25 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, overlayEnabled };
       savePrefs(next);
       set({ prefs: next });
-      void import("../services/overlay").then((m) =>
-        m.setOverlayEnabled(overlayEnabled),
-      );
+      void setOverlayEnabledRust(overlayEnabled);
     },
     setOverlayOpacity: (overlayOpacity) => {
       const next = { ...get().prefs, overlayOpacity: normalizeOpacity(overlayOpacity) };
       savePrefs(next);
       set({ prefs: next });
+      void pushOverlayPrefs();
     },
     setOverlayStartExpanded: (overlayStartExpanded) => {
       const next = { ...get().prefs, overlayStartExpanded };
       savePrefs(next);
       set({ prefs: next });
+      void pushOverlayPrefs();
+    },
+    setOverlayClickThrough: (overlayClickThrough) => {
+      const next = { ...get().prefs, overlayClickThrough };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
     },
     setFullscreenPref: (fullscreen) => {
       const next = { ...get().prefs, fullscreen };
@@ -462,12 +476,14 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       applyTheme(theme);
+      void pushOverlayPrefs();
     },
     setSkin: (skin) => {
       const next = { ...get().prefs, skin };
       savePrefs(next);
       set({ prefs: next });
       applyAppearance(next.theme, skin);
+      void pushOverlayPrefs();
     },
     clearError: () => set({ error: null }),
 

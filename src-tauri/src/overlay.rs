@@ -184,3 +184,13 @@ pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
     };
     save_geometry(&app, &g);
 }
+
+/// Passive-HUD mode: the overlay window ignores cursor events so clicks fall
+/// through to the game. The overlay webview re-applies this from prefs on
+/// mount and on every prefs push, so the window always exists here.
+#[tauri::command]
+pub fn overlay_set_click_through(app: AppHandle, ignore: bool) {
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        let _ = win.set_ignore_cursor_events(ignore);
+    }
+}
