@@ -177,7 +177,19 @@ Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
 | **3** | Hub war room | F1–F5, I4 |
 | **4** | Sets + deck compare | Z2–Z5, S5 |
 
-**Shipped v1.0.0 (2026-07-19):** batches **1–4** (25 WANT tickets) — signed Windows installer + updater + site.
+**Shipped v1.0.0 (2026-07-19):** batches **1–4** (25 WANT tickets) — signed Windows installer + updater + site.  
+**v1.1.x:** Planeswalker themes + Themes UI fix; macOS dmg on site for 1.1.1.
+
+### Next chapter (post-v1 — owner direction 2026-07-19)
+
+See **`handoff.md` → Next chapter** for the full checklist. Summary:
+
+1. **Reliability theater** — tracker edge cases, Arena patch resilience, update UX  
+2. **Onboarding** — first 5 minutes: log found → first match → first tag  
+3. **Shareable moments** — climb / week recap / theme screenshots for social  
+4. **Listen** — real user gaps only; ship only what fits Climb bar + SKIP list  
+
+Monetization ideas parked (tip jar / optional Pro, never paywall core). No new feature bomb unless owner reopens.
 
 ### Explicitly deferred
 
@@ -185,7 +197,7 @@ Limited/Draft hub · overlay · AI without grounded local data · prices · clou
 
 ### Other backlog (low urgency)
 
-- Roll latest macOS dmg when tag CI finishes (any recent tag).
+- After each app tag: roll macOS dmg from GH release into `website/downloads/` + site links.
 - Marketing screenshot carousel (needs owner 1280×860 assets).
 - Full mac signed auto-update (owner decision).
 - `whatsinstandard` v7 when v6 dies.

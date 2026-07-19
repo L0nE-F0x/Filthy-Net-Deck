@@ -1,41 +1,76 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-19 — Grok session close. Product at **v1.1.1**, shipped end-to-end.
+**Last wrap-up:** 2026-07-19 — session close. Product at **v1.1.1** (Windows + macOS on site).
 
 ## Where we are
 
 | Item | Value |
 |------|--------|
 | Version | **1.1.1** |
-| Git | `main` @ `f06dad7` (synced with `origin`) |
-| Tags | `v1.0.0`, `v1.1.0`, `v1.1.1` |
-| Windows installer | `website/downloads/Filthy-Net-Deck-Setup-1.1.1.exe` (+ `.sig`) |
-| Soft channel | `website/version.json` + `public/version.json` → 1.1.1 |
-| Updater | `website/updater/latest.json` → 1.1.1 + signature |
-| Live site | https://filthy-net-deck.netlify.app/ (confirmed 1.1.1) |
-
-## This session (summary)
-
-1. **v1.0.0** — 10× page program batches 1–4 (deep links, Stats/Matchups/DeckView, Format Hub war room, Sets drop/rotation, Settings health/shortcuts). F2 near-rotation only with exact date ≤45d.
-2. **v1.1.0** — Planeswalker themes (Classic, Chandra, Teferi, Liliana, Ajani, Elspeth); orthogonal to dark/light.
-3. **v1.1.1** — Themes UI fix: accordion stays **inside the sidebar** (no overlap on main content).
-4. Marketing copy drafted for X (v1 announcement); not posted by the agent.
-5. Goal “build all 4 batches” completed earlier; no active watchers.
+| Git | `main` (tags `v1.0.0` … `v1.1.1`) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.1.1.exe` (+ `.sig`) |
+| macOS | `website/downloads/Filthy-Net-Deck-1.1.1-universal.dmg` (site buttons match) |
+| Soft / updater | `version.json` + `updater/latest.json` → 1.1.1 |
+| Live | https://filthy-net-deck.netlify.app/ |
 
 ## Product posture
 
-Owner intent: **maintenance + periodical health checks** after this. No new feature batches planned unless reopened.
+- **Now:** maintenance + periodical health checks; listen to user findings.
+- **Later:** **Next chapter** backlog below (owner-approved direction — do not invent new product pillars without owner).
+- **10× SKIP still closed:** D1/D4/D5, M3/M5, Z1, all E*, X3/X4 (`docs/PAGE-10X.md`).
 
-## SKIP still closed
+---
 
-D1/D4/D5, M3/M5, Z1, all E*, X3/X4 (see `docs/PAGE-10X.md`).
+## Next chapter (read this next session)
 
-## Optional follow-ups (not open work)
+Tight upgrades — **not** another 25-ticket feature bomb. Prefer Climb-bar quality and retention over parity with Untapped.
 
-- Roll macOS dmg for 1.1.x into `website/downloads/` when CI produces it; update site macOS link if still on older dmg.
-- Local uncommitted only (ignore unless intentional): `marketing-video/` edits, `goal/` folder.
-- Periodic: `npm run meta` / sets pipeline, Netlify version spot-check, signing key stays on dev machine only.
+### 1. Reliability theater
+- [ ] Tracker edge cases (tray miss, Arena restarts, partial logs)
+- [ ] Arena patch resilience (parse errors surfaced clearly; recover when format shifts)
+- [ ] Update UX polish (signed Update & restart remains primary path; soft fallback honest)
+
+### 2. Onboarding (first 5 minutes)
+- [ ] Clear path: **log found → first match recorded → first opponent tag**
+- [ ] Empty states that teach the loop (Stats / Matchups / Climb) without inventing data
+- [ ] Reduce “is it working?” support friction (Settings tracker health already exists — deepen if needed)
+
+### 3. Shareable moments (marketing = product)
+- [ ] Climb path / season story as screenshot-friendly surfaces
+- [ ] Week recap polish (already exists — make it the default “share after a session”)
+- [ ] Theme skins as social-friendly screenshots (Chandra / Liliana / etc.)
+
+### 4. Listen → ship only what fits
+- [ ] One channel for “what Untapped does that you still miss” (owner social / feedback)
+- [ ] Triage against Climb bar + AGENTS constraints (desktop, Std/Pioneer, local, no fabricated guides)
+- [ ] Only open SKIP tickets if owner reopens them
+
+### Monetization (parked until usage justifies)
+Do **not** implement until owner says go. When relevant, prefer free core intact:
+- Tip jar / Support ApexForge
+- Optional Pro later (exports, advanced recaps, multi-season archive, theme packs) — **never** paywall tracking or daily meta
+- No in-app ads; shareable recaps stay the ad
+- Freemium only after retention metrics (WAU, return after a loss, not just downloads)
+
+### Explicitly deferred (still closed)
+Limited/Draft hub · in-game overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data.
+
+---
+
+## Periodic maintenance
+
+- `npm run meta` / sets pipeline; Netlify `version.json` spot-check after any app ship
+- Signing keys only on dev machine (`%USERPROFILE%\.tauri\filthy-net-deck.key`)
+- Set trailers upkeep (`setTrailers.ts` / pipeline) as WotC posts them
+- macOS: after each version tag, roll dmg from GH release into `website/downloads/` + update `website/index.html` links
 
 ## Branding
 
 ApexForge credit on sidebar + Settings + marketing footer → https://ame-apexforge.org/
+
+## Session history (2026-07-19 arc)
+
+1. **v1.0.0** — 10× batches 1–4 (deep links, personal loop, Format Hub war room, Sets, Settings)
+2. **v1.1.0** — Planeswalker themes
+3. **v1.1.1** — Themes accordion sidebar-only fix
+4. macOS dmg rolled to site for 1.1.1
