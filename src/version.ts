@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.1.1";
+export const APP_VERSION = "1.2.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Themes menu stays in the sidebar — no more covering Decks / My Stats",
-  "Compact planeswalker list with Dark/Light still on top",
-  "Classic · Chandra · Teferi · Liliana · Ajani · Elspeth"
+  "First-session coach: log found → first match → first opponent tag",
+  "Deeper tracker health + clearer Arena parse warnings",
+  "Share cards: week recap, climb story, and theme PNGs",
+  "Update UX: signed Update & restart stays primary",
 ];

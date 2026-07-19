@@ -132,8 +132,11 @@ export default function App() {
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("focus", onFocus);
 
-    // Lightweight safety net if focus events are flaky after tray restore.
-    const poll = window.setInterval(pull, 20_000);
+    // Safety net if focus events are flaky after tray restore.
+    // Tighter poll while the window is visible so tray-missed matches catch up faster.
+    const poll = window.setInterval(() => {
+      if (document.visibilityState === "visible") pull();
+    }, 12_000);
 
     let unFocus: (() => void) | undefined;
     void (async () => {

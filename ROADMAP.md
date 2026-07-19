@@ -1,205 +1,63 @@
 # Filthy Net Deck — Production Roadmap
 
-**Source:** Full preproduction audit, 2026-07-17 (Claude Fable 5), starting from v0.14.0.  
-**How to use this file:** Work top to bottom. Check items off (`[x]`) as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
-**Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` + local password file `filthy-net-deck-key-password.txt` (or ask owner — never commit).
+**Current release:** **v1.1.1** (Planeswalker themes + sidebar Themes fix; Windows + macOS on site).  
+**How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
+**Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
-> **RELEASE PACING POLICY (owner directive, 2026-07-17):** Version bumps are **batched into fewer, bigger releases**. Do not repeat the four-versions-in-one-day cadence (0.14.1 → 0.17.0). Finish meaningful work on `main`, then cut **one** release when the owner asks or a full batch is ready. `npm run meta` / `npm run sets` anytime without a version bump. P0 hotfix may ship solo.
-
----
-
-## Immediate follow-ups
-
-Releases 0.17.0 → **0.23.0** shipped (Windows signed + marketing/OG). macOS dmg for
-0.23 rolls after tag CI. Detail in git history + `handoff.md` §2.
-
-- [x] **v0.23.0 signed Windows publish** (light mode, Arena // import fix, set trailers; NSIS + `.sig`, updater, version.json ×2, OG `?v=0.23.0`).
-- [ ] **Roll v0.23.0 macOS dmg** onto `website/downloads/` + mac download labels (after tag CI).
-
-**Open (low urgency):**
-
-- [ ] **Owner:** verify in-app **Update & restart** 0.22→0.23 from an installed build.
-- [ ] Marketing screenshot/GIF carousel — needs owner-supplied 1280×860 captures with real tracker data.
-- [ ] Full macOS **signed** auto-update in CI (owner decision: store key as repo secret) — soft dmg CTA already works when download URL ends in `.dmg`.
-- [ ] `whatsinstandard` v6 is deprecated — build warns; migrate `fetchStandardRotation` to v7 when it lands (also see `docs/MAINTENANCE.md` item 5).
-- [ ] More set trailers in `set-trailers.json` as WotC posts them (Hobbit, Reality Fracture, etc.).
+> **RELEASE PACING:** Fewer, bigger releases. Finish meaningful work on `main`, then cut **one** version. `npm run meta` / `npm run sets` anytime without a bump. P0 hotfix may ship solo.
 
 ---
 
-## Milestones 1–4 — shipped (2026-07-17, 0.14.1 → 0.17.0)
+## Next chapter — post-v1 (owner 2026-07-19)
 
-Condensed; detail in git history + `handoff.md`.
+Canonical checklist: **`handoff.md` → Next chapter**. Themes (not a second 25-ticket bomb):
 
-- **v0.14.1** — P0 live-meta feed origin fix + polish; mac catch-up.
-- **v0.15.0** — Autostart / tray / window memory / trust.
-- **v0.16.0** — Matchup intel, streaks, CSV.
-- **v0.17.0** — Set Radar binder UX, deck movement chips, hover-art lists, Events filters.
+1. **Reliability theater** — tracker edge cases, Arena parse resilience, update UX honesty  
+2. **Onboarding** — first 5 minutes: log found → first match → first opponent tag  
+3. **Shareable moments** — climb / week recap / theme skins for social  
+4. **Listen** — ship only real user gaps that fit Climb bar + SKIP list  
 
----
-
-## Milestone 5 — v0.18.0 "Content engine" — shipped
-
-- [x] Daily archetype list diff (DeckView vs previous dated meta).
-- [x] Shareable week recap PNG (My Stats).
-- [x] Match-end toast (Settings opt-in).
-- [x] Meta-share timeline + movers (Decks home; `meta/history.json`).
-- [x] Personal vs. meta table (Decks home).
-
----
-
-## Milestone 6 — Infrastructure — shipped (with 0.18.0)
-
-- [x] CI failure alerting (`daily-meta.yml` opens/updates issue by **title only** — no missing label).
-- [x] Cap Scryfall 429 retries (max 8, exponential backoff).
-- [x] Slim feeds (minified latest/sets; drop redundant previews; history JSON).
-- [x] Vitest suite for pure helpers (`npm test`).
-- [x] macOS soft update CTA for `.dmg` URLs; full signed mac updater deferred.
-- [x] Keyboard shortcuts `1`–`7` for main nav.
-
----
-
-## Milestone 7 — Owner refinement batch — **shipped as v0.19.0** (2026-07-17)
-
-Owner requests (Claude Fable 5 session after Grok handoff), released the same day at the
-owner's call: signed Windows publish + updater, macOS dmg rolled, marketing + OG refreshed.
-Owner verified the in-app 0.18→0.19 update.
-
-- [x] **Fullscreen mode** — Settings → Display toggle + F11 anywhere (persists in `bbi.prefs.fullscreen`, applied at boot).
-- [x] **Decks home overhaul** — "Deck to beat" art-backed hero with big stat tiles, top-8 grid right below, meta timeline + you-vs-meta demoted to a two-column row underneath, format switcher inline in the header.
-- [x] **Sets → Format hub** — every Standard-legal set with rotation dates ("rotating next" highlighted), full Pioneer set pool, ban lists with card art for both formats. Data via pipeline `formats` section (Scryfall legalities + whatsinstandard rotation calendar); old feeds without it hide the hub.
-- [x] **My Stats decklist** — deck detail now shows the full latest build (type groups, art thumbs, mana pips, mana curve, sideboard) with one-click **Copy decklist** in Arena import format; Your Arsenal card fans click through to the deck.
-
----
-
-## Milestone 8 — v0.21.0 "Current events" — shipped (2026-07-18)
-
-Batched release (owner directive: fewer, bigger). Theme: the app reacts to
-real-world MTG events with minimal lag, and self-maintains.
-
-- [x] **Pipeline: 4×/day set radar** — Scryfall-only fast lane
-  (`sets-refresh.yml`, 00/12/18 UTC) beside the daily meta job; ship first-look
-  panel spoilers (dropped the <5-card "stub" skip) and undated Scryfall set rows.
-- [x] **B&R pulse** — diff feed ban lists vs a local snapshot; banner on Decks +
-  opt-in desktop toast on a real Banned & Restricted update
-  (`banPulse.ts`, `BanPulse.tsx`, Settings `notifyBanlist`).
-- [x] **Rotation impact** — pipeline `formats.standard.rotation` (cards leaving
-  Standard next); DeckView "loses N cards at rotation" panel + per-card markers;
-  Sets format hub card count (`rotationImpact.ts`, `buildRotationImpact`).
-- [x] **Climb polish** — win/loss streak chips + loss-streak note; season-vs-
-  previous-season comparison (WR, peak, games) (`climbStats.ts`).
-- [x] **Docs** — `docs/MAINTENANCE.md` (self-maintains vs. monthly checklist).
-
-## Milestone 9 — v0.22.0 "Roadmap + card watch" — shipped (2026-07-18)
-
-Owner-directed batch (Kimi). Theme: see further ahead, find cards faster.
-
-- [x] **Future Standard** — roadmap-announced sets with no Scryfall row yet
-  (Nauctis: The Sunken Realm 2027-02-05, Kamigawa: Titanbreach 2027-06-04,
-  Zhalfir 2027-10-01, + the three 2027 Universes Beyond slots) render on the
-  Sets page with dates, notes, and announcement source links. Curated in
-  `pipeline/sources/future-sets.json` (every entry source-linked, nothing
-  invented); the build auto-drops entries once Scryfall catalogs the set or an
-  exact date passes. Feed `sets.json` → `futureSets`, version 1.2.0.
-- [x] **Card watch / Ctrl+K palette** — `cardWatch.ts` indexes every meta
-  decklist (both formats × both modes, main + side); Ctrl+K anywhere opens the
-  palette: card search → which decks play it (copies, board, rank), deck jump,
-  page nav. Topbar Ctrl-K hint button for discovery. 14 unit tests.
-- [x] **Matchup Lab QoL** — tags + notes save on every keystroke (no more lost
-  edits on opponent switch); helper dedupe (`winrateFavor` → `ranks.ts`,
-  `currentStreak` → `climbStats.ts`); `personalMeta` fuzzy join now picks the
-  longest, most specific archetype key instead of first-iteration.
-
-## Explicit non-goals (do not add)
-
-In-game overlay (ToS risk), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.
-
----
-
-## Milestone 10 — v0.23.0 "Polish + trailers" — shipped (2026-07-18)
-
-Owner-directed batch (Grok 4.5). Theme: comfort, Arena reliability, set hype.
-
-- [x] **Light / dark mode** — CSS token flip via `data-theme`, prefs `theme`, discreet
-  top-bar pill + Settings Appearance section (`theme.ts`, `ThemeToggle.tsx`).
-- [x] **Arena import // fix** — front-face only for DFC / adventure / room names so
-  Arena accepts lists (`arenaCardName` client + pipeline; DeckView rebuilds on copy).
-- [x] **Set trailers** — curated WotC YouTube ids (`set-trailers.json` + client
-  fallback); sleek in-app player (youtube-nocookie); View trailer on set cards /
-  Future Standard when known (Nauctis, Titanbreach at ship).
-
-## Milestone 11 — v0.24.0 "Polish batch" — shipping (2026-07-18)
-
-- [x] **Fullscreen topbar collision** — Exit fullscreen / Close to tray in the topbar action row.
-- [x] **Search label** — topbar **Search** button (Ctrl+K still the shortcut).
-- [x] **Recently live expands** — full current Standard pool on Sets (slim previews for older sets).
-- [x] **Settings denser layout** — two-column grid + compact notification rows (uses empty right side).
-- [x] **v0.24.0** full AGENTS.md release (Windows signed + marketing/OG; macOS roll after tag CI).
-
-## Milestone 12 — v0.25.0 nav + Format Hub — shipped
-
-- [x] **Nav reorder** — Decks · My Stats · Climb · Matchups · Sets · Events · Format Hub · Settings (keys 1–8).
-- [x] **Format Hub page** — legality / rotation / bans as `formats` (not buried under Sets).
-
-## Milestone 13 — v0.26.0 Climb 10× — shipped (reference bar)
-
-- [x] **Climb path by deck** — chronological legs, chart by deck, click-through to My Stats (`openStatsDeck`).
-- **Bar for every other page:** path/story + identity on data + deep links + honest empties.  
-  Full plan: **`docs/PAGE-10X.md`**.
-
----
-
-## 10× page program (post-Climb)
-
-**Canonical doc:** [`docs/PAGE-10X.md`](docs/PAGE-10X.md)  
-**Owner picks locked 2026-07-19** — full WANT/SKIP tables live there.
-
-### Climb bar (do not ship “more panels” without these)
-
-1. **Narrative path** (what happened / what next)  
-2. **Entity identity** (deck, opponent, card, set on every row)  
-3. **Deep links both ways** (meta ↔ personal ↔ prep)  
-4. **Honest empty states** (never invent data)
-
-### Approved WANT (build)
-
-- **I1–I4** · **D2, D3** · **S1–S5** · **M1, M2, M4** · **Z2–Z5** · **F1–F5** · **X1, X2**
-
-### Approved SKIP
-
-- **D1, D4, D5** · **M3, M5** · **Z1** · **all Events (E\*)** · **X3, X4**
-
-### Ship batches (order)
-
-| # | Theme | Tickets |
-|---|--------|---------|
-| **1** | Lattice | I1, I2, I3, D2, S1, S3, M1, M4 |
-| **2** | Personal loop | S2, S4, D3, M2, X1, X2 |
-| **3** | Hub war room | F1–F5, I4 |
-| **4** | Sets + deck compare | Z2–Z5, S5 |
-
-**Shipped v1.0.0 (2026-07-19):** batches **1–4** (25 WANT tickets) — signed Windows installer + updater + site.  
-**v1.1.x:** Planeswalker themes + Themes UI fix; macOS dmg on site for 1.1.1.
-
-### Next chapter (post-v1 — owner direction 2026-07-19)
-
-See **`handoff.md` → Next chapter** for the full checklist. Summary:
-
-1. **Reliability theater** — tracker edge cases, Arena patch resilience, update UX  
-2. **Onboarding** — first 5 minutes: log found → first match → first tag  
-3. **Shareable moments** — climb / week recap / theme screenshots for social  
-4. **Listen** — real user gaps only; ship only what fits Climb bar + SKIP list  
-
-Monetization ideas parked (tip jar / optional Pro, never paywall core). No new feature bomb unless owner reopens.
+**Target product version:** **v1.2.x** when this batch ships end-to-end (installer + updater + site).
 
 ### Explicitly deferred
 
-Limited/Draft hub · overlay · AI without grounded local data · prices · cloud sync · Events overhaul.
+Limited/Draft hub · in-game overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data · monetization (tip jar / Pro until usage justifies).
 
-### Other backlog (low urgency)
+### 10× SKIP (still closed)
 
-- After each app tag: roll macOS dmg from GH release into `website/downloads/` + site links.
-- Marketing screenshot carousel (needs owner 1280×860 assets).
-- Full mac signed auto-update (owner decision).
-- `whatsinstandard` v7 when v6 dies.
-- More set trailers in `set-trailers.json`.
-- Feed size / slim galleries (already partly done for older Standard).
+D1, D4, D5 · M3, M5 · Z1 · all E\* · X3, X4 — see `docs/PAGE-10X.md`.
+
+---
+
+## Low-urgency backlog
+
+- After each app tag: roll macOS dmg from GH release into `website/downloads/` + site links  
+- Marketing screenshot/GIF carousel (owner 1280×860 assets with real tracker data)  
+- Full macOS signed auto-update in CI (owner decision: key as repo secret); soft dmg CTA already works  
+- `whatsinstandard` v7 when v6 is fully dead (`fetchStandardRotation` in `pipeline/sources/sets.mjs`)  
+- More set trailers in `set-trailers.json` as WotC posts them  
+- Downloads hygiene: only current release in `website/downloads/` (`docs/MAINTENANCE.md`)  
+- Optional: upload Windows `.exe`s to GitHub Releases; history rewrite to reclaim `.git` size  
+
+---
+
+## Shipped milestones (condensed)
+
+| Version | Theme |
+|---------|--------|
+| **v1.1.1** | Themes accordion sidebar-only |
+| **v1.1.0** | Planeswalker accent skins |
+| **v1.0.0** | 10× batches 1–4 (deep links, personal loop, Format Hub, Sets/compare) |
+| **0.26** | Climb path by deck (Climb bar reference) |
+| **0.25** | Nav reorder + Format Hub page |
+| **0.24–0.23** | Polish, trailers, light mode, Arena import // fix |
+| **0.22–0.18** | Card watch, Future Standard, B&R pulse, rotation impact, recap, content engine |
+| **0.17–0.14** | Matchups, tray/autostart, live meta origin, Set Radar UX |
+
+Detail lives in git history. Older “roll v0.23 macOS / verify 0.22→0.23” follow-ups are **superseded** by the 1.x line.
+
+---
+
+## Non-goals (do not add)
+
+In-game overlay (ToS), price tracking, cloud sync, mobile/APK tracking promises, Alchemy/Historic, fabricated matchup/sideboard content.

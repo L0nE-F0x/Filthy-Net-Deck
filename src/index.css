@@ -4744,3 +4744,83 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   min-width: 0;
   max-width: 100%;
 }
+
+/* —— Tracker onboarding / health (v1.2) —— */
+.tracker-onboarding {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tracker-onboarding-health {
+  margin-bottom: 4px;
+}
+.tracker-onboarding-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tracker-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-muted);
+}
+.tracker-step strong {
+  display: block;
+  color: var(--color-foam);
+  font-weight: 700;
+}
+.tracker-step em {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  opacity: 0.9;
+}
+.tracker-step.is-done strong {
+  color: var(--color-good, #34d399);
+}
+.tracker-step-mark {
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+  font-weight: 800;
+  color: var(--color-acid, #b8f000);
+}
+.tracker-step.is-done .tracker-step-mark {
+  color: var(--color-good, #34d399);
+}
+.tracker-onboarding-actions {
+  margin-top: 4px;
+}
+.tracker-onboarding.is-compact .tracker-onboarding-steps {
+  gap: 6px;
+}
+.share-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pw-themes-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 10px;
+  border-top: 1px solid color-mix(in srgb, var(--color-foam, #f2f4ea) 8%, transparent);
+}
+.pw-themes-share .btn {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+.pw-themes-share-msg {
+  font-size: 11px;
+  color: var(--color-muted);
+}

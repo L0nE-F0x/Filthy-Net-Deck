@@ -27,6 +27,8 @@ import {
   type DeckClimbSummary,
 } from "../services/climbStats";
 import type { TrackedMatch } from "../types/tracker";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { downloadClimbSharePng } from "../services/shareCards";
 
 /** Chart / legend palette — distinct enough on dark and light themes. */
 const DECK_PALETTE = [
@@ -549,7 +551,6 @@ function SeasonCompareCell({
 
 export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
-  const status = useAppStore((s) => s.trackerStatus);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
   const [season, setSeason] = useState<string | null>(null);
@@ -622,6 +623,15 @@ export function Climb() {
   );
 
   const goDeck = (key: string) => openStatsDeck(key);
+  const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const onShareClimb = () => {
+    setShareMsg("Rendering…");
+    void downloadClimbSharePng(matches, seasonKey)
+      .then(() => setShareMsg("Saved climb story PNG."))
+      .catch((e) =>
+        setShareMsg(e instanceof Error ? e.message : "Could not render climb card."),
+      );
+  };
 
   if (matches.length === 0) {
     return (
@@ -635,22 +645,9 @@ export function Climb() {
             history.
           </p>
         </div>
-        {status?.logFound && status.detailedLogs !== false ? (
-          <div className="empty-state">
-            <h2 className="text-lg font-semibold m-0 mb-2">No matches yet</h2>
-            <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-              Play ranked with Filthy Net Deck open — rank samples and deck labels appear as
-              matches complete.
-            </p>
-          </div>
-        ) : (
-          <div className="panel">
-            <p className="text-sm text-muted m-0 leading-relaxed">
-              Climb needs the desktop tracker. Check <strong className="text-foam">My Stats</strong>{" "}
-              for Arena log status.
-            </p>
-          </div>
-        )}
+        <div className="panel">
+          <TrackerOnboarding />
+        </div>
       </div>
     );
   }
@@ -665,6 +662,12 @@ export function Climb() {
             Hover the curve for rank + deck. Click a stretch or deck row to open{" "}
             <strong className="text-foam">My Stats</strong> for that list.
           </p>
+          <div className="share-row mt-2">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={onShareClimb}>
+              Download climb story
+            </button>
+            {shareMsg && <span className="text-xs text-muted">{shareMsg}</span>}
+          </div>
         </div>
         <div className="lab-intro-stats">
           <div>

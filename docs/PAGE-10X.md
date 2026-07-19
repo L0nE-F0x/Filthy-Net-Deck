@@ -2,8 +2,9 @@
 
 **Created:** 2026-07-19 (after Climb Tracker v0.26.0 overhaul)  
 **Owner picks locked:** 2026-07-19 (see **Approved queue** below).  
-**Shipped:** **v1.0.0** (2026-07-19) — all four batches (WANT tickets) in a signed Windows release.  
-**How to use:** Each page is graded against the **Climb bar**. Work is **batched** (see `AGENTS.md` pacing). Check items off when they ship in a real version bump — source-only is not done.
+**Shipped:** **v1.0.0** (2026-07-19) — all four WANT batches in a signed Windows release.  
+**Post-v1:** Next chapter (reliability / onboarding / shareables) lives in **`handoff.md`**, not as new 10× tickets here.  
+**How to use:** Historical plan for the Climb-bar page program. SKIP IDs below stay closed unless the owner reopens them.
 
 ### The Climb bar (what “10×” means here)
 
@@ -283,30 +284,15 @@ These are not pages, but **Climb-class** work depends on them:
 
 ---
 
-## Suggested milestone map (product versions — illustrative)
+## Status vs this doc
 
-Exact version numbers flex with owner pacing; **theme** is what matters.
-
-| Milestone | Theme | Ships |
-|-----------|--------|-------|
-| **Next** | Deep-link lattice | D2, S1, S3, M1, M4, E1, I1 |
-| **+1** | Daily plan loop | D1, D3, M2, M5, S2 |
-| **+2** | Rotation & spoilers war room | F1, F2, Z1, Z2, F3 |
-| **+3** | Trust polish | X1–X3, E2, D4 |
+| Batch | Status |
+|-------|--------|
+| 1 Lattice · 2 Personal loop · 3 Hub · 4 Sets+compare | **Shipped in v1.0.0** |
+| SKIP tickets | Still closed |
+| Next product work | **`handoff.md` Next chapter** (v1.2.x) — not new rows in this file |
 
 P0 hotfixes (tracker, import) still ship solo.
-
----
-
-## Owner decision board
-
-When picking the next batch, choose **one** primary:
-
-1. **Glue the app** (deep links) — fastest 10× feel after Climb  
-2. **Daily plan** (Decks strip + tag nudge) — best for “open every morning”  
-3. **Rotation war room** (Hub + DeckView) — best as Q-exit approaches  
-
-Default recommendation: **(1) then (2)**. Rotation batch activates when the exit window is within ~45 days (see Format Hub F2).
 
 ---
 

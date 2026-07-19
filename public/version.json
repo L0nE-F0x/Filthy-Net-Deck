@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.1.1.exe",
-  "notes": "v1.1.1: Themes picker redesign — expands inside the sidebar only (no more overlap with the main view). Dark/Light still stack with every planeswalker skin."
+  "version": "1.2.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.2.0.exe",
+  "notes": "v1.2.0: First-session coach (log found -> first match -> first tag), deeper tracker health and Arena parse warnings, share cards for climb story / week recap / theme skins, signed Update and restart stays primary."
 }

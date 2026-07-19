@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { SKINS, type SkinId } from "../services/theme";
+import { downloadThemeSharePng } from "../services/shareCards";
 
 /**
  * Sidebar themes control. Expands inline inside the sidebar only —
@@ -10,6 +11,7 @@ export function PlaneswalkerThemes() {
   const skin = useAppStore((s) => s.prefs.skin);
   const setSkin = useAppStore((s) => s.setSkin);
   const [open, setOpen] = useState(false);
+  const [shareMsg, setShareMsg] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -97,6 +99,21 @@ export function PlaneswalkerThemes() {
               );
             })}
           </ul>
+          <div className="pw-themes-share">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                setShareMsg("…");
+                void downloadThemeSharePng(skin)
+                  .then(() => setShareMsg("PNG saved"))
+                  .catch(() => setShareMsg("Failed"));
+              }}
+            >
+              Share {current.name} card
+            </button>
+            {shareMsg && <span className="pw-themes-share-msg">{shareMsg}</span>}
+          </div>
         </div>
       )}
     </div>

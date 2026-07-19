@@ -46,6 +46,11 @@ export function loadAllOpponentNotes(): Store {
   return load();
 }
 
+/** How many opponents currently have a non-empty archetype tag. */
+export function listTaggedOpponentCount(): number {
+  return Object.values(load()).filter((n) => !!n.tag?.trim()).length;
+}
+
 export function setOpponentNote(
   name: string | undefined | null,
   patch: { tag?: string; notes?: string },

@@ -7,6 +7,8 @@
     "studio": "remotion studio",
     "soundtrack": "python scripts/generate_soundtracks.py",
     "render": "remotion render FilthyNetDeck out/filthy-net-deck-final.mp4 --codec h264 --crf 16",
+    "render:v1": "remotion render FilthyNetDeckV1 out/filthy-net-deck-v1-launch.mp4 --codec h264 --crf 16",
+    "render:themes-x": "remotion render FilthyNetDeckThemesX out/filthy-net-deck-themes-x.mp4 --codec h264 --crf 16",
     "still": "remotion still FilthyNetDeck out/still.png"
   },
   "dependencies": {

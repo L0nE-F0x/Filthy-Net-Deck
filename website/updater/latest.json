@@ -1,11 +1,11 @@
 {
-  "version": "1.1.1",
-  "notes": "v1.1.1: Themes picker redesign — expands inside the sidebar only (no more overlap with the main view). Dark/Light still stack with every planeswalker skin.",
-  "pub_date": "2026-07-18T21:03:26.199Z",
+  "version": "1.2.0",
+  "notes": "v1.2.0: First-session coach (log found -> first match -> first tag), deeper tracker health and Arena parse warnings, share cards for climb story / week recap / theme skins, signed Update and restart stays primary.",
+  "pub_date": "2026-07-19T07:21:23.473Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjRsSnZseE1NK2dXRVo2b3NJTGtKK0NpK0RBYytsUWJtR0JiVnJ4aWVtb0ZwTkN4eWxweElqZU5PVTZvQlRGSitQT0h4UCtsVlRZYlY1YjM1aVlLVkFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDA4NTg3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuMS4xX3g2NC1zZXR1cC5leGUKQm5XeElZaTQxbnc5MXN3TjZ1d1lEd29pRUtMQjhFRTJjY0srcjlaS0h3ZXN5UXJneTJOMWxrWjdySU5XN0VKZDhkVHAxNjgxSVFYaWtlZWl0VkdXRHc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.1.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdDN2VnZHl3YzFjWVVIU2FTMjE4YUZBU2laU3p0ODgvUDNLbEhERG52WFVsVVoxdnpoNzFqeDZCS1FCZHdKMW56MGNObVdqVWNib1Fsd1F3cDNVV0E4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDQ1NjY1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuMi4wX3g2NC1zZXR1cC5leGUKNUVGeE5LQy9IVFpubDBNRHFsT05oMzMya1J4RGNNYjl6Y3FWMVlMdldZR1VTSTlTc3lJaXg2SjFUOEJyNUFJNXFrekhvM0tJc25jeTdjSzdLeGQwQlE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.2.0.exe"
     }
   }
 }

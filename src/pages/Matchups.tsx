@@ -18,6 +18,7 @@ import {
 import { winrateFavor } from "../services/ranks";
 import { resolveMetaDeckByTag } from "../services/deepLinks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -187,7 +188,6 @@ function TagMatchupPanel({
 
 export function Matchups() {
   const matches = useAppStore((s) => s.trackerMatches);
-  const status = useAppStore((s) => s.trackerStatus);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const meta = useAppStore((s) => s.meta);
   const openDeck = useAppStore((s) => s.openDeck);
@@ -348,22 +348,9 @@ export function Matchups() {
             the decks you piloted, and room for archetype tags plus prep notes. 100% local.
           </p>
         </div>
-        {status?.logFound && status.detailedLogs !== false ? (
-          <div className="empty-state">
-            <h2 className="text-lg font-semibold m-0 mb-2">No matches yet</h2>
-            <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-              Keep Filthy Net Deck open while you ladder — opponents appear here the moment a
-              match ends.
-            </p>
-          </div>
-        ) : (
-          <div className="panel">
-            <p className="text-sm text-muted m-0 leading-relaxed">
-              Match tracking needs the desktop app and Arena detailed logs (Options → Account).
-              Open <strong className="text-foam">My Stats</strong> for setup status.
-            </p>
-          </div>
-        )}
+        <div className="panel">
+          <TrackerOnboarding />
+        </div>
       </div>
     );
   }

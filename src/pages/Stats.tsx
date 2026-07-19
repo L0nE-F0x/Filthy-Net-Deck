@@ -28,6 +28,8 @@ import {
 import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
 function pickArenaPreview(
@@ -158,49 +160,30 @@ function tally(matches: TrackedMatch[]): Tally {
 
 function StatusPanel() {
   const status = useAppStore((s) => s.trackerStatus);
+  const matches = useAppStore((s) => s.trackerMatches);
+  const health = diagnoseTrackerHealth(status, matches.length);
 
-  if (!status) {
+  if (
+    health.phase === "browser" ||
+    health.phase === "no_log" ||
+    health.phase === "detailed_off" ||
+    health.phase === "waiting_first" ||
+    health.phase === "parse_stress"
+  ) {
     return (
-      <div className="panel">
+      <div
+        className="panel"
+        style={
+          health.phase === "detailed_off" || health.phase === "parse_stress"
+            ? {
+                borderColor:
+                  "color-mix(in srgb, var(--color-fair) 40%, transparent)",
+              }
+            : undefined
+        }
+      >
         <p className="eyebrow">Match tracking</p>
-        <p className="text-sm text-muted m-0 leading-relaxed">
-          The winrate tracker runs inside the desktop app. Launch Filthy Net Deck from your
-          desktop to record MTG Arena matches.
-        </p>
-      </div>
-    );
-  }
-
-  if (!status.logFound) {
-    return (
-      <div className="panel">
-        <p className="eyebrow">Match tracking</p>
-        <p className="text-sm m-0 mb-1">
-          <span className="feed-dot offline" />
-          Waiting for MTG Arena
-        </p>
-        <p className="text-sm text-muted m-0 leading-relaxed">
-          No Arena log found yet. Start MTG Arena once and this page will come alive. Looking
-          at: <span className="font-mono text-xs selectable">{status.logPath}</span>
-        </p>
-      </div>
-    );
-  }
-
-  if (status.detailedLogs === false) {
-    return (
-      <div className="panel" style={{ borderColor: "color-mix(in srgb, var(--color-fair) 40%, transparent)" }}>
-        <p className="eyebrow">One switch to flip in Arena</p>
-        <p className="text-sm m-0 mb-1">
-          <span className="feed-dot offline" />
-          Detailed logs are disabled
-        </p>
-        <p className="text-sm text-muted m-0 leading-relaxed">
-          Arena only writes match data when detailed logs are on. In MTG Arena open{" "}
-          <strong className="text-foam">Options → Account</strong>, enable{" "}
-          <strong className="text-foam">Detailed Logs (Plugin Support)</strong>, then restart
-          Arena. Every tracker (Untapped, 17Lands…) uses this same official switch.
-        </p>
+        <TrackerOnboarding />
       </div>
     );
   }
@@ -210,21 +193,21 @@ function StatusPanel() {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <p className="text-sm m-0">
           <span className="feed-dot live" />
-          Tracking{status.localPlayer ? ` · ${status.localPlayer}` : ""}
-          {status.detailedLogs === null && (
+          {health.headline}
+          {status?.detailedLogs === null && (
             <span className="text-muted"> — waiting for the first Arena event…</span>
           )}
         </p>
         <span className="text-xs text-muted">
-          {status.matchesRecorded} match{status.matchesRecorded === 1 ? "" : "es"} recorded ·
-          local only, nothing leaves this PC
+          {status?.matchesRecorded ?? 0} match
+          {(status?.matchesRecorded ?? 0) === 1 ? "" : "es"} recorded · local only
         </span>
       </div>
-      {status.parseErrors > 0 && (
+      <p className="text-xs text-muted m-0 mt-1 leading-relaxed">{health.detail}</p>
+      {status && status.parseErrors > 0 && status.parseErrors < 3 && (
         <p className="qa-flag mt-2 mb-0">
-          {status.parseErrors} Arena event{status.parseErrors === 1 ? "" : "s"} could not be
-          parsed — an Arena update may have changed the log format. Tracking may be incomplete
-          until Filthy Net Deck updates.
+          {status.parseErrors} minor parse skip{status.parseErrors === 1 ? "" : "s"} — usually
+          noise; watch this if it climbs after an Arena patch.
         </p>
       )}
     </div>
@@ -1489,12 +1472,13 @@ export function Stats() {
 
       {matches.length === 0 ? (
         status?.logFound && status.detailedLogs !== false ? (
-          <div className="empty-state">
+          <div className="panel">
             <h2 className="text-lg font-semibold m-0 mb-2">No matches recorded yet</h2>
-            <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-              Keep Filthy Net Deck running while you play MTG Arena — every match lands here
-              automatically the moment it ends. Win rates by deck, opponents, play/draw, rank.
+            <p className="text-sm text-muted m-0 mb-3 leading-relaxed max-w-xl">
+              Keep Filthy Net Deck running (or in the tray) while you play — every match lands
+              here the moment it ends.
             </p>
+            <TrackerOnboarding showHealthDetail={false} />
           </div>
         ) : null
       ) : (
@@ -1602,11 +1586,11 @@ export function Stats() {
 
           <SummaryTiles matches={filtered} />
           <FormTiles matches={filtered} />
-          <div className="panel flex flex-wrap items-center justify-between gap-2">
+          <div className="panel share-row">
             <div>
-              <p className="eyebrow m-0 mb-0.5">Shareable recap</p>
+              <p className="eyebrow m-0 mb-0.5">Share after a session</p>
               <p className="text-xs text-muted m-0">
-                One PNG of this week&apos;s WR, rank move, and best deck — every share is an ad.
+                Week recap PNG — WR, rank move, best deck. Post it; every share is free marketing.
               </p>
               {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
             </div>

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Three marketing soundtrack options for Filthy Net Deck.
+Marketing soundtrack options for Filthy Net Deck.
 Each has arrangement arc, SFX (whoosh/impact/riser/glitch), and a real climax.
 
   A — Acid Climax: dark electronic, evolving filter, big drop at ~65%
   B — Synthwave Climb: melodic arps + pads, emotional peak
   C — Trailer Hits: sparse → thunder impacts, hybrid trailer energy
+  D — Arena Pulse: competitive esports half-time, glitch ticks, cut hits, CTA smash
+  D30 — Arena Pulse (30s): timed for Themes X cut (hook → skins → CTA)
 
 No deps beyond numpy.
 """
@@ -677,21 +679,384 @@ def track_c(duration: float = 48.0) -> tuple[np.ndarray, np.ndarray]:
 
 
 # ---------------------------------------------------------------------------
+# Track D — Arena Pulse (competitive esports / product-brand fit)
+# ---------------------------------------------------------------------------
+
+def digital_stutter(length_s: float = 0.09) -> np.ndarray:
+    """Short bit-crushed digital tick for UI / cut energy."""
+    n = int(length_s * SR)
+    tt = np.arange(n) / SR
+    f = 900 + 2400 * (tt / max(length_s, 1e-6))
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR)
+    s += one_pole_hp(noise(n, 31), 3000) * 0.55
+    s = np.round(s * 5) / 5
+    return s * env_adsr(n, 0.0004, 0.012, 0.05, 0.04) * 0.4
+
+
+def laser_blip(midi: int = 84, length_s: float = 0.08) -> np.ndarray:
+    n = int(length_s * SR)
+    tt = np.arange(n) / SR
+    f0, f1 = note_hz(midi), note_hz(midi - 12)
+    freq = f0 + (f1 - f0) * (tt / max(length_s, 1e-6))
+    s = np.sin(2 * np.pi * np.cumsum(freq) / SR)
+    s += 0.3 * np.sin(2 * np.pi * np.cumsum(freq * 2) / SR)
+    return s * env_adsr(n, 0.001, 0.02, 0.05, 0.04) * 0.28
+
+
+def half_time_kick(length_s: float = 0.42) -> np.ndarray:
+    """Punchier, longer kick for competitive half-time feel."""
+    n = int(length_s * SR)
+    tt = np.arange(n) / SR
+    freq = 165 * np.exp(-tt * 16) + 38
+    phase = 2 * np.pi * np.cumsum(freq) / SR
+    body = np.sin(phase) * env_adsr(n, 0.001, 0.05, 0.25, 0.22)
+    click = one_pole_hp(noise(n, 37), 2500) * env_adsr(n, 0.0003, 0.005, 0, 0.012) * 0.5
+    sub = np.sin(2 * np.pi * 48 * tt) * env_adsr(n, 0.002, 0.08, 0.35, 0.25) * 0.35
+    return soft_clip(body * 1.15 + click + sub, 1.25)
+
+
+def track_d(duration: float = 48.0) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Arena Pulse — competitive esports brand bed.
+    Tight 110 BPM half-time groove, glitch ticks, rising tension, CTA smash.
+    """
+    bpm = 110
+    beat = 60.0 / bpm
+    bar = beat * 4
+    n = int(duration * SR)
+    drums = np.zeros(n)
+    bass = np.zeros(n)
+    pulse = np.zeros(n)
+    pads = np.zeros(n)
+    lead = np.zeros(n)
+    sfx = np.zeros(n)
+    total_beats = int(duration / beat)
+    total_bars = int(duration / bar)
+
+    # Sections (bars, ~2.18s each):
+    # 0-2 intro · 2-6 groove · 6-10 lift · 10-16 peak (skin cycle energy)
+    # 16-18 CTA smash · 18+ cool-out
+    for b in range(total_beats):
+        t = b * beat
+        bar_i = b // 4
+        # intro — sparse pulse + glitch ticks
+        if bar_i < 2:
+            if b % 8 == 0:
+                place(drums, t, half_time_kick(), 0.7)
+            if b % 4 == 2:
+                place(sfx, t, digital_stutter(0.07), 0.55)
+            if b % 2 == 1 and bar_i >= 1:
+                place(drums, t, tick(), 0.45)
+            continue
+        # groove
+        if 2 <= bar_i < 6:
+            if b % 8 == 0:
+                place(drums, t, half_time_kick(), 1.0)
+            if b % 8 == 4:
+                place(drums, t, snare(), 0.75)
+                place(drums, t, clap(), 0.25)
+            if b % 2 == 0:
+                place(drums, t + beat * 0.5, hat(), 0.5)
+            if b % 4 == 3:
+                place(sfx, t + beat * 0.75, digital_stutter(0.06), 0.4)
+            continue
+        # lift — denser hats, more ticks
+        if 6 <= bar_i < 10:
+            if b % 8 == 0:
+                place(drums, t, half_time_kick(), 1.05)
+            if b % 4 == 0 and b % 8 != 0:
+                place(drums, t, kick(0.22, 120), 0.35)
+            if b % 8 == 4:
+                place(drums, t, snare(), 0.9)
+                place(drums, t, clap(), 0.4)
+            place(drums, t + beat * 0.5, hat(), 0.55 + 0.04 * (bar_i - 6))
+            if b % 2 == 1:
+                place(sfx, t, tick(), 0.35)
+            if b % 4 == 2:
+                place(sfx, t + beat * 0.25, digital_stutter(0.05), 0.45)
+            continue
+        # peak — competitive drive (maps to walker / feature climax)
+        if 10 <= bar_i < 16:
+            if b % 4 == 0:
+                place(drums, t, half_time_kick(0.38), 1.15)
+            if b % 4 == 2:
+                place(drums, t, snare(), 1.0)
+                place(drums, t, clap(), 0.55)
+            place(drums, t + beat * 0.5, hat(True) if b % 4 == 3 else hat(), 0.72)
+            if b % 2 == 0:
+                place(sfx, t + beat * 0.25, laser_blip(79 + (b % 4) * 2, 0.07), 0.35)
+            if b % 4 == 1:
+                place(sfx, t, digital_stutter(0.08), 0.5)
+            continue
+        # CTA smash zone
+        if 16 <= bar_i < 18:
+            if b % 4 == 0:
+                place(drums, t, half_time_kick(0.45), 1.2)
+            if b % 4 == 2:
+                place(drums, t, snare(), 1.05)
+                place(drums, t, clap(), 0.7)
+            place(drums, t + beat * 0.5, hat(), 0.65)
+            continue
+        # cool-out
+        if b % 8 == 0:
+            place(drums, t, half_time_kick(0.4), 0.6)
+        if b % 8 == 4:
+            place(drums, t, hat(), 0.35)
+
+    # Bass — dark minor roots, half-time pocket
+    # Em-ish competitive palette
+    root_cycle = [28, 28, 26, 31, 28, 24, 26, 31]  # E2 F#2 B2 etc (midi-ish)
+    for bar_i in range(1, min(total_bars, 20)):
+        root = root_cycle[bar_i % len(root_cycle)]
+        g = 0.75 if bar_i < 6 else 0.95 if bar_i < 10 else 1.1 if bar_i < 16 else 1.0
+        place(bass, bar_i * bar, bass_note(root, bar * 0.92), g)
+        # offbeat ghost octave for drive
+        if bar_i >= 6:
+            place(bass, bar_i * bar + beat * 2, bass_note(root + 12, beat * 1.6, root + 7), g * 0.55)
+
+    # Sidechain-ish mid pulse (gated saw pad)
+    for bar_i in range(2, min(total_bars, 18)):
+        dens = 4 if bar_i < 10 else 8
+        notes = [52, 55, 59, 62] if bar_i % 2 == 0 else [50, 55, 59, 64]
+        for i in range(dens):
+            m = notes[i % len(notes)]
+            if bar_i >= 10:
+                m += 12
+            place(
+                pulse,
+                bar_i * bar + i * (bar / dens),
+                arp_pluck(m, beat * (0.35 if dens == 4 else 0.22)),
+                0.55 if bar_i < 10 else 0.85,
+            )
+
+    # Sparse lead motifs — competitive hook, not rave
+    motifs = [
+        (6, [64, 67, 71, 67, 64, 62, 59, 62]),
+        (8, [67, 71, 74, 71, 67, 64, 62, 64]),
+        (10, [71, 74, 76, 74, 71, 67, 64, 67]),
+        (12, [74, 76, 79, 76, 74, 71, 67, 71]),
+        (14, [76, 79, 83, 79, 76, 74, 71, 74]),
+    ]
+    for bar_i, notes in motifs:
+        if bar_i * bar >= duration:
+            continue
+        for i, m in enumerate(notes):
+            place(lead, bar_i * bar + i * beat * 0.5, lead_saw(m, beat * 0.42, 0.4), 0.75 if bar_i < 10 else 1.05)
+
+    # Pads — dark gold atmosphere
+    chords = [
+        [40, 43, 47, 52],  # Em
+        [38, 43, 47, 50],  # D
+        [36, 40, 43, 47],  # C
+        [38, 42, 45, 50],  # Dmaj-ish
+    ]
+    for bar_i in range(0, min(total_bars + 1, 22), 2):
+        g = 0.55 if bar_i < 4 else 0.75 if bar_i < 10 else 0.95 if bar_i < 16 else 0.6
+        place(pads, bar_i * bar, pad_chord(chords[(bar_i // 2) % 4], bar * 2.3), g)
+
+    # SFX arc
+    place(sfx, 2 * bar - 1.0, reverse_cymbal(1.0), 0.55)
+    place(sfx, 2 * bar, whoosh(0.45), 0.7)
+    place(sfx, 2 * bar, impact(0.55), 0.45)
+    place(sfx, 6 * bar - 1.6, riser(1.6), 0.85)
+    place(sfx, 6 * bar, whoosh(0.4), 0.75)
+    place(sfx, 6 * bar, glitch_hit(0.1), 0.55)
+    place(sfx, 10 * bar - 2.0, riser(2.0), 1.0)
+    place(sfx, 10 * bar, impact(0.85), 0.9)
+    place(sfx, 10 * bar, sub_drop(0.65), 0.85)
+    place(sfx, 10 * bar, whoosh(0.5), 0.7)
+    # peak cut accents every bar (skin-cut energy)
+    for bar_i in range(11, 16):
+        place(sfx, bar_i * bar, whoosh(0.28), 0.45)
+        place(sfx, bar_i * bar, digital_stutter(0.07), 0.55)
+        place(sfx, bar_i * bar + beat * 2, laser_blip(86, 0.06), 0.4)
+    # CTA smash
+    place(sfx, 16 * bar - 1.8, riser(1.8), 1.15)
+    place(sfx, 16 * bar - 0.25, reverse_cymbal(0.25), 0.85)
+    place(sfx, 16 * bar, impact(1.15), 1.3)
+    place(sfx, 16 * bar, sub_drop(0.85), 1.15)
+    place(sfx, 16 * bar, whoosh(0.55, False), 0.75)
+    place(sfx, 16 * bar + 0.05, glitch_hit(0.12), 0.7)
+    place(sfx, 18 * bar, impact(0.7), 0.55)
+    place(sfx, 18 * bar, whoosh(0.9, False), 0.5)
+
+    mono = drums * 0.95 + one_pole_lp(bass, 280) * 0.85 + bass * 0.4
+    mono += pulse * 0.7 + lead * 0.8 + pads * 0.75 + sfx * 1.05
+    mono = soft_clip(fade_edges(mono, 0.08, 2.2), 1.06)
+    return to_stereo(mono, 1.12)
+
+
+def track_d_themes_x(duration: float = 30.0) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Arena Pulse timed for Themes X (30s @ 30fps):
+      0.0–5.0s   Hook
+      4.7–14.0s  Themes sidebar
+      13.7–22.1s Walker cycle (6 × ~1.4s cuts)
+      21.7–30.0s Outro / CTA
+    """
+    bpm = 110
+    beat = 60.0 / bpm
+    n = int(duration * SR)
+    drums = np.zeros(n)
+    bass = np.zeros(n)
+    pulse = np.zeros(n)
+    pads = np.zeros(n)
+    lead = np.zeros(n)
+    sfx = np.zeros(n)
+
+    # Exact cut points from VideoThemesX timeline
+    t_hook = 0.0
+    t_themes = 140 / 30  # 4.667
+    t_walk = 410 / 30  # 13.667
+    t_outro = 652 / 30  # 21.733
+    skin_dt = 42 / 30  # 1.4s per planeswalker
+
+    # ---- Drums ----
+    # Hook: sparse half-time kick + digital ticks
+    for i, t in enumerate(np.arange(0, t_themes, beat * 2)):
+        place(drums, float(t), half_time_kick(), 0.55 + 0.05 * min(i, 4))
+        if i % 2 == 1:
+            place(sfx, float(t) + beat * 0.5, digital_stutter(0.06), 0.5)
+
+    # Themes open: groove locks
+    for i, t in enumerate(np.arange(t_themes, t_walk, beat)):
+        bi = i  # beat index in section
+        if bi % 4 == 0:
+            place(drums, float(t), half_time_kick(), 0.95)
+        if bi % 4 == 2:
+            place(drums, float(t), snare(), 0.8)
+            place(drums, float(t), clap(), 0.3)
+        if bi % 2 == 0:
+            place(drums, float(t) + beat * 0.5, hat(), 0.55)
+        if bi % 4 == 3:
+            place(sfx, float(t) + beat * 0.25, digital_stutter(0.05), 0.4)
+
+    # Walker cycle: denser drive + cut hit every skin
+    for i, t in enumerate(np.arange(t_walk, t_outro, beat)):
+        bi = i
+        if bi % 2 == 0:
+            place(drums, float(t), half_time_kick(0.36), 1.1)
+        if bi % 4 == 2:
+            place(drums, float(t), snare(), 1.0)
+            place(drums, float(t), clap(), 0.5)
+        place(drums, float(t) + beat * 0.5, hat(True) if bi % 4 == 3 else hat(), 0.7)
+        if bi % 2 == 1:
+            place(sfx, float(t), laser_blip(81 + (bi % 6) * 2, 0.065), 0.38)
+
+    for k in range(6):
+        t = t_walk + k * skin_dt
+        place(sfx, t, whoosh(0.32), 0.55 + 0.05 * k)
+        place(sfx, t, digital_stutter(0.08), 0.65)
+        place(sfx, t, impact(0.45) if k == 0 else glitch_hit(0.09), 0.5 if k else 0.75)
+
+    # Outro / CTA
+    for i, t in enumerate(np.arange(t_outro, duration - 0.5, beat)):
+        bi = i
+        if bi % 4 == 0:
+            place(drums, float(t), half_time_kick(0.42), 1.05 if bi < 8 else 0.7)
+        if bi % 4 == 2 and bi < 10:
+            place(drums, float(t), snare(), 0.9)
+            place(drums, float(t), clap(), 0.55)
+        if bi < 12:
+            place(drums, float(t) + beat * 0.5, hat(), 0.55)
+
+    # ---- Bass ----
+    roots_hook = [28, 28, 26, 28]
+    for i, t in enumerate(np.arange(0, t_themes, beat * 2)):
+        place(bass, float(t), bass_note(roots_hook[i % 4], beat * 1.85), 0.7)
+
+    roots_body = [28, 28, 26, 31, 28, 24, 26, 31]
+    for i, t in enumerate(np.arange(t_themes, t_outro, beat * 2)):
+        root = roots_body[i % len(roots_body)]
+        g = 0.9 if t < t_walk else 1.1
+        place(bass, float(t), bass_note(root, beat * 1.9), g)
+        if t >= t_walk:
+            place(bass, float(t) + beat, bass_note(root + 12, beat * 0.85, root + 7), g * 0.5)
+
+    place(bass, t_outro, bass_note(28, beat * 3.5), 1.05)
+    place(bass, t_outro + beat * 4, bass_note(26, beat * 3.5), 0.85)
+    place(bass, t_outro + beat * 8, bass_note(28, beat * 4), 0.65)
+
+    # ---- Pulse arps ----
+    arp_notes = [52, 55, 59, 62, 59, 55, 52, 50]
+    for i, t in enumerate(np.arange(t_themes, t_outro, beat * 0.5)):
+        m = arp_notes[i % len(arp_notes)]
+        if t >= t_walk:
+            m += 12
+        place(pulse, float(t), arp_pluck(m, beat * 0.28), 0.55 if t < t_walk else 0.8)
+
+    # ---- Lead hooks ----
+    # Themes section motif
+    motif_a = [64, 67, 71, 67, 64, 62, 59, 62]
+    for i, m in enumerate(motif_a):
+        place(lead, t_themes + 1.2 + i * beat * 0.5, lead_saw(m, beat * 0.4, 0.35), 0.7)
+    # Peak motif over walker
+    motif_b = [71, 74, 76, 74, 71, 67, 64, 67, 74, 76, 79, 76]
+    for i, m in enumerate(motif_b):
+        place(lead, t_walk + 0.3 + i * beat * 0.5, lead_saw(m, beat * 0.38, 0.45), 1.0)
+
+    # ---- Pads ----
+    for t0, chord, g in (
+        (0.0, [40, 43, 47, 52], 0.5),
+        (t_themes, [38, 43, 47, 50], 0.7),
+        (t_themes + 4.5, [36, 40, 43, 47], 0.75),
+        (t_walk, [40, 43, 47, 52], 0.9),
+        (t_walk + 4.2, [38, 42, 45, 50], 0.95),
+        (t_walk + 8.4, [40, 43, 47, 52], 1.0),
+        (t_outro, [40, 43, 47, 52], 0.85),
+        (t_outro + 4.0, [38, 43, 47, 50], 0.55),
+    ):
+        place(pads, t0, pad_chord(chord, 4.5), g)
+
+    # ---- SFX scene hits ----
+    place(sfx, t_hook + 0.15, whoosh(0.5), 0.55)
+    place(sfx, t_hook + 0.2, digital_stutter(0.1), 0.45)
+
+    place(sfx, t_themes - 0.9, reverse_cymbal(0.9), 0.6)
+    place(sfx, t_themes, whoosh(0.45), 0.8)
+    place(sfx, t_themes, impact(0.55), 0.55)
+    place(sfx, t_themes, glitch_hit(0.1), 0.5)
+
+    place(sfx, t_walk - 1.6, riser(1.6), 1.05)
+    place(sfx, t_walk, impact(0.9), 1.0)
+    place(sfx, t_walk, sub_drop(0.7), 0.95)
+    place(sfx, t_walk, whoosh(0.5), 0.75)
+
+    # CTA smash
+    place(sfx, t_outro - 1.5, riser(1.5), 1.2)
+    place(sfx, t_outro - 0.2, reverse_cymbal(0.2), 0.8)
+    place(sfx, t_outro, impact(1.2), 1.35)
+    place(sfx, t_outro, sub_drop(0.9), 1.2)
+    place(sfx, t_outro, whoosh(0.55, False), 0.8)
+    place(sfx, t_outro + 0.04, glitch_hit(0.12), 0.75)
+    place(sfx, t_outro + 0.08, digital_stutter(0.1), 0.6)
+    # soft landing
+    place(sfx, duration - 2.5, whoosh(1.2, False), 0.45)
+
+    mono = drums * 0.95 + one_pole_lp(bass, 280) * 0.85 + bass * 0.4
+    mono += pulse * 0.72 + lead * 0.82 + pads * 0.78 + sfx * 1.08
+    mono = soft_clip(fade_edges(mono, 0.06, 1.8), 1.07)
+    return to_stereo(mono, 1.14)
+
+
+# ---------------------------------------------------------------------------
 
 def main() -> None:
     PUBLIC.mkdir(parents=True, exist_ok=True)
     DESKTOP.mkdir(parents=True, exist_ok=True)
 
     tracks = [
-        ("A", "acid-climax", track_a, "Dark acid electronic — evolving riffs, filter build, drop climax"),
-        ("B", "synthwave-climb", track_b, "Melodic synthwave — arps + lead, emotional peak"),
-        ("C", "trailer-hits", track_c, "Cinematic trailer — braams, impacts, hybrid climax"),
+        ("A", "acid-climax", lambda: track_a(48.0), "Dark acid electronic — evolving riffs, filter build, drop climax"),
+        ("B", "synthwave-climb", lambda: track_b(48.0), "Melodic synthwave — arps + lead, emotional peak"),
+        ("C", "trailer-hits", lambda: track_c(48.0), "Cinematic trailer — braams, impacts, hybrid climax"),
+        ("D", "arena-pulse", lambda: track_d(48.0), "Competitive esports half-time — glitch ticks, cut hits, CTA smash"),
+        ("D30", "arena-pulse-themes-x", lambda: track_d_themes_x(30.0), "Arena Pulse timed for 30s Themes X cut"),
     ]
 
     print("Generating soundtracks…")
     for letter, slug, fn, desc in tracks:
         print(f"\n[{letter}] {slug}\n    {desc}")
-        left, right = fn(48.0)
+        left, right = fn()
         for dest in (
             PUBLIC / f"soundtrack-{slug}.wav",
             DESKTOP / f"FND-Soundtrack-{letter}-{slug}.wav",
@@ -704,24 +1069,22 @@ def main() -> None:
         """Filthy Net Deck — marketing options
 =====================================
 
-SOUNDTRACKS (play these alone — 48s each)
------------------------------------------
-FND-Soundtrack-A-acid-climax.wav
-  Dark acid electronic. Groove → build → big drop climax with whooshes/impacts.
+SOUNDTRACKS
+-----------
+FND-Soundtrack-A-acid-climax.wav (48s)
+  Dark acid electronic. Groove → build → big drop climax.
 
-FND-Soundtrack-B-synthwave-climb.wav
-  Melodic synthwave. Arps + lead line; emotional peak around 2/3.
+FND-Soundtrack-B-synthwave-climb.wav (48s)
+  Melodic synthwave. Arps + lead; emotional peak around 2/3.
 
-FND-Soundtrack-C-trailer-hits.wav
-  Cinematic trailer energy. Sparse open, braam hits, impact barrage climax.
+FND-Soundtrack-C-trailer-hits.wav (48s)
+  Cinematic trailer energy. Sparse open, braam hits, impact climax.
 
-STYLE VIDEOS (when rendered)
-----------------------------
-FND-Style-Neon-Terminal.mp4     + soundtrack A
-FND-Style-Brutalist-Punch.mp4   + soundtrack B
-FND-Style-Trailer-Kinetic.mp4   + soundtrack C
+FND-Soundtrack-D-arena-pulse.wav (48s)
+  Competitive esports brand bed. 110 BPM half-time, glitch ticks, CTA smash.
 
-Pick a style + a soundtrack and we can mix any combo for a final cut.
+FND-Soundtrack-D30-arena-pulse-themes-x.wav (30s)
+  Same vibe, hard-timed to Themes X: hook → sidebar → skin cuts → CTA.
 """,
         encoding="utf-8",
     )

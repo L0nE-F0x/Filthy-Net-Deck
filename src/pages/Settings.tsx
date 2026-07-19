@@ -2,73 +2,36 @@ import { useEffect, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 
-/** X1 — compact tracker health for Settings (mirrors My Stats status facts). */
+/** X1 + v1.2 — tracker health + first-session coach. */
 function TrackerHealthCard() {
-  const status = useAppStore((s) => s.trackerStatus);
-  const matches = useAppStore((s) => s.trackerMatches);
   const setPage = useAppStore((s) => s.setPage);
-  const lastMatch = matches.length
-    ? [...matches].sort((a, b) => b.endedAt - a.endedAt)[0]
-    : null;
-
-  let headline = "Desktop app only";
-  let detail =
-    "Win-rate tracking needs the Filthy Net Deck desktop app reading Arena’s Player.log on this PC.";
-  let ok: "good" | "warn" | "off" = "off";
-
-  if (status) {
-    if (!status.logFound) {
-      headline = "Waiting for MTG Arena";
-      detail = `No Player.log yet. Launch Arena once. Looking at: ${status.logPath}`;
-      ok = "warn";
-    } else if (status.detailedLogs === false) {
-      headline = "Detailed logs off";
-      detail =
-        "In Arena: Options → Account → enable Detailed Logs (Plugin Support), then restart Arena.";
-      ok = "warn";
-    } else {
-      headline = status.localPlayer
-        ? `Tracking · ${status.localPlayer}`
-        : "Tracking Arena matches";
-      detail = `${status.matchesRecorded} match${status.matchesRecorded === 1 ? "" : "es"} on this PC${
-        lastMatch
-          ? ` · last ${new Date(lastMatch.endedAt).toLocaleString(undefined, {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}`
-          : ""
-      }.`;
-      ok = "good";
-    }
-  }
+  const refreshTracker = useAppStore((s) => s.refreshTracker);
 
   return (
     <section className="panel settings-card settings-card-span2">
       <h3 className="settings-card-title">Tracker health</h3>
       <p className="settings-card-desc mb-2">
-        Local only — nothing leaves this machine. Open My Stats for full history.
+        Local only — nothing leaves this machine. Answers “is it working?” without leaving Settings.
       </p>
-      <p className="text-sm m-0 mb-1">
-        <span
-          className={`feed-dot ${ok === "good" ? "live" : ok === "warn" ? "offline" : "offline"}`}
-        />
-        {headline}
-      </p>
-      <p className="text-xs text-muted m-0 leading-relaxed selectable">{detail}</p>
-      <button
-        type="button"
-        className="btn btn-ghost btn-sm mt-2 self-start"
-        onClick={() => setPage("stats")}
-      >
-        Open My Stats →
-      </button>
+      <TrackerOnboarding />
+      <div className="flex flex-wrap gap-2 mt-2">
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => void refreshTracker()}
+        >
+          Re-check log
+        </button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("stats")}>
+          Open My Stats →
+        </button>
+      </div>
     </section>
   );
 }
@@ -250,7 +213,8 @@ export function Settings() {
                 · meta for <strong className="text-foam">{meta.date}</strong>
               </>
             ) : null}
-            . New versions install inside the app — no reinstall dance.
+            . Prefer <strong className="text-foam">Update &amp; restart</strong> (signed, in-app).
+            Opening a browser download is only the fallback when auto-install isn’t available.
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
             <button
@@ -261,7 +225,11 @@ export function Settings() {
                 setUpdateMsg("Checking…");
                 void checkForUpdates().then((result) => {
                   if (result.status === "update") {
-                    setUpdateMsg(`v${result.remote.version} is ready.`);
+                    const avail = useAppStore.getState().updateAvailable;
+                    const mode = avail?.canAutoInstall
+                      ? "Update & restart ready"
+                      : "download fallback only";
+                    setUpdateMsg(`v${result.remote.version} is ready (${mode}).`);
                   } else if (result.status === "latest") {
                     setUpdateMsg("You’re up to date.");
                   } else {
@@ -291,20 +259,21 @@ export function Settings() {
               updateAvailable.downloadUrl && (
                 <button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-ghost btn-sm"
                   onClick={() => {
                     void downloadInstaller(updateAvailable.downloadUrl!);
                   }}
                 >
                   {/\.dmg(\?|$)/i.test(updateAvailable.downloadUrl)
-                    ? `Download macOS v${updateAvailable.version}`
-                    : `Get v${updateAvailable.version}`}
+                    ? `Fallback: download macOS v${updateAvailable.version}`
+                    : `Fallback: download v${updateAvailable.version}`}
                 </button>
               )}
           </div>
           {updateAvailable?.canAutoInstall && !updating && (
             <p className="text-sm text-gold-300 mt-2 mb-0">
-              v{updateAvailable.version} is ready — one click and you’re done.
+              Signed update · v{updateAvailable.version} — one click installs and restarts. No
+              browser required.
             </p>
           )}
           {updateAvailable &&
@@ -312,13 +281,14 @@ export function Settings() {
             updateAvailable.downloadUrl &&
             /\.dmg(\?|$)/i.test(updateAvailable.downloadUrl) && (
               <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
-                macOS builds ship as a signed-site dmg (auto-update signing for Apple is a later
-                infra step). Download, open, and replace the app in Applications.
+                macOS soft path: download the dmg from our site, open it, and replace the app in
+                Applications. Full signed auto-update for Apple is a later infra step.
               </p>
             )}
           {updateAvailable && !updateAvailable.canAutoInstall && (
             <p className="text-sm text-gold-300 mt-2 mb-0">
-              v{updateAvailable.version} is ready — use the button above to get it.
+              v{updateAvailable.version} is ready via the fallback download above (not the primary
+              path on Windows when signing is available).
             </p>
           )}
           {updateMsg && !updateAvailable && (
