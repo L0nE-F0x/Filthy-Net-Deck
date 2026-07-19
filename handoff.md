@@ -7,6 +7,20 @@ Read **`AGENTS.md`** first. User-visible changes still need the full release che
 
 ---
 
+## ✅ Claude Code audit — v1.3.5 (2026-07-19)
+
+**Verdict: ship-clean. No blockers.** Audited at HEAD `66ff2cf` (post macOS roll).
+
+- **Gates green:** `npm test` **112/112** · `npx tsc --noEmit` clean · `cargo check --lib` clean.
+- **Surfaces consistent at 1.3.5, Windows + macOS at parity:** app binary (4 files), `version.json` ×2, `updater/latest.json` (**signature present**), Windows `.exe`+`.sig` and macOS `1.3.5-universal.dmg` in `downloads/`, `index.html` (**19× 1.3.5, 0 stale `1.1.1`**; 2 links → the real dmg), OG/Twitter `?v=1.3.5`. No secrets tracked (only the correct `.exe.sig`).
+- **macOS `transparent()` fix (`b131aa6`) reviewed — correct:** `#[cfg(not(target_os = "macos"))]` gate + shadowing bindings (no `mut`) + `.overlay-macos` CSS (`index.css`) + `navigator.userAgent` detection (`OverlayApp.tsx`). See memory `tauri-transparent-macos-gotcha`.
+- **Grok P1 re-confirmed:** the 1 Hz clock re-render is **mitigated by existing memoization** (`groups`/`metaMap`/`maxPct` stable, `GroupSection`/`CardRow` `memo`'d → only the shell + clock span repaint) — not a bug. Opacity + `startExpanded` cross-webview are **graceful-degradation only** (persistent overlay webview); confirm live opacity update on a real Windows build.
+- **Hygiene:** removed 0-byte `website/_raw_git.bin` stray.
+
+**Staged for the NEXT version (do not ship source-only):** null-Scryfall-cache fix on branch **`fix/arena-meta-null-cache`** (`b1e760b`). A transient offline Scryfall hit was persisted as `null`, poisoning that card (`Card {grpId}`) until a cache-key bump; the fix makes nulls a session-only negative cache (skipped on load + persist) so it self-heals next session. User-visible → fold into the next release via the full AGENTS checklist.
+
+---
+
 ## Where we are
 
 | Item | Value |
