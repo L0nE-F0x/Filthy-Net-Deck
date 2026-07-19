@@ -11,11 +11,11 @@ Read **`AGENTS.md`** first. User-visible changes still need the full release che
 
 | Item | Value |
 |------|--------|
-| Version | **1.3.5** (Windows) |
-| Release commit | `5868c34` — *Release v1.3.5: in-game overlay, refined* |
-| Tag | Expect **`v1.3.5`** if Kimi pushed it (confirm with `git tag -l 'v1.3*'`). |
+| Version | **1.3.5** (Windows + macOS at parity) |
+| Release commit | `5868c34` — *Release v1.3.5: in-game overlay, refined* (+ `b131aa6` macOS build fix) |
+| Tag | **`v1.3.5`** → `b131aa6` (moved once to pick up the macOS fix) |
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-1.3.5.exe` (+ `.sig`) |
-| macOS | **1.1.1** dmg still on site until CI dmg rolled |
+| macOS | `website/downloads/Filthy-Net-Deck-1.3.5-universal.dmg` (CI on re-tag; `transparent()` was the build-breaker) |
 | Soft / updater | `version.json` + `updater/latest.json` → **1.3.5** (live verified) |
 | Live site | https://filthy-net-deck.netlify.app/ |
 
@@ -147,7 +147,7 @@ Arena: **Detailed Logs (Plugin Support)** on.
 
 ## Next product work (after audit)
 
-1. **macOS roll** for latest Windows line when dmg exists  
+1. ~~**macOS roll**~~ — done: v1.3.5 universal dmg on site (tag CI after `transparent()` fix)  
 2. Owner ladder feedback only  
 3. Deferred: draft hub, cloud, Alchemy, prices  
 

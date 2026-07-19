@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.3.5** (in-game overlay polish: grouped list, art crops, mana pips, true slim bar; Windows signed on site; macOS dmg may lag until tag CI).  
+**Current release:** **v1.3.5** (in-game overlay polish: grouped list, art crops, mana pips, true slim bar; Windows signed + macOS universal dmg at parity on site).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -13,10 +13,10 @@
 Canonical checklist: **`handoff.md`**.
 
 1. ~~**Overlay polish**~~ — **shipped in v1.3.5** (grouped sections, art crops, mana pips, true slim bar, opacity + start-expanded settings)  
-2. **macOS roll** — pull `v1.3.5` CI dmg into `website/downloads/` + site links  
+2. ~~**macOS roll**~~ — **done**: `v1.3.5` universal dmg in `website/downloads/` + site links (fixed CI: `transparent()` is Windows/Linux-only)  
 3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
 
-**Shipped:** **v1.3.5** overlay refinement (installer + updater + site + OG).
+**Shipped:** **v1.3.5** overlay refinement + macOS parity (installer + dmg + updater + site + OG).
 
 ### Explicitly deferred
 
