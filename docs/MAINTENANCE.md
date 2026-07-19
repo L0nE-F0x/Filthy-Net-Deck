@@ -71,3 +71,26 @@ never silently stale-as-fresh).
   verify a parser fix — see item 3.
 - **Scraper HTML drift** (Goldfish/Melee/magic.gg redesigns) needs a human once
   detected — but detection itself is automatic via the failure issues.
+
+## Downloads hygiene (avoid repo bloat over time)
+
+`website/downloads/` is served verbatim by Netlify, so **only the current
+release needs to live there** — that is the URL the updater
+(`updater/latest.json`) and the site buttons point at. Historical installers
+just grow the tree and every Netlify deploy.
+
+- **Policy:** when cutting a release, the new installer set (exe/sig/dmg)
+  replaces the old one in `website/downloads/`; don't accumulate. As of the
+  2026-07-19 audit the dir was trimmed to **1.1.1-only** (383 MB → 23 MB).
+- **Archive:** macOS dmgs are attached to each GitHub Release automatically
+  (`macos-build.yml`). Old installers also remain in git history.
+- **Deferred — Windows-exe archival:** Releases currently have **only the dmg**,
+  not the Windows `.exe` (built on the dev box, never uploaded). If a full
+  public Windows archive is wanted, `gh release upload vX.Y.Z <exe> <sig>` for
+  the old versions. Otherwise old Windows exes are recoverable only from git
+  history.
+- **Deferred — reclaim `.git` size:** pruning the working tree does **not**
+  shrink history (~500 MB of old binaries remain in past commits). Reclaiming it
+  needs a history rewrite (`git filter-repo` / BFG) + force-push. Risky because
+  CI and releases push to `main` — coordinate a quiet window, rewrite, then have
+  every clone re-clone. Low priority; the working tree + deploy are already lean.

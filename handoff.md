@@ -1,6 +1,6 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-19 — session close. Product at **v1.1.1** (Windows + macOS on site).
+**Last wrap-up:** 2026-07-19 — post-v1 full audit (verdict: **no user-facing bugs**). Product at **v1.1.1** (Windows + macOS on site).
 
 ## Where we are
 
@@ -63,6 +63,7 @@ Limited/Draft hub · in-game overlay · cloud sync · Alchemy · prices · Event
 - Signing keys only on dev machine (`%USERPROFILE%\.tauri\filthy-net-deck.key`)
 - Set trailers upkeep (`setTrailers.ts` / pipeline) as WotC posts them
 - macOS: after each version tag, roll dmg from GH release into `website/downloads/` + update `website/index.html` links
+- Downloads hygiene: keep **only the current release** in `website/downloads/` (updater + site point at it) — don't accumulate installers. See `docs/MAINTENANCE.md` → "Downloads hygiene". Two deferred items live there (reclaim `.git` history; upload old Windows `.exe`s to Releases).
 
 ## Branding
 
@@ -74,3 +75,4 @@ ApexForge credit on sidebar + Settings + marketing footer → https://ame-apexfo
 2. **v1.1.0** — Planeswalker themes
 3. **v1.1.1** — Themes accordion sidebar-only fix
 4. macOS dmg rolled to site for 1.1.1
+5. **Full audit** — clean, no bugs; trimmed `website/downloads/` to 1.1.1-only (383 MB → 23 MB), pushed + live (`4390823`)
