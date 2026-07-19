@@ -11,8 +11,9 @@ Read **`AGENTS.md`** before any user-visible change.
 
 | Item | Value |
 |------|--------|
-| Version | **1.4.1** (Windows signed; macOS dmg via tag CI — site may still serve 1.4.0 dmg interim) |
+| Version | **1.4.1** (Windows signed + macOS universal dmg at parity) |
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-1.4.1.exe` (+ `.sig`) |
+| macOS | `website/downloads/Filthy-Net-Deck-1.4.1-universal.dmg` |
 | Soft / updater | `version.json` + `updater/latest.json` → **1.4.1** |
 | Live site | https://filthy-net-deck.netlify.app/ |
 
