@@ -220,6 +220,16 @@ function fontStack(spec: string): string {
   return `${spec} "Segoe UI", system-ui, sans-serif`;
 }
 
+/** Load the FND logo mark for the card header; null if it can't load. */
+function loadLogo(): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = "/app-icon.png"; // Vite serves public/ at the web root.
+  });
+}
+
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -272,7 +282,8 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
   ctx.fillStyle = LIME;
   ctx.fillRect(0, 0, W, 14);
 
-  // Header — wordmark + scope
+  // Header — logo mark (top-right), wordmark + scope (left)
+  const logo = await loadLogo();
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = INK;
   ctx.font = fontStack("700 40px");
@@ -280,6 +291,18 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
   ctx.fillStyle = MUTE;
   ctx.font = fontStack("500 25px");
   ctx.fillText(input.subtitle ?? scopeSubtitle(input.scope), PAD, 136);
+  if (logo) {
+    const s = 84;
+    ctx.save();
+    roundRect(ctx, W - PAD - s, 44, s, s, 18);
+    ctx.clip();
+    ctx.drawImage(logo, W - PAD - s, 44, s, s);
+    ctx.restore();
+    ctx.strokeStyle = "rgba(184,240,0,0.35)";
+    ctx.lineWidth = 2;
+    roundRect(ctx, W - PAD - s, 44, s, s, 18);
+    ctx.stroke();
+  }
 
   // Match badge (vs opp + result pill) sits above the deck name for matches.
   let y = 210;
