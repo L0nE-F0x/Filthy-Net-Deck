@@ -39,9 +39,41 @@ export function StatusBanners() {
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
   const metaDiff = useAppStore((s) => s.metaDiff);
+  const rankUpMoment = useAppStore((s) => s.rankUpMoment);
+  const clearRankUpMoment = useAppStore((s) => s.clearRankUpMoment);
+  const setPage = useAppStore((s) => s.setPage);
   const [showWhatsNew, setShowWhatsNew] = useState(() => shouldShowWhatsNew());
 
   const banners: { key: string; className: string; body: ReactNode }[] = [];
+
+  if (rankUpMoment) {
+    banners.push({
+      key: "rank-up",
+      className: "banner banner-gold banner-rank-up",
+      body: (
+        <>
+          <strong>Rank up</strong> — {rankUpMoment.from} → {rankUpMoment.to}.{" "}
+          <button
+            type="button"
+            className="update-dl"
+            onClick={() => {
+              clearRankUpMoment();
+              setPage("climb");
+            }}
+          >
+            Open Climb
+          </button>{" "}
+          <button
+            type="button"
+            className="update-dismiss"
+            onClick={() => clearRankUpMoment()}
+          >
+            Dismiss
+          </button>
+        </>
+      ),
+    });
+  }
 
   if (showWhatsNew) {
     banners.push({

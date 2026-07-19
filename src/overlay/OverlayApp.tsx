@@ -61,23 +61,43 @@ function seasonRecord(
 }
 
 /** Overlay display prefs written by Settings in the main window. */
-function readOverlayPrefs(): { opacity: number; startExpanded: boolean } {
+function readOverlayPrefs(): {
+  opacity: number;
+  startExpanded: boolean;
+  clickThrough: boolean;
+} {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as {
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
+        overlayClickThrough?: boolean;
       };
       return {
         opacity: normalizeOpacity(parsed.overlayOpacity),
         startExpanded: parsed.overlayStartExpanded === true,
+        clickThrough: parsed.overlayClickThrough === true,
       };
     }
   } catch {
     /* ignore */
   }
-  return { opacity: normalizeOpacity(undefined), startExpanded: false };
+  return {
+    opacity: normalizeOpacity(undefined),
+    startExpanded: false,
+    clickThrough: false,
+  };
+}
+
+/** Passive-HUD mode: make this window ignore cursor events (clicks fall through). */
+async function applyClickThrough(ignore: boolean) {
+  if (!isTauri()) return;
+  try {
+    await invoke("overlay_set_click_through", { ignore });
+  } catch {
+    /* older builds without the command */
+  }
 }
 
 async function persistGeometry(heightOverride?: number) {
@@ -302,13 +322,34 @@ const GroupSection = memo(function GroupSection({
   );
 });
 
+/**
+ * 1 Hz match clock in its own memoized child, so the per-second tick only
+ * repaints this span — groups/rows stay untouched (Grok P1-1).
+ */
+const MatchClock = memo(function MatchClock({
+  startedAt,
+}: {
+  startedAt: number;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    setNow(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [startedAt]);
+  return (
+    <span className="overlay-clock" title="Match clock">
+      {formatClock(startedAt, now)}
+    </span>
+  );
+});
+
 export function OverlayApp() {
   const [live, setLive] = useState<LiveMatch | null>(null);
   const [matches, setMatches] = useState<TrackedMatch[]>([]);
   /** Default collapsed — far less invasive; expand for full tracker. */
   const [compact, setCompact] = useState(() => !readOverlayPrefs().startExpanded);
   const [opacity, setOpacity] = useState(() => readOverlayPrefs().opacity);
-  const [now, setNow] = useState(() => Date.now());
   const dragArmed = useRef(false);
   const liveRaf = useRef(0);
   const pendingLive = useRef<LiveMatch | null | undefined>(undefined);
@@ -317,6 +358,14 @@ export function OverlayApp() {
   /** True while a programmatic collapse/expand resize is in flight. */
   const programmaticResize = useRef(false);
   const compactRef = useRef(compact);
+  /**
+   * Latest "start expanded" pref. Read at mount and refreshed live via the
+   * prefs events; applied when each new match starts (the overlay webview is
+   * persistent, so mount-time-only would mean waiting for an app restart).
+   */
+  const startExpandedRef = useRef(readOverlayPrefs().startExpanded);
+  /** matchId the startExpanded pref was last applied to (once per match). */
+  const appliedMatchRef = useRef<string | null>(null);
 
   useEffect(() => {
     compactRef.current = compact;
@@ -324,6 +373,7 @@ export function OverlayApp() {
 
   useEffect(() => {
     bootThemeFromStorage();
+    void applyClickThrough(readOverlayPrefs().clickThrough);
     document.documentElement.classList.add("overlay-root");
     document.body.classList.add("overlay-body");
     // macOS overlay windows can't be transparent (see overlay.rs) — paint the
@@ -338,10 +388,19 @@ export function OverlayApp() {
     };
   }, []);
 
-  // Live-follow the Settings opacity slider via the shared prefs blob.
+  // Live-follow Settings via the shared prefs blob: opacity slider *and* the
+  // chosen Planeswalker skin, so the overlay recolors the instant you switch
+  // theme in the main app (no need to restart the match window). This is the
+  // fallback path — the reliable cross-webview path is the `prefs:overlay`
+  // Tauri event below (DOM `storage` may not fire across WebView2 windows).
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === PREFS_KEY) setOpacity(readOverlayPrefs().opacity);
+      if (e.key !== PREFS_KEY) return;
+      const prefs = readOverlayPrefs();
+      setOpacity(prefs.opacity);
+      startExpandedRef.current = prefs.startExpanded;
+      void applyClickThrough(prefs.clickThrough);
+      bootThemeFromStorage(); // re-apply data-theme + data-skin
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -349,6 +408,7 @@ export function OverlayApp() {
 
   useEffect(() => {
     let unlistenLive: (() => void) | undefined;
+    let unlistenPrefs: (() => void) | undefined;
     let unlistenMoved: (() => void) | undefined;
     let unlistenResized: (() => void) | undefined;
     let cancelled = false;
@@ -388,6 +448,20 @@ export function OverlayApp() {
               }
             });
           }
+        });
+      } catch {
+        /* ignore */
+      }
+      try {
+        // Reliable cross-webview prefs push from the main window (opacity,
+        // skin, startExpanded) — the `storage` listener above is the fallback.
+        unlistenPrefs = await listen("prefs:overlay", () => {
+          if (cancelled) return;
+          const prefs = readOverlayPrefs();
+          setOpacity(prefs.opacity);
+          startExpandedRef.current = prefs.startExpanded;
+          void applyClickThrough(prefs.clickThrough);
+          bootThemeFromStorage();
         });
       } catch {
         /* ignore */
@@ -458,19 +532,13 @@ export function OverlayApp() {
       window.clearTimeout(snapTimer);
       if (liveRaf.current) cancelAnimationFrame(liveRaf.current);
       unlistenLive?.();
+      unlistenPrefs?.();
       unlistenMoved?.();
       unlistenResized?.();
     };
   }, []);
 
-  // Match clock — 1 Hz text tick while playing (no continuous animation).
   const playing = live?.phase === "playing";
-  useEffect(() => {
-    if (!playing) return;
-    setNow(Date.now());
-    const t = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(t);
-  }, [playing]);
 
   const record = useMemo(() => seasonRecord(matches, live), [matches, live]);
   const metaMap = useArenaMetaMap(live?.library);
@@ -541,8 +609,8 @@ export function OverlayApp() {
     [],
   );
 
-  const toggleCompact = useCallback(() => {
-    const next = !compactRef.current;
+  const setCompactMode = useCallback((next: boolean) => {
+    if (next === compactRef.current) return;
     compactRef.current = next;
     setCompact(next);
     if (!isTauri()) return;
@@ -578,6 +646,27 @@ export function OverlayApp() {
       }
     })();
   }, []);
+
+  const toggleCompact = useCallback(() => {
+    setCompactMode(!compactRef.current);
+  }, [setCompactMode]);
+
+  // Apply the "start expanded" pref once per match — live pref changes are
+  // pushed via `prefs:overlay`/storage into startExpandedRef, and take effect
+  // here on the next match start (never mid-match, so a manual collapse is
+  // not yanked back between Bo3 games).
+  const liveMatchId = live?.matchId;
+  const livePhase = live?.phase;
+  useEffect(() => {
+    if (
+      livePhase === "playing" &&
+      liveMatchId &&
+      appliedMatchRef.current !== liveMatchId
+    ) {
+      appliedMatchRef.current = liveMatchId;
+      setCompactMode(!startExpandedRef.current);
+    }
+  }, [liveMatchId, livePhase, setCompactMode]);
 
   if (!live || live.phase === "idle") {
     return <div className="overlay-empty" />;
@@ -702,11 +791,7 @@ export function OverlayApp() {
               <span className="overlay-mode-chip">
                 {live.bestOf > 1 ? `Bo${live.bestOf}` : "Bo1"}
               </span>
-              {playing ? (
-                <span className="overlay-clock" title="Match clock">
-                  {formatClock(live.startedAt, now)}
-                </span>
-              ) : null}
+              {playing ? <MatchClock startedAt={live.startedAt} /> : null}
             </span>
           </div>
 

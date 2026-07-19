@@ -13,6 +13,7 @@ import {
   sendTestNotification,
   type NotifyPermission,
 } from "../services/notify";
+import { previewSfx, SOUND_CUE_SETS, type SoundCueSet } from "../services/sfx";
 
 /** X1 + v1.2 — tracker health + first-session coach. */
 function TrackerHealthCard() {
@@ -76,6 +77,9 @@ export function Settings() {
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
   const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
+  const setOverlayClickThrough = useAppStore((s) => s.setOverlayClickThrough);
+  const setSoundEnabled = useAppStore((s) => s.setSoundEnabled);
+  const setSoundCueSet = useAppStore((s) => s.setSoundCueSet);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
   const checkForUpdates = useAppStore((s) => s.checkForUpdates);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
@@ -209,6 +213,20 @@ export function Settings() {
                   <em>Open with the full deck list instead of the slim bar</em>
                 </span>
               </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayClickThrough}
+                  onChange={(e) => setOverlayClickThrough(e.target.checked)}
+                />
+                <span>
+                  <strong>Click-through</strong>
+                  <em>
+                    Overlay ignores the mouse — purely passive over the game.
+                    Turn off here to move or resize it again
+                  </em>
+                </span>
+              </label>
               <label className="settings-slider-row">
                 <span>
                   <strong>Panel opacity</strong>
@@ -228,6 +246,70 @@ export function Settings() {
             </div>
           </section>
         )}
+
+        {/* —— Sound (opt-in, main app only) —— */}
+        <section className="panel settings-card settings-card-span2">
+          <h3 className="settings-card-title">Sound</h3>
+          <p className="settings-card-desc mb-2">
+            Soft match-end and rank-up cues in the main app only — never in the
+            overlay, never by default. Short synthesized tones (no sample packs).
+            Pick a set and preview before you leave it on.
+          </p>
+          <div className="settings-toggle-list">
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.soundEnabled}
+                onChange={(e) => {
+                  const on = e.target.checked;
+                  setSoundEnabled(on);
+                  if (on) previewSfx(prefs.soundCueSet, "win");
+                }}
+              />
+              <span>
+                <strong>UI sound cues</strong>
+                <em>Win / loss / draw + rank-up · off by default</em>
+              </span>
+            </label>
+          </div>
+          <div className="settings-sfx-sets" role="radiogroup" aria-label="Sound cue set">
+            {SOUND_CUE_SETS.map((set) => {
+              const active = prefs.soundCueSet === set.id;
+              return (
+                <label
+                  key={set.id}
+                  className={`settings-sfx-card${active ? " is-active" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="soundCueSet"
+                    value={set.id}
+                    checked={active}
+                    onChange={() => {
+                      setSoundCueSet(set.id as SoundCueSet);
+                      previewSfx(set.id, "win");
+                    }}
+                  />
+                  <span className="settings-sfx-card-body">
+                    <strong>{set.label}</strong>
+                    <em>{set.blurb}</em>
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSoundCueSet(set.id as SoundCueSet);
+                      previewSfx(set.id, "rankup");
+                    }}
+                  >
+                    Preview
+                  </button>
+                </label>
+              );
+            })}
+          </div>
+        </section>
 
         {/* —— Notifications (stacked compact rows) —— */}
         <section className="panel settings-card settings-card-span2">

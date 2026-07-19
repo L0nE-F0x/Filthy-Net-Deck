@@ -1,6 +1,6 @@
 # Filthy Net Deck — Production Roadmap
 
-**Current release:** **v1.3.5** (in-game overlay polish: grouped list, art crops, mana pips, true slim bar; Windows signed + macOS universal dmg at parity on site).  
+**Current release:** **v1.4.0** (Bells & Whistles: share cards, overlay harden, a11y, opt-in sound; Windows signed — macOS dmg via tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -8,15 +8,17 @@
 
 ---
 
-## Next chapter — post-v1.3.5 (owner 2026-07-19)
+## Next chapter — post-v1.4.0 (owner 2026-07-19)
 
 Canonical checklist: **`handoff.md`**.
 
-1. ~~**Overlay polish**~~ — **shipped in v1.3.5** (grouped sections, art crops, mana pips, true slim bar, opacity + start-expanded settings)  
-2. ~~**macOS roll**~~ — **done**: `v1.3.5` universal dmg in `website/downloads/` + site links (fixed CI: `transparent()` is Windows/Linux-only)  
-3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
+1. ~~**Overlay polish**~~ — **shipped in v1.3.5**  
+2. ~~**macOS roll (1.3.5)**~~ — done  
+3. ~~**v1.4.0 "Bells & Whistles"**~~ — **shipped** (Windows signed + site + OG; macOS dmg after `v1.4.0` tag CI)  
+4. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices)  
+5. **Follow-up:** roll **1.4.0** macOS dmg into `website/downloads/` when CI finishes  
 
-**Shipped:** **v1.3.5** overlay refinement + macOS parity (installer + dmg + updater + site + OG).
+**Shipped:** **v1.4.0** Bells & Whistles (share, overlay harden, a11y, opt-in sound).
 
 ### Explicitly deferred
 
@@ -44,6 +46,7 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test
 
 | Version | Theme |
 |---------|--------|
+| **v1.4.0** | Bells & Whistles: share cards, overlay harden, a11y, opt-in sound |
 | **v1.3.5** | Overlay polish: grouped list, art crops, mana pips, slim bar, settings |
 | **v1.3.0** | In-game overlay deck tracker + notify defaults |
 | **v1.2.0** | First-session coach, share cards, update UX |

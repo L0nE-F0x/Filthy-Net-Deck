@@ -125,6 +125,41 @@ export function lastSevenDaysWindow(nowMs = Date.now()): {
   return { fromMs, toMs };
 }
 
+/** Local calendar day: midnight this morning → now. */
+export function dayWindow(nowMs = Date.now()): { fromMs: number; toMs: number } {
+  const d = new Date(nowMs);
+  const fromMs = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  return { fromMs, toMs: nowMs };
+}
+
+/**
+ * The most recent play session: walk back from the latest recorded match,
+ * keeping matches while the gap to the previous one stays under `gapMs`
+ * (default 3h). Returns [nowMs, nowMs] when there are no matches.
+ */
+export function sessionWindow(
+  matches: TrackedMatch[],
+  nowMs = Date.now(),
+  gapMs = 3 * 3600_000,
+): { fromMs: number; toMs: number } {
+  const sorted = matches
+    .filter((m) => m.endedAt > 0)
+    .slice()
+    .sort((a, b) => a.endedAt - b.endedAt);
+  if (!sorted.length) return { fromMs: nowMs, toMs: nowMs };
+
+  let start = sorted.length - 1;
+  for (let i = sorted.length - 1; i > 0; i--) {
+    if (sorted[i].endedAt - sorted[i - 1].endedAt <= gapMs) start = i - 1;
+    else break;
+  }
+  const first = sorted[start];
+  return {
+    fromMs: first.startedAt > 0 ? first.startedAt : first.endedAt,
+    toMs: sorted[sorted.length - 1].endedAt,
+  };
+}
+
 export function formatRecapHeadline(s: RecapStats): string {
   if (s.games === 0) return "No matches this week";
   const pct = Math.round(s.winrate * 100);

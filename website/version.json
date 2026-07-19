@@ -1,5 +1,5 @@
 {
-  "version": "1.3.5",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.3.5.exe",
-  "notes": "v1.3.5: In-game overlay, refined — grouped Lands/Creatures/Spells with real art crops, mana pips, clearer draw odds, a true slim collapsed bar, match clock, opacity slider + start-expanded setting, and a Victory/Defeat end flash."
+  "version": "1.4.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.4.0.exe",
+  "notes": "v1.4.0 Bells & Whistles: deck share cards, overlay theme sync + hardening (MatchClock, live prefs, click-through), a11y & empty states, and opt-in soft UI sound (3 cue sets) with rank-up moments & micro-interactions."
 }

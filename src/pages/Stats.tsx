@@ -11,10 +11,16 @@ import {
   timeAgo,
 } from "../services/tracker";
 import { downloadRecapPng, recapFromMatches } from "../services/recapCard";
-import { formatRecapHeadline } from "../services/recapStats";
+import {
+  dayWindow,
+  formatRecapHeadline,
+  lastSevenDaysWindow,
+  sessionWindow,
+} from "../services/recapStats";
+import { aggregateDeck, downloadDeckSharePng } from "../services/deckShare";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
 import { isLandName } from "../services/landNames";
-import { formatRank, winrateFavor } from "../services/ranks";
+import { formatRank, parseRank, winrateFavor } from "../services/ranks";
 import { currentStreak } from "../services/climbStats";
 import {
   resolveArenaCards,
@@ -29,6 +35,7 @@ import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { CountUp } from "../components/CountUp";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 
@@ -89,6 +96,128 @@ function useArenaCardMap(ids: number[]): Record<number, ArenaCardInfo> {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   return cards;
+}
+
+/* -- Deck share card (decklist + record + FND logo, for posting) -- */
+type DeckShareScope = "all" | "season" | "run" | "session" | "day" | "week";
+
+function scopedMatches(
+  scope: DeckShareScope,
+  matches: TrackedMatch[],
+  runStart: number | undefined,
+): TrackedMatch[] {
+  if (scope === "all") return matches;
+  if (scope === "run")
+    return runStart !== undefined
+      ? matches.filter((m) => m.endedAt >= runStart)
+      : matches;
+  if (scope === "season") {
+    const s = currentSeasonKey();
+    return matches.filter((m) => seasonKeyOf(m.endedAt) === s);
+  }
+  const w =
+    scope === "day"
+      ? dayWindow()
+      : scope === "session"
+        ? sessionWindow(matches)
+        : lastSevenDaysWindow();
+  return matches.filter((m) => m.endedAt >= w.fromMs && m.endedAt <= w.toMs);
+}
+
+async function shareDeckCard(
+  scope: DeckShareScope,
+  deckName: string,
+  deckList: { main: number[]; side?: number[] },
+  matches: TrackedMatch[],
+  runStart: number | undefined,
+): Promise<void> {
+  const ms = scopedMatches(scope, matches, runStart);
+  let wins = 0;
+  let losses = 0;
+  let draws = 0;
+  for (const m of ms) {
+    if (m.result === "win") wins++;
+    else if (m.result === "loss") losses++;
+    else if (m.result === "draw") draws++;
+  }
+  const decided = wins + losses;
+  const ranked = ms
+    .map((m) => ({ at: m.endedAt, r: parseRank(m.myRank) }))
+    .filter(
+      (x): x is { at: number; r: NonNullable<ReturnType<typeof parseRank>> } =>
+        x.r != null,
+    )
+    .sort((a, b) => a.at - b.at);
+  const peak = ranked.length
+    ? ranked.reduce((b, x) => (x.r.score > b.r.score ? x : b), ranked[0])
+    : null;
+  const streak = currentStreak(ms);
+
+  // Resolve with full meta so grouping + mana colors are accurate even for
+  // cards seen before the 0.19 cache upgrade.
+  const cards = await resolveArenaCards([...new Set(deckList.main)], {
+    full: true,
+  });
+  const list = aggregateDeck(deckList.main, deckList.side, cards);
+
+  await downloadDeckSharePng({
+    scope,
+    deckName,
+    list,
+    wins,
+    losses,
+    draws,
+    winratePct: decided ? Math.round((wins / decided) * 100) : null,
+    games: ms.length,
+    rankNow: ranked.length ? formatRank(ranked[ranked.length - 1].r) : null,
+    rankPeak: peak ? formatRank(peak.r) : null,
+    bestOf: ms.length ? ms[0].bestOf : null,
+    streakLabel:
+      streak.type && streak.length > 1
+        ? `${streak.type} streak ×${streak.length}`
+        : null,
+  });
+}
+
+function ShareDeckButton(props: {
+  deckName: string;
+  deckList: { main: number[]; side?: number[] } | undefined;
+  matches: TrackedMatch[];
+  runStart: number | undefined;
+}) {
+  const { deckName, deckList, matches, runStart } = props;
+  const [busy, setBusy] = useState(false);
+  if (!deckList) return null;
+  const pick = (scope: DeckShareScope) => {
+    setBusy(true);
+    void shareDeckCard(scope, deckName, deckList, matches, runStart)
+      .catch(() => {})
+      .finally(() => setBusy(false));
+  };
+  return (
+    <span className="flex items-center gap-1.5 text-xs">
+      <label className="text-muted">Share</label>
+      <select
+        className="settings-select"
+        value=""
+        disabled={busy}
+        title="Download a branded PNG (decklist + record + FND logo) to post"
+        onChange={(e) => {
+          const v = e.target.value as DeckShareScope | "";
+          e.currentTarget.value = "";
+          if (v) pick(v);
+        }}
+      >
+        <option value="">{busy ? "Rendering…" : "Deck card…"}</option>
+        <option value="all">This deck · all-time</option>
+        <option value="season">This season</option>
+        {runStart !== undefined && <option value="run">This run</option>}
+        <option value="session">This session</option>
+        <option value="day">Today</option>
+        <option value="week">Last 7 days</option>
+      </select>
+    </span>
+  );
 }
 
 const RESULT_LABEL: Record<MatchResult, string> = {
@@ -315,13 +444,20 @@ function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
   return (
     <div className="stat-tiles">
       <div className="panel stat-tile">
-        <span className="stat-num">{matches.length}</span>
+        <CountUp className="stat-num" value={matches.length} />
         <span className="stat-label">Matches</span>
       </div>
       <div className="panel stat-tile">
-        <span className={`stat-num ${rate != null ? `favor-${winrateFavor(rate)}` : ""}`}>
-          {rate != null ? `${(rate * 100).toFixed(1)}%` : "—"}
-        </span>
+        {rate != null ? (
+          <CountUp
+            className={`stat-num favor-${winrateFavor(rate)}`}
+            value={rate * 100}
+            decimals={1}
+            suffix="%"
+          />
+        ) : (
+          <span className="stat-num">—</span>
+        )}
         <span className="stat-label">
           Win rate · {wins}W {losses}L
         </span>
@@ -1199,6 +1335,12 @@ function DeckDetail({
           >
             Opponents
           </button>
+          <ShareDeckButton
+            deckName={deck.name}
+            deckList={deckList}
+            matches={deck.matches}
+            runStart={runStart}
+          />
           {otherDecks.length > 0 && (
             <span className="flex items-center gap-1.5 text-xs">
               <label className="text-muted">Compare</label>
@@ -1568,7 +1710,7 @@ export function Stats() {
           </div>
 
           {insights.length > 0 && (
-            <div className="insight-chips">
+            <div className="insight-chips" aria-live="polite">
               {insights.map((c) => (
                 <button
                   key={c.id}

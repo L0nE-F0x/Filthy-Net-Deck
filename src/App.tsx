@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { nextArenaDropInDays } from "./services/setPulse";
 import { useAppStore } from "./store/useAppStore";
 import { Daily } from "./pages/Daily";
@@ -30,6 +31,7 @@ import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
 import { applyFullscreen, closeToTray, toggleFullscreen } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
+import { syncOverlayPrefFromStore } from "./services/overlay";
 import { Sets } from "./pages/Sets";
 import { FormatHubPage } from "./pages/FormatHub";
 
@@ -114,22 +116,21 @@ export default function App() {
     if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
     // Overlay enable flag is owned by Rust (tray can toggle while main is hidden).
     // Pull that flag first, then mirror into prefs so Settings stays honest.
-    void import("./services/overlay").then(async (m) => {
+    void (async () => {
       try {
-        const { invoke } = await import("@tauri-apps/api/core");
         const rustOn = await invoke<boolean>("overlay_is_enabled");
         const local = useAppStore.getState().prefs.overlayEnabled;
         if (rustOn !== local) {
           useAppStore.getState().setOverlayEnabled(rustOn);
         } else {
-          await m.syncOverlayPrefFromStore(local);
+          await syncOverlayPrefFromStore(local);
         }
       } catch {
-        await m.syncOverlayPrefFromStore(
+        await syncOverlayPrefFromStore(
           useAppStore.getState().prefs.overlayEnabled,
         );
       }
-    });
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
