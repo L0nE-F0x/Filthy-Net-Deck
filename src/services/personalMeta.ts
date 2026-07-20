@@ -16,6 +16,8 @@ export interface PersonalMetaRow {
   yourWinrate: number | null;
   /** Your WR minus a neutral 0.5 baseline, or null without sample. */
   edge: number | null;
+  /** Last up to 5 decided results oldest→newest (W/L) on this deck name. */
+  form: string;
 }
 
 function normalizeName(s: string): string {
@@ -33,16 +35,21 @@ export function personalVsMeta(
 ): PersonalMetaRow[] {
   const minGames = opts?.minGames ?? 0;
 
-  // Aggregate personal record by deck display name
-  const byName = new Map<string, { wins: number; losses: number; label: string }>();
-  for (const m of matches) {
+  // Aggregate personal record by deck display name (chronological for form).
+  const byName = new Map<
+    string,
+    { wins: number; losses: number; label: string; form: string }
+  >();
+  const chronological = [...matches].sort((a, b) => a.endedAt - b.endedAt);
+  for (const m of chronological) {
     if (m.result !== "win" && m.result !== "loss") continue;
     const label = m.deckName?.trim() || deckKey(m);
     const key = normalizeName(label);
-    const row = byName.get(key) ?? { wins: 0, losses: 0, label };
+    const row = byName.get(key) ?? { wins: 0, losses: 0, label, form: "" };
     if (m.result === "win") row.wins++;
     else row.losses++;
     if (m.deckName?.trim()) row.label = m.deckName.trim();
+    row.form = (row.form + (m.result === "win" ? "W" : "L")).slice(-5);
     byName.set(key, row);
   }
 
@@ -77,6 +84,7 @@ export function personalVsMeta(
       yourGames,
       yourWinrate,
       edge: yourWinrate == null ? null : yourWinrate - 0.5,
+      form: you?.form ?? "",
     };
   });
 

@@ -85,6 +85,7 @@ export function PersonalMetaPanel() {
                 <th className="py-1 pr-2 font-medium">Archetype</th>
                 <th className="py-1 pr-2 font-medium">Meta %</th>
                 <th className="py-1 pr-2 font-medium">You</th>
+                <th className="py-1 pr-2 font-medium">Form</th>
                 <th className="py-1 font-medium">WR</th>
               </tr>
             </thead>
@@ -112,6 +113,12 @@ export function PersonalMetaPanel() {
                   <td className="py-1 pr-2">{r.metaShare.toFixed(1)}%</td>
                   <td className="py-1 pr-2">
                     {r.yourGames ? `${r.yourWins}–${r.yourLosses}` : "—"}
+                  </td>
+                  <td
+                    className="py-1 pr-2 font-mono tracking-tight text-muted"
+                    title="Last up to 5 matches on this deck (oldest → newest)"
+                  >
+                    {r.form || "—"}
                   </td>
                   <td className="py-1">
                     {r.yourWinrate != null ? `${Math.round(r.yourWinrate * 100)}%` : "—"}

@@ -75,6 +75,7 @@ describe("personalVsMeta", () => {
     expect(izzet.yourWins).toBe(2);
     expect(izzet.yourLosses).toBe(1);
     expect(izzet.yourWinrate).toBeCloseTo(2 / 3);
+    expect(izzet.form).toBe("WWL");
     expect(izzet.metaShare).toBe(12.3);
     const best = bestPersonalArchetype(rows, 3);
     expect(best?.archetype).toBe("Izzet Prowess");

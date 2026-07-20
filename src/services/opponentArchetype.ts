@@ -191,6 +191,8 @@ export interface VsArchetypeRow {
   winrate: number | null;
   /** Matches that contributed (for debugging / drill-down). */
   sample: number;
+  /** Last up to 5 decided results oldest→newest (W/L). */
+  form: string;
 }
 
 /**
@@ -201,12 +203,14 @@ export function personalVsOpponentArchetypes(
   matches: TrackedMatch[],
   resolveName: NameResolver,
   candidates: Deck[],
-  opts?: InferOptions & { minGames?: number },
+  opts?: InferOptions & { minGames?: number; formWindow?: number },
 ): VsArchetypeRow[] {
   const minGames = opts?.minGames ?? 0;
+  const formWindow = opts?.formWindow ?? 5;
   const by = new Map<string, VsArchetypeRow>();
+  const chronological = [...matches].sort((a, b) => a.endedAt - b.endedAt);
 
-  for (const m of matches) {
+  for (const m of chronological) {
     if (m.result !== "win" && m.result !== "loss") continue;
     const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, opts);
     if (!guess) continue;
@@ -221,12 +225,14 @@ export function personalVsOpponentArchetypes(
         games: 0,
         winrate: null,
         sample: 0,
+        form: "",
       } satisfies VsArchetypeRow);
     if (m.result === "win") row.wins++;
     else row.losses++;
     row.games = row.wins + row.losses;
     row.sample++;
     row.winrate = row.games ? row.wins / row.games : null;
+    row.form = (row.form + (m.result === "win" ? "W" : "L")).slice(-formWindow);
     by.set(key, row);
   }
 

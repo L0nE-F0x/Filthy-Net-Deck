@@ -106,6 +106,7 @@ export function OpponentArchetypePanel() {
               <tr className="text-muted text-left">
                 <th className="py-1 pr-2 font-medium">Archetype</th>
                 <th className="py-1 pr-2 font-medium">You</th>
+                <th className="py-1 pr-2 font-medium">Form</th>
                 <th className="py-1 font-medium">WR</th>
               </tr>
             </thead>
@@ -128,6 +129,12 @@ export function OpponentArchetypePanel() {
                   </td>
                   <td className="py-1 pr-2">
                     {r.wins}–{r.losses}
+                  </td>
+                  <td
+                    className="py-1 pr-2 font-mono tracking-tight text-muted"
+                    title="Last up to 5 matches vs this archetype (oldest → newest)"
+                  >
+                    {r.form || "—"}
                   </td>
                   <td className="py-1">
                     {r.winrate != null ? `${Math.round(r.winrate * 100)}%` : "—"}

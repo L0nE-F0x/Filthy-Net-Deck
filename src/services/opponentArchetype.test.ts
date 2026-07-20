@@ -150,8 +150,10 @@ describe("personalVsOpponentArchetypes", () => {
     const izz = rows.find((r) => r.archetype === "Izzet Prowess");
     expect(izz?.wins).toBe(1);
     expect(izz?.losses).toBe(1);
+    expect(izz?.form).toBe("WL"); // chronological win then loss
     const dom = rows.find((r) => r.archetype === "Domain");
     expect(dom?.wins).toBe(1);
+    expect(dom?.form).toBe("W");
   });
 });
 
