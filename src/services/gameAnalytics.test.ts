@@ -3,7 +3,9 @@ import type { Deck } from "../types/meta";
 import type { TrackedGame, TrackedMatch } from "../types/tracker";
 import {
   deckMatchupMatrix,
+  firstLandStats,
   gamePlayDrawSplit,
+  mulliganStats,
   pct,
   pts,
   recentFormString,
@@ -285,5 +287,53 @@ describe("recentFormString", () => {
       10,
     );
     expect(s).toBe("WLW");
+  });
+});
+
+describe("mulliganStats", () => {
+  it("buckets decided games by mull count", () => {
+    const s = mulliganStats([
+      match({
+        games: [
+          { winningTeamId: 1, mulligans: 0 },
+          { winningTeamId: 2, mulligans: 1 },
+        ],
+      }),
+      match({
+        games: [{ winningTeamId: 1, mulligans: 0 }],
+      }),
+      match({
+        games: [{ winningTeamId: 1 }], // no mull stamp
+      }),
+    ]);
+    expect(s.gamesStamped).toBe(3);
+    expect(s.keep7Rate).toBeCloseTo(2 / 3);
+    expect(s.avgMulligans).toBeCloseTo(1 / 3);
+    expect(s.buckets.find((b) => b.mulls === 0)).toEqual({
+      mulls: 0,
+      games: 2,
+      wins: 2,
+      rate: 1,
+    });
+    expect(s.buckets.find((b) => b.mulls === 1)?.wins).toBe(0);
+  });
+});
+
+describe("firstLandStats", () => {
+  it("splits early / on3 / late and averages turn", () => {
+    const s = firstLandStats([
+      match({
+        games: [
+          { winningTeamId: 1, firstLandTurn: 1 },
+          { winningTeamId: 2, firstLandTurn: 3 },
+          { winningTeamId: 1, firstLandTurn: 5 },
+        ],
+      }),
+    ]);
+    expect(s.gamesStamped).toBe(3);
+    expect(s.avgTurn).toBeCloseTo(3);
+    expect(s.early).toEqual({ wins: 1, games: 1, rate: 1 });
+    expect(s.on3).toEqual({ wins: 0, games: 1, rate: 0 });
+    expect(s.late).toEqual({ wins: 1, games: 1, rate: 1 });
   });
 });

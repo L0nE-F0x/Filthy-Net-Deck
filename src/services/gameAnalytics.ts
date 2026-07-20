@@ -210,3 +210,99 @@ export function pts(delta: number | null): string {
   const v = Math.round(delta * 100);
   return `${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(v)} pts`;
 }
+
+export interface MulliganBucket {
+  /** 0 = kept 7, 1 = one mull, … */
+  mulls: number;
+  games: number;
+  wins: number;
+  rate: number | null;
+}
+
+export interface MulliganStats {
+  buckets: MulliganBucket[];
+  /** Mean mulligans across stamped games. */
+  avgMulligans: number | null;
+  /** Fraction of stamped games that kept 7 (mulls === 0). */
+  keep7Rate: number | null;
+  gamesStamped: number;
+}
+
+/**
+ * B2 — winrate by mulligans taken. Only games with a recorded mulligan
+ * count *and* a decided winner are included.
+ */
+export function mulliganStats(matches: TrackedMatch[]): MulliganStats {
+  const by = new Map<number, { games: number; wins: number }>();
+  let sum = 0;
+  let stamped = 0;
+  let keep7 = 0;
+  for (const m of matches) {
+    for (const { index, won } of decidedGames(m)) {
+      const mulls = m.games[index]?.mulligans;
+      if (mulls == null || mulls < 0) continue;
+      stamped++;
+      sum += mulls;
+      if (mulls === 0) keep7++;
+      const row = by.get(mulls) ?? { games: 0, wins: 0 };
+      row.games++;
+      if (won) row.wins++;
+      by.set(mulls, row);
+    }
+  }
+  const buckets: MulliganBucket[] = [...by.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([mulls, r]) => ({
+      mulls,
+      games: r.games,
+      wins: r.wins,
+      rate: r.games ? r.wins / r.games : null,
+    }));
+  return {
+    buckets,
+    avgMulligans: stamped ? sum / stamped : null,
+    keep7Rate: stamped ? keep7 / stamped : null,
+    gamesStamped: stamped,
+  };
+}
+
+export interface FirstLandStats {
+  avgTurn: number | null;
+  /** First land on turn 1–2. */
+  early: GameTally;
+  /** First land on turn 3. */
+  on3: GameTally;
+  /** First land on turn 4+. */
+  late: GameTally;
+  gamesStamped: number;
+}
+
+/**
+ * B2 — winrate by when the first land hit the battlefield.
+ * Games without a first-land stamp are skipped.
+ */
+export function firstLandStats(matches: TrackedMatch[]): FirstLandStats {
+  const early = emptyTally();
+  const on3 = emptyTally();
+  const late = emptyTally();
+  let sum = 0;
+  let stamped = 0;
+  for (const m of matches) {
+    for (const { index, won } of decidedGames(m)) {
+      const turn = m.games[index]?.firstLandTurn;
+      if (turn == null || turn < 1) continue;
+      stamped++;
+      sum += turn;
+      if (turn <= 2) addGame(early, won);
+      else if (turn === 3) addGame(on3, won);
+      else addGame(late, won);
+    }
+  }
+  return {
+    avgTurn: stamped ? sum / stamped : null,
+    early,
+    on3,
+    late,
+    gamesStamped: stamped,
+  };
+}

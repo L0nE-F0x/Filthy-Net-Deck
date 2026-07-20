@@ -64,11 +64,11 @@ Modules: `pipeline/sources/{magic-gg,mtgo,melee,untapped,aggregate,common}.mjs`
 **Priority when assigning lists onto the 8x8 grid (C3, 2026-07-20):**
 
 1. **MTGO** challenge / showcase / prelim 60s (embedded JSON) when card overlap confidently matches a Goldfish archetype tile.
-2. **MTGGoldfish** archetype page list (previous single source).
-3. **magic.gg** full-list scrape remains *off* for assignment (historical name corruption) — still used for tournament *links* only.
+2. **magic.gg** structured `<deck-list><main-deck>` blocks from article HTML / Nuxt payload — same listMatch gates + Scryfall validation as MTGO. Free-form HTML card-run scraping stays **dead** (historical name corruption).
+3. **MTGGoldfish** archetype page list (fallback when no tournament list matches).
 4. **Melee** remains event links only (no free full-list feed today).
 
-Goldfish tiles still own **rank / meta % / archetype name**. Only the *60* can come from MTGO.
+Goldfish tiles still own **rank / meta % / archetype name**. The *60* may come from MTGO, magic.gg, or Goldfish (in that order).
 
 **Policy (product rule):**
 
@@ -92,7 +92,19 @@ Example: https://www.mtgo.com/decklist/standard-challenge-32-2026-07-0912847094
 ### magic.gg details
 
 Index: https://magic.gg/decklists  
-Articles (e.g. Traditional Standard Ranked) contain continuous `N Card Name` runs which we pack into 60/15 boards.
+Articles (e.g. Traditional Standard Ranked) embed **structured** deck blocks:
+
+```html
+<deck-list deck-title="…" format="Standard" event-name="…">
+  <main-deck>
+  4 Card Name
+  …
+  </main-deck>
+  <side-board>…</side-board>
+</deck-list>
+```
+
+These often live inside the Nuxt SSR payload (`\u003Cdeck-list…`). Parser: `pipeline/sources/magic-gg.mjs` (`parseMagicGgDecklists` / `fetchMagicGgListPool`). Only boards with ≥55 mainboard cards are candidates; assignment still requires `listMatch` + Scryfall.
 
 ---
 

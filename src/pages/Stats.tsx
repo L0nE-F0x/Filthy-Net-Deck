@@ -41,7 +41,7 @@ import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
 import { GameAnalyticsPanel } from "../components/GameAnalyticsPanel";
-import { gamePlayDrawSplit } from "../services/gameAnalytics";
+import { gamePlayDrawSplit, mulliganStats } from "../services/gameAnalytics";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
 import { ShareMenu } from "../components/ShareMenu";
@@ -70,6 +70,12 @@ import {
   type MatchSortKey,
 } from "../services/matchHistorySort";
 import { QueueAnalyticsPanel } from "../components/QueueAnalyticsPanel";
+import {
+  buildVersions,
+  diffLists,
+  latestDecklist,
+  latestMainboard,
+} from "../services/deckVersions";
 
 function pickArenaPreview(
   main: number[] | undefined,
@@ -90,24 +96,6 @@ function pickArenaPreview(
     else spells.push(ref);
   }
   return [...spells, ...lands].slice(0, max);
-}
-
-/** Latest stored mainboard for a deck group (newest match with a list wins). */
-function latestMainboard(matches: TrackedMatch[]): number[] | undefined {
-  for (const m of matches) {
-    if (m.deckMain?.length) return m.deckMain;
-  }
-  return undefined;
-}
-
-/** Latest stored full list (main + side) for a deck group. */
-function latestDecklist(
-  matches: TrackedMatch[],
-): { main: number[]; side?: number[] } | undefined {
-  for (const m of matches) {
-    if (m.deckMain?.length) return { main: m.deckMain, side: m.deckSide };
-  }
-  return undefined;
 }
 
 function useArenaCardMap(ids: number[]): Record<number, ArenaCardInfo> {
@@ -620,6 +608,17 @@ function SplitsPanel({
     if (pd.draw.games > 0)
       out.push({ label: "On the draw · games", wins: pd.draw.wins, losses: pd.draw.games - pd.draw.wins });
 
+    // B2 — keep-7 vs mulled (only when the tracker stamped mulligans).
+    const ms = mulliganStats(matches);
+    for (const b of ms.buckets) {
+      if (b.games < 3) continue;
+      out.push({
+        label: b.mulls === 0 ? "Kept 7 · games" : `Mulled −${b.mulls} · games`,
+        wins: b.wins,
+        losses: b.games - b.wins,
+      });
+    }
+
     const bo1 = tally(matches.filter((m) => m.bestOf === 1));
     const bo3 = tally(matches.filter((m) => m.bestOf === 3));
     if (bo1.decided > 0 && bo3.decided > 0) {
@@ -912,47 +911,6 @@ function StatsArsenal({
 // ---------------------------------------------------------------------------
 // Deck detail: versions, diffs, fresh runs, delete
 // ---------------------------------------------------------------------------
-
-interface DeckVersion {
-  hash: string;
-  main?: number[];
-  side?: number[];
-  matches: TrackedMatch[];
-  firstAt: number;
-  lastAt: number;
-}
-
-/** Versions in order of first appearance; a version = a distinct card list. */
-function buildVersions(deckMatches: TrackedMatch[]): DeckVersion[] {
-  const asc = [...deckMatches].sort((a, b) => a.startedAt - b.startedAt);
-  const byHash = new Map<string, DeckVersion>();
-  for (const m of asc) {
-    if (!m.deckHash) continue;
-    let v = byHash.get(m.deckHash);
-    if (!v) {
-      v = { hash: m.deckHash, matches: [], firstAt: m.startedAt, lastAt: m.endedAt };
-      byHash.set(m.deckHash, v);
-    }
-    v.matches.push(m);
-    v.lastAt = Math.max(v.lastAt, m.endedAt);
-    if (!v.main && m.deckMain) {
-      v.main = m.deckMain;
-      v.side = m.deckSide;
-    }
-  }
-  return [...byHash.values()];
-}
-
-/** Multiset diff: positive delta = added in `next`, negative = cut. */
-function diffLists(prev: number[], next: number[]): { id: number; delta: number }[] {
-  const counts = new Map<number, number>();
-  for (const id of next) counts.set(id, (counts.get(id) ?? 0) + 1);
-  for (const id of prev) counts.set(id, (counts.get(id) ?? 0) - 1);
-  return [...counts.entries()]
-    .filter(([, delta]) => delta !== 0)
-    .map(([id, delta]) => ({ id, delta }))
-    .sort((a, b) => b.delta - a.delta || a.id - b.id);
-}
 
 function DiffArt({
   main,

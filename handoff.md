@@ -1,10 +1,22 @@
-# Filthy Net Deck — handoff
+**Last wrap-up:** 2026-07-20 (Grok) — **C3 magic.gg lists + B2 mulligan/first-land + peels/bloat docs** (source on main; still v1.8.0 binary until next release).
+**Next agent:** Read this file + AGENTS.md + 100X-ROADMAP.md. Program tail closed in source. Optional: owner-approved git history rewrite (docs/GIT-HISTORY-BLOAT.md); next app release when ready.
 
-**Last wrap-up:** 2026-07-20 (Grok) — **v1.8.0 fully released** (Win+macOS+updater+site, live byte-verified).
-**Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
+**Repo:** L0nE-F0x/Filthy-Net-Deck · branch **main**.
+**Live product version:** **v1.8.0** — new source features need a version bump + full AGENTS checklist to be live in the installed app.
 
-**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
-**Live product version:** **v1.7.0** — Windows signed exe (5,701,809 bytes) + macOS universal dmg (18,327,664 bytes) + updater + soft channel + OG, all confirmed live byte-identical on filthy-net-deck.com.
+---
+
+## Post-1.8 source batch (this session)
+
+| ID | What landed |
+|----|-------------|
+| **C3 complete** | magic.gg structured <deck-list> parser + pool; list priority **MTGO → magic.gg → Goldfish**; tests in pipeline/magic-gg.test.mjs |
+| **B2 complete** | Tracker mulligans + irstLandTurn per game; GRE mull count (lib growth before T1) + first land on BF; analytics + GameAnalyticsPanel + SplitsPanel; CSV columns |
+| **Peels** | deckVersions.ts, climbChart.ts (+ tests); Stats/Climb wired |
+| **Bloat** | Working tree already pruned; docs/GIT-HISTORY-BLOAT.md + MAINTENANCE notes — **no force-push** without owner |
+| **Docs** | DATA-AND-UPDATES C3 chain; 100X scoreboard |
+
+**Gate:** tsc + eslint + 273 vitest + cargo test (incl. mulligan/first-land) green.
 
 ---
 

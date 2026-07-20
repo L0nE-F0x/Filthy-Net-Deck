@@ -53,6 +53,12 @@ pub struct TrackedGame {
     /// True when the local player was on the play for this game.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub on_play: Option<bool>,
+    /// Times the local player mulliganed this game (0 = kept 7). None if unknown.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mulligans: Option<u32>,
+    /// Turn number of the local player's first land on the battlefield.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_land_turn: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -234,7 +240,7 @@ pub fn tracker_export_csv(
     }
 
     let mut csv = String::from(
-        "date,season,result,deck,opponent,opponent_platform,queue,best_of,games_won,games_lost,rank,game1_on_play,opponent_cards_seen,match_id\n",
+        "date,season,result,deck,opponent,opponent_platform,queue,best_of,games_won,games_lost,rank,game1_on_play,game1_mulligans,game1_first_land_turn,opponent_cards_seen,match_id\n",
     );
     for m in &matches {
         let wins = m
@@ -247,18 +253,25 @@ pub fn tracker_export_csv(
             .iter()
             .filter(|g| g.winning_team_id.is_some() && g.winning_team_id != Some(m.my_team_id))
             .count();
-        let on_play = m
-            .games
-            .first()
+        let g1 = m.games.first();
+        let on_play = g1
             .and_then(|g| g.on_play)
             .map(|p| if p { "play" } else { "draw" })
             .unwrap_or("");
+        let mulls = g1
+            .and_then(|g| g.mulligans)
+            .map(|n| n.to_string())
+            .unwrap_or_default();
+        let first_land = g1
+            .and_then(|g| g.first_land_turn)
+            .map(|n| n.to_string())
+            .unwrap_or_default();
         // Calendar season key YYYY-MM for spreadsheet pivots (from iso_date).
         let day = iso_date(m.ended_at);
         let season = if day.len() >= 7 { &day[..7] } else { "" };
         let cards_seen = m.opponent_seen.as_ref().map(|v| v.len()).unwrap_or(0);
         csv.push_str(&format!(
-            "{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
             iso_date(m.ended_at),
             season,
             m.result,
@@ -271,6 +284,8 @@ pub fn tracker_export_csv(
             losses,
             csv_escape(m.my_rank.as_deref().unwrap_or("")),
             on_play,
+            mulls,
+            first_land,
             cards_seen,
             csv_escape(&m.match_id),
         ));
@@ -486,7 +501,15 @@ struct PendingMatch {
     season_ordinal: Option<u32>,
     /// Per-game "was I on the play", indexed by GRE connection order.
     game_on_play: Vec<Option<bool>>,
+    /// Per-game mulligan count (0 = kept 7), same index order as game_on_play.
+    game_mulligans: Vec<Option<u32>>,
+    /// Per-game first land turn, same index order.
+    game_first_land_turn: Vec<Option<u32>>,
     awaiting_first_turn: bool,
+    /// Count mulligan reshuffles until turn 1 locks.
+    mulligans_open: bool,
+    /// Live turn number from GRE turnInfo (current game).
+    cur_turn: Option<u32>,
     /// Opponent cards (grpId) revealed via GRE this match.
     opponent_seen: HashSet<u32>,
 }
@@ -521,6 +544,10 @@ impl DeckTracker {
         self.left_instances.clear();
         self.zone_types.clear();
         self.last_lib_count = None;
+    }
+
+    fn library_count(&self) -> Option<u32> {
+        self.last_lib_count
     }
 
     fn snapshot(&self) -> (Vec<LiveCardCount>, Option<u32>) {
@@ -885,7 +912,11 @@ impl LogParser {
                     if let Some(pending) = self.pending.get_mut(&match_id) {
                         // New GRE connection = new game; expect its turn-1 info next.
                         pending.game_on_play.push(None);
+                        pending.game_mulligans.push(Some(0));
+                        pending.game_first_land_turn.push(None);
                         pending.awaiting_first_turn = true;
+                        pending.mulligans_open = true;
+                        pending.cur_turn = None;
                         // Only game 1 identifies the registered deck; later games
                         // are post-sideboard lists.
                         if pending.deck_hash.is_none() {
@@ -910,11 +941,14 @@ impl LogParser {
         // Cheap gate: most GRE spam has neither library zones nor objects.
         if has_gsm
             && my_seat.is_some()
-            && (line.contains("\"gameObjects\"") || line.contains("ZoneType_Library"))
+            && (line.contains("\"gameObjects\"")
+                || line.contains("ZoneType_Library")
+                || line.contains("\"turnInfo\""))
         {
             if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
                 if let Some(my_seat) = my_seat {
                     let mut changed = false;
+                    let lib_before = self.deck_tracker.library_count();
                     if let Some(msgs) = v
                         .get("greToClientEvent")
                         .and_then(|e| e.get("greToClientMessages"))
@@ -924,9 +958,16 @@ impl LogParser {
                             if let Some(gsm) = msg.get("gameStateMessage") {
                                 changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
                                 if let Some(pending) = self.pending.get_mut(&match_id) {
+                                    note_turn_number(pending, gsm);
                                     changed |= note_opponent_cards(
                                         &mut self.deck_tracker.zone_types,
                                         &mut pending.opponent_seen,
+                                        gsm,
+                                        my_seat,
+                                    );
+                                    changed |= note_first_land(
+                                        &mut self.deck_tracker.zone_types,
+                                        pending,
                                         gsm,
                                         my_seat,
                                     );
@@ -936,12 +977,35 @@ impl LogParser {
                     } else if let Some(gsm) = v.get("gameStateMessage") {
                         changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
                         if let Some(pending) = self.pending.get_mut(&match_id) {
+                            note_turn_number(pending, gsm);
                             changed |= note_opponent_cards(
                                 &mut self.deck_tracker.zone_types,
                                 &mut pending.opponent_seen,
                                 gsm,
                                 my_seat,
                             );
+                            changed |= note_first_land(
+                                &mut self.deck_tracker.zone_types,
+                                pending,
+                                gsm,
+                                my_seat,
+                            );
+                        }
+                    }
+                    // Library grew during mulligan window → count a mulligan.
+                    if let Some(pending) = self.pending.get_mut(&match_id) {
+                        if pending.mulligans_open {
+                            if let (Some(prev), Some(now)) =
+                                (lib_before, self.deck_tracker.library_count())
+                            {
+                                if now > prev {
+                                    if let Some(slot) = pending.game_mulligans.last_mut() {
+                                        let n = slot.unwrap_or(0) + 1;
+                                        *slot = Some(n);
+                                        changed = true;
+                                    }
+                                }
+                            }
                         }
                     }
                     if changed {
@@ -955,9 +1019,16 @@ impl LogParser {
             if let Some(pending) = self.pending.get_mut(&match_id) {
                 if pending.awaiting_first_turn {
                     pending.awaiting_first_turn = false;
+                    pending.mulligans_open = false;
                     if let Some(my_seat) = pending.my_seat_id {
                         if let Some(slot) = pending.game_on_play.last_mut() {
                             *slot = Some(active_seat == my_seat);
+                        }
+                    }
+                    // Ensure mulligan slot is frozen at least at 0.
+                    if let Some(slot) = pending.game_mulligans.last_mut() {
+                        if slot.is_none() {
+                            *slot = Some(0);
                         }
                     }
                 }
@@ -1109,6 +1180,98 @@ fn zone_reveals_card(ty: &str) -> bool {
     )
 }
 
+/// GRE marks lands via cardTypes (string enum in modern clients).
+fn object_is_land(go: &serde_json::Value) -> bool {
+    if let Some(arr) = go.get("cardTypes").and_then(|t| t.as_array()) {
+        for t in arr {
+            if t.as_str() == Some("CardType_Land") {
+                return true;
+            }
+        }
+    }
+    // Older / alternate payload shapes.
+    if let Some(arr) = go.get("types").and_then(|t| t.as_array()) {
+        for t in arr {
+            if t.as_str() == Some("CardType_Land") || t.as_str() == Some("Land") {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+fn note_turn_number(pending: &mut PendingMatch, gsm: &serde_json::Value) {
+    if let Some(n) = gsm
+        .get("turnInfo")
+        .and_then(|t| t.get("turnNumber"))
+        .and_then(|n| n.as_u64())
+    {
+        pending.cur_turn = Some(n as u32);
+    }
+}
+
+/// Record turn of first land the local player puts on the battlefield.
+fn note_first_land(
+    zone_types: &mut HashMap<u32, String>,
+    pending: &mut PendingMatch,
+    gsm: &serde_json::Value,
+    my_seat: u32,
+) -> bool {
+    // Already recorded for this game.
+    if pending
+        .game_first_land_turn
+        .last()
+        .copied()
+        .flatten()
+        .is_some()
+    {
+        return false;
+    }
+    if let Some(zones) = gsm.get("zones").and_then(|z| z.as_array()) {
+        for z in zones {
+            let Some(zid) = z.get("zoneId").and_then(|x| x.as_u64()).map(|x| x as u32) else {
+                continue;
+            };
+            if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
+                zone_types.insert(zid, ty.to_string());
+            }
+        }
+    }
+    let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) else {
+        return false;
+    };
+    for go in gos {
+        let ty = go.get("type").and_then(|t| t.as_str()).unwrap_or("");
+        if ty != "GameObjectType_Card" {
+            continue;
+        }
+        let owner = go
+            .get("ownerSeatId")
+            .and_then(|o| o.as_u64())
+            .map(|o| o as u32);
+        if owner != Some(my_seat) {
+            continue;
+        }
+        if !object_is_land(go) {
+            continue;
+        }
+        let zone_id = go.get("zoneId").and_then(|z| z.as_u64()).map(|z| z as u32);
+        let zone_ty = zone_id
+            .and_then(|z| zone_types.get(&z))
+            .map(|s| s.as_str())
+            .unwrap_or("");
+        if zone_ty != "ZoneType_Battlefield" {
+            continue;
+        }
+        let turn = pending.cur_turn.unwrap_or(1);
+        if let Some(slot) = pending.game_first_land_turn.last_mut() {
+            *slot = Some(turn);
+            return true;
+        }
+    }
+    false
+}
+
 /// Record opponent-owned cards that appear in revealed zones. Returns true if set grew.
 fn note_opponent_cards(
     zone_types: &mut HashMap<u32, String>,
@@ -1193,6 +1356,8 @@ fn finalize_match(
                 winning_team_id: winning,
                 reason,
                 on_play: None,
+                mulligans: None,
+                first_land_turn: None,
             }),
             "MatchScope_Match" => {
                 match_winning_team = winning;
@@ -1206,6 +1371,16 @@ fn finalize_match(
     for (i, on_play) in pending.game_on_play.iter().enumerate() {
         if let (Some(game), Some(v)) = (games.get_mut(i), on_play) {
             game.on_play = Some(*v);
+        }
+    }
+    for (i, mulls) in pending.game_mulligans.iter().enumerate() {
+        if let (Some(game), Some(v)) = (games.get_mut(i), mulls) {
+            game.mulligans = Some(*v);
+        }
+    }
+    for (i, turn) in pending.game_first_land_turn.iter().enumerate() {
+        if let (Some(game), Some(v)) = (games.get_mut(i), turn) {
+            game.first_land_turn = Some(*v);
         }
     }
 
@@ -2135,6 +2310,89 @@ mod tests {
         assert_eq!(done.len(), 1);
         let seen = done[0].opponent_seen.as_ref().expect("persisted");
         assert_eq!(seen, &vec![777, 888]);
+    }
+
+    /// B2 — library growth before turn 1 counts as a mulligan; first land turn stamps.
+    #[test]
+    fn mulligans_and_first_land_turn_from_gre() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-mull", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        // Opening hand draws: library shrinks 6 → 0 remaining instances (tracked).
+        let draw = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "zones": [
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [] },
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [1,2,3,4,5,6] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 1, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 2, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 3, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 4, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 5, "grpId": 102, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 6, "grpId": 102, "zoneId": 35, "ownerSeatId": 2 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(draw);
+        // Mulligan: library grows again (cards returned).
+        let mull = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "zones": [
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [1,2,3,4,5,6] },
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [] }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(mull);
+        // Turn 1 locks mulligans; we're on the play (seat 2 active).
+        p.feed_line(GRE_TURN1);
+        // Second turn + first land on battlefield.
+        let land = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "turnInfo": { "turnNumber": 2, "activePlayer": 2 },
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 2, "objectInstanceIds": [99] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 99, "grpId": 500, "zoneId": 10, "ownerSeatId": 2, "cardTypes": ["CardType_Land"] }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(land);
+        let done = p.feed_line(&room_completed(
+            "m-mull",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done.len(), 1);
+        let g = &done[0].games[0];
+        assert_eq!(g.mulligans, Some(1), "one library-growth mulligan");
+        assert_eq!(g.first_land_turn, Some(2));
+        assert_eq!(g.on_play, Some(true));
+    }
+
+    #[test]
+    fn kept_seven_records_zero_mulligans() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-keep", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        p.feed_line(GRE_TURN1);
+        let done = p.feed_line(&room_completed(
+            "m-keep",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done[0].games[0].mulligans, Some(0));
+        assert_eq!(done[0].games[0].first_land_turn, None);
     }
 
     /// C4 — committed corpus of anonymized log fixtures (runs in CI).

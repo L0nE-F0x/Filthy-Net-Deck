@@ -5,6 +5,10 @@ export interface TrackedGame {
   reason?: string;
   /** True when the local player was on the play for this game. */
   onPlay?: boolean;
+  /** Times the local player mulliganed this game (0 = kept 7). */
+  mulligans?: number;
+  /** Turn number of the local player's first land on the battlefield. */
+  firstLandTurn?: number;
 }
 
 export type MatchResult = "win" | "loss" | "draw" | "unknown";

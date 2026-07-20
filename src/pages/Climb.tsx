@@ -20,7 +20,6 @@ import {
   buildClimbLegs,
   currentStreak,
   deckClimbSummaries,
-  deckColorIndex,
   longestStreak,
   previousSeasonSummary,
   type ClimbLeg,
@@ -39,73 +38,10 @@ import {
   type ShareDestination,
 } from "../services/communityShare";
 import { tallyMatches } from "../services/statsHelpers";
-
-/** Chart / legend palette — distinct enough on dark and light themes. */
-const DECK_PALETTE = [
-  "#d4a84b",
-  "#4a7fd4",
-  "#34d399",
-  "#f87171",
-  "#a78bfa",
-  "#fbbf24",
-  "#2dd4bf",
-  "#fb7185",
-  "#60a5fa",
-  "#c084fc",
-];
+import { deckSwatch, monotonePath } from "../services/climbChart";
 
 function tally(matches: TrackedMatch[]) {
   return tallyMatches(matches);
-}
-
-function deckSwatch(key: string): string {
-  return DECK_PALETTE[deckColorIndex(key, DECK_PALETTE.length)];
-}
-
-/**
- * Monotone cubic (Fritsch–Carlson) path through points. Smooths the curve
- * without overshooting past any data point.
- */
-function monotonePath(pts: { x: number; y: number }[]): string {
-  const n = pts.length;
-  if (n === 0) return "";
-  if (n === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-  const dx: number[] = [];
-  const slope: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
-    const d = pts[i + 1].x - pts[i].x || 1e-6;
-    dx.push(d);
-    slope.push((pts[i + 1].y - pts[i].y) / d);
-  }
-  const tan: number[] = [slope[0]];
-  for (let i = 1; i < n - 1; i++) {
-    tan.push(slope[i - 1] * slope[i] <= 0 ? 0 : (slope[i - 1] + slope[i]) / 2);
-  }
-  tan.push(slope[n - 2]);
-  for (let i = 0; i < n - 1; i++) {
-    if (slope[i] === 0) {
-      tan[i] = 0;
-      tan[i + 1] = 0;
-      continue;
-    }
-    const a = tan[i] / slope[i];
-    const b = tan[i + 1] / slope[i];
-    const s = a * a + b * b;
-    if (s > 9) {
-      const tau = 3 / Math.sqrt(s);
-      tan[i] = tau * a * slope[i];
-      tan[i + 1] = tau * b * slope[i];
-    }
-  }
-  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-  for (let i = 0; i < n - 1; i++) {
-    const h = dx[i] / 3;
-    d +=
-      ` C ${(pts[i].x + h).toFixed(1)} ${(pts[i].y + tan[i] * h).toFixed(1)}` +
-      ` ${(pts[i + 1].x - h).toFixed(1)} ${(pts[i + 1].y - tan[i + 1] * h).toFixed(1)}` +
-      ` ${pts[i + 1].x.toFixed(1)} ${pts[i + 1].y.toFixed(1)}`;
-  }
-  return d;
 }
 
 function RankChart({

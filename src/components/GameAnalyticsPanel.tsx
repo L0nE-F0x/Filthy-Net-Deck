@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
-import { deckMatchupMatrix, pct, pts, sideboardSplit } from "../services/gameAnalytics";
+import {
+  deckMatchupMatrix,
+  firstLandStats,
+  mulliganStats,
+  pct,
+  pts,
+  sideboardSplit,
+} from "../services/gameAnalytics";
 import { fieldExpectedWr } from "../services/fieldScore";
 import { decksForMode } from "../services/deckHelpers";
 import type { TrackedMatch } from "../types/tracker";
@@ -86,6 +93,8 @@ export function GameAnalyticsPanel({
   }, [resolvedTick]);
 
   const side = useMemo(() => sideboardSplit(deckMatches), [deckMatches]);
+  const mulls = useMemo(() => mulliganStats(deckMatches), [deckMatches]);
+  const lands = useMemo(() => firstLandStats(deckMatches), [deckMatches]);
   const matchups = useMemo(
     () =>
       deckMatchupMatrix(deckMatches, resolveName, candidates, {
@@ -100,11 +109,19 @@ export function GameAnalyticsPanel({
   );
 
   const hasSide = side.matchesConsidered > 0;
+  const hasMulls = mulls.gamesStamped > 0;
+  const hasLands = lands.gamesStamped > 0;
   const seenMatches = deckMatches.filter(
     (m) => (m.opponentSeen?.length ?? 0) > 0,
   ).length;
 
-  if (!hasSide && matchups.length === 0 && seenMatches === 0) {
+  if (
+    !hasSide &&
+    !hasMulls &&
+    !hasLands &&
+    matchups.length === 0 &&
+    seenMatches === 0
+  ) {
     return null; // nothing recorded at game granularity yet — stay quiet
   }
 
@@ -162,6 +179,61 @@ export function GameAnalyticsPanel({
             <span className="text-muted font-normal">({side.post.games}g)</span>
             {side.delta != null && (
               <span className="text-muted font-normal"> · {pts(side.delta)} after siding</span>
+            )}
+          </p>
+        </div>
+      )}
+
+      {hasMulls && (
+        <div className="mb-3 text-xs">
+          <p className="text-muted m-0 mb-0.5">
+            Mulligans · {mulls.gamesStamped} stamped game{mulls.gamesStamped === 1 ? "" : "s"}
+          </p>
+          <p className="m-0 font-semibold">
+            Keep 7: {pct(mulls.keep7Rate)}
+            {mulls.avgMulligans != null && (
+              <span className="text-muted font-normal">
+                {" "}
+                · avg {mulls.avgMulligans.toFixed(2)} mulls
+              </span>
+            )}
+          </p>
+          {mulls.buckets.length > 1 && (
+            <p className="m-0 mt-0.5 text-muted font-normal leading-relaxed">
+              {mulls.buckets.map((b) => (
+                <span key={b.mulls} className="mr-2">
+                  {b.mulls === 0 ? "7-card" : `−${b.mulls}`}: {pct(b.rate)} ({b.games}g)
+                </span>
+              ))}
+            </p>
+          )}
+        </div>
+      )}
+
+      {hasLands && (
+        <div className="mb-3 text-xs">
+          <p className="text-muted m-0 mb-0.5">
+            First land · avg turn{" "}
+            {lands.avgTurn != null ? lands.avgTurn.toFixed(1) : "—"}
+          </p>
+          <p className="m-0 font-semibold leading-relaxed">
+            {lands.early.games > 0 && (
+              <span className="mr-2">
+                T1–2: {pct(lands.early.rate)}{" "}
+                <span className="text-muted font-normal">({lands.early.games}g)</span>
+              </span>
+            )}
+            {lands.on3.games > 0 && (
+              <span className="mr-2">
+                T3: {pct(lands.on3.rate)}{" "}
+                <span className="text-muted font-normal">({lands.on3.games}g)</span>
+              </span>
+            )}
+            {lands.late.games > 0 && (
+              <span>
+                T4+: {pct(lands.late.rate)}{" "}
+                <span className="text-muted font-normal">({lands.late.games}g)</span>
+              </span>
             )}
           </p>
         </div>

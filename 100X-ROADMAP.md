@@ -12,13 +12,13 @@
 
 **Active pillar items (A1–D2, excluding cancelled):** ~14 unique program tickets.  
 **Cancelled by owner:** A1 package managers · **A2 Store** · **A3 Linux** · **B3 cloud LLM**.  
-**Done (shipped through v1.8.0 or source-complete on main):** roughly **~85–90% of remaining program**.
+**Done (shipped through v1.8.0 or source-complete on main):** roughly **~95%+ of remaining program** (C3/B2/maintenance tail closed in source).
 
 | ID | Status | Notes |
 |----|--------|--------|
 | **C1** CI quality gate | ✅ Done | tsc / vitest / build / cargo on every push |
 | **C2** Goldfish fixtures | ✅ Done | `pipeline/goldfish.test.mjs` + fixtures |
-| **C3** Multi-source lists | ✅ Done (partial) | MTGO → Goldfish; **magic.gg lists deferred** |
+| **C3** Multi-source lists | ✅ Done | MTGO → magic.gg structured → Goldfish; Scryfall + listMatch gates |
 | **C4** Tracker log fixtures | ✅ Done | committed fixtures; real-log still `#[ignore]` |
 | **C5** ESLint zero-warning | ✅ Done | `eslint.config.js` + CI |
 | **C6** Diagnostic export | ✅ Done | Settings → Export diagnostic |
@@ -28,20 +28,19 @@
 | **A4** Public meta site | ✅ Done | `/meta-web/` from daily pipeline |
 | **A5** Share loop | ✅ Done (1.7–1.8) | PNG destinations + opponent share |
 | **B1** Opponent archetype | ✅ Done (1.6+) | + accept-tag on main |
-| **B2** Deeper analytics | ✅ Mostly done | play/draw, sideboard, form, field EV, queues; **no mulligan rates** (not in log fields) |
+| **B2** Deeper analytics | ✅ Done | play/draw, sideboard, form, field EV, queues, **mulligan rates + first-land turn** |
 | **B3** AI coach | ❌ Cancelled | local grounded chips instead |
 | **B4** Overlay depth | ✅ Done (1.7) | archetype + historical WR |
 | **D1** First-value coach | ✅ Done (1.7) | progress + You're live |
 | **D2** Daily loop | ✅ Done (1.8) | catch-up strip + session wrap + coach notes |
 | **D2-b** Season recap habit | ✅ Done (1.8) | notify + share banner |
 
-**What's left (thin tail, not “half the roadmap”):**
-1. **C3 remainder** — magic.gg list scrape (deferred: name corruption risk).  
-2. **B2 remainder** — mulligan-kept rates / first-land turn **need new tracker fields** (not free).  
-3. **Continuous debt** — further Stats/Sets peels, `.git` history bloat, polish.  
-4. **Optional A5 extras** — Discord Rich Presence (not requested; skip unless asked).  
+**What's left (thin tail):**
+1. **Optional history rewrite** — see docs/GIT-HISTORY-BLOAT.md (force-push; needs owner).  
+2. **Optional A5 extras** — Discord Rich Presence (not requested; skip unless asked).  
+3. **Ongoing peels** — touch Stats/Sets/Climb as you edit them (deckVersions + climbChart done this pass).  
 
-**Honest takeaway:** the *program* is near complete. What remains is either **cancelled**, **blocked on parser data**, **deliberately deferred**, or **maintenance debt** — not a second full roadmap.
+**Honest takeaway:** the *program* is complete for active pillars. Remaining work is optional (git history rewrite with owner force-push) or continuous polish — not a second roadmap.
 
 ---
 
@@ -123,7 +122,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 **B1 — Local opponent-archetype inference.** ✅ **Source 2026-07-20** (not in published binary yet). The tracker already captures *cards seen* from the opponent via GRE `gameObjects` (the same feed that drives the in-library HUD). Feed opponent-revealed cards into the existing `cardWatch` / meta-archetype matcher to *label* the opponent's deck — locally, from real cards, never fabricated. This turns "Matchups vs a name" into "Matchups vs Izzet Prowess" with a real, personal win-rate. It's the single highest-value data unlock and it's **already in the log stream you parse.**
 
-**B2 — Deeper personal analytics (all local, all real).** Mulligan-kept-vs-mull rates, win% on the play vs draw by archetype (data is captured; surface it), turn-of-first-land-drop, per-archetype sideboard-game deltas (Bo3 g2/g3 already parsed). This is 17Lands-class insight for Constructed — but private and offline.
+**B2 — Deeper personal analytics (all local, all real).** Mulligan-kept-vs-mull rates + first-land turn (tracker fields + UI), play/draw, sideboard deltas, form, field EV, queues. This is 17Lands-class insight for Constructed — but private and offline.
 
 **B3 — Grounded AI coach.** CANCELLED 2026-07-20 (owner: park forever; no cloud LLM ever). Was: The roadmap defers "AI without grounded local data" — correctly. The move is a coach that is *only ever* grounded: input = the user's real matches + today's real Scryfall-validated meta lists; output = "you're 2–7 vs the field's #1 deck (Izzet Prowess); here are 3 sideboard cards *from your own list* the ranked Izzet peers run against it." No invented cards (the `brewLab.ts` deterministic staples engine is the guardrail), Claude API only summarizes/prioritizes real rows. Ship it opt-in, offline-capable-degraded, with every claim traceable to a match id or a deck id. This is the feature that gets written up.
 
@@ -139,7 +138,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 **C2 — Fixture tests for the fragile scrapers.** `vitest` already globs `pipeline/**/*.test.mjs` — write them. Snapshot real Goldfish HTML into fixtures and assert `parseMetagameTiles` / `parseArchetypeDeckPage` extract the right tiles/lists. When Goldfish redesigns, the test goes red *before* production does.
 
-**C3 — Multi-source meta (kill the single point of failure).** DONE partial 2026-07-20: MTGO challenge lists assign onto Goldfish tiles when card-overlap matches; Goldfish archetype page is fallback. magic.gg still events-only (safe list parser deferred).
+**C3 — Multi-source meta (kill the single point of failure).** DONE partial 2026-07-20: MTGO challenge lists assign onto Goldfish tiles when card-overlap matches; Goldfish archetype page is fallback. magic.gg structured deck-list assignment online (same listMatch + Scryfall gates as MTGO).
 
 **C4 — Automated tracker-parser regression suite.** Promote the `#[ignore]`d `replay_real_log` into a committed corpus of *anonymized* log fixtures covering each event type (Playing, MatchCompleted, courses, rank, GRE deck, mulligan reshuffle). Run in CI. When an Arena update changes the log, CI tells you which shape broke.
 
@@ -179,12 +178,12 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 ### Phase 2 — Reach via content & trust *(was Store/Linux — cancelled)*
 - ~~**A2** Microsoft Store (MSIX)~~ — **cancelled** (owner 2026-07-20)
 - ~~**A3** Linux (Proton / AppImage / Flatpak)~~ — **cancelled** (owner 2026-07-20)
-- **C3** multi-source meta assignment (done partial — MTGO → Goldfish)
+- **C3** multi-source meta assignment (done — MTGO → magic.gg → Goldfish)
 - *Outcome:* distribution stays **website + signed updater** on **Windows + macOS only**.
 
 ### Phase 3 — Widen the moat *(Differentiation + Retention)*
 - **B1** local opponent-archetype inference (highest-value data unlock)
-- **B2** deeper personal analytics surfacing
+- **B2** deeper personal analytics (incl. mulligan + first-land)
 - **D1/D2** activation funnel + daily-loop home strip
 - *Outcome:* the tracker becomes clearly best-in-class; day-2 retention climbs.
 

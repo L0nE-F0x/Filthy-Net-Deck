@@ -77,6 +77,19 @@ never silently stale-as-fresh).
   verify a parser fix — see item 3.
 - **Scraper HTML drift** (Goldfish/Melee/magic.gg redesigns) needs a human once
   detected — but detection itself is automatic via the failure issues.
+- **`.git` pack bloat** from historical installers — working tree is pruned each
+  release; shrinking history requires a coordinated filter-repo force-push.
+  See `docs/GIT-HISTORY-BLOAT.md`. Do **not** force-push from CI/agents.
+
+## Release download hygiene
+
+After every app release:
+
+1. `website/downloads/` should contain only the **current** (optionally +1 prior)
+   Windows `.exe` + `.sig` and macOS `.dmg`.
+2. Confirm `public/downloads/` is empty / gitignored.
+3. Optional: schedule the history rewrite in `docs/GIT-HISTORY-BLOAT.md` when
+   clone times become painful.
 
 ## Downloads hygiene (avoid repo bloat over time)
 
