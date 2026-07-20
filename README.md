@@ -1,5 +1,7 @@
 # Filthy Net Deck
 
+[![CI](https://github.com/L0nE-F0x/Filthy-Net-Deck/actions/workflows/ci.yml/badge.svg)](https://github.com/L0nE-F0x/Filthy-Net-Deck/actions/workflows/ci.yml)
+
 Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, tournament pulse, and a **local winrate tracker** for your own Arena matches.
 
 **Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.

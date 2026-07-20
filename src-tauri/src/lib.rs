@@ -175,11 +175,9 @@ pub fn run() {
                 notify_tray_hint_once(window.app_handle());
                 api.prevent_close();
             }
-            WindowEvent::Resized(_) => {
-                if window.is_minimized().unwrap_or(false) {
-                    let _ = window.unminimize();
-                    hide_to_tray(window);
-                }
+            WindowEvent::Resized(_) if window.is_minimized().unwrap_or(false) => {
+                let _ = window.unminimize();
+                hide_to_tray(window);
             }
             _ => {}
         })

@@ -1,0 +1,97 @@
+# Quality gate for every push / PR (100X-ROADMAP Phase 0, C1).
+#
+# Two jobs:
+#   web  (ubuntu)  — tsc --noEmit, vitest, production vite build
+#   rust (windows) — rustfmt check, clippy -D warnings, cargo test
+#                    (windows-latest matches the primary ship target)
+#
+# Data-only commits (daily meta JSON, website/, docs) skip the gate — the
+# pipeline workflows have their own failure-issue automation.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "website/**"
+      - "public/meta/**"
+      - "docs/**"
+      - "marketing-video/**"
+      - "goal/**"
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "website/**"
+      - "public/meta/**"
+      - "docs/**"
+      - "marketing-video/**"
+      - "goal/**"
+      - "**.md"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web · tsc + vitest + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+  rust:
+    name: Rust · fmt + clippy + test (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # tauri::generate_context! embeds dist/ at compile time — build the
+      # frontend before any cargo command can typecheck the crate.
+      - name: Install deps
+        run: npm ci
+
+      - name: Build frontend (needed by generate_context!)
+        run: npm run build
+
+      - name: rustfmt check
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      - name: Clippy (warnings are errors)
+        working-directory: src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        working-directory: src-tauri
+        run: cargo test

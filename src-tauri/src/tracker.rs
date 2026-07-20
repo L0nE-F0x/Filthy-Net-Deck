@@ -192,7 +192,7 @@ pub fn tracker_status(state: State<'_, TrackerShared>) -> TrackerStatus {
 pub fn tracker_matches(state: State<'_, TrackerShared>) -> Vec<TrackedMatch> {
     let data = state.0.lock().expect("tracker lock");
     let mut out = data.matches.clone();
-    out.sort_by(|a, b| b.started_at.cmp(&a.started_at));
+    out.sort_by_key(|m| std::cmp::Reverse(m.started_at));
     out
 }
 
@@ -243,7 +243,7 @@ pub fn tracker_export_csv(
     let matches = {
         let data = state.0.lock().expect("tracker lock");
         let mut out = data.matches.clone();
-        out.sort_by(|a, b| b.started_at.cmp(&a.started_at));
+        out.sort_by_key(|m| std::cmp::Reverse(m.started_at));
         out
     };
     if matches.is_empty() {
@@ -505,7 +505,10 @@ impl DeckTracker {
                 if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
                     self.zone_types.insert(zid, ty.to_string());
                 }
-                let owner = z.get("ownerSeatId").and_then(|o| o.as_u64()).map(|o| o as u32);
+                let owner = z
+                    .get("ownerSeatId")
+                    .and_then(|o| o.as_u64())
+                    .map(|o| o as u32);
                 let ty = z.get("type").and_then(|t| t.as_str()).unwrap_or("");
                 if ty == "ZoneType_Library" && owner == Some(my_seat) {
                     let n = z
@@ -554,10 +557,7 @@ impl DeckTracker {
             if self.left_instances.contains(&instance) {
                 continue;
             }
-            let zone_id = go
-                .get("zoneId")
-                .and_then(|z| z.as_u64())
-                .map(|z| z as u32);
+            let zone_id = go.get("zoneId").and_then(|z| z.as_u64()).map(|z| z as u32);
             let zone_ty = zone_id
                 .and_then(|z| self.zone_types.get(&z))
                 .map(|s| s.as_str())
@@ -723,7 +723,6 @@ impl LogParser {
 
     /// Route a bare-JSON Arena payload (match room, GRE, auth, courses, rank).
     fn feed_json_payload(&mut self, trimmed: &str) -> Vec<TrackedMatch> {
-
         // Cheap substring routing before paying for a JSON parse.
         if trimmed.contains("\"matchGameRoomStateChangedEvent\"") {
             return self.on_room_event(trimmed);
@@ -772,10 +771,7 @@ impl LogParser {
             // Rank payloads share a line shape with other bare JSON; not an error.
             return;
         };
-        if let Some(season) = v
-            .get("constructedSeasonOrdinal")
-            .and_then(|s| s.as_u64())
-        {
+        if let Some(season) = v.get("constructedSeasonOrdinal").and_then(|s| s.as_u64()) {
             self.current_season = Some(season as u32);
         }
         let class = v.get("constructedClass").and_then(|c| c.as_str());
@@ -818,10 +814,7 @@ impl LogParser {
             return;
         };
         // Seat needed for library tracking.
-        let my_seat = self
-            .pending
-            .get(&match_id)
-            .and_then(|p| p.my_seat_id);
+        let my_seat = self.pending.get(&match_id).and_then(|p| p.my_seat_id);
 
         if has_deck {
             if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
@@ -1081,7 +1074,11 @@ fn finalize_match(
     } else {
         pending.event_id
     };
-    let best_of = if event_id.contains("Traditional") { 3 } else { 1 };
+    let best_of = if event_id.contains("Traditional") {
+        3
+    } else {
+        1
+    };
 
     TrackedMatch {
         match_id,
@@ -1236,7 +1233,10 @@ fn turn_number_is_one(body: &str) -> bool {
 
 fn extract_u32_after(body: &str, key: &str) -> Option<u32> {
     let at = body.find(key)? + key.len();
-    let digits: String = body[at..].chars().take_while(|c| c.is_ascii_digit()).collect();
+    let digits: String = body[at..]
+        .chars()
+        .take_while(|c| c.is_ascii_digit())
+        .collect();
     digits.parse().ok()
 }
 
@@ -1600,7 +1600,12 @@ mod tests {
         )
     }
 
-    fn room_completed(match_id: &str, event: &str, games: &[(u32, &str)], match_winner: u32) -> String {
+    fn room_completed(
+        match_id: &str,
+        event: &str,
+        games: &[(u32, &str)],
+        match_winner: u32,
+    ) -> String {
         let mut results: Vec<String> = games
             .iter()
             .map(|(w, r)| {
@@ -1831,10 +1836,7 @@ mod tests {
 
     #[test]
     fn deck_hash_is_stable_and_order_independent() {
-        assert_eq!(
-            fingerprint(&[101, 102, 101]),
-            fingerprint(&[101, 101, 102])
-        );
+        assert_eq!(fingerprint(&[101, 102, 101]), fingerprint(&[101, 101, 102]));
         assert_ne!(fingerprint(&[101, 101]), fingerprint(&[101, 102]));
     }
 

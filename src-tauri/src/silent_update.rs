@@ -21,9 +21,7 @@ fn is_allowed_update_url(url: &str) -> bool {
 #[tauri::command]
 pub async fn install_update_silent(app: AppHandle, url: String) -> Result<(), String> {
     if !is_allowed_update_url(&url) {
-        return Err(
-            "Update URL must be from filthy-net-deck.com (or legacy Netlify host).".into(),
-        );
+        return Err("Update URL must be from filthy-net-deck.com (or legacy Netlify host).".into());
     }
     let lower = url.to_ascii_lowercase();
     if !lower.ends_with(".exe") {
@@ -72,9 +70,7 @@ pub async fn install_update_silent(app: AppHandle, url: String) -> Result<(), St
         let script = if relaunch.is_empty() {
             format!("ping -n 2 127.0.0.1 >nul & \"{installer}\" /S")
         } else {
-            format!(
-                "ping -n 2 127.0.0.1 >nul & \"{installer}\" /S & start \"\" \"{relaunch}\""
-            )
+            format!("ping -n 2 127.0.0.1 >nul & \"{installer}\" /S & start \"\" \"{relaunch}\"")
         };
 
         use std::os::windows::process::CommandExt;
