@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://filthy-net-deck.com/sitemap.xml

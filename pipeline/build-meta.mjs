@@ -26,6 +26,7 @@ import { collectMagicGgTournaments } from "./sources/magic-gg.mjs";
 import { collectMtgoTournaments } from "./sources/mtgo.mjs";
 import { collectMelee } from "./sources/melee.mjs";
 import { collectUntapped } from "./sources/untapped.mjs";
+import { buildMetaSite } from "./build-meta-site.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -253,6 +254,11 @@ function writeMeta(bundle) {
     writeFileSync(join(dir, `${bundle.date}.json`), archiveJson);
   }
   updateHistory(bundle);
+  try {
+    buildMetaSite();
+  } catch (e) {
+    console.warn(`  meta-web generate failed: ${e.message}`);
+  }
   const deckCount = Object.keys(bundle.decks || {}).length;
   console.log(
     `Wrote meta ${bundle.date} · formats=${bundle.formats.length} · decks=${deckCount} · tournaments=${bundle.tournaments?.length ?? 0}`,

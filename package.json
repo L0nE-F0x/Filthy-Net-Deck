@@ -15,7 +15,8 @@
     "sets": "node pipeline/build-sets.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src pipeline --max-warnings 0"
+    "lint": "eslint src pipeline --max-warnings 0",
+    "meta:site": "node pipeline/build-meta-site.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

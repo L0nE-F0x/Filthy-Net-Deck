@@ -134,7 +134,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 - *Outcome:* regressions can no longer reach users. Now it is safe to scale reach.
 
 ### Phase 1 — Open the floodgates *(Reach)*
-- **A1** winget + Chocolatey + Homebrew Cask (reuse existing artifacts)
+- ~~**A1** winget / Homebrew / Chocolatey~~ — cancelled (website + in-app updater only)
 - **A4** static public meta site generated from `latest.json`/`history.json`
 - **A5** one-click community share on recap/matchup
 - *Outcome:* discovery surface goes from 1 page to many; every daily run is indexable.
@@ -202,10 +202,10 @@ The temptation at scale is to compromise the things that make this app trustwort
 ## 7. If you only do five things
 
 1. **Ship a CI test/typecheck/clippy gate this week** (C1). Everything else is built on it.
-2. **Publish to `winget` + Homebrew Cask** (A1) — 10× reach from artifacts you already build.
-3. **Generate the public meta site from your daily feed** (A4) — turn your cron into a content engine.
-4. **Infer the opponent's archetype from cards already in your log stream** (B1) — the moat-widener that costs no new data.
-5. **Wire the multi-source list priority you already documented** (C3) — remove the single point of failure before the audience arrives.
+2. **Ship the public meta site from the daily feed** (A4) — SEO surface that funnels to the download.
+3. **Local opponent-archetype inference** (B1) — moat from cards already in the log stream.
+4. **Wire the multi-source list priority you already documented** (C3) — remove the single point of failure before the audience arrives.
+5. **Grounded local coach / deeper analytics** (B2/B3) — only after B1 + C3 harden the spine.
 
 Do these five and the remaining pillars have a hardened, discoverable, differentiated base to multiply against.
 
