@@ -22,13 +22,16 @@ import {
   drawPct,
   formatClock,
   groupLibrary,
+  matchupHudLine,
   normalizeOpacity,
+  opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
   type OverlayGroup,
 } from "./overlayModel";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
+import { deckMatchupMatrix } from "../services/gameAnalytics";
 import { decksForMode } from "../services/deckHelpers";
 import type { MetaBundle } from "../types/meta";
 
@@ -698,23 +701,59 @@ export function OverlayApp() {
     };
   }, [live?.matchId, live?.opponentSeen]);
 
-  const oppGuessLabel = useMemo(() => {
+  /** Live archetype guess + personal historical WR on this deck (B4). */
+  const oppHud = useMemo(() => {
     void oppNamesTick;
-    if (!live?.opponentSeen?.length) return null;
+    if (!live?.opponentSeen?.length) {
+      return {
+        guess: null as string | null,
+        matchup: null as ReturnType<typeof matchupHudLine>,
+        seen: opponentCardsSeenCount(live?.opponentSeen),
+      };
+    }
     const bundle = loadMetaCache();
-    if (!bundle) return null;
-    const fmt = bundle.formats.find((f) => f.featured) ?? bundle.formats[0];
-    if (!fmt) return null;
-    const mode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
-    const decks = decksForMode(fmt, mode as "bo1" | "bo3", bundle.decks);
-    const g = inferOpponentArchetype(
-      live.opponentSeen,
-      (id) => peekArenaMeta(id)?.name ?? null,
-      decks,
-      { minHits: 2, minConfidence: 0.35 },
-    );
-    return g ? g.archetype : null;
-  }, [live, oppNamesTick]);
+    const resolveName = (id: number) => peekArenaMeta(id)?.name ?? null;
+    const inferOpts = { minHits: 2, minConfidence: 0.35 };
+
+    let guess: string | null = null;
+    let candidates: ReturnType<typeof decksForMode> = [];
+    if (bundle) {
+      const fmt = bundle.formats.find((f) => f.featured) ?? bundle.formats[0];
+      if (fmt) {
+        const mode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
+        candidates = decksForMode(fmt, mode as "bo1" | "bo3", bundle.decks);
+        const g = inferOpponentArchetype(
+          live.opponentSeen,
+          resolveName,
+          candidates,
+          inferOpts,
+        );
+        guess = g ? g.archetype : null;
+      }
+    }
+
+    let matchup = null as ReturnType<typeof matchupHudLine>;
+    if (guess && candidates.length) {
+      const key = live.deckId ?? live.deckName ?? live.deckHash ?? null;
+      const sameDeck = matches.filter((m) => {
+        if (m.result !== "win" && m.result !== "loss") return false;
+        if (!key) return false;
+        return deckKey(m) === key || (!!live.deckHash && m.deckHash === live.deckHash);
+      });
+      const rows = deckMatchupMatrix(sameDeck, resolveName, candidates, inferOpts);
+      matchup = matchupHudLine(rows, guess, 2);
+    }
+
+    return {
+      guess,
+      matchup,
+      seen: opponentCardsSeenCount(live.opponentSeen),
+    };
+  }, [live, matches, oppNamesTick]);
+
+  const oppGuessLabel = oppHud.guess;
+  const matchupLine = oppHud.matchup;
+  const cardsSeen = oppHud.seen;
 
   if (!live || live.phase === "idle") {
     return <div className="overlay-empty" />;
@@ -787,9 +826,19 @@ export function OverlayApp() {
           <span className="overlay-opp-line" data-tauri-drag-region>
             {opp}
             {oppGuessLabel ? (
-              <span className="overlay-opp-arch" title="Inferred from cards seen">
+              <span
+                className="overlay-opp-arch"
+                title={
+                  matchupLine
+                    ? `Inferred from cards seen · your record vs ${matchupLine.archetype}: ${matchupLine.detail}`
+                    : "Inferred from cards seen"
+                }
+              >
                 {" "}
                 · {oppGuessLabel}
+                {matchupLine ? (
+                  <span className="overlay-opp-mu"> · {matchupLine.short}</span>
+                ) : null}
               </span>
             ) : null}
           </span>
@@ -834,6 +883,21 @@ export function OverlayApp() {
               {deck}
             </span>
             <span className="overlay-sub-right" data-tauri-drag-region>
+              {matchupLine ? (
+                <span
+                  className="overlay-mu-line"
+                  title={`Personal matchup vs ${matchupLine.archetype} (cards actually seen in past games)`}
+                >
+                  vs {matchupLine.archetype}: {matchupLine.detail}
+                </span>
+              ) : cardsSeen > 0 ? (
+                <span
+                  className="overlay-seen-line"
+                  title="Distinct opponent cards observed this match"
+                >
+                  {cardsSeen} seen
+                </span>
+              ) : null}
               {record.wr != null ? (
                 <span
                   className="overlay-wr-line"

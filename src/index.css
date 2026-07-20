@@ -5193,6 +5193,56 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
 .tracker-onboarding-health {
   margin-bottom: 4px;
 }
+.tracker-onboarding-progress {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-foam) 8%, transparent);
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+.tracker-onboarding-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-gold-500) 80%, transparent),
+    var(--color-good, #34d399)
+  );
+  transition: width 0.35s ease;
+}
+.tracker-onboarding-progress-label {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-muted, #9aa38a);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.tracker-onboarding-live {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-good, #34d399) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-good, #34d399) 35%, transparent);
+}
+.tracker-onboarding-live strong {
+  font-size: 0.85rem;
+  color: var(--color-good, #34d399);
+}
+.tracker-onboarding-live span {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--color-muted, #9aa38a);
+}
+.tracker-onboarding.is-live .tracker-onboarding-progress-bar {
+  background: var(--color-good, #34d399);
+}
 .tracker-onboarding-steps {
   list-style: none;
   margin: 0;
@@ -5420,6 +5470,15 @@ html.overlay-macos .overlay-shell {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.overlay-opp-arch {
+  font-weight: 600;
+  color: color-mix(in srgb, var(--color-gold-300) 85%, var(--color-foam));
+}
+.overlay-opp-mu {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-good);
+}
 .overlay-bar-stats {
   display: flex;
   align-items: center;
@@ -5530,6 +5589,22 @@ html.overlay-macos .overlay-shell {
   font-size: 9.5px;
   font-weight: 700;
   color: var(--color-good);
+  font-variant-numeric: tabular-nums;
+}
+.overlay-mu-line {
+  font-size: 9px;
+  font-weight: 650;
+  color: color-mix(in srgb, var(--color-gold-300) 90%, var(--color-foam));
+  font-variant-numeric: tabular-nums;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.overlay-seen-line {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-muted, #9aa38a);
   font-variant-numeric: tabular-nums;
 }
 .overlay-mode-chip {
@@ -5726,7 +5801,7 @@ html.overlay-macos .overlay-shell {
   opacity: 0.7;
 }
 
-/* —— Brew Lab (pure meta list clinic) —— */
+/* ï¿½ï¿½ Brew Lab (pure meta list clinic) ï¿½ï¿½ */
 .brew-lab-head {
   display: flex;
   flex-wrap: wrap;

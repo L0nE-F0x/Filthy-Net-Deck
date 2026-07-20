@@ -6,7 +6,9 @@ import {
   drawPct,
   formatClock,
   groupLibrary,
+  matchupHudLine,
   normalizeOpacity,
+  opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
@@ -155,5 +157,38 @@ describe("normalizeOpacity", () => {
   it("falls back to the default for junk", () => {
     expect(normalizeOpacity(undefined)).toBe(0.92);
     expect(normalizeOpacity("nope")).toBe(0.92);
+  });
+});
+
+describe("matchupHudLine", () => {
+  const rows = [
+    { archetype: "Izzet Prowess", wins: 5, losses: 3, rate: 5 / 8 },
+    { archetype: "Domain", wins: 1, losses: 0, rate: 1 },
+  ];
+
+  it("returns null when archetype missing or thin sample", () => {
+    expect(matchupHudLine(rows, null)).toBeNull();
+    expect(matchupHudLine(rows, "Domain")).toBeNull(); // sample 1 < 2
+    expect(matchupHudLine(rows, "Unknown")).toBeNull();
+  });
+
+  it("formats short and detail for enough sample", () => {
+    const line = matchupHudLine(rows, "Izzet Prowess");
+    expect(line).not.toBeNull();
+    expect(line!.wrPct).toBe(63);
+    expect(line!.short).toBe("63% (5–3)");
+    expect(line!.detail).toBe("5–3 (63%) on this deck");
+    expect(line!.sample).toBe(8);
+  });
+
+  it("honors a higher minSample", () => {
+    expect(matchupHudLine(rows, "Izzet Prowess", 10)).toBeNull();
+  });
+});
+
+describe("opponentCardsSeenCount", () => {
+  it("counts distinct finite ids", () => {
+    expect(opponentCardsSeenCount(undefined)).toBe(0);
+    expect(opponentCardsSeenCount([1, 1, 2, Number.NaN])).toBe(2);
   });
 });

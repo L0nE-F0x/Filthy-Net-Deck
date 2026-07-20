@@ -10,7 +10,7 @@ import {
   seasonLabel,
   timeAgo,
 } from "../services/tracker";
-import { downloadRecapPng, recapFromMatches } from "../services/recapCard";
+import { recapFromMatches, renderRecapPng } from "../services/recapCard";
 import {
   dayWindow,
   formatRecapHeadline,
@@ -18,6 +18,12 @@ import {
   sessionWindow,
 } from "../services/recapStats";
 import { aggregateDeck, downloadDeckSharePng } from "../services/deckShare";
+import {
+  communityShareOptions,
+  deliverShare,
+  recapCaption,
+  type ShareDestination,
+} from "../services/communityShare";
 import { endDeckRun, loadDeckRuns, startDeckRun, type DeckRuns } from "../services/deckRuns";
 import { isLandName } from "../services/landNames";
 import { formatRank, parseRank, winrateFavor } from "../services/ranks";
@@ -38,7 +44,7 @@ import { GameAnalyticsPanel } from "../components/GameAnalyticsPanel";
 import { gamePlayDrawSplit } from "../services/gameAnalytics";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
-import { ShareActionButton, ShareMenu } from "../components/ShareMenu";
+import { ShareMenu } from "../components/ShareMenu";
 import { BrewLabPanel } from "../components/BrewLabPanel";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
@@ -1613,7 +1619,7 @@ function DeckDetail({
             sideIds={deckList?.side}
           />
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
-          <GameAnalyticsPanel deckMatches={visibleMatches} />
+          <GameAnalyticsPanel deckMatches={visibleMatches} deckName={deck.name} />
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory
             matches={visibleMatches}
@@ -1940,24 +1946,41 @@ export function Stats() {
             <div>
               <p className="eyebrow m-0 mb-0.5">Share after a session</p>
               <p className="text-xs text-muted m-0">
-                Week recap PNG — WR, rank move, best deck. Post it; every share is free marketing.
+                Week recap — save PNG, paste into Discord, or post on X with a
+                download link. Every share is free marketing.
               </p>
               {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
             </div>
-            <ShareActionButton
+            <ShareMenu
               label="Share week recap"
-              detail="WR, rank move, best deck — branded PNG"
+              hint="WR, rank move, best deck — branded card"
               variant="primary"
-              onShare={async () => {
+              options={communityShareOptions("local week only")}
+              onPick={async (id) => {
+                const dest = id as ShareDestination;
                 const stats = recapFromMatches(matches);
-                setRecapMsg(formatRecapHeadline(stats) + " — rendering…");
+                setRecapMsg(`${formatRecapHeadline(stats)} — rendering…`);
                 try {
-                  await downloadRecapPng(matches);
-                  setRecapMsg("Recap PNG saved to your downloads.");
+                  const blob = await renderRecapPng(stats);
+                  const caption = recapCaption({
+                    wins: stats.wins,
+                    losses: stats.losses,
+                    rankDeltaLabel: stats.rankDeltaLabel,
+                    bestDeckName: stats.bestDeck?.name ?? null,
+                  });
+                  const result = await deliverShare({
+                    destination: dest,
+                    blob,
+                    filename: "filthy-net-deck-recap.png",
+                    caption,
+                  });
+                  setRecapMsg(result.message);
+                  if (!result.ok) throw new Error(result.message);
+                  return result.message;
                 } catch (e) {
-                  setRecapMsg(
-                    e instanceof Error ? e.message : "Could not render recap.",
-                  );
+                  const msg =
+                    e instanceof Error ? e.message : "Could not render recap.";
+                  setRecapMsg(msg);
                   throw e;
                 }
               }}

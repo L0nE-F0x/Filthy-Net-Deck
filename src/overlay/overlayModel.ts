@@ -147,3 +147,64 @@ export function normalizeOpacity(value: unknown): number {
   if (!Number.isFinite(n)) return 0.92;
   return Math.min(1, Math.max(0.55, Math.round(n * 100) / 100));
 }
+
+/* ------------------------------------------------------------------ */
+/* B4 — historical matchup HUD line (pure; no focus / no side effects) */
+/* ------------------------------------------------------------------ */
+
+export interface MatchupHudRow {
+  archetype: string;
+  wins: number;
+  losses: number;
+  rate: number | null;
+}
+
+export interface MatchupHudLine {
+  archetype: string;
+  wins: number;
+  losses: number;
+  wrPct: number;
+  /** Compact bar: "62% (5–3)" */
+  short: string;
+  /** Expanded: "5–3 (62%) on this deck" */
+  detail: string;
+  sample: number;
+}
+
+/**
+ * Pick a personal matchup line for the live-inferred opponent archetype.
+ * Requires `minSample` decided matches (default 2) — thin evidence stays hidden.
+ */
+export function matchupHudLine(
+  rows: MatchupHudRow[],
+  archetype: string | null | undefined,
+  minSample = 2,
+): MatchupHudLine | null {
+  const name = archetype?.trim();
+  if (!name || !rows.length) return null;
+  const row = rows.find((r) => r.archetype === name);
+  if (!row) return null;
+  const sample = row.wins + row.losses;
+  if (sample < minSample) return null;
+  const wrPct =
+    row.rate != null
+      ? Math.round(row.rate * 100)
+      : Math.round((row.wins / sample) * 100);
+  return {
+    archetype: name,
+    wins: row.wins,
+    losses: row.losses,
+    wrPct,
+    short: `${wrPct}% (${row.wins}–${row.losses})`,
+    detail: `${row.wins}–${row.losses} (${wrPct}%) on this deck`,
+    sample,
+  };
+}
+
+/** Distinct opponent cards observed this match (for a quiet "n seen" chip). */
+export function opponentCardsSeenCount(
+  opponentSeen: number[] | null | undefined,
+): number {
+  if (!opponentSeen?.length) return 0;
+  return new Set(opponentSeen.filter((id) => Number.isFinite(id))).size;
+}

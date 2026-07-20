@@ -76,7 +76,7 @@ The product is finished enough to deserve an audience 100× larger than a single
 
 **A4 — SEO / content moat.** The daily pipeline already *produces* the most valuable thing in MTG content — a verified, dated, machine-readable metagame — and throws away the HTML surface. Publish a lightweight, statically-generated **public meta site** from `latest.json` + `history.json`: "Standard metagame on {date}", per-archetype pages, rotation countdowns. Every daily run becomes an indexable page. This turns your CI cron into a compounding content engine that funnels to the download.
 
-**A5 — Community & virality.** The `deckShare` / `shareCards` / `recapCard` infrastructure already renders PNGs. Close the loop: one-click "share my season recap" / "share this matchup record" to X/Discord with the app's OG branding, `?v=` cache-busted. Add a Discord presence and a `Share to community` that *seeds* the SEO site.
+**A5 — Community & virality.** ✓ **Source 2026-07-20** (not in published binary yet). The `deckShare` / `shareCards` / `recapCard` infrastructure already renders PNGs. Close the loop: one-click "share my season recap" / "share this matchup record" to X/Discord with the app's OG branding, `?v=` cache-busted. Add a Discord presence and a `Share to community` that *seeds* the SEO site.
 
 ---
 
@@ -90,7 +90,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 **B3 — Grounded AI coach (the deferred idea, done safely).** The roadmap defers "AI without grounded local data" — correctly. The move is a coach that is *only ever* grounded: input = the user's real matches + today's real Scryfall-validated meta lists; output = "you're 2–7 vs the field's #1 deck (Izzet Prowess); here are 3 sideboard cards *from your own list* the ranked Izzet peers run against it." No invented cards (the `brewLab.ts` deterministic staples engine is the guardrail), Claude API only summarizes/prioritizes real rows. Ship it opt-in, offline-capable-degraded, with every claim traceable to a match id or a deck id. This is the feature that gets written up.
 
-**B4 — Overlay depth.** The overlay HUD already tracks the library. Add opponent-cards-seen and a live "you're on X% to win this matchup historically" line — again from purely local data.
+**B4 — Overlay depth.** ✓ **Source 2026-07-20** (not in published binary yet). The overlay HUD already tracks the library. Add opponent-cards-seen and a live "you're on X% to win this matchup historically" line — again from purely local data.
 
 ---
 
@@ -114,7 +114,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 ### Pillar D — Activation & Engagement Loop  *(the ~2× on Activation + Retention)*
 
-**D1 — Sub-2-minute first value.** Instrument (locally) the setup funnel: log found → detailed-logs enabled → first match recorded. `TrackerOnboarding.tsx` exists; make it a guided, checkable, "you're live" moment. The faster a user sees *their own first tracked match*, the higher every downstream number.
+**D1 — Sub-2-minute first value.** ✓ **Source 2026-07-20** (not in published binary yet). Instrument (locally) the setup funnel: log found → detailed-logs enabled → first match recorded. `TrackerOnboarding.tsx` exists; make it a guided, checkable, "you're live" moment. The faster a user sees *their own first tracked match*, the higher every downstream number.
 
 **D2 — The daily loop.** A "since you last opened" digest: meta movers, your record yesterday, rank delta, rotation countdown. The pieces exist (`metaDiff`, `climbStats`, `rankMoments`) — assemble them into one open-worthy home strip. (Note: the 10× SKIP list parked "Today's plan strip" D1; revisit that decision *now* that retention is the explicit goal — it may be the highest-value un-parking.)
 

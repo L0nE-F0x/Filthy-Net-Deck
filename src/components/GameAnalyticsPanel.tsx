@@ -4,6 +4,19 @@ import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
 import { deckMatchupMatrix, pct, pts, sideboardSplit } from "../services/gameAnalytics";
 import type { TrackedMatch } from "../types/tracker";
 import type { Deck } from "../types/meta";
+import { ShareMenu } from "./ShareMenu";
+import {
+  communityShareOptions,
+  deliverShare,
+  metaWebDeckUrl,
+  type ShareDestination,
+} from "../services/communityShare";
+import {
+  matchupShareCaption,
+  matchupShareFilename,
+  packageMatchupShare,
+  renderMatchupSharePng,
+} from "../services/matchupShare";
 
 /**
  * B2 — game-level analytics for one tracked deck (Stats deck detail).
@@ -12,7 +25,14 @@ import type { Deck } from "../types/meta";
  * local, all real; games without recorded facts are excluded, never
  * estimated.
  */
-export function GameAnalyticsPanel({ deckMatches }: { deckMatches: TrackedMatch[] }) {
+export function GameAnalyticsPanel({
+  deckMatches,
+  deckName,
+}: {
+  deckMatches: TrackedMatch[];
+  /** Display name for the share card (tracked deck name). */
+  deckName?: string;
+}) {
   const meta = useAppStore((s) => s.meta);
   const openDeck = useAppStore((s) => s.openDeck);
 
@@ -74,13 +94,48 @@ export function GameAnalyticsPanel({ deckMatches }: { deckMatches: TrackedMatch[
     return null; // nothing recorded at game granularity yet — stay quiet
   }
 
+  const shareName =
+    deckName?.trim() ||
+    deckMatches.find((m) => m.deckName?.trim())?.deckName?.trim() ||
+    "My deck";
+
   return (
     <section className="panel">
-      <p className="eyebrow m-0 mb-1">Game analytics</p>
-      <h3 className="text-sm font-semibold m-0 mb-2">
-        Sideboard & matchups
-        <span className="text-muted font-normal"> · decided games only, from your log</span>
-      </h3>
+      <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+        <div>
+          <p className="eyebrow m-0 mb-1">Game analytics</p>
+          <h3 className="text-sm font-semibold m-0 mb-0">
+            Sideboard & matchups
+            <span className="text-muted font-normal"> · decided games only, from your log</span>
+          </h3>
+        </div>
+        {matchups.length > 0 && (
+          <ShareMenu
+            label="Share matchups"
+            hint="Personal WR by inferred archetype — save, Discord, or X"
+            options={communityShareOptions("seeds public meta link when known")}
+            onPick={async (id) => {
+              const dest = id as ShareDestination;
+              const overallWins = deckMatches.filter((m) => m.result === "win").length;
+              const overallLosses = deckMatches.filter((m) => m.result === "loss").length;
+              const packed = packageMatchupShare(shareName, matchups, {
+                overall: { wins: overallWins, losses: overallLosses },
+              });
+              if (!packed) throw new Error("No matchup rows to share yet");
+              const blob = await renderMatchupSharePng(packed);
+              const caption = matchupShareCaption(packed, metaWebDeckUrl);
+              const result = await deliverShare({
+                destination: dest,
+                blob,
+                filename: matchupShareFilename(shareName),
+                caption,
+              });
+              if (!result.ok) throw new Error(result.message);
+              return result.message;
+            }}
+          />
+        )}
+      </div>
 
       {hasSide && (
         <div className="mb-3 text-xs">

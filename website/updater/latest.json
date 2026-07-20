@@ -1,11 +1,11 @@
 {
-  "version": "1.6.0",
-  "notes": "v1.6.0 The tracker got smarter: opponent-archetype inference (your winrate vs each meta deck, from cards actually seen), Bo3 sideboard analytics + per-deck matchup table, live overlay guess, anonymized diagnostic export. Meta lists now multi-source (real MTGO challenge lists with Goldfish fallback).",
-  "pub_date": "2026-07-20T04:06:48.056Z",
+  "version": "1.7.0",
+  "notes": "v1.7.0 Share the climb: matchup share cards plus save / Discord paste / post on X. Overlay shows your historical WR vs the inferred opponent. Guided first-session coach on Daily - progress bar and You are live when your first match lands.",
+  "pub_date": "2026-07-20T05:07:46.736Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJneFJhang5Q3Yzc2JHZnpCREwycnFRVkZpcDBrQktCYVppbTZpL3pIajB3RklVY0FLQlI1RERPYms2OCtOZG0xY2p3eXNZYmRQdmRMWXNrcE5GVUFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTIwMDQxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNi4wX3g2NC1zZXR1cC5leGUKTml5M3pNTHU3ZlgwakcxcmEyNXo5aDJzV2hpOVlVcnFBYkloOXk4UlBkekhGWlB0YURDWGMvNzNPZHZpdGZySWdpL1B4Wno2ZWVuSUtiZkRMZTg3QlE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.6.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdhUktRQ3dWYWNtZW1hNlpkSlAwbW1vQnpaVitaTW0rRWtnVHdIbTNzOFlZLzNZaFlxNmtFSmZNQmFvOEd4WVhxUThQM05aTEV0ZGF3VlEzQUUwN3d3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTI0MDE5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNy4wX3g2NC1zZXR1cC5leGUKZm9vbUlwakpSY0lFdms2NGdQUXFRNVgrSGlwTm9rdVpBUThiQW9ldVVUanNsaUpGYk0xUmQxNUtGRzY5SkloR1M4M2pNQWx0d2VST0hLQ2Y3a0szQUE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.7.0.exe"
     }
   }
 }

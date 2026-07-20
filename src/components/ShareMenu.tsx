@@ -7,14 +7,28 @@ export type ShareMenuOption = {
   disabled?: boolean;
 };
 
+/** Optional status string returned by onPick / onShare (e.g. "Image copied"). */
+export type ShareStatus = void | string | { message?: string };
+
+function statusFrom(result: ShareStatus, fallback: string): string {
+  if (typeof result === "string" && result.trim()) return result;
+  if (result && typeof result === "object" && result.message?.trim()) {
+    return result.message;
+  }
+  return fallback;
+}
+
 type Props = {
   /** Primary button label, e.g. "Share deck card". */
   label: string;
   /** Short helper under the button in the closed state (optional). */
   hint?: string;
   options: ShareMenuOption[];
-  /** Called with option id; may be async — menu shows busy until settled. */
-  onPick: (id: string) => void | Promise<void>;
+  /**
+   * Called with option id; may be async — menu shows busy until settled.
+   * Return a string (or `{ message }`) to customize the success status line.
+   */
+  onPick: (id: string) => ShareStatus | Promise<ShareStatus>;
   /** Visual weight of the trigger. */
   variant?: "primary" | "ghost";
   className?: string;
@@ -62,13 +76,13 @@ export function ShareMenu({
     setStatus("Rendering…");
     setOpen(false);
     void Promise.resolve(onPick(id))
-      .then(() => setStatus("Saved PNG"))
+      .then((r) => setStatus(statusFrom(r, "Saved PNG")))
       .catch((e) =>
         setStatus(e instanceof Error ? e.message : "Could not render"),
       )
       .finally(() => {
         setBusy(false);
-        window.setTimeout(() => setStatus(null), 3200);
+        window.setTimeout(() => setStatus(null), 4200);
       });
   };
 
@@ -118,11 +132,11 @@ export function ShareMenu({
   );
 }
 
-/** Single-action share (climb story, week recap, theme card). */
+/** Single-action share (theme card, simple one-shot PNG). */
 export function ShareActionButton(props: {
   label: string;
   detail?: string;
-  onShare: () => void | Promise<void>;
+  onShare: () => ShareStatus | Promise<ShareStatus>;
   variant?: "primary" | "ghost";
   className?: string;
 }) {
@@ -142,13 +156,13 @@ export function ShareActionButton(props: {
           setBusy(true);
           setStatus("Rendering…");
           void Promise.resolve(props.onShare())
-            .then(() => setStatus("Saved PNG"))
+            .then((r) => setStatus(statusFrom(r, "Saved PNG")))
             .catch((e) =>
               setStatus(e instanceof Error ? e.message : "Could not render"),
             )
             .finally(() => {
               setBusy(false);
-              window.setTimeout(() => setStatus(null), 3200);
+              window.setTimeout(() => setStatus(null), 4200);
             });
         }}
       >

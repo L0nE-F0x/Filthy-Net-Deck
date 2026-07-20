@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.6.0";
+export const APP_VERSION = "1.7.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,9 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Opponents, named: cards they play are matched to today's ranked meta — see your winrate by enemy archetype on Decks and in deck detail",
-  "Game analytics on My Stats: Bo3 game-1 vs post-board winrate and a per-deck matchup table",
-  "Overlay shows a live guess of the opponent's archetype mid-match",
-  "Meta lists upgraded: real MTGO challenge decklists first, Goldfish fallback",
-  "Settings → Export diagnostic: anonymized parser-health file (counters only — no names, no matches)"
+  "Share matchups, week recap, and climb story — save PNG, copy image for Discord, or post on X with a download link",
+  "Overlay matchup line: your historical WR vs the inferred opponent archetype (cards actually seen), when sample is enough",
+  "First-session coach on Daily: setup progress and a You're live moment when your first match is recorded",
+  "Captions seed the public meta site when a matchup maps to today's ranked list"
 ];

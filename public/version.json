@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.6.0.exe",
-  "notes": "v1.6.0 The tracker got smarter: opponent-archetype inference (your winrate vs each meta deck, from cards actually seen), Bo3 sideboard analytics + per-deck matchup table, live overlay guess, anonymized diagnostic export. Meta lists now multi-source (real MTGO challenge lists with Goldfish fallback)."
+  "version": "1.7.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.7.0.exe",
+  "notes": "v1.7.0 Share the climb: matchup share cards plus save / Discord paste / post on X. Overlay shows your historical WR vs the inferred opponent. Guided first-session coach on Daily - progress bar and You are live when your first match lands."
 }

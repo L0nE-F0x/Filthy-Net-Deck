@@ -7,8 +7,10 @@ import { SpoilerPulse } from "../components/SpoilerPulse";
 import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { OpponentArchetypePanel } from "../components/OpponentArchetypePanel";
+import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
-import { recordVsTags } from "../services/matchupNotes";
+import { recordVsTags, listTaggedOpponentCount } from "../services/matchupNotes";
+import { needsOnboardingCoach } from "../services/trackerHealth";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
 
@@ -157,6 +159,11 @@ export function Daily() {
   const dailyFormatId = useAppStore((s) => s.dailyFormatId);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
   const trackerMatches = useAppStore((s) => s.trackerMatches);
+  const trackerStatus = useAppStore((s) => s.trackerStatus);
+  const showOnboarding = useMemo(() => {
+    const tagged = listTaggedOpponentCount();
+    return needsOnboardingCoach(trackerStatus, trackerMatches, tagged);
+  }, [trackerStatus, trackerMatches]);
 
   // Your record vs tagged archetypes (Matchup Lab) keyed by lowercased tag.
   const vsTagMap = useMemo(() => recordVsTags(trackerMatches), [trackerMatches]);
@@ -223,6 +230,12 @@ export function Daily() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* D1 — activation strip on home until first-session loop is done */}
+      {showOnboarding && (
+        <div className="panel tracker-onboarding-home">
+          <TrackerOnboarding showHealthDetail />
+        </div>
+      )}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>

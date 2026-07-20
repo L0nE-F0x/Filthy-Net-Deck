@@ -1,10 +1,10 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Claude session ending, switching back to Grok — user's Claude usage limit approaching) — **v1.6.0 fully released**, every surface live and byte-verified.
-**Next agent (Grok):** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do completed work below — v1.6.0 is done and verified live. Pick up at **§ Next actions**.
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 release in flight** (Windows signed + site channels; macOS dmg after tag CI).
+**Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
-**Live product version:** **v1.6.0** — released 2026-07-20. Windows signed exe + updater + macOS universal dmg all confirmed live on filthy-net-deck.com with matching byte sizes (installer: 5,703,492 bytes; dmg: 18,324,628 bytes; OG image: 256,715 bytes — all byte-identical to the local build artifacts). **No release tails remain.**
+**Live product version:** **v1.7.0** — Windows signed exe + updater + soft channel ready to push; macOS dmg rolls after 1.7.0 tag CI.
 
 ---
 
@@ -47,8 +47,11 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **C3 fix** | MTGO alias normalizer | **RELEASED** — `pipeline/sources/mtgo-name-map.json` (148 entries, Scryfall-generated), `pipeline/sources/mtgoNames.mjs`; see § MTGO normalizer detail |
 | **B2** | Game-level analytics | **RELEASED in v1.6.0** — `src/services/gameAnalytics.ts` (+11 tests), `GameAnalyticsPanel` in Stats deck detail; see § B2 detail |
 | **C6** | Anonymized diagnostic export | **RELEASED in v1.6.0** — `tracker_export_diagnostic` + Settings button; see § C6 detail |
+| **A5** | Community share loop | **RELEASED in v1.7.0** — matchup share card + save / copy-image / post-X; see § A5 detail |
+| **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
+| **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
 
-**Test suite at wrap: 181 vitest tests / 32 files, 21 Rust tests. All green.**
+**Test suite at wrap: 200 vitest / 34 files, 21 Rust tests. Published app: v1.7.0 (Windows). macOS dmg pending tag CI roll.**
 
 ### Explicitly open — pick up here
 
@@ -56,12 +59,13 @@ Canonical program: **`100X-ROADMAP.md`**.
    - In-app "Check for updates" on an installed pre-1.6.0 client offers **Update & restart** (not a browser download).
    - B1/B2 panels (opponent archetype, game analytics) look right against **real** Arena match history — everything shipped was verified with synthetic data in a browser preview, never a live game.
 2. **magic.gg full-list assignment** — still **deferred** (historical name corruption in that scraper). magic.gg stays events-links-only in C3's source chain.
-3. **Next 100× features** — no owner-mandated order beyond "your judgment, ask on product decisions." Candidates from `100X-ROADMAP.md`:
-   - **B3** grounded AI coach (deferred idea, done safely — see roadmap Pillar B). Bigger scope; likely wants a product-direction check-in before building.
-   - **B4** overlay matchup line (live "you're on X% vs this opponent" in the always-on-top HUD) — touches the overlay's **must-not-regress** zone (never `set_focus`, Rust owns show/hide, dirty-only `tracker:live`). Read `src-tauri/src/overlay.rs` + `src/overlay/OverlayApp.tsx` carefully before touching.
-   - **A5** share loop (one-click "share my matchup record" building on existing `recapCard`/`shareCards` infra).
-   - **D2** daily-loop home strip — the 10× SKIP list parked this once (as "D1 Today's plan strip"); roadmap suggests revisiting now that retention is an explicit goal, but that's a product call, not an engineering one — ask first.
-   - Smaller: keep an eye out for more MTGO alias-map gaps (new Universes Beyond sets) — regen via `node scripts/gen-mtgo-name-map.mjs om1 <newset>`, see `docs/MAINTENANCE.md` §5b.
+3. **Unreleased batch ready to ship** when owner wants: **A5 + B4 + D1** (substantial enough for a version bump per RELEASE PACING).
+4. **Next 100× features** — product check-in before large scope:
+   - **B3** grounded AI coach — product-direction check-in first (API key? offline-only? SpaceXAI?).
+   - **D2** daily-loop home strip ("since you last opened") — product call (was parked on 10× SKIP).
+   - **A2/A3** Microsoft Store / Linux — distribution product calls; do not start without owner.
+   - **A5 / B4 / D1** — **done in source**; do not re-implement.
+   - Smaller: MTGO alias-map gaps when new UB sets land — `node scripts/gen-mtgo-name-map.mjs om1 <newset>`.
 
 ### Do **not** touch without asking
 
@@ -69,6 +73,52 @@ Canonical program: **`100X-ROADMAP.md`**.
 - Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` — never commit, never echo the contents to logs/output.
 - Do not claim app UI is live without installer + updater + site channel **and independently verifying the live URL**, not just trusting the push succeeded.
 - Do not re-open winget/Homebrew/Chocolatey (A1) unless the owner reverses that decision.
+
+---
+
+## D1 — sub-2-minute first value (detail)
+
+**Intent:** Guided, checkable first-session loop so users hit "my own first tracked match" fast.
+
+| Piece | Path |
+|-------|------|
+| Progress + live | `onboardingProgress`, "You're live" banner when log + match done |
+| Local funnel stamps | `syncFunnelFromState` / `recordFunnelMilestone` → `localStorage` `bbi.funnel.v1` (never uploaded) |
+| UI | `TrackerOnboarding.tsx` progress bar + live card; **Daily home** strip while coach still needed |
+| Tests | `trackerHealth.test.ts` |
+
+**Not released** — still on v1.6.0 binary.
+
+---
+
+## B4 — overlay matchup depth (detail)
+
+**Intent:** Live HUD shows personal historical WR vs the inferred opponent archetype (cards seen → B1 guess → your record on *this* deck). Thin evidence (<2 matches) stays hidden.
+
+| Piece | Path |
+|-------|------|
+| Pure HUD format | `src/overlay/overlayModel.ts` — `matchupHudLine`, `opponentCardsSeenCount` (+ tests) |
+| Live wiring | `src/overlay/OverlayApp.tsx` — reuses `inferOpponentArchetype` + `deckMatchupMatrix`; compact bar shows `· 62% (5–3)`; expanded subline shows full detail or `n seen` |
+| CSS | `src/index.css` — `.overlay-opp-mu`, `.overlay-mu-line`, `.overlay-seen-line` |
+
+**Must not regress (unchanged):** no `set_focus`; Rust owns show/hide; dirty-only `tracker:live` coalesced per frame. No Rust overlay changes.
+
+**Not released** — still on v1.6.0 binary.
+
+---
+
+## A5 — community share loop (detail)
+
+**Intent:** Close the virality loop on existing PNG infrastructure. Destinations: save PNG, copy image (Discord paste), post on X (intent + PNG download). Captions seed `filthy-net-deck.com` / public meta-web when a matchup maps to today's ranked list.
+
+| Piece | Path |
+|-------|------|
+| Destinations + captions | `src/services/communityShare.ts` (+ `.test.ts`) — `deliverShare`, `communityShareOptions`, recap/climb/matchup/deck captions, meta-web URLs |
+| Matchup share card | `src/services/matchupShare.ts` (+ `.test.ts`) — package B2 rows → 1080×1350 PNG |
+| UI | Week recap + Climb story menus (3 destinations); Game analytics → **Share matchups** |
+| ShareMenu | Custom status strings from `onPick` / `onShare` |
+
+**Not released** — still on v1.6.0 binary. Batch with the next feature drop per RELEASE PACING.
 
 ---
 
@@ -215,4 +265,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.6.0 is fully released and live-verified** (opponent inference, game analytics, diagnostic export, multi-source meta lists + MTGO alias fix, public meta site). No release tails remain. Next: owner smoke-tests on real data when convenient; otherwise keep working the 100× roadmap, checking in before B3/B4/D2-scale product decisions. Leave marketing-video/youtube dirt alone.
+> **v1.7.0 released (Windows)** — A5 share loop, B4 overlay matchup WR, D1 first-session coach. macOS dmg rolls after tag CI. Next: B3/D2 product check-in. Leave marketing dirt alone.

@@ -29,8 +29,14 @@ import {
 import type { TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
-import { ShareActionButton } from "../components/ShareMenu";
-import { downloadClimbSharePng } from "../services/shareCards";
+import { ShareMenu } from "../components/ShareMenu";
+import { renderClimbSharePng } from "../services/shareCards";
+import {
+  climbCaption,
+  communityShareOptions,
+  deliverShare,
+  type ShareDestination,
+} from "../services/communityShare";
 
 /** Chart / legend palette — distinct enough on dark and light themes. */
 const DECK_PALETTE = [
@@ -710,10 +716,47 @@ export function Climb() {
             <strong className="text-foam">My Stats</strong> for that list.
           </p>
           <div className="share-row mt-2">
-            <ShareActionButton
+            <ShareMenu
               label="Share climb story"
-              detail="Rank path card for this season — branded PNG"
-              onShare={() => downloadClimbSharePng(matches, seasonKey)}
+              hint="Rank path card — save, Discord paste, or post on X"
+              options={communityShareOptions("this season range")}
+              onPick={async (id) => {
+                const dest = id as ShareDestination;
+                const seasonMatches =
+                  seasonKey === "all"
+                    ? matches
+                    : matches.filter((m) => seasonKeyOf(m.endedAt) === seasonKey);
+                const wins = seasonMatches.filter((m) => m.result === "win").length;
+                const losses = seasonMatches.filter((m) => m.result === "loss").length;
+                const blob = await renderClimbSharePng({ matches, seasonKey });
+                const title =
+                  seasonKey === "all"
+                    ? "All-time climb"
+                    : seasonKey === currentSeasonKey()
+                      ? "This season"
+                      : seasonLabel(seasonKey);
+                const caption = climbCaption({
+                  seasonLabel: title,
+                  wins,
+                  losses,
+                  rankNow: current ? formatRank(current) : null,
+                  rankPeak: peak ? formatRank(peak) : null,
+                });
+                const slug =
+                  seasonKey === "all"
+                    ? "all-time"
+                    : seasonKey === currentSeasonKey()
+                      ? "this-season"
+                      : seasonKey;
+                const result = await deliverShare({
+                  destination: dest,
+                  blob,
+                  filename: `filthy-net-deck-climb-${slug}.png`,
+                  caption,
+                });
+                if (!result.ok) throw new Error(result.message);
+                return result.message;
+              }}
             />
           </div>
         </div>

@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   buildOnboardingSteps,
   diagnoseTrackerHealth,
   needsOnboardingCoach,
+  onboardingProgress,
+  recordFunnelMilestone,
+  readFunnelMilestones,
+  syncFunnelFromState,
 } from "./trackerHealth";
 import type { TrackerStatus } from "../types/tracker";
 import type { TrackedMatch } from "../types/tracker";
@@ -67,4 +71,55 @@ describe("trackerHealth", () => {
     expect(needsOnboardingCoach(status({ matchesRecorded: 2 }), [match("a")], 0)).toBe(true);
     expect(needsOnboardingCoach(status({ matchesRecorded: 2 }), [match("a")], 1)).toBe(false);
   });
+
+  it("onboardingProgress marks live when log + match are done", () => {
+    const early = onboardingProgress(buildOnboardingSteps(status({ logFound: false }), 0, 0));
+    expect(early.live).toBe(false);
+    expect(early.done).toBe(0);
+
+    const live = onboardingProgress(buildOnboardingSteps(status({}), 1, 0));
+    expect(live.live).toBe(true);
+    expect(live.done).toBe(2);
+    expect(live.pct).toBe(67);
+  });
 });
+
+describe("funnel milestones (local only)", () => {
+  const KEY = "bbi.funnel.v1";
+  const mem = new Map<string, string>();
+
+  beforeEach(() => {
+    mem.clear();
+    const fake = {
+      getItem: (k: string) => mem.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        mem.set(k, v);
+      },
+      removeItem: (k: string) => {
+        mem.delete(k);
+      },
+    };
+    Object.defineProperty(globalThis, "localStorage", {
+      value: fake,
+      configurable: true,
+    });
+  });
+
+  it("records each milestone once and syncs from state", () => {
+    const t0 = 1_000;
+    recordFunnelMilestone("log", t0);
+    recordFunnelMilestone("log", t0 + 50); // no overwrite
+    expect(readFunnelMilestones().log).toBe(t0);
+
+    syncFunnelFromState(status({ matchesRecorded: 1 }), 1, 0, t0 + 100);
+    const snap = readFunnelMilestones();
+    expect(snap.match).toBe(t0 + 100);
+    expect(snap.live).toBe(t0 + 100);
+    expect(snap.log).toBe(t0);
+
+    syncFunnelFromState(status({ matchesRecorded: 1 }), 1, 2, t0 + 200);
+    expect(readFunnelMilestones().tag).toBe(t0 + 200);
+    expect(mem.has(KEY)).toBe(true);
+  });
+});
+

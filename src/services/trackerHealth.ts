@@ -167,3 +167,91 @@ export function needsOnboardingCoach(
   if (taggedOpponentCount === 0 && matches.length > 0 && matches.length < 8) return true;
   return false;
 }
+
+/** Steps complete + whether the tracker is "live" (log + ≥1 match). */
+export function onboardingProgress(steps: OnboardingStep[]): {
+  done: number;
+  total: number;
+  pct: number;
+  /** Log found + detailed on + first match — the sub-2-minute value moment. */
+  live: boolean;
+} {
+  const total = steps.length;
+  const done = steps.filter((s) => s.done).length;
+  const log = steps.find((s) => s.id === "log")?.done === true;
+  const match = steps.find((s) => s.id === "match")?.done === true;
+  return {
+    done,
+    total,
+    pct: total ? Math.round((done / total) * 100) : 0,
+    live: log && match,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Local funnel milestones (never uploaded — D1 instrumentation)       */
+/* ------------------------------------------------------------------ */
+
+const FUNNEL_KEY = "bbi.funnel.v1";
+
+export type FunnelMilestone = "log" | "match" | "tag" | "live";
+
+export type FunnelSnapshot = Partial<Record<FunnelMilestone, number>>;
+
+export function readFunnelMilestones(): FunnelSnapshot {
+  try {
+    const raw = localStorage.getItem(FUNNEL_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as FunnelSnapshot;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeFunnelMilestones(snap: FunnelSnapshot): void {
+  try {
+    localStorage.setItem(FUNNEL_KEY, JSON.stringify(snap));
+  } catch {
+    /* private mode / quota — ignore */
+  }
+}
+
+/** Record a milestone once (first timestamp wins). Local only. */
+export function recordFunnelMilestone(
+  id: FunnelMilestone,
+  atMs = Date.now(),
+): FunnelSnapshot {
+  const snap = readFunnelMilestones();
+  if (snap[id] == null) {
+    snap[id] = atMs;
+    writeFunnelMilestones(snap);
+  }
+  return snap;
+}
+
+/**
+ * Sync funnel stamps from current tracker state. Idempotent; safe to call
+ * on every Settings/onboarding paint. Does not send anything off-box.
+ */
+export function syncFunnelFromState(
+  status: TrackerStatus | null,
+  matchCount: number,
+  taggedOpponentCount: number,
+  nowMs = Date.now(),
+): FunnelSnapshot {
+  if (!status) return readFunnelMilestones();
+  if (status.logFound && status.detailedLogs !== false) {
+    recordFunnelMilestone("log", nowMs);
+  }
+  if (matchCount > 0) {
+    recordFunnelMilestone("match", nowMs);
+    if (status.logFound && status.detailedLogs !== false) {
+      recordFunnelMilestone("live", nowMs);
+    }
+  }
+  if (taggedOpponentCount > 0) {
+    recordFunnelMilestone("tag", nowMs);
+  }
+  return readFunnelMilestones();
+}
