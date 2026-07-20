@@ -38,6 +38,7 @@ import {
   deliverShare,
   type ShareDestination,
 } from "../services/communityShare";
+import { tallyMatches } from "../services/statsHelpers";
 
 /** Chart / legend palette — distinct enough on dark and light themes. */
 const DECK_PALETTE = [
@@ -54,10 +55,7 @@ const DECK_PALETTE = [
 ];
 
 function tally(matches: TrackedMatch[]) {
-  const wins = matches.filter((m) => m.result === "win").length;
-  const losses = matches.filter((m) => m.result === "loss").length;
-  const decided = wins + losses;
-  return { wins, losses, decided, rate: decided > 0 ? wins / decided : null };
+  return tallyMatches(matches);
 }
 
 function deckSwatch(key: string): string {
