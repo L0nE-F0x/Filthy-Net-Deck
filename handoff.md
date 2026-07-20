@@ -1,8 +1,25 @@
-**Last wrap-up:** 2026-07-20 (Grok) — **C3 magic.gg lists + B2 mulligan/first-land + peels/bloat docs** (source on main; still v1.8.0 binary until next release).
-**Next agent:** Read this file + AGENTS.md + 100X-ROADMAP.md. Program tail closed in source. Optional: owner-approved git history rewrite (docs/GIT-HISTORY-BLOAT.md); next app release when ready.
+# Filthy Net Deck — handoff
 
-**Repo:** L0nE-F0x/Filthy-Net-Deck · branch **main**.
-**Live product version:** **v1.8.0** — new source features need a version bump + full AGENTS checklist to be live in the installed app.
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.9.0 fully released** (Windows signed + updater + site + OG; macOS via tag CI then dmg roll).
+**Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Program pillars complete; optional git history rewrite only with owner force-push approval.
+
+**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version:** **v1.9.0** — Windows Setup + signed in-app updater + soft channel + marketing/OG. macOS universal dmg after CI (see Roll commit if present).
+
+---
+
+## v1.9.0 release batch
+
+| Theme | What shipped |
+|-------|----------------|
+| **B2 complete** | Mulligan keep-7 rates + first-land turn (tracker GRE fields, Game analytics, Splits, CSV) |
+| **C3 complete** | magic.gg structured `<deck-list>` assignment; priority MTGO → magic.gg → Goldfish |
+| **Post-1.8 stack** | B1 accept-tag, session wrap share, local coach chips, first-match toast, meta edge |
+| **Hygiene** | Peels (`deckVersions`, `climbChart`); `docs/GIT-HISTORY-BLOAT.md` (no force-push) |
+
+**Installer:** `website/downloads/Filthy-Net-Deck-Setup-1.9.0.exe` (+ `.sig`) · updater `website/updater/latest.json`.
+
+**Gate before push:** tsc / eslint / vitest / cargo as usual.
 
 ---
 

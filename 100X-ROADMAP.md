@@ -1,7 +1,7 @@
 # Filthy Net Deck — the 100× Roadmap
 
 **Prepared:** 2026-07-20 · from a full-codebase deep scan  
-**Live product (updated):** **v1.8.0** (2026-07-20) · Tauri 2 + React 19 + TypeScript + Tailwind 4 + Zustand 5  
+**Live product (updated):** **v1.9.0** (2026-07-20) · Tauri 2 + React 19 + TypeScript + Tailwind 4 + Zustand 5  
 **Original scan baseline:** v1.5.x · ~21,600 lines TS/TSX · ~2,441 lines Rust · pipeline + 250+ vitest tests now
 
 > This is not a list of 100 features. **100× is multiplicative, not additive.** A great app that nobody installs is 1×. This roadmap identifies the handful of multipliers that compound — reach, retention, reliability, and a defensible moat — and sequences them so each one is protected by the one before it.
@@ -12,7 +12,7 @@
 
 **Active pillar items (A1–D2, excluding cancelled):** ~14 unique program tickets.  
 **Cancelled by owner:** A1 package managers · **A2 Store** · **A3 Linux** · **B3 cloud LLM**.  
-**Done (shipped through v1.8.0 or source-complete on main):** roughly **~95%+ of remaining program** (C3/B2/maintenance tail closed in source).
+**Done (shipped through v1.9.0 or source-complete on main):** roughly **~95%+ of remaining program** (C3/B2/maintenance tail closed in source).
 
 | ID | Status | Notes |
 |----|--------|--------|

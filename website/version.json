@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.8.0.exe",
-  "notes": "v1.8.0 Retention & depth: Daily catch-up strip, season recap notify + share, queue WR, field EV vs the meta, matchup form/play-draw, opponent share cards, meta-mover toasts, richer match-end alerts. CSV gains season + cards-seen. Windows + macOS via website + signed updater."
+  "version": "1.9.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.9.0.exe",
+  "notes": "v1.9.0 Depth batch: mulligan keep-7 rates + first-land turn analytics from your Arena log; multi-source meta lists (MTGO + structured magic.gg); accept-tag matchups, session wrap share, grounded local coach chips, first-match toast. Windows + macOS via website + signed updater."
 }

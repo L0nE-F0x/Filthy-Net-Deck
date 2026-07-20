@@ -130,7 +130,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v1.8.0  {mid}  CATCH UP + FIELD EV + SHARE"
+    badge_text = f"NEW  {mid}  v1.9.0  {mid}  MULLIGANS + MAGIC.GG LISTS"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -145,9 +145,9 @@ def main() -> None:
     draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
-        "Daily catch-up. Season recap share.",
-        "Field EV vs the meta. Queue WR.",
-        "Matchup form + opponent share cards.",
+        "Mulligan rates + first-land turn analytics.",
+        "Multi-source lists: MTGO + magic.gg.",
+        "Coach chips, session wrap, accept-tag MU.",
         f"No Alchemy {mid} 100% local {mid} free Win + macOS.",
     ]
     dy = ty + 236
@@ -158,7 +158,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v1.8.0  ·  Windows + macOS", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v1.9.0  ·  Windows + macOS", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.com", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")
