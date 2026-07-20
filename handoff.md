@@ -68,7 +68,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 
 ### Do **not** touch without asking
 
-- Unrelated dirty tree: `marketing-video/*`, `website/assets/youtube*`, `goal/` — leave alone, has been dirty across multiple sessions, is the owner's in-progress work.
+- Unrelated dirty tree: `website/assets/youtube*`, `goal/` — leave alone if present (owner WIP). **`marketing-video/` was deleted 2026-07-20** (old Remotion promo pipeline; no longer part of the product).
 - Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` — never commit, never echo the contents to logs/output.
 - Do not claim app UI is live without installer + updater + site channel **and independently verifying the live URL**, not just trusting the push succeeded.
 - Do not re-open winget/Homebrew/Chocolatey (A1) unless the owner reverses that decision.
