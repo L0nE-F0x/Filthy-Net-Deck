@@ -1842,8 +1842,8 @@ fn match_end_body(m: &TrackedMatch, history: &[TrackedMatch]) -> String {
             }
         }
         let decided = wins + losses;
-        if decided > 0 {
-            body.push_str(&format!(" · {}% this season", wins * 100 / decided));
+        if let Some(pct) = (wins * 100).checked_div(decided) {
+            body.push_str(&format!(" · {pct}% this season"));
         }
     }
     if let Some(rank) = m
@@ -2290,12 +2290,7 @@ mod tests {
         other_month.result = "loss".to_string();
         other_month.ended_at = base.ended_at + 40 * 86_400_000;
 
-        let history = vec![
-            base,
-            loss.clone(),
-            other_deck,
-            other_month,
-        ];
+        let history = vec![base, loss.clone(), other_deck, other_month];
         let body = match_end_body(&loss, &history);
         assert!(body.starts_with("Loss vs Rival"), "{body}");
         assert!(body.contains("50% this season"), "{body}");
