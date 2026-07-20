@@ -1,95 +1,60 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok) — session closed. **v1.9.0 fully released** (Win + macOS + signed updater + site + OG), live byte-verified on both hosts.  
-**Next agent:** **Fable five / Claude Code** — owner has a **final pass** plus **a couple of tiny last-minute changes** they wrote down. Read this file + `AGENTS.md` + `100X-ROADMAP.md` before coding.
+**Last wrap-up:** 2026-07-20 (Claude / Fable 5) — **v2.0.0 fully released** (owner's 10-item handwritten final batch). 100X program is **complete**; there is no active roadmap. Future work = owner requests.
 
-**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (tip should be `ccdca15` or later).  
-**Live product version:** **v1.9.0**
+**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version:** **v2.0.0**
 
 | Artifact | Notes |
 |----------|--------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.9.0.exe` (5,703,232 B) + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-1.9.0-universal.dmg` (18,332,290 B) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.0.0.exe` + `.sig` (key 67FCA9900F523D49 verified) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.0.0-universal.dmg` (rolled from tag CI) |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| Tag | `v1.9.0` (macOS CI already green; dmg rolled in `ccdca15`) |
-| Marketing | OG / Twitter meta + `og-image.png?v=1.9.0` cache-bust |
-
-**Live check (already done this session):**  
-`https://filthy-net-deck.com/version.json` and legacy netlify host both return **1.9.0**; updater signature matches local `.sig`; exe + dmg Content-Length match local files; homepage shows 1.9.0.
+| Tag | `v2.0.0` |
+| Marketing | New-in-v2.0 bento, OG / Twitter meta + `og-image.png?v=2.0.0` cache-bust |
 
 ---
 
-## What this Grok session closed
+## What v2.0.0 shipped (owner's 10 items)
 
-### Release commits
-- `39e227a` — C3 magic.gg lists + B2 mulligan/first-land + peels + git-bloat docs (source)  
-- `14ca34c` — **Release v1.9.0** (signed Windows, updater, soft channel, site, OG)  
-- `ccdca15` — **Roll v1.9.0 macOS** dmg + prune prior installers  
-
-### Product that is now in the 1.9.0 binary / pipeline
-| Area | Detail |
-|------|--------|
-| **B2** | Per-game `mulligans` + `firstLandTurn` in tracker (GRE); Game analytics + Splits keep-7; CSV columns |
-| **C3** | magic.gg structured `<deck-list>` assignment; priority **MTGO → magic.gg → Goldfish**; Scryfall + listMatch gates; `pipeline/magic-gg.test.mjs` |
-| **Earlier stack in same release** | B1 accept-tag, session wrap share, local coach chips, first-match toast, meta edge, field EV, queue WR, etc. (see 100X scoreboard) |
-| **Peels** | `src/services/deckVersions.ts`, `climbChart.ts` (+ tests) |
-| **Bloat** | Working tree downloads = current only; history still large — see `docs/GIT-HISTORY-BLOAT.md` (**no force-push without owner**) |
-
-### Program status
-100× active pillars are effectively **done** (cancelled: A1 packages, A2 Store, A3 Linux, B3 cloud LLM). Remaining is polish / owner nits / optional history rewrite — not a second roadmap.
-
----
-
-## Your job (Fable / Claude Code)
-
-1. **Owner’s final pass** — they have **tiny last-minute changes** written down; implement those first.  
-2. Any extra polish they request; keep scope tight.  
-3. If changes are **user-visible**, follow **`AGENTS.md` end-to-end release** (version bump + signed Windows + updater + site + OG + push + tag + macOS roll + live byte verify). Source-only is fine for pure docs/internal peels.  
-4. Full local gate before every push:  
-   `npm run lint && npx tsc --noEmit && npm test`  
-   and `cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`
-
----
+| # | Feature | Where |
+|---|---------|-------|
+| 1 | Decklist views on My Stats deck detail: **Stacked (default, Arena-style) / List / Text**, persisted | `src/components/TrackedDecklist.tsx`, prefs `decklistView` |
+| 2 | **Brew Lab standalone page** — clinic any tracked deck or **pasted list**; **Clinic Grade** A+…D over 5 axes; copyable text report | `src/pages/BrewLab.tsx`, `src/components/BrewLabPanel.tsx` (`BrewClinic`), `brewLab.ts` (`clinicGrade`, `fromNamedLines`), `namedCards.ts` (Scryfall POST /cards/collection), `arenaImport.ts` (`parseDeckText`) |
+| 3 | **Mythic % climb** — tracker stamps `Mythic 93.4%` / `Mythic #874` (from `constructedPercentile` / `constructedLeaderboardPlace`, defensive); climb chart zooms into the Mythic band | `src-tauri/src/tracker.rs on_rank`, `src/services/ranks.ts`, `src/pages/Climb.tsx` |
+| 4 | Climb path **newest/oldest toggle** (stretch numbers stay chronological) | `Climb.tsx`, pref `climbNewestFirst` |
+| 5 | Nav: **Events ↔ Format Hub swapped**, Brew Lab added — keys **1–9** | `App.tsx` NAV, CommandPalette |
+| 6 | Overlay **⚙ quick-settings pill** (opacity, start-expanded, bar widgets, click-through) — writes prefs + emits `prefs:overlay`; main window mirrors via `reloadPrefs()` | `src/overlay/OverlayApp.tsx`, `useAppStore.ts` |
+| 7 | **Minimized overlay bar** now shows season record, Bo chip, match clock (toggleable) | `OverlayApp.tsx`, prefs `overlayBarClock/Record` |
+| 8 | **Help & tour** — first-run modal (localStorage `bbi.helpSeen.v1`), topbar Help button, Settings entry | `src/components/HelpGuide.tsx` |
+| 9 | Settings **Interface card**: launch page, decklist view, climb order, reduce motion (`data-reduce-motion`) | `Settings.tsx`, `theme.ts applyReduceMotion` |
+| 10 | Everything persisted in the `bbi.prefs` blob (shared with overlay webview) | `useAppStore.ts loadPrefs` |
 
 ## Owner preferences (non‑negotiable)
 
-- Desktop only — no mobile / Android WR tracking promises.  
-- Distribution: **website + signed in-app updater only** — no winget / Homebrew / Chocolatey / Store / Linux.  
-- Prefer **Update & restart** over Chrome download for updates.  
-- Signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file next to it — **never commit, never echo**.  
-- Formats: **Standard + Pioneer only**; real lists only.  
+- Desktop only — no mobile / Android WR tracking promises.
+- Distribution: **website + signed in-app updater only** — no winget / Homebrew / Chocolatey / Store / Linux.
+- Prefer **Update & restart** over browser download for updates.
+- Signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `filthy-net-deck-key-password.txt` next to it — **never commit, never echo**. Never sign with the repo-root key (abandoned, wrong pubkey).
+- Formats: **Standard + Pioneer only**; real lists only. Brew Lab must stay pure (no AI, no invented cards).
 
 ## Do **not** touch without asking
 
-- Dirty / untracked owner WIP (leave alone unless they say otherwise):  
-  `website/assets/youtube*`, `website/assets/video/`, `website/assets/_gen_youtube.py`, `website/assets/_compose_youtube_community.py`, `goal/`  
-- Private signing keys.  
-- Git history rewrite / force-push (document only: `docs/GIT-HISTORY-BLOAT.md`).  
-- Cancelled product tracks (packages, Store, Linux, cloud LLM).
+- Owner WIP (dirty/untracked): `website/assets/youtube*`, `website/assets/video/`, `website/assets/_gen_youtube.py`, `website/assets/_compose_youtube_community.py`, `goal/`
+- Private signing keys · git history rewrite (`docs/GIT-HISTORY-BLOAT.md`) · cancelled tracks (packages, Store, Linux, cloud LLM).
 
----
+## Full local gate before every push
 
-## Quick map for common edits
+`npm run lint && npx tsc --noEmit && npm test`
+then `cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`
+
+## Quick map
 
 | Need | Where |
 |------|--------|
-| App version / What’s New | `package.json`, `src/version.ts`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json` |
-| Tracker / mulligans / first land | `src-tauri/src/tracker.rs`, `src/types/tracker.ts`, `src/services/gameAnalytics.ts` |
-| Meta list sources | `pipeline/build-meta.mjs`, `pipeline/sources/magic-gg.mjs`, `listMatch.mjs`, `mtgo.mjs` |
-| Marketing + OG | `website/index.html`, `website/assets/_gen_og.py` → `og-image.png` |
-| Updater / soft channel | `website/updater/latest.json`, `website/version.json`, `public/version.json` |
-| Release rules | **`AGENTS.md`** (definition of done table) |
-| Program scoreboard | `100X-ROADMAP.md` |
-
----
-
-## Suggested first steps for next agent
-
-1. `git pull` · confirm `main` at/after `ccdca15` · `git status` clean except owner WIP above.  
-2. Ask / read owner’s written tiny changes; implement those only first.  
-3. Run the full gate; push; **only** version-bump if UI/product-visible.  
-4. If releasing: full AGENTS checklist + independent live URL verify (not “push and assume”).
-
-**Working tree note at handoff:** youtube asset WIP + `goal/` may be dirty/untracked — **owner’s**, not release residue.
-
-Thanks — talk later.
+| Version / What's New | `package.json`, `src/version.ts`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json` |
+| Tracker / ranks / mulligans | `src-tauri/src/tracker.rs`, `src/types/tracker.ts` |
+| Brew Lab / grade | `src/services/brewLab.ts`, `src/pages/BrewLab.tsx` |
+| Meta sources | `pipeline/build-meta.mjs`, `pipeline/sources/*` |
+| Release rules | **`AGENTS.md`** (definition of done) · release recipe also in agent memory |
+| Marketing + OG | `website/index.html`, `website/assets/_gen_og.py` |
