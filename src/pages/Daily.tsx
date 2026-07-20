@@ -6,6 +6,7 @@ import { BanPulse } from "../components/BanPulse";
 import { SpoilerPulse } from "../components/SpoilerPulse";
 import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
+import { OpponentArchetypePanel } from "../components/OpponentArchetypePanel";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { recordVsTags } from "../services/matchupNotes";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
@@ -403,6 +404,9 @@ export function Daily() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
         <MetaShareTimeline />
         <PersonalMetaPanel />
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+        <OpponentArchetypePanel />
       </div>
 
       {metaDiff.previousDate && metaDiff.changes.length > 0 && (

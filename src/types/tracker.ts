@@ -36,6 +36,11 @@ export interface TrackedMatch {
   deckSide?: number[];
   /** Arena ranked season ordinal (seasons reset monthly). */
   seasonOrdinal?: number;
+  /**
+   * Distinct Arena grpIds observed on the opponent seat this match
+   * (battlefield / gy / exile / stack / hand). Used to infer meta archetype.
+   */
+  opponentSeen?: number[];
 }
 
 export interface TrackerStatus {
@@ -80,4 +85,6 @@ export interface LiveMatch {
   /** Cards still in library (mainboard). */
   library?: LiveCardCount[];
   libraryTotal?: number;
+  /** Opponent grpIds seen so far this match. */
+  opponentSeen?: number[];
 }

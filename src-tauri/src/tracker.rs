@@ -97,6 +97,11 @@ pub struct TrackedMatch {
     /// Arena ranked season ordinal (from rank payloads; seasons reset monthly).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub season_ordinal: Option<u32>,
+    /// Distinct Arena grpIds observed on the *opponent* seat this match
+    /// (battlefield / gy / exile / stack / hand). Used client-side to infer
+    /// meta archetype. Empty when detailed logs never revealed opponent cards.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opponent_seen: Option<Vec<u32>>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -160,6 +165,9 @@ pub struct LiveMatch {
     /// Sum of `library.remaining` (quick badge).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_total: Option<u32>,
+    /// Opponent grpIds seen so far this match (sorted).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub opponent_seen: Vec<u32>,
 }
 
 // ---------------------------------------------------------------------------
@@ -430,6 +438,8 @@ struct PendingMatch {
     /// Per-game "was I on the play", indexed by GRE connection order.
     game_on_play: Vec<Option<bool>>,
     awaiting_first_turn: bool,
+    /// Opponent cards (grpId) revealed via GRE this match.
+    opponent_seen: HashSet<u32>,
 }
 
 /// Live mainboard-in-library tracker driven by GRE zone + gameObject diffs.
@@ -676,6 +686,7 @@ impl LogParser {
             result: None,
             library,
             library_total,
+            opponent_seen: sorted_grp_ids(&pending.opponent_seen),
         })
     }
 
@@ -863,10 +874,26 @@ impl LogParser {
                         for msg in msgs {
                             if let Some(gsm) = msg.get("gameStateMessage") {
                                 changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
+                                if let Some(pending) = self.pending.get_mut(&match_id) {
+                                    changed |= note_opponent_cards(
+                                        &mut self.deck_tracker.zone_types,
+                                        &mut pending.opponent_seen,
+                                        gsm,
+                                        my_seat,
+                                    );
+                                }
                             }
                         }
                     } else if let Some(gsm) = v.get("gameStateMessage") {
                         changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
+                                if let Some(pending) = self.pending.get_mut(&match_id) {
+                                    changed |= note_opponent_cards(
+                                        &mut self.deck_tracker.zone_types,
+                                        &mut pending.opponent_seen,
+                                        gsm,
+                                        my_seat,
+                                    );
+                                }
                     }
                     if changed {
                         self.live_dirty = true;
@@ -1011,6 +1038,83 @@ impl LogParser {
     }
 }
 
+
+fn sorted_grp_ids(set: &HashSet<u32>) -> Vec<u32> {
+    let mut v: Vec<u32> = set.iter().copied().collect();
+    v.sort_unstable();
+    v
+}
+
+/// Zones where an opponent card's grpId is "seen" by the local player.
+fn zone_reveals_card(ty: &str) -> bool {
+    matches!(
+        ty,
+        "ZoneType_Battlefield"
+            | "ZoneType_Graveyard"
+            | "ZoneType_Exile"
+            | "ZoneType_Stack"
+            | "ZoneType_Hand"
+            | "ZoneType_Command"
+            | "ZoneType_Revealed"
+            | "ZoneType_FaceUp"
+            | "ZoneType_Transient"
+    )
+}
+
+/// Record opponent-owned cards that appear in revealed zones. Returns true if set grew.
+fn note_opponent_cards(
+    zone_types: &mut HashMap<u32, String>,
+    seen: &mut HashSet<u32>,
+    gsm: &serde_json::Value,
+    my_seat: u32,
+) -> bool {
+    if let Some(zones) = gsm.get("zones").and_then(|z| z.as_array()) {
+        for z in zones {
+            let Some(zid) = z.get("zoneId").and_then(|x| x.as_u64()).map(|x| x as u32) else {
+                continue;
+            };
+            if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
+                zone_types.insert(zid, ty.to_string());
+            }
+        }
+    }
+    let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) else {
+        return false;
+    };
+    let mut changed = false;
+    for go in gos {
+        let ty = go.get("type").and_then(|t| t.as_str()).unwrap_or("");
+        if ty != "GameObjectType_Card" {
+            continue;
+        }
+        let owner = go
+            .get("ownerSeatId")
+            .and_then(|o| o.as_u64())
+            .map(|o| o as u32);
+        if owner.is_none() || owner == Some(my_seat) {
+            continue;
+        }
+        let zone_id = go.get("zoneId").and_then(|z| z.as_u64()).map(|z| z as u32);
+        let zone_ty = zone_id
+            .and_then(|z| zone_types.get(&z))
+            .map(|s| s.as_str())
+            .unwrap_or("");
+        if !zone_reveals_card(zone_ty) {
+            continue;
+        }
+        let Some(grp) = go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32) else {
+            continue;
+        };
+        if grp == 0 {
+            continue;
+        }
+        if seen.insert(grp) {
+            changed = true;
+        }
+    }
+    changed
+}
+
 fn finalize_match(
     match_id: String,
     pending: PendingMatch,
@@ -1104,6 +1208,15 @@ fn finalize_match(
         deck_side: pending.deck_side,
         my_rank: pending.my_rank,
         season_ordinal: pending.season_ordinal,
+        opponent_seen: {
+            let mut v: Vec<u32> = pending.opponent_seen.into_iter().collect();
+            v.sort_unstable();
+            if v.is_empty() {
+                None
+            } else {
+                Some(v)
+            }
+        },
     }
 }
 
@@ -1429,6 +1542,7 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
             result: Some(m.result.clone()),
             library: Vec::new(),
             library_total: None,
+            opponent_seen: m.opponent_seen.clone().unwrap_or_default(),
         };
         let mid = ended.match_id.clone();
         publish_live(app, Some(ended));
@@ -1934,6 +2048,45 @@ mod tests {
         }
         (p, matches)
     }
+
+
+    #[test]
+    fn opponent_cards_seen_from_gre_game_objects() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-opp", "Ladder"));
+        // Opponent seat 1 plays grp 777 on battlefield; our seat is 2.
+        let gsm = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50] },
+                { "zoneId": 11, "type": "ZoneType_Graveyard", "ownerSeatId": 1, "objectInstanceIds": [51] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 50, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 },
+                { "type": "GameObjectType_Card", "instanceId": 51, "grpId": 888, "zoneId": 11, "ownerSeatId": 1 },
+                { "type": "GameObjectType_Card", "instanceId": 52, "grpId": 101, "zoneId": 10, "ownerSeatId": 2 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(gsm);
+        let live = p.live_match().expect("playing");
+        assert!(live.opponent_seen.contains(&777), "battlefield opp card");
+        assert!(live.opponent_seen.contains(&888), "graveyard opp card");
+        assert!(!live.opponent_seen.contains(&101), "must not include our cards");
+        let done = p.feed_line(&room_completed(
+            "m-opp",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done.len(), 1);
+        let seen = done[0].opponent_seen.as_ref().expect("persisted");
+        assert_eq!(seen, &vec![777, 888]);
+    }
+
 
     /// C4 — committed corpus of anonymized log fixtures (runs in CI).
     #[test]

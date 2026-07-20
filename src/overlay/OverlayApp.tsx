@@ -28,6 +28,10 @@ import {
   pipTone,
   type OverlayGroup,
 } from "./overlayModel";
+import { inferOpponentArchetype } from "../services/opponentArchetype";
+import { decksForMode } from "../services/deckHelpers";
+import type { MetaBundle } from "../types/meta";
+
 
 const SNAP_PX = 24;
 /** Collapsed = accent line + title bar only. Keep in sync with the CSS bar height. */
@@ -36,6 +40,19 @@ const COLLAPSED_H = 34;
 const MIN_EXPANDED_H = 120;
 /** localStorage prefs blob shared with the main window (same origin). */
 const PREFS_KEY = "bbi.prefs";
+
+
+function loadMetaCache(): MetaBundle | null {
+  try {
+    const raw = localStorage.getItem("bbi.meta.lastGood");
+    if (!raw) return null;
+    const data = JSON.parse(raw) as MetaBundle;
+    if (!data?.formats?.length || !data.decks) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
 
 function seasonRecord(
   matches: TrackedMatch[],
@@ -668,6 +685,37 @@ export function OverlayApp() {
     }
   }, [liveMatchId, livePhase, setCompactMode]);
 
+  const [oppNamesTick, setOppNamesTick] = useState(0);
+  useEffect(() => {
+    const ids = live?.opponentSeen ?? [];
+    if (!ids.length) return;
+    let cancelled = false;
+    void resolveArenaMetaBatch(ids).then(() => {
+      if (!cancelled) setOppNamesTick((n) => n + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [live?.matchId, live?.opponentSeen]);
+
+  const oppGuessLabel = useMemo(() => {
+    void oppNamesTick;
+    if (!live?.opponentSeen?.length) return null;
+    const bundle = loadMetaCache();
+    if (!bundle) return null;
+    const fmt = bundle.formats.find((f) => f.featured) ?? bundle.formats[0];
+    if (!fmt) return null;
+    const mode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
+    const decks = decksForMode(fmt, mode as "bo1" | "bo3", bundle.decks);
+    const g = inferOpponentArchetype(
+      live.opponentSeen,
+      (id) => peekArenaMeta(id)?.name ?? null,
+      decks,
+      { minHits: 2, minConfidence: 0.35 },
+    );
+    return g ? g.archetype : null;
+  }, [live, oppNamesTick]);
+
   if (!live || live.phase === "idle") {
     return <div className="overlay-empty" />;
   }
@@ -738,6 +786,12 @@ export function OverlayApp() {
           )}
           <span className="overlay-opp-line" data-tauri-drag-region>
             {opp}
+            {oppGuessLabel ? (
+              <span className="overlay-opp-arch" title="Inferred from cards seen">
+                {" "}
+                · {oppGuessLabel}
+              </span>
+            ) : null}
           </span>
         </div>
         <div className="overlay-bar-stats" data-tauri-drag-region>

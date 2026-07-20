@@ -1,54 +1,35 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 — Phase 0 done; A1 package managers **cancelled**; A4 public meta site shipped under `website/meta-web/`.
-**Next agent:** **B1** local opponent-archetype inference (or C3 multi-source meta). Read **`AGENTS.md`** before any release.
+**Last wrap-up:** 2026-07-20 — B1 opponent-archetype inference implemented (source). Needs an **app release** before desktop users get `opponentSeen` in the tracker.
+**Next agent:** Either cut **v1.5.2** end-to-end (AGENTS.md checklist) so B1 ships to installers, or start **C3 multi-source meta**. Ask user before signing/publishing a release.
 
 ---
 
 ## ▶ TOP OF THE TODO LIST — the 100× program
 
-Canonical plan: **`100X-ROADMAP.md`**.
-
-### Do these five, in order
-
-1. ~~**CI quality gate.**~~ ✅ *(C1)*
-2. ~~**Package managers (winget/brew/choco).**~~ ❌ **CANCELLED** — website + in-app updater only. *(A1)*
-3. ~~**Public meta site from the daily feed.**~~ ✅ **DONE 2026-07-20** — `pipeline/build-meta-site.mjs` → `website/meta-web/` (hub + Standard/Pioneer + 32 deck pages), sitemap/robots, wired into `npm run meta` + daily CI. *(A4)*
-4. **Local opponent-archetype inference.** GRE gameObjects → meta matcher. *(B1)* ← **NEXT**
-5. **Multi-source meta.** magic.gg → mtgo → goldfish → melee. *(C3)*
-
-### Phase 0 (done)
-
-- C1 CI · C2 Goldfish fixtures · C4 tracker log fixtures · C5 eslint — all green.
-
-**Guardrails:** real-data-only · local-only tracking · AI grounded-or-absent · no in-draft overlay · Standard+Pioneer · end-to-end releases · **install via website + signed in-app updater only** (no winget/brew/choco).
+1. ~~CI / fixtures / eslint~~ ✅ Phase 0
+2. ~~Package managers~~ ❌ cancelled (website + updater only)
+3. ~~Public meta site~~ ✅ A4 `website/meta-web/`
+4. ~~Opponent archetype inference~~ ✅ **B1 source** — see below; **not in a published binary yet**
+5. **Multi-source meta** (C3) ← after B1 is released (or in parallel if meta-only)
 
 ---
 
-## Public meta (A4)
+## B1 — what shipped (this commit)
 
-| URL path | What |
-|----------|------|
-| `/meta-web/` | Today hub |
-| `/meta-web/standard.html` | Standard Bo1+Bo3 |
-| `/meta-web/pioneer.html` | Pioneer Bo1+Bo3 |
-| `/meta-web/deck/<id>.html` | Full list + Arena import + trend |
-| `/sitemap.xml` | Indexable URLs |
+| Layer | Change |
+|-------|--------|
+| Rust tracker | Collect opponent `grpId`s from GRE gameObjects (battlefield/gy/exile/stack/hand…); persist as `opponentSeen` on match + live snapshot |
+| TS | `src/services/opponentArchetype.ts` — score today\'s ranked lists by distinctive card overlap |
+| Daily | `OpponentArchetypePanel` — WR by inferred opponent archetype |
+| Stats | Match history shows inferred archetype next to opponent name |
+| Overlay | Live bar shows guess when confidence is high (uses cached meta) |
+| Tests | Rust `opponent_cards_seen_*` + 8 vitest cases |
 
-Regenerate: `npm run meta:site` (also runs at end of `npm run meta`).
-
----
-
-## Where we are
-
-| Item | Value |
-|------|--------|
-| Version | **1.5.1** |
-| Install | website downloads + signed in-app updater |
-| Live site | https://filthy-net-deck.com/ |
+Guardrails: local only, real meta lists only, no upload.
 
 ---
 
 ## One-liner
 
-> Phase 0 solid. Public meta site is the SEO funnel. Next moat work: **B1 opponent archetype** from cards already in the log.
+> B1 is coded and tested. **Publish a desktop build** before users benefit; then C3 multi-source meta.

@@ -40,6 +40,9 @@ import { ShareActionButton, ShareMenu } from "../components/ShareMenu";
 import { BrewLabPanel } from "../components/BrewLabPanel";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
+import { inferOpponentArchetype } from "../services/opponentArchetype";
+import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
+import { decksForMode } from "../services/deckHelpers";
 
 function pickArenaPreview(
   main: number[] | undefined,
@@ -1191,10 +1194,12 @@ function MatchRow({
   m,
   onOpponent,
   onDeck,
+  oppArch,
 }: {
   m: TrackedMatch;
   onOpponent: (name: string) => void;
   onDeck: (key: string) => void;
+  oppArch?: string | null;
 }) {
   const onPlay = m.games.length === 1 ? m.games[0]?.onPlay : undefined;
   return (
@@ -1207,6 +1212,9 @@ function MatchRow({
         onClick={() => onOpponent(m.opponentName ?? "Unknown")}
       >
         vs {m.opponentName ?? "Unknown"}
+        {oppArch ? (
+          <span className="text-muted font-normal"> · {oppArch}</span>
+        ) : null}
       </button>
       <span className="match-detail">
         <button
@@ -1278,11 +1286,57 @@ function MatchHistory({
   onOpponent: (name: string) => void;
   onDeck: (key: string) => void;
 }) {
+  const meta = useAppStore((s) => s.meta);
+  const mode = useAppStore((s) => s.mode);
+  const dailyFormatId = useAppStore((s) => s.dailyFormatId);
   const [visible, setVisible] = useState(30);
   const [sort, setSort] = useState<{ key: MatchSortKey; dir: SortDir }>({
     key: "when",
     dir: "desc",
   });
+  const [namesTick, setNamesTick] = useState(0);
+
+  const candidates = useMemo(() => {
+    if (!meta) return [];
+    const fmt =
+      meta.formats.find((f) => f.id === dailyFormatId) ??
+      meta.formats.find((f) => f.featured) ??
+      meta.formats[0];
+    if (!fmt) return [];
+    return decksForMode(fmt, mode, meta.decks);
+  }, [meta, mode, dailyFormatId]);
+
+  useEffect(() => {
+    const ids = new Set<number>();
+    for (const m of matches) {
+      for (const id of m.opponentSeen ?? []) ids.add(id);
+    }
+    if (ids.size === 0) return;
+    let cancelled = false;
+    void resolveArenaMetaBatch([...ids]).then(() => {
+      if (!cancelled) setNamesTick((n) => n + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [matches]);
+
+  const archByMatch = useMemo(() => {
+    void namesTick;
+    const map = new Map<string, string>();
+    if (!candidates.length) return map;
+    const resolve = (id: number) => peekArenaMeta(id)?.name ?? null;
+    for (const m of matches) {
+      if (!m.opponentSeen?.length) continue;
+      const g = inferOpponentArchetype(m.opponentSeen, resolve, candidates, {
+        minHits: 2,
+        minConfidence: 0.3,
+      });
+      if (g) map.set(m.matchId, g.archetype);
+    }
+    return map;
+  }, [matches, candidates, namesTick]);
+
   const sorted = useMemo(
     () => sortMatches(matches, sort.key, sort.dir),
     [matches, sort.key, sort.dir],
@@ -1323,7 +1377,13 @@ function MatchHistory({
           />
         </div>
         {sorted.slice(0, visible).map((m) => (
-          <MatchRow key={m.matchId} m={m} onOpponent={onOpponent} onDeck={onDeck} />
+          <MatchRow
+            key={m.matchId}
+            m={m}
+            onOpponent={onOpponent}
+            onDeck={onDeck}
+            oppArch={archByMatch.get(m.matchId)}
+          />
         ))}
       </div>
       {sorted.length > visible && (
