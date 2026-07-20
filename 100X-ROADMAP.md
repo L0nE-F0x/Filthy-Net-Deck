@@ -84,7 +84,7 @@ The product is finished enough to deserve an audience 100× larger than a single
 
 Nobody else has a local, offline, no-account Arena tracker this good. Widen the gap.
 
-**B1 — Local opponent-archetype inference.** The tracker already captures *cards seen* from the opponent via GRE `gameObjects` (the same feed that drives the in-library HUD). Feed opponent-revealed cards into the existing `cardWatch` / meta-archetype matcher to *label* the opponent's deck — locally, from real cards, never fabricated. This turns "Matchups vs a name" into "Matchups vs Izzet Prowess" with a real, personal win-rate. It's the single highest-value data unlock and it's **already in the log stream you parse.**
+**B1 — Local opponent-archetype inference.** ✅ **Source 2026-07-20** (not in published binary yet). The tracker already captures *cards seen* from the opponent via GRE `gameObjects` (the same feed that drives the in-library HUD). Feed opponent-revealed cards into the existing `cardWatch` / meta-archetype matcher to *label* the opponent's deck — locally, from real cards, never fabricated. This turns "Matchups vs a name" into "Matchups vs Izzet Prowess" with a real, personal win-rate. It's the single highest-value data unlock and it's **already in the log stream you parse.**
 
 **B2 — Deeper personal analytics (all local, all real).** Mulligan-kept-vs-mull rates, win% on the play vs draw by archetype (data is captured; surface it), turn-of-first-land-drop, per-archetype sideboard-game deltas (Bo3 g2/g3 already parsed). This is 17Lands-class insight for Constructed — but private and offline.
 
@@ -203,8 +203,8 @@ The temptation at scale is to compromise the things that make this app trustwort
 
 1. **Ship a CI test/typecheck/clippy gate this week** (C1). Everything else is built on it.
 2. **Ship the public meta site from the daily feed** (A4) — SEO surface that funnels to the download.
-3. **Local opponent-archetype inference** (B1) — moat from cards already in the log stream.
-4. **Wire the multi-source list priority you already documented** (C3) — remove the single point of failure before the audience arrives.
+3. **Local opponent-archetype inference** (B1) — ✅ **source on main 2026-07-20**; needs app release for users.
+4. **Multi-source list priority** (C3) — ✅ **partial 2026-07-20** (MTGO → Goldfish; magic.gg lists deferred).
 5. **Grounded local coach / deeper analytics** (B2/B3) — only after B1 + C3 harden the spine.
 
 Do these five and the remaining pillars have a hardened, discoverable, differentiated base to multiply against.

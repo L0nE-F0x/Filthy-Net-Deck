@@ -2,7 +2,7 @@
 
 > **▶ NEXT PROGRAM: [`100X-ROADMAP.md`](100X-ROADMAP.md)** — reach × reliability × moat. Start there (Phase 0: CI/test gate) before new page work. `handoff.md` carries the top-of-todo checklist.
 
-**Current release:** **v1.5.0** (Brew Lab — pure list clinic vs ranked peers; Windows signed — macOS dmg via tag CI).  
+**Current release:** **v1.5.1** (custom domain + dual host). App `main` may be ahead of published binaries (see `handoff.md`).
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -10,16 +10,20 @@
 
 ---
 
-## Next chapter — post-v1.5.0 (owner 2026-07-20)
+## Next chapter — 100× program (owner 2026-07-20+)
 
-Canonical checklist: **`handoff.md`**.
+Canonical checklist: **`handoff.md`** (always read first). Program plan: **`100X-ROADMAP.md`**.
 
-1. ~~**v1.4.x Bells & polish**~~ — shipped  
-2. ~~**v1.5.0 Brew Lab**~~ — pure meta list clinic (no AI)  
-3. **Deferred** stays deferred (draft hub, cloud, Alchemy, prices, free-form LLM coach)  
-4. Owner ladder feedback / Brew Lab iteration  
+**Published:** **v1.5.1**. **On `main` not yet in installer:** B1 opponent-archetype inference.
 
-**Shipped:** **v1.5.0 Brew Lab**.
+1. ~~Phase 0 CI / fixtures / eslint / tracker log corpus~~  
+2. ~~A4 public meta site (`/meta-web/`)~~  
+3. ~~C3 multi-source lists (MTGO → Goldfish)~~  
+4. ~~A1 package managers~~ — **cancelled** (website + in-app updater only)  
+5. **Ship B1** via next app version when owner requests release  
+6. Then B2/B3 / remaining 100× pillars per roadmap  
+
+**Deferred** stays deferred (draft hub, cloud, Alchemy, prices, free-form LLM coach).
 
 ### Explicitly deferred
 
