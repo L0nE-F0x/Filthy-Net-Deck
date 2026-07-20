@@ -1,11 +1,11 @@
 {
-  "version": "1.7.0",
-  "notes": "v1.7.0 Share the climb: matchup share cards plus save / Discord paste / post on X. Overlay shows your historical WR vs the inferred opponent. Guided first-session coach on Daily - progress bar and You are live when your first match lands.",
-  "pub_date": "2026-07-20T05:07:46.736Z",
+  "version": "1.8.0",
+  "notes": "v1.8.0 Retention & depth: Daily catch-up strip, season recap notify + share, queue WR, field EV vs the meta, matchup form/play-draw, opponent share cards, meta-mover toasts, richer match-end alerts. CSV gains season + cards-seen. Windows + macOS via website + signed updater.",
+  "pub_date": "2026-07-20T06:24:45.064Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdhUktRQ3dWYWNtZW1hNlpkSlAwbW1vQnpaVitaTW0rRWtnVHdIbTNzOFlZLzNZaFlxNmtFSmZNQmFvOEd4WVhxUThQM05aTEV0ZGF3VlEzQUUwN3d3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTI0MDE5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNy4wX3g2NC1zZXR1cC5leGUKZm9vbUlwakpSY0lFdms2NGdQUXFRNVgrSGlwTm9rdVpBUThiQW9ldVVUanNsaUpGYk0xUmQxNUtGRzY5SkloR1M4M2pNQWx0d2VST0hLQ2Y3a0szQUE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.7.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjYvdm5wWXNKREs4WEN6YnFTQlIvMXVOZVNkV3pYcVBVMjU3UVZvRnp0OHB4eXRuSWNBR25QMTduZm9yb3Y4SkQ3YXd1aTgweTV4bEdicTlDaUM2VFE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTI4NjY2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuOC4wX3g2NC1zZXR1cC5leGUKUCt5RWNVa1B1RTRISU9ET3RCNEg2Ym9PcXRRdTNuM2dyQU96b1QxQ012YTZOUWVVSmxwMjVTQUkwRkM3S0o5NC8vb0NhYy8xcUxXV0RRZVkzUTdEQ1E9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.8.0.exe"
     }
   }
 }

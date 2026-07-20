@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.7.0";
+export const APP_VERSION = "1.8.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,9 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Share matchups, week recap, and climb story — save PNG, copy image for Discord, or post on X with a download link",
-  "Overlay matchup line: your historical WR vs the inferred opponent archetype (cards actually seen), when sample is enough",
-  "First-session coach on Daily: setup progress and a You're live moment when your first match is recorded",
-  "Captions seed the public meta site when a matchup maps to today's ranked list"
+  "Catch up on Daily: your recent record, rank path, and meta movers since last open",
+  "Season closed? Climb banner + desktop notify — share your climb story in one click",
+  "Queue WR table, vs-the-field expected winrate, and form (W/L) on matchups and meta panels",
+  "Share any Matchup Lab opponent record to Discord or X; meta-mover toasts when the board shifts",
+  "Richer match-end toasts (opponent archetype when cards were seen); CSV exports season + cards seen"
 ];

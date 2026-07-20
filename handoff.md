@@ -1,6 +1,6 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 live**; **fat unreleased batch ready for v1.8.0** (do not claim shipped until AGENTS checklist).
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.8.0 release cut** (Windows signed + channels; macOS after tag CI).
 **Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
@@ -28,9 +28,9 @@
 
 ---
 
-## Unreleased v1.8.0 batch (source on main — not in binary)
+## v1.8.0 release batch (shipping now)
 
-Cut **one** full AGENTS end-to-end release when the owner asks. Do not ship piecemeal.
+Shipped as **v1.8.0** — full AGENTS checklist. Verify live URLs after Netlify + macOS roll.
 
 | Theme | What landed (source) |
 |-------|----------------------|

@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.7.0.exe",
-  "notes": "v1.7.0 Share the climb: matchup share cards plus save / Discord paste / post on X. Overlay shows your historical WR vs the inferred opponent. Guided first-session coach on Daily - progress bar and You are live when your first match lands."
+  "version": "1.8.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.8.0.exe",
+  "notes": "v1.8.0 Retention & depth: Daily catch-up strip, season recap notify + share, queue WR, field EV vs the meta, matchup form/play-draw, opponent share cards, meta-mover toasts, richer match-end alerts. CSV gains season + cards-seen. Windows + macOS via website + signed updater."
 }
