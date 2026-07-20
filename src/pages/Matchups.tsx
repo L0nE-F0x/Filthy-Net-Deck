@@ -19,6 +19,7 @@ import { winrateFavor } from "../services/ranks";
 import { resolveMetaDeckByTag } from "../services/deepLinks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { recentFormString } from "../services/gameAnalytics";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -36,6 +37,8 @@ interface OppGroup {
   rate: number | null;
   lastAt: number;
   decks: string[];
+  /** Last up to 5 decided results oldest→newest (W/L). */
+  form: string;
   tag?: string;
   notes?: string;
 }
@@ -77,6 +80,7 @@ function groupOpponents(
       rate: decided > 0 ? wins / decided : null,
       lastAt: Math.max(...list.map((m) => m.endedAt)),
       decks,
+      form: recentFormString(list, 5),
       tag: note?.tag,
       notes: note?.notes,
     });
@@ -617,7 +621,17 @@ export function Matchups() {
                     {" · "}
                     {timeAgo(g.lastAt)}
                   </span>
-                  <RateChip wins={g.wins} losses={g.losses} rate={g.rate} />
+                  <span className="mu-lab-form-wrap">
+                    {g.form ? (
+                      <span
+                        className="mu-lab-form font-mono text-xs text-muted"
+                        title="Last up to 5 decided results (oldest → newest)"
+                      >
+                        {g.form}
+                      </span>
+                    ) : null}
+                    <RateChip wins={g.wins} losses={g.losses} rate={g.rate} />
+                  </span>
                 </button>
               ))}
             </div>
@@ -638,6 +652,15 @@ export function Matchups() {
                   {selectedGroup.matches.length} match
                   {selectedGroup.matches.length === 1 ? "" : "es"} · last{" "}
                   {timeAgo(selectedGroup.lastAt)}
+                  {selectedGroup.form ? (
+                    <span
+                      className="font-mono"
+                      title="Last up to 5 decided results (oldest → newest)"
+                    >
+                      {" "}
+                      · form {selectedGroup.form}
+                    </span>
+                  ) : null}
                 </p>
               </div>
               <RateChip

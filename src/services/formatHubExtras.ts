@@ -7,6 +7,7 @@ import type { RotationImpact } from "../types/sets";
 import type { TrackedMatch } from "../types/tracker";
 import { deckRotationImpact } from "./rotationImpact";
 import { deckKey } from "./tracker";
+import { daysUntil as daysUntilDate } from "./setDates";
 
 export interface RotationRosterRow {
   deckId: string;
@@ -58,12 +59,8 @@ export function buildNearRotationHero(
 ): NearRotationHero {
   const withinDays = opts?.withinDays ?? 45;
   const now = opts?.now ?? new Date();
-  now.setHours(12, 0, 0, 0);
-  let daysUntil: number | null = null;
-  if (rotation?.nextDate) {
-    const t = new Date(`${rotation.nextDate}T12:00:00`).getTime();
-    daysUntil = Math.round((t - now.getTime()) / 86400000);
-  }
+  // Shared day-count math with Sets Radar (local noon basis).
+  const daysUntil = daysUntilDate(rotation?.nextDate ?? null, now.getTime());
   // F2: only when we know a calendar date and it falls in [0, withinDays].
   // roughLabel alone (e.g. live feed "Q1 2027" with nextDate:null) must NOT
   // force the "Rotation approaching" hero half a year early.

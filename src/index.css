@@ -2147,6 +2147,16 @@ select,
   white-space: nowrap;
 }
 .mu-lab-score strong { margin-left: 0.15rem; }
+.mu-lab-form-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+.mu-lab-form {
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
 .mu-lab-fields {
   display: flex;
   flex-direction: column;
