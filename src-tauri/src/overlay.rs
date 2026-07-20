@@ -10,6 +10,7 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 const OVERLAY_LABEL: &str = "overlay";
 const ENABLED_FILE: &str = "overlay-enabled";
+const POST_MATCH_FILE: &str = "overlay-post-match";
 const GEOMETRY_FILE: &str = "overlay-geometry.json";
 
 /// Slim column; short default matches collapsed bar (+ room to expand).
@@ -22,6 +23,7 @@ const MAX_W: f64 = 420.0;
 const MAX_H: f64 = 900.0;
 
 static ENABLED: AtomicBool = AtomicBool::new(true);
+static POST_MATCH: AtomicBool = AtomicBool::new(true);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -60,6 +62,41 @@ pub fn is_enabled() -> bool {
 
 fn persist_enabled(app: &AppHandle, enabled: bool) {
     if let Some(path) = enabled_path(app) {
+        if let Some(dir) = path.parent() {
+            let _ = fs::create_dir_all(dir);
+        }
+        let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
+    }
+}
+
+fn post_match_path(app: &AppHandle) -> Option<PathBuf> {
+    app.path()
+        .app_data_dir()
+        .ok()
+        .map(|d| d.join(POST_MATCH_FILE))
+}
+
+/// Post-match summary toggle (default on). When on, the tracker lets the
+/// "ended" live frame linger (~12s vs a 2.8s flash) so the overlay can show
+/// the result card with season form + rank path.
+pub fn load_post_match(app: &AppHandle) {
+    let on = post_match_path(app)
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| {
+            let t = s.trim();
+            t != "0" && !t.eq_ignore_ascii_case("false")
+        })
+        .unwrap_or(true);
+    POST_MATCH.store(on, Ordering::SeqCst);
+}
+
+pub fn is_post_match_enabled() -> bool {
+    POST_MATCH.load(Ordering::SeqCst)
+}
+
+pub fn set_post_match(app: &AppHandle, enabled: bool) {
+    POST_MATCH.store(enabled, Ordering::SeqCst);
+    if let Some(path) = post_match_path(app) {
         if let Some(dir) = path.parent() {
             let _ = fs::create_dir_all(dir);
         }
@@ -161,6 +198,11 @@ pub fn set_enabled(app: &AppHandle, enabled: bool) {
 #[tauri::command]
 pub fn overlay_set_enabled(app: AppHandle, enabled: bool) {
     set_enabled(&app, enabled);
+}
+
+#[tauri::command]
+pub fn overlay_set_post_match(app: AppHandle, enabled: bool) {
+    set_post_match(&app, enabled);
 }
 
 #[tauri::command]

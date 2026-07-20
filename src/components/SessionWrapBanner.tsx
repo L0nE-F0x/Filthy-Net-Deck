@@ -52,7 +52,9 @@ export function SessionWrapBanner() {
           onPick={async (id) => {
             const dest = id as ShareDestination;
             // Reuse week recap renderer with session stats window.
-            const blob = await renderRecapPng(w.stats);
+            const blob = await renderRecapPng(w.stats, {
+              kicker: "Session wrap · local only",
+            });
             const caption = recapCaption({
               wins: w.stats.wins,
               losses: w.stats.losses,

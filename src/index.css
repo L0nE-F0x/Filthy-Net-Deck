@@ -6318,6 +6318,115 @@ html.overlay-macos .overlay-shell {
 }
 .overlay-menu-danger:hover { background: rgba(255, 120, 120, 0.08); }
 
+/* —— Post-match summary card (ended frame, lingers while tracker holds it) —— */
+.postmatch {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 7px 10px 8px;
+  overflow: hidden;
+}
+.postmatch-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.postmatch-chip {
+  font-size: 9.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--color-gold-300);
+  background: rgba(228, 192, 106, 0.1);
+  border: 1px solid rgba(228, 192, 106, 0.22);
+}
+.postmatch-chip--arch {
+  color: var(--color-azure-300);
+  background: rgba(125, 211, 252, 0.08);
+  border-color: rgba(125, 211, 252, 0.2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.postmatch-form {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.postmatch-form em {
+  font-style: normal;
+  margin-left: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+.postmatch-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 2.5px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.postmatch-dot.is-win {
+  background: rgba(52, 211, 153, 0.85);
+  border-color: rgba(52, 211, 153, 0.5);
+}
+.postmatch-dot.is-loss {
+  background: rgba(248, 113, 113, 0.55);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+.postmatch-graph {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.postmatch-spark {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.postmatch-spark-line {
+  fill: none;
+  stroke: var(--color-gold-400, #e4c06a);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+.postmatch-spark-dot { fill: rgba(255, 255, 255, 0.35); }
+.postmatch-spark-dot.is-win { fill: rgba(52, 211, 153, 0.9); }
+.postmatch-spark-dot.is-loss { fill: rgba(248, 113, 113, 0.8); }
+.postmatch-spark-dot.is-last {
+  stroke: rgb(10 11 16 / 70%);
+  stroke-width: 0.8;
+}
+.postmatch-graph-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 8.5px;
+  font-weight: 600;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.postmatch-graph-kind {
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
 /* �� Brew Lab (pure meta list clinic) �� */
 .brew-lab-head {
   display: flex;

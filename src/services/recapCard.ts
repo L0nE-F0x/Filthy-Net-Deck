@@ -1,5 +1,6 @@
 /**
  * Render a local shareable recap PNG from RecapStats (canvas in the browser).
+ * Styled by shareKit so every card in the app shares one design system.
  */
 
 import {
@@ -9,6 +10,24 @@ import {
   type RecapStats,
 } from "./recapStats";
 import type { TrackedMatch } from "../types/tracker";
+import {
+  BRAND,
+  canvasToPng,
+  chip,
+  downloadBlob,
+  drawFooter,
+  drawHeader,
+  drawTracked,
+  ellipsize,
+  font,
+  loadBrandLogo,
+  makeCanvas,
+  paintBackdrop,
+  panel,
+  ratioBar,
+  statTile,
+  wrRing,
+} from "./shareKit";
 
 export function recapFromMatches(
   matches: TrackedMatch[],
@@ -18,110 +37,124 @@ export function recapFromMatches(
   return buildRecapStats(matches, fromMs, toMs);
 }
 
-/** Draw a 1080×1080 branded recap card; returns a PNG blob. */
-export async function renderRecapPng(stats: RecapStats): Promise<Blob> {
-  const size = 1080;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not available");
-
-  // Background
-  const grad = ctx.createLinearGradient(0, 0, size, size);
-  grad.addColorStop(0, "#0a0f0c");
-  grad.addColorStop(0.5, "#121a14");
-  grad.addColorStop(1, "#0c1410");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-
-  // Gold accent bar
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, 0, size, 12);
-
-  ctx.fillStyle = "#e8f0e9";
-  ctx.font = "600 42px system-ui, Segoe UI, sans-serif";
-  ctx.fillText("Filthy Net Deck", 64, 100);
-
-  ctx.fillStyle = "#8fa396";
-  ctx.font = "400 28px system-ui, Segoe UI, sans-serif";
-  ctx.fillText("Weekly recap · local only", 64, 150);
-
-  const headline = formatRecapHeadline(stats);
-  ctx.fillStyle = "#f4f7f4";
-  ctx.font = "700 56px system-ui, Segoe UI, sans-serif";
-  wrapText(ctx, headline, 64, 280, size - 128, 68);
-
-  let y = 420;
-  ctx.fillStyle = "#c9a227";
-  ctx.font = "600 32px system-ui, Segoe UI, sans-serif";
-  if (stats.rankDeltaLabel) {
-    ctx.fillText(stats.rankDeltaLabel, 64, y);
-    y += 64;
-  }
-
-  if (stats.bestDeck) {
-    ctx.fillStyle = "#8fa396";
-    ctx.font = "400 26px system-ui, Segoe UI, sans-serif";
-    ctx.fillText("Best deck", 64, y);
-    y += 44;
-    ctx.fillStyle = "#e8f0e9";
-    ctx.font = "600 36px system-ui, Segoe UI, sans-serif";
-    const pct = Math.round(stats.bestDeck.winrate * 100);
-    ctx.fillText(
-      `${stats.bestDeck.name} · ${pct}% (${stats.bestDeck.wins}–${stats.bestDeck.losses})`,
-      64,
-      y,
-    );
-  }
-
-  ctx.fillStyle = "#5a6b5e";
-  ctx.font = "400 24px system-ui, Segoe UI, sans-serif";
-  ctx.fillText("filthy-net-deck.com · Built by ApexForge", 64, size - 64);
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))),
-      "image/png",
-    );
-  });
+export interface RecapCardOptions {
+  /** Small uppercase line under the wordmark. */
+  kicker?: string;
 }
 
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number,
-) {
-  const words = text.split(" ");
-  let line = "";
-  let cy = y;
-  for (const w of words) {
-    const test = line ? `${line} ${w}` : w;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      ctx.fillText(line, x, cy);
-      line = w;
-      cy += lineHeight;
-    } else {
-      line = test;
+/** Draw a 1080×1080 branded recap card; returns a PNG blob. */
+export async function renderRecapPng(
+  stats: RecapStats,
+  opts?: RecapCardOptions,
+): Promise<Blob> {
+  const size = 1080;
+  const PAD = 64;
+  const { canvas, ctx } = makeCanvas(size, size);
+
+  paintBackdrop(ctx, size, size);
+  const logo = await loadBrandLogo();
+  let y = drawHeader(ctx, size, {
+    kicker: opts?.kicker ?? "Local recap · tracked on this PC",
+    logo,
+  });
+  y += 44;
+
+  // Headline hero.
+  const headline = formatRecapHeadline(stats);
+  ctx.fillStyle = BRAND.lime;
+  ctx.font = font("800 56px");
+  const headLines: string[] = [];
+  {
+    const words = headline.split(" ");
+    let line = "";
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (ctx.measureText(test).width > size - PAD * 2 && line) {
+        headLines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
     }
+    if (line) headLines.push(line);
   }
-  if (line) ctx.fillText(line, x, cy);
+  for (const l of headLines.slice(0, 2)) {
+    ctx.fillText(ellipsize(ctx, l, size - PAD * 2), PAD, y + 46);
+    y += 66;
+  }
+  y += 76;
+
+  // Rank movement chip.
+  if (stats.rankDeltaLabel) {
+    chip(ctx, PAD, y - 12, stats.rankDeltaLabel, BRAND.gold, 22);
+    y += 56;
+  }
+
+  // Stat band: WR ring + record + games.
+  const decided = stats.wins + stats.losses;
+  const wr = decided ? Math.round(stats.winrate * 100) : null;
+  const bandH = 210;
+  const ringW = 280;
+  panel(ctx, PAD, y, ringW, bandH, 22);
+  wrRing(ctx, PAD + ringW / 2, y + bandH / 2 + 4, 74, wr);
+  const tileW = (size - PAD * 2 - ringW - 2 * 20) / 2;
+  statTile(ctx, PAD + ringW + 20, y, tileW, bandH, {
+    label: "Record",
+    value: `${stats.wins}–${stats.losses}`,
+    sub: stats.draws > 0 ? `+${stats.draws} draws` : null,
+  });
+  statTile(ctx, PAD + ringW + 20 + tileW + 20, y, tileW, bandH, {
+    label: "Games",
+    value: String(stats.games),
+    sub:
+      stats.startRank && stats.endRank
+        ? `${stats.startRank} → ${stats.endRank}`
+        : null,
+  });
+  y += bandH + 48;
+
+  // Best deck panel with WR bar.
+  if (stats.bestDeck) {
+    const d = stats.bestDeck;
+    const pct = Math.round(d.winrate * 100);
+    const ph = 160;
+    panel(ctx, PAD, y, size - PAD * 2, ph, 20);
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("600 18px");
+    drawTracked(ctx, "BEST DECK", PAD + 28, y + 46, 2.5);
+
+    // Right-aligned "W–L · NN%" readout.
+    const pctColor = pct >= 55 ? BRAND.win : pct <= 45 ? BRAND.loss : BRAND.gold;
+    ctx.font = font("800 34px");
+    const pctLabel = `${pct}%`;
+    const pctW = ctx.measureText(pctLabel).width;
+    ctx.fillStyle = pctColor;
+    ctx.fillText(pctLabel, size - PAD - 28 - pctW, y + 100);
+    ctx.font = font("600 26px");
+    const recLabel = `${d.wins}–${d.losses} · `;
+    const recW = ctx.measureText(recLabel).width;
+    ctx.fillStyle = BRAND.mute;
+    ctx.fillText(recLabel, size - PAD - 28 - pctW - recW, y + 100);
+
+    ctx.fillStyle = BRAND.ink;
+    ctx.font = font("700 34px");
+    const nameMax = size - PAD * 2 - 56 - pctW - recW - 32;
+    ctx.fillText(ellipsize(ctx, d.name, nameMax), PAD + 28, y + 100);
+
+    ratioBar(ctx, PAD + 28, y + ph - 32, size - PAD * 2 - 56, 8, d.winrate, BRAND.lime);
+  }
+
+  drawFooter(ctx, size, size, PAD);
+  return canvasToPng(canvas);
 }
 
 /** Trigger a browser download of the recap PNG. */
 export async function downloadRecapPng(
   matches: TrackedMatch[],
   filename = "filthy-net-deck-recap.png",
+  opts?: RecapCardOptions,
 ): Promise<void> {
   const stats = recapFromMatches(matches);
-  const blob = await renderRecapPng(stats);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+  const blob = await renderRecapPng(stats, opts);
+  downloadBlob(blob, filename);
 }

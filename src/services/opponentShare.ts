@@ -1,6 +1,29 @@
 /**
  * Share card for a single Matchup Lab opponent record (A5 extension).
+ * Canvas is browser-only on user share and styled by shareKit so every card
+ * in the app shares one design system.
  */
+
+import {
+  BRAND,
+  canvasToPng,
+  chip,
+  drawFooter,
+  drawHeader,
+  drawTracked,
+  ellipsize,
+  fillRoundRect,
+  font,
+  loadBrandLogo,
+  makeCanvas,
+  paintBackdrop,
+  panel,
+  statTile,
+  strokeRoundRect,
+  withAlpha,
+  wrapLines,
+  wrRing,
+} from "./shareKit";
 
 export interface OpponentShareInput {
   opponentName: string;
@@ -9,38 +32,6 @@ export interface OpponentShareInput {
   form?: string;
   tag?: string | null;
   decks?: string[];
-}
-
-const LIME = "#b8f000";
-const INK = "#f2f4ea";
-const MUTE = "#9aa38a";
-const FAINT = "#5a6b5e";
-const GOLD = "#e8c56a";
-
-function fontStack(spec: string): string {
-  return `${spec} "Segoe UI", system-ui, sans-serif`;
-}
-
-function ellipsize(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string {
-  if (ctx.measureText(text).width <= maxWidth) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(`${t}…`).width > maxWidth) {
-    t = t.slice(0, -1);
-  }
-  return `${t}…`;
-}
-
-function loadLogo(): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = "/app-icon.png";
-  });
 }
 
 export function opponentShareCaption(input: OpponentShareInput): string {
@@ -54,93 +45,111 @@ export function opponentShareCaption(input: OpponentShareInput): string {
   return bits.join(" · ");
 }
 
+/** Small W/L square for the recent-form strip. */
+function formChip(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  letter: string,
+): number {
+  const s = 40;
+  const up = letter.toUpperCase();
+  const color = up === "W" ? BRAND.win : up === "L" ? BRAND.loss : BRAND.mute;
+  fillRoundRect(ctx, x, y, s, s, 10, withAlpha(color, 0.16));
+  strokeRoundRect(ctx, x, y, s, s, 10, withAlpha(color, 0.55), 1.5);
+  ctx.fillStyle = color;
+  ctx.font = font("800 22px");
+  const tw = ctx.measureText(up).width;
+  ctx.fillText(up, x + (s - tw) / 2, y + s / 2 + 8);
+  return s;
+}
+
 /** 1080×1080 opponent record card. */
 export async function renderOpponentSharePng(
   input: OpponentShareInput,
 ): Promise<Blob> {
   const size = 1080;
   const PAD = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not available");
+  const { canvas, ctx } = makeCanvas(size, size);
 
-  const grad = ctx.createLinearGradient(0, 0, size, size);
-  grad.addColorStop(0, "#050604");
-  grad.addColorStop(0.55, "#0e140c");
-  grad.addColorStop(1, "#0a1008");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-  ctx.fillStyle = LIME;
-  ctx.fillRect(0, 0, size, 14);
+  paintBackdrop(ctx, size, size);
+  const logo = await loadBrandLogo();
+  let y = drawHeader(ctx, size, {
+    kicker: "Matchup Lab · local record",
+    logo,
+  });
+  y += 36;
 
-  const logo = await loadLogo();
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 40px");
-  ctx.fillText("Filthy Net Deck", PAD, 96);
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("500 26px");
-  ctx.fillText("Matchup Lab · local record", PAD, 142);
-  if (logo) {
-    ctx.drawImage(logo, size - PAD - 84, 44, 84, 84);
+  // VS kicker + opponent hero.
+  ctx.fillStyle = BRAND.mute;
+  ctx.font = font("600 20px");
+  drawTracked(ctx, "VS OPPONENT", PAD, y, 3);
+  y += 38;
+
+  const name = input.opponentName || "Opponent";
+  let namePx = 64;
+  let nameLines: string[] = [];
+  while (namePx > 36) {
+    ctx.font = font(`800 ${namePx}px`);
+    nameLines = wrapLines(ctx, name, size - PAD * 2);
+    if (nameLines.length <= 2) break;
+    namePx -= 2;
   }
-
-  let y = 280;
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("600 28px");
-  ctx.fillText("VS", PAD, y);
-  y += 70;
-  ctx.fillStyle = LIME;
-  ctx.font = fontStack("800 64px");
-  ctx.fillText(ellipsize(ctx, input.opponentName || "Opponent", size - PAD * 2), PAD, y);
-  y += 90;
+  ctx.font = font(`800 ${namePx}px`);
+  ctx.fillStyle = BRAND.lime;
+  for (const l of nameLines.slice(0, 2)) {
+    ctx.fillText(ellipsize(ctx, l, size - PAD * 2), PAD, y + namePx * 0.82);
+    y += namePx * 1.1;
+  }
+  y += 30;
 
   if (input.tag) {
-    ctx.fillStyle = GOLD;
-    ctx.font = fontStack("600 30px");
-    ctx.fillText(ellipsize(ctx, input.tag, size - PAD * 2), PAD, y);
-    y += 50;
+    chip(ctx, PAD, y, input.tag, BRAND.gold, 22);
+    y += 66;
   }
 
+  // Stat band: record tile + WR ring.
+  y += 22;
   const decided = input.wins + input.losses;
   const wr = decided ? Math.round((input.wins / decided) * 100) : null;
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 52px");
-  ctx.fillText(
-    wr != null
-      ? `${input.wins}–${input.losses}  ·  ${wr}% WR`
-      : `${input.wins}–${input.losses}`,
-    PAD,
-    y,
-  );
-  y += 70;
-
-  if (input.form) {
-    ctx.fillStyle = MUTE;
-    ctx.font = fontStack("600 32px");
-    ctx.fillText(`Form  ${input.form}`, PAD, y);
-    y += 50;
-  }
-
-  if (input.decks?.length) {
-    ctx.fillStyle = MUTE;
-    ctx.font = fontStack("500 26px");
-    ctx.fillText(
-      ellipsize(ctx, `Your decks: ${input.decks.slice(0, 3).join(", ")}`, size - PAD * 2),
-      PAD,
-      y,
-    );
-  }
-
-  ctx.fillStyle = FAINT;
-  ctx.font = fontStack("400 22px");
-  ctx.fillText("filthy-net-deck.com · Built by ApexForge", PAD, size - 56);
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))),
-      "image/png",
-    );
+  const bandH = 240;
+  const ringW = 320;
+  const tileW = size - PAD * 2 - ringW - 20;
+  statTile(ctx, PAD, y, tileW, bandH, {
+    label: "Your record",
+    value: `${input.wins}–${input.losses}`,
+    sub: decided ? `${decided} decided matches` : "No decided matches yet",
   });
+  panel(ctx, PAD + tileW + 20, y, ringW, bandH, 22);
+  wrRing(ctx, PAD + tileW + 20 + ringW / 2, y + bandH / 2 + 4, 86, wr);
+  y += bandH + 56;
+
+  // Recent form strip (oldest → newest).
+  if (input.form) {
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("600 19px");
+    drawTracked(ctx, "RECENT FORM", PAD, y + 12, 2.5);
+    let fx = PAD + 170;
+    for (const ch of input.form.slice(-5)) {
+      fx += formChip(ctx, fx, y - 16, ch) + 12;
+    }
+  }
+
+  // Your decks line, anchored above the footer.
+  if (input.decks?.length) {
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("500 25px");
+    ctx.fillText(
+      ellipsize(
+        ctx,
+        `Your decks: ${input.decks.slice(0, 3).join(", ")}`,
+        size - PAD * 2,
+      ),
+      PAD,
+      size - 150,
+    );
+  }
+
+  drawFooter(ctx, size, size, PAD);
+  return canvasToPng(canvas);
 }

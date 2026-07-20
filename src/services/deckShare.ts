@@ -4,9 +4,32 @@
  * Untapped screenshot next to a gameplay post.
  *
  * This module keeps the aggregation pure/testable; the canvas renderer lives
- * alongside it (browser-only, called on user "Share").
+ * alongside it (browser-only, called on user "Share") and is styled by
+ * shareKit so every card in the app shares one design system.
  */
 import type { ArenaCardInfo } from "./arenaCards";
+import {
+  BRAND,
+  MANA_PIP,
+  canvasToPng,
+  chip,
+  downloadBlob,
+  drawFooter,
+  drawHeader,
+  drawPips,
+  drawTracked,
+  ellipsize,
+  font,
+  loadBrandLogo,
+  makeCanvas,
+  paintBackdrop,
+  panel,
+  pill,
+  statTile,
+  withAlpha,
+  wrapLines,
+  wrRing,
+} from "./shareKit";
 
 export type DeckColor = "w" | "u" | "b" | "r" | "g" | "c" | "multi";
 
@@ -178,21 +201,6 @@ export interface DeckShareInput {
   result?: "win" | "loss" | "draw" | null;
 }
 
-const LIME = "#b8f000";
-const INK = "#f2f4ea";
-const MUTE = "#9aa38a";
-const FAINT = "#5a6b5e";
-
-const DOT: Record<DeckColor, string> = {
-  w: "#f4e7bd",
-  u: "#3487c9",
-  b: "#7d736d",
-  r: "#e0424a",
-  g: "#22a55f",
-  c: "#b9b9b9",
-  multi: "#e8c56a",
-};
-
 function scopeSubtitle(scope: ShareScope): string {
   switch (scope) {
     case "match":
@@ -216,48 +224,19 @@ function scopeSlug(scope: ShareScope): string {
   return scope;
 }
 
-function fontStack(spec: string): string {
-  return `${spec} "Segoe UI", system-ui, sans-serif`;
-}
-
-/** Load the FND logo mark for the card header; null if it can't load. */
-function loadLogo(): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = "/app-icon.png"; // Vite serves public/ at the web root.
-  });
-}
-
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function ellipsize(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string {
-  if (ctx.measureText(text).width <= maxWidth) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(t + "…").width > maxWidth) {
-    t = t.slice(0, -1);
+/** WUBRG identity of the mainboard (gold pip for multi-only decks). */
+function colorIdentity(list: DeckShareList): string[] {
+  const present = new Set<string>();
+  let multi = 0;
+  for (const g of list.groups) {
+    for (const r of g.rows) {
+      if (r.color === "multi") multi += r.qty;
+      else if (r.color !== "c") present.add(r.color);
+    }
   }
-  return t + "…";
+  const keys = ["w", "u", "b", "r", "g"].filter((k) => present.has(k));
+  if (!keys.length && multi > 0) keys.push("multi");
+  return keys;
 }
 
 /** Draw a branded 1080×1350 deck card with the real list + record. */
@@ -265,48 +244,18 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
   const W = 1080;
   const H = 1350;
   const PAD = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not available");
+  const { canvas, ctx } = makeCanvas(W, H);
 
-  // Background
-  const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, "#05070420");
-  grad.addColorStop(0, "#050604");
-  grad.addColorStop(0.55, "#0e140c");
-  grad.addColorStop(1, "#0a1008");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = LIME;
-  ctx.fillRect(0, 0, W, 14);
+  paintBackdrop(ctx, W, H);
+  const logo = await loadBrandLogo();
+  let y = drawHeader(ctx, W, {
+    kicker: input.subtitle ?? scopeSubtitle(input.scope),
+    logo,
+  });
 
-  // Header — logo mark (top-right), wordmark + scope (left)
-  const logo = await loadLogo();
-  ctx.textBaseline = "alphabetic";
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 40px");
-  ctx.fillText("Filthy Net Deck", PAD, 96);
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("500 25px");
-  ctx.fillText(input.subtitle ?? scopeSubtitle(input.scope), PAD, 136);
-  if (logo) {
-    const s = 84;
-    ctx.save();
-    roundRect(ctx, W - PAD - s, 44, s, s, 18);
-    ctx.clip();
-    ctx.drawImage(logo, W - PAD - s, 44, s, s);
-    ctx.restore();
-    ctx.strokeStyle = "rgba(184,240,0,0.35)";
-    ctx.lineWidth = 2;
-    roundRect(ctx, W - PAD - s, 44, s, s, 18);
-    ctx.stroke();
-  }
-
-  // Match badge (vs opp + result pill) sits above the deck name for matches.
-  let y = 210;
+  // Match badge (result pill + opponent) sits above the deck name.
   if (input.scope === "match" && (input.opponent || input.result)) {
+    let bx = PAD;
     if (input.result) {
       const label =
         input.result === "win"
@@ -314,106 +263,123 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
           : input.result === "loss"
             ? "DEFEAT"
             : "DRAW";
-      const pillColor =
+      const color =
         input.result === "win"
-          ? "#34d399"
+          ? BRAND.win
           : input.result === "loss"
-            ? "#f87171"
-            : "#fbbf24";
-      ctx.font = fontStack("800 26px");
-      const pw = ctx.measureText(label).width + 40;
-      ctx.fillStyle = pillColor;
-      roundRect(ctx, PAD, y - 34, pw, 46, 10);
-      ctx.fill();
-      ctx.fillStyle = "#07120b";
-      ctx.fillText(label, PAD + 20, y);
-      if (input.opponent) {
-        ctx.fillStyle = MUTE;
-        ctx.font = fontStack("500 28px");
-        ctx.fillText(
-          ellipsize(ctx, `vs ${input.opponent}`, W - PAD * 2 - pw - 24),
-          PAD + pw + 20,
-          y,
-        );
-      }
-    } else if (input.opponent) {
-      ctx.fillStyle = MUTE;
-      ctx.font = fontStack("600 30px");
-      ctx.fillText(ellipsize(ctx, `vs ${input.opponent}`, W - PAD * 2), PAD, y);
+            ? BRAND.loss
+            : BRAND.draw;
+      bx += pill(ctx, bx, y + 4, label, color, 24) + 20;
     }
-    y += 56;
+    if (input.opponent) {
+      ctx.fillStyle = BRAND.mute;
+      ctx.font = font("500 28px");
+      ctx.fillText(
+        ellipsize(ctx, `vs ${input.opponent}`, W - PAD - bx),
+        bx,
+        y + 38,
+      );
+    }
+    y += 84;
   } else {
-    y = 232;
+    y += 24;
   }
 
-  // Deck name hero (up to two lines)
-  ctx.fillStyle = LIME;
-  ctx.font = fontStack("800 66px");
-  const nameLines: string[] = [];
-  {
-    const words = (input.deckName || "Untitled deck").split(" ");
-    let line = "";
-    for (const w of words) {
-      const test = line ? `${line} ${w}` : w;
-      if (ctx.measureText(test).width > W - PAD * 2 && line) {
-        nameLines.push(line);
-        line = w;
-      } else line = test;
-    }
-    if (line) nameLines.push(line);
+  // Deck name hero (up to two lines, shrinking to fit).
+  const deckName = input.deckName || "Untitled deck";
+  let namePx = 62;
+  let nameLines: string[] = [];
+  while (namePx > 34) {
+    ctx.font = font(`800 ${namePx}px`);
+    nameLines = wrapLines(ctx, deckName, W - PAD * 2);
+    if (nameLines.length <= 2) break;
+    namePx -= 2;
   }
+  ctx.font = font(`800 ${namePx}px`);
+  ctx.fillStyle = BRAND.lime;
   for (const l of nameLines.slice(0, 2)) {
-    ctx.fillText(ellipsize(ctx, l, W - PAD * 2), PAD, y);
-    y += 74;
+    ctx.fillText(ellipsize(ctx, l, W - PAD * 2), PAD, y + namePx * 0.82);
+    y += namePx * 1.12;
   }
-  y += 6;
+  y += 18;
 
-  // Record band
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 46px");
-  const wrBits =
-    input.winratePct != null
-      ? `${input.wins}–${input.losses}  ·  ${input.winratePct}% WR`
-      : `${input.wins}–${input.losses}`;
-  ctx.fillText(wrBits, PAD, y);
-  // games count to the right
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("500 30px");
-  const gamesLabel = `${input.games} game${input.games === 1 ? "" : "s"}`;
-  ctx.fillText(gamesLabel, W - PAD - ctx.measureText(gamesLabel).width, y - 4);
-  y += 50;
-
-  // Rank / format / streak sub-line
-  const subBits = [
-    input.rankNow ? `Now ${input.rankNow}` : null,
-    input.rankPeak && input.rankPeak !== input.rankNow
-      ? `Peak ${input.rankPeak}`
-      : null,
-    input.format ?? null,
-    input.bestOf && input.bestOf > 1 ? `Bo${input.bestOf}` : null,
-    input.streakLabel ?? null,
-  ].filter(Boolean) as string[];
-  if (subBits.length) {
-    ctx.fillStyle = "#e8c56a";
-    ctx.font = fontStack("600 28px");
-    ctx.fillText(ellipsize(ctx, subBits.join("   ·   "), W - PAD * 2), PAD, y);
+  // Color identity pips.
+  const identity = colorIdentity(input.list);
+  if (identity.length) {
+    drawPips(ctx, PAD, y + 12, identity, 13);
     y += 40;
   }
 
-  // Divider
-  y += 8;
-  ctx.strokeStyle = "rgba(184,240,0,0.22)";
-  ctx.lineWidth = 2;
+  // Format / Bo / streak chips.
+  const chipBits = [
+    input.format ?? null,
+    input.bestOf && input.bestOf > 1 ? `Bo${input.bestOf}` : null,
+    input.streakLabel ?? null,
+  ].filter((b): b is string => !!b);
+  if (chipBits.length) {
+    let cx = PAD;
+    for (const bit of chipBits.slice(0, 3)) {
+      if (cx > W - PAD - 120) break;
+      cx += chip(ctx, cx, y, bit, BRAND.gold, 21) + 14;
+    }
+    y += 54;
+  }
+
+  // Stat band: WR ring + record + rank/form tiles.
+  y += 14;
+  const bandH = 196;
+  const ringW = 280;
+  panel(ctx, PAD, y, ringW, bandH, 22);
+  wrRing(ctx, PAD + ringW / 2, y + bandH / 2 + 4, 72, input.winratePct);
+
+  const tileW = (W - PAD * 2 - ringW - 2 * 20) / 2;
+  const gamesLabel = `${input.games} game${input.games === 1 ? "" : "s"}`;
+  statTile(ctx, PAD + ringW + 20, y, tileW, bandH, {
+    label: "Record",
+    value: `${input.wins}–${input.losses}`,
+    sub: gamesLabel,
+  });
+  const sideTile = input.rankNow
+    ? {
+        label: "Rank now",
+        value: input.rankNow,
+        sub:
+          input.rankPeak && input.rankPeak !== input.rankNow
+            ? `Peak ${input.rankPeak}`
+            : null,
+      }
+    : input.streakLabel
+      ? { label: "Form", value: input.streakLabel, sub: null }
+      : {
+          label: "Window",
+          value: scopeWindowLabel(input.scope),
+          sub: null,
+        };
+  statTile(ctx, PAD + ringW + 20 + tileW + 20, y, tileW, bandH, sideTile);
+  y += bandH + 40;
+
+  // Decklist header.
+  ctx.fillStyle = BRAND.mute;
+  ctx.font = font("600 20px");
+  drawTracked(ctx, "DECKLIST", PAD, y, 3);
+  const totalBits = [`${input.list.total} cards`];
+  if (input.list.sideboard > 0) totalBits.push(`+${input.list.sideboard} sideboard`);
+  ctx.font = font("500 23px");
+  const totalLabel = totalBits.join("  ·  ");
+  ctx.fillText(totalLabel, W - PAD - ctx.measureText(totalLabel).width, y);
+  y += 16;
+  ctx.strokeStyle = withAlpha(BRAND.lime, 0.25);
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(PAD, y);
   ctx.lineTo(W - PAD, y);
   ctx.stroke();
-  y += 34;
+  y += 26;
 
   // Decklist — whole groups split across two balanced columns; row height
   // scales up so a short aggro list fills the card as well as a 60-card list.
   const listTop = y;
-  const listBottom = H - 120;
+  const listBottom = H - 128;
   const gutter = 48;
   const colW = (W - PAD * 2 - gutter) / 2;
   const colX = [PAD, PAD + colW + gutter];
@@ -438,43 +404,60 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
     gs.reduce((a, g) => a + 1 + g.rows.length, 0),
   );
   const maxLines = Math.max(1, colLines[0], colLines[1]);
+  // Reserve room for the initial 0.72-unit offset and inter-group gaps so
+  // nothing overflows past listBottom.
+  const maxGroups = Math.max(colGroups[0].length, colGroups[1].length, 1);
+  const effectiveLines = maxLines + 0.72 + 0.3 * (maxGroups - 1);
   const unit = Math.max(
-    38,
-    Math.min(56, Math.floor((listBottom - listTop) / maxLines)),
+    36,
+    Math.min(60, Math.floor((listBottom - listTop) / effectiveLines)),
   );
-  const headSize = Math.max(20, Math.round(unit * 0.4));
-  const rowSize = Math.max(22, Math.round(unit * 0.5));
-  const dotR = Math.max(6, Math.round(unit * 0.14));
+  const headSize = Math.max(19, Math.round(unit * 0.38));
+  const rowSize = Math.max(22, Math.round(unit * 0.48));
+  const dotR = Math.max(6, Math.round(unit * 0.13));
 
-  const drawHeader = (label: string, count: number, x: number, baseY: number) => {
-    ctx.fillStyle = MUTE;
-    ctx.font = fontStack(`700 ${headSize}px`);
-    ctx.fillText(label.toUpperCase(), x, baseY);
+  const drawGroupHeader = (label: string, count: number, x: number, baseY: number) => {
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font(`700 ${headSize}px`);
+    drawTracked(ctx, label.toUpperCase(), x, baseY, 2);
     const c = String(count);
+    ctx.fillStyle = BRAND.lime;
     ctx.fillText(c, x + colW - ctx.measureText(c).width, baseY);
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.strokeStyle = "rgba(255,255,255,0.09)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x, baseY + Math.round(unit * 0.26));
-    ctx.lineTo(x + colW, baseY + Math.round(unit * 0.26));
+    ctx.moveTo(x, baseY + Math.round(unit * 0.28));
+    ctx.lineTo(x + colW, baseY + Math.round(unit * 0.28));
     ctx.stroke();
   };
 
   const drawRow = (row: DeckShareRow, x: number, baseY: number) => {
-    ctx.fillStyle = DOT[row.color];
+    const pipColor = MANA_PIP[row.color] ?? BRAND.mute;
+    const cyDot = baseY - Math.round(rowSize * 0.32);
+    const grad = ctx.createRadialGradient(
+      x + dotR * 0.4,
+      cyDot - dotR * 0.4,
+      dotR * 0.2,
+      x + dotR,
+      cyDot,
+      dotR * 1.3,
+    );
+    grad.addColorStop(0, withAlpha(pipColor, 0.95));
+    grad.addColorStop(1, withAlpha(pipColor, 0.7));
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.arc(x + dotR, baseY - Math.round(rowSize * 0.32), dotR, 0, Math.PI * 2);
+    ctx.arc(x + dotR, cyDot, dotR, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = "rgba(0,0,0,0.4)";
+    ctx.strokeStyle = "rgba(0,0,0,0.45)";
     ctx.lineWidth = 1;
     ctx.stroke();
     const textX = x + dotR * 2 + 12;
-    ctx.fillStyle = INK;
-    ctx.font = fontStack(`700 ${rowSize}px`);
+    ctx.fillStyle = BRAND.lime;
+    ctx.font = font(`700 ${rowSize}px`);
     ctx.fillText(`${row.qty}`, textX, baseY);
     const qtyW = ctx.measureText(`${row.qty}`).width;
-    ctx.font = fontStack(`500 ${rowSize}px`);
-    ctx.fillStyle = row.unresolved ? MUTE : "#e9ecdf";
+    ctx.font = font(`500 ${rowSize}px`);
+    ctx.fillStyle = row.unresolved ? BRAND.mute : BRAND.paper;
     ctx.fillText(
       ellipsize(ctx, row.name, colW - (textX - x) - qtyW - 14),
       textX + qtyW + 14,
@@ -493,7 +476,7 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
         overflow += g.rows.length; // no room for this group at all
         continue;
       }
-      drawHeader(g.label, g.count, colX[c], cy);
+      drawGroupHeader(g.label, g.count, colX[c], cy);
       cy += unit;
       for (const row of g.rows) {
         if (cy + unit > listBottom) {
@@ -506,31 +489,33 @@ export async function renderDeckSharePng(input: DeckShareInput): Promise<Blob> {
     }
   }
 
-  // Sideboard + overflow note
-  const notes: string[] = [];
-  if (input.list.sideboard > 0) notes.push(`+${input.list.sideboard} sideboard`);
-  if (overflow > 0) notes.push(`+${overflow} more`);
-  if (notes.length) {
-    ctx.fillStyle = MUTE;
-    ctx.font = fontStack("500 24px");
-    ctx.fillText(notes.join("  ·  "), PAD, H - 108);
+  if (overflow > 0) {
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("500 22px");
+    ctx.fillText(`+${overflow} more`, PAD, H - 104);
   }
 
-  // Footer
-  ctx.fillStyle = FAINT;
-  ctx.font = fontStack("400 23px");
-  ctx.fillText(
-    "filthy-net-deck.com · Built by ApexForge",
-    PAD,
-    H - 52,
-  );
+  drawFooter(ctx, W, H, PAD);
+  return canvasToPng(canvas);
+}
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))),
-      "image/png",
-    );
-  });
+function scopeWindowLabel(scope: ShareScope): string {
+  switch (scope) {
+    case "match":
+      return "Match";
+    case "session":
+      return "Session";
+    case "day":
+      return "Today";
+    case "run":
+      return "Run";
+    case "week":
+      return "7 days";
+    case "season":
+      return "Season";
+    case "all":
+      return "All-time";
+  }
 }
 
 function slugify(s: string): string {
@@ -551,10 +536,5 @@ export async function downloadDeckSharePng(
   const name =
     filename ??
     `filthy-net-deck-${slugify(input.deckName)}-${scopeSlug(input.scope)}.png`;
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, name);
 }

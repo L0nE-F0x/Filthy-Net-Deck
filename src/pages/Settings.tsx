@@ -140,6 +140,7 @@ export function Settings() {
   const setOverlayClickThrough = useAppStore((s) => s.setOverlayClickThrough);
   const setOverlayBarClock = useAppStore((s) => s.setOverlayBarClock);
   const setOverlayBarRecord = useAppStore((s) => s.setOverlayBarRecord);
+  const setOverlayPostMatch = useAppStore((s) => s.setOverlayPostMatch);
   const setDecklistView = useAppStore((s) => s.setDecklistView);
   const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
   const setDefaultPage = useAppStore((s) => s.setDefaultPage);
@@ -383,6 +384,20 @@ export function Settings() {
               <label className="settings-toggle-row">
                 <input
                   type="checkbox"
+                  checked={prefs.overlayPostMatch}
+                  onChange={(e) => setOverlayPostMatch(e.target.checked)}
+                />
+                <span>
+                  <strong>Post-match summary</strong>
+                  <em>
+                    Result card with season form + rank path lingers ~12s after
+                    each match
+                  </em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
                   checked={prefs.overlayClickThrough}
                   onChange={(e) => setOverlayClickThrough(e.target.checked)}
                 />
@@ -498,9 +513,11 @@ export function Settings() {
         <section className="panel settings-card settings-card-span2">
           <h3 className="settings-card-title">Notifications</h3>
           <p className="settings-card-desc mb-2">
-            Desktop toasts stay on this PC. Match-end is on by default. If you never
-            see toasts, check Windows → Notifications and Focus Assist for Filthy Net
-            Deck.
+            Desktop toasts stay on this PC. Match-end is on by default and fires
+            from the tracker itself, so it lands even while you&apos;re mid-game
+            in Arena or the app sits in the tray. If banners never pop, check
+            Windows → Notifications and Focus Assist — the toast still waits in
+            Action Center either way.
           </p>
           <div className="settings-toggle-list">
             <label className="settings-toggle-row">

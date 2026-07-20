@@ -1815,7 +1815,9 @@ export function Stats() {
                 const stats = recapFromMatches(matches);
                 setRecapMsg(`${formatRecapHeadline(stats)} — rendering…`);
                 try {
-                  const blob = await renderRecapPng(stats);
+                  const blob = await renderRecapPng(stats, {
+                    kicker: "Weekly recap · local only",
+                  });
                   const caption = recapCaption({
                     wins: stats.wins,
                     losses: stats.losses,

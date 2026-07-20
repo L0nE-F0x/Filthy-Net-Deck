@@ -51,7 +51,7 @@ import {
   summarizeMetaMovers,
 } from "../services/metaMoverHabit";
 import { normalizeOpacity } from "../overlay/overlayModel";
-import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust } from "../services/overlay";
+import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setNotifyMatchEndRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
@@ -111,6 +111,8 @@ interface Prefs {
   overlayBarClock: boolean;
   /** Collapsed overlay bar: show season record with this deck (default on). */
   overlayBarRecord: boolean;
+  /** Post-match summary card lingers in the overlay after win/loss (default on). */
+  overlayPostMatch: boolean;
   /** Tracked-decklist display style on My Stats (default stacked — compact). */
   decklistView: DecklistView;
   /** Climb path list order — newest stretch on top (default on). */
@@ -145,6 +147,7 @@ function loadPrefs(): Prefs {
         overlayClickThrough?: boolean;
         overlayBarClock?: boolean;
         overlayBarRecord?: boolean;
+        overlayPostMatch?: boolean;
         decklistView?: string;
         climbNewestFirst?: boolean;
         defaultPage?: string;
@@ -169,6 +172,7 @@ function loadPrefs(): Prefs {
         overlayClickThrough: parsed.overlayClickThrough === true,
         overlayBarClock: parsed.overlayBarClock !== false,
         overlayBarRecord: parsed.overlayBarRecord !== false,
+        overlayPostMatch: parsed.overlayPostMatch !== false,
         decklistView:
           parsed.decklistView === "list" || parsed.decklistView === "compact"
             ? parsed.decklistView
@@ -205,6 +209,7 @@ function loadPrefs(): Prefs {
     overlayClickThrough: false,
     overlayBarClock: true,
     overlayBarRecord: true,
+    overlayPostMatch: true,
     decklistView: "stacked",
     climbNewestFirst: true,
     defaultPage: "daily",
@@ -354,6 +359,8 @@ interface AppState {
   setOverlayBarClock: (v: boolean) => void;
   /** Collapsed overlay bar: season record on/off. */
   setOverlayBarRecord: (v: boolean) => void;
+  /** Post-match summary card in the overlay after win/loss. */
+  setOverlayPostMatch: (v: boolean) => void;
   /** Tracked-decklist display style (My Stats deck detail). */
   setDecklistView: (v: DecklistView) => void;
   /** Climb path order — newest stretch on top. */
@@ -559,6 +566,8 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, notifyMatchEnd };
       savePrefs(next);
       set({ prefs: next });
+      // Rust posts this toast itself (works tray-hidden) — keep it in sync.
+      void setNotifyMatchEndRust(notifyMatchEnd);
     },
     setNotifyBanlist: (notifyBanlist) => {
       const next = { ...get().prefs, notifyBanlist };
@@ -605,6 +614,14 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       void pushOverlayPrefs();
+    },
+    setOverlayPostMatch: (overlayPostMatch) => {
+      const next = { ...get().prefs, overlayPostMatch };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
+      // Rust owns the linger window (12s vs short flash) — keep it in sync.
+      void setOverlayPostMatchRust(overlayPostMatch);
     },
     setDecklistView: (decklistView) => {
       const next = { ...get().prefs, decklistView };
@@ -773,6 +790,10 @@ export const useAppStore = create<AppState>((set, get) => {
     initTracker: async () => {
       if (get().trackerReady) return;
       set({ trackerReady: true });
+      // Self-heal pref drift on boot: localStorage is the UI source of truth;
+      // Rust mirrors both flags (it posts the toast / owns the linger window).
+      void setNotifyMatchEndRust(get().prefs.notifyMatchEnd);
+      void setOverlayPostMatchRust(get().prefs.overlayPostMatch);
       await get().refreshTracker();
       await subscribeTracker({
         onMatch: (m) => {
@@ -845,8 +866,10 @@ export const useAppStore = create<AppState>((set, get) => {
               void playSfx("draw", { set });
             }
           }
-          // Opt-in match-end toast — richer when B1 can name the opponent deck.
-          if (prefs.notifyMatchEnd) {
+          // Match-end toast. In the desktop app the tracker thread posts it
+          // itself (immune to tray-hidden webview + Focus Assist queues it);
+          // this JS path remains for browser/dev only.
+          if (prefs.notifyMatchEnd && !isTauri()) {
             const history = [m, ...cur];
             void (async () => {
               const { matchEndToastBody } = await import("../services/matchNotify");

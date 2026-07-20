@@ -75,6 +75,8 @@ pub fn run() {
             overlay::overlay_get_geometry,
             overlay::overlay_save_geometry,
             overlay::overlay_set_click_through,
+            overlay::overlay_set_post_match,
+            tracker::notify_set_match_end,
             silent_update::install_update_silent
         ])
         .setup(|app| {
@@ -109,6 +111,8 @@ pub fn run() {
             }
 
             overlay::load_enabled(app.handle());
+            overlay::load_post_match(app.handle());
+            tracker::load_notify_match_end(app.handle());
 
             // Winrate tracker: tail MTG Arena's Player.log in the background.
             tracker::start(app.handle().clone());

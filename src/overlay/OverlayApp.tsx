@@ -34,6 +34,7 @@ import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
 import { decksForMode } from "../services/deckHelpers";
 import type { MetaBundle } from "../types/meta";
+import { PostMatchSummary } from "./PostMatchSummary";
 
 
 const SNAP_PX = 24;
@@ -41,6 +42,8 @@ const SNAP_PX = 24;
 const COLLAPSED_H = 34;
 /** Expanded window never goes below this when restoring. */
 const MIN_EXPANDED_H = 120;
+/** Grow the panel to at least this tall while the post-match summary is up. */
+const SUMMARY_MIN_H = 252;
 /** localStorage prefs blob shared with the main window (same origin). */
 const PREFS_KEY = "bbi.prefs";
 
@@ -87,6 +90,7 @@ interface OverlayPrefs {
   clickThrough: boolean;
   barClock: boolean;
   barRecord: boolean;
+  postMatch: boolean;
 }
 
 function readOverlayPrefs(): OverlayPrefs {
@@ -99,6 +103,7 @@ function readOverlayPrefs(): OverlayPrefs {
         overlayClickThrough?: boolean;
         overlayBarClock?: boolean;
         overlayBarRecord?: boolean;
+        overlayPostMatch?: boolean;
       };
       return {
         opacity: normalizeOpacity(parsed.overlayOpacity),
@@ -106,6 +111,7 @@ function readOverlayPrefs(): OverlayPrefs {
         clickThrough: parsed.overlayClickThrough === true,
         barClock: parsed.overlayBarClock !== false,
         barRecord: parsed.overlayBarRecord !== false,
+        postMatch: parsed.overlayPostMatch !== false,
       };
     }
   } catch {
@@ -117,6 +123,7 @@ function readOverlayPrefs(): OverlayPrefs {
     clickThrough: false,
     barClock: true,
     barRecord: true,
+    postMatch: true,
   };
 }
 
@@ -154,6 +161,16 @@ async function applyClickThrough(ignore: boolean) {
   if (!isTauri()) return;
   try {
     await invoke("overlay_set_click_through", { ignore });
+  } catch {
+    /* older builds without the command */
+  }
+}
+
+/** Keep the Rust linger window in sync with the post-match toggle. */
+async function applyPostMatch(enabled: boolean) {
+  if (!isTauri()) return;
+  try {
+    await invoke("overlay_set_post_match", { enabled });
   } catch {
     /* older builds without the command */
   }
@@ -427,6 +444,10 @@ export function OverlayApp() {
   const startExpandedRef = useRef(readOverlayPrefs().startExpanded);
   /** matchId the startExpanded pref was last applied to (once per match). */
   const appliedMatchRef = useRef<string | null>(null);
+  /** matchId the post-match summary was last auto-shown for (once per match). */
+  const appliedSummaryRef = useRef<string | null>(null);
+  /** Panel height before the summary grew it — restored on the next match. */
+  const preSummaryH = useRef<number | null>(null);
 
   useEffect(() => {
     compactRef.current = compact;
@@ -674,6 +695,9 @@ export function OverlayApp() {
     if (next === compactRef.current) return;
     compactRef.current = next;
     setCompact(next);
+    // Captured synchronously: a summary-grown height must never become the
+    // remembered expanded height when the panel collapses.
+    const preGrownH = preSummaryH.current;
     if (!isTauri()) return;
     void (async () => {
       try {
@@ -689,7 +713,7 @@ export function OverlayApp() {
         try {
           if (next) {
             // Collapsing — remember the real expanded height.
-            expandedH.current = Math.max(curH, MIN_EXPANDED_H);
+            expandedH.current = Math.max(preGrownH ?? curH, MIN_EXPANDED_H);
             await win.setSize(new LogicalSize(w, COLLAPSED_H));
           } else {
             await win.setSize(
@@ -736,6 +760,82 @@ export function OverlayApp() {
       setCompactMode(!startExpandedRef.current);
     }
   }, [liveMatchId, livePhase, setCompactMode]);
+
+  // Post-match summary: once per match, make sure the panel is expanded and
+  // tall enough to show the card; restore the user's height when the next
+  // match starts. Runs after the startExpanded effect so compactRef is final.
+  const summaryOn = livePhase === "ended" && prefs.postMatch;
+  useEffect(() => {
+    if (summaryOn && liveMatchId) {
+      if (appliedSummaryRef.current === liveMatchId) return;
+      appliedSummaryRef.current = liveMatchId;
+      if (!isTauri()) {
+        if (compactRef.current) setCompactMode(false);
+        return;
+      }
+      void (async () => {
+        try {
+          const { getCurrentWindow, LogicalSize } = await import(
+            "@tauri-apps/api/window"
+          );
+          const win = getCurrentWindow();
+          const factor = await win.scaleFactor();
+          const size = await win.outerSize();
+          const w = size.width / factor;
+          const curH = size.height / factor;
+          const wasCompact = compactRef.current;
+          if (!wasCompact && curH >= SUMMARY_MIN_H) return; // visible + tall enough
+          preSummaryH.current = wasCompact ? expandedH.current : curH;
+          if (wasCompact) {
+            compactRef.current = false;
+            setCompact(false);
+          }
+          programmaticResize.current = true;
+          try {
+            await win.setSize(
+              new LogicalSize(
+                w,
+                Math.max(wasCompact ? expandedH.current : curH, SUMMARY_MIN_H),
+              ),
+            );
+            await ensureOnScreen();
+          } finally {
+            window.setTimeout(() => {
+              programmaticResize.current = false;
+            }, 400);
+          }
+        } catch {
+          /* ignore */
+        }
+      })();
+    } else if (livePhase === "playing" && preSummaryH.current != null) {
+      const target = preSummaryH.current;
+      preSummaryH.current = null;
+      // Collapsed by the startExpanded effect — the collapse path already
+      // recorded `target` as the expanded height, nothing to resize.
+      if (compactRef.current || !isTauri()) return;
+      void (async () => {
+        try {
+          const { getCurrentWindow, LogicalSize } = await import(
+            "@tauri-apps/api/window"
+          );
+          const win = getCurrentWindow();
+          const factor = await win.scaleFactor();
+          const size = await win.outerSize();
+          programmaticResize.current = true;
+          try {
+            await win.setSize(new LogicalSize(size.width / factor, target));
+          } finally {
+            window.setTimeout(() => {
+              programmaticResize.current = false;
+            }, 400);
+          }
+        } catch {
+          /* ignore */
+        }
+      })();
+    }
+  }, [summaryOn, livePhase, liveMatchId, setCompactMode]);
 
   const [oppNamesTick, setOppNamesTick] = useState(0);
   useEffect(() => {
@@ -979,7 +1079,14 @@ export function OverlayApp() {
             </span>
           </div>
 
-          {groups.length > 0 ? (
+          {ended && prefs.postMatch ? (
+            <PostMatchSummary
+              live={live}
+              matches={matches}
+              record={record}
+              oppGuess={oppGuessLabel}
+            />
+          ) : groups.length > 0 ? (
             <div className="overlay-decklist">
               {groups.map((g) => (
                 <GroupSection
@@ -1042,6 +1149,17 @@ export function OverlayApp() {
                     onChange={(e) => patchPrefs({ overlayBarRecord: e.target.checked })}
                   />
                   <span>Record on the minimized bar</span>
+                </label>
+                <label className="overlay-menu-row">
+                  <input
+                    type="checkbox"
+                    checked={prefs.postMatch}
+                    onChange={(e) => {
+                      patchPrefs({ overlayPostMatch: e.target.checked });
+                      void applyPostMatch(e.target.checked);
+                    }}
+                  />
+                  <span>Post-match summary</span>
                 </label>
                 <button
                   type="button"

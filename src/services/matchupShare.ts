@@ -1,11 +1,27 @@
 /**
  * A5 — personal matchup share card.
  * Renders a branded PNG from B1/B2 matchup rows (real cards seen → archetypes).
- * Aggregation stays pure; canvas is browser-only on user share.
+ * Aggregation stays pure; canvas is browser-only on user share and styled by
+ * shareKit so every card in the app shares one design system.
  */
 
 import type { DeckMatchupRow } from "./gameAnalytics";
 import { matchupCaption } from "./communityShare";
+import {
+  BRAND,
+  canvasToPng,
+  drawFooter,
+  drawHeader,
+  ellipsize,
+  font,
+  loadBrandLogo,
+  makeCanvas,
+  paintBackdrop,
+  panel,
+  ratioBar,
+  statTile,
+  wrRing,
+} from "./shareKit";
 
 export interface MatchupShareLine {
   archetype: string;
@@ -22,46 +38,6 @@ export interface MatchupShareInput {
   losses: number;
   rows: MatchupShareLine[];
   formatHint?: string | null;
-}
-
-const LIME = "#b8f000";
-const INK = "#f2f4ea";
-const MUTE = "#9aa38a";
-const FAINT = "#5a6b5e";
-const GOLD = "#e8c56a";
-
-function fontStack(spec: string): string {
-  return `${spec} "Segoe UI", system-ui, sans-serif`;
-}
-
-function ellipsize(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string {
-  if (ctx.measureText(text).width <= maxWidth) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(`${t}…`).width > maxWidth) {
-    t = t.slice(0, -1);
-  }
-  return `${t}…`;
-}
-
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
 }
 
 /**
@@ -128,13 +104,9 @@ export function matchupShareCaption(
   });
 }
 
-function loadLogo(): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = "/app-icon.png";
-  });
+function wrColor(rate: number | null): string {
+  if (rate == null) return BRAND.mute;
+  return rate >= 55 ? BRAND.win : rate <= 45 ? BRAND.loss : BRAND.gold;
 }
 
 /** 1080×1350 matchup matrix card — personal WR by inferred archetype. */
@@ -144,138 +116,109 @@ export async function renderMatchupSharePng(
   const W = 1080;
   const H = 1350;
   const PAD = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not available");
+  const { canvas, ctx } = makeCanvas(W, H);
 
-  const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, "#050604");
-  grad.addColorStop(0.55, "#0e140c");
-  grad.addColorStop(1, "#0a1008");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = LIME;
-  ctx.fillRect(0, 0, W, 14);
+  paintBackdrop(ctx, W, H);
+  const logo = await loadBrandLogo();
+  let y = drawHeader(ctx, W, {
+    kicker: "Personal matchups · cards actually seen",
+    logo,
+  });
+  y += 26;
 
-  const logo = await loadLogo();
-  ctx.textBaseline = "alphabetic";
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 40px");
-  ctx.fillText("Filthy Net Deck", PAD, 96);
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("500 25px");
-  ctx.fillText("Personal matchups · cards actually seen", PAD, 136);
-  if (logo) {
-    const s = 84;
-    ctx.save();
-    roundRect(ctx, W - PAD - s, 44, s, s, 18);
-    ctx.clip();
-    ctx.drawImage(logo, W - PAD - s, 44, s, s);
-    ctx.restore();
-    ctx.strokeStyle = "rgba(184,240,0,0.35)";
-    ctx.lineWidth = 2;
-    roundRect(ctx, W - PAD - s, 44, s, s, 18);
-    ctx.stroke();
+  // Hero: deck name.
+  ctx.fillStyle = BRAND.lime;
+  ctx.font = font("800 56px");
+  ctx.fillText(ellipsize(ctx, input.deckName, W - PAD * 2), PAD, y + 44);
+  if (input.formatHint) {
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("600 20px");
+    ctx.fillText(input.formatHint.toUpperCase(), PAD + 2, y + 84);
+    y += 42;
   }
+  y += 108;
 
-  let y = 230;
-  ctx.fillStyle = LIME;
-  ctx.font = fontStack("800 58px");
-  const name = ellipsize(ctx, input.deckName, W - PAD * 2);
-  ctx.fillText(name, PAD, y);
-  y += 72;
-
+  // Stat band: overall WR ring + record + sample size.
   const decided = input.wins + input.losses;
   const wr = decided ? Math.round((input.wins / decided) * 100) : null;
-  ctx.fillStyle = INK;
-  ctx.font = fontStack("700 44px");
-  ctx.fillText(
-    wr != null
-      ? `${input.wins}–${input.losses}  ·  ${wr}% WR`
-      : `${input.wins}–${input.losses}`,
-    PAD,
-    y,
-  );
-  y += 40;
-  if (input.formatHint) {
-    ctx.fillStyle = GOLD;
-    ctx.font = fontStack("600 26px");
-    ctx.fillText(input.formatHint, PAD, y);
-    y += 36;
-  }
+  const bandH = 190;
+  const ringW = 280;
+  panel(ctx, PAD, y, ringW, bandH, 22);
+  wrRing(ctx, PAD + ringW / 2, y + bandH / 2 + 4, 70, wr);
+  const tileW = (W - PAD * 2 - ringW - 2 * 20) / 2;
+  statTile(ctx, PAD + ringW + 20, y, tileW, bandH, {
+    label: "Overall record",
+    value: `${input.wins}–${input.losses}`,
+    sub: decided ? `${decided} decided matches` : "No decided matches",
+  });
+  statTile(ctx, PAD + ringW + 20 + tileW + 20, y, tileW, bandH, {
+    label: "Archetypes faced",
+    value: String(input.rows.length),
+    sub: "inferred from cards seen",
+  });
+  y += bandH + 40;
 
-  y += 16;
-  ctx.strokeStyle = "rgba(184,240,0,0.22)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(PAD, y);
-  ctx.lineTo(W - PAD, y);
-  ctx.stroke();
-  y += 48;
+  // Matchup table inside a panel.
+  const tableTop = y;
+  const tableBottom = H - 118;
+  panel(ctx, PAD, tableTop, W - PAD * 2, tableBottom - tableTop, 22);
+  const ix = PAD + 30;
+  const iw = W - PAD * 2 - 60;
 
-  // Table header
-  ctx.fillStyle = MUTE;
-  ctx.font = fontStack("700 24px");
-  ctx.fillText("VS ARCHETYPE", PAD, y);
-  ctx.fillText("RECORD", W - PAD - 280, y);
-  ctx.fillText("WR", W - PAD - 90, y);
-  y += 28;
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  // Table header.
+  ctx.fillStyle = BRAND.mute;
+  ctx.font = font("700 19px");
+  const hy = tableTop + 48;
+  ctx.fillText("VS ARCHETYPE", ix, hy);
+  ctx.fillText("RECORD", ix + iw - 268, hy);
+  ctx.fillText("WR", ix + iw - ctx.measureText("WR").width, hy);
+  ctx.strokeStyle = BRAND.hairline;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(PAD, y);
-  ctx.lineTo(W - PAD, y);
+  ctx.moveTo(ix, hy + 18);
+  ctx.lineTo(ix + iw, hy + 18);
   ctx.stroke();
-  y += 44;
 
+  const rowsTop = hy + 34;
+  const rowsBottom = tableBottom - 24;
   const rowH = Math.min(
-    64,
-    Math.max(48, Math.floor((H - 140 - y) / Math.max(1, input.rows.length))),
+    96,
+    Math.max(46, Math.floor((rowsBottom - rowsTop) / Math.max(1, input.rows.length))),
   );
 
+  let ry = rowsTop;
   for (const row of input.rows) {
-    if (y + rowH > H - 120) break;
+    if (ry + rowH > rowsBottom + 8) break;
     const rate =
       row.rate != null
         ? Math.round(row.rate * 100)
         : row.wins + row.losses
           ? Math.round((row.wins / (row.wins + row.losses)) * 100)
           : null;
+    const base = ry + Math.round(rowH * 0.52);
 
-    ctx.fillStyle = INK;
-    ctx.font = fontStack("600 32px");
-    ctx.fillText(ellipsize(ctx, row.archetype, W - PAD * 2 - 320), PAD, y);
+    ctx.fillStyle = BRAND.ink;
+    ctx.font = font("600 30px");
+    ctx.fillText(ellipsize(ctx, row.archetype, iw - 320), ix, base);
 
-    ctx.fillStyle = MUTE;
-    ctx.font = fontStack("600 30px");
-    const rec = `${row.wins}–${row.losses}`;
-    ctx.fillText(rec, W - PAD - 280, y);
+    ctx.fillStyle = BRAND.mute;
+    ctx.font = font("600 28px");
+    ctx.fillText(`${row.wins}–${row.losses}`, ix + iw - 268, base);
 
-    ctx.fillStyle =
-      rate == null ? MUTE : rate >= 55 ? "#34d399" : rate <= 45 ? "#f87171" : GOLD;
-    ctx.font = fontStack("700 30px");
+    ctx.fillStyle = wrColor(rate);
+    ctx.font = font("800 28px");
     const wrText = rate == null ? "—" : `${rate}%`;
-    ctx.fillText(wrText, W - PAD - 90, y);
+    ctx.fillText(wrText, ix + iw - ctx.measureText(wrText).width, base);
 
-    y += rowH;
+    // WR ratio bar under the row.
+    if (rate != null) {
+      ratioBar(ctx, ix, base + 14, iw, 6, rate / 100, wrColor(rate));
+    }
+    ry += rowH;
   }
 
-  ctx.fillStyle = FAINT;
-  ctx.font = fontStack("400 23px");
-  ctx.fillText(
-    "filthy-net-deck.com · Built by ApexForge",
-    PAD,
-    H - 52,
-  );
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))),
-      "image/png",
-    );
-  });
+  drawFooter(ctx, W, H, PAD);
+  return canvasToPng(canvas);
 }
 
 function slugify(s: string): string {

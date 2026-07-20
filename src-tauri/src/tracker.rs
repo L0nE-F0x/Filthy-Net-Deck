@@ -26,6 +26,7 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -1747,6 +1748,125 @@ fn backfill_file(app: &AppHandle, parser: &mut LogParser, path: &Path) {
     record_matches(app, completed);
 }
 
+// ---------------------------------------------------------------------------
+// Match-end desktop toast (Rust-side)
+// ---------------------------------------------------------------------------
+//
+// This toast used to be posted by the frontend, but mid-match the main
+// webview is usually tray-hidden (JS timers throttled) and Windows Focus
+// Assist mutes banners while Arena runs. Posting from the tracker thread is
+// immune to webview state, and the toast still queues in Action Center when
+// Focus Assist suppresses the banner.
+
+const NOTIFY_MATCH_END_FILE: &str = "notify-match-end";
+static NOTIFY_MATCH_END: AtomicBool = AtomicBool::new(true);
+
+fn notify_match_end_path(app: &AppHandle) -> Option<PathBuf> {
+    app.path()
+        .app_data_dir()
+        .ok()
+        .map(|d| d.join(NOTIFY_MATCH_END_FILE))
+}
+
+/// Load the persisted toggle at startup (default on — matches the UI pref).
+pub fn load_notify_match_end(app: &AppHandle) {
+    let on = notify_match_end_path(app)
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| {
+            let t = s.trim();
+            t != "0" && !t.eq_ignore_ascii_case("false")
+        })
+        .unwrap_or(true);
+    NOTIFY_MATCH_END.store(on, Ordering::SeqCst);
+}
+
+fn notify_match_end_enabled() -> bool {
+    NOTIFY_MATCH_END.load(Ordering::SeqCst)
+}
+
+/// Mirror of the Settings → Notifications → "Match-end toasts" toggle.
+#[tauri::command]
+pub fn notify_set_match_end(app: AppHandle, enabled: bool) {
+    NOTIFY_MATCH_END.store(enabled, Ordering::SeqCst);
+    if let Some(path) = notify_match_end_path(&app) {
+        if let Some(dir) = path.parent() {
+            let _ = fs::create_dir_all(dir);
+        }
+        let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
+    }
+}
+
+/// Stable deck identity, mirroring the frontend `deckKey` (id → name → hash).
+fn match_deck_key(m: &TrackedMatch) -> Option<&str> {
+    m.deck_id
+        .as_deref()
+        .or(m.deck_name.as_deref())
+        .or(m.deck_hash.as_deref())
+}
+
+/// Toast body: "Win vs Rival · 62% this season · Diamond 1".
+/// `history` must already include `m` itself.
+fn match_end_body(m: &TrackedMatch, history: &[TrackedMatch]) -> String {
+    let result = match m.result.as_str() {
+        "win" => "Win",
+        "loss" => "Loss",
+        "draw" => "Draw",
+        _ => "Match ended",
+    };
+    let opp = m
+        .opponent_name
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .unwrap_or("opponent");
+    let mut body = format!("{result} vs {opp}");
+
+    let season = iso_date(m.ended_at);
+    let season = &season[..7]; // "YYYY-MM"
+    if let Some(key) = match_deck_key(m) {
+        let mut wins = 0u32;
+        let mut losses = 0u32;
+        for h in history {
+            if &iso_date(h.ended_at)[..7] != season {
+                continue;
+            }
+            let same_deck = match_deck_key(h) == Some(key)
+                || (m.deck_hash.is_some() && h.deck_hash == m.deck_hash);
+            if !same_deck {
+                continue;
+            }
+            match h.result.as_str() {
+                "win" => wins += 1,
+                "loss" => losses += 1,
+                _ => {}
+            }
+        }
+        let decided = wins + losses;
+        if decided > 0 {
+            body.push_str(&format!(" · {}% this season", wins * 100 / decided));
+        }
+    }
+    if let Some(rank) = m
+        .my_rank
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        body.push_str(&format!(" · {rank}"));
+    }
+    body
+}
+
+fn post_match_end_toast(app: &AppHandle, body: &str) {
+    use tauri_plugin_notification::NotificationExt;
+    let _ = app
+        .notification()
+        .builder()
+        .title("Filthy Net Deck")
+        .body(body)
+        .show();
+}
+
 fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
     if completed.is_empty() {
         return;
@@ -1763,11 +1883,17 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
                 append_match(&file, &m);
             }
             data.matches.push(m.clone());
-            fresh.push(m);
+            // Toast body while the lock is held: history already includes `m`.
+            let toast = if notify_match_end_enabled() {
+                Some(match_end_body(&m, &data.matches))
+            } else {
+                None
+            };
+            fresh.push((m, toast));
         }
         data.status.matches_recorded = data.matches.len();
     }
-    for m in fresh {
+    for (m, toast) in fresh {
         // Brief "ended" live frame so the overlay can flash the result, then idle.
         let ended = LiveMatch {
             match_id: m.match_id.clone(),
@@ -1791,6 +1917,9 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
         publish_live(app, Some(ended));
         schedule_clear_ended(app, mid);
         let _ = app.emit("tracker:match", &m);
+        if let Some(body) = toast {
+            post_match_end_toast(app, &body);
+        }
     }
     emit_status(app);
 }
@@ -1828,7 +1957,15 @@ fn sync_live(app: &AppHandle, parser: &LogParser) {
 fn schedule_clear_ended(app: &AppHandle, match_id: String) {
     let app2 = app.clone();
     std::thread::spawn(move || {
-        std::thread::sleep(Duration::from_millis(2800));
+        // Post-match summary on: let the result card linger (~12s). Off: the
+        // original short flash. Read at schedule time; a mid-match toggle
+        // applies from the next match.
+        let linger_ms: u64 = if crate::overlay::is_post_match_enabled() {
+            12_000
+        } else {
+            2_800
+        };
+        std::thread::sleep(Duration::from_millis(linger_ms));
         let still = {
             let shared = app2.state::<TrackerShared>();
             let data = shared.0.lock().expect("tracker lock");
@@ -2113,6 +2250,69 @@ mod tests {
         assert_eq!(m.started_at, 1783952720500);
         assert_eq!(m.ended_at, 1783953022767);
         assert_eq!(p.parse_errors, 0);
+    }
+
+    #[test]
+    fn match_end_body_has_result_opp_season_pct_and_rank() {
+        let mut p = LogParser::new();
+        let matches = full_match(&mut p);
+        let m = &matches[0];
+        let body = match_end_body(m, &matches);
+        assert!(body.starts_with("Win vs Rival"), "{body}");
+        assert!(body.contains("100% this season"), "{body}");
+        assert!(body.ends_with("· Diamond 1"), "{body}");
+    }
+
+    #[test]
+    fn match_end_body_season_pct_counts_same_deck_same_month_only() {
+        let mut p = LogParser::new();
+        let matches = full_match(&mut p);
+        let base = matches[0].clone();
+
+        // Same deck, same month, a loss → 1W/1L = 50%.
+        let mut loss = base.clone();
+        loss.match_id = "m-2".to_string();
+        loss.result = "loss".to_string();
+        loss.ended_at = base.ended_at + 60_000;
+
+        // Different deck, same month — must not move the pct.
+        let mut other_deck = base.clone();
+        other_deck.match_id = "m-3".to_string();
+        other_deck.result = "loss".to_string();
+        other_deck.ended_at = base.ended_at + 120_000;
+        other_deck.deck_id = Some("deck-9".to_string());
+        other_deck.deck_name = Some("Mono Green".to_string());
+        other_deck.deck_hash = Some("other-hash".to_string());
+
+        // Same deck, 40 days later — different month, must not move the pct.
+        let mut other_month = base.clone();
+        other_month.match_id = "m-4".to_string();
+        other_month.result = "loss".to_string();
+        other_month.ended_at = base.ended_at + 40 * 86_400_000;
+
+        let history = vec![
+            base,
+            loss.clone(),
+            other_deck,
+            other_month,
+        ];
+        let body = match_end_body(&loss, &history);
+        assert!(body.starts_with("Loss vs Rival"), "{body}");
+        assert!(body.contains("50% this season"), "{body}");
+    }
+
+    #[test]
+    fn match_end_body_omits_pct_and_rank_when_unknown() {
+        let mut p = LogParser::new();
+        let matches = full_match(&mut p);
+        let mut m = matches[0].clone();
+        m.deck_id = None;
+        m.deck_name = None;
+        m.deck_hash = None;
+        m.my_rank = None;
+        m.opponent_name = None;
+        let history = vec![m.clone()];
+        assert_eq!(match_end_body(&m, &history), "Win vs opponent");
     }
 
     #[test]
