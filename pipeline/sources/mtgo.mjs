@@ -9,6 +9,7 @@
  * Modern/Legacy/etc. onto Arena formats.
  */
 import { getText, sleep } from "./common.mjs";
+import { normalizeMtgoCardName } from "./mtgoNames.mjs";
 
 function mapMtgoFormat(slug = "") {
   const s = String(slug).toLowerCase();
@@ -71,15 +72,18 @@ export function extractMtgoDecklistsData(html) {
 }
 
 function cardsFromMtgoRows(arr) {
-  /** @type {{ count: number, name: string }[]} */
-  const out = [];
+  // MTGO repeats a card across rows (one per printing) and names UB
+  // dual-identity cards by printed alias — normalize, then merge by name.
+  /** @type {Map<string, number>} */
+  const byName = new Map();
   for (const row of arr || []) {
-    const name = row?.card_attributes?.card_name;
+    const raw = row?.card_attributes?.card_name;
     const qty = Number(row?.qty) || 0;
-    if (!name || qty < 1) continue;
-    out.push({ count: qty, name: String(name).trim() });
+    if (!raw || qty < 1) continue;
+    const name = normalizeMtgoCardName(raw);
+    byName.set(name, (byName.get(name) || 0) + qty);
   }
-  return out;
+  return [...byName].map(([name, count]) => ({ count, name }));
 }
 
 /**

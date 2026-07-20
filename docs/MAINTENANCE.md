@@ -54,6 +54,12 @@ never silently stale-as-fresh).
    badges / Settings sources. If everything degraded to Goldfish-only or
    `partial`, a scraper (magic.gg / MTGO) probably changed its HTML — check the
    latest CI run logs even if it "succeeded".
+5b. **MTGO alias map** — when a new Universes Beyond set with dual-identity
+   printings (printed alias ≠ canonical name, like OM1 Marvel) enters
+   Standard/Pioneer, rerun `node scripts/gen-mtgo-name-map.mjs om1 <newset>`
+   so MTGO decklists keep validating whole. Symptom if stale: pipeline
+   diagnostics show `MTGO cleaned (unknown=<alias name>)` and a deck ships
+   short (e.g. 58/60).
 6. **whatsinstandard API** — the build warns if v6 reports itself deprecated;
    check the CI log for `check for v7` and migrate `fetchStandardRotation` in
    `pipeline/sources/sets.mjs` if so.
