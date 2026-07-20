@@ -6,6 +6,7 @@ import {
   gamePlayDrawSplit,
   pct,
   pts,
+  recentFormString,
   sideboardSplit,
 } from "./gameAnalytics";
 
@@ -207,9 +208,33 @@ describe("deckMatchupMatrix", () => {
     expect(iz.rate).toBe(0.5);
     expect(iz.g1).toEqual({ wins: 1, games: 2, rate: 0.5 });
     expect(iz.post).toEqual({ wins: 1, games: 3, rate: 1 / 3 });
+    expect(iz.form).toBe("WL"); // win then loss chronological
     const dom = rows[1];
     expect([dom.wins, dom.losses]).toEqual([1, 0]);
     expect(dom.g1).toEqual({ wins: 1, games: 1, rate: 1 });
+  });
+
+  it("tracks play/draw tallies when onPlay is stamped", () => {
+    const rows = deckMatchupMatrix(
+      [
+        match({
+          result: "win",
+          opponentSeen: [1, 2, 3],
+          games: [{ winningTeamId: 1, onPlay: true }],
+        }),
+        match({
+          result: "loss",
+          opponentSeen: [1, 2, 3],
+          games: [{ winningTeamId: 2, onPlay: false }],
+        }),
+      ],
+      resolve,
+      [izzet],
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].play).toEqual({ wins: 1, games: 1, rate: 1 });
+    expect(rows[0].draw).toEqual({ wins: 0, games: 1, rate: 0 });
+    expect(rows[0].form).toBe("WL");
   });
 
   it("skips matches with too little evidence instead of inventing an Unknown bucket", () => {
@@ -245,5 +270,20 @@ describe("formatting", () => {
     expect(pts(-0.04)).toBe("−4 pts");
     expect(pts(0)).toBe("±0 pts");
     expect(pts(null)).toBe("—");
+  });
+});
+
+describe("recentFormString", () => {
+  it("builds oldest→newest W/L over the window", () => {
+    const s = recentFormString(
+      [
+        match({ result: "win", games: [] }),
+        match({ result: "loss", games: [] }),
+        match({ result: "draw", games: [] }),
+        match({ result: "win", games: [] }),
+      ],
+      10,
+    );
+    expect(s).toBe("WLW");
   });
 });

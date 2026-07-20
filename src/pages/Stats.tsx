@@ -51,6 +51,12 @@ import type { MatchResult, TrackedMatch } from "../types/tracker";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
 import { decksForMode } from "../services/deckHelpers";
+import {
+  formExtremes,
+  isSameLocalDay,
+  rollingWinrate,
+  tallyMatches,
+} from "../services/statsHelpers";
 
 function pickArenaPreview(
   main: number[] | undefined,
@@ -307,18 +313,10 @@ function SortHeaderBtn({
   );
 }
 
-interface Tally {
-  wins: number;
-  losses: number;
-  decided: number;
-  rate: number | null;
-}
+type Tally = ReturnType<typeof tallyMatches>;
 
 function tally(matches: TrackedMatch[]): Tally {
-  const wins = matches.filter((m) => m.result === "win").length;
-  const losses = matches.filter((m) => m.result === "loss").length;
-  const decided = wins + losses;
-  return { wins, losses, decided, rate: decided > 0 ? wins / decided : null };
+  return tallyMatches(matches);
 }
 
 function StatusPanel() {
@@ -378,27 +376,7 @@ function StatusPanel() {
 }
 
 function isToday(ms: number): boolean {
-  const d = new Date(ms);
-  const now = new Date();
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  );
-}
-
-/** Rolling win rate over the last N decided matches at each point in time. */
-function rollingWinrate(matches: TrackedMatch[], window = 10): number[] {
-  const decided = [...matches]
-    .filter((m) => m.result === "win" || m.result === "loss")
-    .sort((a, b) => a.endedAt - b.endedAt);
-  const out: number[] = [];
-  for (let i = 0; i < decided.length; i++) {
-    const slice = decided.slice(Math.max(0, i - window + 1), i + 1);
-    const wins = slice.filter((m) => m.result === "win").length;
-    out.push(wins / slice.length);
-  }
-  return out;
+  return isSameLocalDay(ms);
 }
 
 function TrendSparkline({ matches }: { matches: TrackedMatch[] }) {
@@ -433,8 +411,12 @@ function TrendSparkline({ matches }: { matches: TrackedMatch[] }) {
 function FormTiles({ matches }: { matches: TrackedMatch[] }) {
   const today = useMemo(() => tally(matches.filter((m) => isToday(m.endedAt))), [matches]);
   const streak = useMemo(() => currentStreak(matches), [matches]);
+  const { best: formHi, worst: formLo } = useMemo(
+    () => formExtremes(matches, 10),
+    [matches],
+  );
 
-  if (today.decided === 0 && streak.type === null) return null;
+  if (today.decided === 0 && streak.type === null && !formHi) return null;
 
   return (
     <div className="stat-tiles stat-tiles-3">
@@ -483,6 +465,20 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
         <TrendSparkline matches={matches} />
         <span className="stat-label">Win rate trend · rolling 10</span>
       </div>
+      {formHi ? (
+        <div
+          className="panel stat-tile"
+          title={`Best 10-match stretch: ${formHi.wins}W–${formHi.losses}L (${Math.round(formHi.rate * 100)}%)`}
+        >
+          <span className={`stat-num favor-${winrateFavor(formHi.rate)}`}>
+            {Math.round(formHi.rate * 100)}%
+          </span>
+          <span className="stat-label">
+            Best 10 · {formHi.wins}W–{formHi.losses}L
+            {formLo ? ` · worst ${Math.round(formLo.rate * 100)}%` : ""}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

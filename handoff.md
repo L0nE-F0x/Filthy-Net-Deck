@@ -54,8 +54,10 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |
 | **D2-b** | Season recap habit | **SOURCE only (unreleased)** — closed-season notify + share banner on Climb |
 | **Ret** | Local open-day counters | **SOURCE only** — Settings About note; never uploaded |
+| **B2+** | Matchup form + play/draw | **SOURCE only** — Game analytics table columns + form extremes tile |
+| **Ref** | Stats pure helpers peel | **SOURCE only** — statsHelpers.ts (tally/rolling/form extremes) |
 
-**Test suite at wrap: 216+ vitest. v1.7.0 live; stacked unreleased: D2 light, D2-b season recap, local retention.**
+**Test suite at wrap: 224 vitest. v1.7.0 live; stacked unreleased: D2*, B2+ matchup form/play-draw, statsHelpers peel, retention.**
 
 ### Explicitly open — pick up here
 

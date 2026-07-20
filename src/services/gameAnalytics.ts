@@ -115,6 +115,14 @@ export interface DeckMatchupRow {
   /** Game-level splits within this matchup. */
   g1: GameTally;
   post: GameTally;
+  /** Game-level play/draw within this matchup (onPlay stamp required). */
+  play: GameTally;
+  draw: GameTally;
+  /**
+   * Recent match results vs this archetype, oldest→newest within the last N
+   * decided matches (W/L chars). Empty when no history.
+   */
+  form: string;
 }
 
 /**
@@ -126,12 +134,15 @@ export function deckMatchupMatrix(
   deckMatches: TrackedMatch[],
   resolveName: NameResolver,
   candidates: Deck[],
-  opts?: InferOptions,
+  opts?: InferOptions & { formWindow?: number },
 ): DeckMatchupRow[] {
   if (!candidates.length) return [];
+  const formWindow = opts?.formWindow ?? 5;
   const by = new Map<string, DeckMatchupRow>();
+  // Chronological for form strings.
+  const chronological = [...deckMatches].sort((a, b) => a.endedAt - b.endedAt);
 
-  for (const m of deckMatches) {
+  for (const m of chronological) {
     if (m.result !== "win" && m.result !== "loss") continue;
     const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, opts);
     if (!guess) continue;
@@ -146,14 +157,21 @@ export function deckMatchupMatrix(
         rate: null,
         g1: emptyTally(),
         post: emptyTally(),
+        play: emptyTally(),
+        draw: emptyTally(),
+        form: "",
       } satisfies DeckMatchupRow);
 
     if (m.result === "win") row.wins++;
     else row.losses++;
     row.rate = row.wins / (row.wins + row.losses);
+    row.form = (row.form + (m.result === "win" ? "W" : "L")).slice(-formWindow);
 
     for (const { index, won } of decidedGames(m)) {
       addGame(index === 0 ? row.g1 : row.post, won);
+      const onPlay = m.games[index]?.onPlay;
+      if (onPlay == null) continue;
+      addGame(onPlay ? row.play : row.draw, won);
     }
     by.set(guess.archetype, row);
   }
@@ -164,6 +182,21 @@ export function deckMatchupMatrix(
       (b.rate ?? 0) - (a.rate ?? 0) ||
       a.archetype.localeCompare(b.archetype),
   );
+}
+
+/**
+ * Compact form string for decided matches (oldest→newest), e.g. "WWLWL".
+ * Pure; used by Stats form tiles and tests.
+ */
+export function recentFormString(
+  matches: TrackedMatch[],
+  window = 10,
+): string {
+  const decided = [...matches]
+    .filter((m) => m.result === "win" || m.result === "loss")
+    .sort((a, b) => a.endedAt - b.endedAt)
+    .slice(-window);
+  return decided.map((m) => (m.result === "win" ? "W" : "L")).join("");
 }
 
 /** "62%" / "—" formatting shared by the panel. */

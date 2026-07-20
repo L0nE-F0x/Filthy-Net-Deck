@@ -161,6 +161,9 @@ export function GameAnalyticsPanel({
                 <th className="py-1 pr-2 font-medium">Vs archetype</th>
                 <th className="py-1 pr-2 font-medium">Matches</th>
                 <th className="py-1 pr-2 font-medium">WR</th>
+                <th className="py-1 pr-2 font-medium">Form</th>
+                <th className="py-1 pr-2 font-medium">Play</th>
+                <th className="py-1 pr-2 font-medium">Draw</th>
                 <th className="py-1 pr-2 font-medium">G1</th>
                 <th className="py-1 font-medium">Post-board</th>
               </tr>
@@ -186,6 +189,18 @@ export function GameAnalyticsPanel({
                     {r.wins}–{r.losses}
                   </td>
                   <td className="py-1 pr-2">{pct(r.rate)}</td>
+                  <td
+                    className="py-1 pr-2 font-mono tracking-tight"
+                    title="Last up to 5 matches vs this archetype (oldest → newest)"
+                  >
+                    {r.form || "—"}
+                  </td>
+                  <td className="py-1 pr-2">
+                    {r.play.games ? `${pct(r.play.rate)} (${r.play.games}g)` : "—"}
+                  </td>
+                  <td className="py-1 pr-2">
+                    {r.draw.games ? `${pct(r.draw.rate)} (${r.draw.games}g)` : "—"}
+                  </td>
                   <td className="py-1 pr-2">
                     {r.g1.games ? `${pct(r.g1.rate)} (${r.g1.games}g)` : "—"}
                   </td>

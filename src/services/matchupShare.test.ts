@@ -17,6 +17,9 @@ function row(
     rate: null,
     g1: { wins: 0, games: 0, rate: null },
     post: { wins: 0, games: 0, rate: null },
+    play: { wins: 0, games: 0, rate: null },
+    draw: { wins: 0, games: 0, rate: null },
+    form: "",
     ...partial,
   };
 }
