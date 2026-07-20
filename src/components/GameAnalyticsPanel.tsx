@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
 import { deckMatchupMatrix, pct, pts, sideboardSplit } from "../services/gameAnalytics";
+import { fieldExpectedWr } from "../services/fieldScore";
+import { decksForMode } from "../services/deckHelpers";
 import type { TrackedMatch } from "../types/tracker";
 import type { Deck } from "../types/meta";
 import { ShareMenu } from "./ShareMenu";
@@ -50,6 +52,14 @@ export function GameAnalyticsPanel({
     return out;
   }, [meta]);
 
+  // Ranked board (featured format Bo3) for field-EV weighting by meta share.
+  const rankedForField = useMemo(() => {
+    if (!meta) return [] as Deck[];
+    const fmt = meta.formats.find((f) => f.featured) ?? meta.formats[0];
+    if (!fmt) return [];
+    return decksForMode(fmt, "bo3", meta.decks);
+  }, [meta]);
+
   const allIds = useMemo(() => {
     const s = new Set<number>();
     for (const m of deckMatches) {
@@ -83,6 +93,10 @@ export function GameAnalyticsPanel({
         minConfidence: 0.3,
       }),
     [deckMatches, resolveName, candidates],
+  );
+  const field = useMemo(
+    () => fieldExpectedWr(matchups, rankedForField, { minGames: 3 }),
+    [matchups, rankedForField],
   );
 
   const hasSide = side.matchesConsidered > 0;
@@ -149,6 +163,21 @@ export function GameAnalyticsPanel({
             {side.delta != null && (
               <span className="text-muted font-normal"> · {pts(side.delta)} after siding</span>
             )}
+          </p>
+        </div>
+      )}
+
+      {field && (
+        <div className="mb-3 text-xs">
+          <p className="text-muted m-0 mb-0.5">
+            Vs the field (meta-weighted, ≥3 games per matchup)
+          </p>
+          <p className="m-0 font-semibold">
+            {pct(field.rate)}{" "}
+            <span className="text-muted font-normal">
+              expected if the board faces you in meta proportion · {field.rowsUsed} matchup
+              {field.rowsUsed === 1 ? "" : "s"}
+            </span>
           </p>
         </div>
       )}

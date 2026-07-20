@@ -25,6 +25,16 @@ import {
   type OppGroup,
   type OppSortKey,
 } from "../services/matchupGroups";
+import { ShareMenu } from "../components/ShareMenu";
+import {
+  communityShareOptions,
+  deliverShare,
+  type ShareDestination,
+} from "../services/communityShare";
+import {
+  opponentShareCaption,
+  renderOpponentSharePng,
+} from "../services/opponentShare";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -595,12 +605,39 @@ export function Matchups() {
                   ) : null}
                 </p>
               </div>
-              <RateChip
-                wins={selectedGroup.wins}
-                losses={selectedGroup.losses}
-                rate={selectedGroup.rate}
-                tip={`Your record vs ${selectedGroup.name}`}
-              />
+              <div className="flex items-center gap-2 flex-wrap">
+                <RateChip
+                  wins={selectedGroup.wins}
+                  losses={selectedGroup.losses}
+                  rate={selectedGroup.rate}
+                  tip={`Your record vs ${selectedGroup.name}`}
+                />
+                <ShareMenu
+                  label="Share record"
+                  hint="Branded PNG — save, Discord, or X"
+                  options={communityShareOptions("Matchup Lab")}
+                  onPick={async (id) => {
+                    const dest = id as ShareDestination;
+                    const input = {
+                      opponentName: selectedGroup.name,
+                      wins: selectedGroup.wins,
+                      losses: selectedGroup.losses,
+                      form: selectedGroup.form,
+                      tag: selectedGroup.tag,
+                      decks: selectedGroup.decks,
+                    };
+                    const blob = await renderOpponentSharePng(input);
+                    const result = await deliverShare({
+                      destination: dest,
+                      blob,
+                      filename: `filthy-net-deck-vs-${selectedGroup.key.slice(0, 24)}.png`,
+                      caption: opponentShareCaption(input),
+                    });
+                    if (!result.ok) throw new Error(result.message);
+                    return result.message;
+                  }}
+                />
+              </div>
             </div>
 
             <div className="mu-lab-fields">

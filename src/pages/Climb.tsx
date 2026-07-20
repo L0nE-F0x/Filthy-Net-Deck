@@ -532,6 +532,12 @@ function DeckClimbRow({
         <span className="climb-deck-sub" title="First → last rank stamp while on this deck">
           {trail}
           {d.legs > 1 ? ` · ${d.legs} stretches` : ""}
+          {d.form ? (
+            <span className="font-mono" title="Last up to 5 decided results">
+              {" "}
+              · {d.form}
+            </span>
+          ) : null}
         </span>
       </span>
       <span

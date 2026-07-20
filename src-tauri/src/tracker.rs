@@ -234,7 +234,7 @@ pub fn tracker_export_csv(
     }
 
     let mut csv = String::from(
-        "date,result,deck,opponent,opponent_platform,queue,best_of,games_won,games_lost,rank,game1_on_play,match_id\n",
+        "date,season,result,deck,opponent,opponent_platform,queue,best_of,games_won,games_lost,rank,game1_on_play,opponent_cards_seen,match_id\n",
     );
     for m in &matches {
         let wins = m
@@ -253,9 +253,14 @@ pub fn tracker_export_csv(
             .and_then(|g| g.on_play)
             .map(|p| if p { "play" } else { "draw" })
             .unwrap_or("");
+        // Calendar season key YYYY-MM for spreadsheet pivots (from iso_date).
+        let day = iso_date(m.ended_at);
+        let season = if day.len() >= 7 { &day[..7] } else { "" };
+        let cards_seen = m.opponent_seen.as_ref().map(|v| v.len()).unwrap_or(0);
         csv.push_str(&format!(
-            "{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
             iso_date(m.ended_at),
+            season,
             m.result,
             csv_escape(m.deck_name.as_deref().unwrap_or("")),
             csv_escape(m.opponent_name.as_deref().unwrap_or("")),
@@ -266,6 +271,7 @@ pub fn tracker_export_csv(
             losses,
             csv_escape(m.my_rank.as_deref().unwrap_or("")),
             on_play,
+            cards_seen,
             csv_escape(&m.match_id),
         ));
     }

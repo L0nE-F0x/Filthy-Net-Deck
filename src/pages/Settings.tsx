@@ -120,6 +120,7 @@ export function Settings() {
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
+  const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
   const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
@@ -402,6 +403,17 @@ export function Settings() {
               <span>
                 <strong>B&amp;R announcements</strong>
                 <em>When Standard or Pioneer ban lists change</em>
+              </span>
+            </label>
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.notifyMetaMovers}
+                onChange={(e) => setNotifyMetaMovers(e.target.checked)}
+              />
+              <span>
+                <strong>Meta board movers</strong>
+                <em>When a deck rises or enters today&apos;s ranked board</em>
               </span>
             </label>
             <label className="settings-toggle-row">

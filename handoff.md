@@ -1,6 +1,6 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 fully released** (Windows + macOS + updater + site, live byte-verified).
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 live**; **fat unreleased batch ready for v1.8.0** (do not claim shipped until AGENTS checklist).
 **Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
@@ -25,6 +25,24 @@
 - Pause and ask on product decisions; otherwise follow `100X-ROADMAP.md` + `AGENTS.md`.
 - End-to-end release checklist is mandatory for any user-visible app version (see `AGENTS.md`) — **run the full local gate (`npm run lint && npx tsc --noEmit && npm test && cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`) before every push.** Two prior pushes this program broke CI by skipping this.
 - "Continue" / "keep progressing" without further detail = pick the next roadmap item yourself, in the order you judge best; ask before scope changes or releases unless already told to proceed.
+
+---
+
+## Unreleased v1.8.0 batch (source on main — not in binary)
+
+Cut **one** full AGENTS end-to-end release when the owner asks. Do not ship piecemeal.
+
+| Theme | What landed (source) |
+|-------|----------------------|
+| **Retention** | D2 light Catch-up strip; D2-b season recap notify+share; local open-day counters |
+| **Analytics** | Matchup form + play/draw; field EV; queue WR panel; form on Daily meta panels; Climb form; Stats form extremes + insights |
+| **Virality** | Opponent share card (Matchup Lab); existing A5 destinations |
+| **Habits** | Meta-mover desktop notify (Settings toggle); richer match-end toast (B1 archetype + MU) |
+| **Data out** | CSV adds season + opponent_cards_seen |
+| **Hygiene** | Peels: statsHelpers, deckStats, setDates, matchHistorySort, matchupGroups |
+| **Cancelled** | A1 packages, A2 Store, A3 Linux, B3 cloud LLM |
+
+**Test suite:** 248+ vitest; Rust tracker tests green.
 
 ---
 
@@ -296,4 +314,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.7.0 live.** Stacked unreleased: D2 light digest (+streak/rotation fillers), D2-b season recap habit (notify+share), local retention counters. B3 cancelled. marketing-video gone. Keep stacking before next version bump; leave youtube/goal WIP alone.
+> **v1.7.0 live.** **v1.8.0 batch is fat and unreleased:** D2 digest + season recap, retention, B2+ form/play-draw/field EV, queue analytics, meta-mover notify, opponent share, richer match-end toast, CSV season/cards_seen, peels. A1/A2/A3/B3 cancelled. Cut full AGENTS release when owner asks.

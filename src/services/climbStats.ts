@@ -9,6 +9,7 @@
 import type { TrackedMatch } from "../types/tracker";
 import { parseRank, type ParsedRank } from "./ranks";
 import { deckKey, seasonKeyOf } from "./tracker";
+import { recentFormString } from "./gameAnalytics";
 
 export interface Streak {
   type: "win" | "loss" | null;
@@ -197,6 +198,8 @@ export interface DeckClimbSummary {
   /** How many separate legs this deck appeared in. */
   legs: number;
   lastPlayedAt: number;
+  /** Last up to 5 decided results oldest→newest (W/L). */
+  form: string;
 }
 
 /** Aggregate per-deck climb contribution (all games on that deck in range). */
@@ -242,6 +245,7 @@ export function deckClimbSummaries(matches: TrackedMatch[]): DeckClimbSummary[] 
       endRank,
       legs: legCount.get(key) ?? 1,
       lastPlayedAt: Math.max(...list.map((m) => m.endedAt)),
+      form: recentFormString(list, 5),
     });
   }
   return out.sort(

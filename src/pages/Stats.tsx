@@ -69,6 +69,7 @@ import {
   sortMatches,
   type MatchSortKey,
 } from "../services/matchHistorySort";
+import { QueueAnalyticsPanel } from "../components/QueueAnalyticsPanel";
 
 function pickArenaPreview(
   main: number[] | undefined,
@@ -1509,6 +1510,7 @@ function DeckDetail({
             sideIds={deckList?.side}
           />
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
+          <QueueAnalyticsPanel matches={visibleMatches} />
           <GameAnalyticsPanel deckMatches={visibleMatches} deckName={deck.name} />
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory
@@ -1832,6 +1834,7 @@ export function Stats() {
 
           <SummaryTiles matches={filtered} />
           <FormTiles matches={filtered} />
+          <QueueAnalyticsPanel matches={filtered} />
           <div className="panel share-row">
             <div>
               <p className="eyebrow m-0 mb-0.5">Share after a session</p>

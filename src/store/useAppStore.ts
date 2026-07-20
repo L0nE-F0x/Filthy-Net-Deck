@@ -44,6 +44,12 @@ import {
   type BanChange,
 } from "../services/banPulse";
 import { notifyDesktop } from "../services/notify";
+import {
+  markMetaMoverNotifyFired,
+  metaMoverSignature,
+  shouldFireMetaMoverNotify,
+  summarizeMetaMovers,
+} from "../services/metaMoverHabit";
 import { normalizeOpacity } from "../overlay/overlayModel";
 import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
@@ -68,6 +74,8 @@ interface Prefs {
   notifyMatchEnd: boolean;
   /** Desktop toast when a B&R announcement changes the ban lists (default on). */
   notifyBanlist: boolean;
+  /** Tray ping when daily meta board moves (rose / new on board). */
+  notifyMetaMovers: boolean;
   /** Always-on-top match HUD during Arena games (default on). */
   overlayEnabled: boolean;
   /** Overlay panel background opacity (0.55–1, default 0.92). */
@@ -102,6 +110,7 @@ function loadPrefs(): Prefs {
         notifyArenaEve?: boolean;
         notifyMatchEnd?: boolean;
         notifyBanlist?: boolean;
+        notifyMetaMovers?: boolean;
         overlayEnabled?: boolean;
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
@@ -119,6 +128,7 @@ function loadPrefs(): Prefs {
         // Was opt-in (=== true); default ON so match-end toasts actually fire.
         notifyMatchEnd: parsed.notifyMatchEnd !== false,
         notifyBanlist: parsed.notifyBanlist !== false,
+        notifyMetaMovers: parsed.notifyMetaMovers !== false,
         overlayEnabled: parsed.overlayEnabled !== false,
         overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
         overlayStartExpanded: parsed.overlayStartExpanded === true,
@@ -143,6 +153,7 @@ function loadPrefs(): Prefs {
     notifyArenaEve: true,
     notifyMatchEnd: true,
     notifyBanlist: true,
+    notifyMetaMovers: true,
     overlayEnabled: true,
     overlayOpacity: 0.92,
     overlayStartExpanded: false,
@@ -271,6 +282,7 @@ interface AppState {
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
   setNotifyBanlist: (v: boolean) => void;
+  setNotifyMetaMovers: (v: boolean) => void;
   setOverlayEnabled: (v: boolean) => void;
   /** Overlay panel opacity (0.55–1) — read live by the overlay window. */
   setOverlayOpacity: (v: number) => void;
@@ -466,6 +478,11 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
     },
+    setNotifyMetaMovers: (notifyMetaMovers) => {
+      const next = { ...get().prefs, notifyMetaMovers };
+      savePrefs(next);
+      set({ prefs: next });
+    },
     setOverlayEnabled: (overlayEnabled) => {
       const next = { ...get().prefs, overlayEnabled };
       savePrefs(next);
@@ -657,36 +674,28 @@ export const useAppStore = create<AppState>((set, get) => {
               void playSfx("draw", { set });
             }
           }
-          // Opt-in match-end toast — proves the tracker is alive.
+          // Opt-in match-end toast — richer when B1 can name the opponent deck.
           if (prefs.notifyMatchEnd) {
-            const result =
-              m.result === "win"
-                ? "Win"
-                : m.result === "loss"
-                  ? "Loss"
-                  : m.result === "draw"
-                    ? "Draw"
-                    : "Match";
-            const opp = m.opponentName?.trim() || "opponent";
-            // Include the match we just prepended.
-            const withNew = [m, ...cur].filter((x) => {
-              const d = new Date(x.endedAt);
-              const n = new Date();
-              return (
-                d.getFullYear() === n.getFullYear() &&
-                d.getMonth() === n.getMonth() &&
-                (x.result === "win" || x.result === "loss")
-              );
-            });
-            const wins = withNew.filter((x) => x.result === "win").length;
-            const losses = withNew.filter((x) => x.result === "loss").length;
-            const decided = wins + losses;
-            const wr = decided ? Math.round((wins / decided) * 100) : null;
-            const body =
-              wr != null
-                ? `${result} vs ${opp} · ${wr}% this season`
-                : `${result} vs ${opp}`;
-            void notifyDesktop("Filthy Net Deck", body);
+            const history = [m, ...cur];
+            void (async () => {
+              const { matchEndToastBody } = await import("../services/matchNotify");
+              const { peekArenaMeta } = await import("../services/arenaMeta");
+              const candidates: import("../types/meta").Deck[] = [];
+              const meta = get().meta;
+              if (meta) {
+                for (const fmt of meta.formats) {
+                  for (const id of fmt.bo3DeckIds ?? []) {
+                    const d = meta.decks[id];
+                    if (d) candidates.push(d);
+                  }
+                }
+              }
+              const body = matchEndToastBody(m, history, {
+                resolveName: (grpId) => peekArenaMeta(grpId)?.name ?? null,
+                candidates,
+              });
+              await notifyDesktop("Filthy Net Deck", body);
+            })();
           }
         },
         onStatus: (s) => {
@@ -759,6 +768,17 @@ export const useAppStore = create<AppState>((set, get) => {
           lastRefresh: new Date().toISOString(),
           metaDiff: diff,
         });
+        // One-shot meta-mover toast (rose / new on board) when opted in.
+        if (get().prefs.notifyMetaMovers && diff.changes.length) {
+          const body = summarizeMetaMovers(diff.changes);
+          if (body) {
+            const sig = metaMoverSignature(bundle.date, diff.changes);
+            if (shouldFireMetaMoverNotify(sig)) {
+              void notifyDesktop("Meta board moved", `${body}. Open Daily for the full board.`);
+              markMetaMoverNotifyFired(sig);
+            }
+          }
+        }
         void get().checkForUpdates();
         void get().refreshSets();
       } catch (e) {
