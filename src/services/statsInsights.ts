@@ -5,6 +5,8 @@
 import type { TrackedMatch } from "../types/tracker";
 import { deckKey, seasonKeyOf } from "./tracker";
 import { parseRank, type ParsedRank } from "./ranks";
+import { formExtremes, tallyMatches } from "./statsHelpers";
+import { gamePlayDrawSplit } from "./gameAnalytics";
 
 export interface InsightChip {
   id: string;
@@ -16,9 +18,8 @@ export interface InsightChip {
 }
 
 function tally(matches: TrackedMatch[]) {
-  const wins = matches.filter((m) => m.result === "win").length;
-  const losses = matches.filter((m) => m.result === "loss").length;
-  return { wins, losses, decided: wins + losses };
+  const t = tallyMatches(matches);
+  return { wins: t.wins, losses: t.losses, decided: t.decided };
 }
 
 /** Insight chips for Stats home (clickable when deckKey set). */
@@ -73,34 +74,34 @@ export function buildInsightChips(
     });
   }
 
-  // Play/draw gap on games that stamped onPlay
-  let playW = 0,
-    playN = 0,
-    drawW = 0,
-    drawN = 0;
-  for (const m of decided) {
-    const g1 = m.games[0];
-    if (!g1 || g1.onPlay == null) continue;
-    if (g1.onPlay) {
-      playN++;
-      if (m.result === "win") playW++;
-    } else {
-      drawN++;
-      if (m.result === "win") drawW++;
-    }
+  // Game-level play/draw gap (every stamped game — B2, not g1-only proxy)
+  const pd = gamePlayDrawSplit(decided);
+  if (pd.play.games >= 5 && pd.draw.games >= 5 && pd.gap != null && Math.abs(pd.gap) >= 0.08) {
+    chips.push({
+      id: "play-draw",
+      label: pd.gap > 0 ? "Play-skewed" : "Draw-skewed",
+      detail: `Play ${((pd.play.rate ?? 0) * 100).toFixed(0)}% · Draw ${((pd.draw.rate ?? 0) * 100).toFixed(0)}% · game-level`,
+      kind: "neutral",
+    });
   }
-  if (playN >= 5 && drawN >= 5) {
-    const pr = playW / playN;
-    const dr = drawW / drawN;
-    const gap = pr - dr;
-    if (Math.abs(gap) >= 0.08) {
-      chips.push({
-        id: "play-draw",
-        label: gap > 0 ? "Play-skewed" : "Draw-skewed",
-        detail: `Play ${(pr * 100).toFixed(0)}% · Draw ${(dr * 100).toFixed(0)}%`,
-        kind: "neutral",
-      });
-    }
+
+  // Best / worst 10-match form stretch
+  const extremes = formExtremes(decided, 10);
+  if (extremes.best && extremes.best.rate >= 0.7) {
+    chips.push({
+      id: "best-form",
+      label: "Hot stretch",
+      detail: `Best 10 · ${Math.round(extremes.best.rate * 100)}% (${extremes.best.wins}–${extremes.best.losses})`,
+      kind: "good",
+    });
+  }
+  if (extremes.worst && extremes.worst.rate <= 0.3) {
+    chips.push({
+      id: "worst-form",
+      label: "Cold stretch",
+      detail: `Worst 10 · ${Math.round(extremes.worst.rate * 100)}% (${extremes.worst.wins}–${extremes.worst.losses})`,
+      kind: "warning",
+    });
   }
 
   // Loss streak deck (current run of losses — which deck)
@@ -123,7 +124,7 @@ export function buildInsightChips(
     }
   }
 
-  return chips;
+  return chips.slice(0, 6);
 }
 
 export interface SeasonStory {

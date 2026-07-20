@@ -51,6 +51,8 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
 | **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
 | **B3** | Grounded AI coach | **CANCELLED** — no cloud LLM ever (owner 2026-07-20) |
+| **A2** | Microsoft Store (MSIX) | **CANCELLED** — website + signed updater only (owner 2026-07-20) |
+| **A3** | Linux build | **CANCELLED** — Windows + macOS only (owner 2026-07-20) |
 | **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |
 | **D2-b** | Season recap habit | **SOURCE only (unreleased)** — closed-season notify + share banner on Climb |
 | **Ret** | Local open-day counters | **SOURCE only** — Settings About note; never uploaded |
@@ -68,7 +70,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 3. **Next 100× features** — product check-in before large scope:
    - **B3** grounded AI coach — **CANCELLED** (no cloud LLM ever).
    - **D2** light catch-up strip — **done in source** (batch into next release).
-   - **A2/A3** Microsoft Store / Linux — distribution product calls; do not start without owner.
+   - **A2** Microsoft Store / **A3** Linux — **CANCELLED** (owner 2026-07-20). Windows + macOS via website + signed updater only.
    - **A5 / B4 / D1** — **released in v1.7.0**.
    - Smaller: MTGO alias-map gaps when new UB sets land — `node scripts/gen-mtgo-name-map.mjs om1 <newset>`.
 
@@ -77,7 +79,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 - Unrelated dirty tree: `website/assets/youtube*`, `goal/` — leave alone if present (owner WIP). **`marketing-video/` was deleted 2026-07-20** (old Remotion promo pipeline; no longer part of the product).
 - Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` — never commit, never echo the contents to logs/output.
 - Do not claim app UI is live without installer + updater + site channel **and independently verifying the live URL**, not just trusting the push succeeded.
-- Do not re-open winget/Homebrew/Chocolatey (A1) unless the owner reverses that decision.
+- Do not re-open winget/Homebrew/Chocolatey (A1), Microsoft Store (A2), or Linux packaging (A3) unless the owner reverses that decision.
 
 ---
 
@@ -286,7 +288,7 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 ## Suggested next actions (pick with owner if ambiguous, otherwise use judgment per their standing instruction)
 
 1. **Flag, don't block on:** ask the owner to smoke-test v1.6.0 on a real installed client (update path + B1/B2 against real Arena data) when convenient.
-2. **Otherwise:** D2 light is source-done — batch into next release when ready. B3 is cancelled. Remaining product calls: A2/A3 Store/Linux only.
+2. **Otherwise:** keep stacking app features (D2/B2 peels already unreleased). B3 AI, A1 packages, **A2 Store, A3 Linux** are all **cancelled**. No open distribution product calls — ship Win+macOS via website + updater only.
 3. **Do not** re-open winget/Homebrew/Chocolatey unless the owner reverses that decision.
 4. **Do not** start a new release unless the owner asks, or the accumulated unreleased work is substantial enough to justify one (match this session's judgment: batch a few features, then release, don't ship one micro-version per item — see `ROADMAP.md`'s "RELEASE PACING" note).
 

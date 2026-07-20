@@ -50,7 +50,7 @@ Today (rough, directional):
 
 | Factor | Today | Ceiling this roadmap unlocks | Multiplier |
 |---|---|---|---|
-| **Reach** — how many eligible players can find/install it | ~1× (one website) | Store + package-manager + Linux + SEO | **~10×** |
+| **Reach** — how many eligible players can find/install it | ~1× (one website) | SEO/meta site + share virality (Store/pm/Linux **cancelled**) | **~3–5×** via content, not stores |
 | **Activation** — % who get the tracker working | ~1× | Guided setup, health checks, first-value in <2 min | **~2×** |
 | **Retention** — do they open it tomorrow | ~1.5× (tracker is sticky) | Daily loop, streaks, grounded coach | **~2.5×** |
 | **Reliability** — does it stay correct unattended | ~2× (self-healing feed) | CI gates + multi-source + parser tests | protects the rest |
@@ -70,9 +70,9 @@ The product is finished enough to deserve an audience 100× larger than a single
 - **Windows:** publish a `winget` manifest (`L0nE-F0x.FilthyNetDeck`) and a Chocolatey package. Both consume the *existing* signed NSIS `.exe` — near-zero new build work, huge discoverability with power users.
 - **macOS:** ship a **Homebrew Cask** pointing at the universal dmg the `macos-build.yml` tag CI already produces. Roadmap already notes "roll dmg into downloads" — this extends the same artifact to `brew install --cask`.
 
-**A2 — Microsoft Store (MSIX).** The largest untapped Windows discovery channel for a consumer desktop app. Tauri supports MSIX packaging. This is the marquee reach unlock. (Mac App Store is possible but sandboxing fights the `Player.log` read — evaluate, likely defer in favor of Homebrew + notarized dmg.)
+**A2 — Microsoft Store (MSIX).** ❌ **CANCELLED 2026-07-20** (owner: website + signed in-app updater only; no store channel). Was: MSIX packaging for Microsoft Store discovery.
 
-**A3 — Linux build.** Arena runs on Linux via Proton for a real, vocal segment. `tracker.rs` already `#[cfg]`-gates log paths (Windows/macOS today) — add the Linux `~/.wine`/Proton `Player.log` path and ship an AppImage + Flatpak. Reuses ~95% of the codebase.
+**A3 — Linux build.** ❌ **CANCELLED 2026-07-20** (owner: Windows + macOS only; no Linux/Proton packaging). Was: Proton `Player.log` path + AppImage/Flatpak.
 
 **A4 — SEO / content moat.** The daily pipeline already *produces* the most valuable thing in MTG content — a verified, dated, machine-readable metagame — and throws away the HTML surface. Publish a lightweight, statically-generated **public meta site** from `latest.json` + `history.json`: "Standard metagame on {date}", per-archetype pages, rotation countdowns. Every daily run becomes an indexable page. This turns your CI cron into a compounding content engine that funnels to the download.
 
@@ -139,11 +139,11 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 - **A5** one-click community share on recap/matchup
 - *Outcome:* discovery surface goes from 1 page to many; every daily run is indexable.
 
-### Phase 2 — The store & the second OS *(Reach, part 2)*
-- **A2** Microsoft Store (MSIX)
-- **A3** Linux (Proton `Player.log` path + AppImage/Flatpak)
-- **C3** multi-source meta assignment (resolve the single-source risk *before* the store audience arrives)
-- *Outcome:* the two biggest reach unlocks, on a hardened, multi-sourced spine.
+### Phase 2 — Reach via content & trust *(was Store/Linux — cancelled)*
+- ~~**A2** Microsoft Store (MSIX)~~ — **cancelled** (owner 2026-07-20)
+- ~~**A3** Linux (Proton / AppImage / Flatpak)~~ — **cancelled** (owner 2026-07-20)
+- **C3** multi-source meta assignment (done partial — MTGO → Goldfish)
+- *Outcome:* distribution stays **website + signed updater** on **Windows + macOS only**.
 
 ### Phase 3 — Widen the moat *(Differentiation + Retention)*
 - **B1** local opponent-archetype inference (highest-value data unlock)
@@ -192,7 +192,7 @@ The temptation at scale is to compromise the things that make this app trustwort
 |---|---|---|
 | Goldfish/scraper redesign blacks out meta | High (eventually) | **C2** fixtures + **C3** multi-source failover |
 | Arena log-format change breaks the tracker | Medium (every few patches) | **C4** fixture corpus in CI + **C6** diagnostic export shortens the fix loop |
-| Store review friction (MSIX / notarization) | Medium | Start MSIX early in Phase 2; keep the direct-download channel as the guaranteed path |
+| ~~Store review friction (MSIX)~~ | — | **N/A** — A2 cancelled; website + updater is the only Windows path |
 | AI coach hallucinates and erodes trust | Medium if done wrong | **B3** grounding contract: no card exists in output unless it exists in a real list; ship behind opt-in |
 | Growth outpaces a one-person maintenance loop | Medium | Phase 0 CI + fixtures make the app *more* autonomous before the audience scales; the existing failure-issue automation already covers data |
 | `.git` bloat slows CI as build frequency rises | Low-Med | Scheduled history rewrite during a coordinated quiet window |

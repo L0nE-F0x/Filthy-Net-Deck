@@ -59,6 +59,34 @@ describe("buildInsightChips", () => {
     expect(chips.some((c) => c.id === "worst-deck" && c.deckKey)).toBe(true);
     expect(chips.some((c) => c.id === "hot-deck")).toBe(true);
   });
+
+  it("flags hot/cold 10-match stretches when form extremes are extreme", () => {
+    const matches: TrackedMatch[] = [];
+    // 10 wins then 10 losses → best form 100%, worst 0%
+    for (let i = 0; i < 10; i++) {
+      matches.push(
+        m({
+          result: "win",
+          endedAt: JUL(i + 1),
+          deckName: "X",
+          deckId: "x",
+        }),
+      );
+    }
+    for (let i = 0; i < 10; i++) {
+      matches.push(
+        m({
+          result: "loss",
+          endedAt: JUL(20 + i),
+          deckName: "X",
+          deckId: "x",
+        }),
+      );
+    }
+    const chips = buildInsightChips(matches);
+    expect(chips.some((c) => c.id === "best-form")).toBe(true);
+    expect(chips.some((c) => c.id === "worst-form")).toBe(true);
+  });
 });
 
 describe("buildSeasonStory", () => {
