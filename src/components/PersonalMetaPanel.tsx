@@ -86,7 +86,8 @@ export function PersonalMetaPanel() {
                 <th className="py-1 pr-2 font-medium">Meta %</th>
                 <th className="py-1 pr-2 font-medium">You</th>
                 <th className="py-1 pr-2 font-medium">Form</th>
-                <th className="py-1 font-medium">WR</th>
+                <th className="py-1 pr-2 font-medium">WR</th>
+                <th className="py-1 font-medium">Edge</th>
               </tr>
             </thead>
             <tbody>
@@ -120,8 +121,16 @@ export function PersonalMetaPanel() {
                   >
                     {r.form || "—"}
                   </td>
-                  <td className="py-1">
+                  <td className="py-1 pr-2">
                     {r.yourWinrate != null ? `${Math.round(r.yourWinrate * 100)}%` : "—"}
+                  </td>
+                  <td
+                    className="py-1"
+                    title="Your WR minus 50% baseline (positive = beating coin-flip)"
+                  >
+                    {r.edge == null
+                      ? "—"
+                      : `${r.edge >= 0 ? "+" : "−"}${Math.abs(Math.round(r.edge * 100))} pts`}
                   </td>
                 </tr>
               ))}

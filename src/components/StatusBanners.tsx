@@ -52,7 +52,8 @@ export function StatusBanners() {
       className: "banner banner-gold banner-rank-up",
       body: (
         <>
-          <strong>Rank up</strong> — {rankUpMoment.from} → {rankUpMoment.to}.{" "}
+          <strong>Rank up</strong> — {rankUpMoment.from} → {rankUpMoment.to}. Keep the climb
+          going.{" "}
           <button
             type="button"
             className="update-dl"
@@ -62,6 +63,16 @@ export function StatusBanners() {
             }}
           >
             Open Climb
+          </button>{" "}
+          <button
+            type="button"
+            className="update-dl"
+            onClick={() => {
+              clearRankUpMoment();
+              setPage("stats");
+            }}
+          >
+            My Stats
           </button>{" "}
           <button
             type="button"

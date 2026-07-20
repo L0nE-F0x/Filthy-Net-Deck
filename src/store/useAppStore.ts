@@ -658,11 +658,22 @@ export const useAppStore = create<AppState>((set, get) => {
           const cur = get().trackerMatches;
           if (cur.some((x) => x.matchId === m.matchId)) return;
           const rankUp = detectRankUp(m, cur);
+          const prevCount = cur.length;
           set({
             trackerMatches: [m, ...cur],
             // M2: offer tagging when we know the opponent name
             tagNudgeOpponent: m.opponentName?.trim() || get().tagNudgeOpponent,
             rankUpMoment: rankUp ?? get().rankUpMoment,
+          });
+          // D1: one-shot first-match celebration toast
+          void import("../services/firstMatchCelebrate").then((mod) => {
+            if (mod.shouldCelebrateFirstMatch(prevCount, prevCount + 1)) {
+              void notifyDesktop(
+                "You're live",
+                "First match recorded on this PC. Open My Stats for your record.",
+              );
+              mod.markFirstMatchCelebrated();
+            }
           });
           // B1 accept-tag: async suggestion when cards were seen
           if (m.opponentName?.trim() && (m.opponentSeen?.length ?? 0) > 0) {

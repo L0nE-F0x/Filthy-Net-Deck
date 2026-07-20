@@ -1,14 +1,51 @@
 # Filthy Net Deck — the 100× Roadmap
 
-**Prepared:** 2026-07-20 · from a full-codebase deep scan
-**Baseline:** v1.5.0 shipped (v1.5.1 in tree) · Tauri 2 + React 19 + TypeScript + Tailwind 4 + Zustand 5
-**Scope of scan:** ~21,600 lines TS/TSX · ~2,441 lines Rust · ~1,966 lines pipeline JS · 27 test suites · 3 CI workflows
+**Prepared:** 2026-07-20 · from a full-codebase deep scan  
+**Live product (updated):** **v1.8.0** (2026-07-20) · Tauri 2 + React 19 + TypeScript + Tailwind 4 + Zustand 5  
+**Original scan baseline:** v1.5.x · ~21,600 lines TS/TSX · ~2,441 lines Rust · pipeline + 250+ vitest tests now
 
 > This is not a list of 100 features. **100× is multiplicative, not additive.** A great app that nobody installs is 1×. This roadmap identifies the handful of multipliers that compound — reach, retention, reliability, and a defensible moat — and sequences them so each one is protected by the one before it.
 
 ---
 
-## 0. Honest snapshot — what the scan actually found
+## Progress scoreboard (2026-07-20 evening)
+
+**Active pillar items (A1–D2, excluding cancelled):** ~14 unique program tickets.  
+**Cancelled by owner:** A1 package managers · **A2 Store** · **A3 Linux** · **B3 cloud LLM**.  
+**Done (shipped through v1.8.0 or source-complete on main):** roughly **~85–90% of remaining program**.
+
+| ID | Status | Notes |
+|----|--------|--------|
+| **C1** CI quality gate | ✅ Done | tsc / vitest / build / cargo on every push |
+| **C2** Goldfish fixtures | ✅ Done | `pipeline/goldfish.test.mjs` + fixtures |
+| **C3** Multi-source lists | ✅ Done (partial) | MTGO → Goldfish; **magic.gg lists deferred** |
+| **C4** Tracker log fixtures | ✅ Done | committed fixtures; real-log still `#[ignore]` |
+| **C5** ESLint zero-warning | ✅ Done | `eslint.config.js` + CI |
+| **C6** Diagnostic export | ✅ Done | Settings → Export diagnostic |
+| **A1** winget/brew/choco | ❌ Cancelled | website + signed updater only |
+| **A2** Microsoft Store | ❌ Cancelled | |
+| **A3** Linux | ❌ Cancelled | Win + macOS only |
+| **A4** Public meta site | ✅ Done | `/meta-web/` from daily pipeline |
+| **A5** Share loop | ✅ Done (1.7–1.8) | PNG destinations + opponent share |
+| **B1** Opponent archetype | ✅ Done (1.6+) | + accept-tag on main |
+| **B2** Deeper analytics | ✅ Mostly done | play/draw, sideboard, form, field EV, queues; **no mulligan rates** (not in log fields) |
+| **B3** AI coach | ❌ Cancelled | local grounded chips instead |
+| **B4** Overlay depth | ✅ Done (1.7) | archetype + historical WR |
+| **D1** First-value coach | ✅ Done (1.7) | progress + You're live |
+| **D2** Daily loop | ✅ Done (1.8) | catch-up strip + session wrap + coach notes |
+| **D2-b** Season recap habit | ✅ Done (1.8) | notify + share banner |
+
+**What's left (thin tail, not “half the roadmap”):**
+1. **C3 remainder** — magic.gg list scrape (deferred: name corruption risk).  
+2. **B2 remainder** — mulligan-kept rates / first-land turn **need new tracker fields** (not free).  
+3. **Continuous debt** — further Stats/Sets peels, `.git` history bloat, polish.  
+4. **Optional A5 extras** — Discord Rich Presence (not requested; skip unless asked).  
+
+**Honest takeaway:** the *program* is near complete. What remains is either **cancelled**, **blocked on parser data**, **deliberately deferred**, or **maintenance debt** — not a second full roadmap.
+
+---
+
+## 0. Honest snapshot — what the scan actually found *(historical; many rows fixed since)*
 
 Filthy Net Deck is, engineering-wise, **already very good**. It is disciplined where most side projects are sloppy:
 
