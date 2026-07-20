@@ -47,7 +47,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 ### Explicitly open
 
 1. **Ship B1 to users** — cut **v1.5.2** (or next version) full AGENTS.md release when owner wants it. Until then, B1 exists only on `main` for `tauri:dev` / future builds.
-2. **Live meta refresh with C3** — optional: run `npm run meta` once and inspect how many lists are `listSource: "mtgo"` vs goldfish; commit if good.
+2. ~~**Live meta refresh with C3**~~ ✅ **DONE 2026-07-20 (Claude)** — first C3 run: **30/32 deck objects `listSource: "mtgo"`** (named pilots + scores), 2 Goldfish fallback; committed `d7b62d1`. Also **restored the red CI gate** Grok's B1/C3 pushes left (rustfmt drift + unused param, `4df30bf`) — run the full local gate before any push. One diagnostic: MTGO names `Desecrex` / `Gift of Servitude` failed Scryfall validation (Mardu Discard shipped 58/60) — candidate for a small verified MTGO→Scryfall name-normalizer.
 3. **magic.gg full-list assignment** — still **deferred** (historical name corruption). Events links only.
 4. **Next 100× features** (after release choice): **B2** deeper personal analytics, **B3** grounded coach, **A5** share loop, **A2** Store, etc. Prefer owner direction; default ladder was B1+C3 then B2/B3.
 
