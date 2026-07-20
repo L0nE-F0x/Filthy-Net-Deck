@@ -51,7 +51,9 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
 | **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
 | **B3** | Grounded AI coach | **CANCELLED** — no cloud LLM ever (owner 2026-07-20) |
-| **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |\n| **D2-b** | Season recap habit | **SOURCE only (unreleased)** — closed-season notify + share banner on Climb |\n| **Ret** | Local open-day counters | **SOURCE only** — Settings About note; never uploaded |
+| **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |
+| **D2-b** | Season recap habit | **SOURCE only (unreleased)** — closed-season notify + share banner on Climb |
+| **Ret** | Local open-day counters | **SOURCE only** — Settings About note; never uploaded |
 
 **Test suite at wrap: 216+ vitest. v1.7.0 live; stacked unreleased: D2 light, D2-b season recap, local retention.**
 
@@ -88,6 +90,15 @@ Canonical program: **`100X-ROADMAP.md`**.
 | Last-open stamp | localStorage `bbi.daily.lastOpenAt` (local only) |
 
 **Not released** — still on v1.7.0 binary until next version bump.
+
+### D2-b — season recap habit + retention
+
+| Piece | Path |
+|-------|------|
+| Closed-season nudge | `src/services/seasonRecapHabit.ts` — ≥5 games, dismiss/notify once |
+| UI | `SeasonRecapBanner` on Climb — share via A5 destinations + dismiss |
+| Local retention | `src/services/localRetention.ts` — open-day set; Settings About note |
+| Digest fillers | streak + Standard rotation days when primary chips are thin |
 
 ---
 
