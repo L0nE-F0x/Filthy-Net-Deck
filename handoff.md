@@ -1,7 +1,7 @@
-# Filthy Net Deck — handoff
+﻿# Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 — full-codebase deep scan → **`100X-ROADMAP.md`** written (the next program).
-**Next agent:** Start with **`100X-ROADMAP.md`** → the plan is reach × reliability × moat. Do **Phase 0 (harden the base) first** — it gates everything else. Read **`AGENTS.md`** before any release.
+**Last wrap-up:** 2026-07-20 — Phase 0 CI hardening shipped; winget + Homebrew manifests drafted locally (A1 prep, not submitted).
+**Next agent:** Continue **`100X-ROADMAP.md`**. Phase 0 CI items (C1/C2/C5) are done; C4 still needs user go-ahead for real `Player.log` fixtures. Read **`AGENTS.md`** before any release.
 
 ---
 
@@ -11,25 +11,39 @@ Canonical plan: **`100X-ROADMAP.md`** (root, next to `ROADMAP.md`). The thesis: 
 
 ### Do these five, in order
 
-1. ~~**CI quality gate.**~~ ✅ **DONE 2026-07-20** — `.github/workflows/ci.yml` (web job: tsc/vitest/build on ubuntu · rust job: fmt/clippy `-D warnings`/cargo test on windows; data-only commits skipped; README badge). All gates verified green locally first (143 JS tests, 16 Rust tests, 3 clippy lints fixed, rustfmt normalized). **Verify the first Actions run is green after push.** *(Roadmap C1)*
-2. **winget + Homebrew Cask.** Reuse the signed NSIS `.exe` and the tag-CI universal dmg. ~10× reach from artifacts you already build. *(A1)*
+1. ~~**CI quality gate.**~~ ✅ **DONE 2026-07-20** — `.github/workflows/ci.yml` (web: tsc/vitest/build · rust: fmt/clippy `-D warnings`/cargo test). Runs 1–3 green on `main`. *(Roadmap C1)*
+2. **winget + Homebrew Cask.** ✅ **LOCAL PREP DONE 2026-07-20** — see `packaging/`. Manifests validated with `winget validate`. **Not submitted** to winget-pkgs / homebrew-cask / personal tap. Needs explicit go before any PR. *(A1)*
 3. **Public meta site from the daily feed.** Static-generate indexable pages from `latest.json`/`history.json` — turns the CI cron into a content/SEO engine that funnels to the download. *(A4)*
 4. **Local opponent-archetype inference.** The GRE `gameObjects` stream you already parse for the overlay carries opponent cards seen — feed them into the meta matcher for real, private, per-archetype win-rates. No new data source. *(B1)*
 5. **Multi-source meta.** Wire the `magic.gg → mtgo → goldfish → melee` list priority that `docs/DATA-AND-UPDATES.md` already describes — today the 8×8 lists come from **Goldfish only** (single point of failure). *(C3)*
 
 ### Also queued in Phase 0 (cheap, high-leverage)
-- ~~Fixture tests for `pipeline/sources/goldfish.mjs`~~ ✅ **DONE 2026-07-20** — `pipeline/goldfish.test.mjs` (9 tests) against real gzipped 2026-07-20 pages in `pipeline/__fixtures__/`; recapture snippet in the test header.
-- ~~Commit `eslint` config~~ ✅ **DONE 2026-07-20** — flat `eslint.config.js` (ts-eslint recommended + react-hooks classic pair; v6 compiler-era rules deliberately off — see config comment), `npm run lint` at `--max-warnings 0`, wired into CI web job. 27 baseline findings triaged: 6 real smells fixed, 4 dep-arrays made idiom-clean, rest were opinionated-rule noise. *Prettier deliberately skipped:* the tree is already style-consistent and a full reformat is a 21k-line mechanical diff; adopt later with `blame.ignoreRevsFile` if wanted.
-- Un-`ignore` the tracker replay test with a committed anonymized log-fixture corpus.
+- ~~Fixture tests for `pipeline/sources/goldfish.mjs`~~ ✅ **DONE 2026-07-20** — `pipeline/goldfish.test.mjs` (9 tests) + gzipped fixtures. *(C2)*
+- ~~Commit `eslint` config~~ ✅ **DONE 2026-07-20** — flat `eslint.config.js`, zero-warning gate in CI. Prettier skipped deliberately (blame noise). *(C5)*
+- **C4** Un-`ignore` the tracker replay test with a committed anonymized log-fixture corpus — needs real (anonymized) `Player.log` excerpts; **ask before reading the user's log**.
 
 **Guardrails (never compromise):** real-data-only · local-only tracking · AI grounded-or-absent · no in-draft overlay (ToS) · Standard+Pioneer focus · end-to-end releases. Full detail in `100X-ROADMAP.md` §4.
+
+---
+
+## Packaging (A1) — where things stand
+
+| Item | Path / ID | Status |
+|------|-----------|--------|
+| winget manifests | `packaging/winget/L0nE-F0x/FilthyNetDeck/1.5.1/` | Validated locally |
+| Package ID | `L0nE-F0x.FilthyNetDeck` | Ready for winget-pkgs PR when approved |
+| Homebrew cask | `packaging/homebrew/filthy-net-deck.rb` | Draft; brew not available on this Windows host |
+| How-to | `packaging/README.md` | Validate / submit steps |
+| Chocolatey | — | Not drafted yet (same .exe as winget) |
+
+**Do not** claim `winget install` / `brew install` works for the public until a PR/tap is merged.
 
 ---
 
 ## Smaller leftover
 
 - **Smoke Brew Lab** on a real tracked deck with a list (My Stats → deck detail → below tracked list). Confirm staples come only from today's ranked meta; no invented card names.
-- macOS **1.5.0** dmg: roll from tag CI into `website/downloads/` + site links if not already at parity.
+- Unrelated working-tree dirt may exist under `marketing-video/` and `website/assets/youtube*` — leave alone unless asked.
 
 ---
 
@@ -37,12 +51,12 @@ Canonical plan: **`100X-ROADMAP.md`** (root, next to `ROADMAP.md`). The thesis: 
 
 | Item | Value |
 |------|--------|
-| Version | **1.5.0** (Windows signed + macOS universal dmg) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.5.0.exe` |
-| macOS | `website/downloads/Filthy-Net-Deck-1.5.0-universal.dmg` |
-| Headline | **Brew Lab** — shape/staples clinic vs ranked Bo1/Bo3 peers |
-| Soft / updater | `version.json` + `updater/latest.json` → **1.5.0** |
+| Version | **1.5.1** (Windows signed + macOS universal dmg) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.5.1.exe` |
+| macOS | `website/downloads/Filthy-Net-Deck-1.5.1-universal.dmg` |
+| Soft / updater | `version.json` + `updater/latest.json` → **1.5.1** |
 | Live site | https://filthy-net-deck.com/ (legacy: https://filthy-net-deck.netlify.app/) |
+| HEAD (at wrap) | C5 lint commit on `main`; CI green |
 
 Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local only — never commit.
 
@@ -60,4 +74,4 @@ Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local 
 
 ## One-liner
 
-> **Next chapter = the 100× program** (`100X-ROADMAP.md`): harden the base (CI/tests), then open distribution (winget/brew/store/Linux/SEO), then widen the tracker moat (opponent inference, grounded coach). Phase 0 first.
+> Phase 0 CI is green. A1 manifests live under `packaging/` (local only). Next: either submit winget/brew with user go-ahead, finish C4 with log-fixture consent, or start A4 public meta site.

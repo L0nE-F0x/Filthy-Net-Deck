@@ -1,0 +1,38 @@
+﻿# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
+# Local prep only — not submitted to microsoft/winget-pkgs yet.
+PackageIdentifier: L0nE-F0x.FilthyNetDeck
+PackageVersion: 1.5.1
+PackageLocale: en-US
+Publisher: L0nE-F0x
+PublisherUrl: https://github.com/L0nE-F0x
+PublisherSupportUrl: https://github.com/L0nE-F0x/Filthy-Net-Deck/issues
+Author: L0nE-F0x
+PackageName: Filthy Net Deck
+PackageUrl: https://filthy-net-deck.com/
+License: Freeware
+Copyright: Copyright (c) L0nE-F0x / ApexForge
+ShortDescription: Desktop MTG Arena meta companion — daily Standard & Pioneer lists, Brew Lab, local winrate tracker
+Description: |-
+  Filthy Net Deck is a free desktop companion for Magic: The Gathering Arena.
+  Daily Standard and Pioneer metagame (real ranked lists only, every card verified on Scryfall),
+  Brew Lab list clinic, in-match overlay, share cards, and a local-only winrate tracker that
+  tails Player.log on your PC — nothing is uploaded.
+
+  Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of the Coast LLC.
+  Built by ApexForge.
+Moniker: filthy-net-deck
+Tags:
+  - arena
+  - deck
+  - magic
+  - meta
+  - mtg
+  - mtga
+  - tracker
+ReleaseNotes: |-
+  v1.5.1 — Custom domain filthy-net-deck.com is primary (Netlify DNS).
+  Legacy netlify.app host still works for installed clients.
+  Meta, updates, and share branding prefer .com.
+ReleaseNotesUrl: https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/tag/v1.5.1
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0
