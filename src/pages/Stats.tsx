@@ -34,6 +34,8 @@ import {
 import { resolveMetaDeck } from "../services/deepLinks";
 import { CardArt, CardArtStrip, type ArtRef } from "../components/CardArt";
 import { TrackedDecklist } from "../components/TrackedDecklist";
+import { GameAnalyticsPanel } from "../components/GameAnalyticsPanel";
+import { gamePlayDrawSplit } from "../services/gameAnalytics";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
 import { ShareActionButton, ShareMenu } from "../components/ShareMenu";
@@ -597,19 +599,11 @@ function SplitsPanel({
     const out: { label: string; wins: number; losses: number }[] = [];
 
     // Per-game play/draw split — the classic "am I too draw-dependent" check.
-    let playW = 0, playL = 0, drawW = 0, drawL = 0;
-    for (const m of matches) {
-      for (const g of m.games) {
-        if (g.onPlay === undefined || g.winningTeamId == null) continue;
-        const won = g.winningTeamId === m.myTeamId;
-        if (g.onPlay && won) playW++;
-        else if (g.onPlay) playL++;
-        else if (won) drawW++;
-        else drawL++;
-      }
-    }
-    if (playW + playL > 0) out.push({ label: "On the play · games", wins: playW, losses: playL });
-    if (drawW + drawL > 0) out.push({ label: "On the draw · games", wins: drawW, losses: drawL });
+    const pd = gamePlayDrawSplit(matches);
+    if (pd.play.games > 0)
+      out.push({ label: "On the play · games", wins: pd.play.wins, losses: pd.play.games - pd.play.wins });
+    if (pd.draw.games > 0)
+      out.push({ label: "On the draw · games", wins: pd.draw.wins, losses: pd.draw.games - pd.draw.wins });
 
     const bo1 = tally(matches.filter((m) => m.bestOf === 1));
     const bo3 = tally(matches.filter((m) => m.bestOf === 3));
@@ -1619,6 +1613,7 @@ function DeckDetail({
             sideIds={deckList?.side}
           />
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
+          <GameAnalyticsPanel deckMatches={visibleMatches} />
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory
             matches={visibleMatches}
