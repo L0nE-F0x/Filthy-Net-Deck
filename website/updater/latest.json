@@ -1,11 +1,11 @@
 {
-  "version": "1.9.0",
-  "notes": "v1.9.0 Depth batch: mulligan keep-7 rates + first-land turn analytics from your Arena log; multi-source meta lists (MTGO + structured magic.gg); accept-tag matchups, session wrap share, grounded local coach chips, first-match toast. Windows + macOS via website + signed updater.",
-  "pub_date": "2026-07-20T08:18:11.000Z",
+  "version": "2.0.0",
+  "notes": "v2.0.0 — the big one: Brew Lab page grades any list (tracked or pasted) against today's ranked field; Mythic % climb curve (no more flat line); stacked Arena-style decklists; in-game overlay quick-settings pill + richer minimized bar; help & tour; a Settings Interface card full of toggles.",
+  "pub_date": "2026-07-20T09:09:48.000Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitoM01vcGxKTzF2dUFPUllwbHZYdkJVZFZTYWR1a3ZGbWRxMVkvMUZ2OVA3ejBpdllhTHFvT1JjRkkvcWJoK0dpM1VKRWI3Qjdsa3htYU12ZkxJendvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTM1NDU2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuOS4wX3g2NC1zZXR1cC5leGUKY283U2ZnalNkcWhsU1Y3MHB4R3lra2haUlA5aVd6MVpDdUdBd0plZ0NsQjF4YUFZWWFnc2o2UEtqODZnYnZjSDk1REY3YU1jM0YrRUFTZjVuZGRZQ1E9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.9.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitRNjBtczJNK3BZd3BpWDQreDM1QS8wcVJPUitXT21wb25FbHAybG1pcmZDK0hFQktIMVlmelozSSs2ajVGOTBTbUlJV1h3S1kvb1hXY1BUNFNoSUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTM4NTU1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4wX3g2NC1zZXR1cC5leGUKQzhKVVpwWWVsc0ZSbnlvcnJDVC9IeEpYQkhLR240TDhmNGV2UWw2ekp1ZjdsTzNrTWZzVktBZnRtc3RISklvM1NSS0dscy9Ra1ZFWHc0b0ZEekRsRGc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.0.exe"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.9.0.exe",
-  "notes": "v1.9.0 Depth batch: mulligan keep-7 rates + first-land turn analytics from your Arena log; multi-source meta lists (MTGO + structured magic.gg); accept-tag matchups, session wrap share, grounded local coach chips, first-match toast. Windows + macOS via website + signed updater."
+  "version": "2.0.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.0.exe",
+  "notes": "v2.0.0 — the big one: Brew Lab page grades any list (tracked or pasted) against today's ranked field; Mythic % climb curve (no more flat line); stacked Arena-style decklists; in-game overlay quick-settings pill + richer minimized bar; help & tour; a Settings Interface card full of toggles."
 }
