@@ -1,29 +1,30 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok session ending) — 100× Phase 0 + A4 + B1 (source) + C3 shipped on `main`.  
-**Next agent (Claude):** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do completed work below. Pick up at **§ Next actions**.
+**Last wrap-up:** 2026-07-20 (Claude session ending, switching back to Grok — user's Claude usage limit approaching) — **v1.6.0 fully released**, every surface live and byte-verified.
+**Next agent (Grok):** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do completed work below — v1.6.0 is done and verified live. Pick up at **§ Next actions**.
 
-**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1`).  
-**Live product version:** **v1.6.0** — released 2026-07-20 (Claude session): B1 opponent inference + B2 game analytics + C6 diagnostic export + C3 multi-source lists + A4 meta site. Windows signed exe + updater live on filthy-net-deck.com; macOS dmg via tag CI (roll into downloads when green — mac button holds 1.5.1 with a CI note until then).
+**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
+**Live product version:** **v1.6.0** — released 2026-07-20. Windows signed exe + updater + macOS universal dmg all confirmed live on filthy-net-deck.com with matching byte sizes (installer: 5,703,492 bytes; dmg: 18,324,628 bytes; OG image: 256,715 bytes — all byte-identical to the local build artifacts). **No release tails remain.**
 
 ---
 
-## Session context (what just happened)
+## Session context (what just happened, across Claude ↔ Grok handoffs today)
 
-User resumed a Claude session mid-100× program, then continued with Grok:
+1. Prior Claude session explained winget/Homebrew/Chocolatey → **owner cancelled package managers entirely** (website + signed in-app updater only — do not resurrect without asking).
+2. Grok shipped **A4 public meta site**, **B1 opponent-archetype inference** (source only), **C3 multi-source meta lists** (MTGO → Goldfish fallback), then handed off to Claude.
+3. This Claude session: found Grok's B1/C3 pushes had left CI **red** (rustfmt drift + one unused var) — fixed and restored green (`4df30bf`) before doing anything else.
+4. Ran the first live C3 smoke: **30/32 deck objects sourced from real MTGO challenge lists** (2 Goldfish fallback), committed (`d7b62d1`).
+5. Owner said: **keep progressing through 100X-ROADMAP.md in whatever order I judge best; do a version-bump workflow at the end of the session.**
+6. Shipped **B2 game-level analytics** (Bo3 pre/post-board delta + per-deck matchup table vs B1-inferred archetypes) and **C6 anonymized diagnostic export** (Settings → Export diagnostic).
+7. A user-spawned background task asked for an **MTGO→Scryfall card-name normalizer** (root cause of a 2026-07-20 Mardu Discard list shipping 58/60 cards). Investigated and fixed: MTGO names OM1 Universes Beyond cards by **printed alias** ("Desecrex, Gift of Servitude"), not the **canonical Scryfall name** ("Carnage, Crimson Chaos"). Shipped a 148-entry alias map **generated from Scryfall itself** (verified by construction) + normalizer wired into the MTGO parser (`1a2bd14`).
+8. Owner approved an immediate release. Ran the **full AGENTS.md end-to-end checklist** for **v1.6.0**: version bumps, signed Windows build, updater metadata, soft channel, site copy + OG regeneration, push, tag, macOS CI, dmg roll. **Verified every live URL byte-for-byte against the local artifacts** — not just "pushed and assumed."
 
-1. Explained winget/Homebrew/Chocolatey → **user cancelled package managers entirely** (website download + signed in-app updater only).
-2. Removed A1 packaging work; shipped **A4 public meta site**.
-3. Shipped **B1 opponent-archetype inference** (tracker + UI source).
-4. User chose **skip desktop release for now**.
-5. Shipped **C3 multi-source meta lists** (MTGO → Goldfish fallback).
-6. User asked to update handoff so Claude can continue exactly here.
-
-**Owner preferences:**
+**Owner preferences (apply across all agents/sessions):**
 - Desktop only (no mobile promises).
 - Install via website + in-app updater — **no winget / Homebrew / Chocolatey**.
 - Pause and ask on product decisions; otherwise follow `100X-ROADMAP.md` + `AGENTS.md`.
-- End-to-end release checklist is mandatory for any user-visible app version (see `AGENTS.md`).
+- End-to-end release checklist is mandatory for any user-visible app version (see `AGENTS.md`) — **run the full local gate (`npm run lint && npx tsc --noEmit && npm test && cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`) before every push.** Two prior pushes this program broke CI by skipping this.
+- "Continue" / "keep progressing" without further detail = pick the next roadmap item yourself, in the order you judge best; ask before scope changes or releases unless already told to proceed.
 
 ---
 
@@ -31,39 +32,49 @@ User resumed a Claude session mid-100× program, then continued with Grok:
 
 Canonical program: **`100X-ROADMAP.md`**.
 
-### Done this program (2026-07-20)
+### Done this program (2026-07-20) — all shipped in **v1.6.0**, live and verified
 
 | ID | Item | Evidence / paths |
 |----|------|------------------|
-| **C1** | CI quality gate | `.github/workflows/ci.yml` — tsc/vitest/build + rustfmt/clippy/cargo test |
+| **C1** | CI quality gate | `.github/workflows/ci.yml` — tsc/vitest/build + rustfmt/clippy/cargo test, runs on every push/PR |
 | **C2** | Goldfish fixture tests | `pipeline/goldfish.test.mjs` + `pipeline/__fixtures__/` |
 | **C5** | ESLint zero-warning gate | `eslint.config.js`, `npm run lint`, CI web job |
 | **C4** | Tracker log fixtures | `src-tauri/tests/fixtures/logs/*` + `fixture_*` tests; real-log helper stays `#[ignore]` |
 | **A1** | winget/brew/choco | **CANCELLED** by owner — do not resurrect without asking |
-| **A4** | Public meta site | `pipeline/build-meta-site.mjs` → `website/meta-web/`; `sitemap.xml` / `robots.txt`; wired into `npm run meta` + daily-meta CI; homepage nav “Public meta” |
-| **B1** | Opponent archetype inference | **Source only** — see § B1 detail; **not in v1.5.1 installer** |
-| **C3** | Multi-source meta lists | MTGO match → Goldfish fallback; see § C3 detail |
-| **B2** | Game-level analytics (Claude) | `src/services/gameAnalytics.ts` (+11 tests) — Bo3 pre/post-board delta, per-deck matchup table vs B1-inferred archetypes; `GameAnalyticsPanel` in Stats deck detail; SplitsPanel play/draw refactored onto shared fn. **Source only — ships with B1's release** |
-| **C6** | Anonymized diagnostic export (Claude) | `tracker_export_diagnostic` (Rust → Downloads JSON, counters/flags only, no names/paths) + Settings Tracker-health button. **Source only — needs same release** |
+| **A4** | Public meta site | `pipeline/build-meta-site.mjs` → `website/meta-web/`; wired into `npm run meta` + daily CI; live at `/meta-web/` |
+| **B1** | Opponent archetype inference | **RELEASED in v1.6.0** — see § B1 detail |
+| **C3** | Multi-source meta lists | **RELEASED** — MTGO match → Goldfish fallback; first live run 30/32 MTGO; see § C3 detail |
+| **C3 fix** | MTGO alias normalizer | **RELEASED** — `pipeline/sources/mtgo-name-map.json` (148 entries, Scryfall-generated), `pipeline/sources/mtgoNames.mjs`; see § MTGO normalizer detail |
+| **B2** | Game-level analytics | **RELEASED in v1.6.0** — `src/services/gameAnalytics.ts` (+11 tests), `GameAnalyticsPanel` in Stats deck detail; see § B2 detail |
+| **C6** | Anonymized diagnostic export | **RELEASED in v1.6.0** — `tracker_export_diagnostic` + Settings button; see § C6 detail |
 
-### Explicitly open
+**Test suite at wrap: 181 vitest tests / 32 files, 21 Rust tests. All green.**
 
-1. ~~**Ship B1 + B2 + C6 to users**~~ ✅ **RELEASED as v1.6.0, 2026-07-20** (`b45b67f`, tag `v1.6.0`). Windows signed exe + updater + soft channel + site + OG all live and verified on filthy-net-deck.com. Remaining tails: (a) roll the macOS dmg from tag CI into `website/downloads/` + flip the mac button (roll-script pattern); (b) owner verifies in-app "Check for updates" offers **Update & restart** from an installed 1.5.x; (c) owner smoke of B1/B2 panels against real Arena data.
-2. ~~**Live meta refresh with C3**~~ ✅ **DONE 2026-07-20 (Claude)** — first C3 run: **30/32 deck objects `listSource: "mtgo"`** (named pilots + scores), 2 Goldfish fallback; committed `d7b62d1`. Also **restored the red CI gate** Grok's B1/C3 pushes left (rustfmt drift + unused param, `4df30bf`) — run the full local gate before any push. One diagnostic: MTGO names `Desecrex` / `Gift of Servitude` failed Scryfall validation (Mardu Discard shipped 58/60) — candidate for a small verified MTGO→Scryfall name-normalizer.
-3. **magic.gg full-list assignment** — still **deferred** (historical name corruption). Events links only.
-4. **Next 100× features** (after release choice): **B2** deeper personal analytics, **B3** grounded coach, **A5** share loop, **A2** Store, etc. Prefer owner direction; default ladder was B1+C3 then B2/B3.
+### Explicitly open — pick up here
+
+1. **Owner verification (only the owner can do these — flag, don't block on them):**
+   - In-app "Check for updates" on an installed pre-1.6.0 client offers **Update & restart** (not a browser download).
+   - B1/B2 panels (opponent archetype, game analytics) look right against **real** Arena match history — everything shipped was verified with synthetic data in a browser preview, never a live game.
+2. **magic.gg full-list assignment** — still **deferred** (historical name corruption in that scraper). magic.gg stays events-links-only in C3's source chain.
+3. **Next 100× features** — no owner-mandated order beyond "your judgment, ask on product decisions." Candidates from `100X-ROADMAP.md`:
+   - **B3** grounded AI coach (deferred idea, done safely — see roadmap Pillar B). Bigger scope; likely wants a product-direction check-in before building.
+   - **B4** overlay matchup line (live "you're on X% vs this opponent" in the always-on-top HUD) — touches the overlay's **must-not-regress** zone (never `set_focus`, Rust owns show/hide, dirty-only `tracker:live`). Read `src-tauri/src/overlay.rs` + `src/overlay/OverlayApp.tsx` carefully before touching.
+   - **A5** share loop (one-click "share my matchup record" building on existing `recapCard`/`shareCards` infra).
+   - **D2** daily-loop home strip — the 10× SKIP list parked this once (as "D1 Today's plan strip"); roadmap suggests revisiting now that retention is an explicit goal, but that's a product call, not an engineering one — ask first.
+   - Smaller: keep an eye out for more MTGO alias-map gaps (new Universes Beyond sets) — regen via `node scripts/gen-mtgo-name-map.mjs om1 <newset>`, see `docs/MAINTENANCE.md` §5b.
 
 ### Do **not** touch without asking
 
-- Unrelated dirty tree: `marketing-video/*`, `website/assets/youtube*`, `goal/` — leave alone.
-- Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` (never commit).
-- Do not claim app UI is live without installer + updater + site channel.
+- Unrelated dirty tree: `marketing-video/*`, `website/assets/youtube*`, `goal/` — leave alone, has been dirty across multiple sessions, is the owner's in-progress work.
+- Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` — never commit, never echo the contents to logs/output.
+- Do not claim app UI is live without installer + updater + site channel **and independently verifying the live URL**, not just trusting the push succeeded.
+- Do not re-open winget/Homebrew/Chocolatey (A1) unless the owner reverses that decision.
 
 ---
 
 ## B1 — opponent archetype (detail)
 
-**Intent:** GRE already exposes opponent cards on battlefield/gy/exile/stack/hand. Collect `grpId`s, match to today’s ranked meta lists (distinctive non-land overlap), show local WR by inferred archetype.
+**Intent:** GRE already exposes opponent cards on battlefield/gy/exile/stack/hand. Collect `grpId`s, match to today's ranked meta lists (distinctive non-land overlap), show local WR by inferred archetype.
 
 | Layer | Location |
 |-------|----------|
@@ -74,7 +85,21 @@ Canonical program: **`100X-ROADMAP.md`**.
 | Stats history | `MatchHistory` / `MatchRow` in `src/pages/Stats.tsx` |
 | Overlay live guess | `src/overlay/OverlayApp.tsx` — uses `bbi.meta.lastGood` cache |
 
-**Release requirement:** Rust change → new Windows (and macOS) binary + updater. Soft channel alone is insufficient.
+**Shipped in v1.6.0** — Rust change went out with a new signed Windows binary + macOS dmg + updater.
+
+---
+
+## B2 — game-level analytics (detail)
+
+**Intent:** Match-level stats already existed (play/draw, Bo1/Bo3). B2 adds game-level granularity: Bo3 pre-board (game 1) vs post-board (games 2+) winrate — the sideboard signal — plus a per-deck matchup table vs B1-inferred opponent archetypes.
+
+| Piece | Path |
+|-------|------|
+| Pure logic | `src/services/gameAnalytics.ts` (+ `.test.ts`, 11 tests) — `sideboardSplit`, `deckMatchupMatrix`, `gamePlayDrawSplit` |
+| UI | `src/components/GameAnalyticsPanel.tsx`, mounted in Stats deck detail below `SplitsPanel` |
+| Refactor | `SplitsPanel`'s inline play/draw loop in `src/pages/Stats.tsx` now calls the shared `gamePlayDrawSplit` — same output, single source of truth |
+
+Games without a recorded winner or on-play stamp are excluded, never guessed. Thin matchup evidence is skipped, never bucketed as "Unknown."
 
 ---
 
@@ -90,9 +115,36 @@ Canonical program: **`100X-ROADMAP.md`**.
 | Tests | `pipeline/listMatch.test.mjs` |
 | Docs | `docs/DATA-AND-UPDATES.md` (priority section) |
 
-Decks may include `listSource: "mtgo" | "goldfish"` and richer `listNote` / `sources[]`.
+Decks may include `listSource: "mtgo" | "goldfish"` and richer `listNote` / `sources[]`. **First live run (2026-07-20): 30/32 deck objects from MTGO, 2 Goldfish fallback.**
 
 **Not done:** magic.gg list scrape for assignment (links only). Melee still links only.
+
+### MTGO alias normalizer (added same day, fixes a C3 regression)
+
+MTGO decklist JSON names Universes Beyond dual-identity printings by their **printed alias** ("Desecrex, Gift of Servitude"), which Scryfall's `/cards/collection` validation endpoint rejects — the canonical name is "Carnage, Crimson Chaos". Without normalization, these cards silently drop from lists (2026-07-20 Mardu Discard shipped 58/60).
+
+| Piece | Path |
+|-------|------|
+| Generated alias map (148 entries, OM1) | `pipeline/sources/mtgo-name-map.json` — every entry sourced from Scryfall, never hand-typed |
+| Regen script | `scripts/gen-mtgo-name-map.mjs` — `node scripts/gen-mtgo-name-map.mjs om1 <newset>` when a new UB alias set enters Standard/Pioneer |
+| Normalizer | `pipeline/sources/mtgoNames.mjs` — `normalizeMtgoCardName`, pass-through for unknown names (still drop with a diagnostic downstream — no fabrication) |
+| Wired into | `pipeline/sources/mtgo.mjs` → `cardsFromMtgoRows` (also merges MTGO's duplicate per-printing rows by name) |
+| Tests | `pipeline/mtgoNames.test.mjs` (4 tests) |
+| Maintenance doc | `docs/MAINTENANCE.md` §5b — symptom to watch for: diagnostics showing `MTGO cleaned (unknown=<alias>)` |
+
+---
+
+## C6 — anonymized diagnostic export (detail)
+
+**Intent:** Privacy-preserving field visibility. When the tracker misbehaves after an Arena update, a user can export a small JSON with **counters and flags only** — no player names, no opponent names, no match contents, no file paths — and attach it to a GitHub issue.
+
+| Piece | Path |
+|-------|------|
+| Rust command | `src-tauri/src/tracker.rs` — `tracker_export_diagnostic`; writes to Downloads, reveals in file manager |
+| Frontend wrapper | `src/services/tracker.ts` — `exportTrackerDiagnostic` |
+| UI | Settings → Tracker health card → "Export diagnostic" button (Tauri-only, hidden in browser) |
+
+Contents: app version, platform, `logFound`/`detailedLogs`/`backfillDone` flags, `matchesRecorded`/`parseErrors` counters, last-event date (day granularity only).
 
 ---
 
@@ -100,22 +152,25 @@ Decks may include `listSource: "mtgo" | "goldfish"` and richer `listNote` / `sou
 
 - Generator: `pipeline/build-meta-site.mjs` (`npm run meta:site`; also end of `npm run meta`)
 - Output: `website/meta-web/` (hub, standard/pioneer, 32 deck pages), `website/sitemap.xml`, `website/robots.txt`
-- After Netlify deploy: `https://filthy-net-deck.com/meta-web/`
+- Live: `https://filthy-net-deck.com/meta-web/`
 
 ---
 
-## Where the product is
+## Where the product is (v1.6.0, live and verified 2026-07-20)
 
 | Item | Value |
 |------|--------|
-| Published app | **v1.5.1** (dual host filthy-net-deck.com + netlify.app) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.5.1.exe` (+ `.sig`) |
-| macOS | `website/downloads/Filthy-Net-Deck-1.5.1-universal.dmg` |
-| Updater / soft | `website/updater/latest.json`, `website/version.json`, `public/version.json` |
+| Published app | **v1.6.0** (dual host filthy-net-deck.com + netlify.app) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-1.6.0.exe` (+ `.sig`) — live, 5,703,492 bytes |
+| macOS | `website/downloads/Filthy-Net-Deck-1.6.0-universal.dmg` — live, 18,324,628 bytes (rolled from tag CI, `c41a710`) |
+| Updater / soft | `website/updater/latest.json`, `website/version.json`, `public/version.json` — all confirmed live at 1.6.0 |
+| OG image | `website/assets/og-image.png?v=1.6.0` — live, 256,715 bytes, feature copy refreshed |
 | Formats | Standard + Pioneer only |
 | Tracker | Local `Player.log` only |
 
-Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local only.
+Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted) + `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt`. Never commit or echo either. Pipe file contents into env vars (`TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`) for `npm run tauri:build`.
+
+**Downloads hygiene:** `website/downloads/` currently holds exactly the 1.6.0 exe+sig+dmg — no superseded versions. Keep it that way per `docs/MAINTENANCE.md`.
 
 ---
 
@@ -136,28 +191,28 @@ Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted). Password local 
 ```bash
 npm install
 npm run tauri:dev
-npm test              # vitest (pipeline + src) — ~166 tests at wrap
-npm run lint
-npm run meta          # live meta + regenerates meta-web
-npm run meta:site     # static pages only from existing latest.json
-npm run tauri:build   # installers (set TAURI_SIGNING_* for updater)
-cd src-tauri && cargo test
+npm test              # vitest (pipeline + src) — 181 tests / 32 files at wrap
+npm run lint           # eslint, zero-warning gate
+npx tsc --noEmit
+npm run meta           # live meta + regenerates meta-web
+npm run meta:site      # static pages only from existing latest.json
+npm run tauri:build    # installers (set TAURI_SIGNING_PRIVATE_KEY + _PASSWORD)
+cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
 ```
+
+**Before every push:** run the full local gate above. Two pushes this program broke CI by skipping it (rustfmt drift + an unused var) — cheap to catch locally, costly to catch in CI.
 
 ---
 
-## Suggested next actions (pick with user if ambiguous)
+## Suggested next actions (pick with owner if ambiguous, otherwise use judgment per their standing instruction)
 
-**Default if user says “continue” without specifying:**
-
-1. **Optional smoke:** `npm run meta` — confirm C3 assigns some MTGO lists; commit meta JSON only if policy allows (real live data).
-2. **Or** start **B2** / next moat item from `100X-ROADMAP.md` (source-only OK).
-3. **Or** when user asks to ship B1: **v1.5.2** full release checklist in `AGENTS.md` (version bumps, signed build, downloads, updater, version.json, OG, Netlify, tag for macOS).
-
-**Do not** re-open winget/Homebrew/Chocolatey unless user reverses that decision.
+1. **Flag, don't block on:** ask the owner to smoke-test v1.6.0 on a real installed client (update path + B1/B2 against real Arena data) when convenient.
+2. **Otherwise:** pick the next `100X-ROADMAP.md` item. B3 (grounded coach) and D2 (daily-loop strip) are the highest-leverage remaining items but both call for a quick product-direction check-in before building, per owner's "pause and ask on product decisions." A5 (share loop) and small B1-adjacent polish are lower-risk to just build.
+3. **Do not** re-open winget/Homebrew/Chocolatey unless the owner reverses that decision.
+4. **Do not** start a new release unless the owner asks, or the accumulated unreleased work is substantial enough to justify one (match this session's judgment: batch a few features, then release, don't ship one micro-version per item — see `ROADMAP.md`'s "RELEASE PACING" note).
 
 ---
 
 ## One-liner
 
-> Phase 0 + public meta site + C3 list failover are on `main`. B1 opponent inference is coded but needs a desktop release. Next: owner chooses release vs more features; leave marketing-video dirt alone.
+> **v1.6.0 is fully released and live-verified** (opponent inference, game analytics, diagnostic export, multi-source meta lists + MTGO alias fix, public meta site). No release tails remain. Next: owner smoke-tests on real data when convenient; otherwise keep working the 100× roadmap, checking in before B3/B4/D2-scale product decisions. Leave marketing-video/youtube dirt alone.
