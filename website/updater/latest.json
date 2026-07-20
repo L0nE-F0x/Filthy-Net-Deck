@@ -1,11 +1,11 @@
 {
-  "version": "2.0.1",
-  "notes": "v2.0.1: Post-match summary in the overlay (season form + rank path lingers ~12s after each game), match-end toasts that land while you're in Arena or the app is in the tray, and every share PNG rebuilt premium (WR rings, mana pips, sparklines).",
-  "pub_date": "2026-07-20T13:59:51.000Z",
+  "version": "2.0.2",
+  "notes": "v2.0.2: The overlay went stealth - density modes shrink the footprint (Minimal is text-only), an Opponent tab lists every card they've shown with the archetype read, turn/play/mulligan chips, idle dim, and it remembers your size & position.",
+  "pub_date": "2026-07-20T20:12:57.000Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJuUGZ4UVBQT2xRcnpxZ2xRUDZBaC9SYXI2bzQ5YURTa2ZtTlBCVVl0UXF5eEMwbldpM3Z1aktBVVBJQ1lEUWM4RTdZb1h4djFHWXZlREh1MnhneFF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTU1ODgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4xX3g2NC1zZXR1cC5leGUKemFucU5PM0g4YnAvbWlFVGFHZkZTVTFibURlYzBrZVdZRXdadlY1MXZnZTFlNGJhUGc0ZVMyMW4yUW50dE1TY2dPbzdOcS9vc3F6NlpDU2lJZ3VJQ1E9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlJN0k4R0ZOL0FRaVNGRXJRSDRFaTY0czd0UkYwR1c5bFFQZXVJZmFTYWIyeThLdC85TVUvSXpucWVHSWJXNEkvZjdYTkRoSW5wYi8xeFREV2VkWFEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTc4MzMxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4yX3g2NC1zZXR1cC5leGUKaE1Bd0lHZm9ydWd4TWg2d0FhRGxkTHc5ejRYOUdUdmpHTHEzQUd3bzZuY0paMHYvVE1PbnVHSnp1bFBQUlBzaGVrZ1l3K3NiN0o4bmJQNEpQclo0QkE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.2.exe"
     }
   }
 }

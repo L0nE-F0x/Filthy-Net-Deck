@@ -1,5 +1,5 @@
 {
-  "version": "2.0.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.1.exe",
-  "notes": "v2.0.1: Post-match summary in the overlay (season form + rank path lingers after each game), match-end toasts that land while you're in Arena, and every share PNG rebuilt premium."
+  "version": "2.0.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.2.exe",
+  "notes": "v2.0.2: The overlay went stealth — density modes shrink the footprint (Minimal is text-only), an Opponent tab lists every card they've shown with the archetype read, turn/play/mulligan chips, idle dim, and it remembers your size & position."
 }
