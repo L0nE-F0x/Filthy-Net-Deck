@@ -1916,7 +1916,85 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
     }
 
-    /// Replay a real Player.log: `FND_REPLAY_LOG=path cargo test replay_real_log -- --nocapture --ignored`
+    /// Load a committed anonymized fixture under `tests/fixtures/logs/`.
+    fn fixture_log(name: &str) -> String {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("tests")
+            .join("fixtures")
+            .join("logs")
+            .join(name);
+        fs::read_to_string(&path).unwrap_or_else(|e| panic!("read fixture {}: {e}", path.display()))
+    }
+
+    fn replay_text(text: &str) -> (LogParser, Vec<TrackedMatch>) {
+        let mut p = LogParser::new();
+        let mut matches = Vec::new();
+        for line in text.split('\n') {
+            matches.extend(p.feed_line(line));
+        }
+        (p, matches)
+    }
+
+    /// C4 — committed corpus of anonymized log fixtures (runs in CI).
+    #[test]
+    fn fixture_bo1_win_full() {
+        let (p, matches) = replay_text(&fixture_log("bo1_win_full.log"));
+        assert_eq!(matches.len(), 1, "expected one completed match");
+        let m = &matches[0];
+        assert_eq!(m.match_id, "m-fixture-bo1");
+        assert_eq!(m.result, "win");
+        assert_eq!(m.event_id, "Ladder");
+        assert_eq!(m.best_of, 1);
+        assert_eq!(m.opponent_name.as_deref(), Some("Rival"));
+        assert_eq!(m.my_player_name.as_deref(), Some("Hero"));
+        assert_eq!(m.deck_name.as_deref(), Some("Izzet Cauldron"));
+        assert_eq!(m.deck_id.as_deref(), Some("deck-1"));
+        assert_eq!(m.my_rank.as_deref(), Some("Diamond 1"));
+        assert_eq!(m.games.len(), 1);
+        assert_eq!(m.games[0].on_play, Some(true));
+        assert_eq!(p.detailed_logs(), Some(true));
+        assert_eq!(p.parse_errors, 0);
+    }
+
+    #[test]
+    fn fixture_bo3_win() {
+        let (_p, matches) = replay_text(&fixture_log("bo3_win.log"));
+        assert_eq!(matches.len(), 1);
+        let m = &matches[0];
+        assert_eq!(m.match_id, "m-fixture-bo3");
+        assert_eq!(m.event_id, "Traditional_Ladder");
+        assert_eq!(m.best_of, 3);
+        assert_eq!(m.games.len(), 3);
+        assert_eq!(m.result, "win");
+        assert_eq!(m.opponent_name.as_deref(), Some("Bo3Rival"));
+    }
+
+    #[test]
+    fn fixture_loss_and_orphan_complete() {
+        let (_p, matches) = replay_text(&fixture_log("loss_and_orphan_complete.log"));
+        assert_eq!(matches.len(), 2, "loss + orphan completion");
+        let loss = matches.iter().find(|m| m.match_id == "m-fixture-loss").expect("loss");
+        assert_eq!(loss.result, "loss");
+        assert_eq!(loss.opponent_name.as_deref(), Some("Conceder"));
+        let orphan = matches
+            .iter()
+            .find(|m| m.match_id == "m-fixture-orphan")
+            .expect("orphan");
+        assert_eq!(orphan.result, "win");
+        assert_eq!(orphan.opponent_name.as_deref(), Some("Orphan"));
+    }
+
+    #[test]
+    fn fixture_draw_and_detailed_logs() {
+        let (p, matches) = replay_text(&fixture_log("draw_and_detailed_logs.log"));
+        assert_eq!(p.detailed_logs(), Some(true));
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].result, "draw");
+        assert_eq!(matches[0].match_id, "m-fixture-draw");
+    }
+
+    /// Optional local debug against a real Player.log (not run in CI):
+    /// `FND_REPLAY_LOG=path cargo test replay_real_log -- --nocapture --ignored`
     #[test]
     #[ignore]
     fn replay_real_log() {
@@ -1926,11 +2004,7 @@ mod tests {
         };
         let text = fs::read(&path).expect("read log");
         let text = String::from_utf8_lossy(&text);
-        let mut p = LogParser::new();
-        let mut matches = Vec::new();
-        for line in text.split('\n') {
-            matches.extend(p.feed_line(line));
-        }
+        let (p, matches) = replay_text(&text);
         eprintln!(
             "== {} matches, detailed_logs={:?}, player={:?}, parse_errors={}",
             matches.len(),
