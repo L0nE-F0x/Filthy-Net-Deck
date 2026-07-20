@@ -1,5 +1,7 @@
 # Filthy Net Deck — Production Roadmap
 
+> **▶ NEXT PROGRAM: [`100X-ROADMAP.md`](100X-ROADMAP.md)** — reach × reliability × moat. Start there (Phase 0: CI/test gate) before new page work. `handoff.md` carries the top-of-todo checklist.
+
 **Current release:** **v1.5.0** (Brew Lab — pure list clinic vs ranked peers; Windows signed — macOS dmg via tag CI).  
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
