@@ -19,7 +19,12 @@ import { winrateFavor } from "../services/ranks";
 import { resolveMetaDeckByTag } from "../services/deepLinks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
-import { recentFormString } from "../services/gameAnalytics";
+import {
+  groupOpponents,
+  sortOppGroups,
+  type OppGroup,
+  type OppSortKey,
+} from "../services/matchupGroups";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -28,80 +33,7 @@ const RESULT_LABEL: Record<MatchResult, string> = {
   unknown: "?",
 };
 
-interface OppGroup {
-  key: string;
-  name: string;
-  matches: TrackedMatch[];
-  wins: number;
-  losses: number;
-  rate: number | null;
-  lastAt: number;
-  decks: string[];
-  /** Last up to 5 decided results oldest→newest (W/L). */
-  form: string;
-  tag?: string;
-  notes?: string;
-}
-
-type SortKey = "recent" | "matches" | "rate" | "losses" | "name";
-
-function groupOpponents(
-  matches: TrackedMatch[],
-  notes: ReturnType<typeof loadAllOpponentNotes>,
-): OppGroup[] {
-  const by = new Map<string, TrackedMatch[]>();
-  for (const m of matches) {
-    const k = opponentKey(m.opponentName);
-    let list = by.get(k);
-    if (!list) {
-      list = [];
-      by.set(k, list);
-    }
-    list.push(m);
-  }
-  const out: OppGroup[] = [];
-  for (const [key, list] of by) {
-    const wins = list.filter((m) => m.result === "win").length;
-    const losses = list.filter((m) => m.result === "loss").length;
-    const decided = wins + losses;
-    const decks = [
-      ...new Set(list.map((m) => m.deckName).filter((n): n is string => Boolean(n))),
-    ];
-    const note = notes[key];
-    const name =
-      list.find((m) => m.opponentName)?.opponentName?.trim() ||
-      (key === "unknown" ? "Unknown" : key);
-    out.push({
-      key,
-      name,
-      matches: list,
-      wins,
-      losses,
-      rate: decided > 0 ? wins / decided : null,
-      lastAt: Math.max(...list.map((m) => m.endedAt)),
-      decks,
-      form: recentFormString(list, 5),
-      tag: note?.tag,
-      notes: note?.notes,
-    });
-  }
-  return out;
-}
-
-function sortGroups(groups: OppGroup[], key: SortKey): OppGroup[] {
-  return [...groups].sort((a, b) => {
-    if (key === "recent") return b.lastAt - a.lastAt;
-    if (key === "matches") return b.matches.length - a.matches.length || b.lastAt - a.lastAt;
-    if (key === "losses") return b.losses - a.losses || b.matches.length - a.matches.length;
-    if (key === "rate") {
-      if (a.rate == null && b.rate == null) return b.matches.length - a.matches.length;
-      if (a.rate == null) return 1;
-      if (b.rate == null) return -1;
-      return a.rate - b.rate || b.matches.length - a.matches.length; // worst first
-    }
-    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-  });
-}
+type SortKey = OppSortKey;
 
 function RateChip({
   wins,
@@ -290,7 +222,7 @@ export function Matchups() {
           (x.notes ?? "").toLowerCase().includes(q),
       );
     }
-    return sortGroups(g, sort);
+    return sortOppGroups(g, sort);
   }, [filtered, notes, tagFilter, sort, query]);
 
   const knownTags = useMemo(() => {
