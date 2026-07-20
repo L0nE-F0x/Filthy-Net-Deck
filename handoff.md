@@ -51,9 +51,9 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
 | **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
 | **B3** | Grounded AI coach | **CANCELLED** — no cloud LLM ever (owner 2026-07-20) |
-| **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |
+| **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |\n| **D2-b** | Season recap habit | **SOURCE only (unreleased)** — closed-season notify + share banner on Climb |\n| **Ret** | Local open-day counters | **SOURCE only** — Settings About note; never uploaded |
 
-**Test suite at wrap: 209 vitest / 35 files, 21 Rust tests. v1.7.0 live; D2 light unreleased.**
+**Test suite at wrap: 216+ vitest. v1.7.0 live; stacked unreleased: D2 light, D2-b season recap, local retention.**
 
 ### Explicitly open — pick up here
 
@@ -281,4 +281,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.7.0 fully released.** B3 cancelled (no cloud LLM). D2 light catch-up strip is **source-complete, unreleased**. marketing-video removed. Next: batch D2 into a release when ready; leave youtube/goal WIP alone.
+> **v1.7.0 live.** Stacked unreleased: D2 light digest (+streak/rotation fillers), D2-b season recap habit (notify+share), local retention counters. B3 cancelled. marketing-video gone. Keep stacking before next version bump; leave youtube/goal WIP alone.

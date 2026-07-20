@@ -150,4 +150,17 @@ describe("buildDailyDigest", () => {
     });
     expect(chips).toEqual([]);
   });
+
+  it("fills with streak and rotation when primary chips are empty", () => {
+    const { chips } = buildDailyDigest({
+      matches: [],
+      nowMs: Date.now(),
+      lastOpenMs: null,
+      metaChanges: [],
+      mode: "bo1",
+      streak: { type: "win", length: 4 },
+      rotationDays: 12,
+    });
+    expect(chips.map((c) => c.kind)).toEqual(["streak", "rotation"]);
+  });
 });

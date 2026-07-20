@@ -30,6 +30,7 @@ import type { TrackedMatch } from "../types/tracker";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
 import { ShareMenu } from "../components/ShareMenu";
+import { SeasonRecapBanner } from "../components/SeasonRecapBanner";
 import { renderClimbSharePng } from "../services/shareCards";
 import {
   climbCaption,
@@ -707,6 +708,7 @@ export function Climb() {
 
   return (
     <div className="flex flex-col gap-3">
+      <SeasonRecapBanner />
       <div className="panel lab-intro">
         <div>
           <p className="eyebrow m-0">Climb Tracker</p>

@@ -118,7 +118,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 **D2 — The daily loop.** Source 2026-07-20 (light, unreleased). A "since you last opened" digest: meta movers, your record yesterday, rank delta, rotation countdown. The pieces exist (`metaDiff`, `climbStats`, `rankMoments`) — assemble them into one open-worthy home strip. (Note: the 10× SKIP list parked "Today's plan strip" D1; revisit that decision *now* that retention is the explicit goal — it may be the highest-value un-parking.)
 
-**D2 — Streaks & seasonal recap as a habit.** `recapCard` renders a season PNG. Make the end-of-season recap a *notification-driven event* ("your Silver→Diamond climb is ready") that pulls users back and seeds Pillar A5 sharing.
+**D2 — Streaks & seasonal recap as a habit.** Source 2026-07-20 (unreleased). `recapCard` renders a season PNG. Make the end-of-season recap a *notification-driven event* ("your Silver→Diamond climb is ready") that pulls users back and seeds Pillar A5 sharing.
 
 ---
 

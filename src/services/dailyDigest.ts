@@ -7,7 +7,7 @@ import type { TrackedMatch } from "../types/tracker";
 import type { MetaChange } from "./metaDiff";
 import { formatRank, parseRank } from "./ranks";
 
-export type DigestChipKind = "record" | "rank" | "meta";
+export type DigestChipKind = "record" | "rank" | "meta" | "streak" | "rotation";
 
 export interface DigestChip {
   id: string;
@@ -151,6 +151,10 @@ export function buildDailyDigest(input: {
   metaChanges: MetaChange[];
   formatId?: string | null;
   mode: "bo1" | "bo3";
+  /** Current win/loss streak (optional filler chip). */
+  streak?: { type: "win" | "loss" | null; length: number } | null;
+  /** Days until Standard rotation (optional filler chip). */
+  rotationDays?: number | null;
 }): { window: DigestWindow; chips: DigestChip[] } {
   const window = digestWindow(input.nowMs, input.lastOpenMs);
   const chips: DigestChip[] = [];
@@ -187,6 +191,36 @@ export function buildDailyDigest(input: {
       kind: "meta",
       label: `${verb}: ${mover.name}`,
       detail: "Meta board movement",
+    });
+  }
+
+  // Fill remaining slots (max 3) with streak / rotation when primary chips are thin.
+  if (
+    chips.length < 3 &&
+    input.streak?.type &&
+    input.streak.length >= 2
+  ) {
+    chips.push({
+      id: "streak",
+      kind: "streak",
+      label: `${input.streak.type === "win" ? "W" : "L"} streak ×${input.streak.length}`,
+      detail: "Current run · decided matches",
+    });
+  }
+
+  if (
+    chips.length < 3 &&
+    input.rotationDays != null &&
+    input.rotationDays >= 0 &&
+    input.rotationDays <= 90
+  ) {
+    const d = input.rotationDays;
+    chips.push({
+      id: "rotation",
+      kind: "rotation",
+      label:
+        d === 0 ? "Rotates today" : d === 1 ? "Rotates tomorrow" : `Rotation in ${d}d`,
+      detail: "Standard · whatsinstandard",
     });
   }
 

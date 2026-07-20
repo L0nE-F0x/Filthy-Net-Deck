@@ -113,6 +113,8 @@ export default function App() {
   useEffect(() => {
     void initTracker();
     void refreshMeta().finally(() => setBootDone(true));
+    // Local-only open-day counter (retention; never uploaded).
+    void import("./services/localRetention").then((m) => m.recordAppOpen());
     if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
     // Overlay enable flag is owned by Rust (tray can toggle while main is hidden).
     // Pull that flag first, then mirror into prefs so Settings stays honest.

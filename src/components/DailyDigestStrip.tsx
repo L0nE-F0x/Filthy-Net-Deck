@@ -5,11 +5,11 @@ import {
   readLastOpenAt,
   writeLastOpenAt,
 } from "../services/dailyDigest";
+import { currentStreak } from "../services/climbStats";
 
 /**
- * D2 (light) — 2–3 chips: your recent record, rank path, top meta mover.
- * Local only; stamps last-open after first paint so the next visit gets a
- * real "since last open" window.
+ * D2 (light) — up to 3 chips: recent record, rank path, meta mover,
+ * with streak / rotation as fillers. Local only.
  */
 export function DailyDigestStrip({
   formatId,
@@ -19,10 +19,20 @@ export function DailyDigestStrip({
   const matches = useAppStore((s) => s.trackerMatches);
   const mode = useAppStore((s) => s.mode);
   const metaDiff = useAppStore((s) => s.metaDiff);
+  const sets = useAppStore((s) => s.sets);
   const stamped = useRef(false);
 
   // Capture last-open once per mount so chips stay stable for this visit.
   const lastOpenMs = useMemo(() => readLastOpenAt(), []);
+
+  const rotationDays = useMemo(() => {
+    const next = sets?.formats?.standard?.rotation?.nextDate;
+    if (!next) return null;
+    const t = Date.parse(`${next}T12:00:00`);
+    if (!Number.isFinite(t)) return null;
+    const ms = t - Date.now();
+    return Math.ceil(ms / 86400000);
+  }, [sets]);
 
   const { window, chips } = useMemo(
     () =>
@@ -33,8 +43,10 @@ export function DailyDigestStrip({
         metaChanges: metaDiff.changes,
         formatId,
         mode,
+        streak: currentStreak(matches),
+        rotationDays,
       }),
-    [matches, lastOpenMs, metaDiff.changes, formatId, mode],
+    [matches, lastOpenMs, metaDiff.changes, formatId, mode, rotationDays],
   );
 
   useEffect(() => {

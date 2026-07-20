@@ -21,6 +21,21 @@ import {
   SOUND_CUE_SETS,
   type SoundCueSet,
 } from "../services/sfx";
+import { retentionSnapshot } from "../services/localRetention";
+
+/** Local-only open-day counter — never leaves this PC. */
+function LocalOpenDaysNote() {
+  const snap = retentionSnapshot();
+  if (snap.openDayCount <= 0) return null;
+  return (
+    <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
+      Opened on <strong className="text-foam">{snap.openDayCount}</strong> distinct day
+      {snap.openDayCount === 1 ? "" : "s"} on this PC
+      {snap.day2 ? " · day-2 return" : ""}
+      {snap.day7 ? " · day-7 habit" : ""}. Counters stay local — never uploaded.
+    </p>
+  );
+}
 
 /** X1 + v1.2 — tracker health + first-session coach. C6 — diagnostic export. */
 function TrackerHealthCard() {
@@ -566,6 +581,7 @@ export function Settings() {
               ApexForge
             </button>
           </p>
+          <LocalOpenDaysNote />
         </section>
       </div>
     </div>
