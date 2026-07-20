@@ -1,10 +1,10 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 release in flight** (Windows signed + site channels; macOS dmg after tag CI).
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.7.0 fully released** (Windows + macOS + updater + site, live byte-verified).
 **Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
-**Live product version:** **v1.7.0** — Windows signed exe + updater + soft channel ready to push; macOS dmg rolls after 1.7.0 tag CI.
+**Live product version:** **v1.7.0** — Windows signed exe (5,701,809 bytes) + macOS universal dmg (18,327,664 bytes) + updater + soft channel + OG, all confirmed live byte-identical on filthy-net-deck.com.
 
 ---
 
@@ -51,7 +51,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
 | **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
 
-**Test suite at wrap: 200 vitest / 34 files, 21 Rust tests. Published app: v1.7.0 (Windows). macOS dmg pending tag CI roll.**
+**Test suite at wrap: 200 vitest / 34 files, 21 Rust tests. v1.7.0 fully released and live-verified.**
 
 ### Explicitly open — pick up here
 
@@ -59,8 +59,7 @@ Canonical program: **`100X-ROADMAP.md`**.
    - In-app "Check for updates" on an installed pre-1.6.0 client offers **Update & restart** (not a browser download).
    - B1/B2 panels (opponent archetype, game analytics) look right against **real** Arena match history — everything shipped was verified with synthetic data in a browser preview, never a live game.
 2. **magic.gg full-list assignment** — still **deferred** (historical name corruption in that scraper). magic.gg stays events-links-only in C3's source chain.
-3. **Unreleased batch ready to ship** when owner wants: **A5 + B4 + D1** (substantial enough for a version bump per RELEASE PACING).
-4. **Next 100× features** — product check-in before large scope:
+3. **Next 100× features** — product check-in before large scope:
    - **B3** grounded AI coach — product-direction check-in first (API key? offline-only? SpaceXAI?).
    - **D2** daily-loop home strip ("since you last opened") — product call (was parked on 10× SKIP).
    - **A2/A3** Microsoft Store / Linux — distribution product calls; do not start without owner.
@@ -265,4 +264,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.7.0 released (Windows)** — A5 share loop, B4 overlay matchup WR, D1 first-session coach. macOS dmg rolls after tag CI. Next: B3/D2 product check-in. Leave marketing dirt alone.
+> **v1.7.0 fully released and live-verified** (A5 share loop, B4 overlay matchup WR, D1 first-session coach; Windows + macOS + updater). Next: product check-in on B3/D2. Leave marketing dirt alone. Owner: smoke Update & restart from pre-1.7.0 when convenient.
