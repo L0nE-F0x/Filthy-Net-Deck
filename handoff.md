@@ -1,6 +1,6 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 (Grok) — **v1.8.0 release cut** (Windows signed + channels; macOS after tag CI).
+**Last wrap-up:** 2026-07-20 (Grok) — **v1.8.0 fully released** (Win+macOS+updater+site, live byte-verified).
 **Next agent:** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do A5/B4/D1 or re-ship 1.6.0. Pick up at **§ Explicitly open**.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1` — should show `c41a710` or later).
@@ -30,7 +30,7 @@
 
 ## v1.8.0 release batch (shipping now)
 
-Shipped as **v1.8.0** — full AGENTS checklist. Verify live URLs after Netlify + macOS roll.
+**v1.8.0 fully released and live-verified.** Resume 100× roadmap stacking (A1/A2/A3/B3 cancelled).
 
 | Theme | What landed (source) |
 |-------|----------------------|
@@ -314,4 +314,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.7.0 live.** **v1.8.0 batch is fat and unreleased:** D2 digest + season recap, retention, B2+ form/play-draw/field EV, queue analytics, meta-mover notify, opponent share, richer match-end toast, CSV season/cards_seen, peels. A1/A2/A3/B3 cancelled. Cut full AGENTS release when owner asks.
+> **v1.8.0 fully released and live-verified.** Resume roadmap stacking; A1/A2/A3/B3 cancelled. Leave youtube/goal WIP alone.
