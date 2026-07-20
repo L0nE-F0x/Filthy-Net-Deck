@@ -1,0 +1,4 @@
+[Client GRE] DETAILED LOGS: DISABLED
+[Client GRE] DETAILED LOGS: ENABLED
+{ "transactionId": "t1", "timestamp": "1783956000000", "authenticateResponse": { "clientId": "LOCALUSERID111111111111111", "sessionId": "s4" } }
+{ "timestamp": "1783956001000", "matchGameRoomStateChangedEvent": { "gameRoomInfo": { "gameRoomConfig": { "reservedPlayers": [ { "userId": "LOCALUSERID111111111111111", "playerName": "Hero", "teamId": 2, "systemSeatId": 2, "eventId": "Ladder" }, { "userId": "OPPONENTUSERID55555555555", "playerName": "Drawer", "teamId": 1, "systemSeatId": 1, "eventId": "Ladder" } ], "matchId": "m-fixture-draw" }, "stateType": "MatchGameRoomStateType_MatchCompleted", "finalMatchResult": { "resultList": [ { "scope": "MatchScope_Match", "result": "ResultType_Draw" } ] } } } }
