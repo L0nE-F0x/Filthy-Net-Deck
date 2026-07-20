@@ -5337,6 +5337,79 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   align-items: center;
   gap: 0.4rem;
 }
+
+.session-wrap-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  border-color: color-mix(in srgb, var(--color-good, #34d399) 30%, transparent);
+  background: color-mix(in srgb, var(--color-good, #34d399) 8%, transparent);
+}
+.session-wrap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.local-coach-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.local-coach-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.local-coach-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-width: 9rem;
+  flex: 1 1 9rem;
+  max-width: 18rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--color-foam) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-foam) 10%, transparent);
+  color: inherit;
+  font: inherit;
+}
+.local-coach-chip strong {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.local-coach-chip span {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--color-muted, #9aa38a);
+}
+.local-coach-chip.kind-good {
+  border-color: color-mix(in srgb, var(--color-good, #34d399) 35%, transparent);
+}
+.local-coach-chip.kind-good strong {
+  color: var(--color-good, #34d399);
+}
+.local-coach-chip.kind-warning {
+  border-color: color-mix(in srgb, #f87171 35%, transparent);
+}
+.local-coach-chip.kind-warning strong {
+  color: #f87171;
+}
+.local-coach-chip:hover {
+  background: color-mix(in srgb, var(--color-gold-500) 10%, transparent);
+}
 .tracker-onboarding-steps {
   list-style: none;
   margin: 0;

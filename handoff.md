@@ -30,7 +30,7 @@
 
 ## v1.8.0 release batch (shipping now)
 
-**v1.8.0 fully released and live-verified.** Resume 100× roadmap stacking (A1/A2/A3/B3 cancelled).
+**v1.8.0 fully released.** Post-1.8 stack (unreleased): B1 accept-tag, session wrap share, local coach chips. A1/A2/A3/B3 cancelled.
 
 | Theme | What landed (source) |
 |-------|----------------------|

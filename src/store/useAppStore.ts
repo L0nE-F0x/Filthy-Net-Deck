@@ -270,6 +270,8 @@ interface AppState {
   clearFormatsFocus: () => void;
   /** Pending nudge to tag last opponent (M2). */
   tagNudgeOpponent: string | null;
+  /** B1-suggested archetype tag for the nudged opponent (or null). */
+  tagNudgeSuggested: string | null;
   clearTagNudge: () => void;
   /** Latest rank-up moment (ladder climb) — shown once in the main app. */
   rankUpMoment: RankUpMoment | null;
@@ -359,6 +361,7 @@ export const useAppStore = create<AppState>((set, get) => {
     matchupsFocusTag: null,
     formatsFocusTab: null,
     tagNudgeOpponent: null,
+    tagNudgeSuggested: null,
     rankUpMoment: null,
     climbFocusDeckKey: null,
     meta: null,
@@ -435,6 +438,7 @@ export const useAppStore = create<AppState>((set, get) => {
         matchupsFocusTag: null,
         page: "matchups",
         tagNudgeOpponent: null,
+        tagNudgeSuggested: null,
       }),
     openMatchupTag: (tag) =>
       set({
@@ -450,7 +454,7 @@ export const useAppStore = create<AppState>((set, get) => {
         page: "formats",
       }),
     clearFormatsFocus: () => set({ formatsFocusTab: null }),
-    clearTagNudge: () => set({ tagNudgeOpponent: null }),
+    clearTagNudge: () => set({ tagNudgeOpponent: null, tagNudgeSuggested: null }),
     clearRankUpMoment: () => set({ rankUpMoment: null }),
     openClimbDeck: (trackerDeckKey) =>
       set({
@@ -660,6 +664,41 @@ export const useAppStore = create<AppState>((set, get) => {
             tagNudgeOpponent: m.opponentName?.trim() || get().tagNudgeOpponent,
             rankUpMoment: rankUp ?? get().rankUpMoment,
           });
+          // B1 accept-tag: async suggestion when cards were seen
+          if (m.opponentName?.trim() && (m.opponentSeen?.length ?? 0) > 0) {
+            void (async () => {
+              try {
+                const { suggestOpponentTag } = await import("../services/tagSuggest");
+                const { peekArenaMeta, resolveArenaMetaBatch } = await import(
+                  "../services/arenaMeta"
+                );
+                await resolveArenaMetaBatch(m.opponentSeen ?? []);
+                const candidates: import("../types/meta").Deck[] = [];
+                const meta = get().meta;
+                if (meta) {
+                  for (const fmt of meta.formats) {
+                    for (const id of fmt.bo3DeckIds ?? []) {
+                      const d = meta.decks[id];
+                      if (d) candidates.push(d);
+                    }
+                  }
+                }
+                const s = suggestOpponentTag(
+                  m,
+                  (id) => peekArenaMeta(id)?.name ?? null,
+                  candidates,
+                );
+                if (
+                  s &&
+                  get().tagNudgeOpponent === s.opponentName
+                ) {
+                  set({ tagNudgeSuggested: s.archetype });
+                }
+              } catch {
+                /* ignore */
+              }
+            })();
+          }
           // Soft match-end + rank-up cues (main app only; opt-in).
           const prefs = get().prefs;
           if (prefs.soundEnabled) {

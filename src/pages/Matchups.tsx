@@ -172,6 +172,7 @@ export function Matchups() {
   const matchupsFocusTag = useAppStore((s) => s.matchupsFocusTag);
   const clearMatchupsFocus = useAppStore((s) => s.clearMatchupsFocus);
   const tagNudgeOpponent = useAppStore((s) => s.tagNudgeOpponent);
+  const tagNudgeSuggested = useAppStore((s) => s.tagNudgeSuggested);
   const clearTagNudge = useAppStore((s) => s.clearTagNudge);
   useEffect(() => {
     void refreshTracker();
@@ -339,28 +340,53 @@ export function Matchups() {
           <div>
             <p className="eyebrow m-0 mb-1">Tag last opponent</p>
             <p className="text-sm m-0">
-              You just played <strong className="text-foam">{tagNudgeOpponent}</strong> — add an
-              archetype tag so Decks can show your record vs them.
+              You just played <strong className="text-foam">{tagNudgeOpponent}</strong>
+              {tagNudgeSuggested ? (
+                <>
+                  {" "}
+                  — cards seen look like{" "}
+                  <strong className="text-gold-300">{tagNudgeSuggested}</strong>
+                </>
+              ) : (
+                <> — add an archetype tag so Decks can show your record vs them</>
+              )}
+              .
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {tagNudgeSuggested ? (
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  setOpponentNote(tagNudgeOpponent, {
+                    tag: tagNudgeSuggested,
+                    notes: getOpponentNote(tagNudgeOpponent)?.notes ?? "",
+                  });
+                  setNoteTick((n) => n + 1);
+                  clearTagNudge();
+                }}
+              >
+                Accept · {tagNudgeSuggested}
+              </button>
+            ) : null}
             <button
               type="button"
-              className="btn btn-primary btn-sm"
+              className={`btn btn-sm ${tagNudgeSuggested ? "btn-ghost" : "btn-primary"}`}
               onClick={() => {
                 const key = opponentKey(tagNudgeOpponent);
                 const g = groups.find((x) => x.key === key);
                 if (g) openOpponent(g);
                 else {
                   setSelected(key);
-                  setTagDraft("");
+                  setTagDraft(tagNudgeSuggested ?? "");
                   setNotesDraft("");
                   setEditingKey(key);
                 }
                 clearTagNudge();
               }}
             >
-              Tag now
+              {tagNudgeSuggested ? "Edit tag" : "Tag now"}
             </button>
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => clearTagNudge()}>
               Dismiss

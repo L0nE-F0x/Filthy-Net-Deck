@@ -9,6 +9,8 @@ import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { OpponentArchetypePanel } from "../components/OpponentArchetypePanel";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { DailyDigestStrip } from "../components/DailyDigestStrip";
+import { SessionWrapBanner } from "../components/SessionWrapBanner";
+import { LocalCoachStrip } from "../components/LocalCoachStrip";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { recordVsTags, listTaggedOpponentCount } from "../services/matchupNotes";
 import { needsOnboardingCoach } from "../services/trackerHealth";
@@ -237,8 +239,10 @@ export function Daily() {
           <TrackerOnboarding showHealthDetail />
         </div>
       )}
+      <SessionWrapBanner />
       {/* D2 light — 2–3 catch-up chips when there's something to say */}
       <DailyDigestStrip formatId={activeFmt?.id} />
+      <LocalCoachStrip />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>
