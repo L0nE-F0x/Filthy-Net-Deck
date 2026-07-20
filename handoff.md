@@ -19,7 +19,7 @@ Canonical plan: **`100X-ROADMAP.md`** (root, next to `ROADMAP.md`). The thesis: 
 
 ### Also queued in Phase 0 (cheap, high-leverage)
 - ~~Fixture tests for `pipeline/sources/goldfish.mjs`~~ ✅ **DONE 2026-07-20** — `pipeline/goldfish.test.mjs` (9 tests) against real gzipped 2026-07-20 pages in `pipeline/__fixtures__/`; recapture snippet in the test header.
-- Commit `eslint` / `prettier` configs (rustfmt already enforced via CI with defaults).
+- ~~Commit `eslint` config~~ ✅ **DONE 2026-07-20** — flat `eslint.config.js` (ts-eslint recommended + react-hooks classic pair; v6 compiler-era rules deliberately off — see config comment), `npm run lint` at `--max-warnings 0`, wired into CI web job. 27 baseline findings triaged: 6 real smells fixed, 4 dep-arrays made idiom-clean, rest were opinionated-rule noise. *Prettier deliberately skipped:* the tree is already style-consistent and a full reformat is a 21k-line mechanical diff; adopt later with `blame.ignoreRevsFile` if wanted.
 - Un-`ignore` the tracker replay test with a committed anonymized log-fixture corpus.
 
 **Guardrails (never compromise):** real-data-only · local-only tracking · AI grounded-or-absent · no in-draft overlay (ToS) · Standard+Pioneer focus · end-to-end releases. Full detail in `100X-ROADMAP.md` §4.

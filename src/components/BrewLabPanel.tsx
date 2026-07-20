@@ -156,6 +156,9 @@ export function BrewLabPanel({ deckName, mainIds, sideIds }: Props) {
     return () => {
       alive = false;
     };
+    // Joined-id key: reacts to real list changes without refetch loops from
+    // per-render array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allIds.join(",")]);
 
   const report: BrewClinicReport = useMemo(() => {

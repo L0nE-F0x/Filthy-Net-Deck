@@ -8,7 +8,7 @@
  * The old approach (deck/arena_download/<id>) returns 403 "Just a moment" and
  * must not be used.
  */
-import { getText, sleep } from "./common.mjs";
+import { getText } from "./common.mjs";
 
 const BASE = "https://www.mtggoldfish.com";
 

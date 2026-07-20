@@ -143,6 +143,9 @@ export function DeckView() {
     return () => {
       cancelled = true;
     };
+    // Revalidate only when the deck identity changes — a meta refresh swaps
+    // the object but the same list needs no second Scryfall pass.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deck?.id]);
 
   if (!deck) {

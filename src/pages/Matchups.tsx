@@ -291,6 +291,7 @@ export function Matchups() {
 
   const knownTags = useMemo(() => {
     void noteTick;
+    void matches;
     return listKnownTags();
   }, [noteTick, matches]);
 

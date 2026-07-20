@@ -22,7 +22,10 @@ export function TrackerOnboarding({
   const matches = useAppStore((s) => s.trackerMatches);
   const setPage = useAppStore((s) => s.setPage);
   // re-read notes length via match list + store tick: count tags from notes service
-  const tagged = useMemo(() => listTaggedOpponentCount(), [matches.length]);
+  const tagged = useMemo(() => {
+    void matches.length;
+    return listTaggedOpponentCount();
+  }, [matches.length]);
 
   const health = useMemo(
     () => diagnoseTrackerHealth(status, matches.length, { taggedOpponentCount: tagged }),

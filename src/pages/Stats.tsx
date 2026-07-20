@@ -1248,7 +1248,7 @@ const RESULT_ORDER: Record<MatchResult, number> = {
 function sortMatches(matches: TrackedMatch[], key: MatchSortKey, dir: SortDir): TrackedMatch[] {
   const mul = dir === "asc" ? 1 : -1;
   return [...matches].sort((a, b) => {
-    let cmp = 0;
+    let cmp: number;
     if (key === "result") {
       cmp = RESULT_ORDER[a.result] - RESULT_ORDER[b.result];
     } else if (key === "opponent") {

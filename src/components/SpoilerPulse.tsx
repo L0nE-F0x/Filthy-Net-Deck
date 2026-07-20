@@ -20,8 +20,8 @@ export function SpoilerPulse() {
 
   // Estimated Arena dates are a paper−3d guess — say "expected", not "hits".
   const estimated = top.arenaConfidence === "estimated";
-  let headline = top.name;
-  let detail = "";
+  const headline = top.name;
+  let detail: string;
   if (top.kind === "arena_today") {
     detail = estimated ? "expected on Arena today" : "hits Arena today";
   } else if (top.kind === "arena_tomorrow") {

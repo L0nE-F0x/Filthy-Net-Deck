@@ -73,7 +73,6 @@ export async function renderRecapPng(stats: RecapStats): Promise<Blob> {
       64,
       y,
     );
-    y += 72;
   }
 
   ctx.fillStyle = "#5a6b5e";
