@@ -6,6 +6,7 @@ import {
   writeLastOpenAt,
 } from "../services/dailyDigest";
 import { currentStreak } from "../services/climbStats";
+import { daysUntil } from "../services/setDates";
 
 /**
  * D2 (light) — up to 3 chips: recent record, rank path, meta mover,
@@ -25,14 +26,10 @@ export function DailyDigestStrip({
   // Capture last-open once per mount so chips stay stable for this visit.
   const lastOpenMs = useMemo(() => readLastOpenAt(), []);
 
-  const rotationDays = useMemo(() => {
-    const next = sets?.formats?.standard?.rotation?.nextDate;
-    if (!next) return null;
-    const t = Date.parse(`${next}T12:00:00`);
-    if (!Number.isFinite(t)) return null;
-    const ms = t - Date.now();
-    return Math.ceil(ms / 86400000);
-  }, [sets]);
+  const rotationDays = useMemo(
+    () => daysUntil(sets?.formats?.standard?.rotation?.nextDate ?? null),
+    [sets],
+  );
 
   const { window, chips } = useMemo(
     () =>

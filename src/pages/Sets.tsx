@@ -15,7 +15,6 @@ import {
   type DateConfidence,
   type FutureSet,
   type SetPreviewCard,
-  type SetStatus,
   type UpcomingSet,
 } from "../types/sets";
 import { IconBack } from "../components/NavIcons";
@@ -23,66 +22,27 @@ import { ManaCost } from "../components/ManaCost";
 import { TrailerButton, TrailerPlayer } from "../components/TrailerPlayer";
 import { trailerForSet, type SetTrailer } from "../services/setTrailers";
 import { totalNewCount } from "../services/setPulse";
+import {
+  cardHasColor,
+  confidenceHint,
+  countdownLabel,
+  daysUntil,
+  formatSetDate,
+  isArenaDropWindow,
+  rarityClass,
+  RARITY_RANK,
+  statusClass,
+  statusLabel,
+  typeBucket,
+  type TypeFilter,
+} from "../services/setDates";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
 type ColorFilter = "all" | "W" | "U" | "B" | "R" | "G" | "C";
 type SortKey = "collector" | "name" | "cmc" | "rarity" | "newest";
-type TypeFilter = "all" | "creature" | "instant" | "sorcery" | "enchantment" | "artifact" | "planeswalker" | "land" | "other";
 
-function statusLabel(s: SetStatus): string {
-  switch (s) {
-    case "spoiling":
-      return "Spoilers live";
-    case "announced":
-      return "Announced";
-    case "live_on_arena":
-      return "On Arena";
-    case "released":
-      return "Released";
-    default:
-      return s;
-  }
-}
-
-function statusClass(s: SetStatus): string {
-  return `set-status set-status-${s}`;
-}
-
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return "TBA";
-  try {
-    return new Date(`${iso}T12:00:00`).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
-}
-
-function daysUntil(iso: string | null | undefined): number | null {
-  if (!iso) return null;
-  const t = new Date(`${iso}T12:00:00`).getTime();
-  const now = new Date();
-  now.setHours(12, 0, 0, 0);
-  return Math.round((t - now.getTime()) / 86400000);
-}
-
-function countdownLabel(iso: string | null | undefined): string {
-  const d = daysUntil(iso);
-  if (d == null) return "TBA";
-  if (d < 0) return `${Math.abs(d)}d ago`;
-  if (d === 0) return "Today";
-  if (d === 1) return "Tomorrow";
-  return `${d}d`;
-}
-
-function confidenceHint(c: DateConfidence | undefined): string {
-  if (c === "estimated") return "est.";
-  if (c === "official" || c === "override") return "official";
-  return "";
-}
+/** Local alias so existing JSX keeps calling formatDate. */
+const formatDate = formatSetDate;
 
 function DateRow({
   label,
@@ -106,43 +66,6 @@ function DateRow({
       <span className="set-date-count">{countdownLabel(date)}</span>
     </div>
   );
-}
-
-function rarityClass(r: string): string {
-  const x = r.toLowerCase();
-  if (x === "mythic") return "rarity-mythic";
-  if (x === "rare") return "rarity-rare";
-  if (x === "uncommon") return "rarity-uncommon";
-  if (x === "common") return "rarity-common";
-  return "rarity-special";
-}
-
-const RARITY_RANK: Record<string, number> = {
-  mythic: 0,
-  rare: 1,
-  uncommon: 2,
-  common: 3,
-};
-
-function typeBucket(typeLine: string | undefined): TypeFilter {
-  const t = (typeLine || "").toLowerCase();
-  if (t.includes("creature")) return "creature";
-  if (t.includes("planeswalker")) return "planeswalker";
-  if (t.includes("instant")) return "instant";
-  if (t.includes("sorcery")) return "sorcery";
-  if (t.includes("enchantment")) return "enchantment";
-  if (t.includes("artifact")) return "artifact";
-  if (t.includes("land")) return "land";
-  return "other";
-}
-
-function cardIsColorless(c: SetPreviewCard): boolean {
-  return !c.colors?.length;
-}
-
-function cardHasColor(c: SetPreviewCard, col: string): boolean {
-  if (col === "C") return cardIsColorless(c);
-  return (c.colors || []).includes(col);
 }
 
 /** Scryfall marks unreleased cards not_legal until launch day — say so. Z3: badges open Format Hub. */
@@ -171,12 +94,6 @@ function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: 
       </button>
     </div>
   );
-}
-
-/** Z2 — Arena drop within ±1 calendar day. */
-function isArenaDropWindow(iso: string | null | undefined): boolean {
-  const d = daysUntil(iso);
-  return d != null && d >= -1 && d <= 1;
 }
 
 function CardDetailDrawer({
