@@ -18,8 +18,8 @@ Canonical plan: **`100X-ROADMAP.md`** (root, next to `ROADMAP.md`). The thesis: 
 5. **Multi-source meta.** Wire the `magic.gg → mtgo → goldfish → melee` list priority that `docs/DATA-AND-UPDATES.md` already describes — today the 8×8 lists come from **Goldfish only** (single point of failure). *(C3)*
 
 ### Also queued in Phase 0 (cheap, high-leverage)
-- Fixture tests for `pipeline/sources/goldfish.mjs` (vitest already globs `pipeline/**/*.test.mjs` — none exist yet).
-- Commit `eslint` / `prettier` / `rustfmt.toml`.
+- ~~Fixture tests for `pipeline/sources/goldfish.mjs`~~ ✅ **DONE 2026-07-20** — `pipeline/goldfish.test.mjs` (9 tests) against real gzipped 2026-07-20 pages in `pipeline/__fixtures__/`; recapture snippet in the test header.
+- Commit `eslint` / `prettier` configs (rustfmt already enforced via CI with defaults).
 - Un-`ignore` the tracker replay test with a committed anonymized log-fixture corpus.
 
 **Guardrails (never compromise):** real-data-only · local-only tracking · AI grounded-or-absent · no in-draft overlay (ToS) · Standard+Pioneer focus · end-to-end releases. Full detail in `100X-ROADMAP.md` §4.
