@@ -102,7 +102,7 @@ Nobody else has a local, offline, no-account Arena tracker this good. Widen the 
 
 **C2 — Fixture tests for the fragile scrapers.** `vitest` already globs `pipeline/**/*.test.mjs` — write them. Snapshot real Goldfish HTML into fixtures and assert `parseMetagameTiles` / `parseArchetypeDeckPage` extract the right tiles/lists. When Goldfish redesigns, the test goes red *before* production does.
 
-**C3 — Multi-source meta (kill the single point of failure).** Resolve the doc/impl drift: actually wire `magic.gg` and `MTGO` decklist parsing into `buildFormat`'s list assignment with the priority chain `docs/DATA-AND-UPDATES.md` already promises, Goldfish as fallback. One source going dark should degrade quality, not black out the meta.
+**C3 — Multi-source meta (kill the single point of failure).** DONE partial 2026-07-20: MTGO challenge lists assign onto Goldfish tiles when card-overlap matches; Goldfish archetype page is fallback. magic.gg still events-only (safe list parser deferred).
 
 **C4 — Automated tracker-parser regression suite.** Promote the `#[ignore]`d `replay_real_log` into a committed corpus of *anonymized* log fixtures covering each event type (Playing, MatchCompleted, courses, rank, GRE deck, mulligan reshuffle). Run in CI. When an Arena update changes the log, CI tells you which shape broke.
 

@@ -5,8 +5,10 @@
  *   1. Only real data ships. There is NO seed pack, no invented lists, no
  *      generated matchup content. If live data can't be fetched, the pipeline
  *      ABORTS WITHOUT WRITING so the previously published (real) data stays up.
- *   2. A deck's identity, rank, list, colors, and key cards all come from ONE
- *      source: MTGGoldfish metagame tiles + that archetype's page list.
+ *   2. Archetype *identity* + rank + meta % come from MTGGoldfish tiles.
+ *      *Lists* prefer multi-source assignment (C3): MTGO challenge 60s when they
+ *      match the tile, else Goldfish archetype page. magic.gg stays events-only
+ *      until a safe list parser exists (historical name corruption).
  *   3. Every card name must validate against Scryfall (canonical name,
  *      per-format legality, scryfall id for exact CDN images).
  *
@@ -23,7 +25,8 @@ import { buildArenaImport, sleep } from "./sources/common.mjs";
 import { fetchMetagameTiles, fetchArchetypeDeck } from "./sources/goldfish.mjs";
 import { validateDeck } from "./sources/scryfall.mjs";
 import { collectMagicGgTournaments } from "./sources/magic-gg.mjs";
-import { collectMtgoTournaments } from "./sources/mtgo.mjs";
+import { collectMtgoTournaments, fetchMtgoListPool } from "./sources/mtgo.mjs";
+import { pickBestListForTile } from "./sources/listMatch.mjs";
 import { collectMelee } from "./sources/melee.mjs";
 import { collectUntapped } from "./sources/untapped.mjs";
 import { buildMetaSite } from "./build-meta-site.mjs";
@@ -61,15 +64,29 @@ function slugify(name) {
 }
 
 /**
- * Build one format's decks from goldfish tiles. Every deck is fully live and
- * Scryfall-validated or it doesn't ship — there is no fallback.
+ * Build one format's decks.
+ *
+ * Identity / rank / meta %: Goldfish metagame tiles (unchanged).
+ * List assignment (C3): MTGO challenge 60 when it matches the tile, else
+ * Goldfish archetype page. Every shipping list is Scryfall-validated.
  */
 async function buildFormat(def, diagnostics) {
   const { tiles } = await fetchMetagameTiles(def.goldfishPath);
   console.log(`  [${def.id}] ${tiles.length} archetype tiles`);
 
+  let tournamentPool = [];
+  try {
+    tournamentPool = await fetchMtgoListPool(def.id, { maxEvents: 3, maxDecks: 96 });
+    console.log(`  [${def.id}] MTGO list pool: ${tournamentPool.length}`);
+  } catch (e) {
+    diagnostics.push(`${def.id}: MTGO list pool failed (${e.message}) — Goldfish-only lists`);
+    console.warn(`  [${def.id}] MTGO pool failed: ${e.message}`);
+  }
+
   const picked = [];
   const usedSlugs = new Set();
+  /** Tournament lists already assigned (one list per archetype). */
+  const usedTournamentKeys = new Set();
 
   for (const tile of tiles) {
     if (picked.length >= DECKS_PER_FORMAT) break;
@@ -79,39 +96,103 @@ async function buildFormat(def, diagnostics) {
     if (/^other$/i.test(tile.name.trim())) continue;
 
     await sleep(450);
-    const list = await fetchArchetypeDeck(tile.slug);
-    if (!list) {
-      diagnostics.push(`${def.id}/${tile.name}: archetype list unavailable — skipped`);
-      continue;
+    let goldfishList = null;
+    try {
+      goldfishList = await fetchArchetypeDeck(tile.slug);
+    } catch (e) {
+      diagnostics.push(`${def.id}/${tile.name}: goldfish fetch error (${e.message})`);
     }
 
-    const scratch = {
-      mainboard: list.mainboard.map((c) => ({ ...c })),
-      sideboard: list.sideboard.map((c) => ({ ...c })),
-    };
-    const report = await validateDeck(scratch, def.id, { dropIllegal: true });
+    // C3: prefer a real MTGO 60 that matches this archetype.
+    const freePool = tournamentPool.filter((l) => {
+      const key = `${l.sourceUrl}|${l.player}`;
+      return !usedTournamentKeys.has(key);
+    });
+    const tournamentHit = pickBestListForTile(freePool, tile, goldfishList);
 
-    if (report.skipped) {
-      diagnostics.push(`${def.id}/${tile.name}: scryfall unreachable — skipped`);
-      continue;
+    let chosen = null;
+    let listSource = "goldfish";
+    let listMeta = {};
+
+    if (tournamentHit) {
+      const scratch = {
+        mainboard: tournamentHit.list.mainboard.map((c) => ({ ...c })),
+        sideboard: tournamentHit.list.sideboard.map((c) => ({ ...c })),
+      };
+      const report = await validateDeck(scratch, def.id, { dropIllegal: true });
+      if (
+        !report.skipped &&
+        report.unknown.length <= 2 &&
+        report.mainCount >= 55
+      ) {
+        if (report.unknown.length || report.illegal.length) {
+          diagnostics.push(
+            `${def.id}/${tile.name}: MTGO cleaned (unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
+          );
+        }
+        chosen = scratch;
+        listSource = "mtgo";
+        listMeta = {
+          player: tournamentHit.list.player,
+          eventName: tournamentHit.list.eventName,
+          sourceUrl: tournamentHit.list.sourceUrl,
+          matchScore: tournamentHit.match.score,
+          keyHits: tournamentHit.match.keyHits,
+        };
+        usedTournamentKeys.add(
+          `${tournamentHit.list.sourceUrl}|${tournamentHit.list.player}`,
+        );
+      } else {
+        diagnostics.push(
+          `${def.id}/${tile.name}: MTGO candidate rejected (main=${report.mainCount}, unknown=${report.unknown.length}) — try Goldfish`,
+        );
+      }
     }
-    if (report.unknown.length > 2 || report.mainCount < 55) {
-      diagnostics.push(
-        `${def.id}/${tile.name}: rejected (unknown=${report.unknown.join("|") || "none"}, main=${report.mainCount})`,
-      );
-      continue;
+
+    if (!chosen && goldfishList) {
+      const scratch = {
+        mainboard: goldfishList.mainboard.map((c) => ({ ...c })),
+        sideboard: goldfishList.sideboard.map((c) => ({ ...c })),
+      };
+      const report = await validateDeck(scratch, def.id, { dropIllegal: true });
+
+      if (report.skipped) {
+        diagnostics.push(`${def.id}/${tile.name}: scryfall unreachable — skipped`);
+        continue;
+      }
+      if (report.unknown.length > 2 || report.mainCount < 55) {
+        diagnostics.push(
+          `${def.id}/${tile.name}: rejected (unknown=${report.unknown.join("|") || "none"}, main=${report.mainCount})`,
+        );
+        continue;
+      }
+      if (report.unknown.length || report.illegal.length) {
+        diagnostics.push(
+          `${def.id}/${tile.name}: cleaned (dropped unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
+        );
+      }
+      chosen = scratch;
+      listSource = "goldfish";
+      listMeta = { deckId: goldfishList.deckId };
     }
-    if (report.unknown.length || report.illegal.length) {
-      diagnostics.push(
-        `${def.id}/${tile.name}: cleaned (dropped unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
-      );
+
+    if (!chosen) {
+      diagnostics.push(`${def.id}/${tile.name}: no validated list (MTGO+Goldfish) — skipped`);
+      continue;
     }
 
     usedSlugs.add(dedupeSlug);
-    picked.push({ tile, list: scratch, deckId: list.deckId });
-    console.log(
-      `  [${def.id}] ✓ ${tile.name} — ${report.mainCount} cards (goldfish deck #${list.deckId ?? "?"})`,
-    );
+    picked.push({ tile, list: chosen, listSource, listMeta });
+    const mainCount = chosen.mainboard.reduce((n, c) => n + (c.count || 0), 0);
+    if (listSource === "mtgo") {
+      console.log(
+        `  [${def.id}] ✓ ${tile.name} — ${mainCount} cards (MTGO ${listMeta.eventName} / ${listMeta.player}, score=${listMeta.matchScore?.toFixed?.(1) ?? listMeta.matchScore})`,
+      );
+    } else {
+      console.log(
+        `  [${def.id}] ✓ ${tile.name} — ${mainCount} cards (goldfish deck #${listMeta.deckId ?? "?"})`,
+      );
+    }
   }
 
   // Deck objects: one per mode. Same ranked order (straight meta %) for both
@@ -121,8 +202,29 @@ async function buildFormat(def, diagnostics) {
   const decks = [];
   picked.forEach((p, idx) => {
     const slug = slugify(p.tile.name);
+    const fromMtgo = p.listSource === "mtgo";
     for (const mode of ["bo1", "bo3"]) {
       const sideboard = mode === "bo3" ? p.list.sideboard : [];
+      const sources = [
+        ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
+        {
+          name: "MTGGoldfish metagame",
+          url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
+        },
+      ];
+      if (fromMtgo && p.listMeta.sourceUrl) {
+        sources.unshift({
+          name: `MTGO — ${p.listMeta.eventName || "event"} (${p.listMeta.player || "?"})`,
+          url: p.listMeta.sourceUrl,
+        });
+      }
+      const listNote = fromMtgo
+        ? `Live list from MTGO (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
+        : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
+      const description = fromMtgo
+        ? `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative list from recent MTGO (${p.listMeta.eventName || "event"}).`
+        : `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative current list from the archetype page.`;
+
       const deck = {
         id: `${def.id}-${mode}-${slug}`,
         name: p.tile.name,
@@ -132,23 +234,18 @@ async function buildFormat(def, diagnostics) {
         tier: idx < 3 ? 1 : idx < 6 ? 2 : 3,
         colors: p.tile.colors || [],
         archetype: p.tile.name,
-        description: `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative current list from the archetype page.`,
+        description,
         mainboard: p.list.mainboard,
         sideboard,
         matchups: [],
         sideboardGuide: [],
         arenaImport: buildArenaImport({ mainboard: p.list.mainboard, sideboard }),
-        sources: [
-          ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
-          {
-            name: "MTGGoldfish metagame",
-            url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
-          },
-        ],
+        sources,
         metaShare: p.tile.metaPct,
         keyCards: p.tile.keyCards?.length ? p.tile.keyCards : undefined,
         listQuality: "authoritative",
-        listNote: `Live from MTGGoldfish archetype page${p.deckId ? ` (deck #${p.deckId})` : ""} · all card names verified on Scryfall.`,
+        listNote,
+        listSource: p.listSource,
       };
       decks.push(deck);
     }
@@ -309,7 +406,7 @@ async function main() {
       bo1: { deckId: bo1DeckIds[0] ?? "" },
       bo3: { deckId: bo3DeckIds[0] ?? "" },
       tiers: [1, 2, 3].map((n) => ({ tier: n, archetypes: tiers[n] })),
-      metaNotes: `Meta % and lists from MTGGoldfish (${today}). Every card name verified via Scryfall. Rank = metagame share.`,
+      metaNotes: `Meta % from MTGGoldfish (${today}); lists from MTGO when matched else Goldfish. Every card name verified via Scryfall. Rank = metagame share.`,
       metaShareTop: topIds.slice(0, 4).map((id) => ({
         name: decks[id]?.name ?? id,
         pct: decks[id]?.metaShare ?? 0,
@@ -334,10 +431,11 @@ async function main() {
       authoritativeLists: Object.keys(decks).length,
       failedLists: 0,
       listPolicy:
-        "live-only: goldfish tile + archetype list, scryfall-validated; run aborts rather than shipping anything fabricated",
+        "live-only: goldfish tiles for rank; lists MTGO-match or goldfish; scryfall-validated; aborts rather than fabricating",
       sourcesDetail: [
         "mtggoldfish-metagame-tiles",
-        "mtggoldfish-archetype-decklists",
+        "mtgo-challenge-lists (C3, when matched)",
+        "mtggoldfish-archetype-decklists (fallback)",
         "scryfall-collection-validation",
         "tournament-links: magic.gg, mtgo, melee, untapped",
       ],

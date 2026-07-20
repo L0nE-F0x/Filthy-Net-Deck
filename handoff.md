@@ -1,35 +1,29 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-20 — B1 opponent-archetype inference implemented (source). Needs an **app release** before desktop users get `opponentSeen` in the tracker.
-**Next agent:** Either cut **v1.5.2** end-to-end (AGENTS.md checklist) so B1 ships to installers, or start **C3 multi-source meta**. Ask user before signing/publishing a release.
+**Last wrap-up:** 2026-07-20 — C3 multi-source meta lists (MTGO + Goldfish) shipped in pipeline source. B1 still needs a desktop release when you want it live for users.
+**Next agent:** C3 is in-repo; run pm run meta\ when you want a live refresh. App feature **B1** still needs **v1.5.2** end-to-end when ready. Optional next: magic.gg safe list parser, or B2 analytics.
 
 ---
 
-## ▶ TOP OF THE TODO LIST — the 100× program
+## ▶ TOP OF THE TODO LIST
 
-1. ~~CI / fixtures / eslint~~ ✅ Phase 0
-2. ~~Package managers~~ ❌ cancelled (website + updater only)
-3. ~~Public meta site~~ ✅ A4 `website/meta-web/`
-4. ~~Opponent archetype inference~~ ✅ **B1 source** — see below; **not in a published binary yet**
-5. **Multi-source meta** (C3) ← after B1 is released (or in parallel if meta-only)
+1. ~~Phase 0 CI/fixtures~~ ✅
+2. ~~A1 package managers~~ ❌ cancelled
+3. ~~A4 public meta site~~ ✅
+4. ~~B1 opponent archetype~~ ✅ source (needs app release)
+5. ~~C3 multi-source meta lists~~ ✅ **MTGO → Goldfish** (magic.gg lists still deferred)
 
 ---
 
-## B1 — what shipped (this commit)
+## C3 notes
 
-| Layer | Change |
-|-------|--------|
-| Rust tracker | Collect opponent `grpId`s from GRE gameObjects (battlefield/gy/exile/stack/hand…); persist as `opponentSeen` on match + live snapshot |
-| TS | `src/services/opponentArchetype.ts` — score today\'s ranked lists by distinctive card overlap |
-| Daily | `OpponentArchetypePanel` — WR by inferred opponent archetype |
-| Stats | Match history shows inferred archetype next to opponent name |
-| Overlay | Live bar shows guess when confidence is high (uses cached meta) |
-| Tests | Rust `opponent_cards_seen_*` + 8 vitest cases |
-
-Guardrails: local only, real meta lists only, no upload.
+- Goldfish tiles still define the 8 archetype slots + meta %.
+- For each tile, pipeline tries recent MTGO Challenge lists (card-overlap match), else Goldfish archetype page.
+- Every list still Scryfall-validated; no fabricated 60s.
+- See \pipeline/sources/listMatch.mjs\, \etchMtgoListPool\, \docs/DATA-AND-UPDATES.md\.
 
 ---
 
 ## One-liner
 
-> B1 is coded and tested. **Publish a desktop build** before users benefit; then C3 multi-source meta.
+> Reliability spine upgraded: meta lists can survive a Goldfish archetype-page miss via MTGO. Ship B1 when you want a desktop release.

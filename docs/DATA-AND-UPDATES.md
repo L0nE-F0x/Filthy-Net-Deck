@@ -61,9 +61,14 @@ Modules: `pipeline/sources/{magic-gg,mtgo,melee,untapped,aggregate,common}.mjs`
 | **Untapped.gg** | Arena ladder meta + archetype links | Ladder signal (lists often login-walled) |
 | **Built-in pack** | Installer fallback only | Tagged `fallback` — never presented as live |
 
-**Priority when assigning lists onto the 8×8 grid:**
+**Priority when assigning lists onto the 8x8 grid (C3, 2026-07-20):**
 
-`magic.gg` → `mtgo` → `mtggoldfish export` → `melee` (if lists) → keep tagged fallback
+1. **MTGO** challenge / showcase / prelim 60s (embedded JSON) when card overlap confidently matches a Goldfish archetype tile.
+2. **MTGGoldfish** archetype page list (previous single source).
+3. **magic.gg** full-list scrape remains *off* for assignment (historical name corruption) — still used for tournament *links* only.
+4. **Melee** remains event links only (no free full-list feed today).
+
+Goldfish tiles still own **rank / meta % / archetype name**. Only the *60* can come from MTGO.
 
 **Policy (product rule):**
 
