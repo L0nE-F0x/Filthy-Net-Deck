@@ -1,11 +1,11 @@
 {
-  "version": "1.5.1",
-  "notes": "v1.5.1 Custom domain: filthy-net-deck.com is primary (Netlify DNS). Legacy netlify.app host still works for installed clients. Meta, updates, and share branding prefer .com.",
-  "pub_date": "2026-07-19T17:23:02.547Z",
+  "version": "1.6.0",
+  "notes": "v1.6.0 The tracker got smarter: opponent-archetype inference (your winrate vs each meta deck, from cards actually seen), Bo3 sideboard analytics + per-deck matchup table, live overlay guess, anonymized diagnostic export. Meta lists now multi-source (real MTGO challenge lists with Goldfish fallback).",
+  "pub_date": "2026-07-20T04:06:48.056Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wis1UzZxQ2V1bFhOdFFMMHFCZkJZeTVoKzFrTEtWbGwwU3c0dlRjeStLTm1iNDlCRTdMS0F4RHVldUQzZVBYVXZXYzNjc2o5aUo0NUorb2FPSWJpQ0FJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NDgxNzc1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNS4xX3g2NC1zZXR1cC5leGUKV0JvTENiUFFwV25obitNdHBKVWhzdDlxN2htbzV6dzgvbmFVOXgrcU5CQnIrZ1lMdXhNSWFPc2pDbVZjZkxNbHdOaWoyRW1FSXBqV0dsMHE0VUZzQnc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.5.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJneFJhang5Q3Yzc2JHZnpCREwycnFRVkZpcDBrQktCYVppbTZpL3pIajB3RklVY0FLQlI1RERPYms2OCtOZG0xY2p3eXNZYmRQdmRMWXNrcE5GVUFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTIwMDQxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzEuNi4wX3g2NC1zZXR1cC5leGUKTml5M3pNTHU3ZlgwakcxcmEyNXo5aDJzV2hpOVlVcnFBYkloOXk4UlBkekhGWlB0YURDWGMvNzNPZHZpdGZySWdpL1B4Wno2ZWVuSUtiZkRMZTg3QlE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-1.6.0.exe"
     }
   }
 }
