@@ -22,13 +22,18 @@ import {
   drawPct,
   formatClock,
   groupLibrary,
+  groupSeenCards,
   matchupHudLine,
+  normalizeDensity,
   normalizeOpacity,
   opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
+  playDrawLabel,
+  type OverlayDensity,
   type OverlayGroup,
+  type OverlayRow,
 } from "./overlayModel";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
@@ -91,6 +96,10 @@ interface OverlayPrefs {
   barClock: boolean;
   barRecord: boolean;
   postMatch: boolean;
+  /** Row density of the expanded list — footprint knob (default compact). */
+  density: OverlayDensity;
+  /** Fade the panel quieter while the mouse is elsewhere (default on). */
+  idleDim: boolean;
 }
 
 function readOverlayPrefs(): OverlayPrefs {
@@ -104,6 +113,8 @@ function readOverlayPrefs(): OverlayPrefs {
         overlayBarClock?: boolean;
         overlayBarRecord?: boolean;
         overlayPostMatch?: boolean;
+        overlayDensity?: string;
+        overlayIdleDim?: boolean;
       };
       return {
         opacity: normalizeOpacity(parsed.overlayOpacity),
@@ -112,6 +123,8 @@ function readOverlayPrefs(): OverlayPrefs {
         barClock: parsed.overlayBarClock !== false,
         barRecord: parsed.overlayBarRecord !== false,
         postMatch: parsed.overlayPostMatch !== false,
+        density: normalizeDensity(parsed.overlayDensity),
+        idleDim: parsed.overlayIdleDim !== false,
       };
     }
   } catch {
@@ -124,6 +137,8 @@ function readOverlayPrefs(): OverlayPrefs {
     barClock: true,
     barRecord: true,
     postMatch: true,
+    density: normalizeDensity(undefined),
+    idleDim: true,
   };
 }
 
@@ -268,13 +283,19 @@ async function ensureOnScreen() {
   }
 }
 
-function useArenaMetaMap(library: LiveCardCount[] | undefined) {
+function useArenaMetaMap(rawIds: number[]) {
   const [tick, setTick] = useState(0);
-  const ids = useMemo(
-    () => (library ?? []).map((c) => c.grpId).sort((a, b) => a - b),
-    [library],
+  const key = useMemo(
+    () =>
+      [...new Set(rawIds)]
+        .sort((a, b) => a - b)
+        .join(","),
+    [rawIds],
   );
-  const key = ids.join(",");
+  const ids = useMemo(
+    () => (key ? key.split(",").map(Number) : []),
+    [key],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -398,6 +419,50 @@ const GroupSection = memo(function GroupSection({
   );
 });
 
+/** Opponent-seen row: art · name · pips. No qty/draw% — we only know "shown". */
+const SeenRow = memo(function SeenRow({ row }: { row: OverlayRow }) {
+  const label = row.meta?.name ?? `Card ${row.card.grpId}`;
+  const art = row.meta?.artUrl;
+  return (
+    <li className={`overlay-card-row is-seen${row.meta?.isLand ? " is-land" : ""}`}>
+      {art ? (
+        <img
+          className="overlay-card-art"
+          src={art}
+          alt=""
+          width={30}
+          height={42}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+      ) : (
+        <span className="overlay-card-art overlay-card-art--empty" />
+      )}
+      <span className="overlay-card-name" title={label}>
+        {label}
+      </span>
+      <ManaPips cost={row.meta?.manaCost} />
+    </li>
+  );
+});
+
+const SeenSection = memo(function SeenSection({ group }: { group: OverlayGroup }) {
+  return (
+    <section className={`overlay-group overlay-group--${group.id}`}>
+      <header className="overlay-group-head" data-tauri-drag-region>
+        <span className="overlay-group-label">{group.label}</span>
+        <span className="overlay-group-count">{group.rows.length}</span>
+      </header>
+      <ul className="overlay-group-list">
+        {group.rows.map((row) => (
+          <SeenRow key={row.card.grpId} row={row} />
+        ))}
+      </ul>
+    </section>
+  );
+});
+
 /**
  * 1 Hz match clock in its own memoized child, so the per-second tick only
  * repaints this span — groups/rows stay untouched (Grok P1-1).
@@ -428,6 +493,10 @@ export function OverlayApp() {
   const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
   /** Quick-settings pill menu (footer of the expanded overlay). */
   const [menuOpen, setMenuOpen] = useState(false);
+  /** Expanded list panel: my library or the opponent's seen cards. */
+  const [view, setView] = useState<"deck" | "opp">("deck");
+  /** Idle-dim: true while the cursor is over the panel. */
+  const [hot, setHot] = useState(false);
   const dragArmed = useRef(false);
   const liveRaf = useRef(0);
   const pendingLive = useRef<LiveMatch | null | undefined>(undefined);
@@ -497,6 +566,15 @@ export function OverlayApp() {
     let snapTimer: number | undefined;
 
     void (async () => {
+      // Plain-browser demo (`/?demo#/overlay`): style the HUD without Arena.
+      if (!isTauri() && new URLSearchParams(window.location.search).has("demo")) {
+        const { demoLiveMatch, demoMatches } = await import("./demoLive");
+        if (!cancelled) {
+          setLive(demoLiveMatch());
+          setMatches(demoMatches());
+        }
+        return;
+      }
       try {
         const snap = await invoke<LiveMatch | null>("tracker_live");
         if (!cancelled) setLive(snap);
@@ -623,11 +701,22 @@ export function OverlayApp() {
   const playing = live?.phase === "playing";
 
   const record = useMemo(() => seasonRecord(matches, live), [matches, live]);
-  const metaMap = useArenaMetaMap(live?.library);
+  // One meta map for both panels: my library and the opponent's seen cards.
+  const allIds = useMemo(() => {
+    const ids = (live?.library ?? []).map((c) => c.grpId);
+    for (const id of live?.opponentSeen ?? []) ids.push(id);
+    return ids;
+  }, [live?.library, live?.opponentSeen]);
+  const metaMap = useArenaMetaMap(allIds);
 
   const groups = useMemo(
     () => groupLibrary(live?.library ?? [], (id) => metaMap.get(id)),
     [live?.library, metaMap],
+  );
+
+  const oppGroups = useMemo(
+    () => groupSeenCards(live?.opponentSeen, (id) => metaMap.get(id)),
+    [live?.opponentSeen, metaMap],
   );
 
   const libTotal = live?.libraryTotal ?? 0;
@@ -758,6 +847,7 @@ export function OverlayApp() {
     ) {
       appliedMatchRef.current = liveMatchId;
       setCompactMode(!startExpandedRef.current);
+      setView("deck");
     }
   }, [liveMatchId, livePhase, setCompactMode]);
 
@@ -837,22 +927,10 @@ export function OverlayApp() {
     }
   }, [summaryOn, livePhase, liveMatchId, setCompactMode]);
 
-  const [oppNamesTick, setOppNamesTick] = useState(0);
-  useEffect(() => {
-    const ids = live?.opponentSeen ?? [];
-    if (!ids.length) return;
-    let cancelled = false;
-    void resolveArenaMetaBatch(ids).then(() => {
-      if (!cancelled) setOppNamesTick((n) => n + 1);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [live?.matchId, live?.opponentSeen]);
-
   /** Live archetype guess + personal historical WR on this deck (B4). */
   const oppHud = useMemo(() => {
-    void oppNamesTick;
+    // metaMap identity changes as card names resolve — recompute the guess.
+    void metaMap;
     if (!live?.opponentSeen?.length) {
       return {
         guess: null as string | null,
@@ -898,7 +976,7 @@ export function OverlayApp() {
       matchup,
       seen: opponentCardsSeenCount(live.opponentSeen),
     };
-  }, [live, matches, oppNamesTick]);
+  }, [live, matches, metaMap]);
 
   const oppGuessLabel = oppHud.guess;
   const matchupLine = oppHud.matchup;
@@ -927,11 +1005,20 @@ export function OverlayApp() {
       ? Math.round((landStats.rem / libTotal) * 1000) / 10
       : null;
 
+  const playLabel = playDrawLabel(live.onPlay);
+
+  // Quiet down while the mouse is elsewhere. Never while ended (result should
+  // pop) and never with click-through (no hover events would ever wake it).
+  const dimmed =
+    prefs.idleDim && !hot && !prefs.clickThrough && !menuOpen && !ended;
+
   const shellClass = [
     "overlay-shell",
+    `density-${prefs.density}`,
     ended ? "is-ended" : "",
     ended && live.result ? `is-${live.result}` : "",
     compact ? "is-compact" : "",
+    dimmed ? "is-dim" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -940,6 +1027,8 @@ export function OverlayApp() {
     <div
       className={shellClass}
       style={{ "--ov-alpha": prefs.opacity } as CSSProperties}
+      onMouseEnter={() => setHot(true)}
+      onMouseLeave={() => setHot(false)}
     >
       <div className="overlay-accent" />
 
@@ -1019,6 +1108,14 @@ export function OverlayApp() {
               {landPct != null ? <em>{landPct}%</em> : null}
             </span>
           ) : null}
+          {compact && playing && live.turn != null ? (
+            <span
+              className="overlay-mode-chip overlay-chip--turn"
+              title={`Turn ${live.turn}${playLabel ? ` — on the ${playLabel.toLowerCase()}` : ""}`}
+            >
+              T{live.turn}
+            </span>
+          ) : null}
           {compact && live.bestOf > 1 ? (
             <span className="overlay-mode-chip" title="Best of three">
               Bo3
@@ -1072,12 +1169,59 @@ export function OverlayApp() {
                   {record.wins}–{record.losses}
                 </span>
               ) : null}
+              {playing && live.turn != null ? (
+                <span className="overlay-mode-chip overlay-chip--turn" title="Current turn">
+                  T{live.turn}
+                </span>
+              ) : null}
+              {playing && playLabel ? (
+                <span
+                  className="overlay-mode-chip"
+                  title={playLabel === "Play" ? "You are on the play" : "You are on the draw"}
+                >
+                  {playLabel}
+                </span>
+              ) : null}
+              {playing && (live.mulligans ?? 0) > 0 ? (
+                <span
+                  className="overlay-mode-chip overlay-chip--mull"
+                  title={`Mulligans taken this game`}
+                >
+                  M{live.mulligans}
+                </span>
+              ) : null}
               <span className="overlay-mode-chip">
                 {live.bestOf > 1 ? `Bo${live.bestOf}` : "Bo1"}
               </span>
               {playing ? <MatchClock startedAt={live.startedAt} /> : null}
             </span>
           </div>
+
+          {!(ended && prefs.postMatch) && (
+            <div className="overlay-tabs" role="tablist" aria-label="Overlay panel">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === "deck"}
+                className={`overlay-tab${view === "deck" ? " is-active" : ""}`}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={() => setView("deck")}
+              >
+                My deck
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === "opp"}
+                className={`overlay-tab${view === "opp" ? " is-active" : ""}`}
+                title="Cards your opponent has shown this match"
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={() => setView("opp")}
+              >
+                Opponent{cardsSeen > 0 ? ` · ${cardsSeen}` : ""}
+              </button>
+            </div>
+          )}
 
           {ended && prefs.postMatch ? (
             <PostMatchSummary
@@ -1086,6 +1230,23 @@ export function OverlayApp() {
               record={record}
               oppGuess={oppGuessLabel}
             />
+          ) : view === "opp" ? (
+            <div className="overlay-decklist overlay-decklist--opp">
+              {oppGuessLabel ? (
+                <p className="overlay-opp-note">
+                  Reads like <strong>{oppGuessLabel}</strong>
+                  {matchupLine ? <em> · you {matchupLine.detail}</em> : null}
+                </p>
+              ) : null}
+              {oppGroups.length > 0 ? (
+                oppGroups.map((g) => <SeenSection key={g.id} group={g} />)
+              ) : (
+                <p className="overlay-hint">
+                  Nothing revealed yet…
+                  <span>Opponent cards land here as they get played or shown</span>
+                </p>
+              )}
+            </div>
           ) : groups.length > 0 ? (
             <div className="overlay-decklist">
               {groups.map((g) => (
@@ -1123,6 +1284,29 @@ export function OverlayApp() {
                     aria-label="Overlay opacity"
                   />
                   <em>{Math.round(prefs.opacity * 100)}%</em>
+                </label>
+                <div className="overlay-menu-seg" role="radiogroup" aria-label="List density">
+                  <span>Density</span>
+                  {(["cozy", "compact", "minimal"] as const).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      role="radio"
+                      aria-checked={prefs.density === d}
+                      className={`overlay-seg-btn${prefs.density === d ? " is-active" : ""}`}
+                      onClick={() => patchPrefs({ overlayDensity: d })}
+                    >
+                      {d === "cozy" ? "Cozy" : d === "compact" ? "Compact" : "Minimal"}
+                    </button>
+                  ))}
+                </div>
+                <label className="overlay-menu-row">
+                  <input
+                    type="checkbox"
+                    checked={prefs.idleDim}
+                    onChange={(e) => patchPrefs({ overlayIdleDim: e.target.checked })}
+                  />
+                  <span>Dim while the mouse is away</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input

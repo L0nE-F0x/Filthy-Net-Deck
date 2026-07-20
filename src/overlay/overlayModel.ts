@@ -85,6 +85,37 @@ export function groupLibrary(
   return groups;
 }
 
+/**
+ * Group the opponent's seen cards (distinct grpIds) with the same
+ * Lands / Creatures / Spells sections as the library list.
+ */
+export function groupSeenCards(
+  seen: number[] | null | undefined,
+  metaOf: (grpId: number) => ArenaCardMeta | null | undefined,
+): OverlayGroup[] {
+  if (!seen?.length) return [];
+  const distinct = [...new Set(seen.filter((id) => Number.isFinite(id)))];
+  return groupLibrary(
+    distinct.map((grpId) => ({ grpId, remaining: 1, total: 1 })),
+    metaOf,
+  );
+}
+
+/** Overlay list density — footprint knob. Compact is the product default. */
+export type OverlayDensity = "cozy" | "compact" | "minimal";
+
+export function normalizeDensity(value: unknown): OverlayDensity {
+  return value === "cozy" || value === "minimal" ? value : "compact";
+}
+
+/** Chip text for the on-play/on-draw flag (null until turn 1 locks). */
+export function playDrawLabel(
+  onPlay: boolean | null | undefined,
+): "Play" | "Draw" | null {
+  if (onPlay == null) return null;
+  return onPlay ? "Play" : "Draw";
+}
+
 /** Next-draw chance for at least this many copies still in library. */
 export function drawPct(remaining: number, libraryTotal: number): number | null {
   if (libraryTotal <= 0 || remaining <= 0) return null;

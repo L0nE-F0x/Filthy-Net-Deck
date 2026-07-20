@@ -91,4 +91,10 @@ export interface LiveMatch {
   libraryTotal?: number;
   /** Opponent grpIds seen so far this match. */
   opponentSeen?: number[];
+  /** Current turn number (GRE turnInfo) — absent until turn 1 registers. */
+  turn?: number;
+  /** Local player on the play this game (absent until turn 1 locks). */
+  onPlay?: boolean;
+  /** Mulligans taken this game (0 = kept opening hand). */
+  mulligans?: number;
 }

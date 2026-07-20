@@ -6,12 +6,15 @@ import {
   drawPct,
   formatClock,
   groupLibrary,
+  groupSeenCards,
   matchupHudLine,
+  normalizeDensity,
   normalizeOpacity,
   opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
+  playDrawLabel,
 } from "./overlayModel";
 
 function meta(partial: Partial<ArenaCardMeta>): ArenaCardMeta {
@@ -190,5 +193,45 @@ describe("opponentCardsSeenCount", () => {
   it("counts distinct finite ids", () => {
     expect(opponentCardsSeenCount(undefined)).toBe(0);
     expect(opponentCardsSeenCount([1, 1, 2, Number.NaN])).toBe(2);
+  });
+});
+
+describe("groupSeenCards", () => {
+  const metas = new Map<number, ArenaCardMeta>([
+    [10, meta({ name: "Mountain", typeLine: "Basic Land — Mountain", isLand: true })],
+    [20, meta({ name: "Slickshot Show-Off", typeLine: "Creature — Bird Wizard", cmc: 2 })],
+    [30, meta({ name: "Sleight of Hand", typeLine: "Sorcery", cmc: 1 })],
+  ]);
+  const metaOf = (id: number) => metas.get(id);
+
+  it("groups distinct seen ids like the library list", () => {
+    const groups = groupSeenCards([20, 10, 30, 20, 10], metaOf);
+    expect(groups.map((g) => g.id)).toEqual(["land", "creature", "spell"]);
+    // Distinct — the duplicate reveals collapse to one row each.
+    expect(groups.flatMap((g) => g.rows).length).toBe(3);
+  });
+
+  it("returns empty for nothing seen", () => {
+    expect(groupSeenCards(undefined, metaOf)).toEqual([]);
+    expect(groupSeenCards([], metaOf)).toEqual([]);
+  });
+});
+
+describe("normalizeDensity", () => {
+  it("passes valid values and defaults junk to compact", () => {
+    expect(normalizeDensity("cozy")).toBe("cozy");
+    expect(normalizeDensity("minimal")).toBe("minimal");
+    expect(normalizeDensity("compact")).toBe("compact");
+    expect(normalizeDensity(undefined)).toBe("compact");
+    expect(normalizeDensity("huge")).toBe("compact");
+  });
+});
+
+describe("playDrawLabel", () => {
+  it("maps the on-play flag to a chip label", () => {
+    expect(playDrawLabel(true)).toBe("Play");
+    expect(playDrawLabel(false)).toBe("Draw");
+    expect(playDrawLabel(null)).toBeNull();
+    expect(playDrawLabel(undefined)).toBeNull();
   });
 });

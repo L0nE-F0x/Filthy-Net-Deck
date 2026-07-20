@@ -23,6 +23,7 @@ import {
   type SoundCueSet,
 } from "../services/sfx";
 import { retentionSnapshot } from "../services/localRetention";
+import type { OverlayDensity } from "../overlay/overlayModel";
 
 /** Sidebar labels for the launch-page picker (nav pages only). */
 const PAGE_LABELS: Partial<Record<Page, string>> = {
@@ -141,6 +142,8 @@ export function Settings() {
   const setOverlayBarClock = useAppStore((s) => s.setOverlayBarClock);
   const setOverlayBarRecord = useAppStore((s) => s.setOverlayBarRecord);
   const setOverlayPostMatch = useAppStore((s) => s.setOverlayPostMatch);
+  const setOverlayDensity = useAppStore((s) => s.setOverlayDensity);
+  const setOverlayIdleDim = useAppStore((s) => s.setOverlayIdleDim);
   const setDecklistView = useAppStore((s) => s.setDecklistView);
   const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
   const setDefaultPage = useAppStore((s) => s.setDefaultPage);
@@ -326,9 +329,11 @@ export function Settings() {
           <section className="panel settings-card settings-card-span2">
             <h3 className="settings-card-title">In-game overlay</h3>
             <p className="settings-card-desc mb-2">
-              Slim always-on-top deck tracker: mini art, mana pips, next-draw
-              odds, land count. Starts collapsed (bar only) — expand with ▾.
-              Drag to move, resize from the edges, snaps to screen edges. The{" "}
+              Slim always-on-top deck tracker: next-draw odds, land count, turn
+              and play/draw chips, plus an Opponent tab listing every card
+              they've shown. Starts collapsed (bar only) — expand with ▾. Drag
+              to move, resize from the edges, snaps to screen edges — size and
+              position are remembered. The{" "}
               <strong className="text-foam">⚙ pill</strong> in the expanded
               overlay changes opacity and these toggles in-game — no alt-tab.
               Everything is read from Arena's own log on this PC — nothing
@@ -394,6 +399,41 @@ export function Settings() {
                     each match
                   </em>
                 </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayIdleDim}
+                  onChange={(e) => setOverlayIdleDim(e.target.checked)}
+                />
+                <span>
+                  <strong>Dim while the mouse is away</strong>
+                  <em>
+                    Panel fades quieter over the game and wakes on hover — the
+                    discreet default
+                  </em>
+                </span>
+              </label>
+              <label className="settings-select-row" htmlFor="pref-ov-density">
+                <span>
+                  <strong>List density</strong>
+                  <em>
+                    How much screen the expanded tracker uses — Minimal is a
+                    text-only HUD
+                  </em>
+                </span>
+                <select
+                  id="pref-ov-density"
+                  className="fnd-select"
+                  value={prefs.overlayDensity}
+                  onChange={(e) =>
+                    setOverlayDensity(e.target.value as OverlayDensity)
+                  }
+                >
+                  <option value="cozy">Cozy (large art rows)</option>
+                  <option value="compact">Compact (default)</option>
+                  <option value="minimal">Minimal (text only)</option>
+                </select>
               </label>
               <label className="settings-toggle-row">
                 <input

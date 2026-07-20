@@ -50,7 +50,11 @@ import {
   shouldFireMetaMoverNotify,
   summarizeMetaMovers,
 } from "../services/metaMoverHabit";
-import { normalizeOpacity } from "../overlay/overlayModel";
+import {
+  normalizeDensity,
+  normalizeOpacity,
+  type OverlayDensity,
+} from "../overlay/overlayModel";
 import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setNotifyMatchEndRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
 import {
@@ -113,6 +117,10 @@ interface Prefs {
   overlayBarRecord: boolean;
   /** Post-match summary card lingers in the overlay after win/loss (default on). */
   overlayPostMatch: boolean;
+  /** Overlay list density — cozy / compact / minimal (default compact). */
+  overlayDensity: OverlayDensity;
+  /** Overlay fades quieter while the mouse is elsewhere (default on). */
+  overlayIdleDim: boolean;
   /** Tracked-decklist display style on My Stats (default stacked — compact). */
   decklistView: DecklistView;
   /** Climb path list order — newest stretch on top (default on). */
@@ -148,6 +156,8 @@ function loadPrefs(): Prefs {
         overlayBarClock?: boolean;
         overlayBarRecord?: boolean;
         overlayPostMatch?: boolean;
+        overlayDensity?: string;
+        overlayIdleDim?: boolean;
         decklistView?: string;
         climbNewestFirst?: boolean;
         defaultPage?: string;
@@ -173,6 +183,8 @@ function loadPrefs(): Prefs {
         overlayBarClock: parsed.overlayBarClock !== false,
         overlayBarRecord: parsed.overlayBarRecord !== false,
         overlayPostMatch: parsed.overlayPostMatch !== false,
+        overlayDensity: normalizeDensity(parsed.overlayDensity),
+        overlayIdleDim: parsed.overlayIdleDim !== false,
         decklistView:
           parsed.decklistView === "list" || parsed.decklistView === "compact"
             ? parsed.decklistView
@@ -210,6 +222,8 @@ function loadPrefs(): Prefs {
     overlayBarClock: true,
     overlayBarRecord: true,
     overlayPostMatch: true,
+    overlayDensity: "compact",
+    overlayIdleDim: true,
     decklistView: "stacked",
     climbNewestFirst: true,
     defaultPage: "daily",
@@ -361,6 +375,8 @@ interface AppState {
   setOverlayBarRecord: (v: boolean) => void;
   /** Post-match summary card in the overlay after win/loss. */
   setOverlayPostMatch: (v: boolean) => void;
+  setOverlayDensity: (v: OverlayDensity) => void;
+  setOverlayIdleDim: (v: boolean) => void;
   /** Tracked-decklist display style (My Stats deck detail). */
   setDecklistView: (v: DecklistView) => void;
   /** Climb path order — newest stretch on top. */
@@ -622,6 +638,18 @@ export const useAppStore = create<AppState>((set, get) => {
       void pushOverlayPrefs();
       // Rust owns the linger window (12s vs short flash) — keep it in sync.
       void setOverlayPostMatchRust(overlayPostMatch);
+    },
+    setOverlayDensity: (overlayDensity) => {
+      const next = { ...get().prefs, overlayDensity };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
+    },
+    setOverlayIdleDim: (overlayIdleDim) => {
+      const next = { ...get().prefs, overlayIdleDim };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
     },
     setDecklistView: (decklistView) => {
       const next = { ...get().prefs, decklistView };

@@ -16,7 +16,8 @@ const GEOMETRY_FILE: &str = "overlay-geometry.json";
 /// Slim column; short default matches collapsed bar (+ room to expand).
 const DEFAULT_W: f64 = 228.0;
 const DEFAULT_H: f64 = 168.0;
-const MIN_W: f64 = 180.0;
+/// Minimal density (no card art) stays readable down to ~164 logical px.
+const MIN_W: f64 = 164.0;
 /// Collapsed bar = 2px accent + 30px bar + border — allow the JS shrink.
 const MIN_H: f64 = 32.0;
 const MAX_W: f64 = 420.0;
@@ -127,12 +128,52 @@ fn save_geometry(app: &AppHandle, g: &OverlayGeometry) {
     }
 }
 
+/// Logical monitor rect: (x, y, width, height).
+type MonitorRect = (f64, f64, f64, f64);
+
+/// True when enough of the panel's title bar overlaps a monitor to grab it
+/// with the mouse. Saved geometry from an unplugged monitor / changed layout
+/// fails this and falls back to the OS default position (size is kept).
+fn geometry_reachable(geo: &OverlayGeometry, monitors: &[MonitorRect]) -> bool {
+    const GRAB_W: f64 = 40.0;
+    const BAR_H: f64 = 34.0;
+    monitors.iter().any(|&(mx, my, mw, mh)| {
+        let overlap_w = (geo.x + geo.width).min(mx + mw) - geo.x.max(mx);
+        let overlap_h = (geo.y + BAR_H).min(my + mh) - geo.y.max(my);
+        overlap_w >= GRAB_W && overlap_h >= BAR_H / 2.0
+    })
+}
+
+fn monitor_rects(app: &AppHandle) -> Vec<MonitorRect> {
+    app.available_monitors()
+        .map(|monitors| {
+            monitors
+                .iter()
+                .map(|m| {
+                    let f = m.scale_factor().max(0.5);
+                    (
+                        m.position().x as f64 / f,
+                        m.position().y as f64 / f,
+                        m.size().width as f64 / f,
+                        m.size().height as f64 / f,
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
 /// Ensure the overlay webview exists (hidden until shown).
 pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
     if app.get_webview_window(OVERLAY_LABEL).is_some() {
         return Ok(());
     }
     let geo = load_geometry(app);
+    // Monitor layout changed since the save → keep the size, drop the position.
+    let pos_ok = geo.as_ref().is_some_and(|g| {
+        let rects = monitor_rects(app);
+        rects.is_empty() || geometry_reachable(g, &rects)
+    });
     let (w, h) = geo
         .as_ref()
         .map(|g| (g.width, g.height))
@@ -157,10 +198,9 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     let builder = builder.transparent(true);
 
-    let builder = if let Some(g) = geo {
-        builder.position(g.x, g.y)
-    } else {
-        builder
+    let builder = match &geo {
+        Some(g) if pos_ok => builder.position(g.x, g.y),
+        _ => builder,
     };
 
     builder.build().map_err(|e| e.to_string())?;
@@ -234,5 +274,34 @@ pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
 pub fn overlay_set_click_through(app: AppHandle, ignore: bool) {
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
         let _ = win.set_ignore_cursor_events(ignore);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn geo(x: f64, y: f64) -> OverlayGeometry {
+        OverlayGeometry {
+            x,
+            y,
+            width: 228.0,
+            height: 300.0,
+        }
+    }
+
+    #[test]
+    fn geometry_reachable_detects_stranded_positions() {
+        let one = [(0.0, 0.0, 1920.0, 1080.0)];
+        assert!(geometry_reachable(&geo(100.0, 50.0), &one));
+        // Fully on an unplugged side display.
+        assert!(!geometry_reachable(&geo(-2400.0, 50.0), &one));
+        // A grabbable sliver on the right edge still counts.
+        assert!(geometry_reachable(&geo(1880.0, 0.0), &one));
+        // Title bar entirely above the top edge — can't be grabbed.
+        assert!(!geometry_reachable(&geo(100.0, -60.0), &one));
+        // A second monitor with negative coords rescues the same position.
+        let two = [(0.0, 0.0, 1920.0, 1080.0), (-2560.0, 0.0, 2560.0, 1440.0)];
+        assert!(geometry_reachable(&geo(-2400.0, 50.0), &two));
     }
 }

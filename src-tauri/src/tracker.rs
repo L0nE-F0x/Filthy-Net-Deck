@@ -175,6 +175,15 @@ pub struct LiveMatch {
     /// Opponent grpIds seen so far this match (sorted).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub opponent_seen: Vec<u32>,
+    /// Current turn number (GRE turnInfo) — None until turn 1 registers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub turn: Option<u32>,
+    /// Local player on the play this game (None until turn 1 locks).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub on_play: Option<bool>,
+    /// Mulligans taken this game (0 = kept opening hand).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mulligans: Option<u32>,
 }
 
 // ---------------------------------------------------------------------------
@@ -764,6 +773,9 @@ impl LogParser {
             library,
             library_total,
             opponent_seen: sorted_grp_ids(&pending.opponent_seen),
+            turn: pending.cur_turn,
+            on_play: pending.game_on_play.last().copied().flatten(),
+            mulligans: pending.game_mulligans.last().copied().flatten(),
         })
     }
 
@@ -979,7 +991,7 @@ impl LogParser {
                             if let Some(gsm) = msg.get("gameStateMessage") {
                                 changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
                                 if let Some(pending) = self.pending.get_mut(&match_id) {
-                                    note_turn_number(pending, gsm);
+                                    changed |= note_turn_number(pending, gsm);
                                     changed |= note_opponent_cards(
                                         &mut self.deck_tracker.zone_types,
                                         &mut pending.opponent_seen,
@@ -998,7 +1010,7 @@ impl LogParser {
                     } else if let Some(gsm) = v.get("gameStateMessage") {
                         changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
                         if let Some(pending) = self.pending.get_mut(&match_id) {
-                            note_turn_number(pending, gsm);
+                            changed |= note_turn_number(pending, gsm);
                             changed |= note_opponent_cards(
                                 &mut self.deck_tracker.zone_types,
                                 &mut pending.opponent_seen,
@@ -1052,6 +1064,8 @@ impl LogParser {
                             *slot = Some(0);
                         }
                     }
+                    // On-play / mulligan chips just became known — re-emit HUD.
+                    self.live_dirty = true;
                 }
             }
         }
@@ -1221,14 +1235,20 @@ fn object_is_land(go: &serde_json::Value) -> bool {
     false
 }
 
-fn note_turn_number(pending: &mut PendingMatch, gsm: &serde_json::Value) {
+/// Track the live turn number. Returns true when it changed (HUD re-emit).
+fn note_turn_number(pending: &mut PendingMatch, gsm: &serde_json::Value) -> bool {
     if let Some(n) = gsm
         .get("turnInfo")
         .and_then(|t| t.get("turnNumber"))
         .and_then(|n| n.as_u64())
     {
-        pending.cur_turn = Some(n as u32);
+        let n = Some(n as u32);
+        if pending.cur_turn != n {
+            pending.cur_turn = n;
+            return true;
+        }
     }
+    false
 }
 
 /// Record turn of first land the local player puts on the battlefield.
@@ -1912,6 +1932,9 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
             library: Vec::new(),
             library_total: None,
             opponent_seen: m.opponent_seen.clone().unwrap_or_default(),
+            turn: None,
+            on_play: m.games.last().and_then(|g| g.on_play),
+            mulligans: m.games.last().and_then(|g| g.mulligans),
         };
         let mid = ended.match_id.clone();
         publish_live(app, Some(ended));
@@ -2220,6 +2243,34 @@ mod tests {
         let c101 = live.library.iter().find(|c| c.grp_id == 101).unwrap();
         assert_eq!(c101.remaining, 2); // started 4, drew 2
         assert_eq!(c101.total, 4);
+    }
+
+    #[test]
+    fn live_exposes_turn_on_play_and_mulligans() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-hud", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        let live = p.live_match().expect("playing");
+        assert_eq!(live.turn, None);
+        assert_eq!(live.on_play, None);
+        assert_eq!(live.mulligans, Some(0));
+
+        p.feed_line(GRE_TURN1);
+        let live = p.live_match().expect("playing");
+        assert_eq!(live.turn, Some(1));
+        assert_eq!(live.on_play, Some(true)); // active seat 2 == my seat
+        assert_eq!(live.mulligans, Some(0));
+
+        // A later turnInfo advances the live turn and flags a HUD re-emit.
+        p.consume_live_dirty();
+        let gsm_t7 = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": { "turnInfo": { "phase": "Phase_Main1", "turnNumber": 7, "activePlayer": 1 } }
+        } ] } }"#;
+        p.feed_line(gsm_t7);
+        assert!(p.consume_live_dirty(), "turn change re-emits the HUD");
+        assert_eq!(p.live_match().unwrap().turn, Some(7));
     }
 
     #[test]
