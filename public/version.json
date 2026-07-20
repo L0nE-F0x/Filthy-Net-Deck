@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.0.exe",
-  "notes": "v2.0.0 — the big one: Brew Lab page grades any list (tracked or pasted) against today's ranked field; Mythic % climb curve (no more flat line); stacked Arena-style decklists; in-game overlay quick-settings pill + richer minimized bar; help & tour; a Settings Interface card full of toggles."
+  "version": "2.0.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.1.exe",
+  "notes": "v2.0.1: Post-match summary in the overlay (season form + rank path lingers after each game), match-end toasts that land while you're in Arena, and every share PNG rebuilt premium."
 }

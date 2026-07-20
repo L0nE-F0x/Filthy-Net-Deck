@@ -1,11 +1,11 @@
 {
-  "version": "2.0.0",
-  "notes": "v2.0.0 — the big one: Brew Lab page grades any list (tracked or pasted) against today's ranked field; Mythic % climb curve (no more flat line); stacked Arena-style decklists; in-game overlay quick-settings pill + richer minimized bar; help & tour; a Settings Interface card full of toggles.",
-  "pub_date": "2026-07-20T09:09:48.000Z",
+  "version": "2.0.1",
+  "notes": "v2.0.1: Post-match summary in the overlay (season form + rank path lingers ~12s after each game), match-end toasts that land while you're in Arena or the app is in the tray, and every share PNG rebuilt premium (WR rings, mana pips, sparklines).",
+  "pub_date": "2026-07-20T13:59:51.000Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitRNjBtczJNK3BZd3BpWDQreDM1QS8wcVJPUitXT21wb25FbHAybG1pcmZDK0hFQktIMVlmelozSSs2ajVGOTBTbUlJV1h3S1kvb1hXY1BUNFNoSUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTM4NTU1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4wX3g2NC1zZXR1cC5leGUKQzhKVVpwWWVsc0ZSbnlvcnJDVC9IeEpYQkhLR240TDhmNGV2UWw2ekp1ZjdsTzNrTWZzVktBZnRtc3RISklvM1NSS0dscy9Ra1ZFWHc0b0ZEekRsRGc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJuUGZ4UVBQT2xRcnpxZ2xRUDZBaC9SYXI2bzQ5YURTa2ZtTlBCVVl0UXF5eEMwbldpM3Z1aktBVVBJQ1lEUWM4RTdZb1h4djFHWXZlREh1MnhneFF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTU1ODgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4xX3g2NC1zZXR1cC5leGUKemFucU5PM0g4YnAvbWlFVGFHZkZTVTFibURlYzBrZVdZRXdadlY1MXZnZTFlNGJhUGc0ZVMyMW4yUW50dE1TY2dPbzdOcS9vc3F6NlpDU2lJZ3VJQ1E9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.1.exe"
     }
   }
 }
