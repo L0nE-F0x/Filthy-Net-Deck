@@ -111,6 +111,29 @@ export function IconSets({ className }: IconProps): ReactNode {
   );
 }
 
+/** Brew Lab — list clinic flask */
+export function IconBrewLab({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M10 3h4M11 3v6l-5.5 8.5A2 2 0 007.2 21h9.6a2 2 0 001.7-3.5L13 9V3" />
+      <path d="M8.2 15h7.6" />
+      <circle cx="11" cy="17.5" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="14" cy="18.5" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** Help — circled question mark */
+export function IconHelp({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M9.6 9.3a2.5 2.5 0 114.1 2c-.9.7-1.7 1.2-1.7 2.4" />
+      <circle cx="12" cy="16.8" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 /** Format Hub — legality / rotation / bans */
 export function IconFormatHub({ className }: IconProps): ReactNode {
   return (

@@ -1,6 +1,7 @@
 /**
  * Arena constructed rank parsing + climb estimates.
- * Labels look like "Diamond 1", "Platinum 3", "Mythic", "Mythic 82%".
+ * Labels look like "Diamond 1", "Platinum 3", "Mythic", "Mythic 82%",
+ * "Mythic 93.4%", or "Mythic #874" (leaderboard place, top ~1200).
  */
 
 export type RankTier =
@@ -18,12 +19,18 @@ export interface ParsedRank {
   division?: number;
   /** Mythic percentile 0–100 when present. */
   mythicPct?: number;
+  /** Mythic leaderboard place (1 = best) when present — beats percentile. */
+  mythicPlace?: number;
   /**
    * Monotonic score for graphing. Higher = better.
-   * Bronze 4 = 0 … Diamond 1 = 19, Mythic base = 20, + pct/100.
+   * Bronze 4 = 0 … Diamond 1 = 19, Mythic base = 20, + pct/100 (20–21).
+   * Leaderboard Mythic maps to 21–22 (place 1200 → 21, place 1 → ~22).
    */
   score: number;
 }
+
+/** Arena's Mythic leaderboard covers roughly the top 1200 players. */
+const MYTHIC_LEADERBOARD_SIZE = 1200;
 
 const TIERS: RankTier[] = [
   "Bronze",
@@ -45,6 +52,13 @@ export function parseRank(raw: string | undefined | null): ParsedRank | null {
   if (!TIERS.includes(tier)) return null;
 
   if (tier === "Mythic") {
+    const placeMatch = s.match(/#\s*(\d+)/);
+    if (placeMatch) {
+      const mythicPlace = Math.max(1, Number(placeMatch[1]));
+      const clamped = Math.min(MYTHIC_LEADERBOARD_SIZE, mythicPlace);
+      const score = 21 + (1 - clamped / MYTHIC_LEADERBOARD_SIZE);
+      return { raw: s, tier, mythicPlace, score };
+    }
     const pctMatch = s.match(/(\d+(?:\.\d+)?)\s*%/);
     const mythicPct = pctMatch ? Math.min(100, Math.max(0, Number(pctMatch[1]))) : undefined;
     const score = 20 + (mythicPct != null ? mythicPct / 100 : 0);
@@ -61,6 +75,7 @@ export function parseRank(raw: string | undefined | null): ParsedRank | null {
 
 export function formatRank(p: ParsedRank): string {
   if (p.tier === "Mythic") {
+    if (p.mythicPlace != null) return `Mythic #${p.mythicPlace}`;
     return p.mythicPct != null ? `Mythic ${Math.round(p.mythicPct)}%` : "Mythic";
   }
   return `${p.tier} ${p.division ?? 4}`;
@@ -68,6 +83,13 @@ export function formatRank(p: ParsedRank): string {
 
 /** Human label for a score step, e.g. 18 → "Diamond 2". */
 export function rankLabelFromScore(score: number): string {
+  if (score >= 21) {
+    const place = Math.max(
+      1,
+      Math.round((1 - (score - 21)) * MYTHIC_LEADERBOARD_SIZE),
+    );
+    return `Mythic #${place}`;
+  }
   if (score >= 20) {
     const pct = Math.round((score - 20) * 100);
     return pct > 0 ? `Mythic ${pct}%` : "Mythic";
@@ -76,6 +98,23 @@ export function rankLabelFromScore(score: number): string {
   const tier = TIERS[Math.floor(clamped / 4)] as RankTier;
   const division = 4 - (clamped % 4);
   return `${tier} ${division}`;
+}
+
+/**
+ * Axis label for the all-Mythic climb chart, with enough precision to keep
+ * neighboring ticks distinct when the whole range is a few percent.
+ */
+export function mythicAxisLabel(score: number, spanScore: number): string {
+  if (score >= 21) {
+    const place = Math.max(
+      1,
+      Math.round((1 - (score - 21)) * MYTHIC_LEADERBOARD_SIZE),
+    );
+    return `#${place}`;
+  }
+  const pct = (score - 20) * 100;
+  const decimals = spanScore * 100 < 4 ? 1 : 0;
+  return `${pct.toFixed(decimals)}%`;
 }
 
 /** Next discrete step above this rank (Mythic stays Mythic). */

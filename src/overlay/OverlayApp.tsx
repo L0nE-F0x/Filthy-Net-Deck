@@ -80,12 +80,16 @@ function seasonRecord(
   };
 }
 
-/** Overlay display prefs written by Settings in the main window. */
-function readOverlayPrefs(): {
+/** Overlay display prefs shared with the main window (Settings ⇄ pill menu). */
+interface OverlayPrefs {
   opacity: number;
   startExpanded: boolean;
   clickThrough: boolean;
-} {
+  barClock: boolean;
+  barRecord: boolean;
+}
+
+function readOverlayPrefs(): OverlayPrefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (raw) {
@@ -93,11 +97,15 @@ function readOverlayPrefs(): {
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
         overlayClickThrough?: boolean;
+        overlayBarClock?: boolean;
+        overlayBarRecord?: boolean;
       };
       return {
         opacity: normalizeOpacity(parsed.overlayOpacity),
         startExpanded: parsed.overlayStartExpanded === true,
         clickThrough: parsed.overlayClickThrough === true,
+        barClock: parsed.overlayBarClock !== false,
+        barRecord: parsed.overlayBarRecord !== false,
       };
     }
   } catch {
@@ -107,7 +115,38 @@ function readOverlayPrefs(): {
     opacity: normalizeOpacity(undefined),
     startExpanded: false,
     clickThrough: false,
+    barClock: true,
+    barRecord: true,
   };
+}
+
+/**
+ * Merge a patch into the shared prefs blob and broadcast `prefs:overlay` so
+ * the main window's Settings mirror it live (no alt-tab needed). The emit is
+ * lightly debounced — the opacity slider fires per pixel.
+ */
+let prefsEmitTimer = 0;
+function writeOverlayPrefs(patch: Record<string, unknown>): void {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    const obj = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+    Object.assign(obj, patch);
+    localStorage.setItem(PREFS_KEY, JSON.stringify(obj));
+  } catch {
+    /* ignore */
+  }
+  if (!isTauri()) return;
+  window.clearTimeout(prefsEmitTimer);
+  prefsEmitTimer = window.setTimeout(() => {
+    void (async () => {
+      try {
+        const { emit } = await import("@tauri-apps/api/event");
+        await emit("prefs:overlay");
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, 120);
 }
 
 /** Passive-HUD mode: make this window ignore cursor events (clicks fall through). */
@@ -369,7 +408,9 @@ export function OverlayApp() {
   const [matches, setMatches] = useState<TrackedMatch[]>([]);
   /** Default collapsed — far less invasive; expand for full tracker. */
   const [compact, setCompact] = useState(() => !readOverlayPrefs().startExpanded);
-  const [opacity, setOpacity] = useState(() => readOverlayPrefs().opacity);
+  const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
+  /** Quick-settings pill menu (footer of the expanded overlay). */
+  const [menuOpen, setMenuOpen] = useState(false);
   const dragArmed = useRef(false);
   const liveRaf = useRef(0);
   const pendingLive = useRef<LiveMatch | null | undefined>(undefined);
@@ -416,10 +457,10 @@ export function OverlayApp() {
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key !== PREFS_KEY) return;
-      const prefs = readOverlayPrefs();
-      setOpacity(prefs.opacity);
-      startExpandedRef.current = prefs.startExpanded;
-      void applyClickThrough(prefs.clickThrough);
+      const p = readOverlayPrefs();
+      setPrefs(p);
+      startExpandedRef.current = p.startExpanded;
+      void applyClickThrough(p.clickThrough);
       bootThemeFromStorage(); // re-apply data-theme + data-skin
     };
     window.addEventListener("storage", onStorage);
@@ -477,10 +518,10 @@ export function OverlayApp() {
         // skin, startExpanded) — the `storage` listener above is the fallback.
         unlistenPrefs = await listen("prefs:overlay", () => {
           if (cancelled) return;
-          const prefs = readOverlayPrefs();
-          setOpacity(prefs.opacity);
-          startExpandedRef.current = prefs.startExpanded;
-          void applyClickThrough(prefs.clickThrough);
+          const p = readOverlayPrefs();
+          setPrefs(p);
+          startExpandedRef.current = p.startExpanded;
+          void applyClickThrough(p.clickThrough);
           bootThemeFromStorage();
         });
       } catch {
@@ -671,6 +712,14 @@ export function OverlayApp() {
     setCompactMode(!compactRef.current);
   }, [setCompactMode]);
 
+  /** Pill-menu pref change: persist + broadcast + reflect locally at once. */
+  const patchPrefs = useCallback((patch: Record<string, unknown>) => {
+    writeOverlayPrefs(patch);
+    const p = readOverlayPrefs();
+    setPrefs(p);
+    startExpandedRef.current = p.startExpanded;
+  }, []);
+
   // Apply the "start expanded" pref once per match — live pref changes are
   // pushed via `prefs:overlay`/storage into startExpandedRef, and take effect
   // here on the next match start (never mid-match, so a manual collapse is
@@ -790,7 +839,7 @@ export function OverlayApp() {
   return (
     <div
       className={shellClass}
-      style={{ "--ov-alpha": opacity } as CSSProperties}
+      style={{ "--ov-alpha": prefs.opacity } as CSSProperties}
     >
       <div className="overlay-accent" />
 
@@ -844,6 +893,15 @@ export function OverlayApp() {
           </span>
         </div>
         <div className="overlay-bar-stats" data-tauri-drag-region>
+          {compact && prefs.barRecord && record.wr != null ? (
+            <span
+              className="overlay-stat overlay-stat--rec"
+              title={`This season on this deck: ${record.wins}–${record.losses} · ${record.wr}%`}
+            >
+              {record.wins}–{record.losses}
+              <em>{record.wr}%</em>
+            </span>
+          ) : null}
           {libTotal > 0 ? (
             <span
               className="overlay-stat overlay-stat--lib"
@@ -860,6 +918,14 @@ export function OverlayApp() {
               {landStats.rem}L
               {landPct != null ? <em>{landPct}%</em> : null}
             </span>
+          ) : null}
+          {compact && live.bestOf > 1 ? (
+            <span className="overlay-mode-chip" title="Best of three">
+              Bo3
+            </span>
+          ) : null}
+          {compact && prefs.barClock && playing ? (
+            <MatchClock startedAt={live.startedAt} />
           ) : null}
         </div>
         <button
@@ -932,6 +998,79 @@ export function OverlayApp() {
               </span>
             </p>
           )}
+
+          <div className="overlay-foot">
+            {menuOpen && (
+              <div className="overlay-menu" role="menu" aria-label="Overlay quick settings">
+                <label className="overlay-menu-slider">
+                  <span>Opacity</span>
+                  <input
+                    type="range"
+                    min={55}
+                    max={100}
+                    step={1}
+                    value={Math.round(prefs.opacity * 100)}
+                    onChange={(e) =>
+                      patchPrefs({ overlayOpacity: Number(e.target.value) / 100 })
+                    }
+                    aria-label="Overlay opacity"
+                  />
+                  <em>{Math.round(prefs.opacity * 100)}%</em>
+                </label>
+                <label className="overlay-menu-row">
+                  <input
+                    type="checkbox"
+                    checked={prefs.startExpanded}
+                    onChange={(e) =>
+                      patchPrefs({ overlayStartExpanded: e.target.checked })
+                    }
+                  />
+                  <span>Start matches expanded</span>
+                </label>
+                <label className="overlay-menu-row">
+                  <input
+                    type="checkbox"
+                    checked={prefs.barClock}
+                    onChange={(e) => patchPrefs({ overlayBarClock: e.target.checked })}
+                  />
+                  <span>Clock on the minimized bar</span>
+                </label>
+                <label className="overlay-menu-row">
+                  <input
+                    type="checkbox"
+                    checked={prefs.barRecord}
+                    onChange={(e) => patchPrefs({ overlayBarRecord: e.target.checked })}
+                  />
+                  <span>Record on the minimized bar</span>
+                </label>
+                <button
+                  type="button"
+                  className="overlay-menu-danger"
+                  title="Overlay ignores the mouse from now on — turn it back off in the main app (Settings → In-game overlay)"
+                  onClick={() => {
+                    patchPrefs({ overlayClickThrough: true });
+                    setMenuOpen(false);
+                    void applyClickThrough(true);
+                  }}
+                >
+                  Enable click-through
+                  <em>undo from the main app</em>
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              className={`overlay-foot-pill${menuOpen ? " is-open" : ""}`}
+              title="Overlay quick settings — no alt-tab needed"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen((v) => !v);
+              }}
+            >
+              ⚙
+            </button>
+          </div>
         </>
       )}
     </div>

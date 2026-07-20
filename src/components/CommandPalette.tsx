@@ -21,9 +21,10 @@ const PALETTE_PAGES: { id: Page; label: string }[] = [
   { id: "stats", label: "My Stats" },
   { id: "climb", label: "Climb" },
   { id: "matchups", label: "Matchups" },
+  { id: "brewlab", label: "Brew Lab" },
   { id: "sets", label: "Sets" },
-  { id: "meta", label: "Events" },
   { id: "formats", label: "Format Hub" },
+  { id: "meta", label: "Events" },
   { id: "settings", label: "Settings" },
 ];
 

@@ -121,6 +121,17 @@ export function applyAppearance(theme: ThemeMode, skin: SkinId): void {
 }
 
 /**
+ * Reduce-motion preference: kills count-ups, pulses and long transitions via
+ * a root attribute the stylesheet keys off (`[data-reduce-motion]`).
+ */
+export function applyReduceMotion(on: boolean): void {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  if (on) root.setAttribute("data-reduce-motion", "1");
+  else root.removeAttribute("data-reduce-motion");
+}
+
+/**
  * Read theme + skin from localStorage prefs before React mounts so the first
  * paint doesn't flash the wrong palette.
  */

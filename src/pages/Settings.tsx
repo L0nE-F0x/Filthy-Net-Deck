@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useAppStore } from "../store/useAppStore";
+import { LANDING_PAGES, useAppStore, type DecklistView } from "../store/useAppStore";
+import type { Page } from "../types/meta";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
@@ -22,6 +23,18 @@ import {
   type SoundCueSet,
 } from "../services/sfx";
 import { retentionSnapshot } from "../services/localRetention";
+
+/** Sidebar labels for the launch-page picker (nav pages only). */
+const PAGE_LABELS: Partial<Record<Page, string>> = {
+  daily: "Decks",
+  stats: "My Stats",
+  climb: "Climb",
+  matchups: "Matchups",
+  brewlab: "Brew Lab",
+  sets: "Sets",
+  formats: "Format Hub",
+  meta: "Events",
+};
 
 /** Local-only open-day counter — never leaves this PC. */
 function LocalOpenDaysNote() {
@@ -89,10 +102,10 @@ function TrackerHealthCard() {
   );
 }
 
-/** X2 — discoverability for 1–8 / Ctrl+K / F11. */
+/** X2 — discoverability for 1–9 / Ctrl+K / F11. */
 function KeyboardCheatSheet() {
   const rows: { keys: string; action: string }[] = [
-    { keys: "1–8", action: "Jump nav: Decks · Stats · Climb · Matchups · Sets · Events · Format Hub · Settings" },
+    { keys: "1–9", action: "Jump nav: Decks · Stats · Climb · Matchups · Brew Lab · Sets · Format Hub · Events · Settings" },
     { keys: "Ctrl+K", action: "Command palette — search cards, decks, pages" },
     { keys: "F11", action: "Toggle fullscreen (also in Display above)" },
   ];
@@ -125,6 +138,13 @@ export function Settings() {
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
   const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
   const setOverlayClickThrough = useAppStore((s) => s.setOverlayClickThrough);
+  const setOverlayBarClock = useAppStore((s) => s.setOverlayBarClock);
+  const setOverlayBarRecord = useAppStore((s) => s.setOverlayBarRecord);
+  const setDecklistView = useAppStore((s) => s.setDecklistView);
+  const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
+  const setDefaultPage = useAppStore((s) => s.setDefaultPage);
+  const setReduceMotion = useAppStore((s) => s.setReduceMotion);
+  const setHelpOpen = useAppStore((s) => s.setHelpOpen);
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled);
   const setSoundCueSet = useAppStore((s) => s.setSoundCueSet);
   const setFullscreenPref = useAppStore((s) => s.setFullscreenPref);
@@ -221,6 +241,82 @@ export function Settings() {
           </section>
         )}
 
+        {/* —— Interface (v2.0 — maximum knobs, sensible defaults) —— */}
+        <section className="panel settings-card settings-card-span2">
+          <h3 className="settings-card-title">Interface</h3>
+          <p className="settings-card-desc mb-2">
+            Make the app open and read the way you want. Every choice is remembered.
+          </p>
+          <div className="settings-toggle-list">
+            <label className="settings-select-row" htmlFor="pref-landing">
+              <span>
+                <strong>Launch page</strong>
+                <em>Which page the app opens on</em>
+              </span>
+              <select
+                id="pref-landing"
+                className="fnd-select"
+                value={prefs.defaultPage}
+                onChange={(e) => setDefaultPage(e.target.value as Page)}
+              >
+                {LANDING_PAGES.map((p) => (
+                  <option key={p} value={p}>
+                    {PAGE_LABELS[p] ?? p}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="settings-select-row" htmlFor="pref-decklist">
+              <span>
+                <strong>Decklist view</strong>
+                <em>Default layout for tracked decklists in My Stats</em>
+              </span>
+              <select
+                id="pref-decklist"
+                className="fnd-select"
+                value={prefs.decklistView}
+                onChange={(e) => setDecklistView(e.target.value as DecklistView)}
+              >
+                <option value="stacked">Stacked (Arena-style, compact)</option>
+                <option value="list">List (art rows + curve)</option>
+                <option value="compact">Text (smallest)</option>
+              </select>
+            </label>
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.climbNewestFirst}
+                onChange={(e) => setClimbNewestFirst(e.target.checked)}
+              />
+              <span>
+                <strong>Climb path — newest first</strong>
+                <em>Latest ladder stretch on top (uncheck for season-start first)</em>
+              </span>
+            </label>
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.reduceMotion}
+                onChange={(e) => setReduceMotion(e.target.checked)}
+              />
+              <span>
+                <strong>Reduce motion</strong>
+                <em>Tone down count-ups, pulses and transitions</em>
+              </span>
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              title="Page-by-page tour — the same one that opens on first launch"
+              onClick={() => setHelpOpen(true)}
+            >
+              Open help &amp; tour
+            </button>
+          </div>
+        </section>
+
         <TrackerHealthCard />
         <KeyboardCheatSheet />
 
@@ -231,7 +327,9 @@ export function Settings() {
             <p className="settings-card-desc mb-2">
               Slim always-on-top deck tracker: mini art, mana pips, next-draw
               odds, land count. Starts collapsed (bar only) — expand with ▾.
-              Drag to move, resize from the edges, snaps to screen edges.
+              Drag to move, resize from the edges, snaps to screen edges. The{" "}
+              <strong className="text-foam">⚙ pill</strong> in the expanded
+              overlay changes opacity and these toggles in-game — no alt-tab.
               Everything is read from Arena's own log on this PC — nothing
               leaves it. If exclusive fullscreen hides the panel, switch Arena
               to borderless windowed. Running a second tracker at the same time
@@ -258,6 +356,28 @@ export function Settings() {
                 <span>
                   <strong>Start expanded</strong>
                   <em>Open with the full deck list instead of the slim bar</em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayBarClock}
+                  onChange={(e) => setOverlayBarClock(e.target.checked)}
+                />
+                <span>
+                  <strong>Clock on the minimized bar</strong>
+                  <em>Match timer stays visible even when collapsed</em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.overlayBarRecord}
+                  onChange={(e) => setOverlayBarRecord(e.target.checked)}
+                />
+                <span>
+                  <strong>Record on the minimized bar</strong>
+                  <em>Season W–L with this deck on the collapsed bar</em>
                 </span>
               </label>
               <label className="settings-toggle-row">

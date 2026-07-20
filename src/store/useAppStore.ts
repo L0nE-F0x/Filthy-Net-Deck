@@ -55,6 +55,7 @@ import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust } from "..
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
+  applyReduceMotion,
   applyTheme,
   isSkinId,
   type SkinId,
@@ -65,6 +66,21 @@ import { isSoundCueSet, playSfx, type SoundCueSet } from "../services/sfx";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
+
+/** Tracked-decklist display style on My Stats (v2.0). */
+export type DecklistView = "stacked" | "list" | "compact";
+
+/** Pages allowed as the launch landing page (main nav only). */
+export const LANDING_PAGES: Page[] = [
+  "daily",
+  "stats",
+  "climb",
+  "matchups",
+  "brewlab",
+  "sets",
+  "formats",
+  "meta",
+];
 
 interface Prefs {
   defaultMode: PlayMode;
@@ -91,6 +107,18 @@ interface Prefs {
   soundEnabled: boolean;
   /** Which synthesized cue set to use when sound is on. */
   soundCueSet: SoundCueSet;
+  /** Collapsed overlay bar: show the match clock (default on). */
+  overlayBarClock: boolean;
+  /** Collapsed overlay bar: show season record with this deck (default on). */
+  overlayBarRecord: boolean;
+  /** Tracked-decklist display style on My Stats (default stacked — compact). */
+  decklistView: DecklistView;
+  /** Climb path list order — newest stretch on top (default on). */
+  climbNewestFirst: boolean;
+  /** Page the app opens on at launch (main nav pages only). */
+  defaultPage: Page;
+  /** Tone down UI animation (count-ups, pulses, transitions). */
+  reduceMotion: boolean;
   /** Launch the app fullscreen (also toggled live with F11). */
   fullscreen: boolean;
   /** Appearance — dark is the product default. */
@@ -115,6 +143,12 @@ function loadPrefs(): Prefs {
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
         overlayClickThrough?: boolean;
+        overlayBarClock?: boolean;
+        overlayBarRecord?: boolean;
+        decklistView?: string;
+        climbNewestFirst?: boolean;
+        defaultPage?: string;
+        reduceMotion?: boolean;
         soundEnabled?: boolean;
         soundCueSet?: string;
         fullscreen?: boolean;
@@ -133,6 +167,17 @@ function loadPrefs(): Prefs {
         overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
         overlayStartExpanded: parsed.overlayStartExpanded === true,
         overlayClickThrough: parsed.overlayClickThrough === true,
+        overlayBarClock: parsed.overlayBarClock !== false,
+        overlayBarRecord: parsed.overlayBarRecord !== false,
+        decklistView:
+          parsed.decklistView === "list" || parsed.decklistView === "compact"
+            ? parsed.decklistView
+            : "stacked",
+        climbNewestFirst: parsed.climbNewestFirst !== false,
+        defaultPage: LANDING_PAGES.includes(parsed.defaultPage as Page)
+          ? (parsed.defaultPage as Page)
+          : "daily",
+        reduceMotion: parsed.reduceMotion === true,
         // Sound is opt-in — OFF by default (owner: bad sound ruins an app).
         soundEnabled: parsed.soundEnabled === true,
         soundCueSet: isSoundCueSet(parsed.soundCueSet) ? parsed.soundCueSet : "soft",
@@ -158,6 +203,12 @@ function loadPrefs(): Prefs {
     overlayOpacity: 0.92,
     overlayStartExpanded: false,
     overlayClickThrough: false,
+    overlayBarClock: true,
+    overlayBarRecord: true,
+    decklistView: "stacked",
+    climbNewestFirst: true,
+    defaultPage: "daily",
+    reduceMotion: false,
     soundEnabled: false,
     soundCueSet: "soft",
     fullscreen: false,
@@ -280,6 +331,13 @@ interface AppState {
   climbFocusDeckKey: string | null;
   openClimbDeck: (trackerDeckKey: string) => void;
   clearClimbFocus: () => void;
+  /** Brew Lab focus: open the clinic with a tracked deck pre-selected. */
+  brewLabFocusDeckKey: string | null;
+  openBrewLabDeck: (trackerDeckKey: string) => void;
+  clearBrewLabFocus: () => void;
+  /** Help center modal (v2.0) — openable from anywhere. */
+  helpOpen: boolean;
+  setHelpOpen: (v: boolean) => void;
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
@@ -292,6 +350,24 @@ interface AppState {
   setOverlayStartExpanded: (v: boolean) => void;
   /** Overlay ignores mouse input (passive HUD) — re-applied live. */
   setOverlayClickThrough: (v: boolean) => void;
+  /** Collapsed overlay bar: match clock on/off. */
+  setOverlayBarClock: (v: boolean) => void;
+  /** Collapsed overlay bar: season record on/off. */
+  setOverlayBarRecord: (v: boolean) => void;
+  /** Tracked-decklist display style (My Stats deck detail). */
+  setDecklistView: (v: DecklistView) => void;
+  /** Climb path order — newest stretch on top. */
+  setClimbNewestFirst: (v: boolean) => void;
+  /** Launch landing page. */
+  setDefaultPage: (p: Page) => void;
+  /** Tone down UI animation. */
+  setReduceMotion: (v: boolean) => void;
+  /**
+   * Re-read the prefs blob from localStorage into the store. The overlay's
+   * quick-settings pill writes prefs directly and emits `prefs:overlay` —
+   * the main window calls this so Settings sliders stay honest.
+   */
+  reloadPrefs: () => void;
   /** Opt-in UI sound (main app only). */
   setSoundEnabled: (v: boolean) => void;
   /** Which cue set to play when sound is enabled. */
@@ -343,6 +419,7 @@ declare global {
 export const useAppStore = create<AppState>((set, get) => {
   const prefs = loadPrefs();
   applyAppearance(prefs.theme, prefs.skin);
+  applyReduceMotion(prefs.reduceMotion);
   // The test-only meta URL override was removed in 0.8.3 — clear any leftover.
   try {
     localStorage.removeItem("bbi.metaUrl");
@@ -350,7 +427,7 @@ export const useAppStore = create<AppState>((set, get) => {
     /* ignore */
   }
   return {
-    page: "daily",
+    page: prefs.defaultPage,
     mode: prefs.defaultMode,
     selectedFormatId: null,
     dailyFormatId: prefs.lastFormatId ?? null,
@@ -364,6 +441,8 @@ export const useAppStore = create<AppState>((set, get) => {
     tagNudgeSuggested: null,
     rankUpMoment: null,
     climbFocusDeckKey: null,
+    brewLabFocusDeckKey: null,
+    helpOpen: false,
     meta: null,
     metaSource: null,
     feedStatus: null,
@@ -462,6 +541,10 @@ export const useAppStore = create<AppState>((set, get) => {
         page: "climb",
       }),
     clearClimbFocus: () => set({ climbFocusDeckKey: null }),
+    openBrewLabDeck: (trackerDeckKey) =>
+      set({ brewLabFocusDeckKey: trackerDeckKey, page: "brewlab" }),
+    clearBrewLabFocus: () => set({ brewLabFocusDeckKey: null }),
+    setHelpOpen: (helpOpen) => set({ helpOpen }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };
       savePrefs(next);
@@ -510,6 +593,44 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       void pushOverlayPrefs();
+    },
+    setOverlayBarClock: (overlayBarClock) => {
+      const next = { ...get().prefs, overlayBarClock };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
+    },
+    setOverlayBarRecord: (overlayBarRecord) => {
+      const next = { ...get().prefs, overlayBarRecord };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
+    },
+    setDecklistView: (decklistView) => {
+      const next = { ...get().prefs, decklistView };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setClimbNewestFirst: (climbNewestFirst) => {
+      const next = { ...get().prefs, climbNewestFirst };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setDefaultPage: (defaultPage) => {
+      const next = { ...get().prefs, defaultPage };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setReduceMotion: (reduceMotion) => {
+      const next = { ...get().prefs, reduceMotion };
+      savePrefs(next);
+      set({ prefs: next });
+      applyReduceMotion(reduceMotion);
+    },
+    reloadPrefs: () => {
+      const next = loadPrefs();
+      set({ prefs: next });
+      applyReduceMotion(next.reduceMotion);
     },
     setSoundEnabled: (soundEnabled) => {
       const next = { ...get().prefs, soundEnabled };

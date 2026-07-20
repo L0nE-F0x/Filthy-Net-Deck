@@ -3,7 +3,10 @@ import type { Deck, MetaBundle } from "../types/meta";
 import {
   averageShapes,
   buildFindings,
+  clinicGrade,
+  clinicReportText,
   fromCardEntries,
+  fromNamedLines,
   peerStaples,
   runBrewClinic,
   shapeOf,
@@ -184,5 +187,93 @@ describe("runBrewClinic", () => {
       mode: "bo1",
     });
     expect(report.emptyReason).toMatch(/mainboard/i);
+  });
+});
+
+describe("clinicGrade (v2.0)", () => {
+  const meta = metaWithPeers([
+    midrange("Golgari Midrange", "a"),
+    midrange("Golgari Midrange 2", "b"),
+    midrange("Golgari Midrange 3", "c"),
+  ]);
+
+  it("grades a peer-shaped list higher than a warped one", () => {
+    const peerLike = runBrewClinic({
+      deckName: "Golgari Midrange",
+      main: midrange("Golgari Midrange", "a").mainboard.map((c) => ({ ...c })),
+      meta,
+      mode: "bo1",
+      formatId: "standard",
+    });
+    const warped = runBrewClinic({
+      deckName: "Golgari Midrange",
+      main: fromCardEntries([
+        { name: "Forest", count: 10, land: true, cmc: 0 },
+        { name: "Big Idiot", count: 50, type: "creature", cmc: 7 },
+      ]),
+      meta,
+      mode: "bo1",
+      formatId: "standard",
+    });
+    const gGood = clinicGrade(peerLike);
+    const gBad = clinicGrade(warped);
+    expect(gGood).not.toBeNull();
+    expect(gBad).not.toBeNull();
+    expect(gGood!.score).toBeGreaterThan(gBad!.score);
+    expect(gGood!.score).toBeGreaterThanOrEqual(88); // literally a peer list
+    expect(gBad!.letter).toMatch(/C|D/);
+    expect(gGood!.axes.map((a) => a.id)).toEqual([
+      "mana",
+      "curve",
+      "interaction",
+      "staples",
+    ]);
+    for (const a of [...gGood!.axes, ...gBad!.axes]) {
+      expect(a.score).toBeGreaterThanOrEqual(0);
+      expect(a.score).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("returns null on empty reports and renders copyable text otherwise", () => {
+    const empty = runBrewClinic({ deckName: "X", main: [], meta, mode: "bo1" });
+    expect(clinicGrade(empty)).toBeNull();
+    const report = runBrewClinic({
+      deckName: "Golgari Midrange",
+      main: midrange("Golgari Midrange", "a").mainboard.map((c) => ({ ...c })),
+      meta,
+      mode: "bo1",
+      formatId: "standard",
+    });
+    const grade = clinicGrade(report);
+    const text = clinicReportText("Golgari Midrange", report, grade);
+    expect(text).toContain("Brew Lab clinic — Golgari Midrange");
+    expect(text).toContain("Grade:");
+    expect(text).toContain("no invented cards");
+  });
+});
+
+describe("fromNamedLines (paste mode)", () => {
+  const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+  it("maps resolved names, merges duplicates, reports unknowns", () => {
+    const { cards, unknown } = fromNamedLines(
+      [
+        { name: "Shock", count: 2 },
+        { name: "shock", count: 2 },
+        { name: "Totally Fake Card", count: 4 },
+        { name: "Forest", count: 20 },
+      ],
+      {
+        shock: { name: "Shock", typeLine: "Instant", cmc: 1 },
+        forest: { name: "Forest", typeLine: "Basic Land — Forest", cmc: 0 },
+        "totally fake card": null,
+      },
+      norm,
+    );
+    expect(unknown).toEqual(["Totally Fake Card"]);
+    const shock = cards.find((c) => c.name === "Shock");
+    expect(shock?.count).toBe(4);
+    expect(shock?.type).toBe("instant");
+    expect(cards.find((c) => c.name === "Forest")?.land).toBe(true);
   });
 });

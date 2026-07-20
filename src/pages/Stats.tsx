@@ -45,7 +45,6 @@ import { gamePlayDrawSplit, mulliganStats } from "../services/gameAnalytics";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { CountUp } from "../components/CountUp";
 import { ShareMenu } from "../components/ShareMenu";
-import { BrewLabPanel } from "../components/BrewLabPanel";
 import { diagnoseTrackerHealth } from "../services/trackerHealth";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
@@ -1266,6 +1265,7 @@ function DeckDetail({
   const openDeck = useAppStore((s) => s.openDeck);
   const openMatchupOpponent = useAppStore((s) => s.openMatchupOpponent);
   const openClimbDeck = useAppStore((s) => s.openClimbDeck);
+  const openBrewLabDeck = useAppStore((s) => s.openBrewLabDeck);
   const openStatsCompare = useAppStore((s) => s.openStatsCompare);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
   const setPage = useAppStore((s) => s.setPage);
@@ -1394,6 +1394,14 @@ function DeckDetail({
           <button
             type="button"
             className="btn btn-ghost btn-sm"
+            title="Grade this list against today's ranked peer field in Brew Lab"
+            onClick={() => openBrewLabDeck(deck.key)}
+          >
+            Brew Lab clinic
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
             title="Tag and note opponents in Matchup Lab"
             onClick={() => setPage("matchups")}
           >
@@ -1462,11 +1470,6 @@ function DeckDetail({
               side={deckList.side}
             />
           )}
-          <BrewLabPanel
-            deckName={deck.name}
-            mainIds={deckList?.main}
-            sideIds={deckList?.side}
-          />
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <QueueAnalyticsPanel matches={visibleMatches} />
           <GameAnalyticsPanel deckMatches={visibleMatches} deckName={deck.name} />

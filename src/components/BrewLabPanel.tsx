@@ -2,14 +2,16 @@ import { useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import type { FormatId, PlayMode } from "../types/meta";
 import {
-  fromArenaIds,
+  clinicGrade,
+  clinicReportText,
   runBrewClinic,
   type BrewClinicReport,
   type ClinicFinding,
+  type CountedName,
   type ListShape,
 } from "../services/brewLab";
-import { resolveArenaCards } from "../services/arenaCards";
-import { useEffect } from "react";
+import { copyToClipboard } from "../services/arenaImport";
+import { IconCopy } from "./NavIcons";
 
 function severityClass(s: ClinicFinding["severity"]): string {
   if (s === "gap") return "brew-finding is-gap";
@@ -112,98 +114,95 @@ function CurveBars({ yours, peer }: { yours: ListShape; peer: ListShape }) {
   );
 }
 
+/** v2.0 — letter-grade scorecard from the same peer-field arithmetic. */
+function GradeCard({ report, deckName }: { report: BrewClinicReport; deckName: string }) {
+  const grade = useMemo(() => clinicGrade(report), [report]);
+  const [copied, setCopied] = useState(false);
+  if (!grade) return null;
+  const tone =
+    grade.score >= 80 ? "is-good" : grade.score >= 64 ? "is-mid" : "is-low";
+  return (
+    <div className={`brew-grade ${tone}`}>
+      <div
+        className="brew-grade-badge"
+        title={`Clinic grade: weighted alignment with today's ranked peer field (${grade.score}/100)`}
+      >
+        <strong>{grade.letter}</strong>
+        <span>{grade.score}/100</span>
+      </div>
+      <div className="brew-grade-axes">
+        <p className="brew-grade-verdict">{grade.verdict}</p>
+        {grade.axes.map((a) => (
+          <div key={a.id} className="brew-grade-axis" title={`${a.label}: ${a.detail}`}>
+            <span className="brew-grade-axis-label">{a.label}</span>
+            <span className="mu-track brew-grade-track">
+              <span
+                className={`mu-fill favor-${a.score >= 80 ? "favored" : a.score >= 55 ? "even" : "unfavored"}`}
+                style={{ width: `${Math.max(4, a.score)}%`, display: "block" }}
+              />
+            </span>
+            <span className="brew-grade-axis-num">{a.score}</span>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="btn btn-ghost btn-sm brew-grade-copy"
+        title="Copy the whole clinic as plain text — paste into Discord or notes"
+        onClick={() => {
+          void copyToClipboard(clinicReportText(deckName, report, grade)).then((ok) => {
+            setCopied(ok);
+            setTimeout(() => setCopied(false), 2400);
+          });
+        }}
+      >
+        <IconCopy className="w-4 h-4" /> {copied ? "Copied!" : "Copy report"}
+      </button>
+    </div>
+  );
+}
+
 type Props = {
   deckName: string;
-  mainIds: number[] | undefined;
-  sideIds: number[] | undefined;
+  main: CountedName[];
+  side?: CountedName[];
+  /** True while card names are still resolving (paste mode / cold cache). */
+  resolving?: boolean;
 };
 
 /**
- * Brew Lab panel — meta-grounded list clinic on a tracked deck.
- * Resolves Arena ids with the existing Scryfall cache path only (same as Stats art).
+ * Brew Lab clinic — meta-grounded list review with a letter-grade scorecard.
+ * Pure: shape + staples come only from ranked lists already in today's feed.
  */
-export function BrewLabPanel({ deckName, mainIds, sideIds }: Props) {
+export function BrewClinic({ deckName, main, side, resolving }: Props) {
   const meta = useAppStore((s) => s.meta);
   const appMode = useAppStore((s) => s.mode);
   const [mode, setMode] = useState<PlayMode>(appMode);
   const [formatId, setFormatId] = useState<FormatId | "auto">("auto");
-  const [cardMap, setCardMap] = useState<
-    Record<number, { name?: string; typeLine?: string; cmc?: number } | null>
-  >({});
-  const [loading, setLoading] = useState(false);
 
-  const allIds = useMemo(() => {
-    const s = new Set<number>();
-    for (const id of mainIds ?? []) s.add(id);
-    for (const id of sideIds ?? []) s.add(id);
-    return [...s];
-  }, [mainIds, sideIds]);
-
-  useEffect(() => {
-    if (allIds.length === 0) {
-      setCardMap({});
-      return;
-    }
-    let alive = true;
-    setLoading(true);
-    void resolveArenaCards(allIds, { full: true })
-      .then((map) => {
-        if (alive) setCardMap(map);
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-    // Joined-id key: reacts to real list changes without refetch loops from
-    // per-render array identity.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allIds.join(",")]);
-
-  const report: BrewClinicReport = useMemo(() => {
-    if (!mainIds?.length) {
-      return runBrewClinic({
+  const report: BrewClinicReport = useMemo(
+    () =>
+      runBrewClinic({
         deckName,
-        main: [],
+        main,
+        side: side && side.length ? side : undefined,
         meta,
         mode,
         formatId: formatId === "auto" ? undefined : formatId,
-      });
-    }
-    const main = fromArenaIds(mainIds, cardMap);
-    const side =
-      sideIds && sideIds.length ? fromArenaIds(sideIds, cardMap) : undefined;
-    // Wait until we have names for most of the main
-    if (main.length === 0 && loading) {
-      return runBrewClinic({
-        deckName,
-        main: [],
-        meta,
-        mode,
-        formatId: formatId === "auto" ? undefined : formatId,
-      });
-    }
-    return runBrewClinic({
-      deckName,
-      main,
-      side,
-      meta,
-      mode,
-      formatId: formatId === "auto" ? undefined : formatId,
-    });
-  }, [deckName, mainIds, sideIds, cardMap, meta, mode, formatId, loading]);
+      }),
+    [deckName, main, side, meta, mode, formatId],
+  );
 
   return (
     <div className="panel brew-lab">
       <div className="brew-lab-head">
         <div>
           <h3 className="dash-title m-0" title="Compare your list shape to today’s ranked meta peers">
-            Brew Lab
+            Clinic · {deckName}
           </h3>
           <p className="text-xs text-muted m-0 mt-1 leading-relaxed max-w-xl">
             Pure list clinic — no AI, no invented cards. Shape and staples come only from ranked
-            Standard/Pioneer lists already in today’s feed, plus your Arena-submitted main/side.
+            Standard/Pioneer lists already in today’s feed.
           </p>
         </div>
         <div className="brew-lab-controls">
@@ -250,8 +249,8 @@ export function BrewLabPanel({ deckName, mainIds, sideIds }: Props) {
         </div>
       </div>
 
-      {loading && (
-        <p className="text-xs text-muted m-0 mt-2" title="Resolving card names from local/Scryfall cache">
+      {resolving && (
+        <p className="text-xs text-muted m-0 mt-2 loading-pulse" title="Resolving card names from local/Scryfall cache">
           Resolving card names…
         </p>
       )}
@@ -275,6 +274,8 @@ export function BrewLabPanel({ deckName, mainIds, sideIds }: Props) {
               <> · no exact meta name match — using full board as peers</>
             )}
           </p>
+
+          <GradeCard report={report} deckName={deckName} />
 
           <div className="brew-lab-grid mt-3">
             <ShapeMini label="Your main" shape={report.yourMain} peer={report.peerMainAvg} />

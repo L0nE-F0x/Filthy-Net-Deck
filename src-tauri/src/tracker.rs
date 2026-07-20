@@ -867,6 +867,26 @@ impl LogParser {
             if class.is_empty() {
                 return;
             }
+            // Mythic has no divisions — Arena reports a percentile (most
+            // players) or a leaderboard place (top ~1200) instead. Stamp it so
+            // the Climb chart can show real movement inside Mythic. Both
+            // fields are optional; absent/zero falls back to the bare class.
+            if class.eq_ignore_ascii_case("mythic") {
+                let place = v
+                    .get("constructedLeaderboardPlace")
+                    .and_then(|p| p.as_u64())
+                    .filter(|p| *p > 0);
+                let pct = v
+                    .get("constructedPercentile")
+                    .and_then(|p| p.as_f64())
+                    .filter(|p| *p > 0.0 && *p <= 100.0);
+                self.current_rank = Some(match (place, pct) {
+                    (Some(place), _) => format!("Mythic #{place}"),
+                    (None, Some(pct)) => format!("Mythic {pct:.1}%"),
+                    (None, None) => "Mythic".to_string(),
+                });
+                return;
+            }
             self.current_rank = Some(match level {
                 Some(l) if l > 0 => format!("{class} {l}"),
                 _ => class.to_string(),
@@ -1967,6 +1987,29 @@ mod tests {
     const GRE_TURN1: &str = r#"{ "transactionId": "t5", "timestamp": "1783952730000", "greToClientEvent": { "greToClientMessages": [ { "type": "GREMessageType_GameStateMessage", "gameStateMessage": { "turnInfo": { "phase": "Phase_Beginning", "step": "Step_Upkeep", "turnNumber": 1, "activePlayer": 2, "priorityPlayer": 2, "decisionPlayer": 2 } } } ] } }"#;
 
     const RANK: &str = r#"{"constructedSeasonOrdinal":91,"constructedClass":"Diamond","constructedLevel":1,"constructedStep":2,"constructedMatchesWon":131,"constructedMatchesLost":116,"constructedMatchesDrawn":1,"limitedSeasonOrdinal":91,"limitedLevel":4}"#;
+
+    const RANK_MYTHIC_PCT: &str = r#"{"constructedSeasonOrdinal":91,"constructedClass":"Mythic","constructedLevel":0,"constructedStep":0,"constructedPercentile":93.4,"constructedLeaderboardPlace":0,"constructedMatchesWon":140,"constructedMatchesLost":118,"constructedMatchesDrawn":1}"#;
+
+    const RANK_MYTHIC_PLACE: &str = r#"{"constructedSeasonOrdinal":91,"constructedClass":"Mythic","constructedLevel":0,"constructedPercentile":100.0,"constructedLeaderboardPlace":874,"constructedMatchesWon":180,"constructedMatchesLost":120}"#;
+
+    const RANK_MYTHIC_BARE: &str =
+        r#"{"constructedSeasonOrdinal":91,"constructedClass":"Mythic","constructedLevel":0}"#;
+
+    #[test]
+    fn mythic_rank_stamps_percentile_place_or_bare() {
+        let mut p = LogParser::new();
+        p.feed_line(RANK_MYTHIC_PCT);
+        assert_eq!(p.current_rank.as_deref(), Some("Mythic 93.4%"));
+        // Leaderboard place beats percentile (top ~1200 players).
+        p.feed_line(RANK_MYTHIC_PLACE);
+        assert_eq!(p.current_rank.as_deref(), Some("Mythic #874"));
+        // No percentile / place fields at all — plain Mythic, never invented.
+        p.feed_line(RANK_MYTHIC_BARE);
+        assert_eq!(p.current_rank.as_deref(), Some("Mythic"));
+        // Non-mythic path is untouched.
+        p.feed_line(RANK);
+        assert_eq!(p.current_rank.as_deref(), Some("Diamond 1"));
+    }
 
     fn full_match(parser: &mut LogParser) -> Vec<TrackedMatch> {
         let mut out = Vec::new();

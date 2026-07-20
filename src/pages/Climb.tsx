@@ -11,6 +11,7 @@ import {
   buildRankSeries,
   estimateMatchesPerStep,
   formatRank,
+  mythicAxisLabel,
   nextRankLabel,
   rankLabelFromScore,
   winrateFavor,
@@ -75,11 +76,29 @@ function RankChart({
   const padB = 26;
 
   const scores = series.map((p) => p.rank.score);
-  let lo = Math.floor(Math.min(...scores));
-  let hi = Math.ceil(Math.max(...scores));
-  if (hi - lo < 2) {
-    lo = Math.max(0, lo - 1);
-    hi = lo + 2;
+  // All-Mythic range: zoom the axis into the percentile/leaderboard band so
+  // Mythic movement shows as a real curve instead of a flat line at the top.
+  const allMythic = Math.min(...scores) >= 20;
+  let lo: number;
+  let hi: number;
+  if (allMythic) {
+    const minS = Math.min(...scores);
+    const maxS = Math.max(...scores);
+    const pad = Math.max(0.01, (maxS - minS) * 0.15);
+    lo = Math.max(20, minS - pad);
+    hi = Math.min(22, maxS + pad);
+    if (hi - lo < 0.05) {
+      const mid = (lo + hi) / 2;
+      lo = Math.max(20, mid - 0.025);
+      hi = Math.min(22, lo + 0.05);
+    }
+  } else {
+    lo = Math.floor(Math.min(...scores));
+    hi = Math.ceil(Math.max(...scores));
+    if (hi - lo < 2) {
+      lo = Math.max(0, lo - 1);
+      hi = lo + 2;
+    }
   }
 
   const minT = series[0].at;
@@ -98,12 +117,25 @@ function RankChart({
         ` L ${pts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`
       : "";
 
-  let step = 1;
-  while ((hi - lo) / step > 6) step *= 2;
   const yTicks: { s: number; label: string; y: number }[] = [];
-  for (let s = lo; s <= hi; s += step) {
-    if (s > 20) break;
-    yTicks.push({ s, label: rankLabelFromScore(s), y: yOf(s) });
+  if (allMythic) {
+    // Evenly spaced ticks across the zoomed Mythic band, labeled as % / #place.
+    const n = 5;
+    for (let i = 0; i < n; i++) {
+      const s = lo + ((hi - lo) * i) / (n - 1);
+      yTicks.push({
+        s,
+        label: `Mythic ${mythicAxisLabel(s, hi - lo)}`,
+        y: yOf(s),
+      });
+    }
+  } else {
+    let step = 1;
+    while ((hi - lo) / step > 6) step *= 2;
+    for (let s = lo; s <= hi; s += step) {
+      if (s > 20) break;
+      yTicks.push({ s, label: rankLabelFromScore(s), y: yOf(s) });
+    }
   }
 
   const dayMs = 86_400_000;
@@ -556,6 +588,8 @@ export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
+  const climbNewestFirst = useAppStore((s) => s.prefs.climbNewestFirst);
+  const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
   const [season, setSeason] = useState<string | null>(null);
   const [hoverDeck, setHoverDeck] = useState<string | null>(null);
 
@@ -862,23 +896,51 @@ export function Climb() {
 
       {legs.length > 0 && (
         <div className="panel">
-          <h3 className="dash-title">Climb path</h3>
-          <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-            Chronological stretches on each deck — what you piloted from{" "}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h3 className="dash-title m-0">Climb path</h3>
+            <div className="filter-bar mb-0" role="group" aria-label="Climb path order">
+              {(
+                [
+                  [true, "Newest first"],
+                  [false, "Oldest first"],
+                ] as const
+              ).map(([newest, label]) => (
+                <button
+                  key={label}
+                  type="button"
+                  className={`filter-chip${climbNewestFirst === newest ? " active" : ""}`}
+                  title={
+                    newest
+                      ? "Latest stretch on top (remembered)"
+                      : "Season start on top — read the story in order (remembered)"
+                  }
+                  onClick={() => setClimbNewestFirst(newest)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="text-xs text-muted m-0 mb-3 mt-1 leading-relaxed">
+            Stretches on each deck — what you piloted from{" "}
             {start ? formatRank(start) : "start"} to{" "}
-            {current ? formatRank(current) : "now"}. Click any stretch for full deck stats.
+            {current ? formatRank(current) : "now"}. Stretch numbers stay chronological.
+            Click any stretch for full deck stats.
           </p>
           <div className="climb-leg-list">
-            {legs.map((leg, i) => (
-              <LegCard
-                key={`${leg.deckKey}-${leg.startAt}-${i}`}
-                leg={leg}
-                index={i}
-                onOpen={() => goDeck(leg.deckKey)}
-                highlighted={hoverDeck === leg.deckKey}
-                onHover={(on) => setHoverDeck(on ? leg.deckKey : null)}
-              />
-            ))}
+            {(climbNewestFirst ? [...legs].reverse() : legs).map((leg) => {
+              const i = legs.indexOf(leg);
+              return (
+                <LegCard
+                  key={`${leg.deckKey}-${leg.startAt}-${i}`}
+                  leg={leg}
+                  index={i}
+                  onOpen={() => goDeck(leg.deckKey)}
+                  highlighted={hoverDeck === leg.deckKey}
+                  onHover={(on) => setHoverDeck(on ? leg.deckKey : null)}
+                />
+              );
+            })}
           </div>
         </div>
       )}

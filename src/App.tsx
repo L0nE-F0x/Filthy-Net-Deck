@@ -25,6 +25,8 @@ import {
   IconClimb,
   IconSets,
   IconFormatHub,
+  IconBrewLab,
+  IconHelp,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
@@ -34,8 +36,11 @@ import { isTauri } from "./services/appUpdater";
 import { syncOverlayPrefFromStore } from "./services/overlay";
 import { Sets } from "./pages/Sets";
 import { FormatHubPage } from "./pages/FormatHub";
+import { BrewLab } from "./pages/BrewLab";
+import { HelpGuide } from "./components/HelpGuide";
+import { listen } from "@tauri-apps/api/event";
 
-/** Nav order: Decks → personal loop → world → Format Hub → Settings. Keys 1–8. */
+/** Nav order: Decks → personal loop → Brew Lab → world → Settings. Keys 1–9. */
 const NAV: {
   id: Page;
   label: string;
@@ -45,14 +50,23 @@ const NAV: {
   { id: "stats", label: "My Stats", icon: IconStats },
   { id: "climb", label: "Climb", icon: IconClimb },
   { id: "matchups", label: "Matchups", icon: IconMatchups },
+  { id: "brewlab", label: "Brew Lab", icon: IconBrewLab },
   { id: "sets", label: "Sets", icon: IconSets },
-  { id: "meta", label: "Events", icon: IconMeta },
   { id: "formats", label: "Format Hub", icon: IconFormatHub },
+  { id: "meta", label: "Events", icon: IconMeta },
   { id: "settings", label: "Settings", icon: IconSettings },
 ];
 
 /** Pages that work offline / without a meta download. */
-const LOCAL_PAGES: Page[] = ["settings", "stats", "matchups", "climb", "sets", "formats"];
+const LOCAL_PAGES: Page[] = [
+  "settings",
+  "stats",
+  "matchups",
+  "climb",
+  "brewlab",
+  "sets",
+  "formats",
+];
 
 function pageTitle(page: Page): string {
   switch (page) {
@@ -72,6 +86,8 @@ function pageTitle(page: Page): string {
       return "Matchup Lab";
     case "climb":
       return "Climb Tracker";
+    case "brewlab":
+      return "Brew Lab";
     case "formats":
       return "Format Hub";
     case "settings":
@@ -178,6 +194,20 @@ export default function App() {
       window.clearInterval(poll);
       unFocus?.();
     };
+  }, []);
+
+  // The overlay's quick-settings pill writes the shared prefs blob directly
+  // and emits `prefs:overlay` — mirror those edits back into this window's
+  // store so Settings sliders/toggles stay honest without a restart.
+  useEffect(() => {
+    if (!isTauri()) return;
+    let un: (() => void) | undefined;
+    void listen("prefs:overlay", () => {
+      useAppStore.getState().reloadPrefs();
+    }).then((u) => {
+      un = u;
+    });
+    return () => un?.();
   }, []);
 
   // F11 toggles fullscreen (and remembers the choice for next launch).
@@ -365,6 +395,16 @@ export default function App() {
             <ThemeToggle />
             <button
               type="button"
+              className="fs-btn help-btn"
+              title="Help & tour — what every page does"
+              aria-label="Open help"
+              onClick={() => useAppStore.getState().setHelpOpen(true)}
+            >
+              <IconHelp className="w-3.5 h-3.5" />
+              Help
+            </button>
+            <button
+              type="button"
               className="palette-hint"
               title="Search cards, decks, pages (Ctrl+K)"
               aria-label="Search cards, decks, and pages"
@@ -383,6 +423,8 @@ export default function App() {
         <StatusBanners />
 
         <CommandPalette />
+
+        <HelpGuide />
 
         {error && (
           <div className="mx-5 mt-2 px-3 py-2 rounded-lg bg-poor/10 border border-poor/30 text-sm text-poor flex justify-between gap-2">
@@ -419,6 +461,7 @@ export default function App() {
               {page === "stats" && <Stats />}
               {page === "matchups" && <Matchups />}
               {page === "climb" && <Climb />}
+              {page === "brewlab" && <BrewLab />}
               {page === "formats" && <FormatHubPage />}
               {page === "settings" && <Settings />}
             </>

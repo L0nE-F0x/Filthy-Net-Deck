@@ -3,6 +3,7 @@ import {
   arenaCardName,
   buildArenaImport,
   cardsToArenaLines,
+  parseDeckText,
   sanitizeArenaImportText,
 } from "./arenaImport";
 
@@ -78,5 +79,55 @@ describe("sanitizeArenaImportText", () => {
         "1 Unholy Annex",
       ].join("\n"),
     );
+  });
+});
+
+describe("parseDeckText", () => {
+  it("parses an Arena export with headers and set suffixes", () => {
+    const text = [
+      "About",
+      "Name My Gruul Brew",
+      "",
+      "Deck",
+      "4 Shock (M21) 159",
+      "4x Llanowar Elves",
+      "20 Mountain",
+      "",
+      "Sideboard",
+      "2 Abrade (VOW) 139",
+    ].join("\n");
+    const p = parseDeckText(text);
+    expect(p.main).toEqual([
+      { name: "Shock", count: 4 },
+      { name: "Llanowar Elves", count: 4 },
+      { name: "Mountain", count: 20 },
+    ]);
+    expect(p.side).toEqual([{ name: "Abrade", count: 2 }]);
+    expect(p.skipped).toEqual([]);
+  });
+
+  it("splits MTGO-style lists on the blank line after a real mainboard", () => {
+    const main = Array.from({ length: 15 }, (_, i) => `4 Card ${i + 1}`).join("\n");
+    const p = parseDeckText(`${main}\n\n3 Duress\n2 Rest in Peace`);
+    expect(p.main).toHaveLength(15);
+    expect(p.side).toEqual([
+      { name: "Duress", count: 3 },
+      { name: "Rest in Peace", count: 2 },
+    ]);
+  });
+
+  it("keeps early blank lines in the mainboard and reports noise", () => {
+    const p = parseDeckText("4 Shock\n\n4 Opt\nnot a card line");
+    expect(p.main).toEqual([
+      { name: "Shock", count: 4 },
+      { name: "Opt", count: 4 },
+    ]);
+    expect(p.side).toEqual([]);
+    expect(p.skipped).toEqual(["not a card line"]);
+  });
+
+  it("ignores commander/companion blocks but resumes on card lines", () => {
+    const p = parseDeckText("Companion\n1 Lurrus of the Dream-Den\nDeck\n4 Shock");
+    expect(p.main).toEqual([{ name: "Shock", count: 4 }]);
   });
 });
