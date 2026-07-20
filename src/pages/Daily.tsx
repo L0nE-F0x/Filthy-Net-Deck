@@ -8,6 +8,7 @@ import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { OpponentArchetypePanel } from "../components/OpponentArchetypePanel";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { DailyDigestStrip } from "../components/DailyDigestStrip";
 import { decksForMode, topDeckForMode } from "../services/deckHelpers";
 import { recordVsTags, listTaggedOpponentCount } from "../services/matchupNotes";
 import { needsOnboardingCoach } from "../services/trackerHealth";
@@ -236,6 +237,8 @@ export function Daily() {
           <TrackerOnboarding showHealthDetail />
         </div>
       )}
+      {/* D2 light — 2–3 catch-up chips when there's something to say */}
+      <DailyDigestStrip formatId={activeFmt?.id} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>

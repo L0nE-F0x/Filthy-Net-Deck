@@ -50,8 +50,10 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **A5** | Community share loop | **RELEASED in v1.7.0** — matchup share card + save / copy-image / post-X; see § A5 detail |
 | **B4** | Overlay matchup depth | **RELEASED in v1.7.0** — historical WR line + cards-seen chip; see § B4 detail |
 | **D1** | Sub-2-minute first value | **RELEASED in v1.7.0** — progress bar, "You're live", home strip, local funnel stamps; see § D1 detail |
+| **B3** | Grounded AI coach | **CANCELLED** — no cloud LLM ever (owner 2026-07-20) |
+| **D2** | Daily-loop strip (light) | **SOURCE only (unreleased)** — Catch up chips on Daily; see § D2 detail |
 
-**Test suite at wrap: 200 vitest / 34 files, 21 Rust tests. v1.7.0 fully released and live-verified.**
+**Test suite at wrap: 209 vitest / 35 files, 21 Rust tests. v1.7.0 live; D2 light unreleased.**
 
 ### Explicitly open — pick up here
 
@@ -60,10 +62,10 @@ Canonical program: **`100X-ROADMAP.md`**.
    - B1/B2 panels (opponent archetype, game analytics) look right against **real** Arena match history — everything shipped was verified with synthetic data in a browser preview, never a live game.
 2. **magic.gg full-list assignment** — still **deferred** (historical name corruption in that scraper). magic.gg stays events-links-only in C3's source chain.
 3. **Next 100× features** — product check-in before large scope:
-   - **B3** grounded AI coach — product-direction check-in first (API key? offline-only? SpaceXAI?).
-   - **D2** daily-loop home strip ("since you last opened") — product call (was parked on 10× SKIP).
+   - **B3** grounded AI coach — **CANCELLED** (no cloud LLM ever).
+   - **D2** light catch-up strip — **done in source** (batch into next release).
    - **A2/A3** Microsoft Store / Linux — distribution product calls; do not start without owner.
-   - **A5 / B4 / D1** — **done in source**; do not re-implement.
+   - **A5 / B4 / D1** — **released in v1.7.0**.
    - Smaller: MTGO alias-map gaps when new UB sets land — `node scripts/gen-mtgo-name-map.mjs om1 <newset>`.
 
 ### Do **not** touch without asking
@@ -72,6 +74,20 @@ Canonical program: **`100X-ROADMAP.md`**.
 - Private signing key: `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` — never commit, never echo the contents to logs/output.
 - Do not claim app UI is live without installer + updater + site channel **and independently verifying the live URL**, not just trusting the push succeeded.
 - Do not re-open winget/Homebrew/Chocolatey (A1) unless the owner reverses that decision.
+
+---
+
+## D2 — daily digest strip (light) (detail)
+
+**Product decision (2026-07-20):** light version only (2–3 chips). **B3 AI coach cancelled**; hard rule **no cloud LLM ever**.
+
+| Piece | Path |
+|-------|------|
+| Pure chips | `src/services/dailyDigest.ts` (+ tests) — window, record, rank delta, top meta mover |
+| UI | `src/components/DailyDigestStrip.tsx` on Daily (after onboarding) |
+| Last-open stamp | localStorage `bbi.daily.lastOpenAt` (local only) |
+
+**Not released** — still on v1.7.0 binary until next version bump.
 
 ---
 
@@ -230,6 +246,7 @@ Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (encrypted) + `%USERPROFILE%
 - Sound opt-in OFF · never in overlay
 - Events: freshness + magic.gg/mtgo allowlist
 - Brew Lab: **no AI / no hallucinated card names**
+- **No cloud LLM ever** (owner 2026-07-20 — B3 cancelled; do not resurrect)
 - Real-data-only pipeline (abort rather than fabricate)
 - End-to-end releases per `AGENTS.md`
 
@@ -256,7 +273,7 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 ## Suggested next actions (pick with owner if ambiguous, otherwise use judgment per their standing instruction)
 
 1. **Flag, don't block on:** ask the owner to smoke-test v1.6.0 on a real installed client (update path + B1/B2 against real Arena data) when convenient.
-2. **Otherwise:** pick the next `100X-ROADMAP.md` item. B3 (grounded coach) and D2 (daily-loop strip) are the highest-leverage remaining items but both call for a quick product-direction check-in before building, per owner's "pause and ask on product decisions." A5 (share loop) and small B1-adjacent polish are lower-risk to just build.
+2. **Otherwise:** D2 light is source-done — batch into next release when ready. B3 is cancelled. Remaining product calls: A2/A3 Store/Linux only.
 3. **Do not** re-open winget/Homebrew/Chocolatey unless the owner reverses that decision.
 4. **Do not** start a new release unless the owner asks, or the accumulated unreleased work is substantial enough to justify one (match this session's judgment: batch a few features, then release, don't ship one micro-version per item — see `ROADMAP.md`'s "RELEASE PACING" note).
 
@@ -264,4 +281,4 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 
 ## One-liner
 
-> **v1.7.0 fully released and live-verified** (A5 share loop, B4 overlay matchup WR, D1 first-session coach; Windows + macOS + updater). Next: product check-in on B3/D2. Leave marketing dirt alone. Owner: smoke Update & restart from pre-1.7.0 when convenient.
+> **v1.7.0 fully released.** B3 cancelled (no cloud LLM). D2 light catch-up strip is **source-complete, unreleased**. marketing-video removed. Next: batch D2 into a release when ready; leave youtube/goal WIP alone.
