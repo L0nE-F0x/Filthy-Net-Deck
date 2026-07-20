@@ -209,7 +209,7 @@ function historySpark(points, archetype, format, mode) {
     </section>`;
 }
 
-function buildHub(bundle, history) {
+function buildHub(bundle) {
   const date = bundle.date;
   const sections = (bundle.formats || [])
     .map((fmt) => {
@@ -628,7 +628,7 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
   }
   mkdirSync(join(OUT, "deck"), { recursive: true });
   writeFileSync(join(OUT, "site.css"), CSS);
-  writeFileSync(join(OUT, "index.html"), buildHub(bundle, history));
+  writeFileSync(join(OUT, "index.html"), buildHub(bundle));
 
   const paths = ["/meta-web/", "/meta-web/index.html"];
   for (const fmtId of ["standard", "pioneer"]) {

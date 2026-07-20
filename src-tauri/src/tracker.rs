@@ -886,14 +886,14 @@ impl LogParser {
                         }
                     } else if let Some(gsm) = v.get("gameStateMessage") {
                         changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
-                                if let Some(pending) = self.pending.get_mut(&match_id) {
-                                    changed |= note_opponent_cards(
-                                        &mut self.deck_tracker.zone_types,
-                                        &mut pending.opponent_seen,
-                                        gsm,
-                                        my_seat,
-                                    );
-                                }
+                        if let Some(pending) = self.pending.get_mut(&match_id) {
+                            changed |= note_opponent_cards(
+                                &mut self.deck_tracker.zone_types,
+                                &mut pending.opponent_seen,
+                                gsm,
+                                my_seat,
+                            );
+                        }
                     }
                     if changed {
                         self.live_dirty = true;
@@ -1037,7 +1037,6 @@ impl LogParser {
         }
     }
 }
-
 
 fn sorted_grp_ids(set: &HashSet<u32>) -> Vec<u32> {
     let mut v: Vec<u32> = set.iter().copied().collect();
@@ -2049,7 +2048,6 @@ mod tests {
         (p, matches)
     }
 
-
     #[test]
     fn opponent_cards_seen_from_gre_game_objects() {
         let mut p = LogParser::new();
@@ -2075,7 +2073,10 @@ mod tests {
         let live = p.live_match().expect("playing");
         assert!(live.opponent_seen.contains(&777), "battlefield opp card");
         assert!(live.opponent_seen.contains(&888), "graveyard opp card");
-        assert!(!live.opponent_seen.contains(&101), "must not include our cards");
+        assert!(
+            !live.opponent_seen.contains(&101),
+            "must not include our cards"
+        );
         let done = p.feed_line(&room_completed(
             "m-opp",
             "Ladder",
@@ -2086,7 +2087,6 @@ mod tests {
         let seen = done[0].opponent_seen.as_ref().expect("persisted");
         assert_eq!(seen, &vec![777, 888]);
     }
-
 
     /// C4 — committed corpus of anonymized log fixtures (runs in CI).
     #[test]
@@ -2126,7 +2126,10 @@ mod tests {
     fn fixture_loss_and_orphan_complete() {
         let (_p, matches) = replay_text(&fixture_log("loss_and_orphan_complete.log"));
         assert_eq!(matches.len(), 2, "loss + orphan completion");
-        let loss = matches.iter().find(|m| m.match_id == "m-fixture-loss").expect("loss");
+        let loss = matches
+            .iter()
+            .find(|m| m.match_id == "m-fixture-loss")
+            .expect("loss");
         assert_eq!(loss.result, "loss");
         assert_eq!(loss.opponent_name.as_deref(), Some("Conceder"));
         let orphan = matches
