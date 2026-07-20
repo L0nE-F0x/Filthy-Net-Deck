@@ -3,8 +3,8 @@
 **Last wrap-up:** 2026-07-20 (Grok session ending) — 100× Phase 0 + A4 + B1 (source) + C3 shipped on `main`.  
 **Next agent (Claude):** Read this file + `AGENTS.md` + `100X-ROADMAP.md`. Do **not** re-do completed work below. Pick up at **§ Next actions**.
 
-**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** · HEAD at wrap: **`ea29aef`** (confirm with `git log -1`).  
-**Live product version:** **v1.5.1** (website + installers). App code for B1 is **ahead of published binaries**.
+**Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`** (confirm with `git log -1`).  
+**Live product version:** **v1.6.0** — released 2026-07-20 (Claude session): B1 opponent inference + B2 game analytics + C6 diagnostic export + C3 multi-source lists + A4 meta site. Windows signed exe + updater live on filthy-net-deck.com; macOS dmg via tag CI (roll into downloads when green — mac button holds 1.5.1 with a CI note until then).
 
 ---
 
@@ -48,7 +48,7 @@ Canonical program: **`100X-ROADMAP.md`**.
 
 ### Explicitly open
 
-1. **Ship B1 + B2 + C6 to users** — owner said (2026-07-20, Claude session): keep progressing, **version bump workflow at end of session**. The release now carries opponent inference + game analytics + diagnostic export. Full AGENTS.md checklist; needs the signing-key password.
+1. ~~**Ship B1 + B2 + C6 to users**~~ ✅ **RELEASED as v1.6.0, 2026-07-20** (`b45b67f`, tag `v1.6.0`). Windows signed exe + updater + soft channel + site + OG all live and verified on filthy-net-deck.com. Remaining tails: (a) roll the macOS dmg from tag CI into `website/downloads/` + flip the mac button (roll-script pattern); (b) owner verifies in-app "Check for updates" offers **Update & restart** from an installed 1.5.x; (c) owner smoke of B1/B2 panels against real Arena data.
 2. ~~**Live meta refresh with C3**~~ ✅ **DONE 2026-07-20 (Claude)** — first C3 run: **30/32 deck objects `listSource: "mtgo"`** (named pilots + scores), 2 Goldfish fallback; committed `d7b62d1`. Also **restored the red CI gate** Grok's B1/C3 pushes left (rustfmt drift + unused param, `4df30bf`) — run the full local gate before any push. One diagnostic: MTGO names `Desecrex` / `Gift of Servitude` failed Scryfall validation (Mardu Discard shipped 58/60) — candidate for a small verified MTGO→Scryfall name-normalizer.
 3. **magic.gg full-list assignment** — still **deferred** (historical name corruption). Events links only.
 4. **Next 100× features** (after release choice): **B2** deeper personal analytics, **B3** grounded coach, **A5** share loop, **A2** Store, etc. Prefer owner direction; default ladder was B1+C3 then B2/B3.

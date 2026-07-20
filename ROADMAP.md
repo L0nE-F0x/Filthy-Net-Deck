@@ -14,14 +14,14 @@
 
 Canonical checklist: **`handoff.md`** (always read first). Program plan: **`100X-ROADMAP.md`**.
 
-**Published:** **v1.5.1**. **On `main` not yet in installer:** B1 opponent-archetype inference.
+**Published:** **v1.6.0** (2026-07-20) — B1 opponent inference · B2 game analytics · C6 diagnostic export · C3 multi-source lists · A4 public meta site.
 
 1. ~~Phase 0 CI / fixtures / eslint / tracker log corpus~~  
 2. ~~A4 public meta site (`/meta-web/`)~~  
-3. ~~C3 multi-source lists (MTGO → Goldfish)~~  
+3. ~~C3 multi-source lists (MTGO → Goldfish)~~ + alias normalizer  
 4. ~~A1 package managers~~ — **cancelled** (website + in-app updater only)  
-5. **Ship B1** via next app version when owner requests release  
-6. Then B2/B3 / remaining 100× pillars per roadmap  
+5. ~~Ship B1 (+B2/C6)~~ — **v1.6.0 released**; macOS dmg roll pending tag CI  
+6. Next: **B3 grounded coach** / **B4 overlay matchup line** / **D2 daily-loop strip** — owner picks; B4 + D2 need product calls  
 
 **Deferred** stays deferred (draft hub, cloud, Alchemy, prices, free-form LLM coach).
 
