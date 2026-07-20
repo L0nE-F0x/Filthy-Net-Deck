@@ -43,10 +43,12 @@ Canonical program: **`100X-ROADMAP.md`**.
 | **A4** | Public meta site | `pipeline/build-meta-site.mjs` → `website/meta-web/`; `sitemap.xml` / `robots.txt`; wired into `npm run meta` + daily-meta CI; homepage nav “Public meta” |
 | **B1** | Opponent archetype inference | **Source only** — see § B1 detail; **not in v1.5.1 installer** |
 | **C3** | Multi-source meta lists | MTGO match → Goldfish fallback; see § C3 detail |
+| **B2** | Game-level analytics (Claude) | `src/services/gameAnalytics.ts` (+11 tests) — Bo3 pre/post-board delta, per-deck matchup table vs B1-inferred archetypes; `GameAnalyticsPanel` in Stats deck detail; SplitsPanel play/draw refactored onto shared fn. **Source only — ships with B1's release** |
+| **C6** | Anonymized diagnostic export (Claude) | `tracker_export_diagnostic` (Rust → Downloads JSON, counters/flags only, no names/paths) + Settings Tracker-health button. **Source only — needs same release** |
 
 ### Explicitly open
 
-1. **Ship B1 to users** — cut **v1.5.2** (or next version) full AGENTS.md release when owner wants it. Until then, B1 exists only on `main` for `tauri:dev` / future builds.
+1. **Ship B1 + B2 + C6 to users** — owner said (2026-07-20, Claude session): keep progressing, **version bump workflow at end of session**. The release now carries opponent inference + game analytics + diagnostic export. Full AGENTS.md checklist; needs the signing-key password.
 2. ~~**Live meta refresh with C3**~~ ✅ **DONE 2026-07-20 (Claude)** — first C3 run: **30/32 deck objects `listSource: "mtgo"`** (named pilots + scores), 2 Goldfish fallback; committed `d7b62d1`. Also **restored the red CI gate** Grok's B1/C3 pushes left (rustfmt drift + unused param, `4df30bf`) — run the full local gate before any push. One diagnostic: MTGO names `Desecrex` / `Gift of Servitude` failed Scryfall validation (Mardu Discard shipped 58/60) — candidate for a small verified MTGO→Scryfall name-normalizer.
 3. **magic.gg full-list assignment** — still **deferred** (historical name corruption). Events links only.
 4. **Next 100× features** (after release choice): **B2** deeper personal analytics, **B3** grounded coach, **A5** share loop, **A2** Store, etc. Prefer owner direction; default ladder was B1+C3 then B2/B3.

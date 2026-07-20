@@ -38,6 +38,15 @@ export async function exportTrackerCsv(): Promise<string> {
   return invoke<string>("tracker_export_csv");
 }
 
+/**
+ * C6 — write an anonymized parser-health JSON to Downloads; resolves to the
+ * file path. Counters and flags only — safe to attach to a GitHub issue.
+ */
+export async function exportTrackerDiagnostic(): Promise<string> {
+  if (!isTauri()) throw new Error("Diagnostic export needs the desktop app.");
+  return invoke<string>("tracker_export_diagnostic");
+}
+
 export async function subscribeTracker(handlers: {
   onMatch: (m: TrackedMatch) => void;
   onStatus: (s: TrackerStatus) => void;

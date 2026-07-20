@@ -223,31 +223,6 @@ pub fn tracker_export_csv(
             s.to_string()
         }
     }
-    fn iso_date(ms: u64) -> String {
-        // Days since epoch → Y-M-D (civil calendar), no chrono dependency.
-        let days = (ms / 86_400_000) as i64;
-        let (mut y, mut doy) = (1970i64, days);
-        loop {
-            let leap = (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
-            let len = if leap { 366 } else { 365 };
-            if doy < len {
-                let months = if leap {
-                    [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-                } else {
-                    [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-                };
-                let mut m = 0usize;
-                while doy >= months[m] {
-                    doy -= months[m];
-                    m += 1;
-                }
-                return format!("{y:04}-{:02}-{:02}", m + 1, doy + 1);
-            }
-            doy -= len;
-            y += 1;
-        }
-    }
-
     let matches = {
         let data = state.0.lock().expect("tracker lock");
         let mut out = data.matches.clone();
@@ -305,6 +280,49 @@ pub fn tracker_export_csv(
         iso_date(now_ms())
     ));
     fs::write(&file, csv).map_err(|e| format!("Could not write CSV: {e}"))?;
+    let _ = tauri_plugin_opener::reveal_item_in_dir(&file);
+    Ok(file.display().to_string())
+}
+
+/// C6 — write an anonymized parser-health file to Downloads and reveal it.
+/// Contains ONLY counters and flags: no player names, no opponents, no match
+/// contents, no file paths (the log path embeds the OS username). Safe to
+/// attach to a public GitHub issue when the tracker misbehaves after an
+/// Arena update.
+#[tauri::command]
+pub fn tracker_export_diagnostic(
+    app: AppHandle,
+    state: State<'_, TrackerShared>,
+) -> Result<String, String> {
+    let status = state.0.lock().expect("tracker lock").status.clone();
+    let report = serde_json::json!({
+        "app": "filthy-net-deck",
+        "version": env!("CARGO_PKG_VERSION"),
+        "platform": std::env::consts::OS,
+        "generatedAt": iso_date(now_ms()),
+        "privacy": "Counters and flags only — no player names, no opponents, no match data, no file paths. Safe to attach to a public GitHub issue.",
+        "tracker": {
+            "logFound": status.log_found,
+            "detailedLogs": status.detailed_logs,
+            "backfillDone": status.backfill_done,
+            "matchesRecorded": status.matches_recorded,
+            "parseErrors": status.parse_errors,
+            "lastEventAt": status.last_event_at,
+            "lastEventDate": status.last_event_at.map(iso_date),
+        },
+    });
+    let body = serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?;
+
+    let dir = app
+        .path()
+        .download_dir()
+        .or_else(|_| app.path().app_data_dir())
+        .map_err(|e| format!("No folder to write to: {e}"))?;
+    let file = dir.join(format!(
+        "filthy-net-deck-diagnostic-{}.json",
+        iso_date(now_ms())
+    ));
+    fs::write(&file, body).map_err(|e| format!("Could not write diagnostic: {e}"))?;
     let _ = tauri_plugin_opener::reveal_item_in_dir(&file);
     Ok(file.display().to_string())
 }
@@ -406,6 +424,31 @@ fn now_ms() -> u64 {
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis() as u64)
         .unwrap_or(0)
+}
+
+/// Unix ms → "YYYY-MM-DD" (civil calendar), no chrono dependency.
+fn iso_date(ms: u64) -> String {
+    let days = (ms / 86_400_000) as i64;
+    let (mut y, mut doy) = (1970i64, days);
+    loop {
+        let leap = (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
+        let len = if leap { 366 } else { 365 };
+        if doy < len {
+            let months = if leap {
+                [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            } else {
+                [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            };
+            let mut m = 0usize;
+            while doy >= months[m] {
+                doy -= months[m];
+                m += 1;
+            }
+            return format!("{y:04}-{:02}-{:02}", m + 1, doy + 1);
+        }
+        doy -= len;
+        y += 1;
+    }
 }
 
 // ---------------------------------------------------------------------------

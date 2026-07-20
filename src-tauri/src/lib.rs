@@ -69,6 +69,7 @@ pub fn run() {
             tracker::tracker_clear,
             tracker::tracker_delete_matches,
             tracker::tracker_export_csv,
+            tracker::tracker_export_diagnostic,
             overlay::overlay_set_enabled,
             overlay::overlay_is_enabled,
             overlay::overlay_get_geometry,

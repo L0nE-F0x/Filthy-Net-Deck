@@ -7,6 +7,7 @@ import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
+import { exportTrackerDiagnostic } from "../services/tracker";
 import {
   getNotifyPermission,
   requestNotifyPermission,
@@ -21,10 +22,11 @@ import {
   type SoundCueSet,
 } from "../services/sfx";
 
-/** X1 + v1.2 — tracker health + first-session coach. */
+/** X1 + v1.2 — tracker health + first-session coach. C6 — diagnostic export. */
 function TrackerHealthCard() {
   const setPage = useAppStore((s) => s.setPage);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
+  const [diagMsg, setDiagMsg] = useState<string | null>(null);
 
   return (
     <section className="panel settings-card settings-card-span2">
@@ -44,7 +46,30 @@ function TrackerHealthCard() {
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("stats")}>
           Open My Stats →
         </button>
+        {isTauri() && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            title="Counters and flags only — no names, no matches, no file paths"
+            onClick={() => {
+              setDiagMsg(null);
+              void exportTrackerDiagnostic()
+                .then((path) => setDiagMsg(`Saved ${path}`))
+                .catch((e: unknown) =>
+                  setDiagMsg(e instanceof Error ? e.message : "Export failed"),
+                );
+            }}
+          >
+            Export diagnostic
+          </button>
+        )}
       </div>
+      {diagMsg && <p className="text-xs text-muted m-0 mt-2">{diagMsg}</p>}
+      <p className="text-[10px] text-muted m-0 mt-2 leading-relaxed">
+        Diagnostic file = parser counters and flags only (no player names, no match
+        data, no file paths). If the tracker breaks after an Arena update, attach it
+        to a GitHub issue so the log parser can be fixed fast.
+      </p>
     </section>
   );
 }
