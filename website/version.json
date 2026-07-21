@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.1.0.exe",
-  "notes": "v2.1.0: Set Radar now scouts MythicSpoiler for cards Scryfall hasn't catalogued yet — a \"Just spoiled · unconfirmed\" strip on spoiling sets, clearly labeled, that clears itself the moment Scryfall confirms. Radar refresh also runs every 4 hours now (was 3x/day)."
+  "version": "2.2.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.2.0.exe",
+  "notes": "v2.2.0: Copy the opponent's deck. Matchup Lab now reads the cards the tracker saw them play, guesses the closest ranked list, and lets you copy it as an Arena import or send it straight to Brew Lab to improve on — all local, nothing uploaded."
 }
