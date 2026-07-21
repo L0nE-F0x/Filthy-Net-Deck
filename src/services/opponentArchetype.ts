@@ -252,3 +252,63 @@ export function formatGuessLabel(guess: ArchetypeGuess | null): string | null {
   const pct = Math.round(guess.confidence * 100);
   return `${guess.archetype} · ${pct}%`;
 }
+
+/** Which matches' revealed cards feed the per-opponent deck read. */
+export type SeenScope = "recent" | "all";
+
+export interface OpponentSeenSelection {
+  /** Deduped Arena grpIds to infer from (most-recent match first). */
+  grpIds: number[];
+  /** How many matches contributed cards (1 for "recent"). */
+  matchCount: number;
+  /** Total matches vs this opponent that revealed any card. */
+  seenMatchCount: number;
+  /** endedAt of the freshest contributing match (for labeling). */
+  sourceEndedAt: number | null;
+  /** bestOf of the freshest contributing match — picks Bo1 vs Bo3 lists. */
+  sourceBestOf: number | null;
+}
+
+type SeenMatch = Pick<TrackedMatch, "opponentSeen" | "endedAt" | "bestOf">;
+
+/**
+ * Pick the opponent grpIds to infer from. "recent" uses only the most recent
+ * match that revealed cards (represents one specific deck); "all" unions every
+ * such match (denser signal, but can blend decks a player brought on different
+ * days). Pure — no I/O.
+ */
+export function selectOpponentSeenGrpIds(
+  matches: SeenMatch[],
+  scope: SeenScope,
+): OpponentSeenSelection {
+  const seen = (matches ?? [])
+    .filter((m) => (m.opponentSeen?.length ?? 0) > 0)
+    .sort((a, b) => b.endedAt - a.endedAt); // freshest first
+  const empty: OpponentSeenSelection = {
+    grpIds: [],
+    matchCount: 0,
+    seenMatchCount: 0,
+    sourceEndedAt: null,
+    sourceBestOf: null,
+  };
+  if (!seen.length) return empty;
+
+  const source = seen[0];
+  const contributing = scope === "recent" ? [source] : seen;
+  const grpIds: number[] = [];
+  const dedupe = new Set<number>();
+  for (const m of contributing) {
+    for (const id of m.opponentSeen ?? []) {
+      if (dedupe.has(id)) continue;
+      dedupe.add(id);
+      grpIds.push(id);
+    }
+  }
+  return {
+    grpIds,
+    matchCount: contributing.length,
+    seenMatchCount: seen.length,
+    sourceEndedAt: source.endedAt ?? null,
+    sourceBestOf: source.bestOf ?? null,
+  };
+}

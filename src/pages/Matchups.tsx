@@ -26,6 +26,7 @@ import {
   type OppSortKey,
 } from "../services/matchupGroups";
 import { ShareMenu } from "../components/ShareMenu";
+import { OpponentDeckRead } from "../components/OpponentDeckRead";
 import {
   communityShareOptions,
   deliverShare,
@@ -738,6 +739,8 @@ export function Matchups() {
                 })()}
               </div>
             )}
+
+            <OpponentDeckRead group={selectedGroup} />
 
             {selectedGroup.decks.length > 0 && (
               <div className="mt-3">

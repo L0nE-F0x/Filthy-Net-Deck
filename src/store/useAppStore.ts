@@ -354,6 +354,10 @@ interface AppState {
   brewLabFocusDeckKey: string | null;
   openBrewLabDeck: (trackerDeckKey: string) => void;
   clearBrewLabFocus: () => void;
+  /** Brew Lab seed: open the paste clinic pre-filled with an Arena list. */
+  brewLabSeedText: string | null;
+  openBrewLabText: (arenaImport: string) => void;
+  clearBrewLabSeed: () => void;
   /** Help center modal (v2.0) — openable from anywhere. */
   helpOpen: boolean;
   setHelpOpen: (v: boolean) => void;
@@ -465,6 +469,7 @@ export const useAppStore = create<AppState>((set, get) => {
     rankUpMoment: null,
     climbFocusDeckKey: null,
     brewLabFocusDeckKey: null,
+    brewLabSeedText: null,
     helpOpen: false,
     meta: null,
     metaSource: null,
@@ -567,6 +572,9 @@ export const useAppStore = create<AppState>((set, get) => {
     openBrewLabDeck: (trackerDeckKey) =>
       set({ brewLabFocusDeckKey: trackerDeckKey, page: "brewlab" }),
     clearBrewLabFocus: () => set({ brewLabFocusDeckKey: null }),
+    openBrewLabText: (arenaImport) =>
+      set({ brewLabSeedText: arenaImport, brewLabFocusDeckKey: null, page: "brewlab" }),
+    clearBrewLabSeed: () => set({ brewLabSeedText: null }),
     setHelpOpen: (helpOpen) => set({ helpOpen }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };

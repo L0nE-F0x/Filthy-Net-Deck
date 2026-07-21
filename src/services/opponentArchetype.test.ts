@@ -7,6 +7,7 @@ import {
   normalizeCardName,
   personalVsOpponentArchetypes,
   scoreDeckAgainstSeen,
+  selectOpponentSeenGrpIds,
 } from "./opponentArchetype";
 import type { TrackedMatch } from "../types/tracker";
 
@@ -173,5 +174,47 @@ describe("helpers", () => {
 
   it("confidence is 0 without hits", () => {
     expect(confidenceFromHits(0, 5, 3)).toBe(0);
+  });
+});
+
+describe("selectOpponentSeenGrpIds", () => {
+  const mk = (
+    opponentSeen: number[] | undefined,
+    endedAt: number,
+    bestOf = 1,
+  ): Pick<TrackedMatch, "opponentSeen" | "endedAt" | "bestOf"> => ({
+    opponentSeen,
+    endedAt,
+    bestOf,
+  });
+
+  it("returns an empty selection when nothing was seen", () => {
+    const sel = selectOpponentSeenGrpIds([mk([], 10), mk(undefined, 20)], "recent");
+    expect(sel.grpIds).toEqual([]);
+    expect(sel.seenMatchCount).toBe(0);
+    expect(sel.sourceEndedAt).toBeNull();
+  });
+
+  it("recent scope uses only the freshest match with cards", () => {
+    const sel = selectOpponentSeenGrpIds(
+      [mk([1, 2], 100, 3), mk([5, 6], 200, 1), mk([], 300)],
+      "recent",
+    );
+    expect(sel.grpIds).toEqual([5, 6]);
+    expect(sel.matchCount).toBe(1);
+    expect(sel.seenMatchCount).toBe(2);
+    expect(sel.sourceEndedAt).toBe(200);
+    expect(sel.sourceBestOf).toBe(1);
+  });
+
+  it("all scope unions every match, deduped, freshest first", () => {
+    const sel = selectOpponentSeenGrpIds(
+      [mk([1, 2], 100, 3), mk([2, 5], 200, 1)],
+      "all",
+    );
+    // Freshest match (endedAt 200) contributes first; 2 is deduped.
+    expect(sel.grpIds).toEqual([2, 5, 1]);
+    expect(sel.matchCount).toBe(2);
+    expect(sel.sourceBestOf).toBe(1); // from freshest match
   });
 });

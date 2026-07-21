@@ -66,15 +66,15 @@ function useTrackedClinic(deck: DeckGroup | null) {
   return { cards, side, resolving, hasList: !!list?.main.length };
 }
 
-function PasteClinic() {
-  const [text, setText] = useState("");
+function PasteClinic({ seedText }: { seedText?: string | null }) {
+  const [text, setText] = useState(seedText ?? "");
   const [parsed, setParsed] = useState<ParsedDeckText | null>(null);
   const [resolved, setResolved] = useState<Record<string, NamedCardInfo | null>>({});
   const [resolving, setResolving] = useState(false);
   const [ran, setRan] = useState(false);
 
-  const run = () => {
-    const p = parseDeckText(text);
+  const run = (source?: string) => {
+    const p = parseDeckText(source ?? text);
     setParsed(p);
     setRan(true);
     const names = [...p.main, ...p.side].map((l) => l.name);
@@ -84,6 +84,14 @@ function PasteClinic() {
       .then(setResolved)
       .finally(() => setResolving(false));
   };
+
+  // Seeded from "Improve in Brew Lab": prefill and auto-run the clinic once.
+  useEffect(() => {
+    if (!seedText) return;
+    setText(seedText);
+    run(seedText);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seedText]);
 
   const { main, side, unknown } = useMemo(() => {
     if (!parsed) return { main: [] as CountedName[], side: [] as CountedName[], unknown: [] as string[] };
@@ -117,7 +125,7 @@ function PasteClinic() {
             type="button"
             className="btn btn-primary btn-sm"
             disabled={!text.trim() || resolving}
-            onClick={run}
+            onClick={() => run()}
           >
             {resolving ? "Resolving…" : "Run clinic"}
           </button>
@@ -161,7 +169,11 @@ export function BrewLab() {
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const focusKey = useAppStore((s) => s.brewLabFocusDeckKey);
   const clearFocus = useAppStore((s) => s.clearBrewLabFocus);
+  const seedText = useAppStore((s) => s.brewLabSeedText);
+  const clearSeed = useAppStore((s) => s.clearBrewLabSeed);
   const [source, setSource] = useState<Source>(null);
+  // Snapshot the seed once so clearing store state doesn't unmount the clinic.
+  const [pasteSeed, setPasteSeed] = useState<string | null>(null);
 
   useEffect(() => {
     void refreshTracker();
@@ -173,6 +185,14 @@ export function BrewLab() {
     setSource({ kind: "deck", key: focusKey });
     clearFocus();
   }, [focusKey, clearFocus]);
+
+  // Seeded from Matchup Lab "Improve in Brew Lab": open paste mode pre-filled.
+  useEffect(() => {
+    if (!seedText) return;
+    setPasteSeed(seedText);
+    setSource({ kind: "paste" });
+    clearSeed();
+  }, [seedText, clearSeed]);
 
   const decks = useMemo(() => {
     const groups = groupDecks(matches, loadDeckRuns());
@@ -243,7 +263,7 @@ export function BrewLab() {
         </button>
       </div>
 
-      {source?.kind === "paste" && <PasteClinic />}
+      {source?.kind === "paste" && <PasteClinic seedText={pasteSeed} />}
 
       {source?.kind === "deck" && activeDeck && (
         <>
