@@ -7,7 +7,8 @@ This page says exactly which parts run themselves and which need a human.
 
 | Surface | Mechanism | Lag |
 |---------|-----------|-----|
-| New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (00/12/18 UTC) + daily meta job (06:00 UTC) rebuild `sets.json` → Netlify → apps auto-sync | Hours (Scryfall) + ≤6h (CI) + ≤90min (app) |
+| New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (every 4h) + daily meta job (06:00 UTC) rebuild `sets.json` → Netlify → apps auto-sync | Hours (Scryfall) + ≤4h (CI) + ≤90min (app) |
+| **Fresh spoilers (ahead of Scryfall)** | `pipeline/sources/mythicspoiler.mjs` scrapes MythicSpoiler new-spoilers → cards Scryfall hasn't cataloged attach as `freshSpoilers[]` on upcoming/spoiling sets → gallery "Just spoiled · unconfirmed" strip. Self-heals: each card drops the moment Scryfall catalogs it (normalized-name match). Fail-soft | ≤4h (CI) + ≤90min (app) |
 | Deck meta (Standard + Pioneer 8×8) | `daily-meta.yml` scrapes magic.gg / MTGO / Goldfish / Melee / Untapped, Scryfall-validates, commits `latest.json` | ≤24h |
 | Bans / restrictions | Scryfall `banned:` searches in the sets build — the moment Scryfall applies a B&R update, the next radar run ships it | Hours–1 day |
 | **B&R announcement alerts** (0.21) | The app diffs each feed's ban lists against a local snapshot; a real Banned & Restricted update raises a banner on Decks + an opt-in desktop toast. No code change per announcement | Feed lag + ≤90 min app sync |
@@ -79,6 +80,12 @@ never silently stale-as-fresh).
 7. **Netlify + updater** — confirm `https://filthy-net-deck.com/version.json` (and legacy `https://filthy-net-deck.netlify.app/version.json`)
    and `updater/latest.json` are live and match the shipped version (critical if
    a custom domain migration happens — installed apps pin the netlify URL).
+8. **MythicSpoiler fresh spoilers** — fail-soft, so a MythicSpoiler outage or
+   redesign silently yields zero fresh cards (never a CI failure). Symptom if the
+   page structure drifts: the sets-build log stops printing `+N fresh
+   (mythicspoiler)` during an active spoiler season. Fix: reparse
+   `pipeline/sources/mythicspoiler.mjs` against the new HTML (parser keys on
+   `<code>/cards/<slug>.jpg` image paths) and update `mythicspoiler.test.mjs`.
 
 ## Known structural limits (can't be automated)
 

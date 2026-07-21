@@ -16,6 +16,24 @@ export interface SetTrailerInfo {
   title?: string | null;
 }
 
+/**
+ * An unconfirmed card spotted on a visual-spoiler aggregator (MythicSpoiler)
+ * before Scryfall has cataloged it. Rendered from its source image URL, clearly
+ * labeled unverified, and dropped by the pipeline the moment Scryfall catches up.
+ */
+export interface FreshSpoilerCard {
+  /** Normalized slug (also the dedup key vs Scryfall names). */
+  slug: string;
+  /** Best-effort label only — the card image carries the real name. */
+  name: string;
+  /** Absolute image URL on the source site. */
+  image: string;
+  /** e.g. "mythicspoiler". */
+  source: string;
+  /** Link back to the source page. */
+  sourceUrl: string;
+}
+
 export interface SetPreviewCard {
   name: string;
   scryfallId: string;
@@ -59,6 +77,11 @@ export interface UpcomingSet {
   previews: SetPreviewCard[];
   /** Full spoiled gallery (collector order). May equal previews on tiny sets. */
   cards?: SetPreviewCard[];
+  /**
+   * Unconfirmed cards from a visual-spoiler source (MythicSpoiler) that Scryfall
+   * hasn't cataloged yet. Absent on older feeds / when nothing is fresh.
+   */
+  freshSpoilers?: FreshSpoilerCard[];
   overrideSource: string | null;
   notes: string | null;
   status: SetStatus;

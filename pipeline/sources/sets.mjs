@@ -12,6 +12,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchMythicSpoilerSpoilers, normalizeSlug } from "./mythicspoiler.mjs";
 
 const API = "https://api.scryfall.com";
 const HEADERS = {
@@ -231,6 +232,39 @@ function mapCard(c) {
     },
     scryfallUri: c.scryfall_uri || null,
   };
+}
+
+/**
+ * Fresh (unconfirmed) spoilers for one set: MythicSpoiler cards Scryfall hasn't
+ * cataloged yet. Self-healing — a card drops out the instant its normalized name
+ * appears in the Scryfall gallery (normalizeSlug(scryfallName) === slug), so the
+ * list only ever holds cards genuinely ahead of the API.
+ *
+ * @param {Array<{name:string}>} galleryCards confirmed Scryfall gallery
+ * @param {Array<{slug:string,name:string,image:string}>} mythicCards for this set
+ * @returns {Array<{slug:string,name:string,image:string,source:string,sourceUrl:string}>}
+ */
+function buildFreshSpoilers(galleryCards, mythicCards) {
+  if (!mythicCards?.length) return [];
+  // Confirmed keys: the full normalized name AND, for DFC/split names
+  // ("Front // Back"), the front face alone — MythicSpoiler slugs the front
+  // face only, so indexing it lets those cards self-heal too.
+  const confirmed = new Set();
+  for (const c of galleryCards || []) {
+    const name = String(c.name || "");
+    confirmed.add(normalizeSlug(name));
+    const cut = name.indexOf(" // ");
+    if (cut > -1) confirmed.add(normalizeSlug(name.slice(0, cut)));
+  }
+  return mythicCards
+    .filter((c) => c.slug && !confirmed.has(c.slug))
+    .map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      image: c.image,
+      source: "mythicspoiler",
+      sourceUrl: "https://mythicspoiler.com/newspoilers.html",
+    }));
 }
 
 /**
@@ -513,6 +547,16 @@ export async function buildSetsBundle() {
   const overrides = loadOverrides();
   const trailers = loadTrailers();
 
+  // Freshest visual spoilers, ahead of Scryfall. Fail-soft: an empty result
+  // just means the radar ships Scryfall-only for this run (never an abort).
+  console.log("Sets radar: fetching MythicSpoiler new spoilers…");
+  const mythic = await fetchMythicSpoilerSpoilers();
+  if (mythic.ok) {
+    console.log(
+      `  mythicspoiler: ${mythic.cardCount} cards across ${Object.keys(mythic.bySetCode).length} sets`,
+    );
+  }
+
   console.log("Sets radar: fetching Scryfall /sets…");
   const list = await scryfallGet("/sets");
   const all = list.data || [];
@@ -636,12 +680,25 @@ export async function buildSetsBundle() {
     const trailer = resolveTrailer(trailers, code, s.name);
     if (trailer) entry.trailer = trailer;
     entry.status = computeStatus(entry, today);
+
+    // Fresh (unconfirmed) spoilers — only worth attaching to upcoming/spoiling
+    // sets; a released set's cards are all on Scryfall and would fully dedupe.
+    let freshCount = 0;
+    if (isFuture || entry.status === "spoiling") {
+      const fresh = buildFreshSpoilers(cards, mythic.bySetCode[code]);
+      if (fresh.length) {
+        entry.freshSpoilers = fresh;
+        freshCount = fresh.length;
+      }
+    }
+
     sets.push(entry);
     const galLabel = fullGallery
       ? `gallery ${cards.length}/${entry.cardCount}`
       : `slim ${cards.length} (Standard pool)`;
+    const freshLabel = freshCount ? ` · +${freshCount} fresh (mythicspoiler)` : "";
     console.log(
-      `  ${code} · ${s.name} · ${entry.status} · ${galLabel} · arena ${arena || "—"} (${arenaConfidence})`,
+      `  ${code} · ${s.name} · ${entry.status} · ${galLabel}${freshLabel} · arena ${arena || "—"} (${arenaConfidence})`,
     );
     await sleep(80);
   }
@@ -679,10 +736,17 @@ export async function buildSetsBundle() {
     console.log(`  trailers attached: ${trailerCount}`);
   }
 
+  const freshTotal = sets.reduce((n, s) => n + (s.freshSpoilers?.length || 0), 0);
+  if (freshTotal) {
+    console.log(
+      `  fresh spoilers attached: ${freshTotal} (MythicSpoiler, ahead of Scryfall)`,
+    );
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     date: today,
-    version: "1.3.0",
+    version: "1.4.0",
     policy: {
       arenaFirst: true,
       noAlchemy: true,
@@ -691,9 +755,12 @@ export async function buildSetsBundle() {
         "official overrides when known; otherwise estimated as paper release minus 3 days (labeled)",
       futureSets:
         "roadmap-announced sets from curated, source-linked entries (future-sets.json); dropped automatically once Scryfall catalogs the set",
+      freshSpoilers:
+        "unconfirmed cards from MythicSpoiler shown ahead of Scryfall; dropped automatically once Scryfall catalogs the card (normalized-name match)",
     },
     sources: [
       "scryfall",
+      "mythicspoiler",
       "set-calendar-overrides",
       "whatsinstandard-v6",
       "future-sets",

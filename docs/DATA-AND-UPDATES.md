@@ -115,9 +115,28 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 | Piece | Role |
 |-------|------|
 | `npm run sets` | `pipeline/build-sets.mjs` → Scryfall `/sets` + spoiled cards |
+| `pipeline/sources/mythicspoiler.mjs` | Fresh (unconfirmed) spoilers ahead of Scryfall |
 | `pipeline/sources/set-calendar-overrides.json` | Optional official Arena / spoiler dates |
 | `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
-| App page **Sets** | Countdown (Arena emphasized), spoiler rail, Scryfall link |
+| App page **Sets** | Countdown (Arena emphasized), spoiler rail, fresh-spoiler strip, Scryfall link |
+
+**Fresh spoilers (ahead of Scryfall).** Scryfall usually catalogs new cards within
+hours, but during spoiler season a leaked/previewed card often lands on a visual
+aggregator first. `pipeline/sources/mythicspoiler.mjs` scrapes
+`mythicspoiler.com/newspoilers.html` (static HTML — no robots restrictions) and
+groups cards by set-folder code, which matches the Scryfall set code (`hob`,
+`trk`…). Card slugs are the image filenames, which normalize to the same key as a
+lowercased Scryfall name (`Delighted Halfling` → `delightedhalfling`). The build
+attaches, per upcoming/spoiling set, a `freshSpoilers[]` array of the cards
+Scryfall doesn't have yet — filtered against the Scryfall gallery by that
+normalized key (DFC front faces included), so the list is **self-healing**: a
+card drops the instant Scryfall catalogs it. Fresh cards render in the gallery's
+**"Just spoiled · unconfirmed"** strip from the source image URL (no Scryfall id),
+labeled unverified, with a "+N fresh" badge on the set card. Fail-soft: if
+MythicSpoiler is unreachable the build ships Scryfall-only, never aborts. The
+image host (`mythicspoiler.com`) is allowlisted in the Tauri CSP `img-src`. Adding
+another spoiler source later = one more module returning `{ bySetCode }` merged
+the same way.
 
 **Recently live window.** The radar ships (1) all future/spoiling constructed
 products and anything released in the last ~90 days with **full** Scryfall
@@ -132,10 +151,11 @@ cardNames }`) — the cards leaving Standard at the next rotation, computed by
 diffing `f:standard` cards in rotating vs staying sets. The app uses it for the
 per-deck rotation impact panel and the B&R pulse diffs the `bans` arrays.
 
-CI refreshes the set radar **4× per day**: the daily meta job (06:00 UTC) plus the
-Scryfall-only fast lane `.github/workflows/sets-refresh.yml` (00/12/18 UTC). Arena
-dates are `official` when overridden, otherwise `estimated` (paper − 3 days) and
-labeled in the UI.
+CI refreshes the set radar **7× per day**: the daily meta job (06:00 UTC) plus the
+fast lane `.github/workflows/sets-refresh.yml` every 4h (00/04/08/12/16/20 UTC).
+The fast lane now also pulls MythicSpoiler, so fresh leaks land within a couple of
+hours. Arena dates are `official` when overridden, otherwise `estimated`
+(paper − 3 days) and labeled in the UI.
 
 **New announcements are automatic.** When WotC reveals a set or spoils cards at an
 event, Scryfall catalogs them (usually within hours); the next radar run picks up

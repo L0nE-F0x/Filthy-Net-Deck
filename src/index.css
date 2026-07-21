@@ -3054,6 +3054,68 @@ select,
   color: var(--color-muted);
   font-style: italic;
 }
+.set-fresh-flag {
+  color: color-mix(in srgb, var(--color-gold-500) 80%, var(--color-foam));
+  font-weight: 700;
+}
+
+/* --- Fresh (unconfirmed) spoilers, ahead of Scryfall --- */
+.fresh-spoilers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 34%, transparent);
+  background: color-mix(in srgb, var(--color-gold-500) 6%, var(--color-ink-900));
+}
+.fresh-spoilers-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.fresh-spoilers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 0.6rem;
+}
+.fresh-spoiler-cell {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 30%, transparent);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-ink-900);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.fresh-spoiler-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px color-mix(in srgb, black 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+}
+.fresh-spoiler-cell img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  display: block;
+  background: var(--color-ink-850);
+}
+.fresh-spoiler-pill {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  padding: 0.12rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #1a1205;
+  background: color-mix(in srgb, var(--color-gold-500) 88%, white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
 .set-card-actions {
   display: flex;
   flex-wrap: wrap;

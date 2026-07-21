@@ -1,11 +1,12 @@
-# Fast lane for the set radar only (Scryfall + whatsinstandard — no scraping),
-# so panel spoilers reach the app within hours instead of next-day.
-# The full daily-meta workflow still covers 06:00 UTC; together: 4 refreshes/day.
+# Fast lane for the set radar only (Scryfall + whatsinstandard + MythicSpoiler
+# — the last one for cards that surface before Scryfall catalogs them), so panel
+# spoilers and fresh leaks reach the app within a couple of hours, not next-day.
+# Runs every 4h; the full daily-meta workflow also covers 06:00 UTC.
 name: Set radar refresh
 
 on:
   schedule:
-    - cron: "0 0,12,18 * * *"
+    - cron: "0 0,4,8,12,16,20 * * *"
   workflow_dispatch:
 
 jobs:
@@ -25,7 +26,8 @@ jobs:
         run: npm ci
 
       # Aborts without writing when Scryfall is unavailable — the previously
-      # published sets.json stays live.
+      # published sets.json stays live. MythicSpoiler is fail-soft: if it's down
+      # the build still ships Scryfall-only rather than aborting.
       - name: Build set radar (Arena-first spoilers, no Alchemy)
         id: build_sets
         run: npm run sets
