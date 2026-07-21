@@ -1,5 +1,5 @@
 {
-  "version": "2.0.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.2.exe",
-  "notes": "v2.0.2: The overlay went stealth — density modes shrink the footprint (Minimal is text-only), an Opponent tab lists every card they've shown with the archetype read, turn/play/mulligan chips, idle dim, and it remembers your size & position."
+  "version": "2.1.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.1.0.exe",
+  "notes": "v2.1.0: Set Radar now scouts MythicSpoiler for cards Scryfall hasn't catalogued yet — a \"Just spoiled · unconfirmed\" strip on spoiling sets, clearly labeled, that clears itself the moment Scryfall confirms. Radar refresh also runs every 4 hours now (was 3x/day)."
 }

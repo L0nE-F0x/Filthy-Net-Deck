@@ -1,11 +1,11 @@
 {
-  "version": "2.0.2",
-  "notes": "v2.0.2: The overlay went stealth - density modes shrink the footprint (Minimal is text-only), an Opponent tab lists every card they've shown with the archetype read, turn/play/mulligan chips, idle dim, and it remembers your size & position.",
-  "pub_date": "2026-07-20T20:12:57.000Z",
+  "version": "2.1.0",
+  "notes": "v2.1.0: Set Radar now scouts MythicSpoiler for cards Scryfall hasn't catalogued yet - a \"Just spoiled - unconfirmed\" strip on spoiling sets, clearly labeled, that clears itself the moment Scryfall confirms. Radar refresh also runs every 4 hours now (was 3x/day).",
+  "pub_date": "2026-07-21T05:34:24.147Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlJN0k4R0ZOL0FRaVNGRXJRSDRFaTY0czd0UkYwR1c5bFFQZXVJZmFTYWIyeThLdC85TVUvSXpucWVHSWJXNEkvZjdYTkRoSW5wYi8xeFREV2VkWFEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NTc4MzMxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMC4yX3g2NC1zZXR1cC5leGUKaE1Bd0lHZm9ydWd4TWg2d0FhRGxkTHc5ejRYOUdUdmpHTHEzQUd3bzZuY0paMHYvVE1PbnVHSnp1bFBQUlBzaGVrZ1l3K3NiN0o4bmJQNEpQclo0QkE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.0.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi8wTnEvN3ZSOFlKeWN2b2NkbGJZbDJMVFlwWXEyUDBDc1FJMTFSM01jdHB4amMydERkcnkxY0FzK21Bd09zdytNWkY1a2V3VUVTMEExSThmdWI2cFFrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NjEyMDA1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMS4wX3g2NC1zZXR1cC5leGUKVkUzQzhFUFZHR2lkQTNCVENHMy93cjg3ZSt4TmV6cEIrTXBYVEZ1cVhDd0JQM3lKaWd2akhFaGtDTmxNTVY4SUV6eFRvYmJhNHpjc01HLytGdW81Q3c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.1.0.exe"
     }
   }
 }
