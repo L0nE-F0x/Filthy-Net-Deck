@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.3.0.exe",
-  "notes": "v2.3.0: Alerts now clear fullscreen — match-end and other toasts also show in a small always-on-top card, because Windows mutes its own banners while a game or any app is fullscreen. Plus a fix for the Climb chart's deck button."
+  "version": "2.4.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.4.0.exe",
+  "notes": "v2.4.0: A corner badge now shows for as long as Arena is open — so you can see the tracker is running on the home screen and in the deck builder, not just during a match. Its cog carries the overlay settings worth changing between games."
 }

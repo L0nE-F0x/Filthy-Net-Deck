@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.3.0";
+export const APP_VERSION = "2.4.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,6 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Alerts now clear fullscreen — match-end and other toasts also show in a small always-on-top card, since Windows mutes its own banners while a game is running",
-  "Climb chart: the “Open <deck> stats” button no longer vanishes when you reach for it"
+  "A corner badge while Arena is open — see the tracker is running on the home screen and in the deck builder, not just mid-match",
+  "Its ⚙ carries the overlay settings worth changing between games — overlay on/off, post-match summary, opacity, fullscreen alerts"
 ];

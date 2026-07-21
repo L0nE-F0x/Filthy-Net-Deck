@@ -1,11 +1,11 @@
 {
-  "version": "2.3.0",
-  "notes": "v2.3.0: Alerts now clear fullscreen — match-end and other toasts also show in a small always-on-top card, because Windows mutes its own banners while a game or any app is fullscreen. Plus a fix for the Climb chart's deck button.",
-  "pub_date": "2026-07-21T12:54:48.740613Z",
+  "version": "2.4.0",
+  "notes": "v2.4.0: A corner badge now shows for as long as Arena is open — so you can see the tracker is running on the home screen and in the deck builder, not just during a match. Its cog carries the overlay settings worth changing between games.",
+  "pub_date": "2026-07-21T14:44:16.426100Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9Lc3BrK1RqdFNTVkpIcDE4VE5iUmk5T2Vic043blV2b2xzNU5PVDV1MjBKMmFaYW5XTWVZUW9LQWZTVlR4eEhvQms2NVR5ZXoxZzdRSzFyME42WUFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NjM4NDY3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMy4wX3g2NC1zZXR1cC5leGUKTXArQ283YmNPZ3RLM3pUcVM4MTJFRlJTd2g4c0hJYk85U0dyZVR6TVdqZDE3TzdIcUdtcE1ubnJrMnkwTURLQmh1bTBpU3BBbnB4WVVmK1dSZ2dxQ0E9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.3.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjBhQ2F3d3ZoaERHUkNWZUhsZTdiMU5DNTVJbElhdFBtSksxTU5hTU9JZlJSZ01yQzEwUzBuNFhJWll4aHFuVEVGbWY3ajNzUTVzVlJIYmx0YWZMaHdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NjQ1MDM3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNC4wX3g2NC1zZXR1cC5leGUKN05wcHJJKzhXWGk0MXFyWTJRU0J4bDBibjJkbjQzNlhFdTF4bno1TWNtWEVoUWNWdit6c254RHNqSzg2b0dvZjAyQWhZZUNKa3VBTG5HSnMyN2tjQVE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.4.0.exe"
     }
   }
 }
