@@ -1,17 +1,27 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-21 (Claude/Fable) — **v2.0.2 fully released** (stealth overlay batch) **+ Bo1 board fix, complete** (owner report: Decks page showed identical Bo1/Bo3 boards). Standard Bo1 is now ranked by Untapped.gg's free public ladder analytics (`pipeline/sources/untapped.mjs fetchStandardBo1Ladder`), and ladder-only archetypes with no tournament list ship their **real most-played ladder list** from Untapped's free decks endpoint — deckstring decoded by `decodeUntappedDeckString` (varint v4, layout documented there), names via public mtgajson loc_en, Scryfall-validated like every source, `listSource: "untapped"` with attribution. 2026-07-21 board: Mono-White Auras #1 17.2% (97k-match list incl. 20 Plains), 8/8 slots real. Bo3 stays Goldfish tournament data; Pioneer Bo1 mirrors Bo3 (Explorer stats premium-walled). Soft fallbacks on any API drift (MAINTENANCE 5c; fixture tests `pipeline/untapped.test.mjs` incl. two real deckstrings). Owner note: Untapped's data moat = their user telemetry; long-term ambition is our own aggregated data once the user base grows. 100X program remains **complete**; future work = owner requests.
+**Last wrap-up:** 2026-07-21 (Claude/Opus 4.8) — **three releases shipped back-to-back, all fully live + byte-verified:**
+
+- **v2.1.0 — Set Radar spoilers ahead of Scryfall.** New `pipeline/sources/mythicspoiler.mjs` scrapes mythicspoiler.com/newspoilers (static HTML, folder code == Scryfall set code, slug == normalized card name). Per spoiling set, cards Scryfall hasn't catalogued attach as `freshSpoilers[]` (self-healing: drop the instant Scryfall confirms, DFC front-face aware; dedup in `sets.mjs buildFreshSpoilers`). Fail-soft. Radar refresh cadence 3x/day → **every 4h** (`sets-refresh.yml`). CSP allowlists mythicspoiler.com img-src.
+- **v2.2.0 — copy the opponent's deck (Untapped-parity ask).** New `src/components/OpponentDeckRead.tsx` on Matchup Lab opponent detail: infers closest ranked list from a match's `opponentSeen` (reuses existing `inferOpponentArchetype` — NOT a new engine), shows revealed cards w/ signature hits, "Copy their deck" (Arena import) + "Improve in Brew Lab". New pure `selectOpponentSeenGrpIds(matches, scope)` (recent vs union; unit-tested). New store action `openBrewLabText()` seeds Brew Lab paste clinic + auto-runs. Framed "closest ranked list, not their exact 75."
+- **v2.2.1 — data-source provenance hidden app-wide EXCEPT Events.** New `src/services/sanitizeSources.ts` strips " on <Source>" + trailing "Representative … from …" from `deck.description`; applied in `normalizeMetaBundle` (deckHelpers.ts, the single feed entry point) which also drops `listNote` + empties `sources` → DeckView Sources footer (SourceFooter.tsx **deleted**) + listNote gone. Sets fresh-spoiler strip, FormatHub, Settings, Splash, Help, BrewLab, TrackedDecklist genericized. `build-meta.mjs` templates now source-free. **Owner calls:** utility "Open on Scryfall" card links KEPT; Events (MetaPulse/FormatView) keep sources. Verified sanitizer vs LIVE feed → 0 residuals.
+
+**Known follow-ups (not done, owner-scoped):** public meta-site (`build-meta-site.mjs` → filthy-net-deck.com/meta-web) still shows a Sources section (this pass was "the app" only). Scryfall attribution removed from Settings (their API guidelines request it — deliberate owner trade). Donations link / v3.0 accounts+sync still unstarted.
+
+100X program remains **complete**; future work = owner requests. Preview verification uses the `window.__fndStore` dev handle (seed `trackerMatches`/state in plain vite dev — real Arena grpIds e.g. Ethereal Armor 92065). Note: browser-pane **screenshots time out** (Scryfall CDN images); verify via DOM/get_page_text instead.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
-**Live product version:** **v2.0.2**
+**Live product version:** **v2.2.1**
 
 | Artifact | Notes |
 |----------|--------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.0.2.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
-| macOS | `website/downloads/Filthy-Net-Deck-2.0.2-universal.dmg` (rolled from tag CI; 2.0.1 dmg pruned) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.2.1.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.2.1-universal.dmg` (rolled from tag CI) |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| Tag | `v2.0.2` |
-| Marketing | "Half the overlay. Twice the intel." bento, OG / Twitter meta + `og-image.png?v=2.0.2` cache-bust |
+| Tag | `v2.2.1` (also `v2.1.0`, `v2.2.0` this session) |
+| Marketing | Flagship story stays "Copy the opponent's deck"; OG `og-image.png?v=2.2.1` cache-bust. v2.2.1 notes framed as a UI polish pass (sources deliberately not mentioned). |
+
+Release recipe unchanged: `scripts/do-<ver>-bump.mjs` + `_gen_og.py` + signed `npm run tauri:build` (env from `%USERPROFILE%\.tauri\`) → exe+sig to downloads → `updater/latest.json` → push → tag → macOS CI dmg → mac links. Every release this session pushed clean (no cron race) and byte-verified live on both hosts.
 
 ---
 
