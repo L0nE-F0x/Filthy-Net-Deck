@@ -133,6 +133,7 @@ export function Settings() {
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
+  const setNotifyTopmost = useAppStore((s) => s.setNotifyTopmost);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
@@ -553,11 +554,12 @@ export function Settings() {
         <section className="panel settings-card settings-card-span2">
           <h3 className="settings-card-title">Notifications</h3>
           <p className="settings-card-desc mb-2">
-            Desktop toasts stay on this PC. Match-end is on by default and fires
-            from the tracker itself, so it lands even while you&apos;re mid-game
-            in Arena or the app sits in the tray. If banners never pop, check
-            Windows → Notifications and Focus Assist — the toast still waits in
-            Action Center either way.
+            Desktop toasts stay on this PC. Match-end fires from the tracker
+            itself, so it lands even while the app sits in the tray. Windows
+            mutes its own banners while a game — or any app — runs fullscreen,
+            which is what &ldquo;Show alerts over fullscreen Arena&rdquo; below
+            is for: the same line, painted in a small always-on-top card Arena
+            can&apos;t hide.
           </p>
           <div className="settings-toggle-list">
             <label className="settings-toggle-row">
@@ -604,6 +606,20 @@ export function Settings() {
                 <em>When a match records (e.g. “Win vs Rival · 64% this season”)</em>
               </span>
             </label>
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.notifyTopmost}
+                onChange={(e) => setNotifyTopmost(e.target.checked)}
+              />
+              <span>
+                <strong>Show alerts over fullscreen Arena</strong>
+                <em>
+                  Repeats every alert in a small always-on-top card, top-right
+                  for 7s. Click-through, so it never steals a click from Arena.
+                </em>
+              </span>
+            </label>
           </div>
           {isTauri() && (
             <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -617,8 +633,8 @@ export function Settings() {
                     setNotifyPerm(p);
                     setTestMsg(
                       ok
-                        ? "Test toast sent — check the Windows notification area."
-                        : "Permission not granted. Allow notifications for Filthy Net Deck in Windows Settings.",
+                        ? "Test sent — the always-on-top card shows top-right; the Windows banner also needs OS permission and no do-not-disturb rule."
+                        : "Windows denied banners — allow notifications for Filthy Net Deck in Windows Settings. The always-on-top card still works.",
                     );
                   })();
                 }}

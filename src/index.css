@@ -6930,3 +6930,96 @@ html.overlay-macos .overlay-shell {
   outline: none;
   border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
 }
+
+/* -- Top-most alert card (third webview #/toast) --
+   Windows mutes OS banners while a game or any app is fullscreen, so alerts
+   are painted here too. Shares the overlay's transparent-root rules. */
+.fnd-toast {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(17, 20, 30, 0.96) 0%, rgba(9, 11, 17, 0.96) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 22%, transparent);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+  color: rgba(232, 234, 240, 0.94);
+  font-family: var(--font-display);
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.fnd-toast.is-leaving {
+  opacity: 0;
+  transform: translateX(12px);
+}
+.fnd-toast.is-win {
+  border-color: rgba(52, 211, 153, 0.4);
+}
+.fnd-toast.is-loss {
+  border-color: rgba(248, 113, 113, 0.38);
+}
+.fnd-toast-accent {
+  width: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-gold-500) 85%, transparent),
+    color-mix(in srgb, var(--color-azure-400) 55%, transparent)
+  );
+}
+.fnd-toast.is-win .fnd-toast-accent {
+  background: linear-gradient(180deg, rgba(52, 211, 153, 0.95), rgba(52, 211, 153, 0.25));
+}
+.fnd-toast.is-loss .fnd-toast-accent {
+  background: linear-gradient(180deg, rgba(248, 113, 113, 0.95), rgba(248, 113, 113, 0.25));
+}
+.fnd-toast.is-draw .fnd-toast-accent {
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.95), rgba(251, 191, 36, 0.25));
+}
+.fnd-toast-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.6rem 0.8rem;
+}
+.fnd-toast-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-gold-400) 80%, #e8eaf0);
+}
+.fnd-toast-lead {
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* No "·" split (tray hint, Set Radar, B&R) — wrap the sentence instead of
+   ellipsing it away. */
+.fnd-toast.is-plain .fnd-toast-lead {
+  font-size: 0.8rem;
+  font-weight: 550;
+  line-height: 1.32;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.fnd-toast-sub {
+  font-size: 0.72rem;
+  color: rgba(232, 234, 240, 0.62);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

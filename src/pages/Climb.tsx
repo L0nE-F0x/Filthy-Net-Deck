@@ -56,6 +56,9 @@ function RankChart({
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hover, setHover] = useState<number | null>(null);
+  // Sticky deck for the CTA below the chart. The button lives outside the SVG,
+  // so tying it to `hover` made it vanish the moment you reached for it.
+  const [ctaDeck, setCtaDeck] = useState<{ key: string; name: string } | null>(null);
 
   if (series.length === 0) {
     return (
@@ -182,10 +185,24 @@ function RankChart({
       }
     }
     setHover(best);
+    const p = series[best];
+    if (p.deckKey) setCtaDeck({ key: p.deckKey, name: p.deckName || "deck" });
   };
 
   const hovered = hover != null ? series[hover] : null;
   const hoverPt = hover != null ? pts[hover] : null;
+
+  // CTA target: last deck hovered while it is still in range, otherwise the
+  // most recent deck in the window. Always rendered, so the chart box keeps a
+  // stable height and the button stays clickable after the pointer leaves.
+  const cta = ((): { key: string; name: string } | null => {
+    if (ctaDeck && series.some((p) => p.deckKey === ctaDeck.key)) return ctaDeck;
+    for (let i = series.length - 1; i >= 0; i--) {
+      const k = series[i].deckKey;
+      if (k) return { key: k, name: series[i].deckName || "deck" };
+    }
+    return null;
+  })();
   const tipLines = hovered
     ? [
         formatRank(hovered.rank),
@@ -347,13 +364,14 @@ function RankChart({
           </g>
         )}
       </svg>
-      {hovered?.deckKey && (
+      {cta && (
         <button
           type="button"
           className="climb-chart-cta"
-          onClick={() => onOpenDeck(hovered.deckKey!)}
+          title="Hover the curve to switch decks, then click to open that deck in My Stats"
+          onClick={() => onOpenDeck(cta.key)}
         >
-          Open {hovered.deckName || "deck"} stats →
+          Open {cta.name} stats →
         </button>
       )}
     </div>

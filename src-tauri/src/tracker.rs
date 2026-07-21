@@ -1885,6 +1885,9 @@ fn post_match_end_toast(app: &AppHandle, body: &str) {
         .title("Filthy Net Deck")
         .body(body)
         .show();
+    // Windows mutes OS banners while Arena (or our own window) is fullscreen,
+    // so paint the same line in our top-most window as well.
+    crate::toast::show_toast(app, "Filthy Net Deck", body);
 }
 
 fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {

@@ -186,6 +186,13 @@ const TOPICS: Topic[] = [
           If Arena runs exclusive fullscreen and hides the overlay, switch Arena to borderless
           windowed.
         </p>
+        <p>
+          <strong>Alerts mid-match.</strong> Windows mutes its own notification banners while a
+          game — or any app — runs fullscreen, and no app can opt out of that. So match-end and
+          the other alerts are also painted in a small always-on-top card, top-right for 7s
+          (Settings → Notifications → <em>Show alerts over fullscreen Arena</em>). It is
+          click-through, so it never steals a click from Arena.
+        </p>
       </>
     ),
   },

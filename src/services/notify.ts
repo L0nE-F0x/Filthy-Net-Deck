@@ -41,8 +41,36 @@ export async function requestNotifyPermission(): Promise<NotifyPermission> {
   return p as NotifyPermission;
 }
 
+/**
+ * Mirror an alert into the top-most window (src-tauri/src/toast.rs). Windows
+ * mutes OS banners while a game or any app is fullscreen; this is the surface
+ * that still reaches you mid-match. Rust posts its own match-end toast, so
+ * only frontend-originated alerts come through here.
+ */
+async function mirrorToTopmost(title: string, body: string): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    await invoke("toast_show", { title, body });
+  } catch {
+    /* command unavailable in browser / older builds */
+  }
+}
+
+/** Settings → Notifications → "Show alerts over fullscreen Arena". */
+export async function setTopmostToastEnabled(enabled: boolean): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    await invoke("toast_set_enabled", { enabled });
+  } catch {
+    /* command unavailable in browser / older builds */
+  }
+}
+
 export async function notifyDesktop(title: string, body: string): Promise<void> {
   if (isTauri()) {
+    void mirrorToTopmost(title, body);
     try {
       const { isPermissionGranted, requestPermission, sendNotification } =
         await import("@tauri-apps/plugin-notification");
@@ -71,14 +99,14 @@ export async function notifyDesktop(title: string, body: string): Promise<void> 
 
 /** Settings “Send test notification” — proves the OS path without finishing a match. */
 export async function sendTestNotification(): Promise<boolean> {
-  const before = await getNotifyPermission();
-  if (before !== "granted") {
-    const after = await requestNotifyPermission();
-    if (after !== "granted") return false;
+  if ((await getNotifyPermission()) !== "granted") {
+    await requestNotifyPermission();
   }
   await notifyDesktop(
     "Filthy Net Deck",
     "Test toast — desktop notifications work on this PC.",
   );
-  return true;
+  // In the desktop app the top-most card fires even when Windows denies or
+  // mutes banners, so the test still proves a working path.
+  return isTauri() || (await getNotifyPermission()) === "granted";
 }

@@ -43,7 +43,7 @@ import {
   summarizeBanChanges,
   type BanChange,
 } from "../services/banPulse";
-import { notifyDesktop } from "../services/notify";
+import { notifyDesktop, setTopmostToastEnabled } from "../services/notify";
 import {
   markMetaMoverNotifyFired,
   metaMoverSignature,
@@ -92,6 +92,12 @@ interface Prefs {
   notifyArenaEve: boolean;
   /** Desktop toast when a match is recorded (default on). */
   notifyMatchEnd: boolean;
+  /**
+   * Mirror alerts into a top-most window (default on). Windows mutes OS
+   * banners while a game or any app is fullscreen — this is the surface that
+   * still reaches you mid-match.
+   */
+  notifyTopmost: boolean;
   /** Desktop toast when a B&R announcement changes the ban lists (default on). */
   notifyBanlist: boolean;
   /** Tray ping when daily meta board moves (rose / new on board). */
@@ -147,6 +153,7 @@ function loadPrefs(): Prefs {
         defaultMode?: PlayMode;
         notifyArenaEve?: boolean;
         notifyMatchEnd?: boolean;
+        notifyTopmost?: boolean;
         notifyBanlist?: boolean;
         notifyMetaMovers?: boolean;
         overlayEnabled?: boolean;
@@ -174,6 +181,7 @@ function loadPrefs(): Prefs {
         notifyArenaEve: parsed.notifyArenaEve !== false,
         // Was opt-in (=== true); default ON so match-end toasts actually fire.
         notifyMatchEnd: parsed.notifyMatchEnd !== false,
+        notifyTopmost: parsed.notifyTopmost !== false,
         notifyBanlist: parsed.notifyBanlist !== false,
         notifyMetaMovers: parsed.notifyMetaMovers !== false,
         overlayEnabled: parsed.overlayEnabled !== false,
@@ -213,6 +221,7 @@ function loadPrefs(): Prefs {
     defaultMode: "bo1",
     notifyArenaEve: true,
     notifyMatchEnd: true,
+    notifyTopmost: true,
     notifyBanlist: true,
     notifyMetaMovers: true,
     overlayEnabled: true,
@@ -364,6 +373,7 @@ interface AppState {
   setDefaultMode: (m: PlayMode) => void;
   setNotifyArenaEve: (v: boolean) => void;
   setNotifyMatchEnd: (v: boolean) => void;
+  setNotifyTopmost: (v: boolean) => void;
   setNotifyBanlist: (v: boolean) => void;
   setNotifyMetaMovers: (v: boolean) => void;
   setOverlayEnabled: (v: boolean) => void;
@@ -592,6 +602,13 @@ export const useAppStore = create<AppState>((set, get) => {
       set({ prefs: next });
       // Rust posts this toast itself (works tray-hidden) — keep it in sync.
       void setNotifyMatchEndRust(notifyMatchEnd);
+    },
+    setNotifyTopmost: (notifyTopmost) => {
+      const next = { ...get().prefs, notifyTopmost };
+      savePrefs(next);
+      set({ prefs: next });
+      // Rust owns the top-most window — mirror the toggle across.
+      void setTopmostToastEnabled(notifyTopmost);
     },
     setNotifyBanlist: (notifyBanlist) => {
       const next = { ...get().prefs, notifyBanlist };
@@ -829,6 +846,7 @@ export const useAppStore = create<AppState>((set, get) => {
       // Self-heal pref drift on boot: localStorage is the UI source of truth;
       // Rust mirrors both flags (it posts the toast / owns the linger window).
       void setNotifyMatchEndRust(get().prefs.notifyMatchEnd);
+      void setTopmostToastEnabled(get().prefs.notifyTopmost);
       void setOverlayPostMatchRust(get().prefs.overlayPostMatch);
       await get().refreshTracker();
       await subscribeTracker({

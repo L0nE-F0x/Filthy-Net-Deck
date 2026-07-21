@@ -1,5 +1,6 @@
 mod overlay;
 mod silent_update;
+mod toast;
 mod tracker;
 
 use tauri::{
@@ -33,12 +34,10 @@ fn notify_tray_hint_once(app: &tauri::AppHandle) {
     }
     let _ = std::fs::create_dir_all(&dir);
     let _ = std::fs::write(&marker, b"1");
-    let _ = app
-        .notification()
-        .builder()
-        .title("Still running in the tray")
-        .body("Filthy Net Deck keeps tracking Arena from the system tray. Right-click the tray icon to quit for real.")
-        .show();
+    const TITLE: &str = "Still running in the tray";
+    const BODY: &str = "Filthy Net Deck keeps tracking Arena from the system tray. Right-click the tray icon to quit for real.";
+    let _ = app.notification().builder().title(TITLE).body(BODY).show();
+    toast::show_toast(app, TITLE, BODY);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -77,6 +76,9 @@ pub fn run() {
             overlay::overlay_set_click_through,
             overlay::overlay_set_post_match,
             tracker::notify_set_match_end,
+            toast::toast_set_enabled,
+            toast::toast_show,
+            toast::toast_pending,
             silent_update::install_update_silent
         ])
         .setup(|app| {
@@ -112,6 +114,7 @@ pub fn run() {
 
             overlay::load_enabled(app.handle());
             overlay::load_post_match(app.handle());
+            toast::load_enabled(app.handle());
             tracker::load_notify_match_end(app.handle());
 
             // Winrate tracker: tail MTG Arena's Player.log in the background.
