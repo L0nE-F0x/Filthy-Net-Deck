@@ -79,9 +79,9 @@ const TOPICS: Topic[] = [
           notes, sideboard guide, and a one-click Arena import copy.
         </p>
         <p>
-          Lists come from real sources (MTGO results, magic.gg, Goldfish) via a daily pipeline —
-          there are no placeholder decks. The feed refreshes itself; the dot in the top bar shows
-          live vs cached.
+          Lists come from real tournament and ladder results via a daily pipeline — there are no
+          placeholder decks. The feed refreshes itself; the dot in the top bar shows live vs
+          cached.
         </p>
         <p>
           <strong>Events</strong> tracks tournament results and meta movement over time —
@@ -238,8 +238,7 @@ const TOPICS: Topic[] = [
         <p>
           The tracker tails Arena’s own <em>Player.log</em> on this PC. Matches, ranks, and
           opponents are stored locally (<em>tracker-matches.jsonl</em> in the app’s data folder)
-          and never uploaded anywhere. Card names and art come from Scryfall and are cached for
-          offline use.
+          and never uploaded anywhere. Card names and art are cached locally for offline use.
         </p>
         <p>
           Export everything as CSV from My Stats, or delete per-deck / all history — deletion is

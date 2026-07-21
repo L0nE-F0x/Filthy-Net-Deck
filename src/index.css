@@ -3152,13 +3152,6 @@ select,
   border-radius: 10px;
   overflow: hidden;
   background: var(--color-ink-900);
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.fresh-spoiler-cell:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px color-mix(in srgb, black 45%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--color-gold-500) 45%, transparent);
 }
 .fresh-spoiler-cell img {
   width: 100%;

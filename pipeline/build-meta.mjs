@@ -427,11 +427,13 @@ async function buildFormat(def, diagnostics) {
         url: stats.untappedUrl,
       });
     }
+    // Provenance-free note (the app hides listNote entirely; kept minimal here
+    // for the public meta-site, which renders it directly).
     const listNote = fromLadder
-      ? `Most-played Bo1 ladder list for this archetype on Untapped.gg${p.listMeta.matches ? ` (${p.listMeta.matches.toLocaleString("en-US")} tracked matches)` : ""} · all card names verified on Scryfall.`
+      ? `Most-played Bo1 ladder list for this archetype${p.listMeta.matches ? ` (${p.listMeta.matches.toLocaleString("en-US")} tracked matches)` : ""} · all card names verified.`
       : fromTournament
-        ? `Live list from ${p.listSource} (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
-        : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
+        ? `Representative tournament list for the "${p.tile.name}" archetype · all card names verified.`
+        : `Current representative list · all card names verified.`;
 
     return {
       id: `${def.id}-${mode}-${slug}`,
@@ -462,8 +464,8 @@ async function buildFormat(def, diagnostics) {
     const fromTournament =
       p.listSource === "mtgo" || p.listSource === "magic.gg";
     const description = fromTournament
-      ? `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative list from recent ${p.listSource} (${p.listMeta.eventName || "event"}).`
-      : `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative current list from the archetype page.`;
+      ? `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""}. Representative list from a recent event.`
+      : `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""}. Representative current list.`;
     return { metaShare: p.tile.metaPct, description };
   };
 
@@ -471,7 +473,7 @@ async function buildFormat(def, diagnostics) {
   const ladderStats = (row) => ({
     metaShare: row.sharePct,
     untappedUrl: bo1Meta?.url,
-    description: `${row.sharePct}% of Standard Bo1 ladder matches on Untapped.gg (${row.matches.toLocaleString("en-US")} matches this meta period${row.winratePct != null ? `, ${row.winratePct}% ladder winrate` : ""}). Representative Scryfall-verified list from the usual sources.`,
+    description: `${row.sharePct}% of Standard Bo1 ladder matches (${row.matches.toLocaleString("en-US")} matches this meta period${row.winratePct != null ? `, ${row.winratePct}% ladder winrate` : ""}). Representative verified list.`,
   });
 
   const decks = [];

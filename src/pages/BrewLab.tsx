@@ -110,7 +110,8 @@ function PasteClinic({ seedText }: { seedText?: string | null }) {
         <p className="text-xs text-muted m-0 mb-2 leading-relaxed max-w-2xl">
           Arena export, MTGO text, or plain “4 Card Name” lines — clinic a brew{" "}
           <strong className="text-foam">before</strong> you spend a single wildcard. Card names
-          resolve on Scryfall (cached, exact-name only); unknown names are skipped, never guessed.
+          resolve against a cached database (exact-name only); unknown names are skipped, never
+          guessed.
         </p>
         <textarea
           className="brew-paste-input"
@@ -139,7 +140,7 @@ function PasteClinic({ seedText }: { seedText?: string | null }) {
         </div>
         {ran && unknown.length > 0 && !resolving && (
           <p className="qa-flag mt-2 mb-0">
-            Scryfall doesn’t know: {unknown.slice(0, 6).join(", ")}
+            Not recognized: {unknown.slice(0, 6).join(", ")}
             {unknown.length > 6 ? ` +${unknown.length - 6} more` : ""} — check the spelling; those
             cards are left out of the clinic.
           </p>

@@ -4,7 +4,6 @@ import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
 import { MatchupTable } from "../components/MatchupTable";
 import { SideboardGuide } from "../components/SideboardGuide";
-import { SourceFooter } from "../components/SourceFooter";
 import { ManaCurve, ColorPie } from "../components/ManaCurve";
 import { IconBack, IconCopy } from "../components/NavIcons";
 import { buildArenaImport, copyToClipboard, sanitizeArenaImportText } from "../services/arenaImport";
@@ -267,9 +266,6 @@ export function DeckView() {
                   ? "Partial list"
                   : "Offline / last-known list"}
             </span>
-            {deck.listNote && (
-              <span className="text-[11px] text-muted">{deck.listNote}</span>
-            )}
           </div>
           <div className="mt-3">
             <CardArtStrip cards={previewCards} max={6} />
@@ -278,11 +274,11 @@ export function DeckView() {
       </div>
 
       {qaLoading && (
-        <div className="text-xs text-muted">Checking card names on Scryfall…</div>
+        <div className="text-xs text-muted">Checking card names…</div>
       )}
       {unknown.length > 0 && (
         <div className="qa-flag">
-          <strong>Decklist QA:</strong> {unknown.length} name(s) not found on Scryfall (may be
+          <strong>Decklist QA:</strong> {unknown.length} name(s) not recognized (may be
           Arena-only, new set, or typo): {unknown.slice(0, 8).join(", ")}
           {unknown.length > 8 ? "…" : ""}
         </div>
@@ -441,10 +437,6 @@ export function DeckView() {
               <SideboardGuide guide={deck.sideboardGuide} />
             </section>
           )}
-
-          <section className="panel">
-            <SourceFooter sources={deck.sources} />
-          </section>
         </div>
 
         <aside className="flex flex-col gap-3">

@@ -758,7 +758,7 @@ export function Settings() {
             private win rates — all local on your PC.
           </p>
           <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
-            Fan project · not affiliated with Wizards of the Coast · card images via Scryfall
+            Fan project · not affiliated with Wizards of the Coast
           </p>
           <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
             Built by{" "}

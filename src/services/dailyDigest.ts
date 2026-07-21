@@ -220,7 +220,7 @@ export function buildDailyDigest(input: {
       kind: "rotation",
       label:
         d === 0 ? "Rotates today" : d === 1 ? "Rotates tomorrow" : `Rotation in ${d}d`,
-      detail: "Standard · whatsinstandard",
+      detail: "Standard rotation",
     });
   }
 

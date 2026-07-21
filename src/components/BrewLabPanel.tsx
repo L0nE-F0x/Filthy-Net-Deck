@@ -250,7 +250,7 @@ export function BrewClinic({ deckName, main, side, resolving }: Props) {
       </div>
 
       {resolving && (
-        <p className="text-xs text-muted m-0 mt-2 loading-pulse" title="Resolving card names from local/Scryfall cache">
+        <p className="text-xs text-muted m-0 mt-2 loading-pulse" title="Resolving card names from local cache">
           Resolving card names…
         </p>
       )}

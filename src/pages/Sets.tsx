@@ -224,53 +224,35 @@ function CardDetailDrawer({
   );
 }
 
-/** Human label for a spoiler source id (extend as more sources are added). */
-function spoilerSourceLabel(source: string): string {
-  if (source === "mythicspoiler") return "MythicSpoiler";
-  return source || "source";
-}
-
 /**
- * Unconfirmed cards from a visual-spoiler aggregator, shown ahead of Scryfall.
- * Rendered from the source image URL (no Scryfall id yet) and clearly labeled
- * unverified. The pipeline drops each card the moment Scryfall catalogs it.
+ * Unconfirmed cards shown ahead of the official gallery. Rendered from a preview
+ * image (no card id yet) and clearly labeled unverified; each drops out
+ * automatically once the card is confirmed in the gallery.
  */
 function FreshSpoilers({ cards }: { cards: FreshSpoilerCard[] }): ReactNode {
   if (!cards.length) return null;
-  const source = cards[0].source;
-  const sourceUrl = cards[0].sourceUrl;
   return (
     <section className="fresh-spoilers panel !p-3" aria-label="Just spoiled — unconfirmed">
       <div className="fresh-spoilers-head">
         <div>
           <p className="eyebrow m-0 mb-0.5">Just spoiled · unconfirmed</p>
           <p className="text-xs text-muted m-0 leading-relaxed max-w-2xl">
-            {cards.length} card{cards.length === 1 ? "" : "s"} spotted on{" "}
-            {spoilerSourceLabel(source)} that Scryfall hasn't cataloged yet. Images are
-            unverified previews and drop from here automatically once Scryfall confirms them.
+            {cards.length} card{cards.length === 1 ? "" : "s"} not in the official gallery yet.
+            These are unverified previews — they drop from here automatically once the card is
+            confirmed.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm shrink-0"
-          onClick={() => void openExternal(sourceUrl)}
-          title={`Open ${spoilerSourceLabel(source)}`}
-        >
-          View source
-        </button>
       </div>
       <div className="fresh-spoilers-grid">
         {cards.map((c) => (
-          <button
+          <div
             key={`${c.source}-${c.slug}`}
-            type="button"
             className="fresh-spoiler-cell"
-            title={`${c.name} — unverified (${spoilerSourceLabel(c.source)})`}
-            onClick={() => void openExternal(c.sourceUrl)}
+            title={`${c.name} — unverified preview`}
           >
             <span className="fresh-spoiler-pill">Unconfirmed</span>
-            <img src={c.image} alt={`${c.name} (unverified spoiler)`} loading="lazy" />
-          </button>
+            <img src={c.image} alt={`${c.name} (unverified preview)`} loading="lazy" />
+          </div>
         ))}
       </div>
     </section>
@@ -794,9 +776,7 @@ function SetCard({
               {freshCount > 0 ? (
                 <span
                   className="set-fresh-flag"
-                  title={`${freshCount} unconfirmed on ${spoilerSourceLabel(
-                    set.freshSpoilers?.[0]?.source ?? "",
-                  )}, ahead of Scryfall`}
+                  title={`${freshCount} unconfirmed preview${freshCount === 1 ? "" : "s"} not in the gallery yet`}
                 >
                   {" · "}
                   {freshCount} fresh
@@ -827,11 +807,11 @@ function SetCard({
           </div>
         ) : freshCount > 0 ? (
           <p className="set-no-spoilers">
-            Not on Scryfall yet — {freshCount} unconfirmed spoiler
+            Not in the gallery yet — {freshCount} unconfirmed spoiler
             {freshCount === 1 ? "" : "s"} below.
           </p>
         ) : (
-          <p className="set-no-spoilers">No cards spoiled on Scryfall yet.</p>
+          <p className="set-no-spoilers">No cards spoiled yet.</p>
         )}
 
         <div className="set-card-actions">

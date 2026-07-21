@@ -386,11 +386,6 @@ function HubBody({
         </div>
       )}
 
-      {hub.sources?.length ? (
-        <p className="text-[11px] text-muted m-0 leading-relaxed">
-          Sources: {hub.sources.join(" · ")}
-        </p>
-      ) : null}
     </div>
   );
 }
@@ -472,8 +467,8 @@ export function FormatHubPage() {
         <p className="eyebrow">Format Hub</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Legality &amp; bans</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
-          Real Standard and Pioneer set pools, rotation windows, and ban lists — sourced from
-          Scryfall legalities and the community rotation calendar. Snapshot{" "}
+          Real Standard and Pioneer set pools, rotation windows, and ban lists — from official
+          card legalities and the community rotation calendar. Snapshot{" "}
           <strong className="text-foam">{sets?.date ?? "—"}</strong>
           {summary ? (
             <>

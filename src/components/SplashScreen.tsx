@@ -3,7 +3,7 @@ import { APP_VERSION } from "../version";
 
 const TIPS = [
   "Pulling today’s ranked lists…",
-  "Scryfall-checking every card…",
+  "Double-checking every card…",
   "Warming up Matchup Lab…",
   "Tailing Arena for your winrate…",
   "Netdeck dirty. Climb clean.",

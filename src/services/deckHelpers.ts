@@ -1,4 +1,5 @@
 import type { Deck, FormatMeta, MetaBundle, PlayMode } from "../types/meta";
+import { sanitizeDeckDescription } from "./sanitizeSources";
 
 /** Resolve 8 ranked deck ids for a format + mode (supports legacy single-deck feeds). */
 export function deckIdsForMode(fmt: FormatMeta, mode: PlayMode): string[] {
@@ -52,8 +53,21 @@ export function normalizeMetaBundle(bundle: MetaBundle): MetaBundle {
       bo3: { deckId: bo3DeckIds[0] ?? "" },
     };
   });
+  // Hide data-source provenance app-wide (kept only on the Events page):
+  // sanitize each deck's description, and drop the listNote / sources fields
+  // that exist purely to state where a list came from.
+  const decks: Record<string, Deck> = {};
+  for (const [id, deck] of Object.entries(bundle.decks ?? {})) {
+    decks[id] = {
+      ...deck,
+      description: sanitizeDeckDescription(deck.description),
+      listNote: undefined,
+      sources: [],
+    };
+  }
   return {
     ...bundle,
+    decks,
     formats,
     decksPerFormat: bundle.decksPerFormat ?? 8,
   };

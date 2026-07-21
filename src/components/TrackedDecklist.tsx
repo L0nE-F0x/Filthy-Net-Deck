@@ -364,7 +364,7 @@ export function TrackedDecklist({
             disabled={resolving}
             title={
               resolving
-                ? "Still resolving card names on Scryfall…"
+                ? "Still resolving card names…"
                 : `Copy ${deckName} in Arena import format`
             }
           >
@@ -376,7 +376,7 @@ export function TrackedDecklist({
       {resolving && (
         <p className="text-xs text-muted m-0 mb-2 loading-pulse">
           Resolving {mainRows.length - resolved} card name
-          {mainRows.length - resolved === 1 ? "" : "s"} on Scryfall…
+          {mainRows.length - resolved === 1 ? "" : "s"}…
         </p>
       )}
 
