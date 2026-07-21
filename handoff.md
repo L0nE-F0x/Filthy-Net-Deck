@@ -1,6 +1,10 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-21 (Claude/Opus 4.8) — **three releases shipped back-to-back, all fully live + byte-verified:**
+**Last wrap-up:** 2026-07-21 (Claude/Opus 4.8) — **v2.3.0 shipped** (owner bug report → feature):
+
+- **v2.3.0 — alerts that clear fullscreen + Climb chart button fix.** Owner reported tray notifications never showing during Arena or with FND in F11 fullscreen. **Not an app bug:** Windows 11 auto-enables Do Not Disturb while a game runs / any app is fullscreen / duplicating a display — all four rules ship checked and no app can opt out; toasts only queue in the notification centre. Confirmed against the owner's registry (AUMID `com.filthynetdeck.desktop` registered, notifications allowed, no custom quiet-hours rules → stock defaults). Answer = a **third webview**: `src-tauri/src/toast.rs` builds a borderless, top-most, click-through window at `#/toast`, top-right of the primary monitor, 7s linger, re-cornered per toast. Fed by the tracker's match-end path, the tray hint, and `notifyDesktop()` (new `toast_show` command); pref `notifyTopmost` + Settings toggle "Show alerts over fullscreen Arena" (default on). **Lazy-build handshake:** the first alert is emitted before the webview can subscribe, so the webview pulls it back via `toast_pending` on mount — do not remove. New window labels MUST be added to `capabilities/default.json` `windows` or the webview gets no core permissions. `.transparent()` stays `#[cfg(not(macos))]`. Also fixed: Climb chart's "Open <deck> stats" CTA was bound to SVG hover state, so reaching for it destroyed it — now sticky to the last hovered deck (defaults to most recent), always rendered so the chart box stops jumping height. **Not verifiable from the harness:** native WebView2 windows have no automation path; card layout verified at its exact 344×104 via `/?demo#/toast`, behaviour over Arena needs a manual "Send test notification".
+
+**Previous wrap-up:** 2026-07-21 — **three releases shipped back-to-back, all fully live + byte-verified:**
 
 - **v2.1.0 — Set Radar spoilers ahead of Scryfall.** New `pipeline/sources/mythicspoiler.mjs` scrapes mythicspoiler.com/newspoilers (static HTML, folder code == Scryfall set code, slug == normalized card name). Per spoiling set, cards Scryfall hasn't catalogued attach as `freshSpoilers[]` (self-healing: drop the instant Scryfall confirms, DFC front-face aware; dedup in `sets.mjs buildFreshSpoilers`). Fail-soft. Radar refresh cadence 3x/day → **every 4h** (`sets-refresh.yml`). CSP allowlists mythicspoiler.com img-src.
 - **v2.2.0 — copy the opponent's deck (Untapped-parity ask).** New `src/components/OpponentDeckRead.tsx` on Matchup Lab opponent detail: infers closest ranked list from a match's `opponentSeen` (reuses existing `inferOpponentArchetype` — NOT a new engine), shows revealed cards w/ signature hits, "Copy their deck" (Arena import) + "Improve in Brew Lab". New pure `selectOpponentSeenGrpIds(matches, scope)` (recent vs union; unit-tested). New store action `openBrewLabText()` seeds Brew Lab paste clinic + auto-runs. Framed "closest ranked list, not their exact 75."
@@ -11,15 +15,15 @@
 100X program remains **complete**; future work = owner requests. Preview verification uses the `window.__fndStore` dev handle (seed `trackerMatches`/state in plain vite dev — real Arena grpIds e.g. Ethereal Armor 92065). Note: browser-pane **screenshots time out** (Scryfall CDN images); verify via DOM/get_page_text instead.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
-**Live product version:** **v2.2.1**
+**Live product version:** **v2.3.0**
 
 | Artifact | Notes |
 |----------|--------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.2.1.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
-| macOS | `website/downloads/Filthy-Net-Deck-2.2.1-universal.dmg` (rolled from tag CI) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.3.0.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.3.0-universal.dmg` (rolled from tag CI) |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| Tag | `v2.2.1` (also `v2.1.0`, `v2.2.0` this session) |
-| Marketing | Flagship story stays "Copy the opponent's deck"; OG `og-image.png?v=2.2.1` cache-bust. v2.2.1 notes framed as a UI polish pass (sources deliberately not mentioned). |
+| Tag | `v2.3.0` |
+| Marketing | Flagship story is now "Alerts that survive fullscreen"; OG `og-image.png?v=2.3.0` cache-bust (badge + 3 feature lines regenerated). |
 
 Release recipe unchanged: `scripts/do-<ver>-bump.mjs` + `_gen_og.py` + signed `npm run tauri:build` (env from `%USERPROFILE%\.tauri\`) → exe+sig to downloads → `updater/latest.json` → push → tag → macOS CI dmg → mac links. Every release this session pushed clean (no cron race) and byte-verified live on both hosts.
 
