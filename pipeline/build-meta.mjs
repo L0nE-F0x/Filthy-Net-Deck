@@ -31,7 +31,11 @@ import {
 import { collectMtgoTournaments, fetchMtgoListPool } from "./sources/mtgo.mjs";
 import { pickBestListForTile } from "./sources/listMatch.mjs";
 import { collectMelee } from "./sources/melee.mjs";
-import { collectUntapped } from "./sources/untapped.mjs";
+import {
+  collectUntapped,
+  fetchStandardBo1Ladder,
+  normalizeArchetypeName,
+} from "./sources/untapped.mjs";
 import { buildMetaSite } from "./build-meta-site.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -153,13 +157,11 @@ async function buildFormat(def, diagnostics) {
   /** Tournament lists already assigned (one list per archetype). */
   const usedTournamentKeys = new Set();
 
-  for (const tile of tiles) {
-    if (picked.length >= DECKS_PER_FORMAT) break;
-    const dedupeSlug = slugify(tile.name);
-    if (usedSlugs.has(dedupeSlug)) continue;
-    // "Other" is goldfish's catch-all bucket, not an archetype
-    if (/^other$/i.test(tile.name.trim())) continue;
-
+  /**
+   * Resolve one tile's Scryfall-validated list (C3 priority:
+   * MTGO → magic.gg → Goldfish archetype page). Null = nothing shippable.
+   */
+  const resolveTileList = async (tile) => {
     await sleep(450);
     let goldfishList = null;
     try {
@@ -172,7 +174,6 @@ async function buildFormat(def, diagnostics) {
     let listSource = "goldfish";
     let listMeta = {};
 
-    // C3 priority: MTGO → magic.gg → Goldfish
     const mtgoHit = await tryTournamentList(
       mtgoPool,
       usedTournamentKeys,
@@ -212,13 +213,13 @@ async function buildFormat(def, diagnostics) {
 
       if (report.skipped) {
         diagnostics.push(`${def.id}/${tile.name}: scryfall unreachable — skipped`);
-        continue;
+        return null;
       }
       if (report.unknown.length > 2 || report.mainCount < 55) {
         diagnostics.push(
           `${def.id}/${tile.name}: rejected (unknown=${report.unknown.join("|") || "none"}, main=${report.mainCount})`,
         );
-        continue;
+        return null;
       }
       if (report.unknown.length || report.illegal.length) {
         diagnostics.push(
@@ -234,11 +235,9 @@ async function buildFormat(def, diagnostics) {
       diagnostics.push(
         `${def.id}/${tile.name}: no validated list (MTGO+magic.gg+Goldfish) — skipped`,
       );
-      continue;
+      return null;
     }
 
-    usedSlugs.add(dedupeSlug);
-    picked.push({ tile, list: chosen, listSource, listMeta });
     const mainCount = chosen.mainboard.reduce((n, c) => n + (c.count || 0), 0);
     if (listSource === "mtgo" || listSource === "magic.gg") {
       console.log(
@@ -249,69 +248,177 @@ async function buildFormat(def, diagnostics) {
         `  [${def.id}] ✓ ${tile.name} — ${mainCount} cards (goldfish deck #${listMeta.deckId ?? "?"})`,
       );
     }
+    return { tile, list: chosen, listSource, listMeta };
+  };
+
+  for (const tile of tiles) {
+    if (picked.length >= DECKS_PER_FORMAT) break;
+    const dedupeSlug = slugify(tile.name);
+    if (usedSlugs.has(dedupeSlug)) continue;
+    // "Other" is goldfish's catch-all bucket, not an archetype
+    if (/^other$/i.test(tile.name.trim())) continue;
+    const p = await resolveTileList(tile);
+    if (!p) continue;
+    usedSlugs.add(dedupeSlug);
+    picked.push(p);
   }
 
-  // Deck objects: one per mode. Same ranked order (straight meta %) for both
-  // modes — Bo1 hides the sideboard, that's the only difference. No invented
-  // matchup notes or sideboard guides: those sections stay empty until a real
-  // data source exists.
-  const decks = [];
-  picked.forEach((p, idx) => {
+  // —— Real Bo1 board (Standard only): Untapped free ladder analytics ——
+  // The Bo1 ladder meta is NOT the tournament meta (v2.0.2 user report:
+  // both modes showed the same 8 decks). Ordering, share and winrate come
+  // from the actual Bo1 ladder; lists stay Scryfall-verified from the usual
+  // sources by archetype-name match. Ladder archetypes with no verifiable
+  // list are skipped with a diagnostic — never invented. Any failure falls
+  // back to mirroring the Bo3 board (the previous behavior).
+  let bo1Picks = null; // [{ row, p }] in ladder-share order
+  let bo1Meta = null;
+  if (def.id === "standard") {
+    let ladder = null;
+    try {
+      ladder = await fetchStandardBo1Ladder();
+      console.log(
+        `  [${def.id}] Untapped Bo1 ladder: ${ladder.board.length} archetypes · period ${ladder.periodId} · ${ladder.totalMatches?.toLocaleString?.("en-US") ?? "?"} matches`,
+      );
+    } catch (e) {
+      diagnostics.push(
+        `${def.id}: Untapped Bo1 ladder unavailable (${e.message}) — Bo1 board mirrors Bo3 today`,
+      );
+    }
+    if (ladder) {
+      // Widen the list-source pool: the ladder meta contains archetypes the
+      // tournament top tiles never show (e.g. Mono-White Auras).
+      let fullTiles = [];
+      try {
+        await sleep(450);
+        const full = await fetchMetagameTiles(`${def.goldfishPath}/full`);
+        fullTiles = full.tiles;
+        console.log(`  [${def.id}] full metagame pool: ${fullTiles.length} tiles`);
+      } catch (e) {
+        diagnostics.push(`${def.id}: full metagame pool failed (${e.message})`);
+      }
+      const byNorm = new Map();
+      for (const t of [...tiles, ...fullTiles]) {
+        if (/^other$/i.test(t.name.trim())) continue;
+        const k = normalizeArchetypeName(t.name);
+        if (!byNorm.has(k)) byNorm.set(k, t);
+      }
+      const picks = [];
+      for (const row of ladder.board) {
+        if (picks.length >= DECKS_PER_FORMAT) break;
+        const tile = byNorm.get(row.norm);
+        if (!tile) {
+          diagnostics.push(
+            `${def.id}/bo1: no list source for ladder archetype "${row.name}" (${row.sharePct}%) — skipped`,
+          );
+          continue;
+        }
+        const slug = slugify(tile.name);
+        let p = picked.find((x) => slugify(x.tile.name) === slug);
+        if (!p) {
+          p = await resolveTileList(tile);
+          if (!p) continue;
+          usedSlugs.add(slug);
+        }
+        picks.push({ row, p });
+      }
+      if (picks.length >= MIN_DECKS_PER_FORMAT) {
+        bo1Picks = picks;
+        bo1Meta = { url: ladder.url, totalMatches: ladder.totalMatches };
+      } else {
+        diagnostics.push(
+          `${def.id}/bo1: only ${picks.length} ladder archetypes matched a real list — Bo1 board mirrors Bo3 today`,
+        );
+      }
+    }
+  }
+
+  // Deck objects, one board per mode. Bo3 rank = Goldfish tournament share
+  // (unchanged). Standard Bo1 rank/share/winrate = Untapped ladder when it
+  // resolved above; otherwise Bo1 mirrors Bo3. Bo1 always hides the
+  // sideboard. No invented matchup notes or sideboard guides: those sections
+  // stay empty until a real data source exists.
+  const makeDeck = (p, mode, rank, stats) => {
     const slug = slugify(p.tile.name);
     const fromTournament =
       p.listSource === "mtgo" || p.listSource === "magic.gg";
-    for (const mode of ["bo1", "bo3"]) {
-      const sideboard = mode === "bo3" ? p.list.sideboard : [];
-      const sources = [
-        ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
-        {
-          name: "MTGGoldfish metagame",
-          url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
-        },
-      ];
-      if (fromTournament && p.listMeta.sourceUrl) {
-        const label =
-          p.listSource === "magic.gg"
-            ? `magic.gg — ${p.listMeta.eventName || "article"} (${p.listMeta.player || "?"})`
-            : `MTGO — ${p.listMeta.eventName || "event"} (${p.listMeta.player || "?"})`;
-        sources.unshift({
-          name: label,
-          url: p.listMeta.sourceUrl,
-        });
-      }
-      const listNote = fromTournament
-        ? `Live list from ${p.listSource} (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
-        : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
-      const description = fromTournament
-        ? `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative list from recent ${p.listSource} (${p.listMeta.eventName || "event"}).`
-        : `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative current list from the archetype page.`;
-
-      const deck = {
-        id: `${def.id}-${mode}-${slug}`,
-        name: p.tile.name,
-        format: def.id,
-        mode,
-        rank: idx + 1,
-        tier: idx < 3 ? 1 : idx < 6 ? 2 : 3,
-        colors: p.tile.colors || [],
-        archetype: p.tile.name,
-        description,
-        mainboard: p.list.mainboard,
-        sideboard,
-        matchups: [],
-        sideboardGuide: [],
-        arenaImport: buildArenaImport({ mainboard: p.list.mainboard, sideboard }),
-        sources,
-        metaShare: p.tile.metaPct,
-        keyCards: p.tile.keyCards?.length ? p.tile.keyCards : undefined,
-        listQuality: "authoritative",
-        listNote,
-        listSource: p.listSource,
-      };
-      decks.push(deck);
+    const sideboard = mode === "bo3" ? p.list.sideboard : [];
+    const sources = [
+      ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
+      {
+        name: "MTGGoldfish metagame",
+        url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
+      },
+    ];
+    if (fromTournament && p.listMeta.sourceUrl) {
+      const label =
+        p.listSource === "magic.gg"
+          ? `magic.gg — ${p.listMeta.eventName || "article"} (${p.listMeta.player || "?"})`
+          : `MTGO — ${p.listMeta.eventName || "event"} (${p.listMeta.player || "?"})`;
+      sources.unshift({
+        name: label,
+        url: p.listMeta.sourceUrl,
+      });
     }
+    if (stats.untappedUrl) {
+      sources.unshift({
+        name: "Untapped.gg — Standard Bo1 ladder meta",
+        url: stats.untappedUrl,
+      });
+    }
+    const listNote = fromTournament
+      ? `Live list from ${p.listSource} (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
+      : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
+
+    return {
+      id: `${def.id}-${mode}-${slug}`,
+      name: p.tile.name,
+      format: def.id,
+      mode,
+      rank,
+      tier: rank <= 3 ? 1 : rank <= 6 ? 2 : 3,
+      colors: p.tile.colors || [],
+      archetype: p.tile.name,
+      description: stats.description,
+      mainboard: p.list.mainboard,
+      sideboard,
+      matchups: [],
+      sideboardGuide: [],
+      arenaImport: buildArenaImport({ mainboard: p.list.mainboard, sideboard }),
+      sources,
+      metaShare: stats.metaShare,
+      keyCards: p.tile.keyCards?.length ? p.tile.keyCards : undefined,
+      listQuality: "authoritative",
+      listNote,
+      listSource: p.listSource,
+    };
+  };
+
+  /** Tournament-meta stats (Goldfish tile) — Bo3 and the Bo1 fallback. */
+  const goldfishStats = (p) => {
+    const fromTournament =
+      p.listSource === "mtgo" || p.listSource === "magic.gg";
+    const description = fromTournament
+      ? `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative list from recent ${p.listSource} (${p.listMeta.eventName || "event"}).`
+      : `${p.tile.metaPct ?? "?"}% of tracked ${def.name} decks${p.tile.sampleSize ? ` (${p.tile.sampleSize} lists)` : ""} on MTGGoldfish. Representative current list from the archetype page.`;
+    return { metaShare: p.tile.metaPct, description };
+  };
+
+  /** Real Bo1 ladder stats (Untapped) for one board row. */
+  const ladderStats = (row) => ({
+    metaShare: row.sharePct,
+    untappedUrl: bo1Meta?.url,
+    description: `${row.sharePct}% of Standard Bo1 ladder matches on Untapped.gg (${row.matches.toLocaleString("en-US")} matches this meta period${row.winratePct != null ? `, ${row.winratePct}% ladder winrate` : ""}). Representative Scryfall-verified list from the usual sources.`,
   });
 
+  const decks = [];
+  picked.forEach((p, idx) => decks.push(makeDeck(p, "bo3", idx + 1, goldfishStats(p))));
+  if (bo1Picks) {
+    bo1Picks.forEach(({ row, p }, idx) =>
+      decks.push(makeDeck(p, "bo1", idx + 1, ladderStats(row))),
+    );
+  } else {
+    picked.forEach((p, idx) => decks.push(makeDeck(p, "bo1", idx + 1, goldfishStats(p))));
+  }
   return decks;
 }
 
@@ -438,10 +545,12 @@ async function main() {
       process.exit(1);
     }
 
-    const pairCount = built.length / 2;
-    if (pairCount < MIN_DECKS_PER_FORMAT) {
+    // Boards can diverge per mode now — gate each mode on its own count.
+    const bo1Count = built.filter((d) => d.mode === "bo1").length;
+    const bo3Count = built.filter((d) => d.mode === "bo3").length;
+    if (Math.min(bo1Count, bo3Count) < MIN_DECKS_PER_FORMAT) {
       console.error(
-        `ABORT: ${def.id} produced only ${pairCount} verified decks (< ${MIN_DECKS_PER_FORMAT}). Nothing written — previous published data stays live.`,
+        `ABORT: ${def.id} produced only bo1=${bo1Count}/bo3=${bo3Count} verified decks (< ${MIN_DECKS_PER_FORMAT}). Nothing written — previous published data stays live.`,
       );
       process.exit(1);
     }
@@ -467,7 +576,7 @@ async function main() {
       bo1: { deckId: bo1DeckIds[0] ?? "" },
       bo3: { deckId: bo3DeckIds[0] ?? "" },
       tiers: [1, 2, 3].map((n) => ({ tier: n, archetypes: tiers[n] })),
-      metaNotes: `Meta % from MTGGoldfish (${today}); lists from MTGO when matched else Goldfish. Every card name verified via Scryfall. Rank = metagame share.`,
+      metaNotes: `Bo3 meta % from MTGGoldfish tournament data (${today}); Standard Bo1 board ranked by real Arena ladder play (Untapped.gg) when available, else mirrors Bo3. Lists from MTGO when matched else Goldfish. Every card name verified via Scryfall.`,
       metaShareTop: topIds.slice(0, 4).map((id) => ({
         name: decks[id]?.name ?? id,
         pct: decks[id]?.metaShare ?? 0,

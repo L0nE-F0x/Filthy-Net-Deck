@@ -54,6 +54,14 @@ never silently stale-as-fresh).
    badges / Settings sources. If everything degraded to Goldfish-only or
    `partial`, a scraper (magic.gg / MTGO) probably changed its HTML — check the
    latest CI run logs even if it "succeeded".
+5c. **Standard Bo1 board (Untapped)** — the Bo1 board is ranked by Untapped's
+   free public ladder analytics (`pipeline/sources/untapped.mjs
+   fetchStandardBo1Ladder`); Bo3 stays MTGGoldfish tournament data. If their
+   API drifts, the pipeline soft-falls back to mirroring Bo3 and logs a
+   `Untapped Bo1 ladder unavailable` diagnostic — symptom in-app: Bo1 and Bo3
+   Decks boards identical again. Fixture net: `pipeline/untapped.test.mjs`.
+   Pioneer/Explorer Bo1 stats are premium-walled — Pioneer intentionally
+   mirrors Bo3.
 5b. **MTGO alias map** — when a new Universes Beyond set with dual-identity
    printings (printed alias ≠ canonical name, like OM1 Marvel) enters
    Standard/Pioneer, rerun `node scripts/gen-mtgo-name-map.mjs om1 <newset>`

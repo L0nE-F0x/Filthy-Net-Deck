@@ -26,17 +26,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-selesnya-ouroboroid.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-selesnya-ouroboroid.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-prowess.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -46,17 +36,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-lessons.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-jeskai-lessons.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-4c-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -66,17 +46,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-spellementals.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-izzet-spellementals.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-dimir-excruciator.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -86,17 +56,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-green-landfall.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-mono-green-landfall.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-lessons.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -106,7 +66,42 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-mono-red-prowess.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-4c-reanimator.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-lessons.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-4c-control.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-artifacts.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-selesnya-ouroboroid.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-green-landfall.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-prowess.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -116,17 +111,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-golgari-midrange.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-golgari-midrange.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-izzet-prowess.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -136,17 +121,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-abzan-greasefang.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-abzan-greasefang.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-azorius-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -156,17 +131,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-orzhov-greasefang.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-orzhov-greasefang.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-dimir-midrange.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -176,12 +141,47 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-izzet-phoenix.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-izzet-phoenix.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-izzet-phoenix.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-mono-red-prowess.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-golgari-midrange.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-izzet-prowess.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-abzan-greasefang.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-azorius-control.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-orzhov-greasefang.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-dimir-midrange.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-izzet-phoenix.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
