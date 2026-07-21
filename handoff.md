@@ -1,6 +1,10 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-21 (Claude/Opus 4.8) — **v2.3.0 shipped** (owner bug report → feature):
+**Last wrap-up:** 2026-07-21 (Claude/Opus 4.8) — **v2.3.0 + v2.4.0 shipped** (owner bug report → two features):
+
+- **v2.4.0 — corner presence badge while Arena is open.** Owner asked for a permanently-onscreen sign the app is alive (Arena home screen / deck builder show nothing, since the HUD is match-scoped) plus a small cog of overlay settings. **Nothing in the app knew Arena was merely open** — the only signal was `LiveMatch.phase`. New `src-tauri/src/arena.rs`: 4s poll of the process list for `MTGA` (new `sysinfo` dep, `--no-default-features --features system`); exact stem match so `MTGAHelper.exe` etc. don't trigger it (unit-tested); publishes `arena:running` + drives the badge. New `src-tauri/src/presence.rs` + `src/presence/PresenceApp.tsx` = **fourth webview** (`presence`, route `#/presence`): bottom-left of the primary monitor, always-on-top, NOT click-through (the cog must be clickable). Cog carries overlay on/off, post-match summary, opacity, fullscreen alerts, click-through, open-app. Dims to 42% during a match, wakes on hover. Pref `presenceEnabled` + Settings toggle. **Two traps found while building, both load-bearing:** (1) a non-click-through always-on-top window must never own more pixels than it paints, so the webview measures its own content box and Rust matches the window exactly (`presence_set_size`, bottom-left re-anchor) — hardcoded sizes blocked ~a third more of Arena; (2) the cog menu needs an **intrinsic** width (246px) because the window is sized *from* that measurement — a fluid width pinned it to the collapsed badge width and it could never grow. Resize guarded against observer/resize oscillation by a no-op dedupe. Also extracted `src/overlay/overlayPrefs.ts` (shared prefs bridge) so the HUD and badge can't drift. **Known limitation:** badge (and the v2.3.0 alert card) anchor to the **primary** monitor — Arena on a secondary display puts them on the wrong screen; following Arena's window across monitors is unstarted, owner aware.
+
+**Previous:** v2.3.0 (owner bug report → feature):
 
 - **v2.3.0 — alerts that clear fullscreen + Climb chart button fix.** Owner reported tray notifications never showing during Arena or with FND in F11 fullscreen. **Not an app bug:** Windows 11 auto-enables Do Not Disturb while a game runs / any app is fullscreen / duplicating a display — all four rules ship checked and no app can opt out; toasts only queue in the notification centre. Confirmed against the owner's registry (AUMID `com.filthynetdeck.desktop` registered, notifications allowed, no custom quiet-hours rules → stock defaults). Answer = a **third webview**: `src-tauri/src/toast.rs` builds a borderless, top-most, click-through window at `#/toast`, top-right of the primary monitor, 7s linger, re-cornered per toast. Fed by the tracker's match-end path, the tray hint, and `notifyDesktop()` (new `toast_show` command); pref `notifyTopmost` + Settings toggle "Show alerts over fullscreen Arena" (default on). **Lazy-build handshake:** the first alert is emitted before the webview can subscribe, so the webview pulls it back via `toast_pending` on mount — do not remove. New window labels MUST be added to `capabilities/default.json` `windows` or the webview gets no core permissions. `.transparent()` stays `#[cfg(not(macos))]`. Also fixed: Climb chart's "Open <deck> stats" CTA was bound to SVG hover state, so reaching for it destroyed it — now sticky to the last hovered deck (defaults to most recent), always rendered so the chart box stops jumping height. **Not verifiable from the harness:** native WebView2 windows have no automation path; card layout verified at its exact 344×104 via `/?demo#/toast`, behaviour over Arena needs a manual "Send test notification".
 
@@ -14,16 +18,18 @@
 
 100X program remains **complete**; future work = owner requests. Preview verification uses the `window.__fndStore` dev handle (seed `trackerMatches`/state in plain vite dev — real Arena grpIds e.g. Ethereal Armor 92065). Note: browser-pane **screenshots time out** (Scryfall CDN images); verify via DOM/get_page_text instead.
 
+**Webviews (4):** `main` · `overlay` (match HUD, user-positioned) · `toast` (top-most alert card, v2.3.0) · `presence` (corner badge, v2.4.0). Every new window label MUST be added to `src-tauri/capabilities/default.json` `windows` or it gets no core permissions, and `.transparent()` stays `#[cfg(not(macos))]`.
+
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
-**Live product version:** **v2.3.0**
+**Live product version:** **v2.4.0**
 
 | Artifact | Notes |
 |----------|--------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.3.0.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
-| macOS | `website/downloads/Filthy-Net-Deck-2.3.0-universal.dmg` (rolled from tag CI) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.4.0.exe` + `.sig` (local key, sig key id 67FCA9900F523D49 byte-verified) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.4.0-universal.dmg` (rolled from tag CI) |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| Tag | `v2.3.0` |
-| Marketing | Flagship story is now "Alerts that survive fullscreen"; OG `og-image.png?v=2.3.0` cache-bust (badge + 3 feature lines regenerated). |
+| Tag | `v2.4.0` (also `v2.3.0` this session) |
+| Marketing | Flagship story is now "Always know it's running"; OG `og-image.png?v=2.4.0` cache-bust (badge + 3 feature lines regenerated). |
 
 Release recipe unchanged: `scripts/do-<ver>-bump.mjs` + `_gen_og.py` + signed `npm run tauri:build` (env from `%USERPROFILE%\.tauri\`) → exe+sig to downloads → `updater/latest.json` → push → tag → macOS CI dmg → mac links. Every release this session pushed clean (no cron race) and byte-verified live on both hosts.
 
