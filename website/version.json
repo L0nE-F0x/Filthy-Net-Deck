@@ -1,5 +1,5 @@
 {
-  "version": "2.2.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.2.0.exe",
-  "notes": "v2.2.0: Copy the opponent's deck. Matchup Lab now reads the cards the tracker saw them play, guesses the closest ranked list, and lets you copy it as an Arena import or send it straight to Brew Lab to improve on — all local, nothing uploaded."
+  "version": "2.2.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.2.1.exe",
+  "notes": "v2.2.1: A UI polish pass — cleaner, more focused wording and labels across Decks, Sets, and Format Hub."
 }
