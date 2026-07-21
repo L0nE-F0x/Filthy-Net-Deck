@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T02:22:08.540Z",
+  "generatedAt": "2026-07-21T08:37:20.020Z",
   "date": "2026-07-21",
   "formats": [
     {
@@ -168,21 +168,21 @@
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "17.1% of tracked Standard decks (264 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Challenge 32).",
+      "description": "17.1% of tracked Standard decks (264 lists). Representative list from a recent event.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Leatherhead, Swamp Stalker",
-          "scryfallId": "b1f6b5b5-12ca-468d-bc53-dd0cde60e7b6",
-          "cmc": 4,
-          "type": "creature"
+          "count": 3,
+          "name": "Abandoned Air Temple",
+          "scryfallId": "9c0433f9-8f1e-4a19-a83f-a41925f1b1a9",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
-          "name": "Meltstrider's Resolve",
-          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
-          "cmc": 1,
-          "type": "enchantment"
+          "name": "Ba Sing Se",
+          "scryfallId": "bdf3b2be-d0cd-4a3c-a10e-82d32c12d3bd",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -199,6 +199,41 @@
           "land": true
         },
         {
+          "count": 4,
+          "name": "Pawpatch Recruit",
+          "scryfallId": "7d4d88ba-0ee4-4f66-995b-2e50614f50ee",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Meltstrider's Resolve",
+          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
+          "cmc": 1,
+          "type": "enchantment"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub",
+          "scryfallId": "340c5799-4964-44dd-8c48-8f3f3aba5211",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Leatherhead, Swamp Stalker",
+          "scryfallId": "b1f6b5b5-12ca-468d-bc53-dd0cde60e7b6",
+          "cmc": 4,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Hushwood Verge",
+          "scryfallId": "ec288d76-c1f5-471b-8a53-504f88469c1b",
+          "cmc": 0,
+          "land": true
+        },
+        {
           "count": 2,
           "name": "Ouroboroid",
           "scryfallId": "209c591a-4ab2-4e89-9523-a7b766cf4e51",
@@ -206,18 +241,25 @@
           "type": "creature"
         },
         {
-          "count": 1,
-          "name": "Erode",
-          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
-          "cmc": 1,
-          "type": "instant"
+          "count": 6,
+          "name": "Forest",
+          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
+          "cmc": 0,
+          "land": true
         },
         {
-          "count": 3,
-          "name": "Spider Manifestation",
-          "scryfallId": "99223677-b8a5-48f1-8009-e8475eada7db",
-          "cmc": 2,
-          "type": "creature"
+          "count": 4,
+          "name": "Practiced Offense",
+          "scryfallId": "79c7cf94-c0a1-432d-90d7-7f0599c2e7a8",
+          "cmc": 3,
+          "type": "sorcery"
+        },
+        {
+          "count": 4,
+          "name": "Temple Garden",
+          "scryfallId": "b9b0589d-f327-46a7-8bac-06b7654c547a",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 2,
@@ -235,59 +277,10 @@
         },
         {
           "count": 3,
-          "name": "Abandoned Air Temple",
-          "scryfallId": "9c0433f9-8f1e-4a19-a83f-a41925f1b1a9",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Practiced Offense",
-          "scryfallId": "79c7cf94-c0a1-432d-90d7-7f0599c2e7a8",
-          "cmc": 3,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Ba Sing Se",
-          "scryfallId": "bdf3b2be-d0cd-4a3c-a10e-82d32c12d3bd",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Hushwood Verge",
-          "scryfallId": "ec288d76-c1f5-471b-8a53-504f88469c1b",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Badgermole Cub",
-          "scryfallId": "340c5799-4964-44dd-8c48-8f3f3aba5211",
+          "name": "Spider Manifestation",
+          "scryfallId": "99223677-b8a5-48f1-8009-e8475eada7db",
           "cmc": 2,
           "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Temple Garden",
-          "scryfallId": "b9b0589d-f327-46a7-8bac-06b7654c547a",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Pawpatch Recruit",
-          "scryfallId": "7d4d88ba-0ee4-4f66-995b-2e50614f50ee",
-          "cmc": 1,
-          "type": "creature"
-        },
-        {
-          "count": 6,
-          "name": "Forest",
-          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
-          "cmc": 0,
-          "land": true
         },
         {
           "count": 3,
@@ -309,29 +302,43 @@
           "scryfallId": "61237530-ad49-469c-a952-67c92315708e",
           "cmc": 2,
           "type": "creature"
-        }
-      ],
-      "sideboard": [
+        },
         {
           "count": 1,
           "name": "Erode",
           "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
           "cmc": 1,
           "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Meltstrider's Resolve",
-          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
-          "cmc": 1,
-          "type": "enchantment"
-        },
+        }
+      ],
+      "sideboard": [
         {
           "count": 3,
           "name": "Dawn's Truce",
           "scryfallId": "8f72bfa0-efef-48ce-aff8-d5818ed71ba6",
           "cmc": 2,
           "type": "instant"
+        },
+        {
+          "count": 1,
+          "name": "Seam Rip",
+          "scryfallId": "9d298847-2d02-4593-b4d3-c5b722edac1e",
+          "cmc": 1,
+          "type": "enchantment"
+        },
+        {
+          "count": 1,
+          "name": "Soul-Guide Lantern",
+          "scryfallId": "f4907e7b-d6d5-4e9b-968f-bce34ae4a577",
+          "cmc": 1,
+          "type": "artifact"
+        },
+        {
+          "count": 3,
+          "name": "Rest in Peace",
+          "scryfallId": "d108c2b1-236e-4b8d-8445-d9749ccc4fea",
+          "cmc": 2,
+          "type": "enchantment"
         },
         {
           "count": 3,
@@ -341,18 +348,18 @@
           "type": "enchantment"
         },
         {
-          "count": 4,
-          "name": "Rest in Peace",
-          "scryfallId": "d108c2b1-236e-4b8d-8445-d9749ccc4fea",
-          "cmc": 2,
+          "count": 1,
+          "name": "Meltstrider's Resolve",
+          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
+          "cmc": 1,
           "type": "enchantment"
         },
         {
           "count": 1,
-          "name": "Seam Rip",
-          "scryfallId": "9d298847-2d02-4593-b4d3-c5b722edac1e",
+          "name": "Erode",
+          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
           "cmc": 1,
-          "type": "enchantment"
+          "type": "instant"
         },
         {
           "count": 2,
@@ -364,11 +371,11 @@
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Leatherhead, Swamp Stalker\n1 Meltstrider's Resolve\n4 Brightglass Gearhulk\n2 Multiversal Passage\n2 Ouroboroid\n1 Erode\n3 Spider Manifestation\n2 Plains\n2 Seam Rip\n3 Abandoned Air Temple\n4 Practiced Offense\n1 Ba Sing Se\n4 Hushwood Verge\n4 Badgermole Cub\n4 Temple Garden\n4 Pawpatch Recruit\n6 Forest\n3 Surrak, Elusive Hunter\n4 Llanowar Elves\n2 Jennifer Walters\n\nSideboard\n1 Erode\n1 Meltstrider's Resolve\n3 Dawn's Truce\n3 Sheltered by Ghosts\n4 Rest in Peace\n1 Seam Rip\n2 Elspeth, Storm Slayer",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Ba Sing Se\n4 Brightglass Gearhulk\n2 Multiversal Passage\n4 Pawpatch Recruit\n1 Meltstrider's Resolve\n4 Badgermole Cub\n4 Leatherhead, Swamp Stalker\n4 Hushwood Verge\n2 Ouroboroid\n6 Forest\n4 Practiced Offense\n4 Temple Garden\n2 Plains\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Llanowar Elves\n2 Jennifer Walters\n1 Erode\n\nSideboard\n3 Dawn's Truce\n1 Seam Rip\n1 Soul-Guide Lantern\n3 Rest in Peace\n3 Sheltered by Ghosts\n1 Meltstrider's Resolve\n1 Erode\n2 Elspeth, Storm Slayer",
       "sources": [
         {
-          "name": "MTGO — Standard Challenge 32 (itstime)",
-          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1912847716"
+          "name": "MTGO — Standard Challenge 32 (4FunNoWin)",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-2012847725"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -386,7 +393,7 @@
         "Practiced Offense"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Challenge 32, pilot itstime) matched to Goldfish archetype \"Selesnya Ouroboroid\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Selesnya Ouroboroid\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-izzet-prowess": {
@@ -401,7 +408,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "13.4% of tracked Standard decks (206 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "13.4% of tracked Standard decks (206 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -647,7 +654,7 @@
         "Flow State"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot makaaaa) matched to Goldfish archetype \"Izzet Prowess\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Prowess\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-jeskai-lessons": {
@@ -663,7 +670,7 @@
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "13.3% of tracked Standard decks (205 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "13.3% of tracked Standard decks (205 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -916,7 +923,7 @@
         "Accumulate Wisdom"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot deleon91) matched to Goldfish archetype \"Jeskai Lessons\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Jeskai Lessons\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-4c-control": {
@@ -933,7 +940,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "11.5% of tracked Standard decks (177 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "11.5% of tracked Standard decks (177 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 2,
@@ -1249,7 +1256,7 @@
         "Tablet of Discovery"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot BERNASTORRES) matched to Goldfish archetype \"4c Control\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"4c Control\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-izzet-spellementals": {
@@ -1264,7 +1271,7 @@
         "R"
       ],
       "archetype": "Izzet Spellementals",
-      "description": "9.5% of tracked Standard decks (146 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "9.5% of tracked Standard decks (146 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -1454,7 +1461,7 @@
         "Traumatic Critique"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot medvedev) matched to Goldfish archetype \"Izzet Spellementals\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Spellementals\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-dimir-excruciator": {
@@ -1469,7 +1476,7 @@
         "B"
       ],
       "archetype": "Dimir Excruciator",
-      "description": "5.7% of tracked Standard decks (88 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Challenge 32).",
+      "description": "5.7% of tracked Standard decks (88 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 2,
@@ -1694,7 +1701,7 @@
         "Winternight Stories"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Challenge 32, pilot kcomedina) matched to Goldfish archetype \"Dimir Excruciator\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Dimir Excruciator\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-mono-green-landfall": {
@@ -1708,7 +1715,7 @@
         "G"
       ],
       "archetype": "Mono-Green Landfall",
-      "description": "5.4% of tracked Standard decks (84 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "5.4% of tracked Standard decks (84 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 3,
@@ -1912,7 +1919,7 @@
         "Earthbender Ascension"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot pavementisrad7) matched to Goldfish archetype \"Mono-Green Landfall\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Mono-Green Landfall\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo3-izzet-lessons": {
@@ -1927,7 +1934,7 @@
         "R"
       ],
       "archetype": "Izzet Lessons",
-      "description": "2.1% of tracked Standard decks (33 lists) on MTGGoldfish. Representative list from recent mtgo (Standard Showcase Challenge).",
+      "description": "2.1% of tracked Standard decks (33 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -1944,10 +1951,31 @@
           "type": "instant"
         },
         {
+          "count": 2,
+          "name": "Agna Qel'a",
+          "scryfallId": "6b885829-a323-4f7d-87c9-aa4615dcbe5c",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Artist's Talent",
+          "scryfallId": "8b9e51d9-189b-4dd6-87cb-628ea6373e81",
+          "cmc": 2,
+          "type": "enchantment"
+        },
+        {
           "count": 4,
           "name": "Combustion Technique",
           "scryfallId": "fdcca576-2ef2-44cc-9944-a92bd146444a",
           "cmc": 2,
+          "type": "instant"
+        },
+        {
+          "count": 1,
+          "name": "Fire Magic",
+          "scryfallId": "415ff6a5-61ef-4b37-ae08-e44476300d4a",
+          "cmc": 1,
           "type": "instant"
         },
         {
@@ -1965,6 +1993,13 @@
           "type": "creature"
         },
         {
+          "count": 1,
+          "name": "Impractical Joke",
+          "scryfallId": "39a816b4-39b8-421c-b828-68db901d34b7",
+          "cmc": 1,
+          "type": "sorcery"
+        },
+        {
           "count": 2,
           "name": "Iroh's Demonstration",
           "scryfallId": "18d15fed-1f8f-4407-a221-a47ce75001a8",
@@ -1972,11 +2007,11 @@
           "type": "sorcery"
         },
         {
-          "count": 7,
-          "name": "Island",
-          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
-          "cmc": 0,
-          "land": true
+          "count": 2,
+          "name": "Quantum Riddler",
+          "scryfallId": "120be808-ff3b-4fca-96a1-4db6b9825856",
+          "cmc": 5,
+          "type": "creature"
         },
         {
           "count": 4,
@@ -1986,16 +2021,16 @@
           "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Mathemagics",
-          "scryfallId": "cd3cc172-5609-4bc8-9d84-50680fed6df9",
-          "cmc": 2,
-          "type": "sorcery"
+          "count": 4,
+          "name": "Monument to Endurance",
+          "scryfallId": "d21433ba-0a14-42bc-ad0b-a4ef823a3295",
+          "cmc": 3,
+          "type": "artifact"
         },
         {
-          "count": 3,
-          "name": "Mountain",
-          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
+          "count": 4,
+          "name": "Spirebluff Canal",
+          "scryfallId": "59a04e16-a767-4112-ab01-6ca1b09c286c",
           "cmc": 0,
           "land": true
         },
@@ -2007,37 +2042,16 @@
           "land": true
         },
         {
-          "count": 1,
-          "name": "Spell Snare",
-          "scryfallId": "b7551b61-656e-4f37-b9da-73174db983b7",
-          "cmc": 1,
-          "type": "instant"
+          "count": 3,
+          "name": "Mountain",
+          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
+          "cmc": 0,
+          "land": true
         },
         {
-          "count": 2,
-          "name": "Splatter Technique",
-          "scryfallId": "969b6657-c3b9-47e1-a42e-95bbcccf452d",
-          "cmc": 5,
-          "type": "sorcery"
-        },
-        {
-          "count": 4,
-          "name": "Tablet of Discovery",
-          "scryfallId": "13059664-a940-4a66-8100-0c90b884bab4",
-          "cmc": 3,
-          "type": "artifact"
-        },
-        {
-          "count": 2,
-          "name": "Three Steps Ahead",
-          "scryfallId": "8fffd839-2337-4a14-9312-cee085a17f4b",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 4,
-          "name": "Spirebluff Canal",
-          "scryfallId": "59a04e16-a767-4112-ab01-6ca1b09c286c",
+          "count": 5,
+          "name": "Island",
+          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
           "cmc": 0,
           "land": true
         },
@@ -2047,63 +2061,42 @@
           "scryfallId": "a83903c7-fd51-4526-aed2-359e946fea36",
           "cmc": 0,
           "land": true
-        },
-        {
-          "count": 2,
-          "name": "Thor, God of Thunder",
-          "scryfallId": "cddd314c-c271-475a-b076-01a8599c8015",
-          "cmc": 5,
-          "type": "creature"
         }
       ],
       "sideboard": [
         {
-          "count": 3,
+          "count": 4,
           "name": "Colorstorm Stallion",
           "scryfallId": "f5b54d46-2caf-4d1b-8be1-dbd9e9dce058",
           "cmc": 3,
           "type": "creature"
         },
         {
-          "count": 1,
-          "name": "Mathemagics",
-          "scryfallId": "cd3cc172-5609-4bc8-9d84-50680fed6df9",
-          "cmc": 2,
-          "type": "sorcery"
-        },
-        {
           "count": 2,
-          "name": "Pit of Offerings",
-          "scryfallId": "bc7d3957-b483-4a1f-a244-293c90032f5e",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Price of Freedom",
-          "scryfallId": "9fbe94e9-a71d-4a31-9210-c599abe08e3f",
-          "cmc": 2,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Thor, God of Thunder",
-          "scryfallId": "cddd314c-c271-475a-b076-01a8599c8015",
+          "name": "Emeritus of Ideation // Ancestral Recall",
+          "scryfallId": "75961d36-acf6-425f-9698-0bf52af74f31",
           "cmc": 5,
           "type": "creature"
         },
         {
           "count": 1,
+          "name": "Ghost Vacuum",
+          "scryfallId": "8ac39c01-127f-4471-bc74-11a90c48e306",
+          "cmc": 1,
+          "type": "artifact"
+        },
+        {
+          "count": 2,
           "name": "Spell Snare",
           "scryfallId": "b7551b61-656e-4f37-b9da-73174db983b7",
           "cmc": 1,
           "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Spell Pierce",
-          "scryfallId": "8dd4374f-0301-4b2e-bc99-2cd19568cb3b",
-          "cmc": 1,
+          "count": 2,
+          "name": "Return the Favor",
+          "scryfallId": "a9cc02d1-799d-42aa-9bc2-4c05452b63b4",
+          "cmc": 2,
           "type": "instant"
         },
         {
@@ -2112,15 +2105,22 @@
           "scryfallId": "8fffd839-2337-4a14-9312-cee085a17f4b",
           "cmc": 1,
           "type": "instant"
+        },
+        {
+          "count": 2,
+          "name": "Quantum Riddler",
+          "scryfallId": "120be808-ff3b-4fca-96a1-4db6b9825856",
+          "cmc": 5,
+          "type": "creature"
         }
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Abandon Attachments\n4 Accumulate Wisdom\n4 Combustion Technique\n4 Firebending Lesson\n4 Gran-Gran\n2 Iroh's Demonstration\n7 Island\n4 It'll Quench Ya!\n1 Mathemagics\n3 Mountain\n4 Riverpyre Verge\n1 Spell Snare\n2 Splatter Technique\n4 Tablet of Discovery\n2 Three Steps Ahead\n4 Spirebluff Canal\n4 Steam Vents\n2 Thor, God of Thunder\n\nSideboard\n3 Colorstorm Stallion\n1 Mathemagics\n2 Pit of Offerings\n4 Price of Freedom\n1 Thor, God of Thunder\n1 Spell Snare\n1 Spell Pierce\n2 Three Steps Ahead",
+      "arenaImport": "Deck\n4 Abandon Attachments\n4 Accumulate Wisdom\n2 Agna Qel'a\n4 Artist's Talent\n4 Combustion Technique\n1 Fire Magic\n4 Firebending Lesson\n4 Gran-Gran\n1 Impractical Joke\n2 Iroh's Demonstration\n2 Quantum Riddler\n4 It'll Quench Ya!\n4 Monument to Endurance\n4 Spirebluff Canal\n4 Riverpyre Verge\n3 Mountain\n5 Island\n4 Steam Vents\n\nSideboard\n4 Colorstorm Stallion\n2 Emeritus of Ideation\n1 Ghost Vacuum\n2 Spell Snare\n2 Return the Favor\n2 Three Steps Ahead\n2 Quantum Riddler",
       "sources": [
         {
-          "name": "MTGO — Standard Showcase Challenge (mysteryman21)",
-          "url": "https://www.mtgo.com/decklist/standard-showcase-challenge-2026-07-1112847088"
+          "name": "MTGO — Standard Challenge 32 (hermanomlg)",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-2012847725"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -2138,7 +2138,7 @@
         "Accumulate Wisdom"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot mysteryman21) matched to Goldfish archetype \"Izzet Lessons\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Lessons\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo1-mono-white-auras": {
@@ -2152,7 +2152,7 @@
         "W"
       ],
       "archetype": "Mono-White Auras",
-      "description": "17.2% of Standard Bo1 ladder matches on Untapped.gg (196,890 matches this meta period, 56.5% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "17.2% of Standard Bo1 ladder matches (197,685 matches this meta period, 56.6% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 4,
@@ -2248,7 +2248,7 @@
       ],
       "metaShare": 17.2,
       "listQuality": "authoritative",
-      "listNote": "Most-played Bo1 ladder list for this archetype on Untapped.gg (97,858 tracked matches) · all card names verified on Scryfall.",
+      "listNote": "Most-played Bo1 ladder list for this archetype (98,532 tracked matches) · all card names verified.",
       "listSource": "untapped"
     },
     "standard-bo1-4c-reanimator": {
@@ -2265,7 +2265,7 @@
         "G"
       ],
       "archetype": "4c Reanimator",
-      "description": "8% of Standard Bo1 ladder matches on Untapped.gg (80,903 matches this meta period, 58.8% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "8.1% of Standard Bo1 ladder matches (81,315 matches this meta period, 58.6% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 1,
@@ -2454,14 +2454,14 @@
           "url": "https://www.mtggoldfish.com/metagame/standard"
         }
       ],
-      "metaShare": 8,
+      "metaShare": 8.1,
       "keyCards": [
         "Overlord of the Balemurk",
         "Formidable Speaker",
         "Deceit"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live from MTGGoldfish archetype page (deck #7873174) · all card names verified on Scryfall.",
+      "listNote": "Current representative list · all card names verified.",
       "listSource": "goldfish"
     },
     "standard-bo1-jeskai-lessons": {
@@ -2477,7 +2477,7 @@
         "R"
       ],
       "archetype": "Jeskai Lessons",
-      "description": "5.5% of Standard Bo1 ladder matches on Untapped.gg (56,178 matches this meta period, 51.9% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "5.5% of Standard Bo1 ladder matches (56,438 matches this meta period, 51.6% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 4,
@@ -2649,7 +2649,7 @@
         "Accumulate Wisdom"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot deleon91) matched to Goldfish archetype \"Jeskai Lessons\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Jeskai Lessons\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo1-mono-black-demons": {
@@ -2663,7 +2663,7 @@
         "B"
       ],
       "archetype": "Mono-Black Demons",
-      "description": "5.4% of Standard Bo1 ladder matches on Untapped.gg (66,523 matches this meta period, 53.2% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "5.4% of Standard Bo1 ladder matches (66,738 matches this meta period, 53.2% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 1,
@@ -2787,7 +2787,7 @@
       ],
       "metaShare": 5.4,
       "listQuality": "authoritative",
-      "listNote": "Most-played Bo1 ladder list for this archetype on Untapped.gg (18,519 tracked matches) · all card names verified on Scryfall.",
+      "listNote": "Most-played Bo1 ladder list for this archetype (18,697 tracked matches) · all card names verified.",
       "listSource": "untapped"
     },
     "standard-bo1-4c-control": {
@@ -2804,7 +2804,7 @@
         "R"
       ],
       "archetype": "4c Control",
-      "description": "4.1% of Standard Bo1 ladder matches on Untapped.gg (53,188 matches this meta period, 54.7% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "4.1% of Standard Bo1 ladder matches (53,374 matches this meta period, 54.7% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 2,
@@ -3039,7 +3039,7 @@
         "Tablet of Discovery"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Showcase Challenge, pilot BERNASTORRES) matched to Goldfish archetype \"4c Control\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"4c Control\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo1-jeskai-artifacts": {
@@ -3055,7 +3055,7 @@
         "R"
       ],
       "archetype": "Jeskai Artifacts",
-      "description": "4% of Standard Bo1 ladder matches on Untapped.gg (41,586 matches this meta period, 55.3% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "4% of Standard Bo1 ladder matches (41,780 matches this meta period, 55.9% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 5,
@@ -3213,7 +3213,7 @@
         "Cryogen Relic"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from magic.gg (Traditional (Bo3), pilot Platinum-Mythic Rank Player) matched to Goldfish archetype \"Jeskai Artifacts\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Jeskai Artifacts\" archetype · all card names verified.",
       "listSource": "magic.gg"
     },
     "standard-bo1-selesnya-ouroboroid": {
@@ -3228,21 +3228,21 @@
         "G"
       ],
       "archetype": "Selesnya Ouroboroid",
-      "description": "4% of Standard Bo1 ladder matches on Untapped.gg (31,176 matches this meta period, 56.8% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "4% of Standard Bo1 ladder matches (31,360 matches this meta period, 56.8% ladder winrate). Representative verified list.",
       "mainboard": [
         {
-          "count": 4,
-          "name": "Leatherhead, Swamp Stalker",
-          "scryfallId": "b1f6b5b5-12ca-468d-bc53-dd0cde60e7b6",
-          "cmc": 4,
-          "type": "creature"
+          "count": 3,
+          "name": "Abandoned Air Temple",
+          "scryfallId": "9c0433f9-8f1e-4a19-a83f-a41925f1b1a9",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
-          "name": "Meltstrider's Resolve",
-          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
-          "cmc": 1,
-          "type": "enchantment"
+          "name": "Ba Sing Se",
+          "scryfallId": "bdf3b2be-d0cd-4a3c-a10e-82d32c12d3bd",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -3259,6 +3259,41 @@
           "land": true
         },
         {
+          "count": 4,
+          "name": "Pawpatch Recruit",
+          "scryfallId": "7d4d88ba-0ee4-4f66-995b-2e50614f50ee",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Meltstrider's Resolve",
+          "scryfallId": "53c08af4-b975-4d9d-baba-73e6727f2778",
+          "cmc": 1,
+          "type": "enchantment"
+        },
+        {
+          "count": 4,
+          "name": "Badgermole Cub",
+          "scryfallId": "340c5799-4964-44dd-8c48-8f3f3aba5211",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Leatherhead, Swamp Stalker",
+          "scryfallId": "b1f6b5b5-12ca-468d-bc53-dd0cde60e7b6",
+          "cmc": 4,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Hushwood Verge",
+          "scryfallId": "ec288d76-c1f5-471b-8a53-504f88469c1b",
+          "cmc": 0,
+          "land": true
+        },
+        {
           "count": 2,
           "name": "Ouroboroid",
           "scryfallId": "209c591a-4ab2-4e89-9523-a7b766cf4e51",
@@ -3266,18 +3301,25 @@
           "type": "creature"
         },
         {
-          "count": 1,
-          "name": "Erode",
-          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
-          "cmc": 1,
-          "type": "instant"
+          "count": 6,
+          "name": "Forest",
+          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
+          "cmc": 0,
+          "land": true
         },
         {
-          "count": 3,
-          "name": "Spider Manifestation",
-          "scryfallId": "99223677-b8a5-48f1-8009-e8475eada7db",
-          "cmc": 2,
-          "type": "creature"
+          "count": 4,
+          "name": "Practiced Offense",
+          "scryfallId": "79c7cf94-c0a1-432d-90d7-7f0599c2e7a8",
+          "cmc": 3,
+          "type": "sorcery"
+        },
+        {
+          "count": 4,
+          "name": "Temple Garden",
+          "scryfallId": "b9b0589d-f327-46a7-8bac-06b7654c547a",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 2,
@@ -3295,59 +3337,10 @@
         },
         {
           "count": 3,
-          "name": "Abandoned Air Temple",
-          "scryfallId": "9c0433f9-8f1e-4a19-a83f-a41925f1b1a9",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Practiced Offense",
-          "scryfallId": "79c7cf94-c0a1-432d-90d7-7f0599c2e7a8",
-          "cmc": 3,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Ba Sing Se",
-          "scryfallId": "bdf3b2be-d0cd-4a3c-a10e-82d32c12d3bd",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Hushwood Verge",
-          "scryfallId": "ec288d76-c1f5-471b-8a53-504f88469c1b",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Badgermole Cub",
-          "scryfallId": "340c5799-4964-44dd-8c48-8f3f3aba5211",
+          "name": "Spider Manifestation",
+          "scryfallId": "99223677-b8a5-48f1-8009-e8475eada7db",
           "cmc": 2,
           "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Temple Garden",
-          "scryfallId": "b9b0589d-f327-46a7-8bac-06b7654c547a",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Pawpatch Recruit",
-          "scryfallId": "7d4d88ba-0ee4-4f66-995b-2e50614f50ee",
-          "cmc": 1,
-          "type": "creature"
-        },
-        {
-          "count": 6,
-          "name": "Forest",
-          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
-          "cmc": 0,
-          "land": true
         },
         {
           "count": 3,
@@ -3369,20 +3362,27 @@
           "scryfallId": "61237530-ad49-469c-a952-67c92315708e",
           "cmc": 2,
           "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Erode",
+          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
+          "cmc": 1,
+          "type": "instant"
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Leatherhead, Swamp Stalker\n1 Meltstrider's Resolve\n4 Brightglass Gearhulk\n2 Multiversal Passage\n2 Ouroboroid\n1 Erode\n3 Spider Manifestation\n2 Plains\n2 Seam Rip\n3 Abandoned Air Temple\n4 Practiced Offense\n1 Ba Sing Se\n4 Hushwood Verge\n4 Badgermole Cub\n4 Temple Garden\n4 Pawpatch Recruit\n6 Forest\n3 Surrak, Elusive Hunter\n4 Llanowar Elves\n2 Jennifer Walters",
+      "arenaImport": "Deck\n3 Abandoned Air Temple\n1 Ba Sing Se\n4 Brightglass Gearhulk\n2 Multiversal Passage\n4 Pawpatch Recruit\n1 Meltstrider's Resolve\n4 Badgermole Cub\n4 Leatherhead, Swamp Stalker\n4 Hushwood Verge\n2 Ouroboroid\n6 Forest\n4 Practiced Offense\n4 Temple Garden\n2 Plains\n2 Seam Rip\n3 Spider Manifestation\n3 Surrak, Elusive Hunter\n4 Llanowar Elves\n2 Jennifer Walters\n1 Erode",
       "sources": [
         {
           "name": "Untapped.gg — Standard Bo1 ladder meta",
           "url": "https://mtga.untapped.gg/constructed/standard/meta"
         },
         {
-          "name": "MTGO — Standard Challenge 32 (itstime)",
-          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-1912847716"
+          "name": "MTGO — Standard Challenge 32 (4FunNoWin)",
+          "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-2012847725"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -3400,7 +3400,7 @@
         "Practiced Offense"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Standard Challenge 32, pilot itstime) matched to Goldfish archetype \"Selesnya Ouroboroid\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Selesnya Ouroboroid\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "standard-bo1-mono-white-lifegain": {
@@ -3414,7 +3414,7 @@
         "W"
       ],
       "archetype": "Mono-White Lifegain",
-      "description": "3.6% of Standard Bo1 ladder matches on Untapped.gg (40,388 matches this meta period, 57.5% ladder winrate). Representative Scryfall-verified list from the usual sources.",
+      "description": "3.7% of Standard Bo1 ladder matches (40,640 matches this meta period, 57.5% ladder winrate). Representative verified list.",
       "mainboard": [
         {
           "count": 2,
@@ -3515,9 +3515,9 @@
           "url": "https://mtga.untapped.gg/constructed/standard/decks"
         }
       ],
-      "metaShare": 3.6,
+      "metaShare": 3.7,
       "listQuality": "authoritative",
-      "listNote": "Most-played Bo1 ladder list for this archetype on Untapped.gg (10,864 tracked matches) · all card names verified on Scryfall.",
+      "listNote": "Most-played Bo1 ladder list for this archetype (10,916 tracked matches) · all card names verified.",
       "listSource": "untapped"
     },
     "pioneer-bo3-mono-red-prowess": {
@@ -3531,7 +3531,7 @@
         "R"
       ],
       "archetype": "Mono-Red Prowess",
-      "description": "11.9% of tracked Pioneer decks (123 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "11.9% of tracked Pioneer decks (123 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -3549,10 +3549,10 @@
         },
         {
           "count": 4,
-          "name": "Emberheart Challenger",
-          "scryfallId": "0035082e-bb86-4f95-be48-ffc87fe5286d",
-          "cmc": 2,
-          "type": "creature"
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -3562,6 +3562,13 @@
           "type": "enchantment"
         },
         {
+          "count": 4,
+          "name": "Monastery Swiftspear",
+          "scryfallId": "d6bfa227-4309-40ed-952c-279595eab17e",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
           "count": 2,
           "name": "Monstrous Rage",
           "scryfallId": "eef5a0ae-5907-42c9-a097-3f973737e392",
@@ -3569,11 +3576,11 @@
           "type": "instant"
         },
         {
-          "count": 4,
-          "name": "Monastery Swiftspear",
-          "scryfallId": "d6bfa227-4309-40ed-952c-279595eab17e",
-          "cmc": 1,
-          "type": "creature"
+          "count": 12,
+          "name": "Mountain",
+          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -3626,24 +3633,17 @@
         },
         {
           "count": 4,
+          "name": "Emberheart Challenger",
+          "scryfallId": "0035082e-bb86-4f95-be48-ffc87fe5286d",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
           "name": "Sunspine Lynx",
           "scryfallId": "8995ceaf-b7e0-423c-8f3e-25212d522502",
           "cmc": 4,
           "type": "creature"
-        },
-        {
-          "count": 12,
-          "name": "Mountain",
-          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
         }
       ],
       "sideboard": [
@@ -3692,11 +3692,11 @@
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Bonecrusher Giant\n2 Den of the Bugbear\n4 Emberheart Challenger\n4 Kumano Faces Kakkazan\n2 Monstrous Rage\n4 Monastery Swiftspear\n4 Burst Lightning\n3 Ramunap Ruins\n3 Reckless Rage\n1 Rockface Village\n4 Screaming Nemesis\n1 Sokenzan, Crucible of Defiance\n4 Soul-Scar Mage\n4 Sunspine Lynx\n12 Mountain\n4 Mutavault\n\nSideboard\n3 Flowstone Infusion\n4 Magebane Lizard\n2 Pyroclasm\n2 Redcap Melee\n2 Scorching Shot\n2 Weathered Runestone",
+      "arenaImport": "Deck\n4 Bonecrusher Giant\n2 Den of the Bugbear\n4 Mutavault\n4 Kumano Faces Kakkazan\n4 Monastery Swiftspear\n2 Monstrous Rage\n12 Mountain\n4 Burst Lightning\n3 Ramunap Ruins\n3 Reckless Rage\n1 Rockface Village\n4 Screaming Nemesis\n1 Sokenzan, Crucible of Defiance\n4 Soul-Scar Mage\n4 Emberheart Challenger\n4 Sunspine Lynx\n\nSideboard\n3 Flowstone Infusion\n4 Magebane Lizard\n2 Pyroclasm\n2 Redcap Melee\n2 Scorching Shot\n2 Weathered Runestone",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Danielpena397)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (TheBigBrain)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -3714,7 +3714,7 @@
         "Emberheart Challenger"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Danielpena397) matched to Goldfish archetype \"Mono-Red Prowess\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Mono-Red Prowess\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-golgari-midrange": {
@@ -3729,14 +3729,14 @@
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "11% of tracked Pioneer decks (114 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "11% of tracked Pioneer decks (114 lists). Representative list from a recent event.",
       "mainboard": [
         {
-          "count": 3,
-          "name": "Swamp",
-          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
-          "cmc": 0,
-          "land": true
+          "count": 4,
+          "name": "Fatal Push",
+          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
+          "cmc": 1,
+          "type": "instant"
         },
         {
           "count": 4,
@@ -3746,6 +3746,13 @@
           "type": "creature"
         },
         {
+          "count": 4,
+          "name": "Blooming Marsh",
+          "scryfallId": "861caabb-0573-4e94-8b03-342f90465064",
+          "cmc": 0,
+          "land": true
+        },
+        {
           "count": 1,
           "name": "Boseiju, Who Endures",
           "scryfallId": "2135ac5a-187b-4dc9-8f82-34e8d1603416",
@@ -3753,10 +3760,10 @@
           "land": true
         },
         {
-          "count": 2,
-          "name": "Culling Ritual",
-          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
-          "cmc": 4,
+          "count": 4,
+          "name": "Thoughtseize",
+          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
+          "cmc": 1,
           "type": "sorcery"
         },
         {
@@ -3775,17 +3782,17 @@
         },
         {
           "count": 4,
-          "name": "Fatal Push",
-          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
-          "cmc": 1,
-          "type": "instant"
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 3,
-          "name": "Professor Dellian Fel",
-          "scryfallId": "6ff3b4d8-1271-4c5d-8834-7662244f173d",
-          "cmc": 4,
-          "type": "planeswalker"
+          "name": "Swamp",
+          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
@@ -3809,11 +3816,11 @@
           "land": true
         },
         {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
+          "count": 3,
+          "name": "Professor Dellian Fel",
+          "scryfallId": "6ff3b4d8-1271-4c5d-8834-7662244f173d",
+          "cmc": 4,
+          "type": "planeswalker"
         },
         {
           "count": 4,
@@ -3823,11 +3830,11 @@
           "land": true
         },
         {
-          "count": 1,
-          "name": "Forest",
-          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
-          "cmc": 0,
-          "land": true
+          "count": 2,
+          "name": "Sheoldred, the Apocalypse",
+          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+          "cmc": 4,
+          "type": "creature"
         },
         {
           "count": 1,
@@ -3844,11 +3851,11 @@
           "type": "creature"
         },
         {
-          "count": 2,
-          "name": "Sheoldred, the Apocalypse",
-          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
-          "cmc": 4,
-          "type": "creature"
+          "count": 4,
+          "name": "Unholy Annex // Ritual Chamber",
+          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
+          "cmc": 8,
+          "type": "enchantment"
         },
         {
           "count": 1,
@@ -3865,25 +3872,25 @@
           "type": "instant"
         },
         {
-          "count": 4,
-          "name": "Blooming Marsh",
-          "scryfallId": "861caabb-0573-4e94-8b03-342f90465064",
+          "count": 2,
+          "name": "Culling Ritual",
+          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
+          "cmc": 4,
+          "type": "sorcery"
+        },
+        {
+          "count": 1,
+          "name": "Forest",
+          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber",
-          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
-          "cmc": 8,
-          "type": "enchantment"
-        },
-        {
-          "count": 3,
-          "name": "Abrupt Decay",
-          "scryfallId": "a8e328c6-3a84-49cf-a1a3-1d1e5373d274",
-          "cmc": 2,
-          "type": "instant"
+          "count": 1,
+          "name": "Urborg, Tomb of Yawgmoth",
+          "scryfallId": "9e1a9e38-6ffc-490f-b0be-23ba4e8204c6",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
@@ -3893,27 +3900,20 @@
           "land": true
         },
         {
-          "count": 4,
-          "name": "Thoughtseize",
-          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
-          "cmc": 1,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Urborg, Tomb of Yawgmoth",
-          "scryfallId": "9e1a9e38-6ffc-490f-b0be-23ba4e8204c6",
-          "cmc": 0,
-          "land": true
+          "count": 3,
+          "name": "Abrupt Decay",
+          "scryfallId": "a8e328c6-3a84-49cf-a1a3-1d1e5373d274",
+          "cmc": 2,
+          "type": "instant"
         }
       ],
       "sideboard": [
         {
           "count": 1,
-          "name": "Culling Ritual",
-          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
-          "cmc": 4,
-          "type": "sorcery"
+          "name": "Sheoldred's Edict",
+          "scryfallId": "a9225cc3-90f0-448f-a8d9-7c6c2796d077",
+          "cmc": 2,
+          "type": "instant"
         },
         {
           "count": 2,
@@ -3959,10 +3959,10 @@
         },
         {
           "count": 1,
-          "name": "Sheoldred's Edict",
-          "scryfallId": "a9225cc3-90f0-448f-a8d9-7c6c2796d077",
-          "cmc": 2,
-          "type": "instant"
+          "name": "Culling Ritual",
+          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
+          "cmc": 4,
+          "type": "sorcery"
         },
         {
           "count": 2,
@@ -3981,11 +3981,11 @@
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n3 Swamp\n4 Badgermole Cub\n1 Boseiju, Who Endures\n2 Culling Ritual\n1 Elegy Acolyte\n1 Emeritus of Abundance\n4 Fatal Push\n3 Professor Dellian Fel\n1 Go for the Throat\n3 Graveyard Trespasser\n4 Overgrown Tomb\n4 Mutavault\n4 Llanowar Wastes\n1 Forest\n1 Restless Cottage\n2 Sentinel of the Nameless City\n2 Sheoldred, the Apocalypse\n1 Takenuma, Abandoned Mire\n1 Tear Asunder\n4 Blooming Marsh\n4 Unholy Annex\n3 Abrupt Decay\n1 Wastewood Verge\n4 Thoughtseize\n1 Urborg, Tomb of Yawgmoth\n\nSideboard\n1 Culling Ritual\n2 Duress\n1 End of the Hunt\n2 Go Blank\n2 Invoke Despair\n1 Necromentia\n2 Ray of Enfeeblement\n1 Sheoldred's Edict\n2 Unlicensed Hearse\n1 Withering Curse",
+      "arenaImport": "Deck\n4 Fatal Push\n4 Badgermole Cub\n4 Blooming Marsh\n1 Boseiju, Who Endures\n4 Thoughtseize\n1 Elegy Acolyte\n1 Emeritus of Abundance\n4 Mutavault\n3 Swamp\n1 Go for the Throat\n3 Graveyard Trespasser\n4 Overgrown Tomb\n3 Professor Dellian Fel\n4 Llanowar Wastes\n2 Sheoldred, the Apocalypse\n1 Restless Cottage\n2 Sentinel of the Nameless City\n4 Unholy Annex\n1 Takenuma, Abandoned Mire\n1 Tear Asunder\n2 Culling Ritual\n1 Forest\n1 Urborg, Tomb of Yawgmoth\n1 Wastewood Verge\n3 Abrupt Decay\n\nSideboard\n1 Sheoldred's Edict\n2 Duress\n1 End of the Hunt\n2 Go Blank\n2 Invoke Despair\n1 Necromentia\n2 Ray of Enfeeblement\n1 Culling Ritual\n2 Unlicensed Hearse\n1 Withering Curse",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Arianne)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (Dioferreira)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -4003,7 +4003,7 @@
         "Fatal Push"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Arianne) matched to Goldfish archetype \"Golgari Midrange\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Golgari Midrange\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-izzet-prowess": {
@@ -4018,7 +4018,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "10.1% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "10.1% of tracked Pioneer decks (104 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -4091,13 +4091,6 @@
           "land": true
         },
         {
-          "count": 3,
-          "name": "Burst Lightning",
-          "scryfallId": "aec5d380-d354-4750-931a-6c91853e2edc",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
           "count": 4,
           "name": "Soul-Scar Mage",
           "scryfallId": "a8003786-6e2a-4e2d-a915-f23293c7273a",
@@ -4152,22 +4145,29 @@
           "scryfallId": "eef5a0ae-5907-42c9-a097-3f973737e392",
           "cmc": 1,
           "type": "instant"
+        },
+        {
+          "count": 3,
+          "name": "Burst Lightning",
+          "scryfallId": "aec5d380-d354-4750-931a-6c91853e2edc",
+          "cmc": 1,
+          "type": "instant"
         }
       ],
       "sideboard": [
-        {
-          "count": 2,
-          "name": "Spell Pierce",
-          "scryfallId": "8dd4374f-0301-4b2e-bc99-2cd19568cb3b",
-          "cmc": 1,
-          "type": "instant"
-        },
         {
           "count": 1,
           "name": "Boomerang Basics",
           "scryfallId": "17ab958a-abc6-472e-ad6a-97c731d89c74",
           "cmc": 1,
           "type": "sorcery"
+        },
+        {
+          "count": 1,
+          "name": "Ghost Vacuum",
+          "scryfallId": "8ac39c01-127f-4471-bc74-11a90c48e306",
+          "cmc": 1,
+          "type": "artifact"
         },
         {
           "count": 1,
@@ -4184,11 +4184,11 @@
           "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Ghost Vacuum",
-          "scryfallId": "8ac39c01-127f-4471-bc74-11a90c48e306",
+          "count": 2,
+          "name": "Spell Pierce",
+          "scryfallId": "8dd4374f-0301-4b2e-bc99-2cd19568cb3b",
           "cmc": 1,
-          "type": "artifact"
+          "type": "instant"
         },
         {
           "count": 1,
@@ -4235,11 +4235,11 @@
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Academic Dispute\n3 Boomerang Basics\n1 Island\n4 Monastery Swiftspear\n4 Flow State\n4 Sleight of Hand\n3 Emberheart Challenger\n3 Reckless Rage\n2 Riverglide Pathway\n4 Riverpyre Verge\n3 Burst Lightning\n4 Soul-Scar Mage\n4 Spirebluff Canal\n4 Steam Vents\n4 Stormchaser's Talent\n3 Shivan Reef\n2 Screaming Nemesis\n2 Mountain\n2 Monstrous Rage\n\nSideboard\n2 Spell Pierce\n1 Boomerang Basics\n1 Accumulate Wisdom\n1 Firebending Lesson\n1 Ghost Vacuum\n1 Iroh's Demonstration\n1 It'll Quench Ya!\n1 Octopus Form\n2 Redcap Melee\n2 Scorching Shot\n2 Quantum Riddler",
+      "arenaImport": "Deck\n4 Academic Dispute\n3 Boomerang Basics\n1 Island\n4 Monastery Swiftspear\n4 Flow State\n4 Sleight of Hand\n3 Emberheart Challenger\n3 Reckless Rage\n2 Riverglide Pathway\n4 Riverpyre Verge\n4 Soul-Scar Mage\n4 Spirebluff Canal\n4 Steam Vents\n4 Stormchaser's Talent\n3 Shivan Reef\n2 Screaming Nemesis\n2 Mountain\n2 Monstrous Rage\n3 Burst Lightning\n\nSideboard\n1 Boomerang Basics\n1 Ghost Vacuum\n1 Accumulate Wisdom\n1 Firebending Lesson\n2 Spell Pierce\n1 Iroh's Demonstration\n1 It'll Quench Ya!\n1 Octopus Form\n2 Redcap Melee\n2 Scorching Shot\n2 Quantum Riddler",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (PedraStone)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (RioMare85)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -4257,7 +4257,7 @@
         "Monastery Swiftspear"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot PedraStone) matched to Goldfish archetype \"Izzet Prowess\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Prowess\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-abzan-greasefang": {
@@ -4273,7 +4273,7 @@
         "G"
       ],
       "archetype": "Abzan Greasefang",
-      "description": "8.2% of tracked Pioneer decks (85 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "8.2% of tracked Pioneer decks (85 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 3,
@@ -4523,20 +4523,27 @@
           "type": "creature"
         },
         {
-          "count": 2,
-          "name": "Ral Zarek, Guest Lecturer",
-          "scryfallId": "8fbad757-4081-42f7-a460-68ac03e77510",
-          "cmc": 3,
-          "type": "planeswalker"
+          "count": 1,
+          "name": "Yathan Roadwatcher",
+          "scryfallId": "8e77339b-dd82-481c-9ee2-4156ca69ad35",
+          "cmc": 4,
+          "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Overlord of the Balemurk",
+          "scryfallId": "9b911653-7b96-4cf3-a907-13c5c53a14f7",
+          "cmc": 5,
+          "type": "creature"
         }
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n3 Bitter Triumph\n4 Concealed Courtyard\n1 Boseiju, Who Endures\n4 Cache Grab\n4 Multiversal Passage\n3 Esika's Chariot\n4 Formidable Speaker\n1 Caves of Koilos\n4 Greasefang, Okiba Boss\n1 Forest\n1 Overlord of the Balemurk\n4 Parhelion II\n1 Swamp\n4 Professor of Symbology\n1 Jennifer Walters\n1 Takenuma, Abandoned Mire\n2 Thundering Broodwagon\n1 Emptiness\n4 Blooming Marsh\n1 Selfless Savior\n1 Plains\n4 Temple Garden\n1 Yathan Roadwatcher\n4 Thoughtseize\n1 Skysovereign, Consul Flagship\n\nSideboard\n2 Duress\n1 Enter the Avatar State\n1 Loran of the Third Path\n1 Origin of Metalbending\n1 Beza, the Bounding Spring\n1 Remorseful Cleric\n3 Abrupt Decay\n1 True Ancestry\n1 Ruinous Waterbending\n1 Grand Abolisher\n2 Ral Zarek, Guest Lecturer",
+      "arenaImport": "Deck\n3 Bitter Triumph\n4 Concealed Courtyard\n1 Boseiju, Who Endures\n4 Cache Grab\n4 Multiversal Passage\n3 Esika's Chariot\n4 Formidable Speaker\n1 Caves of Koilos\n4 Greasefang, Okiba Boss\n1 Forest\n1 Overlord of the Balemurk\n4 Parhelion II\n1 Swamp\n4 Professor of Symbology\n1 Jennifer Walters\n1 Takenuma, Abandoned Mire\n2 Thundering Broodwagon\n1 Emptiness\n4 Blooming Marsh\n1 Selfless Savior\n1 Plains\n4 Temple Garden\n1 Yathan Roadwatcher\n4 Thoughtseize\n1 Skysovereign, Consul Flagship\n\nSideboard\n2 Duress\n1 Enter the Avatar State\n1 Loran of the Third Path\n1 Origin of Metalbending\n1 Beza, the Bounding Spring\n1 Remorseful Cleric\n3 Abrupt Decay\n1 True Ancestry\n1 Ruinous Waterbending\n1 Grand Abolisher\n1 Yathan Roadwatcher\n1 Overlord of the Balemurk",
       "sources": [
         {
           "name": "MTGO — Pioneer Challenge 32 (VitorCarvalho01)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847710"
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -4554,7 +4561,7 @@
         "Thoughtseize"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot VitorCarvalho01) matched to Goldfish archetype \"Abzan Greasefang\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Abzan Greasefang\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-azorius-control": {
@@ -4569,236 +4576,173 @@
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "7% of tracked Pioneer decks (72 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "7% of tracked Pioneer decks (72 lists). Representative list from a recent event.",
       "mainboard": [
         {
-          "count": 6,
+          "count": 4,
           "name": "Plains",
           "scryfallId": "5f9b6584-ad27-410d-b6f1-c25c91630aea",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 2,
-          "name": "Petrified Hamlet",
-          "scryfallId": "355dd460-b0e9-41f2-a058-b7f7e39ac387",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 2,
-          "name": "Emeritus of Ideation // Ancestral Recall",
-          "scryfallId": "75961d36-acf6-425f-9698-0bf52af74f31",
-          "cmc": 5,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Erode",
-          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 3,
-          "name": "Beza, the Bounding Spring",
-          "scryfallId": "fc310a26-b6a0-4e42-98ab-bdfd7b06cb63",
-          "cmc": 4,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Ultima",
-          "scryfallId": "39504a0e-f63f-4907-afd7-c4492f6b8a3b",
-          "cmc": 5,
+          "count": 4,
+          "name": "Cleansing Wildfire",
+          "scryfallId": "492d77e5-acc6-41b8-8930-f39d69234919",
+          "cmc": 2,
           "type": "sorcery"
         },
         {
           "count": 4,
-          "name": "Floodfarm Verge",
-          "scryfallId": "d53ed0db-1199-44b3-8eda-8189dfcf53d1",
+          "name": "Mountain",
+          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 5,
-          "name": "Island",
-          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "No More Lies",
-          "scryfallId": "1e0c695d-62f9-4805-9e2f-7032e8464136",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 4,
+          "count": 2,
           "name": "Get Lost",
           "scryfallId": "522aa72b-2b8c-484c-872b-f082101cee35",
           "cmc": 2,
           "type": "instant"
         },
         {
-          "count": 3,
-          "name": "Restless Anchorage",
-          "scryfallId": "e3cab352-734e-454b-8b58-733165f4b3b3",
+          "count": 2,
+          "name": "Flashback",
+          "scryfallId": "1b832fda-d7c4-4566-884c-2a8b6da15488",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Erode",
+          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Field of Ruin",
+          "scryfallId": "143147d2-2eec-41e7-b78a-592288b38630",
           "cmc": 0,
           "land": true
         },
         {
           "count": 4,
-          "name": "Temporary Lockdown",
-          "scryfallId": "82b3088f-7b49-45e9-b447-129a597ceb75",
-          "cmc": 3,
-          "type": "enchantment"
+          "name": "Fiery Impulse",
+          "scryfallId": "5b81a589-44bf-4441-9079-1ae66d067519",
+          "cmc": 1,
+          "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Otawara, Soaring City",
-          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
+          "count": 2,
+          "name": "Elegant Parlor",
+          "scryfallId": "72c6d541-e2cb-4d6e-acac-90a8f53b7006",
           "cmc": 0,
           "land": true
         },
         {
           "count": 4,
-          "name": "The Wandering Emperor",
-          "scryfallId": "fab2d8a9-ab4c-4225-a570-22636293c17d",
-          "cmc": 4,
-          "type": "planeswalker"
-        },
-        {
-          "count": 4,
-          "name": "Hallowed Fountain",
-          "scryfallId": "b7285986-7e08-4969-86ef-452dc5bfdd9f",
+          "name": "Demolition Field",
+          "scryfallId": "0c7e51b6-4898-4632-b39c-3ce438caa882",
           "cmc": 0,
           "land": true
         },
         {
           "count": 2,
-          "name": "Supreme Verdict",
-          "scryfallId": "3892f1c5-937e-4ef4-b6f9-e0c0ded070d0",
+          "name": "Day of Judgment",
+          "scryfallId": "96e84bdc-8a9a-4c58-ba8b-9f052fd60069",
           "cmc": 4,
           "type": "sorcery"
         },
         {
+          "count": 4,
+          "name": "Price of Freedom",
+          "scryfallId": "9fbe94e9-a71d-4a31-9210-c599abe08e3f",
+          "cmc": 2,
+          "type": "sorcery"
+        },
+        {
           "count": 1,
-          "name": "Fountainport",
-          "scryfallId": "658cfcb7-81b7-48c6-9dd2-1663d06108cf",
+          "name": "Cori Mountain Monastery",
+          "scryfallId": "9312821a-2059-4f44-9b20-c9522b827e38",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 3,
-          "name": "Teferi, Hero of Dominaria",
-          "scryfallId": "5d10b752-d9cb-419d-a5c4-d4ee1acb655e",
-          "cmc": 5,
-          "type": "planeswalker"
+          "count": 1,
+          "name": "Castle Ardenvale",
+          "scryfallId": "65e4de2e-47d2-4967-be31-9df0057a9c74",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
-          "name": "Dovin's Veto",
-          "scryfallId": "5d6b5054-2224-4f68-9d82-3ed17c5dacc4",
-          "cmc": 2,
-          "type": "instant"
+          "name": "Tablet of Discovery",
+          "scryfallId": "13059664-a940-4a66-8100-0c90b884bab4",
+          "cmc": 3,
+          "type": "artifact"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring",
+          "scryfallId": "fc310a26-b6a0-4e42-98ab-bdfd7b06cb63",
+          "cmc": 4,
+          "type": "creature"
         },
         {
           "count": 3,
-          "name": "Omen of the Sea",
-          "scryfallId": "a5f30ecd-d009-4d44-aef4-c926ed55a521",
+          "name": "Avengers Disassembled",
+          "scryfallId": "72d3e750-870b-497d-80d7-e3df097db554",
+          "cmc": 3,
+          "type": "sorcery"
+        },
+        {
+          "count": 2,
+          "name": "Sacred Foundry",
+          "scryfallId": "a7758cc6-4e18-48a5-8720-5f42b5cd9d31",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 2,
+          "name": "Sunken Citadel",
+          "scryfallId": "3e1c9b1a-e306-47bb-9f68-2083660319c0",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 2,
+          "name": "The Legend of Roku // Avatar Roku",
+          "scryfallId": "95f2f5af-d405-4534-8683-5a9001f997b4",
+          "cmc": 4,
+          "type": "enchantment"
+        },
+        {
+          "count": 3,
+          "name": "The Wandering Emperor",
+          "scryfallId": "fab2d8a9-ab4c-4225-a570-22636293c17d",
+          "cmc": 4,
+          "type": "planeswalker"
+        }
+      ],
+      "sideboard": [
+        {
+          "count": 2,
+          "name": "Rest in Peace",
+          "scryfallId": "d108c2b1-236e-4b8d-8445-d9749ccc4fea",
           "cmc": 2,
           "type": "enchantment"
         },
         {
-          "count": 4,
-          "name": "Hengegate Pathway // Mistgate Pathway",
-          "scryfallId": "7ef37cb3-d803-47d7-8a01-9c803aa2eadc",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Hall of Storm Giants",
-          "scryfallId": "bf8f052d-8840-4905-a807-9a305f4fd8f7",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Deserted Beach",
-          "scryfallId": "c819de09-dac2-407a-98c8-775865e9bdf8",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
+          "count": 2,
           "name": "March of Otherworldly Light",
           "scryfallId": "553fb946-2706-475b-89f9-e4355ec9ea2b",
           "cmc": 1,
           "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Eiganjo, Seat of the Empire",
-          "scryfallId": "c375a022-5b57-496d-a802-e4ea8376e9e4",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Consult the Star Charts",
-          "scryfallId": "a16a6555-2e3a-4587-aacd-0307d696b26c",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Narset, Parter of Veils",
-          "scryfallId": "4e6e5c63-b6e5-4756-bf23-6c6f8669442d",
-          "cmc": 3,
-          "type": "planeswalker"
-        }
-      ],
-      "sideboard": [
-        {
-          "count": 1,
-          "name": "Narset's Reversal",
-          "scryfallId": "4ede8d68-6870-445c-b140-da98adbc246a",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 3,
-          "name": "High Noon",
-          "scryfallId": "9995e0e6-7c9c-4fef-8fd2-8fb1622e6ec8",
-          "cmc": 2,
-          "type": "enchantment"
-        },
-        {
-          "count": 1,
-          "name": "Yorion, Sky Nomad",
-          "scryfallId": "275426c4-c14e-47d0-a9d4-24da7f6f6911",
-          "cmc": 5,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Farewell",
-          "scryfallId": "114d2180-093b-4838-97ad-badbc8ee50b0",
-          "cmc": 6,
-          "type": "sorcery"
-        },
-        {
           "count": 2,
-          "name": "Change the Equation",
-          "scryfallId": "e98db9ed-b43f-4bc1-b7a9-ce03a534d992",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 3,
           "name": "Kutzil's Flanker",
           "scryfallId": "d1201811-54ab-4c4e-b6e1-19b0d07e5ede",
           "cmc": 3,
@@ -4806,30 +4750,55 @@
         },
         {
           "count": 1,
-          "name": "Narset, Parter of Veils",
-          "scryfallId": "4e6e5c63-b6e5-4756-bf23-6c6f8669442d",
+          "name": "Kaheera, the Orphanguard",
+          "scryfallId": "d4ebed0b-8060-4a7b-a060-5cfcd2172b16",
           "cmc": 3,
-          "type": "planeswalker"
-        },
-        {
-          "count": 1,
-          "name": "Beza, the Bounding Spring",
-          "scryfallId": "fc310a26-b6a0-4e42-98ab-bdfd7b06cb63",
-          "cmc": 4,
           "type": "creature"
         },
         {
           "count": 2,
-          "name": "Rest in Peace",
-          "scryfallId": "d108c2b1-236e-4b8d-8445-d9749ccc4fea",
+          "name": "High Noon",
+          "scryfallId": "9995e0e6-7c9c-4fef-8fd2-8fb1622e6ec8",
           "cmc": 2,
           "type": "enchantment"
+        },
+        {
+          "count": 1,
+          "name": "Get Lost",
+          "scryfallId": "522aa72b-2b8c-484c-872b-f082101cee35",
+          "cmc": 2,
+          "type": "instant"
+        },
+        {
+          "count": 2,
+          "name": "Farewell",
+          "scryfallId": "114d2180-093b-4838-97ad-badbc8ee50b0",
+          "cmc": 6,
+          "type": "sorcery"
+        },
+        {
+          "count": 2,
+          "name": "Elspeth, Storm Slayer",
+          "scryfallId": "73a065e3-b530-4e62-ab3c-4f6f908184ec",
+          "cmc": 5,
+          "type": "planeswalker"
+        },
+        {
+          "count": 1,
+          "name": "Elesh Norn, Mother of Machines",
+          "scryfallId": "44dcab01-1d13-4dfc-ae2f-fbaa3dd35087",
+          "cmc": 5,
+          "type": "creature"
         }
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n6 Plains\n2 Petrified Hamlet\n2 Emeritus of Ideation\n1 Erode\n3 Beza, the Bounding Spring\n1 Ultima\n4 Floodfarm Verge\n5 Island\n4 No More Lies\n4 Get Lost\n3 Restless Anchorage\n4 Temporary Lockdown\n1 Otawara, Soaring City\n4 The Wandering Emperor\n4 Hallowed Fountain\n2 Supreme Verdict\n1 Fountainport\n3 Teferi, Hero of Dominaria\n4 Dovin's Veto\n3 Omen of the Sea\n4 Hengegate Pathway\n1 Hall of Storm Giants\n4 Deserted Beach\n4 March of Otherworldly Light\n1 Eiganjo, Seat of the Empire\n4 Consult the Star Charts\n1 Narset, Parter of Veils\n\nSideboard\n1 Narset's Reversal\n3 High Noon\n1 Yorion, Sky Nomad\n1 Farewell\n2 Change the Equation\n3 Kutzil's Flanker\n1 Narset, Parter of Veils\n1 Beza, the Bounding Spring\n2 Rest in Peace",
+      "arenaImport": "Deck\n4 Plains\n4 Cleansing Wildfire\n4 Mountain\n2 Get Lost\n2 Flashback\n4 Erode\n4 Field of Ruin\n4 Fiery Impulse\n2 Elegant Parlor\n4 Demolition Field\n2 Day of Judgment\n4 Price of Freedom\n1 Cori Mountain Monastery\n1 Castle Ardenvale\n4 Tablet of Discovery\n2 Beza, the Bounding Spring\n3 Avengers Disassembled\n2 Sacred Foundry\n2 Sunken Citadel\n2 The Legend of Roku\n3 The Wandering Emperor\n\nSideboard\n2 Rest in Peace\n2 March of Otherworldly Light\n2 Kutzil's Flanker\n1 Kaheera, the Orphanguard\n2 High Noon\n1 Get Lost\n2 Farewell\n2 Elspeth, Storm Slayer\n1 Elesh Norn, Mother of Machines",
       "sources": [
+        {
+          "name": "MTGO — Pioneer Challenge 32 (7steamvents)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
+        },
         {
           "name": "MTGGoldfish archetype",
           "url": "https://www.mtggoldfish.com/archetype/pioneer-azorius-control"
@@ -4846,8 +4815,8 @@
         "Get Lost"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live from MTGGoldfish archetype page (deck #7871570) · all card names verified on Scryfall.",
-      "listSource": "goldfish"
+      "listNote": "Representative tournament list for the \"Azorius Control\" archetype · all card names verified.",
+      "listSource": "mtgo"
     },
     "pioneer-bo3-orzhov-greasefang": {
       "id": "pioneer-bo3-orzhov-greasefang",
@@ -4861,7 +4830,7 @@
         "B"
       ],
       "archetype": "Orzhov Greasefang",
-      "description": "6.1% of tracked Pioneer decks (63 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "6.1% of tracked Pioneer decks (63 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 2,
@@ -5121,7 +5090,7 @@
         "Parhelion II"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot zippzipp_) matched to Goldfish archetype \"Orzhov Greasefang\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Orzhov Greasefang\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-dimir-midrange": {
@@ -5136,134 +5105,8 @@
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "6% of tracked Pioneer decks (62 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "6% of tracked Pioneer decks (62 lists). Representative list from a recent event.",
       "mainboard": [
-        {
-          "count": 4,
-          "name": "Floodpits Drowner",
-          "scryfallId": "a6a62aa3-8edb-4000-8ebd-15ec4b00eed7",
-          "cmc": 2,
-          "type": "creature"
-        },
-        {
-          "count": 3,
-          "name": "Multiversal Passage",
-          "scryfallId": "f5fb426a-5618-4dd4-9c51-0cc847be8c1d",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Moon-Circuit Hacker",
-          "scryfallId": "c6e466d1-943d-41e6-a47d-c9d951ca4262",
-          "cmc": 2,
-          "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Gloomlake Verge",
-          "scryfallId": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City",
-          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Takenuma, Abandoned Mire",
-          "scryfallId": "499037cc-a577-41cb-8ca2-5e117945634f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Darkslick Shores",
-          "scryfallId": "c49305d1-ac95-43ea-b02d-c3c7205bcda6",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Watery Grave",
-          "scryfallId": "5525d6a6-e532-4047-9da4-bfae7927fecc",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Fatal Push",
-          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 3,
-          "name": "Sheoldred, the Apocalypse",
-          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
-          "cmc": 4,
-          "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Thoughtseize",
-          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
-          "cmc": 1,
-          "type": "sorcery"
-        },
-        {
-          "count": 2,
-          "name": "Island",
-          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Spyglass Siren",
-          "scryfallId": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a",
-          "cmc": 1,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Go for the Throat",
-          "scryfallId": "5446e1ba-c745-45b2-ad05-b22abf04daec",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Swamp",
-          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber",
-          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
-          "cmc": 8,
-          "type": "enchantment"
-        },
-        {
-          "count": 1,
-          "name": "Nowhere to Run",
-          "scryfallId": "fee60e9d-9ee7-444a-88f3-c1929e1888fb",
-          "cmc": 2,
-          "type": "enchantment"
-        },
         {
           "count": 1,
           "name": "Bitter Triumph",
@@ -5280,10 +5123,136 @@
         },
         {
           "count": 4,
+          "name": "Watery Grave",
+          "scryfallId": "5525d6a6-e532-4047-9da4-bfae7927fecc",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Unholy Annex // Ritual Chamber",
+          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
+          "cmc": 8,
+          "type": "enchantment"
+        },
+        {
+          "count": 4,
+          "name": "Floodpits Drowner",
+          "scryfallId": "a6a62aa3-8edb-4000-8ebd-15ec4b00eed7",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Gloomlake Verge",
+          "scryfallId": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Go for the Throat",
+          "scryfallId": "5446e1ba-c745-45b2-ad05-b22abf04daec",
+          "cmc": 2,
+          "type": "instant"
+        },
+        {
+          "count": 2,
+          "name": "Island",
+          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Thoughtseize",
+          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
+          "cmc": 1,
+          "type": "sorcery"
+        },
+        {
+          "count": 4,
+          "name": "Moon-Circuit Hacker",
+          "scryfallId": "c6e466d1-943d-41e6-a47d-c9d951ca4262",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Swamp",
+          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Nowhere to Run",
+          "scryfallId": "fee60e9d-9ee7-444a-88f3-c1929e1888fb",
+          "cmc": 2,
+          "type": "enchantment"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City",
+          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 3,
+          "name": "Sheoldred, the Apocalypse",
+          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+          "cmc": 4,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Spyglass Siren",
+          "scryfallId": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
+          "count": 3,
+          "name": "Multiversal Passage",
+          "scryfallId": "f5fb426a-5618-4dd4-9c51-0cc847be8c1d",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Takenuma, Abandoned Mire",
+          "scryfallId": "499037cc-a577-41cb-8ca2-5e117945634f",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
           "name": "Kaito, Bane of Nightmares",
           "scryfallId": "55a14f30-4ff9-4472-90a6-c3139f1c18e5",
           "cmc": 4,
           "type": "planeswalker"
+        },
+        {
+          "count": 4,
+          "name": "Fatal Push",
+          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Darkslick Shores",
+          "scryfallId": "c49305d1-ac95-43ea-b02d-c3c7205bcda6",
+          "cmc": 0,
+          "land": true
         }
       ],
       "sideboard": [
@@ -5295,45 +5264,10 @@
           "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Path of Peril",
-          "scryfallId": "f0c5449a-d63b-4b22-9432-8f0365c3c4d9",
-          "cmc": 3,
-          "type": "sorcery"
-        },
-        {
-          "count": 2,
-          "name": "Languish",
-          "scryfallId": "9b53ce1b-9353-42ad-89a0-36e907ba576a",
-          "cmc": 4,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Gix's Command",
-          "scryfallId": "9606de75-c25f-411b-a271-258ac5a60987",
-          "cmc": 5,
-          "type": "sorcery"
-        },
-        {
-          "count": 3,
-          "name": "Leyline of the Void",
-          "scryfallId": "aeaa3aff-608d-4723-bb7c-8daedebe9f36",
-          "cmc": 4,
-          "type": "enchantment"
-        },
-        {
           "count": 2,
           "name": "Disdainful Stroke",
           "scryfallId": "588c6217-c460-417e-98bf-de5475780baf",
           "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Spell Pierce",
-          "scryfallId": "8dd4374f-0301-4b2e-bc99-2cd19568cb3b",
-          "cmc": 1,
           "type": "instant"
         },
         {
@@ -5344,20 +5278,55 @@
           "type": "sorcery"
         },
         {
+          "count": 1,
+          "name": "Gix's Command",
+          "scryfallId": "9606de75-c25f-411b-a271-258ac5a60987",
+          "cmc": 5,
+          "type": "sorcery"
+        },
+        {
           "count": 2,
           "name": "Graveyard Trespasser // Graveyard Glutton",
           "scryfallId": "daa2a273-488f-4285-a069-ad159ad2d393",
           "cmc": 3,
           "type": "creature"
+        },
+        {
+          "count": 2,
+          "name": "Languish",
+          "scryfallId": "9b53ce1b-9353-42ad-89a0-36e907ba576a",
+          "cmc": 4,
+          "type": "sorcery"
+        },
+        {
+          "count": 1,
+          "name": "Path of Peril",
+          "scryfallId": "f0c5449a-d63b-4b22-9432-8f0365c3c4d9",
+          "cmc": 3,
+          "type": "sorcery"
+        },
+        {
+          "count": 1,
+          "name": "Spell Pierce",
+          "scryfallId": "8dd4374f-0301-4b2e-bc99-2cd19568cb3b",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 3,
+          "name": "Leyline of the Void",
+          "scryfallId": "aeaa3aff-608d-4723-bb7c-8daedebe9f36",
+          "cmc": 4,
+          "type": "enchantment"
         }
       ],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Floodpits Drowner\n3 Multiversal Passage\n4 Moon-Circuit Hacker\n4 Gloomlake Verge\n1 Otawara, Soaring City\n4 Mutavault\n1 Takenuma, Abandoned Mire\n4 Darkslick Shores\n4 Watery Grave\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n2 Island\n4 Spyglass Siren\n1 Go for the Throat\n1 Swamp\n4 Unholy Annex\n1 Nowhere to Run\n1 Bitter Triumph\n2 Blade of the Oni\n4 Kaito, Bane of Nightmares\n\nSideboard\n1 Bitter Triumph\n1 Path of Peril\n2 Languish\n1 Gix's Command\n3 Leyline of the Void\n2 Disdainful Stroke\n1 Spell Pierce\n2 Duress\n2 Graveyard Trespasser",
+      "arenaImport": "Deck\n1 Bitter Triumph\n2 Blade of the Oni\n4 Watery Grave\n4 Unholy Annex\n4 Floodpits Drowner\n4 Gloomlake Verge\n1 Go for the Throat\n2 Island\n4 Thoughtseize\n4 Moon-Circuit Hacker\n1 Swamp\n4 Mutavault\n1 Nowhere to Run\n1 Otawara, Soaring City\n3 Sheoldred, the Apocalypse\n4 Spyglass Siren\n3 Multiversal Passage\n1 Takenuma, Abandoned Mire\n4 Kaito, Bane of Nightmares\n4 Fatal Push\n4 Darkslick Shores\n\nSideboard\n1 Bitter Triumph\n2 Disdainful Stroke\n2 Duress\n1 Gix's Command\n2 Graveyard Trespasser\n2 Languish\n1 Path of Peril\n1 Spell Pierce\n3 Leyline of the Void",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Kako_Ferrer)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (Xavier_Armer)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -5375,7 +5344,7 @@
         "Fatal Push"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Kako_Ferrer) matched to Goldfish archetype \"Dimir Midrange\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Dimir Midrange\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo3-izzet-phoenix": {
@@ -5390,7 +5359,7 @@
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "5.1% of tracked Pioneer decks (53 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "5.1% of tracked Pioneer decks (53 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -5622,7 +5591,7 @@
         "Consider"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Lord_Beerus) matched to Goldfish archetype \"Izzet Phoenix\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Phoenix\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-mono-red-prowess": {
@@ -5636,7 +5605,7 @@
         "R"
       ],
       "archetype": "Mono-Red Prowess",
-      "description": "11.9% of tracked Pioneer decks (123 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "11.9% of tracked Pioneer decks (123 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -5654,10 +5623,10 @@
         },
         {
           "count": 4,
-          "name": "Emberheart Challenger",
-          "scryfallId": "0035082e-bb86-4f95-be48-ffc87fe5286d",
-          "cmc": 2,
-          "type": "creature"
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -5667,6 +5636,13 @@
           "type": "enchantment"
         },
         {
+          "count": 4,
+          "name": "Monastery Swiftspear",
+          "scryfallId": "d6bfa227-4309-40ed-952c-279595eab17e",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
           "count": 2,
           "name": "Monstrous Rage",
           "scryfallId": "eef5a0ae-5907-42c9-a097-3f973737e392",
@@ -5674,11 +5650,11 @@
           "type": "instant"
         },
         {
-          "count": 4,
-          "name": "Monastery Swiftspear",
-          "scryfallId": "d6bfa227-4309-40ed-952c-279595eab17e",
-          "cmc": 1,
-          "type": "creature"
+          "count": 12,
+          "name": "Mountain",
+          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
@@ -5731,34 +5707,27 @@
         },
         {
           "count": 4,
+          "name": "Emberheart Challenger",
+          "scryfallId": "0035082e-bb86-4f95-be48-ffc87fe5286d",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
           "name": "Sunspine Lynx",
           "scryfallId": "8995ceaf-b7e0-423c-8f3e-25212d522502",
           "cmc": 4,
           "type": "creature"
-        },
-        {
-          "count": 12,
-          "name": "Mountain",
-          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Bonecrusher Giant\n2 Den of the Bugbear\n4 Emberheart Challenger\n4 Kumano Faces Kakkazan\n2 Monstrous Rage\n4 Monastery Swiftspear\n4 Burst Lightning\n3 Ramunap Ruins\n3 Reckless Rage\n1 Rockface Village\n4 Screaming Nemesis\n1 Sokenzan, Crucible of Defiance\n4 Soul-Scar Mage\n4 Sunspine Lynx\n12 Mountain\n4 Mutavault",
+      "arenaImport": "Deck\n4 Bonecrusher Giant\n2 Den of the Bugbear\n4 Mutavault\n4 Kumano Faces Kakkazan\n4 Monastery Swiftspear\n2 Monstrous Rage\n12 Mountain\n4 Burst Lightning\n3 Ramunap Ruins\n3 Reckless Rage\n1 Rockface Village\n4 Screaming Nemesis\n1 Sokenzan, Crucible of Defiance\n4 Soul-Scar Mage\n4 Emberheart Challenger\n4 Sunspine Lynx",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Danielpena397)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (TheBigBrain)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -5776,7 +5745,7 @@
         "Emberheart Challenger"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Danielpena397) matched to Goldfish archetype \"Mono-Red Prowess\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Mono-Red Prowess\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-golgari-midrange": {
@@ -5791,14 +5760,14 @@
         "G"
       ],
       "archetype": "Golgari Midrange",
-      "description": "11% of tracked Pioneer decks (114 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "11% of tracked Pioneer decks (114 lists). Representative list from a recent event.",
       "mainboard": [
         {
-          "count": 3,
-          "name": "Swamp",
-          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
-          "cmc": 0,
-          "land": true
+          "count": 4,
+          "name": "Fatal Push",
+          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
+          "cmc": 1,
+          "type": "instant"
         },
         {
           "count": 4,
@@ -5808,6 +5777,13 @@
           "type": "creature"
         },
         {
+          "count": 4,
+          "name": "Blooming Marsh",
+          "scryfallId": "861caabb-0573-4e94-8b03-342f90465064",
+          "cmc": 0,
+          "land": true
+        },
+        {
           "count": 1,
           "name": "Boseiju, Who Endures",
           "scryfallId": "2135ac5a-187b-4dc9-8f82-34e8d1603416",
@@ -5815,10 +5791,10 @@
           "land": true
         },
         {
-          "count": 2,
-          "name": "Culling Ritual",
-          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
-          "cmc": 4,
+          "count": 4,
+          "name": "Thoughtseize",
+          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
+          "cmc": 1,
           "type": "sorcery"
         },
         {
@@ -5837,17 +5813,17 @@
         },
         {
           "count": 4,
-          "name": "Fatal Push",
-          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
-          "cmc": 1,
-          "type": "instant"
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 3,
-          "name": "Professor Dellian Fel",
-          "scryfallId": "6ff3b4d8-1271-4c5d-8834-7662244f173d",
-          "cmc": 4,
-          "type": "planeswalker"
+          "name": "Swamp",
+          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
@@ -5871,11 +5847,11 @@
           "land": true
         },
         {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
+          "count": 3,
+          "name": "Professor Dellian Fel",
+          "scryfallId": "6ff3b4d8-1271-4c5d-8834-7662244f173d",
+          "cmc": 4,
+          "type": "planeswalker"
         },
         {
           "count": 4,
@@ -5885,11 +5861,11 @@
           "land": true
         },
         {
-          "count": 1,
-          "name": "Forest",
-          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
-          "cmc": 0,
-          "land": true
+          "count": 2,
+          "name": "Sheoldred, the Apocalypse",
+          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+          "cmc": 4,
+          "type": "creature"
         },
         {
           "count": 1,
@@ -5906,11 +5882,11 @@
           "type": "creature"
         },
         {
-          "count": 2,
-          "name": "Sheoldred, the Apocalypse",
-          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
-          "cmc": 4,
-          "type": "creature"
+          "count": 4,
+          "name": "Unholy Annex // Ritual Chamber",
+          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
+          "cmc": 8,
+          "type": "enchantment"
         },
         {
           "count": 1,
@@ -5927,25 +5903,25 @@
           "type": "instant"
         },
         {
-          "count": 4,
-          "name": "Blooming Marsh",
-          "scryfallId": "861caabb-0573-4e94-8b03-342f90465064",
+          "count": 2,
+          "name": "Culling Ritual",
+          "scryfallId": "abaad8c5-763d-4276-9b19-623cd19f59b9",
+          "cmc": 4,
+          "type": "sorcery"
+        },
+        {
+          "count": 1,
+          "name": "Forest",
+          "scryfallId": "22463284-2478-4b1e-9a37-6dd2383266cf",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber",
-          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
-          "cmc": 8,
-          "type": "enchantment"
-        },
-        {
-          "count": 3,
-          "name": "Abrupt Decay",
-          "scryfallId": "a8e328c6-3a84-49cf-a1a3-1d1e5373d274",
-          "cmc": 2,
-          "type": "instant"
+          "count": 1,
+          "name": "Urborg, Tomb of Yawgmoth",
+          "scryfallId": "9e1a9e38-6ffc-490f-b0be-23ba4e8204c6",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 1,
@@ -5955,28 +5931,21 @@
           "land": true
         },
         {
-          "count": 4,
-          "name": "Thoughtseize",
-          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
-          "cmc": 1,
-          "type": "sorcery"
-        },
-        {
-          "count": 1,
-          "name": "Urborg, Tomb of Yawgmoth",
-          "scryfallId": "9e1a9e38-6ffc-490f-b0be-23ba4e8204c6",
-          "cmc": 0,
-          "land": true
+          "count": 3,
+          "name": "Abrupt Decay",
+          "scryfallId": "a8e328c6-3a84-49cf-a1a3-1d1e5373d274",
+          "cmc": 2,
+          "type": "instant"
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n3 Swamp\n4 Badgermole Cub\n1 Boseiju, Who Endures\n2 Culling Ritual\n1 Elegy Acolyte\n1 Emeritus of Abundance\n4 Fatal Push\n3 Professor Dellian Fel\n1 Go for the Throat\n3 Graveyard Trespasser\n4 Overgrown Tomb\n4 Mutavault\n4 Llanowar Wastes\n1 Forest\n1 Restless Cottage\n2 Sentinel of the Nameless City\n2 Sheoldred, the Apocalypse\n1 Takenuma, Abandoned Mire\n1 Tear Asunder\n4 Blooming Marsh\n4 Unholy Annex\n3 Abrupt Decay\n1 Wastewood Verge\n4 Thoughtseize\n1 Urborg, Tomb of Yawgmoth",
+      "arenaImport": "Deck\n4 Fatal Push\n4 Badgermole Cub\n4 Blooming Marsh\n1 Boseiju, Who Endures\n4 Thoughtseize\n1 Elegy Acolyte\n1 Emeritus of Abundance\n4 Mutavault\n3 Swamp\n1 Go for the Throat\n3 Graveyard Trespasser\n4 Overgrown Tomb\n3 Professor Dellian Fel\n4 Llanowar Wastes\n2 Sheoldred, the Apocalypse\n1 Restless Cottage\n2 Sentinel of the Nameless City\n4 Unholy Annex\n1 Takenuma, Abandoned Mire\n1 Tear Asunder\n2 Culling Ritual\n1 Forest\n1 Urborg, Tomb of Yawgmoth\n1 Wastewood Verge\n3 Abrupt Decay",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Arianne)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (Dioferreira)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -5994,7 +5963,7 @@
         "Fatal Push"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Arianne) matched to Goldfish archetype \"Golgari Midrange\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Golgari Midrange\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-izzet-prowess": {
@@ -6009,7 +5978,7 @@
         "R"
       ],
       "archetype": "Izzet Prowess",
-      "description": "10.1% of tracked Pioneer decks (104 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "10.1% of tracked Pioneer decks (104 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -6082,13 +6051,6 @@
           "land": true
         },
         {
-          "count": 3,
-          "name": "Burst Lightning",
-          "scryfallId": "aec5d380-d354-4750-931a-6c91853e2edc",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
           "count": 4,
           "name": "Soul-Scar Mage",
           "scryfallId": "a8003786-6e2a-4e2d-a915-f23293c7273a",
@@ -6143,16 +6105,23 @@
           "scryfallId": "eef5a0ae-5907-42c9-a097-3f973737e392",
           "cmc": 1,
           "type": "instant"
+        },
+        {
+          "count": 3,
+          "name": "Burst Lightning",
+          "scryfallId": "aec5d380-d354-4750-931a-6c91853e2edc",
+          "cmc": 1,
+          "type": "instant"
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Academic Dispute\n3 Boomerang Basics\n1 Island\n4 Monastery Swiftspear\n4 Flow State\n4 Sleight of Hand\n3 Emberheart Challenger\n3 Reckless Rage\n2 Riverglide Pathway\n4 Riverpyre Verge\n3 Burst Lightning\n4 Soul-Scar Mage\n4 Spirebluff Canal\n4 Steam Vents\n4 Stormchaser's Talent\n3 Shivan Reef\n2 Screaming Nemesis\n2 Mountain\n2 Monstrous Rage",
+      "arenaImport": "Deck\n4 Academic Dispute\n3 Boomerang Basics\n1 Island\n4 Monastery Swiftspear\n4 Flow State\n4 Sleight of Hand\n3 Emberheart Challenger\n3 Reckless Rage\n2 Riverglide Pathway\n4 Riverpyre Verge\n4 Soul-Scar Mage\n4 Spirebluff Canal\n4 Steam Vents\n4 Stormchaser's Talent\n3 Shivan Reef\n2 Screaming Nemesis\n2 Mountain\n2 Monstrous Rage\n3 Burst Lightning",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (PedraStone)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (RioMare85)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -6170,7 +6139,7 @@
         "Monastery Swiftspear"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot PedraStone) matched to Goldfish archetype \"Izzet Prowess\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Prowess\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-abzan-greasefang": {
@@ -6186,7 +6155,7 @@
         "G"
       ],
       "archetype": "Abzan Greasefang",
-      "description": "8.2% of tracked Pioneer decks (85 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "8.2% of tracked Pioneer decks (85 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 3,
@@ -6371,7 +6340,7 @@
       "sources": [
         {
           "name": "MTGO — Pioneer Challenge 32 (VitorCarvalho01)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847710"
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -6389,7 +6358,7 @@
         "Thoughtseize"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot VitorCarvalho01) matched to Goldfish archetype \"Abzan Greasefang\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Abzan Greasefang\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-azorius-control": {
@@ -6404,203 +6373,165 @@
         "U"
       ],
       "archetype": "Azorius Control",
-      "description": "7% of tracked Pioneer decks (72 lists) on MTGGoldfish. Representative current list from the archetype page.",
+      "description": "7% of tracked Pioneer decks (72 lists). Representative list from a recent event.",
       "mainboard": [
         {
-          "count": 6,
+          "count": 4,
           "name": "Plains",
           "scryfallId": "5f9b6584-ad27-410d-b6f1-c25c91630aea",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 2,
-          "name": "Petrified Hamlet",
-          "scryfallId": "355dd460-b0e9-41f2-a058-b7f7e39ac387",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 2,
-          "name": "Emeritus of Ideation // Ancestral Recall",
-          "scryfallId": "75961d36-acf6-425f-9698-0bf52af74f31",
-          "cmc": 5,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Erode",
-          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 3,
-          "name": "Beza, the Bounding Spring",
-          "scryfallId": "fc310a26-b6a0-4e42-98ab-bdfd7b06cb63",
-          "cmc": 4,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Ultima",
-          "scryfallId": "39504a0e-f63f-4907-afd7-c4492f6b8a3b",
-          "cmc": 5,
+          "count": 4,
+          "name": "Cleansing Wildfire",
+          "scryfallId": "492d77e5-acc6-41b8-8930-f39d69234919",
+          "cmc": 2,
           "type": "sorcery"
         },
         {
           "count": 4,
-          "name": "Floodfarm Verge",
-          "scryfallId": "d53ed0db-1199-44b3-8eda-8189dfcf53d1",
+          "name": "Mountain",
+          "scryfallId": "426b0211-3d5d-4e53-bcf6-21823c655ffd",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 5,
-          "name": "Island",
-          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "No More Lies",
-          "scryfallId": "1e0c695d-62f9-4805-9e2f-7032e8464136",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 4,
+          "count": 2,
           "name": "Get Lost",
           "scryfallId": "522aa72b-2b8c-484c-872b-f082101cee35",
           "cmc": 2,
           "type": "instant"
         },
         {
-          "count": 3,
-          "name": "Restless Anchorage",
-          "scryfallId": "e3cab352-734e-454b-8b58-733165f4b3b3",
+          "count": 2,
+          "name": "Flashback",
+          "scryfallId": "1b832fda-d7c4-4566-884c-2a8b6da15488",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Erode",
+          "scryfallId": "32e670da-7563-4f6a-a7db-4c126a440eb8",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Field of Ruin",
+          "scryfallId": "143147d2-2eec-41e7-b78a-592288b38630",
           "cmc": 0,
           "land": true
         },
         {
           "count": 4,
-          "name": "Temporary Lockdown",
-          "scryfallId": "82b3088f-7b49-45e9-b447-129a597ceb75",
-          "cmc": 3,
-          "type": "enchantment"
+          "name": "Fiery Impulse",
+          "scryfallId": "5b81a589-44bf-4441-9079-1ae66d067519",
+          "cmc": 1,
+          "type": "instant"
         },
         {
-          "count": 1,
-          "name": "Otawara, Soaring City",
-          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
+          "count": 2,
+          "name": "Elegant Parlor",
+          "scryfallId": "72c6d541-e2cb-4d6e-acac-90a8f53b7006",
           "cmc": 0,
           "land": true
         },
         {
           "count": 4,
-          "name": "The Wandering Emperor",
-          "scryfallId": "fab2d8a9-ab4c-4225-a570-22636293c17d",
-          "cmc": 4,
-          "type": "planeswalker"
-        },
-        {
-          "count": 4,
-          "name": "Hallowed Fountain",
-          "scryfallId": "b7285986-7e08-4969-86ef-452dc5bfdd9f",
+          "name": "Demolition Field",
+          "scryfallId": "0c7e51b6-4898-4632-b39c-3ce438caa882",
           "cmc": 0,
           "land": true
         },
         {
           "count": 2,
-          "name": "Supreme Verdict",
-          "scryfallId": "3892f1c5-937e-4ef4-b6f9-e0c0ded070d0",
+          "name": "Day of Judgment",
+          "scryfallId": "96e84bdc-8a9a-4c58-ba8b-9f052fd60069",
           "cmc": 4,
           "type": "sorcery"
         },
         {
+          "count": 4,
+          "name": "Price of Freedom",
+          "scryfallId": "9fbe94e9-a71d-4a31-9210-c599abe08e3f",
+          "cmc": 2,
+          "type": "sorcery"
+        },
+        {
           "count": 1,
-          "name": "Fountainport",
-          "scryfallId": "658cfcb7-81b7-48c6-9dd2-1663d06108cf",
+          "name": "Cori Mountain Monastery",
+          "scryfallId": "9312821a-2059-4f44-9b20-c9522b827e38",
           "cmc": 0,
           "land": true
         },
         {
-          "count": 3,
-          "name": "Teferi, Hero of Dominaria",
-          "scryfallId": "5d10b752-d9cb-419d-a5c4-d4ee1acb655e",
-          "cmc": 5,
-          "type": "planeswalker"
+          "count": 1,
+          "name": "Castle Ardenvale",
+          "scryfallId": "65e4de2e-47d2-4967-be31-9df0057a9c74",
+          "cmc": 0,
+          "land": true
         },
         {
           "count": 4,
-          "name": "Dovin's Veto",
-          "scryfallId": "5d6b5054-2224-4f68-9d82-3ed17c5dacc4",
-          "cmc": 2,
-          "type": "instant"
+          "name": "Tablet of Discovery",
+          "scryfallId": "13059664-a940-4a66-8100-0c90b884bab4",
+          "cmc": 3,
+          "type": "artifact"
+        },
+        {
+          "count": 2,
+          "name": "Beza, the Bounding Spring",
+          "scryfallId": "fc310a26-b6a0-4e42-98ab-bdfd7b06cb63",
+          "cmc": 4,
+          "type": "creature"
         },
         {
           "count": 3,
-          "name": "Omen of the Sea",
-          "scryfallId": "a5f30ecd-d009-4d44-aef4-c926ed55a521",
-          "cmc": 2,
+          "name": "Avengers Disassembled",
+          "scryfallId": "72d3e750-870b-497d-80d7-e3df097db554",
+          "cmc": 3,
+          "type": "sorcery"
+        },
+        {
+          "count": 2,
+          "name": "Sacred Foundry",
+          "scryfallId": "a7758cc6-4e18-48a5-8720-5f42b5cd9d31",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 2,
+          "name": "Sunken Citadel",
+          "scryfallId": "3e1c9b1a-e306-47bb-9f68-2083660319c0",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 2,
+          "name": "The Legend of Roku // Avatar Roku",
+          "scryfallId": "95f2f5af-d405-4534-8683-5a9001f997b4",
+          "cmc": 4,
           "type": "enchantment"
         },
         {
-          "count": 4,
-          "name": "Hengegate Pathway // Mistgate Pathway",
-          "scryfallId": "7ef37cb3-d803-47d7-8a01-9c803aa2eadc",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Hall of Storm Giants",
-          "scryfallId": "bf8f052d-8840-4905-a807-9a305f4fd8f7",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Deserted Beach",
-          "scryfallId": "c819de09-dac2-407a-98c8-775865e9bdf8",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "March of Otherworldly Light",
-          "scryfallId": "553fb946-2706-475b-89f9-e4355ec9ea2b",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Eiganjo, Seat of the Empire",
-          "scryfallId": "c375a022-5b57-496d-a802-e4ea8376e9e4",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Consult the Star Charts",
-          "scryfallId": "a16a6555-2e3a-4587-aacd-0307d696b26c",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Narset, Parter of Veils",
-          "scryfallId": "4e6e5c63-b6e5-4756-bf23-6c6f8669442d",
-          "cmc": 3,
+          "count": 3,
+          "name": "The Wandering Emperor",
+          "scryfallId": "fab2d8a9-ab4c-4225-a570-22636293c17d",
+          "cmc": 4,
           "type": "planeswalker"
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n6 Plains\n2 Petrified Hamlet\n2 Emeritus of Ideation\n1 Erode\n3 Beza, the Bounding Spring\n1 Ultima\n4 Floodfarm Verge\n5 Island\n4 No More Lies\n4 Get Lost\n3 Restless Anchorage\n4 Temporary Lockdown\n1 Otawara, Soaring City\n4 The Wandering Emperor\n4 Hallowed Fountain\n2 Supreme Verdict\n1 Fountainport\n3 Teferi, Hero of Dominaria\n4 Dovin's Veto\n3 Omen of the Sea\n4 Hengegate Pathway\n1 Hall of Storm Giants\n4 Deserted Beach\n4 March of Otherworldly Light\n1 Eiganjo, Seat of the Empire\n4 Consult the Star Charts\n1 Narset, Parter of Veils",
+      "arenaImport": "Deck\n4 Plains\n4 Cleansing Wildfire\n4 Mountain\n2 Get Lost\n2 Flashback\n4 Erode\n4 Field of Ruin\n4 Fiery Impulse\n2 Elegant Parlor\n4 Demolition Field\n2 Day of Judgment\n4 Price of Freedom\n1 Cori Mountain Monastery\n1 Castle Ardenvale\n4 Tablet of Discovery\n2 Beza, the Bounding Spring\n3 Avengers Disassembled\n2 Sacred Foundry\n2 Sunken Citadel\n2 The Legend of Roku\n3 The Wandering Emperor",
       "sources": [
+        {
+          "name": "MTGO — Pioneer Challenge 32 (7steamvents)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
+        },
         {
           "name": "MTGGoldfish archetype",
           "url": "https://www.mtggoldfish.com/archetype/pioneer-azorius-control"
@@ -6617,8 +6548,8 @@
         "Get Lost"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live from MTGGoldfish archetype page (deck #7871570) · all card names verified on Scryfall.",
-      "listSource": "goldfish"
+      "listNote": "Representative tournament list for the \"Azorius Control\" archetype · all card names verified.",
+      "listSource": "mtgo"
     },
     "pioneer-bo1-orzhov-greasefang": {
       "id": "pioneer-bo1-orzhov-greasefang",
@@ -6632,7 +6563,7 @@
         "B"
       ],
       "archetype": "Orzhov Greasefang",
-      "description": "6.1% of tracked Pioneer decks (63 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "6.1% of tracked Pioneer decks (63 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 2,
@@ -6828,7 +6759,7 @@
         "Parhelion II"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot zippzipp_) matched to Goldfish archetype \"Orzhov Greasefang\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Orzhov Greasefang\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-dimir-midrange": {
@@ -6843,134 +6774,8 @@
         "B"
       ],
       "archetype": "Dimir Midrange",
-      "description": "6% of tracked Pioneer decks (62 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "6% of tracked Pioneer decks (62 lists). Representative list from a recent event.",
       "mainboard": [
-        {
-          "count": 4,
-          "name": "Floodpits Drowner",
-          "scryfallId": "a6a62aa3-8edb-4000-8ebd-15ec4b00eed7",
-          "cmc": 2,
-          "type": "creature"
-        },
-        {
-          "count": 3,
-          "name": "Multiversal Passage",
-          "scryfallId": "f5fb426a-5618-4dd4-9c51-0cc847be8c1d",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Moon-Circuit Hacker",
-          "scryfallId": "c6e466d1-943d-41e6-a47d-c9d951ca4262",
-          "cmc": 2,
-          "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Gloomlake Verge",
-          "scryfallId": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Otawara, Soaring City",
-          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Mutavault",
-          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 1,
-          "name": "Takenuma, Abandoned Mire",
-          "scryfallId": "499037cc-a577-41cb-8ca2-5e117945634f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Darkslick Shores",
-          "scryfallId": "c49305d1-ac95-43ea-b02d-c3c7205bcda6",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Watery Grave",
-          "scryfallId": "5525d6a6-e532-4047-9da4-bfae7927fecc",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Fatal Push",
-          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
-          "cmc": 1,
-          "type": "instant"
-        },
-        {
-          "count": 3,
-          "name": "Sheoldred, the Apocalypse",
-          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
-          "cmc": 4,
-          "type": "creature"
-        },
-        {
-          "count": 4,
-          "name": "Thoughtseize",
-          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
-          "cmc": 1,
-          "type": "sorcery"
-        },
-        {
-          "count": 2,
-          "name": "Island",
-          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Spyglass Siren",
-          "scryfallId": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a",
-          "cmc": 1,
-          "type": "creature"
-        },
-        {
-          "count": 1,
-          "name": "Go for the Throat",
-          "scryfallId": "5446e1ba-c745-45b2-ad05-b22abf04daec",
-          "cmc": 2,
-          "type": "instant"
-        },
-        {
-          "count": 1,
-          "name": "Swamp",
-          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
-          "cmc": 0,
-          "land": true
-        },
-        {
-          "count": 4,
-          "name": "Unholy Annex // Ritual Chamber",
-          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
-          "cmc": 8,
-          "type": "enchantment"
-        },
-        {
-          "count": 1,
-          "name": "Nowhere to Run",
-          "scryfallId": "fee60e9d-9ee7-444a-88f3-c1929e1888fb",
-          "cmc": 2,
-          "type": "enchantment"
-        },
         {
           "count": 1,
           "name": "Bitter Triumph",
@@ -6987,20 +6792,146 @@
         },
         {
           "count": 4,
+          "name": "Watery Grave",
+          "scryfallId": "5525d6a6-e532-4047-9da4-bfae7927fecc",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Unholy Annex // Ritual Chamber",
+          "scryfallId": "0fb4c734-c698-46f2-bc78-5f036f472e5b",
+          "cmc": 8,
+          "type": "enchantment"
+        },
+        {
+          "count": 4,
+          "name": "Floodpits Drowner",
+          "scryfallId": "a6a62aa3-8edb-4000-8ebd-15ec4b00eed7",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Gloomlake Verge",
+          "scryfallId": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Go for the Throat",
+          "scryfallId": "5446e1ba-c745-45b2-ad05-b22abf04daec",
+          "cmc": 2,
+          "type": "instant"
+        },
+        {
+          "count": 2,
+          "name": "Island",
+          "scryfallId": "5a74175b-2418-4226-8435-1490532e644f",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Thoughtseize",
+          "scryfallId": "b281a308-ab6b-47b6-bec7-632c9aaecede",
+          "cmc": 1,
+          "type": "sorcery"
+        },
+        {
+          "count": 4,
+          "name": "Moon-Circuit Hacker",
+          "scryfallId": "c6e466d1-943d-41e6-a47d-c9d951ca4262",
+          "cmc": 2,
+          "type": "creature"
+        },
+        {
+          "count": 1,
+          "name": "Swamp",
+          "scryfallId": "74414c62-4b68-4e1b-9241-feff3231b9ee",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
+          "name": "Mutavault",
+          "scryfallId": "52cc2f10-142d-4e6a-984e-b25f566cc960",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Nowhere to Run",
+          "scryfallId": "fee60e9d-9ee7-444a-88f3-c1929e1888fb",
+          "cmc": 2,
+          "type": "enchantment"
+        },
+        {
+          "count": 1,
+          "name": "Otawara, Soaring City",
+          "scryfallId": "486d7edc-d983-41f0-8b78-c99aecd72996",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 3,
+          "name": "Sheoldred, the Apocalypse",
+          "scryfallId": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+          "cmc": 4,
+          "type": "creature"
+        },
+        {
+          "count": 4,
+          "name": "Spyglass Siren",
+          "scryfallId": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a",
+          "cmc": 1,
+          "type": "creature"
+        },
+        {
+          "count": 3,
+          "name": "Multiversal Passage",
+          "scryfallId": "f5fb426a-5618-4dd4-9c51-0cc847be8c1d",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 1,
+          "name": "Takenuma, Abandoned Mire",
+          "scryfallId": "499037cc-a577-41cb-8ca2-5e117945634f",
+          "cmc": 0,
+          "land": true
+        },
+        {
+          "count": 4,
           "name": "Kaito, Bane of Nightmares",
           "scryfallId": "55a14f30-4ff9-4472-90a6-c3139f1c18e5",
           "cmc": 4,
           "type": "planeswalker"
+        },
+        {
+          "count": 4,
+          "name": "Fatal Push",
+          "scryfallId": "6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7",
+          "cmc": 1,
+          "type": "instant"
+        },
+        {
+          "count": 4,
+          "name": "Darkslick Shores",
+          "scryfallId": "c49305d1-ac95-43ea-b02d-c3c7205bcda6",
+          "cmc": 0,
+          "land": true
         }
       ],
       "sideboard": [],
       "matchups": [],
       "sideboardGuide": [],
-      "arenaImport": "Deck\n4 Floodpits Drowner\n3 Multiversal Passage\n4 Moon-Circuit Hacker\n4 Gloomlake Verge\n1 Otawara, Soaring City\n4 Mutavault\n1 Takenuma, Abandoned Mire\n4 Darkslick Shores\n4 Watery Grave\n4 Fatal Push\n3 Sheoldred, the Apocalypse\n4 Thoughtseize\n2 Island\n4 Spyglass Siren\n1 Go for the Throat\n1 Swamp\n4 Unholy Annex\n1 Nowhere to Run\n1 Bitter Triumph\n2 Blade of the Oni\n4 Kaito, Bane of Nightmares",
+      "arenaImport": "Deck\n1 Bitter Triumph\n2 Blade of the Oni\n4 Watery Grave\n4 Unholy Annex\n4 Floodpits Drowner\n4 Gloomlake Verge\n1 Go for the Throat\n2 Island\n4 Thoughtseize\n4 Moon-Circuit Hacker\n1 Swamp\n4 Mutavault\n1 Nowhere to Run\n1 Otawara, Soaring City\n3 Sheoldred, the Apocalypse\n4 Spyglass Siren\n3 Multiversal Passage\n1 Takenuma, Abandoned Mire\n4 Kaito, Bane of Nightmares\n4 Fatal Push\n4 Darkslick Shores",
       "sources": [
         {
-          "name": "MTGO — Pioneer Challenge 32 (Kako_Ferrer)",
-          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-1912847715"
+          "name": "MTGO — Pioneer Challenge 32 (Xavier_Armer)",
+          "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726"
         },
         {
           "name": "MTGGoldfish archetype",
@@ -7018,7 +6949,7 @@
         "Fatal Push"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Kako_Ferrer) matched to Goldfish archetype \"Dimir Midrange\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Dimir Midrange\" archetype · all card names verified.",
       "listSource": "mtgo"
     },
     "pioneer-bo1-izzet-phoenix": {
@@ -7033,7 +6964,7 @@
         "R"
       ],
       "archetype": "Izzet Phoenix",
-      "description": "5.1% of tracked Pioneer decks (53 lists) on MTGGoldfish. Representative list from recent mtgo (Pioneer Challenge 32).",
+      "description": "5.1% of tracked Pioneer decks (53 lists). Representative list from a recent event.",
       "mainboard": [
         {
           "count": 4,
@@ -7194,7 +7125,7 @@
         "Consider"
       ],
       "listQuality": "authoritative",
-      "listNote": "Live list from mtgo (Pioneer Challenge 32, pilot Lord_Beerus) matched to Goldfish archetype \"Izzet Phoenix\" · Scryfall-verified.",
+      "listNote": "Representative tournament list for the \"Izzet Phoenix\" archetype · all card names verified.",
       "listSource": "mtgo"
     }
   },
@@ -7204,7 +7135,7 @@
       "name": "traditional standard ranked decklists july 13 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-12",
+      "date": "2026-07-13",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-13-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7215,7 +7146,7 @@
       "name": "traditional standard ranked decklists july 20 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-19",
+      "date": "2026-07-20",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-20-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7226,7 +7157,7 @@
       "name": "traditional standard ranked decklists july 6 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-07-05",
+      "date": "2026-07-06",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-july-6-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7237,7 +7168,7 @@
       "name": "traditional standard ranked decklists june 29 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-06-28",
+      "date": "2026-06-29",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-29-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7248,7 +7179,7 @@
       "name": "traditional standard ranked decklists june 22 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-06-21",
+      "date": "2026-06-22",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-22-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7259,7 +7190,7 @@
       "name": "traditional standard ranked decklists june 15 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-06-14",
+      "date": "2026-06-15",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-15-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7270,7 +7201,7 @@
       "name": "traditional standard ranked decklists june 8 2026",
       "format": "standard",
       "platform": "mtga",
-      "date": "2026-06-07",
+      "date": "2026-06-08",
       "url": "https://magic.gg/decklists/traditional-standard-ranked-decklists-june-8-2026",
       "topDecks": [],
       "notes": "Official magic.gg decklist publication",
@@ -7283,6 +7214,28 @@
       "platform": "mtgo",
       "date": "2026-07-11",
       "url": "https://www.mtgo.com/decklist/standard-showcase-challenge-2026-07-1112847088",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-pioneer-challenge-32-2026-07-2012847726",
+      "name": "pioneer challenge 32 2026 07 2012847726",
+      "format": "pioneer",
+      "platform": "mtgo",
+      "date": "2026-07-20",
+      "url": "https://www.mtgo.com/decklist/pioneer-challenge-32-2026-07-2012847726",
+      "topDecks": [],
+      "notes": "Official MTGO published decklists",
+      "source": "mtgo"
+    },
+    {
+      "id": "mtgo-standard-challenge-32-2026-07-2012847725",
+      "name": "standard challenge 32 2026 07 2012847725",
+      "format": "standard",
+      "platform": "mtgo",
+      "date": "2026-07-20",
+      "url": "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-2012847725",
       "topDecks": [],
       "notes": "Official MTGO published decklists",
       "source": "mtgo"
