@@ -1,6 +1,6 @@
 # Filthy Net Deck — handoff
 
-**Last wrap-up:** 2026-07-21 (Claude/Fable) — **v2.0.2 fully released** (stealth overlay batch, owner-requested). 100X program remains **complete**; future work = owner requests.
+**Last wrap-up:** 2026-07-21 (Claude/Fable) — **v2.0.2 fully released** (stealth overlay batch) **+ Bo1 board fix** (owner report: Decks page showed identical Bo1/Bo3 boards). Standard Bo1 is now ranked by Untapped.gg's free public ladder analytics (`pipeline/sources/untapped.mjs fetchStandardBo1Ladder`); Bo3 stays Goldfish tournament data; Pioneer Bo1 mirrors Bo3 (Explorer stats premium-walled). Ladder archetypes with no real list source are skipped with diagnostics — 2026-07-21 that includes ladder-#1 Mono-White Auras (17.6%): nothing verifiable anywhere; ask owner before adding AetherHub-grade sources. Soft fallback to the Bo3 mirror on API drift (MAINTENANCE 5c; fixture tests `pipeline/untapped.test.mjs`). 100X program remains **complete**; future work = owner requests.
 
 **Repo:** `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 **Live product version:** **v2.0.2**
