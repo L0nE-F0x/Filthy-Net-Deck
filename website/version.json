@@ -1,5 +1,5 @@
 {
-  "version": "2.2.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.2.1.exe",
-  "notes": "v2.2.1: A UI polish pass — cleaner, more focused wording and labels across Decks, Sets, and Format Hub."
+  "version": "2.3.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.3.0.exe",
+  "notes": "v2.3.0: Alerts now clear fullscreen — match-end and other toasts also show in a small always-on-top card, because Windows mutes its own banners while a game or any app is fullscreen. Plus a fix for the Climb chart's deck button."
 }

@@ -1,11 +1,11 @@
 {
-  "version": "2.2.1",
-  "notes": "v2.2.1: A UI polish pass — cleaner, more focused wording and labels across Decks, Sets, and Format Hub.",
-  "pub_date": "2026-07-21T08:06:28.328Z",
+  "version": "2.3.0",
+  "notes": "v2.3.0: Alerts now clear fullscreen — match-end and other toasts also show in a small always-on-top card, because Windows mutes its own banners while a game or any app is fullscreen. Plus a fix for the Climb chart's deck button.",
+  "pub_date": "2026-07-21T12:54:48.740613Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFLMGdidE4zSngrYUJ2SlJUV0xsdDdhODNQQmhJS1A4T0ZZL0NwbVExMzFGODN0SC9FWWtya0lGNDNUbmt5ejk0bk9qZG1QZ042SzhCM3FINFNLZXdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NjIxMTcyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMi4xX3g2NC1zZXR1cC5leGUKU2F3cWh4ZFlvSUp3aTJSYjZxS1VEb1ZGeFRIL1VaUC9oSHNsZ2t0RnlTUTliMStoUkwxSEFNMUM4TjQ3Ykx5TkdOelJWRXB4VWhDVVRXam56YWJpRFE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.2.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9Lc3BrK1RqdFNTVkpIcDE4VE5iUmk5T2Vic043blV2b2xzNU5PVDV1MjBKMmFaYW5XTWVZUW9LQWZTVlR4eEhvQms2NVR5ZXoxZzdRSzFyME42WUFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NjM4NDY3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuMy4wX3g2NC1zZXR1cC5leGUKTXArQ283YmNPZ3RLM3pUcVM4MTJFRlJTd2g4c0hJYk85U0dyZVR6TVdqZDE3TzdIcUdtcE1ubnJrMnkwTURLQmh1bTBpU3BBbnB4WVVmK1dSZ2dxQ0E9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.3.0.exe"
     }
   }
 }
