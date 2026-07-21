@@ -33,6 +33,7 @@ import { pickBestListForTile } from "./sources/listMatch.mjs";
 import { collectMelee } from "./sources/melee.mjs";
 import {
   collectUntapped,
+  fetchBo1DeckPool,
   fetchStandardBo1Ladder,
   normalizeArchetypeName,
 } from "./sources/untapped.mjs";
@@ -302,22 +303,80 @@ async function buildFormat(def, diagnostics) {
         const k = normalizeArchetypeName(t.name);
         if (!byNorm.has(k)) byNorm.set(k, t);
       }
+      // Ladder-only archetypes (no tournament tile anywhere): the free deck
+      // pool behind Untapped's public decks page. Fetched lazily, decoded
+      // (deckstring → titleIds → names) and Scryfall-validated like any
+      // other source.
+      let ladderDeckPool = null;
+      const ladderPoolFor = async (norm) => {
+        if (ladderDeckPool === null) {
+          try {
+            ladderDeckPool = await fetchBo1DeckPool(ladder.periodId, ladder.tags);
+            console.log(
+              `  [${def.id}] Untapped Bo1 deck pool: ${ladderDeckPool.size} archetypes`,
+            );
+          } catch (e) {
+            ladderDeckPool = new Map();
+            diagnostics.push(`${def.id}/bo1: ladder deck pool failed (${e.message})`);
+          }
+        }
+        return ladderDeckPool.get(norm) || [];
+      };
+
       const picks = [];
       for (const row of ladder.board) {
         if (picks.length >= DECKS_PER_FORMAT) break;
         const tile = byNorm.get(row.norm);
-        if (!tile) {
+        if (tile) {
+          const slug = slugify(tile.name);
+          let p = picked.find((x) => slugify(x.tile.name) === slug);
+          if (!p) {
+            p = await resolveTileList(tile);
+            if (!p) continue;
+            usedSlugs.add(slug);
+          }
+          picks.push({ row, p });
+          continue;
+        }
+        // No tournament list anywhere — try the ladder's own most-played list.
+        let p = null;
+        for (const cand of (await ladderPoolFor(row.norm)).slice(0, 3)) {
+          const scratch = {
+            mainboard: cand.mainboard.map((c) => ({ ...c })),
+            sideboard: [],
+          };
+          const report = await validateDeck(scratch, def.id, { dropIllegal: true });
+          if (report.skipped) break; // scryfall unreachable — stop trying
+          if (report.unknown.length > 2 || report.mainCount < 55) continue;
+          if (report.unknown.length || report.illegal.length) {
+            diagnostics.push(
+              `${def.id}/bo1/${row.name}: cleaned untapped list (dropped unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
+            );
+          }
+          p = {
+            tile: {
+              name: row.name,
+              slug: null,
+              colors: row.colors,
+              metaPct: row.sharePct,
+              sampleSize: row.matches,
+              keyCards: [],
+              url: "https://mtga.untapped.gg/constructed/standard/decks",
+            },
+            list: scratch,
+            listSource: "untapped",
+            listMeta: { matches: cand.matches },
+          };
+          console.log(
+            `  [${def.id}] ✓ ${row.name} — ${report.mainCount} cards (untapped ladder list, ${cand.matches} matches)`,
+          );
+          break;
+        }
+        if (!p) {
           diagnostics.push(
             `${def.id}/bo1: no list source for ladder archetype "${row.name}" (${row.sharePct}%) — skipped`,
           );
           continue;
-        }
-        const slug = slugify(tile.name);
-        let p = picked.find((x) => slugify(x.tile.name) === slug);
-        if (!p) {
-          p = await resolveTileList(tile);
-          if (!p) continue;
-          usedSlugs.add(slug);
         }
         picks.push({ row, p });
       }
@@ -341,14 +400,17 @@ async function buildFormat(def, diagnostics) {
     const slug = slugify(p.tile.name);
     const fromTournament =
       p.listSource === "mtgo" || p.listSource === "magic.gg";
+    const fromLadder = p.listSource === "untapped";
     const sideboard = mode === "bo3" ? p.list.sideboard : [];
-    const sources = [
-      ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
-      {
-        name: "MTGGoldfish metagame",
-        url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
-      },
-    ];
+    const sources = fromLadder
+      ? [{ name: "Untapped.gg — most-played ladder list", url: p.tile.url }]
+      : [
+          ...(p.tile.url ? [{ name: "MTGGoldfish archetype", url: p.tile.url }] : []),
+          {
+            name: "MTGGoldfish metagame",
+            url: `https://www.mtggoldfish.com/metagame/${def.goldfishPath}`,
+          },
+        ];
     if (fromTournament && p.listMeta.sourceUrl) {
       const label =
         p.listSource === "magic.gg"
@@ -365,9 +427,11 @@ async function buildFormat(def, diagnostics) {
         url: stats.untappedUrl,
       });
     }
-    const listNote = fromTournament
-      ? `Live list from ${p.listSource} (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
-      : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
+    const listNote = fromLadder
+      ? `Most-played Bo1 ladder list for this archetype on Untapped.gg${p.listMeta.matches ? ` (${p.listMeta.matches.toLocaleString("en-US")} tracked matches)` : ""} · all card names verified on Scryfall.`
+      : fromTournament
+        ? `Live list from ${p.listSource} (${p.listMeta.eventName || "event"}, pilot ${p.listMeta.player || "?"}) matched to Goldfish archetype "${p.tile.name}" · Scryfall-verified.`
+        : `Live from MTGGoldfish archetype page${p.listMeta.deckId ? ` (deck #${p.listMeta.deckId})` : ""} · all card names verified on Scryfall.`;
 
     return {
       id: `${def.id}-${mode}-${slug}`,

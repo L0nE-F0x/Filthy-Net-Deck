@@ -108,7 +108,149 @@ export async function fetchStandardBo1Ladder() {
     totalMatches: current?.NORMAL?.matches_count_all?.total,
     board,
     url: "https://mtga.untapped.gg/constructed/standard/meta",
+    tags,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Bo1 decklists — the free decks endpoint behind /constructed/…/decks */
+/* ------------------------------------------------------------------ */
+
+function varints(buf) {
+  const out = [];
+  let cur = 0n;
+  let shift = 0n;
+  for (const b of buf) {
+    cur |= BigInt(b & 0x7f) << shift;
+    if (b & 0x80) {
+      shift += 7n;
+    } else {
+      out.push(Number(cur));
+      cur = 0n;
+      shift = 0n;
+    }
+  }
+  return out;
+}
+
+/**
+ * Pure: decode one Untapped deck string ("ds") into titleId counts.
+ *
+ * Verified layout (2026-07-21, version 4): varint stream of
+ *   [0, version, format, header,
+ *    n₁, Δ×n₁,  n₂, Δ×n₂,  n₃, Δ×n₃,  n₄, Δ×n₄,   ← qty 1..4 groups,
+ *                                                    delta-coded titleIds
+ *    nExtra, (count, titleId)×nExtra,               ← qty ≥5 (basics etc.)
+ *    sideboard…]                                    ← 0 on the Bo1 endpoint
+ *
+ * @returns [{ titleId, count }] mainboard, or null when the shape is off.
+ */
+export function decodeUntappedDeckString(ds) {
+  let v;
+  try {
+    v = varints(Buffer.from(String(ds), "base64url"));
+  } catch {
+    return null;
+  }
+  let i = 0;
+  if (v[i++] !== 0) return null;
+  const version = v[i++];
+  if (version !== 4) return null;
+  i += 2; // format byte + header byte
+  const out = [];
+  for (const qty of [1, 2, 3, 4]) {
+    const n = v[i++];
+    if (!Number.isInteger(n) || n < 0 || n > 250) return null;
+    let acc = 0;
+    for (let k = 0; k < n; k++) {
+      const d = v[i++];
+      if (d === undefined) return null;
+      acc += d;
+      out.push({ titleId: acc, count: qty });
+    }
+  }
+  const extras = v[i++];
+  if (!Number.isInteger(extras) || extras < 0 || extras > 60) return null;
+  for (let k = 0; k < extras; k++) {
+    const count = v[i++];
+    const titleId = v[i++];
+    if (titleId === undefined || count <= 0 || count > 250) return null;
+    out.push({ titleId, count });
+  }
+  const total = out.reduce((n, c) => n + c.count, 0);
+  if (total < 40 || total > 250) return null;
+  return out;
+}
+
+/**
+ * Bo1 ladder decklist pool for archetypes tournament sources never see
+ * (e.g. Mono-White Auras). Uses the same free endpoints as Untapped's public
+ * decks page: deck rows (encoded), archetype tag-groups, and the public
+ * card/loc DB to turn titleIds into card names. Names are validated against
+ * Scryfall downstream exactly like every other source.
+ *
+ * @returns Map norm(archetypeName) → [{ archetypeName, matches, mainboard }]
+ *          sorted by matches desc.
+ */
+export async function fetchBo1DeckPool(periodId, tags) {
+  const [archetypes, deckRows, locList] = await Promise.all([
+    getText(
+      `${API}/analytics/query/archetypes_by_event_scope_and_rank_v2/free?MetaPeriodId=${periodId}&RankingClassScopeFilter=BRONZE_TO_PLATINUM`,
+      "application/json",
+    ).then(JSON.parse),
+    getText(
+      `${API}/analytics/query/decks_by_event_scope_and_rank_v2/free?MetaPeriodId=${periodId}&RankingClassScopeFilter=BRONZE_TO_PLATINUM`,
+      "application/json",
+    ).then(JSON.parse),
+    getText("https://mtgajson.untapped.gg/v1/latest/loc_en.json", "application/json").then(
+      JSON.parse,
+    ),
+  ]);
+
+  const tagName = new Map((tags || []).map((t) => [t.id, t.name]));
+  const nameByPtg = new Map();
+  for (const a of Array.isArray(archetypes) ? archetypes : []) {
+    const name = (a.primary_tags || [])
+      .map((t) => tagName.get(t))
+      .filter(Boolean)
+      .join(" ");
+    if (name) nameByPtg.set(a.primary_tag_group_id, name);
+  }
+
+  const locName = new Map(
+    (Array.isArray(locList) ? locList : []).map((e) => [e.id, e.text]),
+  );
+
+  const pool = new Map();
+  for (const row of Array.isArray(deckRows) ? deckRows : []) {
+    const archetypeName = nameByPtg.get(row.ptg);
+    if (!archetypeName) continue;
+    const decoded = decodeUntappedDeckString(row.ds);
+    if (!decoded) continue;
+    const mainboard = [];
+    let unnamed = 0;
+    for (const { titleId, count } of decoded) {
+      const name = locName.get(titleId);
+      if (!name) {
+        unnamed++;
+        continue;
+      }
+      mainboard.push({ name, count });
+    }
+    if (unnamed > 1) continue; // stale card DB — don't ship a hole
+    // Sample size: wins+losses across the per-rank results buckets.
+    let matches = 0;
+    for (const r of Object.values(row.rs || {})) {
+      if (Array.isArray(r)) matches += (r[0] || 0) + (r[1] || 0);
+    }
+    const norm = normalizeArchetypeName(archetypeName);
+    if (!pool.has(norm)) pool.set(norm, []);
+    pool.get(norm).push({ archetypeName, matches, mainboard });
+  }
+  for (const lists of pool.values()) {
+    lists.sort((a, b) => b.matches - a.matches);
+  }
+  return pool;
 }
 
 const FORMATS = [

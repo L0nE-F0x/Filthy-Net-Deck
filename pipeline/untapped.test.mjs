@@ -15,6 +15,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildBo1BoardFromPayloads,
+  decodeUntappedDeckString,
   normalizeArchetypeName,
 } from "./sources/untapped.mjs";
 
@@ -75,5 +76,42 @@ describe("buildBo1BoardFromPayloads", () => {
   it("drops junk rows and never throws on empty payloads", () => {
     expect(buildBo1BoardFromPayloads([], {})).toEqual([]);
     expect(buildBo1BoardFromPayloads(null, null)).toEqual([]);
+  });
+});
+
+describe("decodeUntappedDeckString", () => {
+  // Real "ds" payloads from the free decks endpoint, 2026-07-21 (period 722).
+  const GOLGARI_CONTROL_DS =
+    "AAQAAQ2HBc0_lZAZxv0ShAS0Kv5byziuA4m0A_j8BsPnCKa6AgWnriHxqAuohgHIxATDpQYBltc1B6QumL0BnPcjr_UH9_QD-p8Q4gMBBo0FAA";
+  const SECOND_DS =
+    "AAQAAQ2HBQUB-l6jyiC90gu9XBkDyfMDkoYEvfYCi58LBrXrAfLCH4nnDObBB8nyAtSiCwW86wG8gUC--QGvAroCBYfYLc5C_bEK9p4LlAEAAA";
+
+  it("decodes a real Bo1 deck string into a 60-card list", () => {
+    const cards = decodeUntappedDeckString(GOLGARI_CONTROL_DS);
+    expect(cards).not.toBeNull();
+    expect(cards.reduce((n, c) => n + c.count, 0)).toBe(60);
+    expect(cards.length).toBe(27); // distinct titleIds
+    // Quantity-group structure: 13×1, 5×2, 1×3, 7×4 + one 6-of (basics).
+    const byQty = {};
+    for (const c of cards) byQty[c.count] = (byQty[c.count] || 0) + 1;
+    expect(byQty).toEqual({ 1: 13, 2: 5, 3: 1, 4: 7, 6: 1 });
+    // Delta decoding: known titleIds — Forest opens, Swamp is the 6-of.
+    expect(cards[0]).toEqual({ titleId: 647, count: 1 });
+    expect(cards[cards.length - 1]).toEqual({ titleId: 653, count: 6 });
+    // Every titleId positive and sane.
+    for (const c of cards) expect(c.titleId).toBeGreaterThan(0);
+  });
+
+  it("decodes a second real payload to a legal-size deck", () => {
+    const cards = decodeUntappedDeckString(SECOND_DS);
+    expect(cards).not.toBeNull();
+    expect(cards.reduce((n, c) => n + c.count, 0)).toBeGreaterThanOrEqual(60);
+  });
+
+  it("returns null for junk instead of throwing", () => {
+    expect(decodeUntappedDeckString("")).toBeNull();
+    expect(decodeUntappedDeckString("AAAA")).toBeNull();
+    expect(decodeUntappedDeckString("not base64 at all!!")).toBeNull();
+    expect(decodeUntappedDeckString(GOLGARI_CONTROL_DS.slice(0, 20))).toBeNull();
   });
 });
