@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { OverlayApp } from "./overlay/OverlayApp";
 import { ToastApp } from "./toast/ToastApp";
+import { PresenceApp } from "./presence/PresenceApp";
 import "./index.css";
 import { bootThemeFromStorage } from "./services/theme";
 
@@ -16,6 +17,7 @@ const routed = (name: string) =>
 function Root() {
   if (routed("overlay")) return <OverlayApp />;
   if (routed("toast")) return <ToastApp />;
+  if (routed("presence")) return <PresenceApp />;
   return <App />;
 }
 

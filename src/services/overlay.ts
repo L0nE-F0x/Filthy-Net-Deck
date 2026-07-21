@@ -38,6 +38,16 @@ export async function setNotifyMatchEndRust(enabled: boolean): Promise<void> {
   }
 }
 
+/** Corner presence badge while Arena is open (Rust owns show/hide). */
+export async function setPresenceEnabled(enabled: boolean): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    await invoke("presence_set_enabled", { enabled });
+  } catch {
+    /* command unavailable in browser / older builds */
+  }
+}
+
 /**
  * Broadcast an overlay-prefs change to every window. The overlay webview is
  * persistent and the DOM `storage` event is not guaranteed to reach it across

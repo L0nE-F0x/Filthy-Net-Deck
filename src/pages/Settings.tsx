@@ -137,6 +137,7 @@ export function Settings() {
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
+  const setPresenceEnabled = useAppStore((s) => s.setPresenceEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
   const setOverlayStartExpanded = useAppStore((s) => s.setOverlayStartExpanded);
   const setOverlayClickThrough = useAppStore((s) => s.setOverlayClickThrough);
@@ -338,7 +339,8 @@ export function Settings() {
               <strong className="text-foam">⚙ pill</strong> in the expanded
               overlay changes opacity and these toggles in-game — no alt-tab.
               Everything is read from Arena's own log on this PC — nothing
-              leaves it. If exclusive fullscreen hides the panel, switch Arena
+              leaves it (the corner badge additionally checks whether Arena
+              itself is running — no other process is looked at). If exclusive fullscreen hides the panel, switch Arena
               to borderless windowed. Running a second tracker at the same time
               can cost Arena FPS.
             </p>
@@ -352,6 +354,21 @@ export function Settings() {
                 <span>
                   <strong>Show match overlay</strong>
                   <em>Auto show/hide with match · ▾ expands full list</em>
+                </span>
+              </label>
+              <label className="settings-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={prefs.presenceEnabled}
+                  onChange={(e) => setPresenceEnabled(e.target.checked)}
+                />
+                <span>
+                  <strong>Corner badge while Arena is open</strong>
+                  <em>
+                    Bottom-left mark so you can see the tracker is running on the
+                    home screen and in the deck builder · ⚙ for the settings worth
+                    changing between matches · dims during a match
+                  </em>
                 </span>
               </label>
               <label className="settings-toggle-row">

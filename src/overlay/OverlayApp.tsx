@@ -24,14 +24,11 @@ import {
   groupLibrary,
   groupSeenCards,
   matchupHudLine,
-  normalizeDensity,
-  normalizeOpacity,
   opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
   playDrawLabel,
-  type OverlayDensity,
   type OverlayGroup,
   type OverlayRow,
 } from "./overlayModel";
@@ -40,6 +37,12 @@ import { deckMatchupMatrix } from "../services/gameAnalytics";
 import { decksForMode } from "../services/deckHelpers";
 import type { MetaBundle } from "../types/meta";
 import { PostMatchSummary } from "./PostMatchSummary";
+import {
+  PREFS_KEY,
+  readOverlayPrefs,
+  writeOverlayPrefs,
+  type OverlayPrefs,
+} from "./overlayPrefs";
 
 
 const SNAP_PX = 24;
@@ -49,8 +52,6 @@ const COLLAPSED_H = 34;
 const MIN_EXPANDED_H = 120;
 /** Grow the panel to at least this tall while the post-match summary is up. */
 const SUMMARY_MIN_H = 252;
-/** localStorage prefs blob shared with the main window (same origin). */
-const PREFS_KEY = "bbi.prefs";
 
 
 function loadMetaCache(): MetaBundle | null {
@@ -89,88 +90,6 @@ function seasonRecord(
 }
 
 /** Overlay display prefs shared with the main window (Settings ⇄ pill menu). */
-interface OverlayPrefs {
-  opacity: number;
-  startExpanded: boolean;
-  clickThrough: boolean;
-  barClock: boolean;
-  barRecord: boolean;
-  postMatch: boolean;
-  /** Row density of the expanded list — footprint knob (default compact). */
-  density: OverlayDensity;
-  /** Fade the panel quieter while the mouse is elsewhere (default on). */
-  idleDim: boolean;
-}
-
-function readOverlayPrefs(): OverlayPrefs {
-  try {
-    const raw = localStorage.getItem(PREFS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as {
-        overlayOpacity?: number;
-        overlayStartExpanded?: boolean;
-        overlayClickThrough?: boolean;
-        overlayBarClock?: boolean;
-        overlayBarRecord?: boolean;
-        overlayPostMatch?: boolean;
-        overlayDensity?: string;
-        overlayIdleDim?: boolean;
-      };
-      return {
-        opacity: normalizeOpacity(parsed.overlayOpacity),
-        startExpanded: parsed.overlayStartExpanded === true,
-        clickThrough: parsed.overlayClickThrough === true,
-        barClock: parsed.overlayBarClock !== false,
-        barRecord: parsed.overlayBarRecord !== false,
-        postMatch: parsed.overlayPostMatch !== false,
-        density: normalizeDensity(parsed.overlayDensity),
-        idleDim: parsed.overlayIdleDim !== false,
-      };
-    }
-  } catch {
-    /* ignore */
-  }
-  return {
-    opacity: normalizeOpacity(undefined),
-    startExpanded: false,
-    clickThrough: false,
-    barClock: true,
-    barRecord: true,
-    postMatch: true,
-    density: normalizeDensity(undefined),
-    idleDim: true,
-  };
-}
-
-/**
- * Merge a patch into the shared prefs blob and broadcast `prefs:overlay` so
- * the main window's Settings mirror it live (no alt-tab needed). The emit is
- * lightly debounced — the opacity slider fires per pixel.
- */
-let prefsEmitTimer = 0;
-function writeOverlayPrefs(patch: Record<string, unknown>): void {
-  try {
-    const raw = localStorage.getItem(PREFS_KEY);
-    const obj = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
-    Object.assign(obj, patch);
-    localStorage.setItem(PREFS_KEY, JSON.stringify(obj));
-  } catch {
-    /* ignore */
-  }
-  if (!isTauri()) return;
-  window.clearTimeout(prefsEmitTimer);
-  prefsEmitTimer = window.setTimeout(() => {
-    void (async () => {
-      try {
-        const { emit } = await import("@tauri-apps/api/event");
-        await emit("prefs:overlay");
-      } catch {
-        /* ignore */
-      }
-    })();
-  }, 120);
-}
-
 /** Passive-HUD mode: make this window ignore cursor events (clicks fall through). */
 async function applyClickThrough(ignore: boolean) {
   if (!isTauri()) return;

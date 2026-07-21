@@ -1,4 +1,6 @@
+mod arena;
 mod overlay;
+mod presence;
 mod silent_update;
 mod toast;
 mod tracker;
@@ -79,6 +81,11 @@ pub fn run() {
             toast::toast_set_enabled,
             toast::toast_show,
             toast::toast_pending,
+            presence::presence_set_enabled,
+            presence::presence_is_enabled,
+            presence::presence_set_size,
+            presence::presence_open_main,
+            arena::arena_is_running,
             silent_update::install_update_silent
         ])
         .setup(|app| {
@@ -115,10 +122,14 @@ pub fn run() {
             overlay::load_enabled(app.handle());
             overlay::load_post_match(app.handle());
             toast::load_enabled(app.handle());
+            presence::load_enabled(app.handle());
             tracker::load_notify_match_end(app.handle());
 
             // Winrate tracker: tail MTG Arena's Player.log in the background.
             tracker::start(app.handle().clone());
+            // "Is Arena up?" — drives the corner presence badge. The tracker
+            // only ever knew about matches, not the client being open.
+            arena::start(app.handle().clone());
 
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;

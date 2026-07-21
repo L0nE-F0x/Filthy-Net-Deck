@@ -55,7 +55,7 @@ import {
   normalizeOpacity,
   type OverlayDensity,
 } from "../overlay/overlayModel";
-import { pushOverlayPrefs, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setNotifyMatchEndRust } from "../services/overlay";
+import { pushOverlayPrefs, setPresenceEnabled as setPresenceEnabledRust, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setNotifyMatchEndRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
@@ -104,6 +104,11 @@ interface Prefs {
   notifyMetaMovers: boolean;
   /** Always-on-top match HUD during Arena games (default on). */
   overlayEnabled: boolean;
+  /**
+   * Corner badge while Arena is open (default on) — proves the app is running
+   * on the home screen and in the deck builder, where the HUD never shows.
+   */
+  presenceEnabled: boolean;
   /** Overlay panel background opacity (0.55–1, default 0.92). */
   overlayOpacity: number;
   /** Overlay starts expanded (full list) instead of collapsed bar. */
@@ -157,6 +162,7 @@ function loadPrefs(): Prefs {
         notifyBanlist?: boolean;
         notifyMetaMovers?: boolean;
         overlayEnabled?: boolean;
+        presenceEnabled?: boolean;
         overlayOpacity?: number;
         overlayStartExpanded?: boolean;
         overlayClickThrough?: boolean;
@@ -185,6 +191,7 @@ function loadPrefs(): Prefs {
         notifyBanlist: parsed.notifyBanlist !== false,
         notifyMetaMovers: parsed.notifyMetaMovers !== false,
         overlayEnabled: parsed.overlayEnabled !== false,
+        presenceEnabled: parsed.presenceEnabled !== false,
         overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
         overlayStartExpanded: parsed.overlayStartExpanded === true,
         overlayClickThrough: parsed.overlayClickThrough === true,
@@ -225,6 +232,7 @@ function loadPrefs(): Prefs {
     notifyBanlist: true,
     notifyMetaMovers: true,
     overlayEnabled: true,
+    presenceEnabled: true,
     overlayOpacity: 0.92,
     overlayStartExpanded: false,
     overlayClickThrough: false,
@@ -377,6 +385,7 @@ interface AppState {
   setNotifyBanlist: (v: boolean) => void;
   setNotifyMetaMovers: (v: boolean) => void;
   setOverlayEnabled: (v: boolean) => void;
+  setPresenceEnabled: (v: boolean) => void;
   /** Overlay panel opacity (0.55–1) — read live by the overlay window. */
   setOverlayOpacity: (v: number) => void;
   /** Start overlay expanded instead of collapsed bar. */
@@ -626,6 +635,13 @@ export const useAppStore = create<AppState>((set, get) => {
       set({ prefs: next });
       void setOverlayEnabledRust(overlayEnabled);
     },
+    setPresenceEnabled: (presenceEnabled) => {
+      const next = { ...get().prefs, presenceEnabled };
+      savePrefs(next);
+      set({ prefs: next });
+      // Rust owns the badge window (the Arena watcher drives show/hide).
+      void setPresenceEnabledRust(presenceEnabled);
+    },
     setOverlayOpacity: (overlayOpacity) => {
       const next = { ...get().prefs, overlayOpacity: normalizeOpacity(overlayOpacity) };
       savePrefs(next);
@@ -848,6 +864,7 @@ export const useAppStore = create<AppState>((set, get) => {
       void setNotifyMatchEndRust(get().prefs.notifyMatchEnd);
       void setTopmostToastEnabled(get().prefs.notifyTopmost);
       void setOverlayPostMatchRust(get().prefs.overlayPostMatch);
+      void setPresenceEnabledRust(get().prefs.presenceEnabled);
       await get().refreshTracker();
       await subscribeTracker({
         onMatch: (m) => {

@@ -21,6 +21,7 @@ tauri-plugin-http = "2.5.9"
 tauri-plugin-store = "2.4.3"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
 tauri-plugin-notification = "2.3.3"
+sysinfo = { version = "0.39.6", default-features = false, features = ["system"] }
 
 [target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
 tauri-plugin-updater = "2"

@@ -7023,3 +7023,170 @@ html.overlay-macos .overlay-shell {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* -- Corner presence badge (fourth webview #/presence) --
+   "FND is running", visible the whole time Arena is open. Bottom-left, fixed.
+   The window is only as big as the badge until the cog menu opens, so it
+   blocks almost nothing; layout is bottom-anchored so the menu grows upward. */
+.fnd-presence {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+.fnd-presence.is-dim {
+  opacity: 0.42;
+}
+.fnd-presence-bar {
+  display: flex;
+  align-items: stretch;
+  align-self: flex-start;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(17, 20, 30, 0.94) 0%, rgba(9, 11, 17, 0.94) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 20%, transparent);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-display);
+}
+.fnd-presence-mark,
+.fnd-presence-cog {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: none;
+  border: 0;
+  color: rgba(232, 234, 240, 0.9);
+  font: inherit;
+  cursor: pointer;
+}
+.fnd-presence-mark img {
+  display: block;
+  border-radius: 4px;
+}
+.fnd-presence-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(52, 211, 153);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.8);
+}
+.fnd-presence-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 234, 240, 0.6);
+}
+.fnd-presence-mark:hover .fnd-presence-label {
+  color: var(--color-gold-300);
+}
+.fnd-presence-cog {
+  border-left: 1px solid color-mix(in srgb, var(--color-gold-500) 14%, transparent);
+  font-size: 0.8rem;
+  color: rgba(232, 234, 240, 0.55);
+}
+.fnd-presence-cog:hover,
+.fnd-presence-cog.is-open {
+  color: var(--color-gold-300);
+  background: color-mix(in srgb, var(--color-gold-500) 10%, transparent);
+}
+
+/* -- Cog menu: the overlay knobs worth changing between matches -- */
+.fnd-presence-menu {
+  /* Intrinsic width, not a percentage: the window is sized *from* this
+     measurement, so a fluid width would pin the menu to the collapsed badge
+     width and it could never grow. */
+  width: 246px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(17, 20, 30, 0.97) 0%, rgba(9, 11, 17, 0.97) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 24%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.62);
+  color: rgba(232, 234, 240, 0.92);
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+}
+.fnd-presence-menu-title {
+  margin: 4px 0 2px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-gold-400) 75%, #e8eaf0);
+}
+.fnd-presence-menu-title:first-child {
+  margin-top: 0;
+}
+.fnd-presence-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 3px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.fnd-presence-row:hover {
+  background: color-mix(in srgb, var(--color-gold-500) 8%, transparent);
+}
+.fnd-presence-slider {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 3px;
+}
+.fnd-presence-row input,
+.fnd-presence-slider input[type="range"] {
+  accent-color: var(--color-gold-400, #e4c06a);
+}
+.fnd-presence-slider input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  height: 10px;
+}
+.fnd-presence-slider span {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.fnd-presence-slider em {
+  font-style: normal;
+  color: rgba(232, 234, 240, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.fnd-presence-danger,
+.fnd-presence-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 22%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-gold-500) 8%, transparent);
+  color: var(--color-gold-300);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+}
+.fnd-presence-danger em,
+.fnd-presence-open em {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.64rem;
+  color: rgba(232, 234, 240, 0.5);
+}
+.fnd-presence-danger:hover,
+.fnd-presence-open:hover {
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  color: var(--color-gold-200);
+}
