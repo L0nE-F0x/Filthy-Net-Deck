@@ -1,5 +1,5 @@
 {
-  "version": "2.5.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.1.exe",
-  "notes": "v2.5.1: Maintenance release. Dependency and build-hygiene cleanup from a full code audit — a slightly lighter build and a security patch to a dev-only tool. Nothing changes on screen; this just keeps the foundations current."
+  "version": "2.5.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.2.exe",
+  "notes": "v2.5.2: Maintenance release. My Stats modularized for maintainability, Arena process-watcher edge tests expanded, and daily meta-web rebuild documented as fully automatic. No player-facing UI change."
 }

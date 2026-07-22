@@ -32,6 +32,17 @@ fn is_arena_process(name: &str) -> bool {
     stem.eq_ignore_ascii_case(ARENA_STEM)
 }
 
+/// Pure transition helper for the poll loop: emit only when running-ness flips.
+/// `previous` is the value *before* this scan; `current` is the fresh scan.
+/// Returns `Some(current)` on an edge (start or stop), else `None`.
+fn running_transition(previous: bool, current: bool) -> Option<bool> {
+    if previous != current {
+        Some(current)
+    } else {
+        None
+    }
+}
+
 /// True when any live process' executable name is Arena's.
 fn scan(sys: &mut System) -> bool {
     sys.refresh_specifics(RefreshKind::nothing().with_processes(ProcessRefreshKind::nothing()));
@@ -47,9 +58,10 @@ pub fn start(app: AppHandle) {
         loop {
             let now = scan(&mut sys);
             // `swap` so only a real transition emits — this runs forever.
-            if RUNNING.swap(now, Ordering::SeqCst) != now {
-                let _ = app.emit("arena:running", now);
-                if now {
+            let previous = RUNNING.swap(now, Ordering::SeqCst);
+            if let Some(running) = running_transition(previous, now) {
+                let _ = app.emit("arena:running", running);
+                if running {
                     crate::presence::show(&app);
                 } else {
                     crate::presence::hide(&app);
@@ -74,6 +86,7 @@ mod tests {
         assert!(is_arena_process("MTGA.exe")); // Windows
         assert!(is_arena_process("MTGA")); // macOS
         assert!(is_arena_process("mtga.exe")); // case-insensitive
+        assert!(is_arena_process("Mtga")); // mixed case stem, no extension
     }
 
     #[test]
@@ -83,6 +96,40 @@ mod tests {
         assert!(!is_arena_process("Untapped.exe"));
         assert!(!is_arena_process("filthy-net-deck.exe"));
         assert!(!is_arena_process(""));
+        // Prefix / suffix cousins must not match the exact stem.
+        assert!(!is_arena_process("MTGAOverlay.exe"));
+        assert!(!is_arena_process("xMTGA.exe"));
+        assert!(!is_arena_process("MTGA2.exe"));
+        // Double-extension leftover should not collapse to MTGA.
+        assert!(!is_arena_process("MTGA.exe.bak"));
+        // Whitespace-only and unrelated games.
+        assert!(!is_arena_process("   "));
+        assert!(!is_arena_process("LeagueClient.exe"));
+    }
+
+    #[test]
+    fn running_transition_emits_only_on_edges() {
+        // Steady states: no emit (debounce / edge-only).
+        assert_eq!(running_transition(false, false), None);
+        assert_eq!(running_transition(true, true), None);
+        // Rising edge: Arena launched.
+        assert_eq!(running_transition(false, true), Some(true));
+        // Falling edge: Arena quit.
+        assert_eq!(running_transition(true, false), Some(false));
+    }
+
+    #[test]
+    fn running_transition_sequence_is_stable() {
+        // Simulate a few poll ticks with no live process / AppHandle.
+        let mut state = false;
+        let mut emits: Vec<bool> = Vec::new();
+        for scan_now in [false, false, true, true, true, false, false] {
+            if let Some(v) = running_transition(state, scan_now) {
+                emits.push(v);
+            }
+            state = scan_now;
+        }
+        assert_eq!(emits, vec![true, false]);
     }
 
     /// Sanity-checks the live process scan against this machine. Ignored by

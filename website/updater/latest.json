@@ -1,11 +1,11 @@
 {
-  "version": "2.5.1",
-  "notes": "v2.5.1: Maintenance release. Dependency and build-hygiene cleanup from a full code audit — a slightly lighter build and a security patch to a dev-only tool. Nothing changes on screen; this just keeps the foundations current.",
-  "pub_date": "2026-07-22T08:36:16Z",
+  "version": "2.5.2",
+  "notes": "v2.5.2: Maintenance release. My Stats modularized for maintainability, Arena process-watcher edge tests expanded, and daily meta-web rebuild documented as fully automatic. No player-facing UI change.",
+  "pub_date": "2026-07-22T10:43:27Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjAzTk5KNnF5cUxSMTJHb3JVbUFOckQvMTkwT1hHY3VBcVFSVkdBL2FSdGxFMi9rR1NpRm9LRkkzYTlIUjFnd3F6ZEpkdGRQbnNFcTN0bnAyeCtZalFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NzA5MzE1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNS4xX3g2NC1zZXR1cC5leGUKeDlRdXpGQUFFb3lXdFNwUXFuT2JaV0NTRXU2RXVGckZlZ25JVkJ2SGV0cGtBb2h0Q1djeTB3aTNJQkJRd2ZiUWJZNUN6NmlYdnBNendwY3FaRVdOQmc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjRnbkplTTFubWFnUzMyaTdzMXd2NThhUVAyOHFjbTVMdmMzTGR0Ym1mS3haa09qS0I2WURLV2xWblZXREhmWm94Tkc0Rnh3WTI0V0Y4TE54eUwxMHdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0NzE2OTkzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNS4yX3g2NC1zZXR1cC5leGUKdkdpQ0xRMDFWZFB2a1N3Ni9LZzBtcndkK2dXQkJIMExjOEhHVjFEVTNUQ1phRjVoVkt6YStuamFjQ2VscmNmME9kclhQdHR1WCtEU0IwZG5Xb3NPQmc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.2.exe"
     }
   }
 }
