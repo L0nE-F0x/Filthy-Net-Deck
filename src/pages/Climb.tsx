@@ -14,6 +14,7 @@ import {
   mythicAxisLabel,
   nextRankLabel,
   rankLabelFromScore,
+  rankSeriesDomain,
   winrateFavor,
   type RankPoint,
 } from "../services/ranks";
@@ -82,27 +83,7 @@ function RankChart({
   // All-Mythic range: zoom the axis into the percentile/leaderboard band so
   // Mythic movement shows as a real curve instead of a flat line at the top.
   const allMythic = Math.min(...scores) >= 20;
-  let lo: number;
-  let hi: number;
-  if (allMythic) {
-    const minS = Math.min(...scores);
-    const maxS = Math.max(...scores);
-    const pad = Math.max(0.01, (maxS - minS) * 0.15);
-    lo = Math.max(20, minS - pad);
-    hi = Math.min(22, maxS + pad);
-    if (hi - lo < 0.05) {
-      const mid = (lo + hi) / 2;
-      lo = Math.max(20, mid - 0.025);
-      hi = Math.min(22, lo + 0.05);
-    }
-  } else {
-    lo = Math.floor(Math.min(...scores));
-    hi = Math.ceil(Math.max(...scores));
-    if (hi - lo < 2) {
-      lo = Math.max(0, lo - 1);
-      hi = lo + 2;
-    }
-  }
+  const { lo, hi } = rankSeriesDomain(scores);
 
   const minT = series[0].at;
   const maxT = series[series.length - 1].at;

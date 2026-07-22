@@ -7,7 +7,12 @@
 import { memo, useMemo } from "react";
 import type { LiveMatch, TrackedMatch } from "../types/tracker";
 import { deckKey } from "../services/tracker";
-import { buildRankSeries, rankLabelFromScore } from "../services/ranks";
+import {
+  buildRankSeries,
+  mythicAxisLabel,
+  rankLabelFromScore,
+  rankSeriesDomain,
+} from "../services/ranks";
 import { sessionWindow } from "../services/recapStats";
 
 /** Sparkline geometry (viewBox units; the SVG scales with panel width). */
@@ -78,14 +83,24 @@ export const PostMatchSummary = memo(function PostMatchSummary({
     // Preferred: the ladder rank path (player-wide, not deck-scoped).
     const series = buildRankSeries(matches).slice(-SPARK_POINTS);
     if (series.length >= 2) {
+      const values = series.map((p) => p.rank.score);
+      const first = values[0];
+      const last = values[values.length - 1];
+      // Match the endpoints' precision to the range on show. Rounding the
+      // start to a whole percent while the end came from live.myRank with a
+      // decimal made a real move read as "94% → 92.7%" — same number twice.
+      const allMythic = Math.min(...values) >= 20;
+      const span = Math.max(...values) - Math.min(...values);
       return {
         kind: "rank",
-        values: series.map((p) => p.rank.score),
+        values,
         results: series.map((p) => p.result),
-        firstLabel: rankLabelFromScore(series[0].rank.score),
-        lastLabel:
-          live.myRank ??
-          rankLabelFromScore(series[series.length - 1].rank.score),
+        firstLabel: allMythic
+          ? `Mythic ${mythicAxisLabel(first, span)}`
+          : rankLabelFromScore(first),
+        lastLabel: allMythic
+          ? `Mythic ${mythicAxisLabel(last, span)}`
+          : (live.myRank ?? rankLabelFromScore(last)),
       };
     }
     // Fallback: running winrate trend on this deck.
@@ -110,12 +125,21 @@ export const PostMatchSummary = memo(function PostMatchSummary({
   const sparkGeom = useMemo(() => {
     if (!spark) return null;
     const n = spark.values.length;
-    let min = Math.min(...spark.values);
-    let max = Math.max(...spark.values);
-    if (max - min < 0.5) {
-      const mid = (max + min) / 2;
-      min = mid - 0.25;
-      max = mid + 0.25;
+    let min: number;
+    let max: number;
+    if (spark.kind === "rank") {
+      // Rank scores need the Mythic-aware domain: a percentile point is 0.01
+      // here, so a flat 0.5 floor drew every Mythic session as a straight line.
+      ({ lo: min, hi: max } = rankSeriesDomain(spark.values));
+    } else {
+      // Winrate trend is already 0–100; just stop a steady run collapsing.
+      min = Math.min(...spark.values);
+      max = Math.max(...spark.values);
+      if (max - min < 5) {
+        const mid = (max + min) / 2;
+        min = mid - 2.5;
+        max = mid + 2.5;
+      }
     }
     const iw = SPARK_W - SPARK_PAD * 2;
     const ih = SPARK_H - SPARK_PAD * 2;

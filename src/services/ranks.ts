@@ -117,6 +117,41 @@ export function mythicAxisLabel(score: number, spanScore: number): string {
   return `${pct.toFixed(decimals)}%`;
 }
 
+/**
+ * Y-axis domain for a rank series.
+ *
+ * Mythic movement lives inside the 20–22 band: a percentile point is 0.01 of
+ * a score, so a whole session of climbing spans hundredths. Any fixed minimum
+ * span sized for the tier scale (where one division = 1.0) squashes that to a
+ * flat line — which is exactly what the post-match sparkline used to draw for
+ * anyone in Mythic. Zoom into the band whenever every sample is Mythic.
+ *
+ * Shared by the Climb chart and the overlay sparkline so the two can't drift.
+ */
+export function rankSeriesDomain(scores: number[]): { lo: number; hi: number } {
+  if (!scores.length) return { lo: 0, hi: 1 };
+  const minS = Math.min(...scores);
+  const maxS = Math.max(...scores);
+  if (minS >= 20) {
+    const pad = Math.max(0.01, (maxS - minS) * 0.15);
+    let lo = Math.max(20, minS - pad);
+    let hi = Math.min(22, maxS + pad);
+    if (hi - lo < 0.05) {
+      const mid = (lo + hi) / 2;
+      lo = Math.max(20, mid - 0.025);
+      hi = Math.min(22, lo + 0.05);
+    }
+    return { lo, hi };
+  }
+  let lo = Math.floor(minS);
+  let hi = Math.ceil(maxS);
+  if (hi - lo < 2) {
+    lo = Math.max(0, lo - 1);
+    hi = lo + 2;
+  }
+  return { lo, hi };
+}
+
 /** Next discrete step above this rank (Mythic stays Mythic). */
 export function nextRankLabel(p: ParsedRank): string | null {
   if (p.tier === "Mythic") return null;

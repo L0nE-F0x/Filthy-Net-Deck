@@ -4,6 +4,7 @@ import {
   mythicAxisLabel,
   parseRank,
   rankLabelFromScore,
+  rankSeriesDomain,
 } from "./ranks";
 
 describe("parseRank", () => {
@@ -55,5 +56,51 @@ describe("mythicAxisLabel", () => {
   it("labels leaderboard scores as places", () => {
     expect(mythicAxisLabel(21 + (1 - 874 / 1200), 0.5)).toBe("#874");
     expect(rankLabelFromScore(21 + (1 - 874 / 1200))).toBe("Mythic #874");
+  });
+});
+
+describe("rankSeriesDomain", () => {
+  /** Fraction of the chart's height the data actually occupies. */
+  const fill = (scores: number[]) => {
+    const { lo, hi } = rankSeriesDomain(scores);
+    return (Math.max(...scores) - Math.min(...scores)) / (hi - lo);
+  };
+
+  it("zooms into the Mythic band so a percentile move is visible", () => {
+    // The reported case: Mythic 94% → 92.7% is 0.013 of a score point. Under
+    // the old flat 0.5-wide floor it filled 2.6% of the height — a flat line.
+    const scores = [20.94, 20.933, 20.928, 20.927];
+    expect(fill(scores)).toBeGreaterThan(0.2);
+    const { lo, hi } = rankSeriesDomain(scores);
+    expect(lo).toBeGreaterThanOrEqual(20);
+    expect(hi).toBeLessThanOrEqual(22);
+  });
+
+  it("keeps a single repeated Mythic score from dividing by zero", () => {
+    const { lo, hi } = rankSeriesDomain([20.5, 20.5, 20.5]);
+    expect(hi).toBeGreaterThan(lo);
+    expect(hi - lo).toBeCloseTo(0.05, 5);
+  });
+
+  it("uses whole steps for the tier ladder", () => {
+    const { lo, hi } = rankSeriesDomain([14, 15, 16]);
+    expect(lo).toBe(14);
+    expect(hi).toBe(16);
+  });
+
+  it("pads a flat tier run to a readable span", () => {
+    const { lo, hi } = rankSeriesDomain([12, 12]);
+    expect(hi - lo).toBe(2);
+  });
+
+  it("never returns an empty domain", () => {
+    const { lo, hi } = rankSeriesDomain([]);
+    expect(hi).toBeGreaterThan(lo);
+  });
+
+  it("handles leaderboard scores above 21", () => {
+    const { lo, hi } = rankSeriesDomain([21.2, 21.25]);
+    expect(hi).toBeGreaterThan(lo);
+    expect(hi).toBeLessThanOrEqual(22);
   });
 });
