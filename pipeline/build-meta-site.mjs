@@ -26,12 +26,15 @@ function resolveDownloads() {
   } catch {
     /* keep default */
   }
+  // Meta-web pages are static and nothing regenerates them on release, so a
+  // version-pinned binary link rots (and 404s once old installers are pruned).
+  // Send visitors to the homepage download section — that is always current.
   return {
     ver,
-    win: `../downloads/Filthy-Net-Deck-Setup-${ver}.exe`,
-    mac: `../downloads/Filthy-Net-Deck-${ver}-universal.dmg`,
-    winDeep: `../../downloads/Filthy-Net-Deck-Setup-${ver}.exe`,
-    macDeep: `../../downloads/Filthy-Net-Deck-${ver}-universal.dmg`,
+    win: `../index.html#download`,
+    mac: `../index.html#download`,
+    winDeep: `../../index.html#download`,
+    macDeep: `../../index.html#download`,
   };
 }
 

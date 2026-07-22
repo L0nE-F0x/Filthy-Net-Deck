@@ -62,8 +62,7 @@ html[data-theme="light"] .sidebar {
   border-right-color: color-mix(in srgb, var(--color-ink-600) 55%, transparent);
 }
 
-html[data-theme="light"] .panel,
-html[data-theme="light"] .viewer-panel {
+html[data-theme="light"] .panel {
   box-shadow: 0 1px 2px color-mix(in srgb, #141821 4%, transparent),
     0 8px 24px color-mix(in srgb, #141821 5%, transparent);
 }
@@ -860,7 +859,6 @@ select,
 .banner-update .update-dismiss:hover {
   opacity: 1;
 }
-.skeleton-banner { min-height: 2.2rem; }
 .skel {
   height: 0.55rem;
   border-radius: 4px;
@@ -948,18 +946,6 @@ select,
   color: var(--color-gold-300);
   border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
 }
-
-.star-btn {
-  border: none;
-  background: transparent;
-  color: var(--color-muted);
-  cursor: pointer;
-  padding: 0.2rem;
-  display: inline-flex;
-  transition: color 0.15s, transform 0.15s;
-}
-.star-btn:hover { color: var(--color-gold-400); transform: scale(1.08); }
-.star-btn.on { color: var(--color-gold-400); }
 
 .mana-curve-bars {
   display: flex;
@@ -1084,59 +1070,6 @@ select,
 /* When both the rotation marker and QA "?" show, keep them side by side. */
 .card-rotating + .text-poor {
   margin-left: 0.4rem;
-}
-
-.viewer-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: color-mix(in srgb, black 55%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  animation: pageIn 0.15s ease;
-}
-.viewer-panel {
-  width: min(960px, 100%);
-  height: min(720px, 92vh);
-  background: var(--color-ink-900);
-  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 24px 60px black;
-}
-.viewer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-600) 50%, transparent);
-}
-.viewer-url {
-  font-size: 0.72rem;
-  color: var(--color-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-  flex: 1;
-}
-.viewer-frame {
-  flex: 1;
-  width: 100%;
-  border: none;
-  background: var(--color-ink-950);
-}
-.viewer-hint {
-  margin: 0;
-  padding: 0.4rem 0.85rem;
-  font-size: 0.7rem;
-  color: var(--color-muted);
-  border-top: 1px solid color-mix(in srgb, var(--color-ink-700) 50%, transparent);
 }
 
 .card-unknown {

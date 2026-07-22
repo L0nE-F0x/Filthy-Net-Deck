@@ -36,6 +36,14 @@ jobs:
         run: npm run sets
         continue-on-error: true
 
+      # Regenerate the public meta-web deck pages from the freshly built JSON.
+      # Without this the static HTML under website/meta-web/ was staged but
+      # never rebuilt by the cron, so it drifted a day behind the live feed.
+      - name: Rebuild public meta-web pages
+        id: build_meta_site
+        run: npm run meta:site
+        continue-on-error: true
+
       - name: Commit meta if changed
         run: |
           git config user.name "github-actions[bot]"
