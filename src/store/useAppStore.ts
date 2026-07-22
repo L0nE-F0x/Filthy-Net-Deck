@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { APP_VERSION } from "../version";
 import { fetchMetaBundle } from "../services/metaFeed";
 import { fetchSetsBundle } from "../services/setsFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
@@ -7,10 +8,10 @@ import {
   type VersionCheckResult,
 } from "../services/versionCheck";
 import {
-  checkAppUpdate,
+  checkAppUpdateSigned,
   installPendingUpdate,
-  installSilentFromUrl,
   isTauri,
+  resolveUpdateOffer,
   type UpdateInstallMode,
 } from "../services/appUpdater";
 import { resolveFormatId } from "../services/formatResolve";
@@ -772,9 +773,10 @@ export const useAppStore = create<AppState>((set, get) => {
     setShowFavoritesOnly: (showFavoritesOnly) => set({ showFavoritesOnly }),
 
     checkForUpdates: async () => {
-      // Preferred: signed Tauri updater (minisign + plugin)
-      const auto = await checkAppUpdate();
-      if (auto) {
+      // Preferred: signed Tauri updater (minisign + plugin).
+      const signed = await checkAppUpdateSigned();
+      if (signed.ok && signed.update) {
+        const auto = signed.update;
         set({
           updateAvailable: {
             version: auto.version,
@@ -788,22 +790,22 @@ export const useAppStore = create<AppState>((set, get) => {
           remote: { version: auto.version, notes: auto.notes },
         };
       }
-      // Fallback: version.json — on desktop, silent NSIS install (no browser)
-      const result = await checkRemoteVersion();
-      if (result.status === "update") {
-        const silent = isTauri() && !!result.remote.downloadUrl;
-        set({
-          updateAvailable: {
-            version: result.remote.version,
-            downloadUrl: result.remote.downloadUrl,
-            notes: result.remote.notes,
-            canAutoInstall: silent,
-            installMode: silent ? "silent" : "browser",
-          },
-        });
-      } else {
+      // The signed updater answered and we're current — believe it. Consulting
+      // version.json here would only offer a weaker path to the same answer.
+      if (signed.ok) {
         set({ updateAvailable: null });
+        return { status: "latest", remote: { version: APP_VERSION } };
       }
+      // Signed check unavailable (offline, bad manifest). version.json can
+      // still *tell* us an update exists, but it cannot authorise installing
+      // one — the user is sent to the download page to run it themselves.
+      const result = await checkRemoteVersion();
+      set({
+        updateAvailable: resolveUpdateOffer(
+          signed,
+          result.status === "update" ? result.remote : null,
+        ),
+      });
       return result;
     },
 
@@ -816,13 +818,6 @@ export const useAppStore = create<AppState>((set, get) => {
         if (available.installMode === "signed") {
           await installPendingUpdate((pct) => set({ updateProgress: pct }));
           // relaunch() exits the app
-          return;
-        }
-        if (available.installMode === "silent" && available.downloadUrl) {
-          await installSilentFromUrl(available.downloadUrl, (pct) =>
-            set({ updateProgress: pct }),
-          );
-          // Rust exits + relaunches
           return;
         }
         throw new Error("No in-app install path available for this update.");

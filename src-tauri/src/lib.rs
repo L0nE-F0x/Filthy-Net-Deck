@@ -1,7 +1,6 @@
 mod arena;
 mod overlay;
 mod presence;
-mod silent_update;
 mod toast;
 mod tracker;
 
@@ -89,8 +88,7 @@ pub fn run() {
             presence::presence_is_enabled,
             presence::presence_set_size,
             presence::presence_open_main,
-            arena::arena_is_running,
-            silent_update::install_update_silent
+            arena::arena_is_running
         ])
         .setup(|app| {
             #[cfg(desktop)]
