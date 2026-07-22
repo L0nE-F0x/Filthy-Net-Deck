@@ -583,6 +583,9 @@ function SeasonCompareCell({
   );
 }
 
+/** Stretches shown before the "Show all" toggle — recent history is the story. */
+const LEGS_PREVIEW = 10;
+
 export function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
@@ -591,6 +594,7 @@ export function Climb() {
   const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
   const [season, setSeason] = useState<string | null>(null);
   const [hoverDeck, setHoverDeck] = useState<string | null>(null);
+  const [showAllLegs, setShowAllLegs] = useState(false);
 
   useEffect(() => {
     void refreshTracker();
@@ -631,6 +635,16 @@ export function Climb() {
   );
   const decks = useMemo(() => deckClimbSummaries(seasonMatches), [seasonMatches]);
   const legs = useMemo(() => buildClimbLegs(seasonMatches), [seasonMatches]);
+  // Preview keeps the most recent stretches whichever way the list is ordered.
+  const orderedLegs = useMemo(
+    () => (climbNewestFirst ? [...legs].reverse() : legs),
+    [legs, climbNewestFirst],
+  );
+  const visibleLegs = showAllLegs
+    ? orderedLegs
+    : climbNewestFirst
+      ? orderedLegs.slice(0, LEGS_PREVIEW)
+      : orderedLegs.slice(-LEGS_PREVIEW);
 
   const current = series.length ? series[series.length - 1].rank : null;
   const peak = series.length
@@ -735,40 +749,8 @@ export function Climb() {
             />
           </div>
         </div>
-        <div className="lab-intro-stats">
-          <div title={current ? `Current rank: ${formatRank(current)}` : "No current rank stamp"}>
-            <strong className="text-gold-300">{current ? formatRank(current) : "—"}</strong>
-            <span>current</span>
-          </div>
-          <div title={peak ? `Best rank in this range: ${formatRank(peak)}` : "No peak rank yet"}>
-            <strong>{peak ? formatRank(peak) : "—"}</strong>
-            <span>peak</span>
-          </div>
-          <div
-            title={
-              seasonDelta == null
-                ? "Not enough rank samples to measure steps"
-                : `Net rank steps this range: ${seasonDelta > 0 ? "+" : ""}${seasonDelta.toFixed(seasonDelta % 1 ? 1 : 0)}`
-            }
-          >
-            <strong
-              className={
-                seasonDelta == null
-                  ? ""
-                  : seasonDelta > 0
-                    ? "favor-favored"
-                    : seasonDelta < 0
-                      ? "favor-unfavored"
-                      : ""
-              }
-            >
-              {seasonDelta == null
-                ? "—"
-                : `${seasonDelta > 0 ? "+" : ""}${seasonDelta.toFixed(seasonDelta % 1 ? 1 : 0)}`}
-            </strong>
-            <span>steps</span>
-          </div>
-        </div>
+        {/* current / peak / steps live in the stat tiles right below — the
+            intro repeating them was pure noise. */}
       </div>
 
       {seasons.length > 1 && (
@@ -921,13 +903,11 @@ export function Climb() {
             </div>
           </div>
           <p className="text-xs text-muted m-0 mb-3 mt-1 leading-relaxed">
-            Stretches on each deck — what you piloted from{" "}
-            {start ? formatRank(start) : "start"} to{" "}
-            {current ? formatRank(current) : "now"}. Stretch numbers stay chronological.
-            Click any stretch for full deck stats.
+            What you piloted from {start ? formatRank(start) : "start"} to{" "}
+            {current ? formatRank(current) : "now"} — click any stretch for full deck stats.
           </p>
           <div className="climb-leg-list">
-            {(climbNewestFirst ? [...legs].reverse() : legs).map((leg) => {
+            {visibleLegs.map((leg) => {
               const i = legs.indexOf(leg);
               return (
                 <LegCard
@@ -941,6 +921,17 @@ export function Climb() {
               );
             })}
           </div>
+          {legs.length > LEGS_PREVIEW && (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-2"
+              onClick={() => setShowAllLegs((v) => !v)}
+            >
+              {showAllLegs
+                ? "Show recent only"
+                : `Show all ${legs.length} stretches`}
+            </button>
+          )}
         </div>
       )}
 

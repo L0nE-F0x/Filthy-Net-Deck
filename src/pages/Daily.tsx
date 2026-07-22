@@ -232,7 +232,7 @@ export function Daily() {
   const heroVs = hero ? vsFor(hero) : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* D1 — activation strip on home until first-session loop is done */}
       {showOnboarding && (
         <div className="panel tracker-onboarding-home">
@@ -240,9 +240,6 @@ export function Daily() {
         </div>
       )}
       <SessionWrapBanner />
-      {/* D2 light — 2–3 catch-up chips when there's something to say */}
-      <DailyDigestStrip formatId={activeFmt?.id} />
-      <LocalCoachStrip />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>
@@ -421,83 +418,18 @@ export function Daily() {
         </section>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+      {/* Personal layer lives below the board: catch-up + coach, then the
+          meta panels. Movement since yesterday is already on the cards (chips)
+          and in the timeline's Movers line, so no separate diff panel. */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
+        <DailyDigestStrip formatId={activeFmt?.id} />
+        <LocalCoachStrip />
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
         <MetaShareTimeline />
         <PersonalMetaPanel />
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
-        <OpponentArchetypePanel />
-      </div>
-
-      {metaDiff.previousDate && metaDiff.changes.length > 0 && (
-        <section className="panel diff-panel">
-          <h3 className="text-sm font-semibold m-0 mb-2">
-            Meta movement since {metaDiff.previousDate}
-          </h3>
-          <div className="max-h-36 overflow-auto">
-            {metaDiff.changes.slice(0, 10).map((ch) => (
-              <div key={`${ch.formatId}-${ch.mode}`} className="diff-row">
-                <span className="text-muted">
-                  {ch.formatName} {ch.mode.toUpperCase()}
-                </span>
-                <span>
-                  {ch.rose.slice(0, 2).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className="diff-up mr-2 link-btn"
-                      onClick={() => {
-                        const d = Object.values(meta.decks).find(
-                          (x) =>
-                            x.name.toLowerCase() === n.toLowerCase() ||
-                            x.archetype.toLowerCase() === n.toLowerCase(),
-                        );
-                        if (d) openDeck(d.id);
-                      }}
-                    >
-                      ↑ {n}
-                    </button>
-                  ))}
-                  {ch.fell.slice(0, 2).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className="diff-down mr-2 link-btn"
-                      onClick={() => {
-                        const d = Object.values(meta.decks).find(
-                          (x) =>
-                            x.name.toLowerCase() === n.toLowerCase() ||
-                            x.archetype.toLowerCase() === n.toLowerCase(),
-                        );
-                        if (d) openDeck(d.id);
-                      }}
-                    >
-                      ↓ {n}
-                    </button>
-                  ))}
-                  {ch.entered.slice(0, 2).map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className="diff-new mr-2 link-btn"
-                      onClick={() => {
-                        const d = Object.values(meta.decks).find(
-                          (x) =>
-                            x.name.toLowerCase() === n.toLowerCase() ||
-                            x.archetype.toLowerCase() === n.toLowerCase(),
-                        );
-                        if (d) openDeck(d.id);
-                      }}
-                    >
-                      + {n}
-                    </button>
-                  ))}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <OpponentArchetypePanel />
     </div>
   );
 }

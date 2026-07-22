@@ -313,26 +313,17 @@ export function Settings() {
           </div>
         </section>
 
-        <TrackerHealthCard />
-        <KeyboardCheatSheet />
-
         {/* —— In-game overlay —— */}
         {isTauri() && (
           <section className="panel settings-card settings-card-span2">
             <h3 className="settings-card-title">In-game overlay</h3>
             <p className="settings-card-desc mb-2">
-              Slim always-on-top deck tracker: next-draw odds, land count, turn
-              and play/draw chips, plus an Opponent tab listing every card
-              they've shown. Starts collapsed (bar only) — expand with ▾. Drag
-              to move, resize from the edges, snaps to screen edges — size and
-              position are remembered. The{" "}
-              <strong className="text-foam">⚙ pill</strong> in the expanded
-              overlay changes opacity and these toggles in-game — no alt-tab.
-              Everything is read from Arena's own log on this PC — nothing
-              leaves it (the corner badge additionally checks whether Arena
-              itself is running — no other process is looked at). If exclusive fullscreen hides the panel, switch Arena
-              to borderless windowed. Running a second tracker at the same time
-              can cost Arena FPS.
+              Slim always-on-top tracker: draw odds, lands, turn, play/draw, and
+              an Opponent tab of every card they’ve shown. Drag to move, resize
+              from the edges — position is remembered, and the{" "}
+              <strong className="text-foam">⚙ pill</strong> adjusts everything
+              in-game. All read from Arena’s own log on this PC. If exclusive
+              fullscreen hides it, switch Arena to borderless windowed.
             </p>
             <div className="settings-toggle-list">
               <label className="settings-toggle-row">
@@ -632,6 +623,10 @@ export function Settings() {
             </div>
           )}
         </section>
+
+        {/* —— Plumbing last: health, shortcuts, updates, about —— */}
+        <TrackerHealthCard />
+        <KeyboardCheatSheet />
 
         {/* —— Updates —— */}
         <section className="panel settings-card settings-card-span2">

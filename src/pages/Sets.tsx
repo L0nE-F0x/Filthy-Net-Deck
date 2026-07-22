@@ -13,7 +13,6 @@ import { openExternal } from "../services/openExternal";
 import {
   isFormatLegal,
   setGalleryCards,
-  type DateConfidence,
   type FreshSpoilerCard,
   type FutureSet,
   type SetPreviewCard,
@@ -26,7 +25,6 @@ import { trailerForSet, type SetTrailer } from "../services/setTrailers";
 import { totalNewCount } from "../services/setPulse";
 import {
   cardHasColor,
-  confidenceHint,
   countdownLabel,
   daysUntil,
   formatSetDate,
@@ -45,30 +43,6 @@ type SortKey = "collector" | "name" | "cmc" | "rarity" | "newest";
 
 /** Local alias so existing JSX keeps calling formatDate. */
 const formatDate = formatSetDate;
-
-function DateRow({
-  label,
-  date,
-  confidence,
-  emphasize,
-}: {
-  label: string;
-  date: string | null;
-  confidence?: DateConfidence;
-  emphasize?: boolean;
-}) {
-  const hint = confidenceHint(confidence);
-  return (
-    <div className={`set-date-row${emphasize ? " set-date-arena" : ""}`}>
-      <span className="set-date-label">{label}</span>
-      <span className="set-date-value">
-        {formatDate(date)}
-        {hint ? <span className="set-date-hint"> · {hint}</span> : null}
-      </span>
-      <span className="set-date-count">{countdownLabel(date)}</span>
-    </div>
-  );
-}
 
 /** Scryfall marks unreleased cards not_legal until launch day — say so. Z3: badges open Format Hub. */
 function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: boolean }) {
@@ -762,24 +736,15 @@ function SetCard({
           </div>
         </div>
 
-        <div className="set-dates">
-          <DateRow
-            label="Arena drop"
-            date={set.dates.arena}
-            confidence={set.datesConfidence.arena}
-            emphasize
-          />
-          <DateRow
-            label="Prerelease"
-            date={set.dates.prerelease}
-            confidence={set.datesConfidence.prerelease}
-          />
-          <DateRow
-            label="Tabletop"
-            date={set.dates.tabletop}
-            confidence={set.datesConfidence.tabletop}
-          />
-        </div>
+        {/* Arena + Paper already carry their dates in the countdown strip —
+            prerelease is the only extra datum, so it gets one quiet line. */}
+        {set.dates.prerelease && (
+          <p className="set-prerelease-line">
+            Prerelease {formatDate(set.dates.prerelease)}
+            {set.datesConfidence.prerelease === "estimated" ? " · est." : ""} ·{" "}
+            {countdownLabel(set.dates.prerelease)}
+          </p>
+        )}
 
         <div className="set-spoiler-meter">
           <div className="set-spoiler-meter-head">
@@ -875,6 +840,90 @@ function SetCard({
   );
 }
 
+/** Live rows shown before the "Show all" toggle. */
+const LIVE_PREVIEW = 8;
+
+/**
+ * v2.5.0 — live sets are history, not news: one row each instead of a full
+ * radar card. Icon · name · drop date · rotation flag · gallery/Scryfall.
+ */
+function LiveSetRow({
+  set,
+  newCount,
+  onOpenGallery,
+  dropDay,
+  rotationDays,
+  rotationLabel,
+}: {
+  set: UpcomingSet;
+  newCount: number;
+  onOpenGallery: (s: UpcomingSet) => void;
+  dropDay?: boolean;
+  rotationDays?: number | null;
+  rotationLabel?: string | null;
+}) {
+  const gallery = setGalleryCards(set);
+  const hasFullGallery = Boolean(set.cards?.length);
+  const nearRotation =
+    rotationDays != null && rotationDays >= 0 && rotationDays <= 45;
+  const droppedAt = set.dates.arena || set.dates.tabletop;
+  return (
+    <div className={`live-set-row${dropDay ? " live-set-row-drop" : ""}`}>
+      {set.iconSvg ? (
+        <img src={set.iconSvg} alt="" className="live-set-icon" width={22} height={22} />
+      ) : (
+        <span className="live-set-icon live-set-icon-blank" aria-hidden="true" />
+      )}
+      <div className="live-set-main">
+        <span className="live-set-name">
+          {set.name}
+          <span className="live-set-code">{set.code.toUpperCase()}</span>
+          {dropDay && (
+            <span className="set-drop-day-badge" title="Arena drop window (±1 day)">
+              Drop day
+            </span>
+          )}
+          {nearRotation && (
+            <span
+              className="set-rot-flag"
+              title={rotationLabel ? `Leaves Standard ${rotationLabel}` : "Leaving Standard soon"}
+            >
+              {rotationDays === 0
+                ? "Rotates today"
+                : rotationDays === 1
+                  ? "Rotates tomorrow"
+                  : `Rotates ${rotationDays}d`}
+            </span>
+          )}
+        </span>
+        <span className="live-set-sub">
+          On Arena {formatDate(droppedAt)} · {countdownLabel(droppedAt)}
+          {set.spoiledCount > 0 ? ` · ${set.spoiledCount} cards` : ""}
+          {newCount > 0 ? ` · +${newCount} new` : ""}
+        </span>
+      </div>
+      <div className="live-set-actions">
+        {gallery.length > 0 && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => onOpenGallery(set)}
+          >
+            {hasFullGallery ? `Gallery (${gallery.length})` : `Previews (${gallery.length})`}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => void openExternal(set.scryfallUri)}
+        >
+          Scryfall
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function Sets() {
   const sets = useAppStore((s) => s.sets);
   const setsLoading = useAppStore((s) => s.setsLoading);
@@ -883,6 +932,7 @@ export function Sets() {
   const refreshSets = useAppStore((s) => s.refreshSets);
   const openFormatHub = useAppStore((s) => s.openFormatHub);
   const [openCode, setOpenCode] = useState<string | null>(null);
+  const [showAllLive, setShowAllLive] = useState(false);
   const [playing, setPlaying] = useState<{ setName: string; trailer: SetTrailer } | null>(
     null,
   );
@@ -992,7 +1042,7 @@ export function Sets() {
   }
 
   return (
-    <div className="flex flex-col gap-5 max-w-5xl">
+    <div className="flex flex-col gap-4 max-w-5xl">
       <div>
         <p className="eyebrow">Sets</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Set radar</h2>
@@ -1065,28 +1115,37 @@ export function Sets() {
 
       {live.length > 0 ? (
         <section>
-          <h3 className="set-section-title">Recently live</h3>
+          <h3 className="set-section-title">Live on Arena</h3>
           <p className="text-xs text-muted m-0 mb-3 max-w-2xl leading-relaxed">
-            Current Standard-legal expansions (Foundations through the latest Arena drop)
-            plus anything that just hit the client — so the radar stays useful after spoilers
-            quiet down.
+            The current Standard-legal pool, newest first. Open a gallery any time —
+            legality and rotation live on Format Hub.
           </p>
-          <div className="set-grid">
-            {live.map((s) => {
+          <div className="panel live-set-list">
+            {(showAllLive ? live : live.slice(0, LIVE_PREVIEW)).map((s) => {
               const rot = stdExitByCode.get(s.code.toLowerCase());
               return (
-                <SetCard
+                <LiveSetRow
                   key={s.code}
                   set={s}
                   newCount={setsNewByCode[s.code]?.length ?? 0}
                   onOpenGallery={(x) => setOpenCode(x.code)}
-                  onPlayTrailer={playTrailer}
                   dropDay={isArenaDropWindow(s.dates.arena)}
                   rotationDays={rot?.days ?? null}
                   rotationLabel={rot?.label ?? null}
                 />
               );
             })}
+            {live.length > LIVE_PREVIEW && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm self-start mt-1"
+                onClick={() => setShowAllLive((v) => !v)}
+              >
+                {showAllLive
+                  ? "Show recent only"
+                  : `Show all ${live.length} sets`}
+              </button>
+            )}
           </div>
         </section>
       ) : null}

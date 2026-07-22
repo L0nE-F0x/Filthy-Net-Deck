@@ -38,7 +38,6 @@ export function StatusBanners() {
   const installUpdate = useAppStore((s) => s.installUpdate);
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
-  const metaDiff = useAppStore((s) => s.metaDiff);
   const rankUpMoment = useAppStore((s) => s.rankUpMoment);
   const clearRankUpMoment = useAppStore((s) => s.clearRankUpMoment);
   const setPage = useAppStore((s) => s.setPage);
@@ -114,9 +113,8 @@ export function StatusBanners() {
       className: "banner banner-warn",
       body: (
         <>
-          <strong>Offline</strong> — couldn’t reach Netlify, showing the last successfully
-          downloaded meta (real data, possibly not today’s). The app re-syncs automatically once
-          you’re back online.
+          <strong>Offline</strong> — showing your last downloaded meta. Re-syncs
+          automatically when you’re back online.
         </>
       ),
     });
@@ -153,10 +151,7 @@ export function StatusBanners() {
                 >
                   Update &amp; restart
                 </button>
-                <span className="text-muted">
-                  {" "}
-                  — downloads and installs inside the app, then relaunches. No browser.
-                </span>
+                <span className="text-muted"> — installs in-app, then relaunches.</span>
                 <button
                   type="button"
                   className="update-dismiss"
@@ -178,10 +173,7 @@ export function StatusBanners() {
               >
                 Download installer
               </button>
-              <span className="text-muted">
-                {" "}
-                — open the setup file after download (browser/dev fallback only).
-              </span>
+              <span className="text-muted"> — run the setup file once it downloads.</span>
               <button
                 type="button"
                 className="update-dismiss"
@@ -199,19 +191,9 @@ export function StatusBanners() {
     });
   }
 
-  if (metaDiff.previousDate && metaDiff.changes.length > 0) {
-    const n = metaDiff.changes.length;
-    banners.push({
-      key: "diff",
-      className: "banner banner-info",
-      body: (
-        <>
-          <strong>Meta moved</strong> — {n} format/mode change{n === 1 ? "" : "s"} since{" "}
-          {metaDiff.previousDate}. See Decks for movement notes.
-        </>
-      ),
-    });
-  }
+  // v2.5.0 — no daily "meta moved" banner: movement already shows as chips on
+  // every deck card and in the timeline's Movers line. Banners are for events
+  // that need action (rank up, update, offline), not daily weather.
 
   if (!banners.length) return null;
 

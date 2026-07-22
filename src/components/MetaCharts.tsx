@@ -126,7 +126,7 @@ export function AnalysisPanel({
   bullets.push(
     `Average listed share across the 8: ${avgShare.toFixed(1)}% — ${avgShare > 8 ? "concentrated top-heavy meta" : "spread-out / diverse field"}.`,
   );
-  if (fmt.metaNotes) bullets.push(fmt.metaNotes);
+  // fmt.metaNotes is already the page lede — repeating it here read as clutter.
   bullets.push(modeHint);
 
   // Matchup matrix teaser from #1 deck

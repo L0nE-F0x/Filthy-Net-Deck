@@ -51,7 +51,6 @@ import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
 import { decksForMode } from "../services/deckHelpers";
 import {
-  formExtremes,
   isSameLocalDay,
   rollingWinrate,
   tallyMatches,
@@ -349,8 +348,10 @@ function StatusPanel() {
     );
   }
 
+  // Healthy: one slim line — the counter says it all. Full health detail
+  // (last event, log path, re-check) lives in Settings → Tracker health.
   return (
-    <div className="panel">
+    <div className="panel status-strip">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <p className="text-sm m-0">
           <span className="feed-dot live" />
@@ -364,7 +365,6 @@ function StatusPanel() {
           {(status?.matchesRecorded ?? 0) === 1 ? "" : "es"} recorded · local only
         </span>
       </div>
-      <p className="text-xs text-muted m-0 mt-1 leading-relaxed">{health.detail}</p>
       {status && status.parseErrors > 0 && status.parseErrors < 3 && (
         <p className="qa-flag mt-2 mb-0">
           {status.parseErrors} minor parse skip{status.parseErrors === 1 ? "" : "s"} — usually
@@ -407,16 +407,13 @@ function TrendSparkline({ matches }: { matches: TrackedMatch[] }) {
   );
 }
 
-/** Today's session, current streak, and the rolling winrate trend. */
+/** Today's session, current streak, and the rolling winrate trend.
+ *  Best/worst-10 stretches live in the insight chips above — not repeated here. */
 function FormTiles({ matches }: { matches: TrackedMatch[] }) {
   const today = useMemo(() => tally(matches.filter((m) => isToday(m.endedAt))), [matches]);
   const streak = useMemo(() => currentStreak(matches), [matches]);
-  const { best: formHi, worst: formLo } = useMemo(
-    () => formExtremes(matches, 10),
-    [matches],
-  );
 
-  if (today.decided === 0 && streak.type === null && !formHi) return null;
+  if (today.decided === 0 && streak.type === null) return null;
 
   return (
     <div className="stat-tiles stat-tiles-3">
@@ -465,20 +462,6 @@ function FormTiles({ matches }: { matches: TrackedMatch[] }) {
         <TrendSparkline matches={matches} />
         <span className="stat-label">Win rate trend · rolling 10</span>
       </div>
-      {formHi ? (
-        <div
-          className="panel stat-tile"
-          title={`Best 10-match stretch: ${formHi.wins}W–${formHi.losses}L (${Math.round(formHi.rate * 100)}%)`}
-        >
-          <span className={`stat-num favor-${winrateFavor(formHi.rate)}`}>
-            {Math.round(formHi.rate * 100)}%
-          </span>
-          <span className="stat-label">
-            Best 10 · {formHi.wins}W–{formHi.losses}L
-            {formLo ? ` · worst ${Math.round(formLo.rate * 100)}%` : ""}
-          </span>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -1737,6 +1720,8 @@ export function Stats() {
           )}
 
           <div className="panel season-story">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0">
             <p className="eyebrow m-0 mb-1">Season story</p>
             <p className="text-sm m-0">
               {seasonStory.wins}W {seasonStory.losses}L
@@ -1774,41 +1759,11 @@ export function Stats() {
                 </>
               )}
             </p>
-          </div>
-
-          {insights.length > 0 && (
-            <div className="insight-chips" aria-live="polite">
-              {insights.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  className={`insight-chip insight-${c.kind}${c.deckKey ? "" : " no-nav"}`}
-                  onClick={() => c.deckKey && setSelectedDeck(c.deckKey)}
-                  disabled={!c.deckKey}
-                >
-                  <strong>{c.label}</strong>
-                  <span>{c.detail}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <SummaryTiles matches={filtered} />
-          <FormTiles matches={filtered} />
-          <QueueAnalyticsPanel matches={filtered} />
-          <div className="panel share-row">
-            <div>
-              <p className="eyebrow m-0 mb-0.5">Share after a session</p>
-              <p className="text-xs text-muted m-0">
-                Week recap — save PNG, paste into Discord, or post on X with a
-                download link. Every share is free marketing.
-              </p>
-              {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
+            {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
             </div>
             <ShareMenu
               label="Share week recap"
-              hint="WR, rank move, best deck — branded card"
-              variant="primary"
+              hint="WR, rank move, best deck — save PNG or post"
               options={communityShareOptions("local week only")}
               onPick={async (id) => {
                 const dest = id as ShareDestination;
@@ -1841,7 +1796,29 @@ export function Stats() {
                 }
               }}
             />
+            </div>
           </div>
+
+          {insights.length > 0 && (
+            <div className="insight-chips" aria-live="polite">
+              {insights.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`insight-chip insight-${c.kind}${c.deckKey ? "" : " no-nav"}`}
+                  onClick={() => c.deckKey && setSelectedDeck(c.deckKey)}
+                  disabled={!c.deckKey}
+                >
+                  <strong>{c.label}</strong>
+                  <span>{c.detail}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <SummaryTiles matches={filtered} />
+          <FormTiles matches={filtered} />
+          <QueueAnalyticsPanel matches={filtered} />
           <StatsArsenal decks={decks} onSelect={setSelectedDeck} />
           <SplitsPanel matches={filtered} />
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />

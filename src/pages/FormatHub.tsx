@@ -462,7 +462,7 @@ export function FormatHubPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5 max-w-5xl">
+    <div className="flex flex-col gap-4 max-w-5xl">
       <div>
         <p className="eyebrow">Format Hub</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Legality &amp; bans</h2>

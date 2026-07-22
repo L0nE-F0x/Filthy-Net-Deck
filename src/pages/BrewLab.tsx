@@ -234,10 +234,8 @@ export function BrewLab() {
             List clinic with a grade
           </h2>
           <p className="text-sm text-muted m-0 mt-1 leading-relaxed max-w-2xl">
-            Compare any list — tracked deck or pasted brew — against today’s ranked{" "}
-            <strong className="text-foam">Standard</strong> /{" "}
-            <strong className="text-foam">Pioneer</strong> peer field: shape, curve, staples, and
-            an honest letter grade. No AI, no invented cards — only real ranked lists.
+            Grade any list against today’s ranked peer field — shape, curve,
+            staples. No AI, only real ranked lists.
           </p>
         </div>
       </div>
