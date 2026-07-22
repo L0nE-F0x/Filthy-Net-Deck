@@ -3,11 +3,40 @@
 **Read this first.** It's the live top-of-todo, kept current across model/agent
 handoffs (Claude ↔ Opus ↔ Grok ↔ Kimi share it).
 
-**Live product version: v2.5.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.5.1** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
 ---
 
-## Last wrap-up: 2026-07-22 (Claude, Fable 5 → Opus 4.8) — v2.5.0 + deep audit
+## v2.5.1 (2026-07-22, Opus 4.8) — maintenance release + meta-web edge fix
+
+Shipped the two v2.5.0-audit fixes that could only reach users via a rebuild:
+the **dependency patches** (dev-only vitest advisory + safe bumps) and the
+**dead-CSS removal** — the v2.5.0 installer was built before those, so they were
+in `main` but not in any distributed binary. v2.5.1 is a maintenance release with
+**no user-facing change**; `WHATS_NEW` is intentionally empty (no post-update
+banner), updater notes carry the honest summary. OG image left as the v2.5.0
+focus-pass card (patch releases add no marketing copy). Full release train ran
+clean (sig key 67FCA9900F523D49, mac dmg from tag CI).
+
+**Two things confirmed/fixed while verifying #3 + #4 from the audit:**
+- **#4 works in production:** the daily-meta cron (`3822115`) regenerated every
+  meta-web page — proof the new `npm run meta:site` step is live. It regenerates
+  meta-web daily now.
+- **Prod↔git drift is real and was masking #3:** the live meta-web served a stale
+  `/#download` (single-quote, older byte size) that matches **no git commit** —
+  an out-of-band `netlify deploy` from the past, stuck at Netlify's edge across
+  several git-based deploys. git + Netlify **origin** are correct
+  (`index.html#download`, rot-free); only the HTML **edge cache** lagged. Root
+  cause: `/meta-web/*` had no `Cache-Control` in `netlify.toml`, so it cached
+  aggressively. **Fixed** — added `max-age=300, must-revalidate` for `/meta-web/*`
+  so daily-regenerated pages stay fresh-on-deploy. If a future session sees the
+  live site not matching git, this drift (documented in the
+  `audit-2026-07-19-v1.1.1` memory) is the first thing to check: deploy via git
+  push only, never manual `netlify deploy`.
+
+---
+
+## Prior wrap-up: 2026-07-22 (Claude, Fable 5 → Opus 4.8) — v2.5.0 + deep audit
 
 **v2.5.0 "the focus pass"** — owner said the app felt cluttered/confusing; asked
 for sleek/tight/tidy. UI declutter only, no data-model changes. Method that
@@ -50,15 +79,16 @@ a real freshness bug); **8 dead CSS classes removed**.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.0.exe` + `.sig` (sig key id 67FCA9900F523D49 byte-verified) |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.0-universal.dmg` (rolled from tag CI) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.1.exe` + `.sig` (sig key id 67FCA9900F523D49 byte-verified) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.1-universal.dmg` (rolled from tag CI) |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
-| Tag | `v2.5.0` |
+| Tag | `v2.5.1` |
 
-Only 2.4.2 + 2.5.0 binaries live in the tree now; older versions are on GitHub
-Releases. Full release recipe is in the `release-workflow` agent memory — follow
-it exactly. Sign ONLY with the `67FCA9900F523D49` key; the repo-root
-`filthy-net-deck.key` is abandoned (wrong pubkey) and silently breaks auto-update.
+Only 2.5.0 + 2.5.1 binaries live in the tree now; older versions are on GitHub
+Releases (every past exe+sig+dmg mirrored there). Full release recipe is in the
+`release-workflow` agent memory — follow it exactly. Sign ONLY with the
+`67FCA9900F523D49` key; the repo-root `filthy-net-deck.key` is abandoned (wrong
+pubkey) and silently breaks auto-update.
 
 ---
 
