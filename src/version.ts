@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.4.1";
+export const APP_VERSION = "2.4.2";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Alerts actually show up — the first one each session was silently swallowed, which also left Quit unresponsive until you killed the app from Task Manager",
-  "Quit from the tray icon now really quits",
-  "Alerts are one thing again: the always-on-top card over Arena, no Windows banner that a fullscreen game mutes anyway",
-  "Fixed set-gallery cards that showed a broken image instead of their art"
+  "The post-match rank path is a real curve again — Mythic movement was being drawn as a flat line",
+  "Updates only ever install through the signed updater now; anything else sends you to the download page",
+  "macOS: the update button opens the download instead of erroring"
 ];
