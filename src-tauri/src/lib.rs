@@ -5,11 +5,18 @@ mod silent_update;
 mod toast;
 mod tracker;
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     Manager, WindowEvent,
 };
+
+/// Set by tray → Quit. `app.exit(0)` asks every window to close, and the
+/// close handler below hides the main window instead of letting it go — so
+/// without this flag the quit is swallowed and the process never dies
+/// (Task Manager was the only way out).
+static QUITTING: AtomicBool = AtomicBool::new(false);
 
 fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
@@ -26,7 +33,6 @@ fn hide_to_tray(window: &tauri::Window) {
 /// One-time toast the first time the window closes to the tray, so users
 /// know the tracker is still running instead of thinking the app quit.
 fn notify_tray_hint_once(app: &tauri::AppHandle) {
-    use tauri_plugin_notification::NotificationExt;
     let Ok(dir) = app.path().app_data_dir() else {
         return;
     };
@@ -38,7 +44,6 @@ fn notify_tray_hint_once(app: &tauri::AppHandle) {
     let _ = std::fs::write(&marker, b"1");
     const TITLE: &str = "Still running in the tray";
     const BODY: &str = "Filthy Net Deck keeps tracking Arena from the system tray. Right-click the tray icon to quit for real.";
-    let _ = app.notification().builder().title(TITLE).body(BODY).show();
     toast::show_toast(app, TITLE, BODY);
 }
 
@@ -61,7 +66,6 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_store::Builder::new().build())
-        .plugin(tauri_plugin_notification::init())
         .manage(tracker::TrackerShared(Default::default()))
         .invoke_handler(tauri::generate_handler![
             tracker::tracker_status,
@@ -122,6 +126,7 @@ pub fn run() {
             overlay::load_enabled(app.handle());
             overlay::load_post_match(app.handle());
             toast::load_enabled(app.handle());
+            toast::prewarm(app.handle());
             presence::load_enabled(app.handle());
             tracker::load_notify_match_end(app.handle());
 
@@ -162,6 +167,7 @@ pub fn run() {
                         overlay::set_enabled(app, next);
                     }
                     "quit" => {
+                        QUITTING.store(true, Ordering::SeqCst);
                         app.exit(0);
                     }
                     _ => {}
@@ -188,17 +194,27 @@ pub fn run() {
 
             Ok(())
         })
-        .on_window_event(|window, event| match event {
-            WindowEvent::CloseRequested { api, .. } => {
-                hide_to_tray(window);
-                notify_tray_hint_once(window.app_handle());
-                api.prevent_close();
+        // Only `main` hides to the tray. The overlay, toast and presence
+        // webviews are Rust-owned chrome: if this handler catches them too, a
+        // stray minimize event hides the very window we just asked to show.
+        .on_window_event(|window, event| {
+            if window.label() != "main" {
+                return;
             }
-            WindowEvent::Resized(_) if window.is_minimized().unwrap_or(false) => {
-                let _ = window.unminimize();
-                hide_to_tray(window);
+            match event {
+                // During a tray quit the close must go through, or `app.exit`
+                // is swallowed and the process survives.
+                WindowEvent::CloseRequested { api, .. } if !QUITTING.load(Ordering::SeqCst) => {
+                    hide_to_tray(window);
+                    notify_tray_hint_once(window.app_handle());
+                    api.prevent_close();
+                }
+                WindowEvent::Resized(_) if window.is_minimized().unwrap_or(false) => {
+                    let _ = window.unminimize();
+                    hide_to_tray(window);
+                }
+                _ => {}
             }
-            _ => {}
         })
         .run(tauri::generate_context!())
         .expect("error while running Filthy Net Deck");

@@ -9,12 +9,7 @@ import { downloadInstaller, openExternal } from "../services/openExternal";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import { exportTrackerDiagnostic } from "../services/tracker";
-import {
-  getNotifyPermission,
-  requestNotifyPermission,
-  sendTestNotification,
-  type NotifyPermission,
-} from "../services/notify";
+import { sendTestNotification } from "../services/notify";
 import {
   previewSfx,
   previewSoundPack,
@@ -133,7 +128,6 @@ export function Settings() {
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
-  const setNotifyTopmost = useAppStore((s) => s.setNotifyTopmost);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
@@ -163,7 +157,6 @@ export function Settings() {
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
   const [autostart, setAutostartState] = useState<boolean | null>(null);
-  const [notifyPerm, setNotifyPerm] = useState<NotifyPermission>("unknown");
   const [testMsg, setTestMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -171,9 +164,6 @@ export function Settings() {
     let alive = true;
     void isAutostartEnabled().then((on) => {
       if (alive) setAutostartState(on);
-    });
-    void getNotifyPermission().then((p) => {
-      if (alive) setNotifyPerm(p);
     });
     return () => {
       alive = false;
@@ -571,12 +561,11 @@ export function Settings() {
         <section className="panel settings-card settings-card-span2">
           <h3 className="settings-card-title">Notifications</h3>
           <p className="settings-card-desc mb-2">
-            Desktop toasts stay on this PC. Match-end fires from the tracker
-            itself, so it lands even while the app sits in the tray. Windows
-            mutes its own banners while a game — or any app — runs fullscreen,
-            which is what &ldquo;Show alerts over fullscreen Arena&rdquo; below
-            is for: the same line, painted in a small always-on-top card Arena
-            can&apos;t hide.
+            Alerts stay on this PC. They&apos;re painted in a small always-on-top
+            card, top-right for 7s — click-through, so it never steals a click
+            from Arena, and it shows over fullscreen Arena where Windows&apos;
+            own banners are muted. Match-end fires from the tracker itself, so
+            it lands even while the app sits in the tray.
           </p>
           <div className="settings-toggle-list">
             <label className="settings-toggle-row">
@@ -623,20 +612,6 @@ export function Settings() {
                 <em>When a match records (e.g. “Win vs Rival · 64% this season”)</em>
               </span>
             </label>
-            <label className="settings-toggle-row">
-              <input
-                type="checkbox"
-                checked={prefs.notifyTopmost}
-                onChange={(e) => setNotifyTopmost(e.target.checked)}
-              />
-              <span>
-                <strong>Show alerts over fullscreen Arena</strong>
-                <em>
-                  Repeats every alert in a small always-on-top card, top-right
-                  for 7s. Click-through, so it never steals a click from Arena.
-                </em>
-              </span>
-            </label>
           </div>
           {isTauri() && (
             <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -644,45 +619,15 @@ export function Settings() {
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={() => {
-                  void (async () => {
-                    const ok = await sendTestNotification();
-                    const p = await getNotifyPermission();
-                    setNotifyPerm(p);
-                    setTestMsg(
-                      ok
-                        ? "Test sent — the always-on-top card shows top-right; the Windows banner also needs OS permission and no do-not-disturb rule."
-                        : "Windows denied banners — allow notifications for Filthy Net Deck in Windows Settings. The always-on-top card still works.",
-                    );
-                  })();
+                  void sendTestNotification().then(() =>
+                    setTestMsg("Test alert sent — look top-right."),
+                  );
                 }}
               >
-                Send test notification
+                Send test alert
               </button>
-              {notifyPerm !== "granted" && (
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => {
-                    void requestNotifyPermission().then((p) => setNotifyPerm(p));
-                  }}
-                >
-                  Request permission
-                </button>
-              )}
-              <span className="text-muted text-xs">
-                OS permission:{" "}
-                <strong className="text-foam">
-                  {notifyPerm === "granted"
-                    ? "granted"
-                    : notifyPerm === "denied"
-                      ? "denied"
-                      : notifyPerm === "default"
-                        ? "not asked yet"
-                        : "unknown"}
-                </strong>
-              </span>
               {testMsg && (
-                <span className="text-muted text-xs w-full">{testMsg}</span>
+                <span className="text-muted text-xs">{testMsg}</span>
               )}
             </div>
           )}

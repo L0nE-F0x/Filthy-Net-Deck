@@ -862,7 +862,10 @@ export const useAppStore = create<AppState>((set, get) => {
       // Self-heal pref drift on boot: localStorage is the UI source of truth;
       // Rust mirrors both flags (it posts the toast / owns the linger window).
       void setNotifyMatchEndRust(get().prefs.notifyMatchEnd);
-      void setTopmostToastEnabled(get().prefs.notifyTopmost);
+      // Always on: the top-most card is the only surface alerts have now, so
+      // the old "show over fullscreen Arena" toggle would just be a silent
+      // kill switch. Anyone who had it off keeps their per-alert toggles.
+      void setTopmostToastEnabled(true);
       void setOverlayPostMatchRust(get().prefs.overlayPostMatch);
       void setPresenceEnabledRust(get().prefs.presenceEnabled);
       await get().refreshTracker();

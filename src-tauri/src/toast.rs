@@ -122,6 +122,17 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// Build the toast webview at startup so no alert ever pays for it.
+///
+/// Belt and braces with the ordering in [`show_toast`]: with the window
+/// already up, `ensure_window` is a cheap early return on every alert, and
+/// the very first toast of a session behaves like all the others.
+pub fn prewarm(app: &AppHandle) {
+    if let Err(e) = ensure_window(app) {
+        eprintln!("[toast] prewarm: {e}");
+    }
+}
+
 pub fn hide(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(TOAST_LABEL) {
         let _ = win.hide();
@@ -146,12 +157,19 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
         *slot = Some((payload.clone(), Instant::now()));
     }
 
+    // Build the webview *before* hopping to the main thread. Creating a
+    // window from inside a `run_on_main_thread` callback deadlocks the event
+    // loop on Windows: the window is created but `build()` never returns, so
+    // the toast is never shown *and* every later main-thread task is wedged
+    // behind it — including the tray menu's `app.exit(0)`. That is why the
+    // first alert of a session silently did nothing and Quit stopped working.
+    if let Err(e) = ensure_window(app) {
+        eprintln!("[toast] ensure_window: {e}");
+        return;
+    }
+
     let app_show = app.clone();
     let _ = app.run_on_main_thread(move || {
-        if let Err(e) = ensure_window(&app_show) {
-            eprintln!("[toast] ensure_window: {e}");
-            return;
-        }
         // Re-corner every time: the monitor layout may have changed since the
         // window was built (laptop undocked, resolution switch).
         if let Some(win) = app_show.get_webview_window(TOAST_LABEL) {
