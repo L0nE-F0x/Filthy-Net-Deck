@@ -1,5 +1,5 @@
 {
-  "version": "2.5.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.0.exe",
-  "notes": "v2.5.0: The focus pass. Every page decluttered — the Decks page leads with the deck board, My Stats and Climb stop repeating the same numbers twice, the set radar collapses old sets into compact rows, and one noisy daily banner is gone. Less chrome, same data."
+  "version": "2.5.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.1.exe",
+  "notes": "v2.5.1: Maintenance release. Dependency and build-hygiene cleanup from a full code audit — a slightly lighter build and a security patch to a dev-only tool. Nothing changes on screen; this just keeps the foundations current."
 }
