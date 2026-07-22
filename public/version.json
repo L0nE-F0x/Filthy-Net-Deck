@@ -1,5 +1,5 @@
 {
-  "version": "2.4.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.4.2.exe",
-  "notes": "v2.4.2: The post-match rank path draws Mythic movement as a real curve again instead of a flat line. Updates now only install through the signed updater — anything else opens the download page, and the macOS update button works instead of erroring."
+  "version": "2.5.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.0.exe",
+  "notes": "v2.5.0: The focus pass. Every page decluttered — the Decks page leads with the deck board, My Stats and Climb stop repeating the same numbers twice, the set radar collapses old sets into compact rows, and one noisy daily banner is gone. Less chrome, same data."
 }
