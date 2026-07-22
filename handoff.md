@@ -22,17 +22,24 @@ clean (sig key 67FCA9900F523D49, mac dmg from tag CI).
 - **#4 works in production:** the daily-meta cron (`3822115`) regenerated every
   meta-web page — proof the new `npm run meta:site` step is live. It regenerates
   meta-web daily now.
-- **Prod↔git drift is real and was masking #3:** the live meta-web served a stale
-  `/#download` (single-quote, older byte size) that matches **no git commit** —
-  an out-of-band `netlify deploy` from the past, stuck at Netlify's edge across
-  several git-based deploys. git + Netlify **origin** are correct
-  (`index.html#download`, rot-free); only the HTML **edge cache** lagged. Root
-  cause: `/meta-web/*` had no `Cache-Control` in `netlify.toml`, so it cached
-  aggressively. **Fixed** — added `max-age=300, must-revalidate` for `/meta-web/*`
-  so daily-regenerated pages stay fresh-on-deploy. If a future session sees the
-  live site not matching git, this drift (documented in the
-  `audit-2026-07-19-v1.1.1` memory) is the first thing to check: deploy via git
-  push only, never manual `netlify deploy`.
+- **Prod↔git drift — meta-web (OPEN, needs Netlify dashboard access).** The live
+  `/meta-web/deck/*.html` serve a `/#download` variant (single-quote, ~8.1 KB)
+  that matches **NO git commit** — git has `index.html#download` (double-quote,
+  ~7.4 KB, rot-free). **Functionally fine:** both link to the homepage download
+  section, so there are ZERO version-pinned binary links and no 404 risk — the
+  #3 goal (no rot) is met live. **But** the drift did NOT self-heal: across the
+  v2.5.1 release + the daily-cron deploy, version.json/downloads converged to git
+  (2.4.2 pruned → 404, 2.5.1 → 200) while the meta-web HTML kept serving the old
+  `/#download`, AND the `Cache-Control: max-age=300` I added to `netlify.toml` for
+  `/meta-web/*` never took effect (still `max-age=0`). That combination means it's
+  probably **not just edge cache** — the Netlify site may not be auto-publishing
+  `website/meta-web/` from git (a pinned/locked production deploy, an out-of-band
+  `netlify deploy`, or auto-publish off). **A human with Netlify dashboard access
+  should check:** is the production deploy locked/pinned? is "auto-publish from
+  git" on? Trigger a clear-cache-and-deploy. The `netlify.toml` header fix is
+  correct and will help once git is actually the published source. Related:
+  `audit-2026-07-19-v1.1.1` memory (prod↔git drift). Rule stands: git push only,
+  never manual `netlify deploy`.
 
 ---
 
