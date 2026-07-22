@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { scryfallCdnUrl } from "../services/scryfall";
+import { ScryfallImg } from "../components/ScryfallImg";
 import { openExternal } from "../services/openExternal";
 import {
   isFormatLegal,
@@ -148,7 +149,12 @@ function CardDetailDrawer({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="set-drawer-art">
-          <img src={scryfallCdnUrl(card.scryfallId, "normal")} alt={card.name} />
+          <ScryfallImg
+            scryfallId={card.scryfallId}
+            imageVersion={card.imageVersion}
+            name={card.name}
+            size="normal"
+          />
         </div>
         <div className="set-drawer-body">
           <div className="flex justify-between items-start gap-2">
@@ -517,9 +523,11 @@ function SetGallery({
                 title={c.name}
               >
                 {isNew ? <span className="set-new-pill">New</span> : null}
-                <img
-                  src={scryfallCdnUrl(c.scryfallId, "normal")}
-                  alt={c.name}
+                <ScryfallImg
+                  scryfallId={c.scryfallId}
+                  imageVersion={c.imageVersion}
+                  name={c.name}
+                  size="normal"
                   loading="lazy"
                 />
                 <span className={`set-gallery-rarity ${rarityClass(c.rarity)}`} />
@@ -676,6 +684,7 @@ function SetCard({
   const heroUrl = set.heroScryfallId
     ? scryfallCdnUrl(set.heroScryfallId, "art_crop")
     : null;
+  const [heroFailed, setHeroFailed] = useState(false);
   const progress =
     set.cardCount > 0
       ? Math.min(100, Math.round((set.spoiledCount / set.cardCount) * 100))
@@ -688,8 +697,14 @@ function SetCard({
   return (
     <article className={`set-card${dropDay ? " set-card-drop-day" : ""}${nearRotation ? " set-card-rotating" : ""}`}>
       <div className="set-card-hero">
-        {heroUrl ? (
-          <img src={heroUrl} alt="" className="set-card-hero-img" />
+        {heroUrl && !heroFailed ? (
+          <img
+            src={heroUrl}
+            alt=""
+            className="set-card-hero-img"
+            // Decorative — a missing scan should degrade to the plain fade, not a broken box.
+            onError={() => setHeroFailed(true)}
+          />
         ) : (
           <div className="set-card-hero-fallback" />
         )}
@@ -797,9 +812,11 @@ function SetCard({
               .slice(0, 10)
               .map((c) => (
                 <div key={c.scryfallId} className="set-preview-thumb" title={c.name}>
-                  <img
-                    src={scryfallCdnUrl(c.scryfallId, "small")}
-                    alt={c.name}
+                  <ScryfallImg
+                    scryfallId={c.scryfallId}
+                    imageVersion={c.imageVersion}
+                    name={c.name}
+                    size="small"
                     loading="lazy"
                   />
                 </div>

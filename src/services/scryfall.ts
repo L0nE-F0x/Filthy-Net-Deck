@@ -12,10 +12,23 @@ import { apiFetch } from "./http";
 
 export type ArtSize = "small" | "normal" | "art_crop";
 
-/** Direct CDN URL from a scryfall card id — no API round-trip needed. */
-export function scryfallCdnUrl(id: string, size: ArtSize = "normal"): string {
+/**
+ * Direct CDN URL from a scryfall card id — no API round-trip needed.
+ *
+ * `imageVersion` is the cache-busting timestamp Scryfall appends to every
+ * `image_uris` entry. It is not cosmetic: for a freshly (re)scanned card the
+ * bare, query-less path can 404 while the versioned one serves fine, so pass
+ * it whenever the pipeline captured it. Without it, callers should be ready
+ * to fall back (see `resolveImageById`).
+ */
+export function scryfallCdnUrl(
+  id: string,
+  size: ArtSize = "normal",
+  imageVersion?: string | null,
+): string {
   const version = size === "art_crop" ? "art_crop" : size;
-  return `https://cards.scryfall.io/${version}/front/${id[0]}/${id[1]}/${id}.jpg`;
+  const base = `https://cards.scryfall.io/${version}/front/${id[0]}/${id[1]}/${id}.jpg`;
+  return imageVersion ? `${base}?${imageVersion}` : base;
 }
 
 const imageCache = new Map<string, string | null>();
@@ -95,6 +108,33 @@ export async function resolveCardImage(
     }
     const data = (await res.json()) as ScryfallCard;
     const uri = pickUri(data, size);
+    imageCache.set(key, uri);
+    return uri;
+  } catch {
+    imageCache.set(key, null);
+    return null;
+  }
+}
+
+/**
+ * Last-resort image lookup by scryfall id, for when the constructed CDN URL
+ * 404s. The API always hands back a versioned `image_uris` entry, so this
+ * recovers cards whose bare CDN path is missing. Cached (including misses)
+ * so a broken card costs one request per session, not one per render.
+ */
+export async function resolveImageById(
+  id: string,
+  size: ArtSize = "normal",
+): Promise<string | null> {
+  const key = `id::${size}::${id}`;
+  if (imageCache.has(key)) return imageCache.get(key) ?? null;
+  try {
+    const res = await throttledFetch(`https://api.scryfall.com/cards/${id}`);
+    if (!res.ok) {
+      imageCache.set(key, null);
+      return null;
+    }
+    const uri = pickUri((await res.json()) as ScryfallCard, size);
     imageCache.set(key, uri);
     return uri;
   } catch {

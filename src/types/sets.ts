@@ -50,6 +50,8 @@ export interface SetPreviewCard {
     pioneer?: FormatLegality;
   };
   scryfallUri?: string | null;
+  /** Cache-busting stamp from Scryfall's image_uris; some scans 404 without it. */
+  imageVersion?: string | null;
 }
 
 export interface UpcomingSet {

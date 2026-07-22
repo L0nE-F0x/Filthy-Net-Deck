@@ -206,6 +206,17 @@ function computeStatus(set, today) {
   return "announced";
 }
 
+/** The `?1784631939` stamp Scryfall puts on every image_uris entry. */
+function imageVersionOf(c) {
+  const uri =
+    c.image_uris?.normal ||
+    c.card_faces?.[0]?.image_uris?.normal ||
+    c.card_faces?.[1]?.image_uris?.normal ||
+    "";
+  const q = uri.indexOf("?");
+  return q >= 0 ? uri.slice(q + 1) : null;
+}
+
 function mapCard(c) {
   const face = c.card_faces?.[0];
   const legalities = c.legalities || {};
@@ -231,6 +242,7 @@ function mapCard(c) {
       pioneer: legalities.pioneer || "not_legal",
     },
     scryfallUri: c.scryfall_uri || null,
+    imageVersion: imageVersionOf(c),
   };
 }
 
