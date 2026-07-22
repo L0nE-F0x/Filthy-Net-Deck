@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.4.0.exe",
-  "notes": "v2.4.0: A corner badge now shows for as long as Arena is open — so you can see the tracker is running on the home screen and in the deck builder, not just during a match. Its cog carries the overlay settings worth changing between games."
+  "version": "2.4.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.4.1.exe",
+  "notes": "v2.4.1: Alerts actually show up. The first alert of each session was silently swallowed — and it took Quit down with it, which is why the app sometimes needed Task Manager to close. Tray Quit works again, and the odd set-gallery card that showed a broken image now loads."
 }
