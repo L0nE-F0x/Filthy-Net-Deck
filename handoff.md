@@ -21,8 +21,8 @@ Single version bump after the audit hygiene batch (no intermediate releases):
 3. **`arena.rs` tests** — more lookalike negatives + pure
    `running_transition` edge-only helper (emit debounce without AppHandle I/O).
 4. Gates: **337** vitest + **33** cargo tests (2 ignored). Signed Windows with
-   key **67FCA9900F523D49**. macOS universal dmg still on **2.5.1** until tag CI
-   produces 2.5.2 (site macOS buttons still point at 2.5.1 dmg honestly).
+   key **67FCA9900F523D49**. **macOS universal dmg rolled** from tag CI
+   (`Filthy-Net-Deck-2.5.2-universal.dmg`); site macOS buttons point at 2.5.2.
 
 `WHATS_NEW` empty (no on-screen product change). Updater notes carry the summary.
 
@@ -53,7 +53,7 @@ P1 Stats extract + MAINTENANCE meta-web row + arena tests closed in **v2.5.2**.
 3. Secondary-monitor limitation for toast/presence — owner-aware, unstarted.
 4. **Owner-scoped, don't start without asking:** donations link, v3.0
    accounts+sync, Scryfall attribution, `.git` 1.1 GB history purge.
-5. Roll **macOS 2.5.2 dmg** from tag CI into `website/downloads/` + fix site links.
+5. ~~Roll **macOS 2.5.2 dmg**~~ **DONE** — rolled from tag CI into downloads + site.
 
 ---
 
@@ -62,12 +62,12 @@ P1 Stats extract + MAINTENANCE meta-web row + arena tests closed in **v2.5.2**.
 | Target | File |
 |--------|------|
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` (sig key id 67FCA9900F523D49) |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.1-universal.dmg` (2.5.2 pending tag CI) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.2-universal.dmg` |
 | Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
 | Tag | `v2.5.2` |
 
-Only 2.5.1 + 2.5.2 Windows binaries in tree (2.5.0 pruned; older on GitHub
-Releases). Sign ONLY with the `67FCA9900F523D49` key; repo-root
+Windows + macOS current + previous (2.5.1, 2.5.2) in tree (2.5.0 pruned; older
+on GitHub Releases). Sign ONLY with the `67FCA9900F523D49` key; repo-root
 `filthy-net-deck.key` is abandoned.
 
 ---
