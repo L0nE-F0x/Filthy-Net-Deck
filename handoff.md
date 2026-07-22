@@ -1,59 +1,106 @@
 # Filthy Net Deck — handoff
 
-**Read this first.** It's the live top-of-todo, kept current across model/agent
-handoffs (Claude ↔ Opus ↔ Grok ↔ Kimi share it).
+**Read this first.** Live top-of-todo across model/agent handoffs
+(Claude ↔ Opus ↔ Grok ↔ Kimi).
 
 **Live product version: v2.5.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
+**Session wrap (2026-07-22, Grok):** release train is **complete** (Windows +
+macOS + updater + site). No open engineering work from this session. Resume by
+picking from **Backlog** below; do not invent product work.
+
 ---
 
-## v2.5.2 (2026-07-22, Grok) — hygiene batch release
+## Current state (as of wrap)
 
-Single version bump after the audit hygiene batch (no intermediate releases):
+| Item | Status |
+|------|--------|
+| App version | **v2.5.2** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
+| Branch | `main` synced with `origin/main` |
+| Key commits | `68084aa` release hygiene · `8e8cb59` macOS dmg roll |
+| Tag | `v2.5.2` (macOS CI already ran green) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.2-universal.dmg` |
+| Updater | `website/updater/latest.json` → 2.5.2 (key **67FCA9900F523D49**) |
+| Soft channel | `website/version.json` + `public/version.json` → 2.5.2 |
+| Site | Download buttons + OG `?v=2.5.2` |
+| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.2 |
+| Gates last green | **337** vitest · **33** cargo (2 ignored) · lint/tsc/clippy clean |
+| `WHATS_NEW` | empty (hygiene release — no post-update banner) |
 
-1. **Stats page extract** — `src/pages/Stats.tsx` (~1889 → ~457) split into
+Tree keeps **current + previous** installers only (2.5.1 + 2.5.2). Older
+binaries on GitHub Releases.
+
+---
+
+## What this session shipped (v2.5.2 hygiene)
+
+1. **Stats extract** — `src/pages/Stats.tsx` ~1889 → ~457 lines. Panels in
    `src/components/stats/` (`StatusPanel`, `SummaryTiles`, `FormTiles`,
    `SplitsPanel`, `StatsArsenal`, `DeckBreakdown`, `MatchHistory`, `DeckDetail`,
-   shared `statsUi.tsx`). Pure mechanical; behavior-preserving. Barrel guard
-   test: `src/components/stats/statsExtract.test.ts`.
-2. **`docs/MAINTENANCE.md`** — fully-automatic table now lists public
-   **meta-web** rebuild via daily `npm run meta:site`.
-3. **`arena.rs` tests** — more lookalike negatives + pure
-   `running_transition` edge-only helper (emit debounce without AppHandle I/O).
-4. Gates: **337** vitest + **33** cargo tests (2 ignored). Signed Windows with
-   key **67FCA9900F523D49**. **macOS universal dmg rolled** from tag CI
-   (`Filthy-Net-Deck-2.5.2-universal.dmg`); site macOS buttons point at 2.5.2.
+   shared `statsUi.tsx`). Barrel guard: `statsExtract.test.ts`. Pure mechanical;
+   browser seed via `window.__fndStore` confirmed home + deck detail.
+2. **`docs/MAINTENANCE.md`** — fully-automatic table lists daily
+   `npm run meta:site` / public `website/meta-web/` rebuild.
+3. **`src-tauri/src/arena.rs`** — expanded lookalike negatives + pure
+   `running_transition` edge-only helper (no AppHandle I/O theater).
+4. **Full release train** — signed Windows (password file
+   `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` next to the key),
+   updater + soft channels, OG regen, push `main`, tag `v2.5.2`, then roll
+   macOS dmg from tag CI into downloads + fix site links.
 
-`WHATS_NEW` empty (no on-screen product change). Updater notes carry the summary.
-
-**Still OPEN (owner Netlify dashboard):** live meta-web `/#download` drift vs
-git `index.html#download` — not user-breaking; see v2.5.1 notes below.
-
----
-
-## Prior: v2.5.1 (2026-07-22, Opus 4.8) — maintenance + meta-web edge note
-
-Shipped the two v2.5.0-audit fixes that could only reach users via a rebuild:
-dependency patches + dead-CSS removal. Prod↔git meta-web drift **OPEN** (needs
-Netlify dashboard): live `/meta-web/deck/*.html` serve `/#download` variant not
-in git; functionally fine (homepage download section). Rule: git push only,
-never manual `netlify deploy`.
+Audit context: `docs/AUDIT-2026-07-22-v2.5.0.md` (P1/P2 hygiene items closed
+in v2.5.2; major deps + owner P3 still open there).
 
 ---
 
-## Prior wrap-up: v2.5.0 focus pass + deep audit
+## OPEN — needs owner (not agent-solo)
 
-See **`docs/AUDIT-2026-07-22-v2.5.0.md`**. UI declutter shipped; audit backlog
-P1 Stats extract + MAINTENANCE meta-web row + arena tests closed in **v2.5.2**.
+### 1. Netlify meta-web prod↔git drift (OPEN)
 
-**Top backlog for successor models:**
-1. ~~Stats.tsx extract~~ **DONE → v2.5.2**
-2. Major dep bumps deferred (typescript 7, vite 8, vitest 4, plugin-react 6) —
-   one at a time on a branch, not batched.
-3. Secondary-monitor limitation for toast/presence — owner-aware, unstarted.
-4. **Owner-scoped, don't start without asking:** donations link, v3.0
-   accounts+sync, Scryfall attribution, `.git` 1.1 GB history purge.
-5. ~~Roll **macOS 2.5.2 dmg**~~ **DONE** — rolled from tag CI into downloads + site.
+Live `/meta-web/deck/*.html` still serve a `/#download` HTML variant that
+matches **no git commit**. Git has rot-free `index.html#download`.
+
+- **User impact:** none (both hit homepage download; no version-pinned exes).
+- **Why it didn’t self-heal:** v2.5.1 deploy + daily cron refreshed
+  version/downloads to git, but meta-web HTML stayed old; `Cache-Control:
+  max-age=300` for `/meta-web/*` in `netlify.toml` never showed up live
+  (`max-age=0`). Suggests pinned deploy / auto-publish off / out-of-band
+  `netlify deploy` for that path.
+- **Owner action:** Netlify dashboard — is production locked? is auto-publish
+  from git on? Clear cache + deploy. **Agents: git push only; never manual
+  `netlify deploy`.**
+
+### 2. Owner marketing WIP (dirty / untracked — DO NOT TOUCH)
+
+Leave alone unless the owner explicitly asks:
+
+- `website/assets/youtube*`, `video/`, `video_stills/`, `launch/`
+- `website/assets/_gen_youtube.py`, `_compose_youtube_community.py`
+- `website/assets/app-screenshot-decks.png`
+- `scripts/capture-app-stills.mjs`, `generate_marketing_*.py`
+- `goal/`
+
+---
+
+## Backlog for the next agent (pick with owner, or hygiene only)
+
+**Do not cut a release unsolicited.** Batch product work; engineering hygiene
+may proceed on judgment. Ask before product decisions.
+
+| Priority | Item | Notes |
+|----------|------|--------|
+| Optional smoke | In-app **Update & restart** from an older build | Confirms signed path; not a code task |
+| P2 eng | Major dep bumps **one branch at a time** | typescript 7, vite 8, vitest 4, plugin-react 6 — never batch |
+| P2 product-aware | Secondary-monitor toast/presence | Owner-aware; follow Arena’s display — real work |
+| P3 owner-only | Donations link · v3.0 accounts/sync · Scryfall attribution re-add · `.git` history purge | Ask first; attribution was a deliberate v2.2.1 trade |
+
+**Good first resume prompts (owner should choose):**
+
+1. “Check Netlify meta-web drift” (owner has dashboard).
+2. “Bump one dep on a branch” (e.g. vitest 4 alone).
+3. “Start secondary-monitor presence/toast” (product-ish — confirm first).
+4. Marketing WIP finish (owner assets only).
 
 ---
 
@@ -61,61 +108,67 @@ P1 Stats extract + MAINTENANCE meta-web row + arena tests closed in **v2.5.2**.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` (sig key id 67FCA9900F523D49) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` |
 | macOS | `website/downloads/Filthy-Net-Deck-2.5.2-universal.dmg` |
-| Updater | `website/updater/latest.json` · soft channel `website/version.json` + `public/version.json` |
+| Updater | `website/updater/latest.json` |
+| Soft | `website/version.json` + `public/version.json` |
 | Tag | `v2.5.2` |
 
-Windows + macOS current + previous (2.5.1, 2.5.2) in tree (2.5.0 pruned; older
-on GitHub Releases). Sign ONLY with the `67FCA9900F523D49` key; repo-root
-`filthy-net-deck.key` is abandoned.
+**Sign only** with key id **67FCA9900F523D49**
+(`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).
+Repo-root `filthy-net-deck.key` is abandoned (wrong pubkey — breaks auto-update).
+Never commit keys; never echo password.
+
+Full definition of done: **`AGENTS.md`**.
 
 ---
 
 ## Full local gate before every push
 
-`npm run lint && npx tsc --noEmit && npm test`
-then `cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`
+```
+npm run lint && npx tsc --noEmit && npm test
+cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
+```
 
 ## Verification without Arena
 
-`npm run dev`, then in the browser console seed `window.__fndStore.setState(...)`
-with real Arena grpIds (e.g. Ethereal Armor 92065). Overlay/toast/presence windows
-have demo routes: `/?demo#/overlay`.
+`npm run dev`, then seed:
+
+```js
+window.__fndStore.setState({ trackerMatches: [/* real grpIds e.g. Ethereal Armor 92065 */] })
+```
+
+Overlay/toast/presence demos: `/?demo#/overlay`.
 
 ## Architecture must-knows
 
-- **Four webviews:** `main` · `overlay` · `toast` · `presence`. New window labels
-  MUST be in `src-tauri/capabilities/default.json` `windows`.
-- **Single feed entry point:** `normalizeMetaBundle` in `src/services/deckHelpers.ts`.
-- Stats UI panels live under `src/components/stats/` (page shell in
-  `src/pages/Stats.tsx`).
+- **Four webviews:** `main` · `overlay` · `toast` · `presence`. Every new
+  window label MUST be in `src-tauri/capabilities/default.json` `windows`.
+  `.transparent()` stays `#[cfg(not(macos))]` or dmg CI breaks.
+- **Feed entry:** only `normalizeMetaBundle` in `src/services/deckHelpers.ts`.
+- **Stats UI:** panels under `src/components/stats/`; page shell
+  `src/pages/Stats.tsx`.
+- **Meta pipeline:** `pipeline/build-meta.mjs`, `build-sets.mjs`,
+  `build-meta-site.mjs` (`npm run meta:site` in daily cron).
 
 ## Owner preferences (non-negotiable)
 
 - Desktop only — no mobile / Android WR promises.
-- Distribution: **website + signed in-app updater only**.
-- Prefer **Update & restart** over browser download.
-- Signing key `%USERPROFILE%\.tauri\filthy-net-deck.key` + password file —
-  **never commit, never echo**.
-- Formats: **Standard + Pioneer only**; real lists only.
-- Batch features per release; ask before product-scale decisions or
-  unsolicited releases; engineering hygiene may proceed.
-
-## Do NOT touch without asking
-
-- Owner WIP: `website/assets/youtube*`, `website/assets/video/`,
-  `website/assets/_gen_youtube.py`, `website/assets/_compose_youtube_community.py`,
-  `website/assets/launch/`, `website/assets/app-screenshot-decks.png`, `goal/`.
-- Private signing keys · `.git` history rewrite · cancelled tracks.
+- Distribution: website + signed in-app updater only (no winget/Homebrew/Store/Linux).
+- Prefer **Update & restart** over browser `.exe` download.
+- Formats: **Standard + Pioneer only**; real lists only. Brew Lab stays pure.
+- Batch features per release; ask before product-scale decisions or unsolicited releases.
 
 ## Quick map
 
 | Need | Where |
 |------|--------|
 | Version / What's New | `package.json`, `src/version.ts`, `src-tauri/{Cargo.toml,tauri.conf.json}`, `*/version.json` |
-| My Stats panels | `src/components/stats/*`, page `src/pages/Stats.tsx` |
-| Arena process watcher | `src-tauri/src/arena.rs` |
-| Meta pipeline | `pipeline/build-meta.mjs`, `pipeline/build-meta-site.mjs` |
+| My Stats | `src/components/stats/*`, `src/pages/Stats.tsx` |
+| Tracker / ranks | `src-tauri/src/tracker.rs`, `src/types/tracker.ts` |
+| Arena open watcher | `src-tauri/src/arena.rs`, `presence.rs` |
+| Overlay / toast | `src/overlay/*`, `src/toast/*` |
+| Meta pipeline | `pipeline/*` |
 | Release rules | **`AGENTS.md`** |
-| This audit + backlog | `docs/AUDIT-2026-07-22-v2.5.0.md` |
+| Self-maintenance | `docs/MAINTENANCE.md` |
+| Audit + backlog detail | `docs/AUDIT-2026-07-22-v2.5.0.md` |
