@@ -11,6 +11,16 @@
   [headers.values]
     Content-Type = "text/html; charset=UTF-8"
 
+# The public meta-web deck pages are regenerated daily by the meta cron. Without
+# an explicit short cache they stuck at Netlify's edge and lagged fresh deploys
+# by hours (observed 2026-07-22: a page kept serving a stale, out-of-band build
+# after several deploys had shipped the corrected one). A 5-minute cache keeps
+# them fresh-on-deploy like /meta/* while staying CDN-friendly.
+[[headers]]
+  for = "/meta-web/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+
 # CORS so the Tauri desktop app can fetch meta + version + updater manifest
 [[headers]]
   for = "/meta/*"
