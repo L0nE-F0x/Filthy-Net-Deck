@@ -66,12 +66,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-white-auras.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-4c-reanimator.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-selesnya-ouroboroid.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -81,17 +76,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-black-demons.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-artifacts.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-white-lifegain.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-prowess.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -101,7 +86,22 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-selesnya-ouroboroid.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-spellementals.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-dimir-excruciator.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-mono-green-landfall.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-izzet-lessons.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
