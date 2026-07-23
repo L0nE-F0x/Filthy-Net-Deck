@@ -11,9 +11,30 @@
  *     and Explorer are premium-walled — only Standard Bo1 is available, which
  *     is exactly the board where tournament data (Goldfish) is wrong.
  */
-import { getText } from "./common.mjs";
+import { getText, UA } from "./common.mjs";
 
 const API = "https://api.mtga.untapped.gg/api/v1";
+/** Untapped rate-limits / stubs free analytics without a real browser Origin. */
+const UNTAPPED_ORIGIN = "https://mtga.untapped.gg";
+
+/**
+ * Fetch Untapped API JSON with browser-like headers. Bare getText() (bot From
+ * header, no Origin) returns a 6-row stub payload with ~100 matches per row —
+ * enough to look like success but too thin for a real Bo1 board (2026-07-23).
+ */
+async function getUntappedJson(url) {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": UA,
+      Accept: "application/json",
+      Origin: UNTAPPED_ORIGIN,
+      Referer: `${UNTAPPED_ORIGIN}/constructed/standard/meta`,
+    },
+    redirect: "follow",
+  });
+  if (!res.ok) throw new Error(`${url} → ${res.status}`);
+  return res.json();
+}
 
 /** Untapped's 4-color nicknames (WUBRG minus one) → community "4c". */
 const FOUR_COLOR_NICKS = /\b(glint[- ]?eye|yore|witch[- ]?maw|dune[- ]?brood|ink[- ]?treader)\b/g;
@@ -42,7 +63,10 @@ const COLOR_BITS = [
 ];
 
 /**
- * Pure: decode the archetype trend payload into a ranked Bo1 board.
+ * Pure: decode the *legacy* archetype_trend payload into a ranked Bo1 board.
+ * Kept for fixture tests — Untapped's live trend endpoint (2026-07-23+) no
+ * longer ships `All` / `popularity` scopes, so production uses
+ * {@link buildBo1BoardFromArchetypes} instead.
  * @returns [{ name, norm, colors, sharePct, winratePct, matches }] by share desc
  */
 export function buildBo1BoardFromPayloads(tags, trend) {
@@ -82,26 +106,87 @@ export function buildBo1BoardFromPayloads(tags, trend) {
 }
 
 /**
+ * Pure: ranked Bo1 board from the free `archetypes_by_event_scope_and_rank_v2`
+ * payload (same data Untapped's public meta page uses). Share is each
+ * archetype's match volume over the sum of returned non-"Other" archetypes.
+ * @returns [{ name, norm, colors, sharePct, winratePct, matches }] by share desc
+ */
+export function buildBo1BoardFromArchetypes(tags, archetypes) {
+  const tagName = new Map((tags || []).map((t) => [t.id, t.name]));
+  const rows = [];
+  for (const a of Array.isArray(archetypes) ? archetypes : []) {
+    const names = (a.primary_tags || [])
+      .map((id) => tagName.get(id))
+      .filter(Boolean);
+    if (!names.length) continue;
+    const name = names.join(" ");
+    if (/\bother\b/i.test(name)) continue;
+
+    const stats = a.stats || {};
+    let matches = 0;
+    let winWeighted = 0;
+    if (stats.all?.total_matches != null) {
+      matches = stats.all.total_matches || 0;
+      winWeighted = (stats.all.winrate || 0) * matches;
+    } else {
+      for (const s of Object.values(stats)) {
+        const m = s?.total_matches || 0;
+        matches += m;
+        winWeighted += (s?.winrate || 0) * m;
+      }
+    }
+    if (matches <= 0) continue;
+
+    const colorByte = a.color_byte || 0;
+    rows.push({
+      name,
+      norm: normalizeArchetypeName(name),
+      colors: COLOR_BITS.filter(([, b]) => colorByte & b).map(([c]) => c),
+      matches,
+      winratePct: matches
+        ? Math.round((winWeighted / matches) * 10) / 10
+        : undefined,
+    });
+  }
+
+  const denom = rows.reduce((n, r) => n + r.matches, 0);
+  if (!denom) return [];
+
+  const board = rows
+    .filter((r) => r.matches >= 1000)
+    .map((r) => ({
+      name: r.name,
+      norm: r.norm,
+      colors: r.colors,
+      sharePct: Math.round((r.matches / denom) * 1000) / 10,
+      winratePct: r.winratePct,
+      matches: r.matches,
+    }));
+  board.sort((a, b) => b.sharePct - a.sharePct || b.matches - a.matches);
+  return board;
+}
+
+/**
  * Live Standard Bo1 ladder board from Untapped's free public analytics.
  * Throws on any failure — the caller treats that as "no Bo1 data today"
  * and falls back to mirroring the Bo3 board (never aborts the pipeline).
+ *
+ * Primary source (2026-07-23+): free archetypes endpoint — the trend
+ * endpoint no longer returns `All`/`popularity` and was producing a 0-row
+ * board (which silently mirrored Bo3). Decklists still come from
+ * {@link fetchBo1DeckPool} / tournament sources by name match.
  */
 export async function fetchStandardBo1Ladder() {
-  const periods = JSON.parse(
-    await getText(`${API}/meta-periods/active`, "application/json"),
-  );
+  const periods = await getUntappedJson(`${API}/meta-periods/active`);
   const current = (Array.isArray(periods) ? periods : []).find(
     (p) => p.event_name === "Ladder" && !p.end_ts,
   );
   if (!current) throw new Error("no open Standard Ladder meta period");
-  const tags = JSON.parse(await getText(`${API}/tags`, "application/json"));
-  const trend = JSON.parse(
-    await getText(
-      `${API}/analytics/query/archetype_trend_by_event_scope_and_rank_v2?EventNameFilter=LADDER&RankingClassScopeFilter=ALL&ClassificationTypeFilter=ARCHETYPES&MetaPeriodScopeFilter=CURRENT`,
-      "application/json",
-    ),
+  const tags = await getUntappedJson(`${API}/tags`);
+  const archetypes = await getUntappedJson(
+    `${API}/analytics/query/archetypes_by_event_scope_and_rank_v2/free?MetaPeriodId=${current.id}&RankingClassScopeFilter=ALL`,
   );
-  const board = buildBo1BoardFromPayloads(tags, trend);
+  const board = buildBo1BoardFromArchetypes(tags, archetypes);
   if (board.length < 4) throw new Error(`Bo1 board too thin (${board.length})`);
   return {
     periodId: current.id,
@@ -194,17 +279,13 @@ export function decodeUntappedDeckString(ds) {
  */
 export async function fetchBo1DeckPool(periodId, tags) {
   const [archetypes, deckRows, locList] = await Promise.all([
-    getText(
+    getUntappedJson(
       `${API}/analytics/query/archetypes_by_event_scope_and_rank_v2/free?MetaPeriodId=${periodId}&RankingClassScopeFilter=BRONZE_TO_PLATINUM`,
-      "application/json",
-    ).then(JSON.parse),
-    getText(
-      `${API}/analytics/query/decks_by_event_scope_and_rank_v2/free?MetaPeriodId=${periodId}&RankingClassScopeFilter=BRONZE_TO_PLATINUM`,
-      "application/json",
-    ).then(JSON.parse),
-    getText("https://mtgajson.untapped.gg/v1/latest/loc_en.json", "application/json").then(
-      JSON.parse,
     ),
+    getUntappedJson(
+      `${API}/analytics/query/decks_by_event_scope_and_rank_v2/free?MetaPeriodId=${periodId}&RankingClassScopeFilter=BRONZE_TO_PLATINUM`,
+    ),
+    getUntappedJson("https://mtgajson.untapped.gg/v1/latest/loc_en.json"),
   ]);
 
   const tagName = new Map((tags || []).map((t) => [t.id, t.name]));

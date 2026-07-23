@@ -14,6 +14,7 @@ import { gunzipSync } from "node:zlib";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  buildBo1BoardFromArchetypes,
   buildBo1BoardFromPayloads,
   decodeUntappedDeckString,
   normalizeArchetypeName,
@@ -76,6 +77,101 @@ describe("buildBo1BoardFromPayloads", () => {
   it("drops junk rows and never throws on empty payloads", () => {
     expect(buildBo1BoardFromPayloads([], {})).toEqual([]);
     expect(buildBo1BoardFromPayloads(null, null)).toEqual([]);
+  });
+});
+
+describe("buildBo1BoardFromArchetypes", () => {
+  // Shape of the free archetypes_by_event_scope_and_rank_v2 endpoint
+  // (production path after the 2026-07-23 trend-API regression).
+  const tags = [
+    { id: 1, name: "Mono-White" },
+    { id: 2, name: "Auras" },
+    { id: 3, name: "Glint-Eye" },
+    { id: 4, name: "Reanimator" },
+    { id: 5, name: "Other" },
+    { id: 6, name: "Jeskai" },
+    { id: 7, name: "Lessons" },
+    { id: 8, name: "Mono-Black" },
+    { id: 9, name: "Demons" },
+  ];
+  const archetypes = [
+    {
+      primary_tags: [1, 2],
+      color_byte: 1,
+      stats: { all: { total_matches: 150000, winrate: 57.4 } },
+    },
+    {
+      primary_tags: [3, 4],
+      color_byte: 15, // WUBR
+      stats: { all: { total_matches: 60000, winrate: 57.6 } },
+    },
+    {
+      primary_tags: [8, 9],
+      color_byte: 4,
+      stats: { all: { total_matches: 50000, winrate: 53.6 } },
+    },
+    {
+      primary_tags: [6, 7],
+      color_byte: 11, // WUR
+      stats: { all: { total_matches: 40000, winrate: 54.1 } },
+    },
+    // Noise: Other + thin sample
+    {
+      primary_tags: [5],
+      color_byte: 0,
+      stats: { all: { total_matches: 90000, winrate: 50 } },
+    },
+    {
+      primary_tags: [6],
+      color_byte: 11,
+      stats: { all: { total_matches: 500, winrate: 60 } },
+    },
+  ];
+
+  it("ranks by match volume and maps 4-color nicknames", () => {
+    const board = buildBo1BoardFromArchetypes(tags, archetypes);
+    expect(board.map((b) => b.name)).toEqual([
+      "Mono-White Auras",
+      "Glint-Eye Reanimator",
+      "Mono-Black Demons",
+      "Jeskai Lessons",
+    ]);
+    expect(board[0].colors).toEqual(["W"]);
+    expect(board[1].norm).toBe("4c reanimator");
+    // Shares are % of non-Other volume (150+60+50+40+0.5 = 300.5k → ~49.9%)
+    expect(board[0].sharePct).toBeGreaterThan(40);
+    expect(board[0].winratePct).toBe(57.4);
+    expect(board[0].matches).toBe(150000);
+  });
+
+  it("aggregates per-rank stats when stats.all is absent", () => {
+    const board = buildBo1BoardFromArchetypes(tags, [
+      {
+        primary_tags: [1, 2],
+        color_byte: 1,
+        stats: {
+          gold: { total_matches: 10000, winrate: 60 },
+          platinum: { total_matches: 20000, winrate: 54 },
+        },
+      },
+      {
+        primary_tags: [6, 7],
+        color_byte: 11,
+        stats: {
+          gold: { total_matches: 5000, winrate: 50 },
+        },
+      },
+    ]);
+    expect(board[0].name).toBe("Mono-White Auras");
+    expect(board[0].matches).toBe(30000);
+    // (60*10k + 54*20k) / 30k = 56
+    expect(board[0].winratePct).toBe(56);
+  });
+
+  it("never throws on empty / malformed payloads", () => {
+    expect(buildBo1BoardFromArchetypes([], [])).toEqual([]);
+    expect(buildBo1BoardFromArchetypes(null, null)).toEqual([]);
+    expect(buildBo1BoardFromArchetypes(tags, [{ no: "stats" }])).toEqual([]);
   });
 });
 

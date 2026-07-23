@@ -58,17 +58,22 @@ never silently stale-as-fresh).
    latest CI run logs even if it "succeeded".
 5c. **Standard Bo1 board (Untapped)** — the Bo1 board is ranked by Untapped's
    free public ladder analytics (`pipeline/sources/untapped.mjs
-   fetchStandardBo1Ladder`); Bo3 stays MTGGoldfish tournament data. Ladder
-   archetypes with no tournament list (e.g. Mono-White Auras) get their
-   most-played ladder list from the free decks endpoint — deckstring decoded
-   by `decodeUntappedDeckString` (varint format, version 4; layout documented
-   in the function), names via mtgajson `loc_en.json`, then normal Scryfall
-   validation. If either API drifts, the pipeline soft-falls back (board →
-   Bo3 mirror; lists → archetype skipped) and logs diagnostics — symptom
-   in-app: Bo1 and Bo3 Decks boards identical again, or ladder-only decks
-   missing. Fixture net: `pipeline/untapped.test.mjs` (incl. two real
-   deckstrings). Pioneer/Explorer Bo1 stats are premium-walled — Pioneer
-   intentionally mirrors Bo3.
+   fetchStandardBo1Ladder` → `archetypes_by_event_scope_and_rank_v2/free`,
+   decoded by `buildBo1BoardFromArchetypes`); Bo3 stays MTGGoldfish tournament
+   data. Requests must send browser-like `Origin`/`Referer` for
+   `mtga.untapped.gg` — without them Untapped returns a 6-row stub that
+   fails the ≥4-archetype gate and the pipeline silently mirrors Bo3
+   (regression 2026-07-23). Ladder archetypes with no tournament list
+   (e.g. Mono-White Auras) get their most-played ladder list from the free
+   decks endpoint — deckstring decoded by `decodeUntappedDeckString` (varint
+   format, version 4; layout documented in the function), names via mtgajson
+   `loc_en.json`, then normal Scryfall validation. If either API drifts, the
+   pipeline soft-falls back (board → Bo3 mirror; lists → archetype skipped)
+   and logs diagnostics — symptom in-app: Bo1 and Bo3 Decks boards identical
+   again, or ladder-only decks missing. Fixture net: `pipeline/untapped.test.mjs`
+   (legacy trend decoder + free-archetypes decoder + two real deckstrings).
+   Pioneer/Explorer Bo1 stats are premium-walled — Pioneer intentionally
+   mirrors Bo3.
 5b. **MTGO alias map** — when a new Universes Beyond set with dual-identity
    printings (printed alias ≠ canonical name, like OM1 Marvel) enters
    Standard/Pioneer, rerun `node scripts/gen-mtgo-name-map.mjs om1 <newset>`
