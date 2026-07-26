@@ -41,22 +41,22 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-4c-control.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-izzet-spellementals.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-mono-green-landfall.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-4c-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-dimir-excruciator.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-mono-green-landfall.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
