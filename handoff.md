@@ -3,11 +3,12 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude ↔ Opus ↔ Grok ↔ Kimi).
 
-**Live product version: v2.5.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.5.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
-**Session wrap (2026-07-22, Grok):** release train is **complete** (Windows +
-macOS + updater + site). No open engineering work from this session. Resume by
-picking from **Backlog** below; do not invent product work.
+**Session wrap (2026-07-28, Opus 5):** release train is **complete** (Windows +
+macOS + updater + site) for **v2.5.3**, an owner-reported overlay bug fix. No
+open engineering work from this session. Resume by picking from **Backlog**
+below; do not invent product work.
 
 ---
 
@@ -15,38 +16,56 @@ picking from **Backlog** below; do not invent product work.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.5.2** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
+| App version | **v2.5.3** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
 | Branch | `main` synced with `origin/main` |
-| Key commits | `68084aa` release hygiene · `8e8cb59` macOS dmg roll |
-| Tag | `v2.5.2` (macOS CI already ran green) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.2-universal.dmg` |
-| Updater | `website/updater/latest.json` → 2.5.2 (key **67FCA9900F523D49**) |
-| Soft channel | `website/version.json` + `public/version.json` → 2.5.2 |
-| Site | Download buttons + OG `?v=2.5.2` |
-| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.2 |
-| Gates last green | **337** vitest · **33** cargo (2 ignored) · lint/tsc/clippy clean |
-| `WHATS_NEW` | empty (hygiene release — no post-update banner) |
+| Key commits | `a8c20f1` rank-path fix · `d3c8250` release · `c57d06f` macOS dmg roll |
+| Tag | `v2.5.3` (macOS CI green, 13m48s) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.3.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.3-universal.dmg` |
+| Updater | `website/updater/latest.json` → 2.5.3 (key **67FCA9900F523D49**, sig cross-checked live) |
+| Soft channel | `website/version.json` + `public/version.json` → 2.5.3 |
+| Site | Download buttons + OG `?v=2.5.3` |
+| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.3 |
+| Gates last green | **355** vitest · **35** cargo (2 ignored) · lint/tsc/clippy clean |
+| `WHATS_NEW` | 3 lines (rank-path fix — post-update banner fires) |
 
-Tree keeps **current + previous** installers only (2.5.1 + 2.5.2). Older
+Tree keeps **current + previous** installers only (2.5.2 exe + 2.5.3). Older
 binaries on GitHub Releases.
 
 ---
 
-## What this session shipped (v2.5.2 hygiene)
+## What this session shipped (v2.5.3 — overlay rank path)
 
-1. **Stats extract** — `src/pages/Stats.tsx` ~1889 → ~457 lines. Panels in
-   `src/components/stats/` (`StatusPanel`, `SummaryTiles`, `FormTiles`,
-   `SplitsPanel`, `StatsArsenal`, `DeckBreakdown`, `MatchHistory`, `DeckDetail`,
-   shared `statsUi.tsx`). Barrel guard: `statsExtract.test.ts`. Pure mechanical;
-   browser seed via `window.__fndStore` confirmed home + deck detail.
-2. **`docs/MAINTENANCE.md`** — fully-automatic table lists daily
-   `npm run meta:site` / public `website/meta-web/` rebuild.
-3. **`src-tauri/src/arena.rs`** — expanded lookalike negatives + pure
-   `running_transition` edge-only helper (no AppHandle I/O theater).
-4. **Full release train** — signed Windows (password file
+Owner report: fresh deck, deck history deleted, yet the post-match card drew a
+long climb line.
+
+1. **`src/services/rankPath.ts`** (new, 12 tests) — the sparkline called
+   `buildRankSeries(matches)` on *every* match ever recorded. Now scoped three
+   ways: **this deck** (everything else on the card already was), **one
+   season** (never span a monthly reset), **ladder queues only** (`myRank` is
+   the constructed rank and gets stamped on drafts/Play too, which padded the
+   line with points that never moved the ladder). Session-first with a season
+   fallback; the caption names the window it used.
+2. **`rank_now` on `LiveMatch`** (`src-tauri/src/tracker.rs`) — `my_rank` is
+   frozen at match start, so the path could not show the game you just played.
+   `record_matches` seeds `rank_now` from the parser's freshest rank and
+   `refresh_ended_rank` patches the lingering ended frame when Arena logs the
+   update (~50 log lines after the result). One game + a real move is now a
+   two-point line. **Verified against a live `Player.log`**: 12/13 results
+   close on a new rank (13th is a draw) — e.g. a win at Mythic 92.1% earning
+   92.6%. Harness: `FND_REPLAY_LOG=<path> cargo test replay_real_log --
+   --nocapture --ignored`.
+3. **Three related bugs** — `PostMatchSummary` counted every match as the
+   current deck when the live match had no deck identity; `seasonRecord`
+   matched any deckless match via `undefined === undefined`;
+   `estimateMatchesPerStep` counted drafts/Play between rank samples,
+   overstating Climb's "matches to next rank".
+4. **Demo knobs** — `/?demo&phase=ended#/overlay` renders the post-match card,
+   `&fresh` cuts history to one game (day-one empty state).
+5. **Full release train** — signed Windows (key id verified against the
+   `tauri.conf.json` pubkey *before* publish, password file
    `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` next to the key),
-   updater + soft channels, OG regen, push `main`, tag `v2.5.2`, then roll
+   updater + soft channels, OG regen, push `main`, tag `v2.5.3`, then roll
    macOS dmg from tag CI into downloads + fix site links.
 
 Audit context: `docs/AUDIT-2026-07-22-v2.5.0.md` (P1/P2 hygiene items closed
@@ -108,11 +127,11 @@ may proceed on judgment. Ask before product decisions.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.2.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.2-universal.dmg` |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.3.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.3-universal.dmg` |
 | Updater | `website/updater/latest.json` |
 | Soft | `website/version.json` + `public/version.json` |
-| Tag | `v2.5.2` |
+| Tag | `v2.5.3` |
 
 **Sign only** with key id **67FCA9900F523D49**
 (`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).
@@ -138,7 +157,8 @@ cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings &
 window.__fndStore.setState({ trackerMatches: [/* real grpIds e.g. Ethereal Armor 92065 */] })
 ```
 
-Overlay/toast/presence demos: `/?demo#/overlay`.
+Overlay/toast/presence demos: `/?demo#/overlay` (add `&phase=ended` for the
+post-match card, `&fresh` for its day-one state).
 
 ## Architecture must-knows
 
