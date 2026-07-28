@@ -131,12 +131,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-orzhov-greasefang.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-azorius-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-azorius-control.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-orzhov-greasefang.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -171,12 +171,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-orzhov-greasefang.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-azorius-control.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-azorius-control.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-orzhov-greasefang.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
