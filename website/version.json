@@ -1,5 +1,5 @@
 {
-  "version": "2.5.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.2.exe",
-  "notes": "v2.5.2: Maintenance release. My Stats modularized for maintainability, Arena process-watcher edge tests expanded, and daily meta-web rebuild documented as fully automatic. No player-facing UI change."
+  "version": "2.5.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.3.exe",
+  "notes": "v2.5.3: Post-match rank path fixed. It now follows the deck you just played in the current session instead of every match ever recorded, counts ranked games only (drafts and Play no longer pad it), never spans a monthly rank reset, and ends on the rank the match earned rather than the one you sat down with. Climb's matches-to-next-rank estimate stops counting unranked games too."
 }
