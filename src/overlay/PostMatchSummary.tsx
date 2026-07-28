@@ -4,15 +4,15 @@
  * carries the result pill + opponent; this adds the progression story:
  * season/session chips, recent form, and the rank-path sparkline.
  */
-import { memo, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import type { LiveMatch, TrackedMatch } from "../types/tracker";
 import { deckKey } from "../services/tracker";
 import {
-  buildRankSeries,
   mythicAxisLabel,
   rankLabelFromScore,
   rankSeriesDomain,
 } from "../services/ranks";
+import { buildRankPath, RANK_PATH_MAX_POINTS } from "../services/rankPath";
 import { sessionWindow } from "../services/recapStats";
 
 /** Sparkline geometry (viewBox units; the SVG scales with panel width). */
@@ -20,7 +20,7 @@ const SPARK_W = 180;
 const SPARK_H = 46;
 const SPARK_PAD = 6;
 /** Points on the progression graph. */
-const SPARK_POINTS = 12;
+const SPARK_POINTS = RANK_PATH_MAX_POINTS;
 /** Recent-form squares. */
 const FORM_GAMES = 8;
 
@@ -42,6 +42,10 @@ interface Spark {
   lastLabel: string;
   /** "rank" = ladder path, "wr" = running winrate trend. */
   kind: "rank" | "wr";
+  /** Caption under the line — names the window, so it can't be misread. */
+  kindLabel: string;
+  /** Tooltip spelling out exactly what the line covers. */
+  hint: string;
 }
 
 export const PostMatchSummary = memo(function PostMatchSummary({
@@ -50,19 +54,32 @@ export const PostMatchSummary = memo(function PostMatchSummary({
   record,
   oppGuess,
 }: Props) {
+  /**
+   * "Same deck as the one just played" — id, then name, then list fingerprint.
+   * With no identity at all we claim nothing: a chip reading "Season 12–4"
+   * built from every deck in history is worse than no chip.
+   */
+  const onDeck = useCallback(
+    (m: TrackedMatch) => {
+      const key = live.deckId ?? live.deckName ?? live.deckHash ?? null;
+      if (!key) return false;
+      return (
+        deckKey(m) === key || (!!live.deckHash && m.deckHash === live.deckHash)
+      );
+    },
+    [live.deckId, live.deckName, live.deckHash],
+  );
+
   /** Decided matches on this deck, chronological. */
-  const deckMatches = useMemo(() => {
-    const key = live.deckId ?? live.deckName ?? live.deckHash ?? null;
-    return matches
-      .filter((m) => {
-        if (m.result !== "win" && m.result !== "loss") return false;
-        if (!key) return true;
-        return (
-          deckKey(m) === key || (!!live.deckHash && m.deckHash === live.deckHash)
-        );
-      })
-      .sort((a, b) => a.endedAt - b.endedAt);
-  }, [matches, live]);
+  const deckMatches = useMemo(
+    () =>
+      matches
+        .filter(
+          (m) => (m.result === "win" || m.result === "loss") && onDeck(m),
+        )
+        .sort((a, b) => a.endedAt - b.endedAt),
+    [matches, onDeck],
+  );
 
   /** Record within the current play session (same deck). */
   const session = useMemo(() => {
@@ -80,32 +97,50 @@ export const PostMatchSummary = memo(function PostMatchSummary({
   const form = useMemo(() => deckMatches.slice(-FORM_GAMES), [deckMatches]);
 
   const spark = useMemo<Spark | null>(() => {
-    // Preferred: the ladder rank path (player-wide, not deck-scoped).
-    const series = buildRankSeries(matches).slice(-SPARK_POINTS);
-    if (series.length >= 2) {
-      const values = series.map((p) => p.rank.score);
+    // Preferred: the ladder path this deck actually walked. Scoped to the
+    // session (then the season) and to ranked queues — see rankPath.ts for
+    // why an unscoped series drew a fresh deck a twelve-game climb.
+    const path = buildRankPath(matches, {
+      onDeck,
+      maxPoints: SPARK_POINTS,
+      liveRank: live.rankNow,
+      liveMatchId: live.matchId,
+    });
+    if (path) {
+      const values = path.points.map((p) => p.score);
       const first = values[0];
       const last = values[values.length - 1];
-      // Match the endpoints' precision to the range on show. Rounding the
-      // start to a whole percent while the end came from live.myRank with a
-      // decimal made a real move read as "94% → 92.7%" — same number twice.
+      // Match the endpoints' precision to the range on show. Rounding a whole
+      // Mythic session to whole percents made a real move read "92% → 92%".
       const allMythic = Math.min(...values) >= 20;
       const span = Math.max(...values) - Math.min(...values);
       return {
         kind: "rank",
+        kindLabel: path.scope === "session" ? "session rank" : "season rank",
         values,
-        results: series.map((p) => p.result),
+        results: path.points.map((p) => p.result),
         firstLabel: allMythic
           ? `Mythic ${mythicAxisLabel(first, span)}`
           : rankLabelFromScore(first),
         lastLabel: allMythic
           ? `Mythic ${mythicAxisLabel(last, span)}`
-          : (live.myRank ?? rankLabelFromScore(last)),
+          : rankLabelFromScore(last),
+        hint:
+          `Ladder rank across your last ${path.points.length} ranked-game ` +
+          `samples on this deck (${path.scope === "session" ? "this session" : "this season"}). ` +
+          (path.endsNow
+            ? `The last point is where this match just left you.`
+            : `Arena logs the rank this match earned a moment after the result.`),
       };
     }
-    // Fallback: running winrate trend on this deck.
-    const recent = deckMatches.slice(-SPARK_POINTS);
+    // Fallback: running winrate trend on this deck, same session-first scope.
+    const { fromMs } = sessionWindow(matches);
+    const sessionGames = deckMatches.filter((m) => m.endedAt >= fromMs);
+    const recent = (sessionGames.length >= 2 ? sessionGames : deckMatches).slice(
+      -SPARK_POINTS,
+    );
     if (recent.length >= 2) {
+      const inSession = sessionGames.length >= 2;
       let wins = 0;
       const values = recent.map((m, i) => {
         if (m.result === "win") wins++;
@@ -113,14 +148,19 @@ export const PostMatchSummary = memo(function PostMatchSummary({
       });
       return {
         kind: "wr",
+        kindLabel: inSession ? "session wr" : "wr trend",
         values,
         results: recent.map((m) => m.result),
         firstLabel: `${Math.round(values[0])}%`,
         lastLabel: `${Math.round(values[values.length - 1])}% WR`,
+        hint:
+          `Running winrate across your last ${recent.length} games on this ` +
+          `deck (${inSession ? "this session" : "all recorded"}). ` +
+          `No ranked-ladder movement to plot yet.`,
       };
     }
     return null;
-  }, [matches, deckMatches, live.myRank]);
+  }, [matches, deckMatches, onDeck, live.matchId, live.rankNow]);
 
   const sparkGeom = useMemo(() => {
     if (!spark) return null;
@@ -197,15 +237,21 @@ export const PostMatchSummary = memo(function PostMatchSummary({
         </div>
       )}
 
+      {!(spark && sparkGeom) && (
+        // The panel is grown to fit a graph — say why there isn't one rather
+        // than leaving a hole (and rather than borrowing another deck's climb).
+        <p className="postmatch-graph-empty">
+          Progression graph starts on your second game with this deck
+        </p>
+      )}
+
       {spark && sparkGeom && (
-        <div className="postmatch-graph">
+        <div className="postmatch-graph" title={spark.hint}>
           <svg
             viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
             className="postmatch-spark"
             role="img"
-            aria-label={
-              spark.kind === "rank" ? "Rank path" : "Winrate trend"
-            }
+            aria-label={spark.hint}
           >
             <polyline className="postmatch-spark-line" points={sparkGeom.line} />
             {sparkGeom.pts.map(([x, y], i) => {
@@ -226,9 +272,7 @@ export const PostMatchSummary = memo(function PostMatchSummary({
           </svg>
           <div className="postmatch-graph-labels">
             <span>{spark.firstLabel}</span>
-            <span className="postmatch-graph-kind">
-              {spark.kind === "rank" ? "rank path" : "wr trend"}
-            </span>
+            <span className="postmatch-graph-kind">{spark.kindLabel}</span>
             <span>{spark.lastLabel}</span>
           </div>
         </div>

@@ -159,6 +159,17 @@ export function nextRankLabel(p: ParsedRank): string | null {
   return rankLabelFromScore(next);
 }
 
+/**
+ * Arena's constructed ranked queues — the only ones that move a rank.
+ * Covers `Ladder`, `Traditional_Ladder` and the format-prefixed variants
+ * (`Alchemy_Ladder`, `Historic_Ladder`, …) while excluding draft/sealed (their
+ * own ladder), Play, Brawl and events. Those all carry a *constructed* rank
+ * stamp anyway, so anything reasoning about ladder movement must filter first.
+ */
+export function isLadderEvent(eventId: string | undefined | null): boolean {
+  return !!eventId && /(^|_)ladder(_|$)/i.test(eventId.trim());
+}
+
 export interface RankPoint {
   at: number;
   rank: ParsedRank;
@@ -200,10 +211,21 @@ export function buildRankSeries(
 /**
  * Estimate matches needed to gain one rank step, from recent history.
  * Falls back to a conservative default when we lack rank transitions.
+ *
+ * Ladder queues only: drafts and Play-queue games carry a constructed rank
+ * stamp but never move it, so counting them inflated "matches to next rank"
+ * by however much unranked play sat between two rank samples.
  */
 export function estimateMatchesPerStep(
-  matches: { endedAt: number; matchId: string; result: string; myRank?: string }[],
+  input: {
+    endedAt: number;
+    matchId: string;
+    result: string;
+    myRank?: string;
+    eventId?: string;
+  }[],
 ): { matchesPerStep: number; source: "history" | "default" } {
+  const matches = input.filter((m) => isLadderEvent(m.eventId));
   const series = buildRankSeries(matches);
   if (series.length < 2) {
     return { matchesPerStep: 5, source: "default" };

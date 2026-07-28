@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  estimateMatchesPerStep,
   formatRank,
+  isLadderEvent,
   mythicAxisLabel,
   parseRank,
   rankLabelFromScore,
@@ -102,5 +104,59 @@ describe("rankSeriesDomain", () => {
     const { lo, hi } = rankSeriesDomain([21.2, 21.25]);
     expect(hi).toBeGreaterThan(lo);
     expect(hi).toBeLessThanOrEqual(22);
+  });
+});
+
+describe("isLadderEvent", () => {
+  it("accepts constructed ranked queues only", () => {
+    expect(isLadderEvent("Ladder")).toBe(true);
+    expect(isLadderEvent("Traditional_Ladder")).toBe(true);
+    expect(isLadderEvent("Alchemy_Ladder")).toBe(true);
+    expect(isLadderEvent("Play")).toBe(false);
+    expect(isLadderEvent("Traditional_Play")).toBe(false);
+    expect(isLadderEvent("Brawl")).toBe(false);
+    expect(isLadderEvent("QuickDraft_DSK_20260701")).toBe(false);
+    expect(isLadderEvent("PremierDraft_TDM")).toBe(false);
+    expect(isLadderEvent(undefined)).toBe(false);
+  });
+});
+
+describe("estimateMatchesPerStep", () => {
+  const game = (
+    i: number,
+    myRank: string | undefined,
+    eventId: string,
+  ) => ({
+    matchId: `m-${i}`,
+    endedAt: 1_000 + i * 10,
+    result: "win",
+    myRank,
+    eventId,
+  });
+
+  it("counts only ladder games between two rank samples", () => {
+    // Two ranked games took one whole step; the drafts in between took none.
+    const ladder = [
+      game(0, "Gold 4", "Ladder"),
+      game(9, "Gold 3", "Ladder"),
+    ];
+    const padded = [
+      ladder[0],
+      ...Array.from({ length: 7 }, (_, i) =>
+        game(i + 1, "Gold 4", "PremierDraft_TDM"),
+      ),
+      ladder[1],
+    ];
+    expect(estimateMatchesPerStep(padded)).toEqual(
+      estimateMatchesPerStep(ladder),
+    );
+  });
+
+  it("falls back to the default when nothing ranked was played", () => {
+    const drafts = [
+      game(0, "Gold 4", "QuickDraft_TDM"),
+      game(1, "Gold 3", "QuickDraft_TDM"),
+    ];
+    expect(estimateMatchesPerStep(drafts).source).toBe("default");
   });
 });

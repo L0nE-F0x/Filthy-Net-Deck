@@ -6637,6 +6637,20 @@ html.overlay-macos .overlay-shell {
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
 }
+.postmatch-graph-empty {
+  margin: auto 0 0;
+  padding: 12px 8px;
+  border-radius: 8px;
+  text-align: center;
+  text-wrap: balance;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-muted);
+  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+}
 .postmatch-graph-kind {
   font-size: 7.5px;
   font-weight: 600;

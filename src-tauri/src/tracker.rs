@@ -156,8 +156,15 @@ pub struct LiveMatch {
     pub opponent_platform: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub my_player_name: Option<String>,
+    /// Rank stamped when this match *started* — where the player sat down.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub my_rank: Option<String>,
+    /// Freshest rank the log has reported, which after a ranked match is the
+    /// one it just earned. `my_rank` is frozen at match start, so this is the
+    /// only way the post-match card can show what the game actually did; the
+    /// ended frame is re-emitted when Arena logs the update a beat later.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rank_now: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deck_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -766,6 +773,7 @@ impl LogParser {
             opponent_platform: pending.opponent_platform.clone(),
             my_player_name: pending.my_player_name.clone(),
             my_rank: pending.my_rank.clone(),
+            rank_now: self.current_rank.clone(),
             deck_name: pending.deck_name.clone(),
             deck_id: pending.deck_id.clone(),
             deck_hash: pending.deck_hash.clone(),
@@ -893,18 +901,34 @@ impl LogParser {
                     .get("constructedPercentile")
                     .and_then(|p| p.as_f64())
                     .filter(|p| *p > 0.0 && *p <= 100.0);
-                self.current_rank = Some(match (place, pct) {
+                self.set_current_rank(match (place, pct) {
                     (Some(place), _) => format!("Mythic #{place}"),
                     (None, Some(pct)) => format!("Mythic {pct:.1}%"),
                     (None, None) => "Mythic".to_string(),
                 });
                 return;
             }
-            self.current_rank = Some(match level {
+            self.set_current_rank(match level {
                 Some(l) if l > 0 => format!("{class} {l}"),
                 _ => class.to_string(),
             });
         }
+    }
+
+    /// Arena logs the rank a ranked match earned a beat *after* the result, so
+    /// a real move has to wake the HUD — that is what lets the post-match card
+    /// finish its rank path while the ended frame is still lingering.
+    fn set_current_rank(&mut self, rank: String) {
+        if self.current_rank.as_deref() == Some(rank.as_str()) {
+            return;
+        }
+        self.current_rank = Some(rank);
+        self.live_dirty = true;
+    }
+
+    /// Freshest rank seen in the log (not frozen to any match).
+    pub fn current_rank(&self) -> Option<String> {
+        self.current_rank.clone()
     }
 
     fn on_courses(&mut self, line: &str) {
@@ -1710,7 +1734,7 @@ fn run_loop(app: AppHandle) {
                             carry.push_str(&chunk);
                             let completed = drain_complete_lines(&mut carry, &mut parser);
                             let live_needed = parser.consume_live_dirty() || !completed.is_empty();
-                            record_matches(&app, completed);
+                            record_matches(&app, completed, parser.current_rank());
                             // Only re-push overlay state when match/library actually moved —
                             // GRE spam otherwise burns CPU on JSON + WebView re-renders.
                             if live_needed {
@@ -1765,7 +1789,7 @@ fn backfill_file(app: &AppHandle, parser: &mut LogParser, path: &Path) {
     for line in text.split('\n') {
         completed.extend(parser.feed_line(line));
     }
-    record_matches(app, completed);
+    record_matches(app, completed, parser.current_rank());
 }
 
 // ---------------------------------------------------------------------------
@@ -1883,7 +1907,10 @@ fn post_match_end_toast(app: &AppHandle, body: &str) {
     crate::toast::show_toast(app, "Filthy Net Deck", body);
 }
 
-fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
+/// `rank_now` is the parser's freshest rank at the moment the result landed.
+/// When Arena wrote the new rank in the same chunk as the match result it is
+/// already the earned one; otherwise `sync_live` patches it mid-linger.
+fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Option<String>) {
     if completed.is_empty() {
         return;
     }
@@ -1921,6 +1948,7 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>) {
             opponent_platform: m.opponent_platform.clone(),
             my_player_name: m.my_player_name.clone(),
             my_rank: m.my_rank.clone(),
+            rank_now: rank_now.clone(),
             deck_name: m.deck_name.clone(),
             deck_id: m.deck_id.clone(),
             deck_hash: m.deck_hash.clone(),
@@ -1970,6 +1998,32 @@ fn publish_live(app: &AppHandle, live: Option<LiveMatch>) {
 fn sync_live(app: &AppHandle, parser: &LogParser) {
     if let Some(live) = parser.live_match() {
         publish_live(app, Some(live));
+        return;
+    }
+    // No match in flight — but the result card may still be on screen, waiting
+    // for the rank Arena logs a beat after the match. Patch that one field
+    // instead of rebuilding: the frame carries the result the card is showing.
+    refresh_ended_rank(app, parser.current_rank());
+}
+
+/// Update `rank_now` on a lingering "ended" frame. No-op unless the rank
+/// actually moved (and never downgrades a known rank back to unknown).
+fn refresh_ended_rank(app: &AppHandle, rank_now: Option<String>) {
+    let Some(rank_now) = rank_now else { return };
+    let updated = {
+        let shared = app.state::<TrackerShared>();
+        let data = shared.0.lock().expect("tracker lock");
+        match data.live.as_ref() {
+            Some(l) if l.phase == "ended" && l.rank_now.as_deref() != Some(rank_now.as_str()) => {
+                let mut next = l.clone();
+                next.rank_now = Some(rank_now);
+                Some(next)
+            }
+            _ => None,
+        }
+    };
+    if let Some(next) = updated {
+        publish_live(app, Some(next));
     }
 }
 
@@ -2165,6 +2219,46 @@ mod tests {
         // Non-mythic path is untouched.
         p.feed_line(RANK);
         assert_eq!(p.current_rank.as_deref(), Some("Diamond 1"));
+    }
+
+    #[test]
+    fn rank_stamp_is_frozen_at_match_start_while_rank_now_moves() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(RANK_MYTHIC_PCT);
+        p.feed_line(COURSES);
+        p.feed_line(&room_playing("m-1", "Ladder"));
+        let live = p.live_match().expect("playing");
+        assert_eq!(live.my_rank.as_deref(), Some("Mythic 93.4%"));
+        assert_eq!(live.rank_now.as_deref(), Some("Mythic 93.4%"));
+
+        // The win lands, then Arena logs the rank it earned.
+        let done = p.feed_line(&room_completed(
+            "m-1",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done.len(), 1);
+        // The recorded match keeps where the player sat down…
+        assert_eq!(done[0].my_rank.as_deref(), Some("Mythic 93.4%"));
+        p.consume_live_dirty();
+        p.feed_line(RANK_MYTHIC_PLACE);
+        // …while the parser follows the ladder, and wakes the HUD so the
+        // lingering result card can finish its rank path.
+        assert_eq!(p.current_rank().as_deref(), Some("Mythic #874"));
+        assert!(p.consume_live_dirty(), "a rank move re-emits the HUD");
+    }
+
+    #[test]
+    fn unchanged_rank_line_does_not_wake_the_hud() {
+        let mut p = LogParser::new();
+        p.feed_line(RANK);
+        p.consume_live_dirty();
+        // Arena repeats the rank payload on every login/queue — noise only.
+        p.feed_line(RANK);
+        assert!(!p.consume_live_dirty());
+        assert_eq!(p.current_rank().as_deref(), Some("Diamond 1"));
     }
 
     fn full_match(parser: &mut LogParser) -> Vec<TrackedMatch> {
@@ -2773,5 +2867,32 @@ mod tests {
                 m.games.iter().map(|g| g.on_play).collect::<Vec<_>>()
             );
         }
+
+        // `my_rank` is frozen at match start, so a ranked result should be
+        // followed by a *different* rank in the log — that delta is what the
+        // post-match card's rank path closes on (`rank_now`). Replay line by
+        // line and report the move each result earned.
+        let mut p2 = LogParser::new();
+        let mut pending: Option<(String, Option<String>)> = None;
+        let mut earned = 0usize;
+        for line in text.split('\n') {
+            for done in p2.feed_line(line) {
+                pending = Some((done.result.clone(), done.my_rank.clone()));
+            }
+            let Some((result, before)) = pending.as_ref() else {
+                continue;
+            };
+            let now = p2.current_rank();
+            if now.is_some() && now != *before {
+                eprintln!(
+                    "{result:<5} | started {:<14} | earned {}",
+                    before.as_deref().unwrap_or("?"),
+                    now.as_deref().unwrap_or("?"),
+                );
+                earned += 1;
+                pending = None;
+            }
+        }
+        eprintln!("== {earned}/{} results closed on a new rank", matches.len());
     }
 }

@@ -80,7 +80,14 @@ export interface LiveMatch {
   opponentName?: string;
   opponentPlatform?: string;
   myPlayerName?: string;
+  /** Rank stamped when this match started — where you sat down. */
   myRank?: string;
+  /**
+   * Freshest rank in the log. After a ranked match this is the one it just
+   * earned (`myRank` is frozen at match start); the ended frame is re-emitted
+   * when Arena logs the update a beat after the result.
+   */
+  rankNow?: string;
   deckName?: string;
   deckId?: string;
   deckHash?: string;

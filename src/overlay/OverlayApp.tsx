@@ -77,7 +77,9 @@ function seasonRecord(
     if (seasonKeyOf(m.endedAt) !== season) return false;
     if (m.result !== "win" && m.result !== "loss") return false;
     if (!key) return false;
-    return deckKey(m) === key || m.deckHash === live.deckHash;
+    // Guard the hash compare: `undefined === undefined` matched every deckless
+    // match into whatever deck was on screen.
+    return deckKey(m) === key || (!!live.deckHash && m.deckHash === live.deckHash);
   });
   const wins = relevant.filter((m) => m.result === "win").length;
   const losses = relevant.filter((m) => m.result === "loss").length;
@@ -486,10 +488,11 @@ export function OverlayApp() {
 
     void (async () => {
       // Plain-browser demo (`/?demo#/overlay`): style the HUD without Arena.
-      if (!isTauri() && new URLSearchParams(window.location.search).has("demo")) {
+      const params = new URLSearchParams(window.location.search);
+      if (!isTauri() && params.has("demo")) {
         const { demoLiveMatch, demoMatches } = await import("./demoLive");
         if (!cancelled) {
-          setLive(demoLiveMatch());
+          setLive(demoLiveMatch({ ended: params.get("phase") === "ended" }));
           setMatches(demoMatches());
         }
         return;
