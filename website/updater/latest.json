@@ -1,11 +1,11 @@
 {
-  "version": "2.5.3",
-  "notes": "v2.5.3: Post-match rank path fixed. It now follows the deck you just played in the current session instead of every match ever recorded, counts ranked games only (drafts and Play no longer pad it), never spans a monthly rank reset, and ends on the rank the match earned rather than the one you sat down with. Climb's matches-to-next-rank estimate stops counting unranked games too.",
-  "pub_date": "2026-07-28T15:18:56Z",
+  "version": "2.5.4",
+  "notes": "v2.5.4: Optional tip jar in Settings -> About. Filthy Net Deck is free and stays free - nothing is gated and there is no nag. Also live on the web: the public meta pages at filthy-net-deck.com/meta-web now carry full decklists, mana curves and card breakdowns for every ranked archetype, with all 32 decks linked and indexable.",
+  "pub_date": "2026-07-30T09:48:20Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjMyMkZQeDRVcWQrRnAyUTZjblhzUzJodXZ2bnZ2WmxEKytXUFYyTkllTjN2cTRycjMxV21iMFlEenhXcElzbFBkbFd6Q3F0TWhnb2J6blhHOUpQMEEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1MjUxOTAyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNS4zX3g2NC1zZXR1cC5leGUKdXJTczBJaDA1Z08xM2xjTG1TWmNueTBER3hKVEk3QmFqQmhZb2kvWDNYT0VZb0hobitVbkMvbVE2Vm5SYVQrOHh3bGlwdzF5ZnlUdXNEMmwvY1B4QWc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJYZDF2N2w5ZHVUUENKQ3BDYlFVd2hKT29FN0RSemRqS1hBZ1VnYXd3MHJqQkxjSVExZ3RjRXdPaVF6Nnd2K3dVZjVKdGJSei9FN1BZaEhNcUQ5M2c0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NDA0ODU1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNS40X3g2NC1zZXR1cC5leGUKTDN2TTFaclpLSHVSemN4VFpYSVVSeDJ2YXdWQWNvT0U0c3lwc3o4UU1iS2Z4Y3VJS2JjRDlkMzBhUDRQU2RyUU4wWEp2UC9MYTd1RWJtdlUrb05TQVE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.4.exe"
     }
   }
 }
