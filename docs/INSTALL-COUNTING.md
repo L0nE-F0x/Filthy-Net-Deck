@@ -2,42 +2,44 @@
 
 **Added:** 2026-07-30 · Phase 0 item 1 of [`PLATFORM-STRATEGY.md`](PLATFORM-STRATEGY.md)
 
-> ## ⚠️ STATUS: NOT LIVE — code written, deploy blocked
+> ## ✅ STATUS: LIVE (2026-07-30, commit `958a0e0`)
 >
-> The function code is committed and tested but **is not wired up**. A first
-> attempt on 2026-07-30 redirected `/version.json` to the function and **took
-> the endpoint down with a 404 for roughly 12 minutes** (commit `5a6ab41`,
-> reverted in `b3dba99`).
+> `/version.json` is served by the counting function on both origins, verified
+> by the `X-FND-Manifest: function` response header. `/updater/latest.json` is
+> still static (no such header) — as intended.
 >
-> **What went wrong:** the redirect deployed but the function did not. This
-> site's base directory is `website`, and there is no `package.json` there — so
-> Netlify had nothing to install `@netlify/blobs` from and never bundled the
-> function. The redirect shipped pointing at a target that did not exist.
+> **Remaining owner step:** set `FND_STATS_TOKEN` and redeploy, or
+> `/api/fnd-stats` stays on 503. See "Reading the numbers".
 >
-> **Why it was not worse:** `/updater/latest.json` is static and was
-> deliberately never touched, so signed auto-updates kept working throughout.
-> `versionCheck.ts` is null-safe, so the app degraded to "couldn't check for
-> updates" rather than erroring.
+> ### Getting here broke production once — read this before touching it again
 >
-> **Process lesson — do not repeat:** deploy the function FIRST and confirm
-> `/api/fnd-stats` returns 503 (not 404). Only add the redirect in a SECOND
-> push, once the target is known to exist. Never ship both together.
+> | # | What was tried | Result |
+> |---|---|---|
+> | 1 | Redirect + function shipped together | **`/version.json` 404 for ~12 min** (`5a6ab41`, reverted `b3dba99`) |
+> | 2 | `website/package.json` added, no redirect | Harmless. Function still absent; sources served as static assets |
+> | 3 | Functions moved to repo root | Deploys **failed** — see below |
+> | 4 | Test file moved out of `functions/` | Deploy green, function live (`e359f7b`) |
+> | 5 | Redirect added, target verified first | **Working** (`958a0e0`) |
 >
-> **Second attempt (same day), also failed — but harmlessly.** Added a minimal
-> `website/package.json` so Netlify could resolve `@netlify/blobs`, deliberately
-> *without* the redirect. `/version.json` and the site stayed 200 throughout.
-> The function still never appeared. Diagnosis: `/netlify/functions/version.mts`
-> was being served as a **static asset** (HTTP 200), proving Netlify was
-> publishing the sources rather than building them.
+> **The actual root cause of #3** was not configuration at all:
+> `netlify/functions/version.test.mts` was treated as a deployable function
+> named `version.test`, and a dot is an illegal Netlify function name. Every
+> deploy failed at the *Deploying* stage for ~15 minutes, including any the
+> daily meta cron would have triggered. **Never put a test file — or anything
+> with a dot in its basename — inside the functions directory.**
 >
-> **Root cause, now understood:** Netlify requires the functions directory to be
-> **outside** the publish directory. With base == publish == `website`, no such
-> location exists. This is not a fixable bug — it is a layout that cannot exist
-> under the current base directory. The functions have been moved back to the
-> repo root and `website/package.json` removed.
+> **Why none of it was worse:** `/updater/latest.json` was deliberately never
+> instrumented, so signed auto-updates worked throughout. `versionCheck.ts` is
+> null-safe, so the app degraded to "couldn't check for updates". And Netlify
+> refuses a whole failed deploy rather than publishing half of it, so the site
+> kept serving a known-good version.
 >
-> **Blocked on one dashboard change only the owner can make** — see "Making this
-> deployable" below. Option B has been ruled out by experiment.
+> **Three rules, each learned the hard way:**
+> 1. Deploy the function first. Confirm `/.netlify/functions/version` returns
+>    200 with `X-FND-Manifest: function`. Add the redirect in a *separate* push.
+> 2. Read the Netlify **deploy log** before theorising. It named the failure in
+>    plain English while three wrong diagnoses were made from response headers.
+> 3. Nothing with a dot in its name goes in `netlify/functions/`.
 
 Answers the question "how many people actually run this?" without adding telemetry, an account, or anything that identifies a user.
 
@@ -47,7 +49,7 @@ Answers the question "how many people actually run this?" without adding telemet
 
 Every running copy already fetches `/version.json` — on launch, on window focus when the local meta copy is >90 min old, hourly on the same staleness check, and when connectivity returns ([`src/App.tsx`](../src/App.tsx) + [`src/services/versionCheck.ts`](../src/services/versionCheck.ts)). The client appends `?t=<now>`, so **every one of those requests bypasses the CDN edge and reaches the origin.**
 
-That traffic was already happening and already being logged; it just wasn't being counted. [`website/netlify/functions/version.mts`](../website/netlify/functions/version.mts) now serves that path and increments aggregate counters on the way through.
+That traffic was already happening and already being logged; it just wasn't being counted. [`netlify/functions/version.mts`](../netlify/functions/version.mts) now serves that path and increments aggregate counters on the way through.
 
 ## What is recorded
 
@@ -107,84 +109,45 @@ Returns `totals` plus a `daily` array. Without the env var the endpoint returns 
 
 `website/version.json` remains the single source of truth, written by the release process. The function imports it directly, so esbuild inlines it at deploy time — no runtime file read, and therefore no dependency on a function's working directory.
 
-## Which netlify.toml is live — read this before editing Netlify config
+## The two netlify.toml files — both are live, for different things
 
-**The repo-root `netlify.toml` is NOT read by Netlify.** The site's base directory is `website`, so the live config is [`website/netlify.toml`](../website/netlify.toml).
+This caused three misdiagnoses. **Neither file is dead.** Verified empirically
+2026-07-30:
 
-Verified 2026-07-30 against live response headers:
+| File | Governs | Why |
+|---|---|---|
+| [`netlify.toml`](../netlify.toml) (repo root) | `publish`, `[functions]` | Read because the Netlify **base directory is the repo root** (blank in the dashboard). Deploy log confirms: `Starting to deploy site from 'website'`. |
+| [`website/netlify.toml`](../website/netlify.toml) | **headers, redirects** | Honoured because it sits *inside* the publish directory. |
 
-| Path | Live header | Root config says | website/ config says |
-|---|---|---|---|
-| `/meta/latest.json` | `max-age=120` + `Access-Control-Allow-Headers` | `max-age=300`, no ACAH | `max-age=120` + ACAH ✅ |
-| `/meta-web/standard.html` | `max-age=0, must-revalidate` | `max-age=300` | *(no rule)* ✅ |
-| `/assets/og-image.png` | `max-age=0, must-revalidate` | `max-age=86400` | *(no rule)* ✅ |
-| `/version.json` | `max-age=60` + ACAH | `max-age=60`, no ACAH | `max-age=60` + ACAH ✅ |
+Evidence for the split: the function deploys (root `[functions]` works), while
+live response headers match the `website/` file — `/meta/latest.json` returns
+`max-age=120` + `Access-Control-Allow-Headers`, which only that file specifies.
 
-Every discriminating header matches `website/netlify.toml`; every rule unique to the root file has never applied.
+**So: functions and build config go in the root file. Redirects and headers go
+in `website/netlify.toml`.** Putting a redirect in the root file will silently
+do nothing.
 
-**This explains `handoff.md` §1.** The `/meta-web/*` `max-age=300` fix "never showed up live" not because of a pinned deploy or auto-publish being off, but because the file it was written into is inert. That open item can be re-scoped.
+**The base directory is correct as-is. Do not change it.** An earlier version of
+this document recommended moving it; that recommendation was wrong and is
+withdrawn.
 
-**Consequence:** the root file's better-documented rules — the meta-web cache fix, og-image caching, the UTF-8 `Content-Type` headers — are all dead. Two ways forward, both owner decisions:
+### Still open: the root file's header rules never apply
 
-1. **Port the wanted rules into `website/netlify.toml`** and delete the root file. No dashboard change, zero risk.
-2. **Change the Netlify base directory to the repo root**, making the root file live and deleting `website/netlify.toml`. Cleaner long-term (that file is the maintained one), but it is a dashboard change affecting the whole deploy and cannot be tested from the repo.
+Because headers come from the `website/` file, these root-file rules have never
+taken effect: `/meta-web/*` `max-age=300`, `/assets/og-image.png`
+`max-age=86400`, and the UTF-8 `Content-Type` rules. **This is the real
+explanation for `handoff.md` §1** — the meta-web cache fix "never showed up
+live" because it was written into the file that does not control headers, not
+because of a pinned deploy or auto-publish being off.
 
-Until that is settled, **all Netlify config goes in `website/netlify.toml`.**
-
-## Making this deployable — owner decision
-
-Netlify Functions need a `package.json` in the base directory to resolve
-`@netlify/blobs`. The base directory is `website`; the `package.json` is at the
-repo root. That mismatch is the whole problem, and there are two ways to close it.
-
-### Option A — move the base directory to the repo root *(cleaner, wider blast radius)*
-
-Netlify → Project configuration → Build & deploy → Build settings → set **Base
-directory** to empty/root, keep **Publish directory** as `website`.
-
-- ✅ `package.json` is where Netlify expects it; functions build normally.
-- ✅ The repo-root `netlify.toml` — the maintained, better-documented file —
-  becomes live, and `website/netlify.toml` can be deleted.
-- ⚠️ **This also activates every currently-dead rule at once**: the `/meta-web/*`
-  `max-age=300` cache fix (handoff.md §1), `/assets/og-image.png` `max-age=86400`,
-  and the UTF-8 `Content-Type` headers. Those are probably all wanted, but they
-  are untested in production and would land in the same deploy.
-- ⚠️ Also check whether the daily-meta / sets-refresh workflows assume the
-  current layout before switching.
-
-### ~~Option B — a minimal `website/package.json`~~ — RULED OUT BY EXPERIMENT
-
-Tried on 2026-07-30 (commit `0c83bd9`, reverted). It fails for a reason no
-dependency file can fix: Netlify requires the functions directory to sit outside
-the publish directory, and with base == publish == `website` there is nowhere to
-put it. The sources were published as static assets instead of being built.
-
-### Is the base-directory change safe? — checked, yes
-
-The one real risk is that activating the root config *drops*
-`Access-Control-Allow-Headers` from `/meta/*` and `/version.json`. Verified
-against the client source that this does not matter:
-
-- `src/services/metaFeed.ts` → `fetch(url, { cache: "no-cache" })` — no custom
-  headers at all.
-- `src/services/versionCheck.ts` → sends only `Accept`, which is a
-  CORS-safelisted request header.
-
-Neither triggers a preflight, so `Access-Control-Allow-Headers` is never
-consulted. The remaining newly-activated rules are all benign caching and
-`Content-Type` settings, and were the owner's intent when written.
-
-**Sequencing — three separate pushes, each independently verified:**
-
-1. Move the base directory. Confirm the site, `/version.json`, and the meta-web
-   cache headers are all correct.
-2. Confirm `/api/fnd-stats` returns **503** (function live) rather than 404.
-3. Only then add the `/version.json` redirect, and confirm the response carries
-   the `X-FND-Manifest: function` header.
+Fix when convenient: port the wanted header rules from the root file into
+`website/netlify.toml`. Low risk, no dashboard change. One thing to check first
+— doing so would *add* `/meta-web/*` caching that has never been active, so
+confirm the daily cron's freshness expectations still hold.
 
 ## Reverting
 
-Delete the `[[redirects]]` block for `/version.json` from [`website/netlify.toml`](../website/netlify.toml) — *not* the root file, which does nothing. The static file is still published, so the endpoint serves normally again on the next deploy. Nothing else needs touching.
+Delete the `[[redirects]]` block for `/version.json` from [`website/netlify.toml`](../website/netlify.toml) — redirects live there, not in the root file. The static file is still published, so the endpoint serves normally again on the next deploy. Nothing else needs touching.
 
 ## Open decision — unique users
 

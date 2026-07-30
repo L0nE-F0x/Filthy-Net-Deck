@@ -2,19 +2,21 @@
 # NOTE: no build command — the daily meta pipeline runs in GitHub Actions
 # (.github/workflows/daily-meta.yml) and commits the JSON. Running it here would
 # let a "no live data" abort fail the whole site deploy (including downloads).
-# ⚠️ THIS FILE IS INERT UNTIL THE NETLIFY BASE DIRECTORY IS SET TO THE REPO ROOT.
+# THE TWO netlify.toml FILES — BOTH ARE LIVE, FOR DIFFERENT THINGS.
+# (Verified empirically 2026-07-30; see docs/INSTALL-COUNTING.md.)
 #
-# As of 2026-07-30 the site's base directory is `website`, so Netlify reads
-# `website/netlify.toml` and ignores this file. Verified against live response
-# headers: /meta/latest.json returns max-age=120 + Access-Control-Allow-Headers
-# (the website/ values), while the /meta-web/* and /assets/og-image.png rules
-# below return max-age=0 — they have never applied. That is also why
-# handoff.md §1's /meta-web/* cache fix "never showed up live".
+#   • THIS file — build config: `publish` and [functions]. Read because the
+#     Netlify base directory is the repo root. Deploy log confirms:
+#     "Starting to deploy site from 'website'".
+#   • website/netlify.toml — HEADERS AND REDIRECTS. Honoured because it sits
+#     inside the publish directory, and it is what live response headers match.
 #
-# This file is the intended long-term config: functions must live OUTSIDE the
-# publish directory, and `package.json` must sit in the base directory — both of
-# which only work with base = repo root. See docs/INSTALL-COUNTING.md
-# "Making this deployable" for the one-time dashboard change that activates it.
+# ⚠️ A redirect or [[headers]] block added HERE will silently do nothing.
+#    Put those in website/netlify.toml.
+#
+# KNOWN GAP: the [[headers]] rules below (/meta-web/*, og-image, UTF-8 HTML)
+# have therefore never applied — which is the real explanation for handoff.md
+# §1. Port them into website/netlify.toml when convenient.
 
 [build]
   publish = "website"
