@@ -1,0 +1,10 @@
+{
+  "//": "Netlify Functions ONLY. This site's base directory is `website`, so Netlify resolves function dependencies from here, not from the repo-root package.json. Keep this file minimal — it exists solely so netlify/functions/*.mts can import @netlify/blobs. The app itself is built from the repo-root package.json and does not use this one. See docs/INSTALL-COUNTING.md.",
+  "name": "filthy-net-deck-site-functions",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.11"
+  }
+}

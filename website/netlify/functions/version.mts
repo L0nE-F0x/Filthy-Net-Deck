@@ -122,6 +122,9 @@ export default async (req: Request, _context: Context): Promise<Response> => {
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      // Lets a deploy be verified unambiguously: if this header is absent,
+      // the static file is serving and counting is NOT active.
+      "X-FND-Manifest": "function",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Accept",
