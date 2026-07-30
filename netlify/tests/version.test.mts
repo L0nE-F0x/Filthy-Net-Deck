@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isAppRequest, platformFrom, safeVersion } from "./version.mts";
+// NOTE: this file lives OUTSIDE netlify/functions on purpose. Netlify treats
+// every file in the functions directory as a deployable function, and a dot in
+// the name is illegal — `version.test.mts` became a function called
+// "version.test" and failed three production deploys on 2026-07-30.
+import { isAppRequest, platformFrom, safeVersion } from "../functions/version.mts";
 
 describe("isAppRequest", () => {
   it("recognises the production Tauri webview origin", () => {

@@ -16,5 +16,5 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true
   },
-  "include": ["functions/**/*.mts"]
+  "include": ["functions/**/*.mts", "tests/**/*.mts"]
 }
