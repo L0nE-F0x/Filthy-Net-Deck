@@ -258,13 +258,23 @@ Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, pr
 ### Phase 1 — Reach
 *~3–4 weeks · no backend*
 
-- Programmatic SEO expansion of `/meta-web/`, properly interlinked, full sitemap, per-page OG
-- Automated daily meta-shift posts to X (marketing-asset scripts already exist in `website/assets/` and `scripts/`)
-- OBS / stream browser-source overlay with watermark
-- Weekly meta email from the same pipeline
+Owner selected **C + B** on 2026-07-30 and cut the rest for now.
+
+- ✅ **C — crawlability** (`776bfa1`). The hub linked only the top 5 Bo1 decks per format, leaving **22 of 32 deck pages unreachable from it**; it now links all 32. Deck pages were dead ends with no outbound deck links; each now links 6 siblings plus its format hub — **192 internal links** across the corpus. Homepage gained a CTA block (previously one nav link). Sitemap gained `lastmod` + tiered priorities, replacing a flat 0.7.
+- ✅ **B — page depth** (`776bfa1`). Deck pages 170 → ~257 lines: mana curve from `cmc` weighted by copies, composition by card type, key-card art strip, colors spelled out, richer descriptions, `BreadcrumbList` JSON-LD. Also fixed `og:image` being pinned at `?v=1.5.1` since v1.5.1 — social caches had held a stale card for eight releases.
+- ⬜ **A — 252 card pages** — not selected. Still the largest corpus expansion available.
+- ❌ **D — monthly archive pages** — cut by owner. Would have needed to live outside `website/meta-web/`, which `build-meta-site.mjs` wipes on every run.
+- ❌ **E / F / G** — per-page OG cards, automated X posts, OBS overlay — all cut for now.
+- ❌ **Weekly meta email** — cut with email capture in Phase 0.
+
+**Two pipeline data quirks discovered and relied upon** (both verified, both documented in `build-meta-site.mjs`):
+1. Lands carry **no `type` field** — all 259 untyped rows in the feed are lands at cmc 0. That is what lets the mana curve exclude them.
+2. `keyCards` (Goldfish meta tile) and the decklist (archetype page) are **different sources** and disagree for 3 of 87 key cards. Those are dropped rather than rendered as empty captions; 3 decks have no `keyCards` at all and omit the section.
+
+**Netlify rewrites the deployed HTML.** Pretty URLs turns `href="deck/x.html"` into `href='/meta-web/deck/x'` — absolute, no extension, single-quoted. Both forms return 200 and every canonical points at the `.html` form, so indexing consolidates correctly. Worth knowing before diffing local output against production and concluding a deploy failed.
 
 **Goal:** acquisition that compounds without daily effort.
-**Gate to Phase 2:** organic search traffic visibly non-zero and installs meaningfully growing. **Do not start Phase 2 before this.**
+**Gate to Phase 2:** organic search traffic visibly non-zero and installs meaningfully growing. **Do not start Phase 2 before this.** As of 2026-07-30 that gate is **not met** — the SEO work is hours old and needs weeks to be crawled. Measuring it requires Google Search Console, which is not yet set up.
 
 ### Phase 2 — Accounts + public profiles
 *~4–6 weeks · first backend*
