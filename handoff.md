@@ -3,12 +3,14 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude ↔ Opus ↔ Grok ↔ Kimi).
 
-**Live product version: v2.5.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.5.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
-**Session wrap (2026-07-28, Opus 5):** release train is **complete** (Windows +
-macOS + updater + site) for **v2.5.3**, an owner-reported overlay bug fix. No
-open engineering work from this session. Resume by picking from **Backlog**
-below; do not invent product work.
+**Session wrap (2026-07-30, Opus 5):** release train **complete** for **v2.5.4**
+(Windows + macOS + updater + site), and the owner verified in-app *Update &
+restart* plus the new tip jar on a real client. This session was mostly
+**business/growth work, not app work** — see `docs/PLATFORM-STRATEGY.md`, which
+is now the live plan alongside this file. No open engineering work. **Next
+checkpoint is a measurement, not a build:** see "Waiting on data" below.
 
 ---
 
@@ -16,60 +18,86 @@ below; do not invent product work.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.5.3** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
+| App version | **v2.5.4** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
 | Branch | `main` synced with `origin/main` |
-| Key commits | `a8c20f1` rank-path fix · `d3c8250` release · `c57d06f` macOS dmg roll |
-| Tag | `v2.5.3` (macOS CI green, 13m48s) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.3.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.3-universal.dmg` |
-| Updater | `website/updater/latest.json` → 2.5.3 (key **67FCA9900F523D49**, sig cross-checked live) |
-| Soft channel | `website/version.json` + `public/version.json` → 2.5.3 |
-| Site | Download buttons + OG `?v=2.5.3` |
-| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.3 |
-| Gates last green | **355** vitest · **35** cargo (2 ignored) · lint/tsc/clippy clean |
-| `WHATS_NEW` | 3 lines (rank-path fix — post-update banner fires) |
+| Key commits | `22d681f` Ko-fi tip jar · `776bfa1` meta-web SEO · `5b36e94` release · `6053b52` macOS roll |
+| Tag | `v2.5.4` (macOS CI green) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.4.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.4-universal.dmg` |
+| Updater | `website/updater/latest.json` → 2.5.4 (key **67FCA9900F523D49**, key id cross-checked pre-publish, live sig byte-matched to build) |
+| Soft channel | `website/version.json` + `public/version.json` → 2.5.4 |
+| Site | Download buttons + OG `?v=2.5.4`, og-image regenerated |
+| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.4 |
+| Owner-verified | in-app **Update & restart** worked; tip jar link works |
+| Gates last green | **365** vitest · lint/tsc clean · `typecheck:functions` (new) |
+| `WHATS_NEW` | 2 lines (tip jar + public meta pages) |
 
-Tree keeps **current + previous** installers only (2.5.2 exe + 2.5.3). Older
-binaries on GitHub Releases.
+Tree keeps current + previous Windows installers (2.5.2, 2.5.3, 2.5.4 exe) and
+**only** the current dmg. ⚠️ `Setup-2.5.2.exe` is **not** mirrored on GitHub
+Releases (v2.5.2 carries only the dmg) — mirror before pruning it. dmgs *are*
+mirrored, which is why the 2.5.3 one was safe to remove.
 
 ---
 
-## What this session shipped (v2.5.3 — overlay rank path)
+## What this session shipped (2026-07-30)
 
-Owner report: fresh deck, deck history deleted, yet the post-match card drew a
-long climb line.
+Mostly growth/ops rather than app code. The app diff is three files.
 
-1. **`src/services/rankPath.ts`** (new, 12 tests) — the sparkline called
-   `buildRankSeries(matches)` on *every* match ever recorded. Now scoped three
-   ways: **this deck** (everything else on the card already was), **one
-   season** (never span a monthly reset), **ladder queues only** (`myRank` is
-   the constructed rank and gets stamped on drafts/Play too, which padded the
-   line with points that never moved the ladder). Session-first with a season
-   fallback; the caption names the window it used.
-2. **`rank_now` on `LiveMatch`** (`src-tauri/src/tracker.rs`) — `my_rank` is
-   frozen at match start, so the path could not show the game you just played.
-   `record_matches` seeds `rank_now` from the parser's freshest rank and
-   `refresh_ended_rank` patches the lingering ended frame when Arena logs the
-   update (~50 log lines after the result). One game + a real move is now a
-   two-point line. **Verified against a live `Player.log`**: 12/13 results
-   close on a new rank (13th is a draw) — e.g. a win at Mythic 92.1% earning
-   92.6%. Harness: `FND_REPLAY_LOG=<path> cargo test replay_real_log --
-   --nocapture --ignored`.
-3. **Three related bugs** — `PostMatchSummary` counted every match as the
-   current deck when the live match had no deck identity; `seasonRecord`
-   matched any deckless match via `undefined === undefined`;
-   `estimateMatchesPerStep` counted drafts/Play between rank samples,
-   overstating Climb's "matches to next rank".
-4. **Demo knobs** — `/?demo&phase=ended#/overlay` renders the post-match card,
-   `&fresh` cuts history to one game (day-one empty state).
-5. **Full release train** — signed Windows (key id verified against the
-   `tauri.conf.json` pubkey *before* publish, password file
-   `%USERPROFILE%\.tauri\filthy-net-deck-key-password.txt` next to the key),
-   updater + soft channels, OG regen, push `main`, tag `v2.5.3`, then roll
-   macOS dmg from tag CI into downloads + fix site links.
+1. **`docs/PLATFORM-STRATEGY.md`** (new) — the business plan around the app:
+   honest audience read, straight answers on backend/monetization/social, a
+   gated five-phase sequence, cut list, risk table. **Read it before proposing
+   product work.** Phase 0 done, Phase 1 partially done, Phase 2 gated.
+2. **Install counting — attempted, withdrawn.** Full post-mortem in
+   `docs/INSTALL-COUNTING.md`. `/version.json` turned out to be a *fallback*
+   endpoint: `useAppStore::checkForUpdates` tries the signed Tauri updater
+   first and returns early, so real installs never request it. **The per-launch
+   signal is `/updater/latest.json`** — read it in Netlify **Observability**
+   (URL filter), not Web Analytics, which has no path breakdown for JSON.
+   Measured baseline: ~325 updater checks/7d, ~15–25 daily actives, ~5 new
+   installs/day. Function code is retained but routed to nothing.
+3. **Ko-fi tip jar** — site + Settings → About, one `DONATE_URL` constant in
+   `src/services/site.ts` (empty string hides it everywhere). Ko-fi rather than
+   PayPal.Me, which Indonesian personal accounts cannot create.
+4. **meta-web SEO (`776bfa1`)** — hub linked only 5 of 32 decks; now links all
+   32, deck pages gained 6 sibling links each (192 corpus-wide), plus mana
+   curve, composition, key-card art, JSON-LD, `lastmod` sitemap. Google Search
+   Console verified, sitemap submitted, three pages queued for indexing.
+5. **v2.5.4 release** — the tip jar, shipped through the full AGENTS checklist.
 
-Audit context: `docs/AUDIT-2026-07-22-v2.5.0.md` (P1/P2 hygiene items closed
-in v2.5.2; major deps + owner P3 still open there).
+### Hard-won facts (do not re-derive)
+
+- **Both `netlify.toml` files are live, for different things.** Repo-root =
+  `publish` + `[functions]`. `website/netlify.toml` = **headers and redirects**
+  (it sits inside the publish dir). A redirect added to the root file silently
+  does nothing.
+- **Netlify Pretty URLs rewrites deployed HTML** (`href="x.html"` →
+  `href='/meta-web/x'`). Live HTML never byte-matches git. Verify deploys with a
+  response header or generated marker, never a byte-diff.
+- **Nothing with a dot in its basename may live in `netlify/functions/`** — a
+  test file there became a function named `version.test` and failed every
+  production deploy for ~15 minutes.
+- **Read the Netlify deploy log before theorising.** Three wrong diagnoses this
+  session came from inferring via response headers while the log said it plainly.
+
+## Waiting on data — the next checkpoint is a measurement, not a build
+
+Owner is away ~2 days; the real check is **~2 weeks out (from 2026-07-30)**.
+
+**Google Search Console → Indexing → Pages.** The meta-web corpus (35 URLs) was
+made crawlable for the first time on 2026-07-30; sitemap submitted, hub + both
+format pages queued for indexing.
+
+- **Climbing toward 35** → the crawlability work landed. Option **A** (252 card
+  pages, one per unique card, ~1 day, pure Node in `build-meta-site.mjs`) becomes
+  clearly worth building, and Phase 2's gate comes into view.
+- **Stuck in single digits** → do **not** add more pages. Diagnose discovery first.
+
+Also worth a glance: Netlify **Observability** filtered to `/updater/latest.json`
+(install trend), and the Ko-fi page (willingness-to-pay signal long before it is
+income).
+
+**Phase 2 (accounts, Discord OAuth, public profiles, then cloud sync) is gated on
+this and should not be started early** — see `docs/PLATFORM-STRATEGY.md` §3.
 
 ---
 
@@ -117,14 +145,16 @@ may proceed on judgment. Ask before product decisions.
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| Optional smoke | In-app **Update & restart** from an older build | Confirms signed path; not a code task |
+| ~~Optional smoke~~ | ~~In-app Update & restart~~ | ✅ Owner verified on v2.5.4, 2026-07-30 |
 | P2 eng | Major dep bumps **one branch at a time** | typescript 7, vite 8, vitest 4, plugin-react 6 — never batch |
 | P2 product-aware | Secondary-monitor toast/presence | Owner-aware; follow Arena’s display — real work |
-| P3 owner-only | Donations link · v3.0 accounts/sync · Scryfall attribution re-add · `.git` history purge | Ask first; attribution was a deliberate v2.2.1 trade |
+| P1 gated | Phase 1 **A** — 252 card pages | Only after Search Console shows indexing. `docs/PLATFORM-STRATEGY.md` §3 |
+| P2 hygiene | Mirror `Setup-2.5.2.exe` to GitHub Releases, then prune | It is the one binary **not** mirrored |
+| P3 owner-only | v3.0 accounts/sync (Phase 2, gated) · Scryfall attribution re-add · `.git` history purge | Ask first; attribution was a deliberate v2.2.1 trade |
 
 **Good first resume prompts (owner should choose):**
 
-1. “Check Netlify meta-web drift” (owner has dashboard).
+1. “Check Search Console indexing and decide on card pages” (the real next step).
 2. “Bump one dep on a branch” (e.g. vitest 4 alone).
 3. “Start secondary-monitor presence/toast” (product-ish — confirm first).
 4. Marketing WIP finish (owner assets only).
@@ -135,11 +165,11 @@ may proceed on judgment. Ask before product decisions.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.3.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.3-universal.dmg` |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.4.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.5.4-universal.dmg` |
 | Updater | `website/updater/latest.json` |
 | Soft | `website/version.json` + `public/version.json` |
-| Tag | `v2.5.3` |
+| Tag | `v2.5.4` |
 
 **Sign only** with key id **67FCA9900F523D49**
 (`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).
