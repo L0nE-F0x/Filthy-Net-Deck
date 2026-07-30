@@ -7,19 +7,12 @@
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
 
-# Install counting — docs/INSTALL-COUNTING.md. The function serves the release
-# manifest and records aggregate per-day counters: no IP, no identifiers.
-[functions]
-  directory = "netlify/functions"
-
-# Forced, because the static version.json sits at this same path and would
-# otherwise win. TO REVERT INSTALL COUNTING: delete this one block — the static
-# file is still published and serves the endpoint again on the next deploy.
-[[redirects]]
-  from = "/version.json"
-  to = "/.netlify/functions/version"
-  status = 200
-  force = true
+# NOTE: install counting (docs/INSTALL-COUNTING.md) is NOT wired up here.
+# A first attempt redirected /version.json to a Netlify Function and took the
+# endpoint down with a 404: the redirect deployed but the function did not,
+# because this site's base directory is `website` and there is no package.json
+# there for Netlify to install @netlify/blobs from. Do not re-add the redirect
+# until the function is confirmed deployed at /.netlify/functions/version.
 
 # Force UTF-8 so em dashes / curly quotes never mojibake in browsers
 [[headers]]
