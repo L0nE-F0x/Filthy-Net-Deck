@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src pipeline --max-warnings 0",
-    "typecheck:functions": "tsc -p website/netlify/tsconfig.json",
+    "typecheck:functions": "tsc -p netlify/tsconfig.json",
     "meta:site": "node pipeline/build-meta-site.mjs"
   },
   "dependencies": {

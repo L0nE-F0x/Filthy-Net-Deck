@@ -34,7 +34,7 @@ import { getStore } from "@netlify/blobs";
 // process writes, so there is still exactly one source of truth. Imported
 // rather than read from disk because a function's working directory is not
 // guaranteed, and a bad path here would break the update check.
-import manifest from "../../version.json";
+import manifest from "../../website/version.json";
 
 /** Failing "up to date" is safer than a false update prompt. */
 const SAFE_FALLBACK = JSON.stringify({ version: "0.0.0", notes: "" });

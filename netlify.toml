@@ -2,23 +2,33 @@
 # NOTE: no build command — the daily meta pipeline runs in GitHub Actions
 # (.github/workflows/daily-meta.yml) and commits the JSON. Running it here would
 # let a "no live data" abort fail the whole site deploy (including downloads).
-# ⚠️ THIS FILE IS NOT READ BY NETLIFY. ⚠️
+# ⚠️ THIS FILE IS INERT UNTIL THE NETLIFY BASE DIRECTORY IS SET TO THE REPO ROOT.
 #
-# The site's base directory is `website`, so Netlify reads `website/netlify.toml`
-# instead. Verified 2026-07-30 against live response headers: /meta/latest.json
-# returns max-age=120 + Access-Control-Allow-Headers (the website/ values), while
-# the /meta-web/* max-age=300 and /assets/og-image.png max-age=86400 rules below
-# return max-age=0 — i.e. they have never applied.
+# As of 2026-07-30 the site's base directory is `website`, so Netlify reads
+# `website/netlify.toml` and ignores this file. Verified against live response
+# headers: /meta/latest.json returns max-age=120 + Access-Control-Allow-Headers
+# (the website/ values), while the /meta-web/* and /assets/og-image.png rules
+# below return max-age=0 — they have never applied. That is also why
+# handoff.md §1's /meta-web/* cache fix "never showed up live".
 #
-# This also explains handoff.md §1: the /meta-web/* cache fix "never showed up
-# live" because this file is inert, not because of a pinned deploy.
-#
-# Do NOT add config here — put it in website/netlify.toml. This file is kept
-# only until the base-directory question is settled (see docs/INSTALL-COUNTING.md
-# "Which netlify.toml is live").
+# This file is the intended long-term config: functions must live OUTSIDE the
+# publish directory, and `package.json` must sit in the base directory — both of
+# which only work with base = repo root. See docs/INSTALL-COUNTING.md
+# "Making this deployable" for the one-time dashboard change that activates it.
 
 [build]
   publish = "website"
+
+# Install counting — docs/INSTALL-COUNTING.md. Inert until the base directory
+# moves to the repo root, at which point Netlify bundles these using the
+# repo-root package.json. `netlify/functions` is outside `website`, so the
+# sources are never published as static assets.
+[functions]
+  directory = "netlify/functions"
+
+# NOTE: the /version.json → function redirect is deliberately NOT here yet.
+# Shipping it before the function was confirmed live 404'd the endpoint on
+# 2026-07-30. Add it only after /api/fnd-stats returns 503 rather than 404.
 
 # Force UTF-8 so em dashes / curly quotes never mojibake
 [[headers]]

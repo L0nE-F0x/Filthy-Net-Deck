@@ -7,12 +7,17 @@
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
 
-# NOTE: install counting (docs/INSTALL-COUNTING.md) is NOT wired up here.
-# A first attempt redirected /version.json to a Netlify Function and took the
-# endpoint down with a 404: the redirect deployed but the function did not,
-# because this site's base directory is `website` and there is no package.json
-# there for Netlify to install @netlify/blobs from. Do not re-add the redirect
-# until the function is confirmed deployed at /.netlify/functions/version.
+# NOTE: install counting (docs/INSTALL-COUNTING.md) cannot be wired up in this
+# file. Netlify requires the functions directory to sit OUTSIDE the publish
+# directory, and here base == publish == `website`, so no such location exists.
+# Two attempts on 2026-07-30 confirmed it: the first 404'd /version.json (the
+# redirect deployed, the function did not), and the second published the
+# function sources as static assets at /netlify/functions/*.mts instead of
+# building them.
+#
+# The functions now live at the repo root and are configured in the repo-root
+# netlify.toml, which activates once the base directory is moved to the root.
+# At that point THIS file becomes the inert one and should be deleted.
 
 # Force UTF-8 so em dashes / curly quotes never mojibake in browsers
 [[headers]]

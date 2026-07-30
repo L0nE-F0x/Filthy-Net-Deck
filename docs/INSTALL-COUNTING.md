@@ -23,7 +23,21 @@
 > `/api/fnd-stats` returns 503 (not 404). Only add the redirect in a SECOND
 > push, once the target is known to exist. Never ship both together.
 >
-> **Blocked on an owner decision** — see "Making this deployable" below.
+> **Second attempt (same day), also failed — but harmlessly.** Added a minimal
+> `website/package.json` so Netlify could resolve `@netlify/blobs`, deliberately
+> *without* the redirect. `/version.json` and the site stayed 200 throughout.
+> The function still never appeared. Diagnosis: `/netlify/functions/version.mts`
+> was being served as a **static asset** (HTTP 200), proving Netlify was
+> publishing the sources rather than building them.
+>
+> **Root cause, now understood:** Netlify requires the functions directory to be
+> **outside** the publish directory. With base == publish == `website`, no such
+> location exists. This is not a fixable bug — it is a layout that cannot exist
+> under the current base directory. The functions have been moved back to the
+> repo root and `website/package.json` removed.
+>
+> **Blocked on one dashboard change only the owner can make** — see "Making this
+> deployable" below. Option B has been ruled out by experiment.
 
 Answers the question "how many people actually run this?" without adding telemetry, an account, or anything that identifies a user.
 
@@ -138,18 +152,35 @@ directory** to empty/root, keep **Publish directory** as `website`.
 - ⚠️ Also check whether the daily-meta / sets-refresh workflows assume the
   current layout before switching.
 
-### Option B — add a minimal `website/package.json` *(uglier, smaller blast radius)*
+### ~~Option B — a minimal `website/package.json`~~ — RULED OUT BY EXPERIMENT
 
-A file containing only `@netlify/blobs` and `@netlify/functions`.
+Tried on 2026-07-30 (commit `0c83bd9`, reverted). It fails for a reason no
+dependency file can fix: Netlify requires the functions directory to sit outside
+the publish directory, and with base == publish == `website` there is nowhere to
+put it. The sources were published as static assets instead of being built.
 
-- ✅ Nothing else changes; one new file, easy to reason about.
-- ⚠️ Two dependency manifests to keep in sync, and the root `netlify.toml` stays
-  dead — so handoff.md §1 stays open.
+### Is the base-directory change safe? — checked, yes
 
-**Recommendation:** Option A is the right end state, but do it as its own change
-with its own verification, *not* bundled with install counting. Ship the base
-directory move, confirm the site and the meta-web cache headers are correct,
-then wire the function, then add the redirect. Three pushes, each verifiable.
+The one real risk is that activating the root config *drops*
+`Access-Control-Allow-Headers` from `/meta/*` and `/version.json`. Verified
+against the client source that this does not matter:
+
+- `src/services/metaFeed.ts` → `fetch(url, { cache: "no-cache" })` — no custom
+  headers at all.
+- `src/services/versionCheck.ts` → sends only `Accept`, which is a
+  CORS-safelisted request header.
+
+Neither triggers a preflight, so `Access-Control-Allow-Headers` is never
+consulted. The remaining newly-activated rules are all benign caching and
+`Content-Type` settings, and were the owner's intent when written.
+
+**Sequencing — three separate pushes, each independently verified:**
+
+1. Move the base directory. Confirm the site, `/version.json`, and the meta-web
+   cache headers are all correct.
+2. Confirm `/api/fnd-stats` returns **503** (function live) rather than 404.
+3. Only then add the `/version.json` redirect, and confirm the response carries
+   the `X-FND-Manifest: function` header.
 
 ## Reverting
 
