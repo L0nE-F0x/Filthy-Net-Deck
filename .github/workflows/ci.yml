@@ -51,6 +51,12 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # Netlify Functions are outside the app tsconfig (Node, not DOM) and are
+      # not bundled by `npm run build`, so without this they would only fail on
+      # deploy — in the path that serves /version.json.
+      - name: Typecheck Netlify functions
+        run: npm run typecheck:functions
+
       - name: Lint (zero warnings)
         run: npm run lint
 

@@ -1,7 +1,25 @@
+# THIS is the config Netlify actually reads — the site's base directory is
+# `website`. The repo-root netlify.toml is inert; see the warning at the top of
+# it. Put all Netlify config here.
+
 [build]
   publish = "."
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
+
+# Install counting — docs/INSTALL-COUNTING.md. The function serves the release
+# manifest and records aggregate per-day counters: no IP, no identifiers.
+[functions]
+  directory = "netlify/functions"
+
+# Forced, because the static version.json sits at this same path and would
+# otherwise win. TO REVERT INSTALL COUNTING: delete this one block — the static
+# file is still published and serves the endpoint again on the next deploy.
+[[redirects]]
+  from = "/version.json"
+  to = "/.netlify/functions/version"
+  status = 200
+  force = true
 
 # Force UTF-8 so em dashes / curly quotes never mojibake in browsers
 [[headers]]

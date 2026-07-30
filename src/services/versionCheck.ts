@@ -24,7 +24,10 @@ export function versionJsonUrl(baseUrl = DEFAULT_BASE): string {
 async function fetchVersionFromBase(
   baseUrl: string,
 ): Promise<RemoteVersion | null> {
-  const url = `${versionJsonUrl(baseUrl)}?t=${Date.now()}`;
+  // `v` lets the CDN count which builds are still in the wild (see
+  // docs/INSTALL-COUNTING.md). It is the version already implicit in an update
+  // check — no new information about the user leaves the machine.
+  const url = `${versionJsonUrl(baseUrl)}?t=${Date.now()}&v=${encodeURIComponent(APP_VERSION)}`;
   try {
     const res = await fetch(url, {
       cache: "no-store",

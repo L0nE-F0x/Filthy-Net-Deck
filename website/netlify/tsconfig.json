@@ -1,0 +1,20 @@
+{
+  "//": "Netlify Functions run on Node, not in the browser, so they can't share the app's DOM-flavoured tsconfig (which scopes to src/ only). Kept separate and wired into `npm run typecheck:functions` + CI so this code is gated like everything else.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true
+  },
+  "include": ["functions/**/*.mts"]
+}

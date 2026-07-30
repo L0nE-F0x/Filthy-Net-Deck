@@ -2,6 +2,21 @@
 # NOTE: no build command — the daily meta pipeline runs in GitHub Actions
 # (.github/workflows/daily-meta.yml) and commits the JSON. Running it here would
 # let a "no live data" abort fail the whole site deploy (including downloads).
+# ⚠️ THIS FILE IS NOT READ BY NETLIFY. ⚠️
+#
+# The site's base directory is `website`, so Netlify reads `website/netlify.toml`
+# instead. Verified 2026-07-30 against live response headers: /meta/latest.json
+# returns max-age=120 + Access-Control-Allow-Headers (the website/ values), while
+# the /meta-web/* max-age=300 and /assets/og-image.png max-age=86400 rules below
+# return max-age=0 — i.e. they have never applied.
+#
+# This also explains handoff.md §1: the /meta-web/* cache fix "never showed up
+# live" because this file is inert, not because of a pinned deploy.
+#
+# Do NOT add config here — put it in website/netlify.toml. This file is kept
+# only until the base-directory question is settled (see docs/INSTALL-COUNTING.md
+# "Which netlify.toml is live").
+
 [build]
   publish = "website"
 
