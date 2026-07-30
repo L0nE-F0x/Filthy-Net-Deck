@@ -59,6 +59,149 @@ function colorsText(colors) {
   return colors.join("");
 }
 
+const COLOR_NAMES = { W: "White", U: "Blue", B: "Black", R: "Red", G: "Green" };
+
+/** "Blue / Red" — spelled out, because that is how people search. */
+function colorsLong(colors) {
+  if (!Array.isArray(colors) || !colors.length) return "Colorless";
+  return colors.map((c) => COLOR_NAMES[c] || c).join(" / ");
+}
+
+/**
+ * The pipeline omits `type` for lands (verified 2026-07-30: all 259 untyped
+ * rows across the feed are lands, every one at cmc 0). So a missing type means
+ * land, and that is the only safe way to split them out.
+ */
+function isLand(card) {
+  return card?.type == null;
+}
+
+/** Copies, not distinct rows — a playset of 4 should count as 4. */
+function copies(cards, pred) {
+  return (cards || []).reduce((n, c) => (pred(c) ? n + (c.count || 0) : n), 0);
+}
+
+function manaCurve(mainboard) {
+  const spells = (mainboard || []).filter((c) => !isLand(c));
+  if (!spells.length) return "";
+  const buckets = [
+    { label: "1", test: (c) => c.cmc <= 1 },
+    { label: "2", test: (c) => c.cmc === 2 },
+    { label: "3", test: (c) => c.cmc === 3 },
+    { label: "4", test: (c) => c.cmc === 4 },
+    { label: "5", test: (c) => c.cmc === 5 },
+    { label: "6+", test: (c) => c.cmc >= 6 },
+  ].map((b) => ({ ...b, n: copies(spells, b.test) }));
+
+  const max = Math.max(...buckets.map((b) => b.n), 1);
+  const totalSpells = copies(spells, () => true);
+  const avg = totalSpells
+    ? (spells.reduce((s, c) => s + (c.cmc || 0) * (c.count || 0), 0) / totalSpells).toFixed(2)
+    : "0";
+
+  const bars = buckets
+    .map(
+      (b) => `
+        <div class="curve-col">
+          <span class="curve-n">${b.n || ""}</span>
+          <span class="curve-bar" style="height:${Math.round((b.n / max) * 72)}px"></span>
+          <span class="curve-x">${esc(b.label)}</span>
+        </div>`,
+    )
+    .join("");
+
+  return `
+    <section class="curve-block">
+      <h2>Mana curve</h2>
+      <div class="curve">${bars}</div>
+      <p class="hint">${esc(totalSpells)} spells · average mana value <strong>${esc(avg)}</strong> (lands excluded)</p>
+    </section>`;
+}
+
+function composition(mainboard) {
+  const rows = [
+    ["Creatures", copies(mainboard, (c) => c.type === "creature")],
+    ["Instants", copies(mainboard, (c) => c.type === "instant")],
+    ["Sorceries", copies(mainboard, (c) => c.type === "sorcery")],
+    ["Artifacts", copies(mainboard, (c) => c.type === "artifact")],
+    ["Enchantments", copies(mainboard, (c) => c.type === "enchantment")],
+    ["Planeswalkers", copies(mainboard, (c) => c.type === "planeswalker")],
+    ["Lands", copies(mainboard, isLand)],
+  ].filter(([, n]) => n > 0);
+  if (!rows.length) return "";
+  return `
+    <section class="comp-block">
+      <h2>Composition</h2>
+      <ul class="comp">
+        ${rows.map(([k, n]) => `<li><span class="comp-n">${n}</span><span class="comp-k">${esc(k)}</span></li>`).join("")}
+      </ul>
+    </section>`;
+}
+
+/**
+ * The key cards with art — gives the page a visual identity above the fold.
+ *
+ * `keyCards` comes from the MTGGoldfish meta tile while the list comes from the
+ * archetype page, so the two occasionally disagree: 3 of 87 key cards across
+ * the current feed appear in neither the mainboard nor the sideboard. Those are
+ * dropped rather than rendered as a bare caption with no art and no count — the
+ * grid auto-fits, so 1, 2 or 3 all lay out correctly.
+ */
+function keyCardStrip(deck) {
+  const byName = new Map(
+    [...(deck.mainboard || []), ...(deck.sideboard || [])].map((c) => [c.name, c]),
+  );
+  const found = (deck.keyCards || [])
+    .slice(0, 3)
+    .map((n) => byName.get(n))
+    .filter((c) => c && scryfallImg(c));
+  if (!found.length) return "";
+
+  const items = found
+    .map(
+      (c) => `<figure class="key-card">
+        <img src="${esc(scryfallImg(c))}" alt="${esc(c.name)}" loading="lazy" width="200" height="146" />
+        <figcaption>${esc(c.name)}${c.count ? ` <span class="qty">${esc(c.count)}×</span>` : ""}</figcaption>
+      </figure>`,
+    )
+    .join("");
+  return `
+    <section class="key-strip">
+      <h2>Key cards</h2>
+      <div class="key-row">${items}</div>
+    </section>`;
+}
+
+/**
+ * Internal links to sibling decks. Deck pages were previously dead ends —
+ * nothing linked out to another deck, which is bad for crawling and worse for
+ * a reader who wants to compare.
+ */
+function relatedDecks(bundle, deck) {
+  const siblings = Object.values(bundle.decks || {})
+    .filter((d) => d.format === deck.format && d.mode === deck.mode && d.id !== deck.id)
+    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
+    .slice(0, 6);
+  if (!siblings.length) return "";
+  const fmtName = deck.format === "pioneer" ? "Pioneer" : "Standard";
+  return `
+    <section class="related">
+      <h2>Other ${esc(fmtName)} ${esc(modeLabel(deck.mode))} decks</h2>
+      <ul class="related-list">
+        ${siblings
+          .map(
+            (d) => `<li><a href="${esc(d.id)}.html">
+              <span class="r-rank">#${esc(d.rank)}</span>
+              <span class="r-name">${esc(d.name)}</span>
+              <span class="r-pct">${d.metaShare != null ? esc(Number(d.metaShare).toFixed(1)) + "%" : ""}</span>
+            </a></li>`,
+          )
+          .join("")}
+      </ul>
+      <p class="hint"><a href="${esc(deck.format)}.html">Full ${esc(fmtName)} metagame →</a></p>
+    </section>`;
+}
+
 function scryfallImg(card) {
   const id = card?.scryfallId;
   if (!id) return null;
@@ -66,8 +209,14 @@ function scryfallImg(card) {
   return `https://cards.scryfall.io/art_crop/front/${id[0]}/${id[1]}/${id}.jpg`;
 }
 
-function layout({ title, description, canonicalPath, body, active }) {
+function layout({ title, description, canonicalPath, body, active, jsonLd }) {
   const canon = `${SITE}${canonicalPath}`;
+  // Was pinned at ?v=1.5.1 and never updated, so social caches kept a stale card.
+  const ogv = resolveDownloads().ver;
+  const ld = jsonLd
+    ? `
+  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,13 +229,13 @@ function layout({ title, description, canonicalPath, body, active }) {
   <meta property="og:url" content="${esc(canon)}" />
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(description)}" />
-  <meta property="og:image" content="${SITE}/assets/og-image.png?v=1.5.1" />
+  <meta property="og:image" content="${SITE}/assets/og-image.png?v=${ogv}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
-  <meta name="twitter:image" content="${SITE}/assets/og-image.png?v=1.5.1" />
+  <meta name="twitter:image" content="${SITE}/assets/og-image.png?v=${ogv}" />
   <link rel="icon" href="../assets/app-icon.png" />
-  <link rel="stylesheet" href="site.css" />
+  <link rel="stylesheet" href="site.css" />${ld}
 </head>
 <body>
   <header class="top">
@@ -217,7 +366,27 @@ function buildHub(bundle) {
   const sections = (bundle.formats || [])
     .map((fmt) => {
       const bo1 = (fmt.bo1DeckIds || []).map((id) => bundle.decks[id]).filter(Boolean);
+      const bo3 = (fmt.bo3DeckIds || []).map((id) => bundle.decks[id]).filter(Boolean);
       const top = bo1.slice(0, 5);
+
+      // Every deck gets a link from the hub. Previously only the top 5 Bo1 were
+      // linked, leaving 22 of 32 deck pages reachable only via a format page.
+      const rest = [...bo1.slice(5), ...bo3];
+      const restLinks = rest.length
+        ? `
+        <div class="all-decks">
+          <h3>All ${esc(fmt.name)} decks</h3>
+          <ul class="deck-links">
+            ${rest
+              .map(
+                (d) =>
+                  `<li><a href="deck/${esc(d.id)}.html">${esc(d.name)} <span class="dim">${esc(modeLabel(d.mode))} · #${esc(d.rank)}</span></a></li>`,
+              )
+              .join("")}
+          </ul>
+        </div>`
+        : "";
+
       return `
       <section class="format-block">
         <div class="format-head">
@@ -227,6 +396,7 @@ function buildHub(bundle) {
         <div class="deck-grid">
           ${top.map(deckCard).join("\n")}
         </div>
+        ${restLinks}
       </section>`;
     })
     .join("\n");
@@ -334,25 +504,53 @@ function buildDeck(bundle, history, deck) {
         <span class="pill soft">${esc(modeLabel(deck.mode))}</span>
       </p>
       <p class="lede">${esc(deck.description || deck.listNote || "")}</p>
+      <p class="hint">
+        ${esc(colorsLong(deck.colors))} · ${esc(fmtName)} ${esc(modeLabel(deck.mode))} ·
+        ranked #${esc(deck.rank)} of the ${esc(fmtName)} ladder on ${esc(date)}
+      </p>
     </section>
     ${downloadBanner(date, 1)}
+    ${keyCardStrip(deck)}
     ${historySpark(history.points, deck.archetype || deck.name, deck.format, deck.mode)}
+    <div class="stat-row">
+      ${manaCurve(deck.mainboard)}
+      ${composition(deck.mainboard)}
+    </div>
     <div class="lists">
       ${listCards(deck.mainboard, "Mainboard")}
       ${listCards(deck.sideboard, "Sideboard")}
     </div>
     ${arena}
+    ${relatedDecks(bundle, deck)}
     ${sources ? `<section class="sources"><h2>Sources</h2><ul>${sources}</ul><p class="hint">listQuality: ${esc(deck.listQuality || "unknown")}</p></section>` : ""}
   `;
 
   // Fix relative nav for deck/* pages: CSS and assets need ../
   // layout() uses site.css and ../assets - deck pages need an extra ../
+  // Breadcrumbs help search engines render the hierarchy rather than a bare
+  // URL, and reinforce the hub → format → deck structure the links now mirror.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Meta", item: `${SITE}/meta-web/` },
+      { "@type": "ListItem", position: 2, name: fmtName, item: `${SITE}/meta-web/${deck.format}.html` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${deck.name} (${modeLabel(deck.mode)})`,
+        item: `${SITE}/meta-web/deck/${deck.id}.html`,
+      },
+    ],
+  };
+
   let html = layout({
-    title: `${deck.name} ${fmtName} ${modeLabel(deck.mode)} (${date}) - Filthy Net Deck`,
-    description: `${deck.name} ${fmtName} ${modeLabel(deck.mode)} list for ${date}. ${share} of the metagame. Scryfall-verified. Free Arena companion.`,
+    title: `${deck.name} ${fmtName} ${modeLabel(deck.mode)} Decklist (${date}) - Filthy Net Deck`,
+    description: `${deck.name} ${fmtName} ${modeLabel(deck.mode)} decklist for ${date} — ${colorsLong(deck.colors)}, ${share} of the metagame, ranked #${deck.rank}. Full mainboard, sideboard, mana curve and Arena import. Scryfall-verified.`,
     canonicalPath: `/meta-web/deck/${deck.id}.html`,
     body,
     active: deck.format,
+    jsonLd,
   });
 
   // Rewrite relative roots for nested deck pages
@@ -575,22 +773,111 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
   .top { flex-direction: column; align-items: flex-start; }
   .download-banner { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---- Deck page depth (mana curve, composition, key cards, related) ---- */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.curve-block, .comp-block, .key-strip, .related {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+.curve-block h2, .comp-block h2, .key-strip h2, .related h2 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+.curve {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 96px;
+}
+.curve-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
+.curve-n { font-size: 0.72rem; color: var(--muted, #9aa38a); min-height: 1em; }
+.curve-bar {
+  width: 100%;
+  min-height: 3px;
+  background: linear-gradient(180deg, #b8f000, #6d8f00);
+  border-radius: 4px 4px 0 0;
+}
+.curve-x { font-size: 0.72rem; color: var(--muted, #9aa38a); }
+
+.comp { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.comp li { display: flex; align-items: baseline; gap: 10px; font-size: 0.86rem; }
+.comp-n { min-width: 2.2em; text-align: right; font-weight: 700; color: #b8f000; }
+.comp-k { color: var(--muted, #9aa38a); }
+
+.key-strip { margin: 20px 0; }
+.key-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.key-card { margin: 0; }
+.key-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
+.key-card figcaption { margin-top: 6px; font-size: 0.8rem; }
+.key-empty { display: block; aspect-ratio: 200/146; border-radius: 8px; background: rgba(255,255,255,0.05); }
+
+.related { margin: 20px 0; }
+.related-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.related-list a {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 7px 9px; border-radius: 8px;
+  text-decoration: none; color: inherit; font-size: 0.86rem;
+}
+.related-list a:hover { background: rgba(184,240,0,0.08); }
+.r-rank { color: var(--muted, #9aa38a); min-width: 2.2em; }
+.r-name { flex: 1; }
+.r-pct { color: #b8f000; font-weight: 600; }
+
+/* Hub: link every deck, not just the featured five */
+.all-decks { margin-top: 18px; }
+.all-decks h3 { font-size: 0.85rem; color: var(--muted, #9aa38a); margin: 0 0 8px; font-weight: 600; }
+.deck-links { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px; }
+.deck-links a {
+  display: block; padding: 6px 9px; border-radius: 8px;
+  text-decoration: none; color: inherit; font-size: 0.84rem;
+}
+.deck-links a:hover { background: rgba(184,240,0,0.08); }
+.deck-links .dim { color: var(--muted, #9aa38a); font-size: 0.78rem; }
+
+@media (max-width: 720px) {
+  .stat-row { grid-template-columns: 1fr; }
+  .key-row { grid-template-columns: 1fr; }
+}
 `;
 
-function writeSitemap(paths) {
+/**
+ * `lastmod` is the feed date, so crawlers can see the corpus genuinely changes
+ * daily rather than having to re-fetch to find out. Priorities are tiered —
+ * previously every meta-web URL sat at 0.7, which tells a crawler nothing
+ * about what matters.
+ */
+function sitemapPriority(p) {
+  if (p === "/meta-web/" || p === "/meta-web/index.html") return "0.9";
+  if (/^\/meta-web\/(standard|pioneer)\.html$/.test(p)) return "0.8";
+  if (p.startsWith("/meta-web/deck/")) return "0.6";
+  return "0.5";
+}
+
+function writeSitemap(paths, lastmod) {
+  const mod = /^\d{4}-\d{2}-\d{2}$/.test(String(lastmod || "")) ? String(lastmod) : null;
+  const modTag = mod ? `\n    <lastmod>${mod}</lastmod>` : "";
   const urls = paths
     .map(
       (p) => `  <url>
-    <loc>${SITE}${p}</loc>
+    <loc>${SITE}${p}</loc>${modTag}
     <changefreq>daily</changefreq>
-    <priority>${p === "/meta-web/" || p === "/meta-web/index.html" ? "0.9" : "0.7"}</priority>
+    <priority>${sitemapPriority(p)}</priority>
   </url>`,
     )
     .join("\n");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${SITE}/</loc>
+    <loc>${SITE}/</loc>${modTag}
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -648,7 +935,7 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
     paths.push(`/meta-web/deck/${d.id}.html`);
   }
 
-  writeSitemap([...new Set(paths)]);
+  writeSitemap([...new Set(paths)], bundle.date);
   writeRobots();
 
   console.log(

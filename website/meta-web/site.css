@@ -202,3 +202,77 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
   .top { flex-direction: column; align-items: flex-start; }
   .download-banner { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---- Deck page depth (mana curve, composition, key cards, related) ---- */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.curve-block, .comp-block, .key-strip, .related {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+.curve-block h2, .comp-block h2, .key-strip h2, .related h2 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+.curve {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 96px;
+}
+.curve-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
+.curve-n { font-size: 0.72rem; color: var(--muted, #9aa38a); min-height: 1em; }
+.curve-bar {
+  width: 100%;
+  min-height: 3px;
+  background: linear-gradient(180deg, #b8f000, #6d8f00);
+  border-radius: 4px 4px 0 0;
+}
+.curve-x { font-size: 0.72rem; color: var(--muted, #9aa38a); }
+
+.comp { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.comp li { display: flex; align-items: baseline; gap: 10px; font-size: 0.86rem; }
+.comp-n { min-width: 2.2em; text-align: right; font-weight: 700; color: #b8f000; }
+.comp-k { color: var(--muted, #9aa38a); }
+
+.key-strip { margin: 20px 0; }
+.key-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.key-card { margin: 0; }
+.key-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
+.key-card figcaption { margin-top: 6px; font-size: 0.8rem; }
+.key-empty { display: block; aspect-ratio: 200/146; border-radius: 8px; background: rgba(255,255,255,0.05); }
+
+.related { margin: 20px 0; }
+.related-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.related-list a {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 7px 9px; border-radius: 8px;
+  text-decoration: none; color: inherit; font-size: 0.86rem;
+}
+.related-list a:hover { background: rgba(184,240,0,0.08); }
+.r-rank { color: var(--muted, #9aa38a); min-width: 2.2em; }
+.r-name { flex: 1; }
+.r-pct { color: #b8f000; font-weight: 600; }
+
+/* Hub: link every deck, not just the featured five */
+.all-decks { margin-top: 18px; }
+.all-decks h3 { font-size: 0.85rem; color: var(--muted, #9aa38a); margin: 0 0 8px; font-weight: 600; }
+.deck-links { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px; }
+.deck-links a {
+  display: block; padding: 6px 9px; border-radius: 8px;
+  text-decoration: none; color: inherit; font-size: 0.84rem;
+}
+.deck-links a:hover { background: rgba(184,240,0,0.08); }
+.deck-links .dim { color: var(--muted, #9aa38a); font-size: 0.78rem; }
+
+@media (max-width: 720px) {
+  .stat-row { grid-template-columns: 1fr; }
+  .key-row { grid-template-columns: 1fr; }
+}

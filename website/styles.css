@@ -1088,6 +1088,33 @@ main,
   color: var(--muted);
   max-width: 36rem;
 }
+/* Route to the public meta corpus at /meta-web/. Sits under the live-meta
+   showcase, where a reader has just seen the top 5 and wants the rest. */
+.meta-web-cta {
+  max-width: 44rem;
+  margin: 1.75rem auto 0;
+  padding: 1.1rem 1.25rem;
+  text-align: center;
+  background: rgba(10, 11, 8, 0.45);
+  border: 1px solid rgba(184, 240, 0, 0.22);
+  border-radius: 12px;
+}
+.meta-web-cta p {
+  margin: 0 0 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(232, 235, 224, 0.82);
+}
+.meta-web-cta strong {
+  color: #b8f000;
+}
+.meta-web-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
 /* Tip jar — deliberately quieter than .download-note so it reads as an offer,
    not a nag. No border, no panel, just a line under the install CTA. */
 .support-note {
