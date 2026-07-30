@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-29 · from the owner's growth/monetization brief + a repo and site read
 **Product at time of writing:** v2.5.3 · Tauri 2 + React 19 + TS + Tailwind 4 + Zustand 5 · ~33.5k lines TS/TSX · ~2.4k Rust · 250+ vitest tests · four webviews
-**Status:** **DRAFT FOR OWNER REVIEW — nothing here is started.** Read, argue with it, then pick.
+**Status:** Reviewed and in progress. **Phase 0 is done** (see §3) — install counting is measured via Netlify Observability, the Ko-fi tip jar is shipped, and Discord + email capture were cut by the owner. Phase 1 (reach) is next. §0's install estimate has since been replaced by real measured data — see Phase 0.
 
 > This document answers three questions the owner asked: (1) is the plan viable, honestly; (2) what's the sequence to build it; (3) what's obviously missing. It supersedes nothing — `ROADMAP.md` and `100X-ROADMAP.md` cover the *app*. This covers the *business around the app*.
 
@@ -244,13 +244,15 @@ Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, pr
 ### Phase 0 — Instrument & rails
 *~1 week · no backend*
 
-- Install/DAU counting from Netlify Analytics filtered to `/updater/latest.json` (**not** `version.json` — see §2.1)
-- Ko-fi / Stripe payment-link donation button — in-app + site
-- Discord server, linked from the app and the site
-- Email capture on the site (Netlify Forms)
-- Opt-in parser-health ping (design it now, ship it here)
+- ✅ **Install/DAU counting** — Netlify **Observability**, URL filter `/updater/latest.json` (**not** `version.json`, see §2.1; Web Analytics has no path breakdown for JSON assets). Baseline 2026-07-30: **~325 updater checks/7 days** (~46/day) and **84 `/downloads/` requests/7 days** — though the `206` partials mean that's realistically ~30–50 actual downloads. Implies **~15–25 daily active installs** and roughly **5 new installs/day**.
+- ✅ **Ko-fi tip jar** — site + Settings → About (Ko-fi pays through to PayPal; PayPal.Me is not offered to Indonesian personal accounts). Single `DONATE_URL` constant in `src/services/site.ts`; empty string hides it everywhere. Gates nothing.
+- ❌ **Discord server** — *cut by owner 2026-07-30.*
+- ❌ **Email capture** — *cut by owner 2026-07-30.*
+- ⬜ **Opt-in parser-health ping** — now the only way to get true unique-install counts, since no passive endpoint distinguishes machines. Ship with a release.
 
-**Goal:** know the numbers, own an audience channel, be able to take money.
+**Revised install estimate:** the measured data puts the base in the **low hundreds**, below the 200–350 guessed in §0 from visitor numbers. That *strengthens* the §0 conclusion rather than changing it — with daily actives in the teens, reach is unambiguously the binding constraint, and Phase 1 matters more than anything on the backend.
+
+**Goal:** know the numbers, be able to take money.
 **Gate to Phase 1:** none — this is unconditional groundwork.
 
 ### Phase 1 — Reach

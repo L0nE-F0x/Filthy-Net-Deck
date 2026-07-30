@@ -25,3 +25,17 @@ export const SITE_ORIGIN = SITE_ORIGIN_PRIMARY;
 
 /** Ordered CDN bases to try (primary first, then legacy). */
 export const SITE_ORIGINS = [SITE_ORIGIN_PRIMARY, SITE_ORIGIN_LEGACY] as const;
+
+/**
+ * Tip jar — Ko-fi, which pays straight through to the owner's PayPal.
+ * (PayPal.Me is not offered to Indonesian personal accounts.)
+ *
+ * Optional and entirely passive — no account, no nag, no gated features. The
+ * app is free and stays free; this is a "if it helped, buy me a coffee" link
+ * in Settings → About and nowhere else.
+ *
+ * Platform-agnostic on purpose: an empty string hides every donate affordance
+ * in the app, and swapping providers is a one-line change here. Keep it in
+ * sync with the link in `website/index.html`.
+ */
+export const DONATE_URL = "https://ko-fi.com/filthynetdeck";

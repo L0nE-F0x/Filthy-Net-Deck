@@ -27,7 +27,9 @@ Canonical checklist: **`handoff.md`** (always read first). Program plan: **`100X
 
 ### Explicitly deferred
 
-Limited/Draft hub · **in-draft** overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data · monetization (tip jar / Pro until usage justifies).
+Limited/Draft hub · **in-draft** overlay · cloud sync · Alchemy · prices · Events overhaul · AI without grounded local data · **Pro tier / paywalls** (until usage justifies — see `docs/PLATFORM-STRATEGY.md`).
+
+> **Tip jar shipped 2026-07-30** (owner call): a passive Ko-fi link on the site and in Settings → About. Free stays free — it gates nothing. The deferral above now covers *paid tiers* only.
 
 ### 10× SKIP (still closed)
 

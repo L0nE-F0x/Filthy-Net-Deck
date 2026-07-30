@@ -6,6 +6,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
+import { DONATE_URL } from "../services/site";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import { exportTrackerDiagnostic } from "../services/tracker";
@@ -743,6 +744,21 @@ export function Settings() {
               ApexForge
             </button>
           </p>
+          {/* Tip jar. Hidden entirely when DONATE_URL is unset, and never
+              gates a feature — the app is free and stays free. */}
+          {DONATE_URL && (
+            <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
+              Free forever. If it helped your climb, you can{" "}
+              <button
+                type="button"
+                className="text-gold-300 hover:text-gold-200 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-xs"
+                onClick={() => void openExternal(DONATE_URL)}
+              >
+                buy me a coffee
+              </button>
+              .
+            </p>
+          )}
           <LocalOpenDaysNote />
         </section>
       </div>

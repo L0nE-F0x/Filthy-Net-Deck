@@ -1088,6 +1088,32 @@ main,
   color: var(--muted);
   max-width: 36rem;
 }
+/* Tip jar — deliberately quieter than .download-note so it reads as an offer,
+   not a nag. No border, no panel, just a line under the install CTA. */
+.support-note {
+  position: relative;
+  z-index: 1;
+  max-width: 36rem;
+  margin: 0.9rem auto 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--muted);
+}
+.support-note strong {
+  color: #b8f000;
+}
+.support-link {
+  color: var(--acid);
+  text-decoration: none;
+  font-weight: 600;
+}
+.support-link:hover {
+  color: var(--acid-bright);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .footer-credit {
   flex-basis: 100%;
   max-width: none !important;
