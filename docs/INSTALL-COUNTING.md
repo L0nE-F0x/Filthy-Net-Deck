@@ -2,6 +2,29 @@
 
 **Added:** 2026-07-30 · Phase 0 item 1 of [`PLATFORM-STRATEGY.md`](PLATFORM-STRATEGY.md)
 
+> ## ⚠️ STATUS: NOT LIVE — code written, deploy blocked
+>
+> The function code is committed and tested but **is not wired up**. A first
+> attempt on 2026-07-30 redirected `/version.json` to the function and **took
+> the endpoint down with a 404 for roughly 12 minutes** (commit `5a6ab41`,
+> reverted in `b3dba99`).
+>
+> **What went wrong:** the redirect deployed but the function did not. This
+> site's base directory is `website`, and there is no `package.json` there — so
+> Netlify had nothing to install `@netlify/blobs` from and never bundled the
+> function. The redirect shipped pointing at a target that did not exist.
+>
+> **Why it was not worse:** `/updater/latest.json` is static and was
+> deliberately never touched, so signed auto-updates kept working throughout.
+> `versionCheck.ts` is null-safe, so the app degraded to "couldn't check for
+> updates" rather than erroring.
+>
+> **Process lesson — do not repeat:** deploy the function FIRST and confirm
+> `/api/fnd-stats` returns 503 (not 404). Only add the redirect in a SECOND
+> push, once the target is known to exist. Never ship both together.
+>
+> **Blocked on an owner decision** — see "Making this deployable" below.
+
 Answers the question "how many people actually run this?" without adding telemetry, an account, or anything that identifies a user.
 
 ---
@@ -93,6 +116,40 @@ Every discriminating header matches `website/netlify.toml`; every rule unique to
 2. **Change the Netlify base directory to the repo root**, making the root file live and deleting `website/netlify.toml`. Cleaner long-term (that file is the maintained one), but it is a dashboard change affecting the whole deploy and cannot be tested from the repo.
 
 Until that is settled, **all Netlify config goes in `website/netlify.toml`.**
+
+## Making this deployable — owner decision
+
+Netlify Functions need a `package.json` in the base directory to resolve
+`@netlify/blobs`. The base directory is `website`; the `package.json` is at the
+repo root. That mismatch is the whole problem, and there are two ways to close it.
+
+### Option A — move the base directory to the repo root *(cleaner, wider blast radius)*
+
+Netlify → Project configuration → Build & deploy → Build settings → set **Base
+directory** to empty/root, keep **Publish directory** as `website`.
+
+- ✅ `package.json` is where Netlify expects it; functions build normally.
+- ✅ The repo-root `netlify.toml` — the maintained, better-documented file —
+  becomes live, and `website/netlify.toml` can be deleted.
+- ⚠️ **This also activates every currently-dead rule at once**: the `/meta-web/*`
+  `max-age=300` cache fix (handoff.md §1), `/assets/og-image.png` `max-age=86400`,
+  and the UTF-8 `Content-Type` headers. Those are probably all wanted, but they
+  are untested in production and would land in the same deploy.
+- ⚠️ Also check whether the daily-meta / sets-refresh workflows assume the
+  current layout before switching.
+
+### Option B — add a minimal `website/package.json` *(uglier, smaller blast radius)*
+
+A file containing only `@netlify/blobs` and `@netlify/functions`.
+
+- ✅ Nothing else changes; one new file, easy to reason about.
+- ⚠️ Two dependency manifests to keep in sync, and the root `netlify.toml` stays
+  dead — so handoff.md §1 stays open.
+
+**Recommendation:** Option A is the right end state, but do it as its own change
+with its own verification, *not* bundled with install counting. Ship the base
+directory move, confirm the site and the meta-web cache headers are correct,
+then wire the function, then add the redirect. Three pushes, each verifiable.
 
 ## Reverting
 
