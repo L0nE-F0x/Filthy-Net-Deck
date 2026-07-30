@@ -2,14 +2,50 @@
 
 **Added:** 2026-07-30 · Phase 0 item 1 of [`PLATFORM-STRATEGY.md`](PLATFORM-STRATEGY.md)
 
-> ## ✅ STATUS: LIVE (2026-07-30, commit `958a0e0`)
+> ## ❌ STATUS: WITHDRAWN — right machinery, wrong endpoint
 >
-> `/version.json` is served by the counting function on both origins, verified
-> by the `X-FND-Manifest: function` response header. `/updater/latest.json` is
-> still static (no such header) — as intended.
+> The function works. It deployed, served `/version.json`, authenticated, and
+> counted correctly — the 7 recorded `other` hits were verification `curl`s,
+> proving the bot/app split works.
 >
-> **Remaining owner step:** set `FND_STATS_TOKEN` and redeploy, or
-> `/api/fnd-stats` stays on 503. See "Reading the numbers".
+> **But `app` stayed at 0, because real installs never request `/version.json`.**
+>
+> ### Why this endpoint was the wrong target
+>
+> `src/store/useAppStore.ts::checkForUpdates` tries the **signed Tauri updater
+> first** (`checkAppUpdateSigned()` → `/updater/latest.json`) and returns early
+> in both success cases — update found, or already current. Its own comment
+> says it: *"Consulting version.json here would only offer a weaker path to the
+> same answer."*
+>
+> `/version.json` is reached **only when the signed check fails** — offline, or
+> a broken manifest. So it is a fallback endpoint, not a heartbeat. Confirmed
+> empirically: a real app launch produced no request at all (neither `app` nor
+> `other` moved).
+>
+> **The mistake:** the premise "every running copy fetches `/version.json` on
+> launch" came from reading `versionCheck.ts` and `App.tsx` without tracing the
+> *caller*. Everything downstream was built correctly on a false foundation.
+> **Lesson: verify that a signal exists before building infrastructure to
+> measure it.** One `curl` against a running app, or two minutes reading
+> `checkForUpdates`, would have caught this before any of it was written.
+>
+> The redirect has been removed. `/version.json` is a plain static file again.
+> The function code is retained — it is sound and tested — but nothing routes
+> to it.
+>
+> ### What to do instead
+>
+> 1. **Now, zero risk:** Netlify Web Analytics, filtered to
+>    **`/updater/latest.json`** — *that* is the endpoint every install hits on
+>    launch, via the Tauri updater. Not `/version.json`.
+> 2. **Properly, later:** the opt-in health ping (Phase 0 item 5 in
+>    `PLATFORM-STRATEGY.md`) shipped in a release. Purpose-built and consented,
+>    rather than piggybacking on an endpoint that may or may not be requested.
+>
+> **Do NOT instrument `/updater/latest.json` with a function.** It drives the
+> signed auto-update. Reading its request count in Analytics is free and safe;
+> putting code in that path is not.
 >
 > ### Getting here broke production once — read this before touching it again
 >

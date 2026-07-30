@@ -15,18 +15,12 @@
 #     one (e.g. /meta/* max-age=120 + Access-Control-Allow-Headers).
 # So: functions go in the root file, redirects and headers go here.
 
-# Install counting — docs/INSTALL-COUNTING.md. Forced because the static
-# version.json sits at this same path and would otherwise win.
-# TO REVERT: delete this one block. The static file is still published and
-# serves the endpoint again on the next deploy.
-# DO NOT add this block unless /.netlify/functions/version already returns 200
-# with an `X-FND-Manifest: function` header — shipping it blind 404'd the
-# endpoint on 2026-07-30.
-[[redirects]]
-  from = "/version.json"
-  to = "/.netlify/functions/version"
-  status = 200
-  force = true
+# Install counting is NOT wired here — and /version.json is the wrong endpoint
+# for it. src/store/useAppStore.ts::checkForUpdates tries the signed Tauri
+# updater first (/updater/latest.json) and returns early whenever it answers.
+# /version.json is only a fallback for when that check fails, so in normal
+# operation no install ever requests it. Measured: 0 app hits.
+# See docs/INSTALL-COUNTING.md "Why this endpoint was the wrong target".
 
 # Force UTF-8 so em dashes / curly quotes never mojibake in browsers
 [[headers]]
