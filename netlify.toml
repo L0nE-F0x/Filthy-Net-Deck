@@ -18,12 +18,9 @@
 
 [build]
   publish = "website"
-  # Explicit no-op. Without this, once the base directory is the repo root
-  # Netlify's framework detection sees the Vite app in package.json and can
-  # inject `npm run build` by itself. The site is pre-built static content
-  # committed by the daily pipeline — there is nothing to build here, and an
-  # auto-detected command is a deploy failure waiting to happen.
-  command = "echo 'static site — nothing to build'"
+  # NOTE: no `command` here on purpose. The Netlify UI has a build command set
+  # (`node pipeline/build-meta.mjs`). Setting one in this file would silently
+  # override it, so leave it to the dashboard until the two are reconciled.
 
 # Install counting — docs/INSTALL-COUNTING.md. Inert until the base directory
 # moves to the repo root, at which point Netlify bundles these using the
