@@ -7,17 +7,26 @@
   # Optional: run pipeline before publish when wired to CI
   # command = "node ../pipeline/build-meta.mjs --seed"
 
-# NOTE: install counting (docs/INSTALL-COUNTING.md) cannot be wired up in this
-# file. Netlify requires the functions directory to sit OUTSIDE the publish
-# directory, and here base == publish == `website`, so no such location exists.
-# Two attempts on 2026-07-30 confirmed it: the first 404'd /version.json (the
-# redirect deployed, the function did not), and the second published the
-# function sources as static assets at /netlify/functions/*.mts instead of
-# building them.
-#
-# The functions now live at the repo root and are configured in the repo-root
-# netlify.toml, which activates once the base directory is moved to the root.
-# At that point THIS file becomes the inert one and should be deleted.
+# HOW THE TWO netlify.toml FILES SPLIT (verified empirically 2026-07-30):
+#   • repo-root netlify.toml — build config: publish dir + [functions]. Read
+#     because the Netlify base directory is the repo root.
+#   • THIS file — headers and redirects. Honoured because it sits inside the
+#     publish directory. Live response headers match this file, not the root
+#     one (e.g. /meta/* max-age=120 + Access-Control-Allow-Headers).
+# So: functions go in the root file, redirects and headers go here.
+
+# Install counting — docs/INSTALL-COUNTING.md. Forced because the static
+# version.json sits at this same path and would otherwise win.
+# TO REVERT: delete this one block. The static file is still published and
+# serves the endpoint again on the next deploy.
+# DO NOT add this block unless /.netlify/functions/version already returns 200
+# with an `X-FND-Manifest: function` header — shipping it blind 404'd the
+# endpoint on 2026-07-30.
+[[redirects]]
+  from = "/version.json"
+  to = "/.netlify/functions/version"
+  status = 200
+  force = true
 
 # Force UTF-8 so em dashes / curly quotes never mojibake in browsers
 [[headers]]
