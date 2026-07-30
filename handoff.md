@@ -75,20 +75,28 @@ in v2.5.2; major deps + owner P3 still open there).
 
 ## OPEN — needs owner (not agent-solo)
 
-### 1. Netlify meta-web prod↔git drift (OPEN)
+### 1. Netlify meta-web prod↔git drift — ✅ CLOSED 2026-07-30 (not a drift)
 
-Live `/meta-web/deck/*.html` still serve a `/#download` HTML variant that
-matches **no git commit**. Git has rot-free `index.html#download`.
+Both halves of this had mundane explanations. No deploy was ever pinned and
+auto-publish was never off.
 
-- **User impact:** none (both hit homepage download; no version-pinned exes).
-- **Why it didn’t self-heal:** v2.5.1 deploy + daily cron refreshed
-  version/downloads to git, but meta-web HTML stayed old; `Cache-Control:
-  max-age=300` for `/meta-web/*` in `netlify.toml` never showed up live
-  (`max-age=0`). Suggests pinned deploy / auto-publish off / out-of-band
-  `netlify deploy` for that path.
-- **Owner action:** Netlify dashboard — is production locked? is auto-publish
-  from git on? Clear cache + deploy. **Agents: git push only; never manual
-  `netlify deploy`.**
+**"Live HTML matches no git commit"** — Netlify's **Pretty URLs** post-processing
+rewrites HTML on deploy: `href="deck/x.html"` becomes `href='/meta-web/deck/x'`
+(absolute, extension stripped, single-quoted). Live HTML will therefore *never*
+byte-match git, by design. Both forms return 200 and every canonical points at
+the `.html` form, so indexing consolidates correctly. Nothing to fix.
+
+**"`max-age=300` never showed up live"** — correct, and it never will: that rule
+lives in the repo-root `netlify.toml`, which Netlify does not read for headers.
+Headers come from `website/netlify.toml` (it sits inside the publish directory).
+More to the point, **the rule was not worth having** — live pages serve
+`max-age=0, must-revalidate`, which is *fresher* than the 300s the "fix" would
+have imposed. See the note at the top of the root `netlify.toml`.
+
+**Confirmed working:** deploys land from git push (multiple verified 2026-07-30),
+and the daily cron regenerated the full meta-web corpus with a same-day
+`lastmod`. Verification method for future doubt: check a response header or a
+generated marker, not a byte-diff against git.
 
 ### 2. Owner marketing WIP (dirty / untracked — DO NOT TOUCH)
 

@@ -14,9 +14,21 @@
 # ⚠️ A redirect or [[headers]] block added HERE will silently do nothing.
 #    Put those in website/netlify.toml.
 #
-# KNOWN GAP: the [[headers]] rules below (/meta-web/*, og-image, UTF-8 HTML)
-# have therefore never applied — which is the real explanation for handoff.md
-# §1. Port them into website/netlify.toml when convenient.
+# The [[headers]] rules below have therefore never applied. Reviewed 2026-07-30
+# against live responses; everything currently serves Netlify's default
+# `public, max-age=0, must-revalidate`. Only one was worth porting:
+#
+#   • /assets/og-image.png (max-age=86400) — PORTED to website/netlify.toml.
+#   • /meta-web/* (max-age=300) — NOT ported. It would make pages *staler* than
+#     the current max-age=0. The handoff.md §1 "fix" was misconceived: the
+#     default already revalidates on every request.
+#   • /updater/* (max-age=60 + CORS) — NOT ported, deliberately. Caching the
+#     update manifest is the wrong direction, and the CORS headers are dead
+#     weight: the Tauri updater fetches via reqwest, not browser fetch, so
+#     no preflight is ever involved.
+#   • /*.html UTF-8 Content-Type — already present in website/netlify.toml.
+#
+# Leaving the rules here for provenance. Do not "fix" them by porting wholesale.
 
 [build]
   publish = "website"

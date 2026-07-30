@@ -55,3 +55,14 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"
+
+# Ported from the repo-root netlify.toml, which Netlify never reads for headers
+# (see the warning at the top of that file). Social scrapers refetch the OG card
+# constantly and it only changes on release, so a day of caching is free. This
+# was the ONLY dead rule worth porting — see the note in the root file for the
+# two that were deliberately left behind.
+[[headers]]
+  for = "/assets/og-image.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "image/png"

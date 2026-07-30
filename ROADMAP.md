@@ -44,7 +44,14 @@ D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test
 - Full macOS signed auto-update in CI (owner decision: key as repo secret); soft dmg CTA already works  
 - `whatsinstandard` v7 when v6 is fully dead  
 - More set trailers in `set-trailers.json` as WotC posts them  
-- Downloads hygiene: only current release in `website/downloads/`  
+- Downloads hygiene: only current release in `website/downloads/` (2.5.2 exe + sig
+  still present alongside 2.5.3). Investigated 2026-07-30: a single 404 for
+  `Setup-2.0.1.exe` in 7 days of logs is **not** a broken update path — nothing on
+  the site links it, and `updater/latest.json` correctly points at the current
+  release regardless of installed version. It is an external or bookmarked link
+  to a pruned installer. Deliberately **no redirect added**: a `/downloads/*`
+  fallback would sit in the signed-updater's download path and turn a clean 404
+  into an HTML response on any future missing file.  
 
 ---
 
