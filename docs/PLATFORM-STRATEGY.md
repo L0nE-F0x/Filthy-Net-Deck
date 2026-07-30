@@ -149,7 +149,9 @@ The right expansion is **programmatic SEO**, not a web app clone:
 
 Zero telemetry is principled but at scale it is dangerous: an Arena patch breaks the parser and the first signal is a bad review. Two fixes, both cheap:
 
-1. **Passive, immediate, zero-privacy-cost:** the updater already fetches `version.json` from the site. Counting those requests server-side gives install and DAU numbers **today**, with no client code change and nothing new leaving the user's machine.
+1. **Passive, immediate, zero-privacy-cost:** every install hits **`/updater/latest.json`** on launch via the signed Tauri updater. Netlify Web Analytics already records it — filter to that path for install and DAU numbers **today**, with no code change and nothing new leaving the user's machine.
+
+   > ⚠️ **Corrected 2026-07-30.** This originally said `version.json`. That was wrong: `useAppStore::checkForUpdates` tries the signed updater first and returns early whenever it answers, so `/version.json` is only a fallback for when that check *fails* — real installs never request it. An attempt to instrument it counted 0 app hits and caused two production incidents. Full write-up in [`INSTALL-COUNTING.md`](INSTALL-COUNTING.md). **Do not put a function in front of `/updater/latest.json`** — it drives the signed auto-update. Reading its count in Analytics is free and safe; code in that path is not.
 2. **Opt-in parser-health ping:** app version, parser version, crash/parse-failure class. No account, no PII, no match data. Ship it *before* scaling, not after.
 
 ### 2.2 The streamer / OBS play
@@ -242,7 +244,7 @@ Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, pr
 ### Phase 0 — Instrument & rails
 *~1 week · no backend*
 
-- Install/DAU counting from `version.json` request logs
+- Install/DAU counting from Netlify Analytics filtered to `/updater/latest.json` (**not** `version.json` — see §2.1)
 - Ko-fi / Stripe payment-link donation button — in-app + site
 - Discord server, linked from the app and the site
 - Email capture on the site (Netlify Forms)
