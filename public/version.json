@@ -1,5 +1,5 @@
 {
-  "version": "2.5.4",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.4.exe",
-  "notes": "v2.5.4: Optional tip jar in Settings -> About. Filthy Net Deck is free and stays free - nothing is gated and there is no nag. Also live on the web: the public meta pages at filthy-net-deck.com/meta-web now carry full decklists, mana curves and card breakdowns for every ranked archetype, with all 32 decks linked and indexable."
+  "version": "2.6.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.0.exe",
+  "notes": "v2.6.0: Sharper opponent-deck reads (Lessons/Control twins no longer collapse), overlay remembers size between matches, full card galleries for every Standard set, and a post-match rank graph that moves with each win or loss inside a tier."
 }

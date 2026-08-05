@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { decksForMode } from "../services/deckHelpers";
+import { inferenceCandidates } from "../services/deckHelpers";
 import {
   inferOpponentArchetype,
   normalizeCardName,
@@ -60,7 +60,8 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
 
   const candidates = useMemo(() => {
     if (!meta || !fmt) return [];
-    return decksForMode(fmt, mode, meta.decks);
+    // Both Bo1/Bo3 lists so Lessons twins stay distinguishable.
+    return inferenceCandidates(meta.decks, { format: fmt, mode });
   }, [meta, fmt, mode]);
 
   // Resolve grpId → card name/art (cached; network only for new ids).

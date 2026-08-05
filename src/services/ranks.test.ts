@@ -95,6 +95,14 @@ describe("rankSeriesDomain", () => {
     expect(hi - lo).toBe(2);
   });
 
+  it("zooms into within-division pip momentum instead of a 2-step pad", () => {
+    // Gold 4 + synthetic W/L drift (see applyWithinRankMomentum).
+    const scores = [12.12, 12.24, 12.12, 12.24];
+    const { lo, hi } = rankSeriesDomain(scores);
+    expect(hi - lo).toBeLessThan(1);
+    expect(fill(scores)).toBeGreaterThan(0.2);
+  });
+
   it("never returns an empty domain", () => {
     const { lo, hi } = rankSeriesDomain([]);
     expect(hi).toBeGreaterThan(lo);

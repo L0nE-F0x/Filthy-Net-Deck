@@ -139,10 +139,11 @@ another spoiler source later = one more module returning `{ bySetCode }` merged
 the same way.
 
 **Recently live window.** The radar ships (1) all future/spoiling constructed
-products and anything released in the last ~90 days with **full** Scryfall
-galleries, plus (2) every expansion still legal in Standard (whatsinstandard
-pool — Foundations through current) with a **slim** mythic/rare sample so the
-feed stays small. Older feeds without those rows just show fewer live cards.
+products and (2) every expansion still legal in Standard (whatsinstandard pool —
+Foundations through current), each with a **full** Scryfall gallery so Sets →
+open always shows Gallery(N) rather than a 14-card preview rail. (Pre-2.6.0
+builds used a slim mythic/rare sample for older Standard sets to keep the feed
+small; desktop clients tolerate the larger payload.)
 
 The sets feed also carries a `formats` hub (Standard/Pioneer legality, rotation
 calendar, ban lists) built from Scryfall legalities + whatsinstandard. Since 0.21

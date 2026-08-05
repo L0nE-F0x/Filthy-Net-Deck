@@ -34,8 +34,8 @@ import {
 } from "./overlayModel";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
-import { decksForMode } from "../services/deckHelpers";
-import type { MetaBundle } from "../types/meta";
+import { inferenceCandidates } from "../services/deckHelpers";
+import type { MetaBundle, PlayMode } from "../types/meta";
 import { PostMatchSummary } from "./PostMatchSummary";
 import {
   PREFS_KEY,
@@ -759,6 +759,11 @@ export function OverlayApp() {
   // pushed via `prefs:overlay`/storage into startExpandedRef, and take effect
   // here on the next match start (never mid-match, so a manual collapse is
   // not yanked back between Bo3 games).
+  //
+  // Also re-apply the user's saved width/height from disk. Without this, a
+  // post-match grow, a mid-session density change, or a transient resize can
+  // leave the panel at the wrong size every new queue pop — the complaint that
+  // "I have to resize it every match".
   const liveMatchId = live?.matchId;
   const livePhase = live?.phase;
   useEffect(() => {
@@ -768,8 +773,48 @@ export function OverlayApp() {
       appliedMatchRef.current !== liveMatchId
     ) {
       appliedMatchRef.current = liveMatchId;
-      setCompactMode(!startExpandedRef.current);
       setView("deck");
+      const wantExpanded = startExpandedRef.current;
+      if (!isTauri()) {
+        setCompactMode(!wantExpanded);
+        return;
+      }
+      void (async () => {
+        try {
+          const { getCurrentWindow, LogicalSize } = await import(
+            "@tauri-apps/api/window"
+          );
+          const win = getCurrentWindow();
+          const factor = await win.scaleFactor();
+          const size = await win.outerSize();
+          const geo = await invoke<{
+            width: number;
+            height: number;
+          } | null>("overlay_get_geometry");
+          const w = geo?.width ?? size.width / factor;
+          const h = Math.max(geo?.height ?? expandedH.current, MIN_EXPANDED_H);
+          expandedH.current = h;
+          programmaticResize.current = true;
+          try {
+            if (wantExpanded) {
+              compactRef.current = false;
+              setCompact(false);
+              await win.setSize(new LogicalSize(w, h));
+              await ensureOnScreen();
+            } else {
+              compactRef.current = true;
+              setCompact(true);
+              await win.setSize(new LogicalSize(w, COLLAPSED_H));
+            }
+          } finally {
+            window.setTimeout(() => {
+              programmaticResize.current = false;
+            }, 400);
+          }
+        } catch {
+          setCompactMode(!wantExpanded);
+        }
+      })();
     }
   }, [liveMatchId, livePhase, setCompactMode]);
 
@@ -865,12 +910,13 @@ export function OverlayApp() {
     const inferOpts = { minHits: 2, minConfidence: 0.35 };
 
     let guess: string | null = null;
-    let candidates: ReturnType<typeof decksForMode> = [];
+    let candidates: ReturnType<typeof inferenceCandidates> = [];
     if (bundle) {
       const fmt = bundle.formats.find((f) => f.featured) ?? bundle.formats[0];
       if (fmt) {
-        const mode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
-        candidates = decksForMode(fmt, mode as "bo1" | "bo3", bundle.decks);
+        const mode: PlayMode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
+        // Both modes + full format field so Lessons twins don't collapse.
+        candidates = inferenceCandidates(bundle.decks, { format: fmt, mode });
         const g = inferOpponentArchetype(
           live.opponentSeen,
           resolveName,

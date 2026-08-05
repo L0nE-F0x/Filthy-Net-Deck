@@ -85,6 +85,63 @@ describe("scoreDeckAgainstSeen", () => {
     expect(s.distinctiveHits).toBe(1);
     expect(s.hits.length).toBe(2);
   });
+
+  it("weights exclusive cards above shared staples (Lessons problem)", () => {
+    const jeskaiLessons = deck(
+      "jl",
+      "Jeskai Lessons",
+      [
+        { name: "Jeskai Revelation" },
+        { name: "Tablet of Discovery" },
+        { name: "Accumulate Wisdom" },
+        { name: "Island", land: true },
+      ],
+      ["Jeskai Revelation", "Tablet of Discovery", "Accumulate Wisdom"],
+    );
+    const izzetLessons = deck(
+      "il",
+      "Izzet Lessons",
+      [
+        { name: "Gran-Gran" },
+        { name: "Tablet of Discovery" },
+        { name: "Questing Druid" },
+        { name: "Island", land: true },
+      ],
+      ["Gran-Gran", "Tablet of Discovery", "Questing Druid"],
+    );
+    const control = deck(
+      "4c",
+      "4c Control",
+      [
+        { name: "Inevitable Defeat" },
+        { name: "Jeskai Revelation" },
+        { name: "Tablet of Discovery" },
+        { name: "Island", land: true },
+      ],
+      ["Inevitable Defeat", "Jeskai Revelation", "Tablet of Discovery"],
+    );
+    const field = [jeskaiLessons, izzetLessons, control];
+    // Only shared Lesson staple + Izzet exclusive → must be Izzet Lessons.
+    const names2: Record<number, string> = {
+      20: "Tablet of Discovery",
+      21: "Gran-Gran",
+      22: "Questing Druid",
+      30: "Inevitable Defeat",
+      31: "Jeskai Revelation",
+    };
+    const r = (id: number) => names2[id] ?? null;
+    const izz = inferOpponentArchetype([20, 21, 22], r, field, {
+      minHits: 2,
+      minConfidence: 0.2,
+    });
+    expect(izz?.archetype).toBe("Izzet Lessons");
+
+    const ctrl = inferOpponentArchetype([20, 30, 31], r, field, {
+      minHits: 2,
+      minConfidence: 0.2,
+    });
+    expect(ctrl?.archetype).toBe("4c Control");
+  });
 });
 
 describe("inferOpponentArchetype", () => {

@@ -108,7 +108,57 @@ function toPoints(
       isNow: true,
     });
   }
-  return points.slice(-maxPoints);
+  return applyWithinRankMomentum(points.slice(-maxPoints));
+}
+
+/**
+ * Arena only stamps tier + division (or Mythic %). Inside a single division the
+ * post-match sparkline used to sit perfectly flat until a promotion. Nudge each
+ * W/L by a fraction of a rank step so the line breathes match-to-match without
+ * ever claiming you changed division. Mythic already has sub-percent precision,
+ * so those scores are left alone.
+ *
+ * Each point's own result is applied *before* plotting it (post-match position
+ * within the rank). Live `isNow` points keep their real ladder score untouched.
+ * Exported for unit tests.
+ */
+export function applyWithinRankMomentum(
+  points: RankPathPoint[],
+): RankPathPoint[] {
+  if (points.length < 2) return points;
+  /** ~1/8 of a division — visible but never looks like a real promote. */
+  const STEP = 0.12;
+  const MAX_DRIFT = 0.45;
+  let drift = 0;
+  let lastFloor = Math.floor(points[0].score);
+  const out: RankPathPoint[] = [];
+  for (const p of points) {
+    // Mythic (≥ 20) already tracks continuous progress — leave alone.
+    if (p.score >= 20) {
+      drift = 0;
+      lastFloor = Math.floor(p.score);
+      out.push(p);
+      continue;
+    }
+    const floor = Math.floor(p.score);
+    if (floor !== lastFloor) {
+      // Real division change — reset synthetic drift so the step is honest.
+      drift = 0;
+      lastFloor = floor;
+    }
+    // The live "now" sample is a real ladder stamp. Never invent pips on top.
+    if (p.isNow) {
+      out.push(p);
+      continue;
+    }
+    // Plot first (rank when you sat down + form so far), then fold this result
+    // into the drift for the *next* point — so a W-W-L-W session actually
+    // climbs and dips instead of landing on only two discrete offsets.
+    out.push(drift === 0 ? p : { ...p, score: p.score + drift });
+    if (p.result === "win") drift = Math.min(MAX_DRIFT, drift + STEP);
+    else if (p.result === "loss") drift = Math.max(-MAX_DRIFT, drift - STEP);
+  }
+  return out;
 }
 
 export function buildRankPath(

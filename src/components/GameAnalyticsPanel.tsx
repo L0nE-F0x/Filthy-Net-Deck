@@ -10,7 +10,10 @@ import {
   sideboardSplit,
 } from "../services/gameAnalytics";
 import { fieldExpectedWr } from "../services/fieldScore";
-import { decksForMode } from "../services/deckHelpers";
+import {
+  decksForMode,
+  inferenceCandidatesFromBundle,
+} from "../services/deckHelpers";
 import type { TrackedMatch } from "../types/tracker";
 import type { Deck } from "../types/meta";
 import { ShareMenu } from "./ShareMenu";
@@ -46,18 +49,12 @@ export function GameAnalyticsPanel({
   const openDeck = useAppStore((s) => s.openDeck);
 
   // Candidates: today's ranked lists across both formats (a tracked deck's
-  // format isn't stored). Bo3 variants only — same mainboards as Bo1, no dupes.
-  const candidates = useMemo(() => {
-    if (!meta) return [] as Deck[];
-    const out: Deck[] = [];
-    for (const fmt of meta.formats) {
-      for (const id of fmt.bo3DeckIds ?? []) {
-        const d = meta.decks[id];
-        if (d) out.push(d);
-      }
-    }
-    return out;
-  }, [meta]);
+  // format isn't stored). Both Bo1 and Bo3 lists so near-twin archetypes stay
+  // distinguishable (Lessons / Control / Prowess).
+  const candidates = useMemo(
+    () => inferenceCandidatesFromBundle(meta, "bo3"),
+    [meta],
+  );
 
   // Ranked board (featured format Bo3) for field-EV weighting by meta share.
   const rankedForField = useMemo(() => {

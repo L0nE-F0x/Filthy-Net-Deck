@@ -589,9 +589,9 @@ export async function buildSetsBundle() {
     console.warn(`  Standard pool skipped for radar expand: ${e.message}`);
   }
 
-  // Full galleries for future/spoiling + ~90 days of new releases. Older
-  // Standard-legal expansions ship a slim mythic/rare sample so the feed stays
-  // downloadable (Marvel alone is already ~half the payload).
+  // Full galleries for every constructed product on the radar (future, spoiling,
+  // and the whole Standard-legal pool). Users browse older sets as full card
+  // galleries, not a 14-card preview rail.
   const fullGalleryStart = addDays(today, -90);
   const candidates = all
     .filter(isConstructedProduct)
@@ -639,7 +639,9 @@ export async function buildSetsBundle() {
 
     const isFuture = !tabletop || tabletop > today;
     const isRecent = Boolean(tabletop && tabletop >= fullGalleryStart);
-    const fullGallery = isFuture || isRecent;
+    // Always ship the full Scryfall gallery for radar sets (older Standard sets open as Gallery(N), not Previews(14)).
+    void isRecent;
+    const fullGallery = true;
 
     const cards = fullGallery
       ? await fetchAllSetCards(code)

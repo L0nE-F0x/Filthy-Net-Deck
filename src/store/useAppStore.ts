@@ -895,16 +895,12 @@ export const useAppStore = create<AppState>((set, get) => {
                   "../services/arenaMeta"
                 );
                 await resolveArenaMetaBatch(m.opponentSeen ?? []);
-                const candidates: import("../types/meta").Deck[] = [];
                 const meta = get().meta;
-                if (meta) {
-                  for (const fmt of meta.formats) {
-                    for (const id of fmt.bo3DeckIds ?? []) {
-                      const d = meta.decks[id];
-                      if (d) candidates.push(d);
-                    }
-                  }
-                }
+                const { inferenceCandidatesFromBundle } = await import(
+                  "../services/deckHelpers"
+                );
+                const mode = (m.bestOf ?? 1) >= 3 ? "bo3" : "bo1";
+                const candidates = inferenceCandidatesFromBundle(meta, mode);
                 const s = suggestOpponentTag(
                   m,
                   (id) => peekArenaMeta(id)?.name ?? null,
@@ -943,16 +939,12 @@ export const useAppStore = create<AppState>((set, get) => {
             void (async () => {
               const { matchEndToastBody } = await import("../services/matchNotify");
               const { peekArenaMeta } = await import("../services/arenaMeta");
-              const candidates: import("../types/meta").Deck[] = [];
               const meta = get().meta;
-              if (meta) {
-                for (const fmt of meta.formats) {
-                  for (const id of fmt.bo3DeckIds ?? []) {
-                    const d = meta.decks[id];
-                    if (d) candidates.push(d);
-                  }
-                }
-              }
+              const { inferenceCandidatesFromBundle } = await import(
+                "../services/deckHelpers"
+              );
+              const mode = (m.bestOf ?? 1) >= 3 ? "bo3" : "bo1";
+              const candidates = inferenceCandidatesFromBundle(meta, mode);
               const body = matchEndToastBody(m, history, {
                 resolveName: (grpId) => peekArenaMeta(grpId)?.name ?? null,
                 candidates,

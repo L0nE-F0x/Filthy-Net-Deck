@@ -23,6 +23,80 @@ export function decksForMode(
     .filter((d): d is Deck => Boolean(d));
 }
 
+/**
+ * Candidate pool for opponent-archetype inference.
+ *
+ * Prefer the mode that matches the queue (Bo1 vs Bo3 lists can differ), then
+ * fold in the other mode's lists and any remaining decks of the same format so
+ * near-twins like Jeskai Lessons / Izzet Lessons / 4c Control all stay in the
+ * field. Dedupes by deck id. When no format is known, falls back to every deck
+ * in the bundle.
+ */
+export function inferenceCandidates(
+  decks: Record<string, Deck>,
+  opts?: {
+    format?: FormatMeta | null;
+    mode?: PlayMode | null;
+    /** When true (default), include the other mode's 8 as well. */
+    bothModes?: boolean;
+  },
+): Deck[] {
+  const fmt = opts?.format;
+  const mode = opts?.mode ?? "bo1";
+  const bothModes = opts?.bothModes !== false;
+  const out: Deck[] = [];
+  const seen = new Set<string>();
+  const push = (d: Deck | undefined) => {
+    if (!d || seen.has(d.id)) return;
+    seen.add(d.id);
+    out.push(d);
+  };
+
+  if (fmt) {
+    for (const d of decksForMode(fmt, mode, decks)) push(d);
+    if (bothModes) {
+      const other: PlayMode = mode === "bo1" ? "bo3" : "bo1";
+      for (const d of decksForMode(fmt, other, decks)) push(d);
+    }
+    // Any other list of the same format not already on the 8×8 grid.
+    for (const d of Object.values(decks)) {
+      if (d.format === fmt.id) push(d);
+    }
+    return out;
+  }
+
+  for (const d of Object.values(decks)) push(d);
+  return out;
+}
+
+/**
+ * Build the inference field across every format in a meta bundle (used by
+ * match-history / analytics where the queue format is unknown).
+ */
+export function inferenceCandidatesFromBundle(
+  bundle: { formats: FormatMeta[]; decks: Record<string, Deck> } | null | undefined,
+  mode?: PlayMode | null,
+): Deck[] {
+  if (!bundle?.decks) return [];
+  const out: Deck[] = [];
+  const seen = new Set<string>();
+  for (const fmt of bundle.formats ?? []) {
+    for (const d of inferenceCandidates(bundle.decks, { format: fmt, mode })) {
+      if (seen.has(d.id)) continue;
+      seen.add(d.id);
+      out.push(d);
+    }
+  }
+  if (!out.length) {
+    for (const d of Object.values(bundle.decks)) {
+      if (seen.has(d.id)) continue;
+      seen.add(d.id);
+      out.push(d);
+    }
+  }
+  return out;
+}
+
 export function topDeckForMode(
   fmt: FormatMeta,
   mode: PlayMode,

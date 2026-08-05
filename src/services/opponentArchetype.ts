@@ -4,9 +4,15 @@
  * Given Arena grpIds observed on the opponent seat (from the GRE stream the
  * tracker already tails), score today's ranked meta lists by distinctive card
  * overlap. Fully offline after names resolve; nothing is uploaded.
+ *
+ * Scoring is inverse-document-frequency weighted so staples shared across half
+ * the field (Lessons, Tablets, dual lands) barely move the needle, while cards
+ * that only one archetype plays (Gran-Gran, Inevitable Defeat, …) lock the
+ * guess. That keeps Jeskai Lessons / Izzet Lessons / 4c Control from collapsing
+ * into each other just because they all cast Lesson cards.
  */
 
-import type { Deck } from "../types/meta";
+import type { Deck, ManaColor } from "../types/meta";
 import type { TrackedMatch } from "../types/tracker";
 
 export function normalizeCardName(name: string): string {
@@ -39,15 +45,29 @@ export interface InferOptions {
   minHits?: number;
   /** Minimum confidence 0..1 (default 0.35). */
   minConfidence?: number;
+  /**
+   * How much better the top score must be than the runner-up (default 0.12 =
+   * 12% relative margin). Prevents coin-flip guesses between near-twins.
+   */
+  minMargin?: number;
 }
 
 function deckCardPool(deck: Deck): {
   all: Set<string>;
   distinctive: Set<string>;
+  key: Set<string>;
 } {
   const all = new Set<string>();
   const distinctive = new Set<string>();
+  const key = new Set<string>();
   for (const c of deck.mainboard ?? []) {
+    const n = normalizeCardName(c.name);
+    if (!n) continue;
+    all.add(n);
+    if (!c.land) distinctive.add(n);
+  }
+  // Sideboard carries archetype tells in Bo3 (and sometimes Bo1 side-in tech).
+  for (const c of deck.sideboard ?? []) {
     const n = normalizeCardName(c.name);
     if (!n) continue;
     all.add(n);
@@ -59,42 +79,160 @@ function deckCardPool(deck: Deck): {
     if (n) {
       all.add(n);
       distinctive.add(n);
+      key.add(n);
     }
   }
-  return { all, distinctive };
+  return { all, distinctive, key };
+}
+
+/** Document frequency of each distinctive card across the candidate field. */
+export function buildCardDocumentFrequency(
+  candidates: Deck[],
+): Map<string, number> {
+  const df = new Map<string, number>();
+  for (const deck of candidates) {
+    const { distinctive } = deckCardPool(deck);
+    for (const n of distinctive) {
+      df.set(n, (df.get(n) ?? 0) + 1);
+    }
+  }
+  return df;
 }
 
 /**
+ * IDF weight: cards in one list score ~log(N), staples shared by half the
+ * field score near zero. Floor keeps a tiny residual so pure density still
+ * breaks pure ties.
+ */
+export function cardIdfWeight(
+  name: string,
+  df: Map<string, number>,
+  nDecks: number,
+): number {
+  const d = df.get(name) ?? 0;
+  if (nDecks <= 0) return 1;
+  return Math.log((nDecks + 1) / (d + 0.5));
+}
+
+/**
+ * Soft color-identity pressure. When every candidate that plays a seen card
+ * shares a color, that color is "observed"; candidates missing an observed
+ * color are nudged down (not eliminated — hybrid cards and splash decks exist).
+ */
+type PipColor = Exclude<ManaColor, "C">;
+
+function observedColorsFromHits(
+  hitNames: string[],
+  candidates: Deck[],
+  df: Map<string, number>,
+): Set<PipColor> {
+  const observed = new Set<PipColor>();
+  for (const n of hitNames) {
+    // Only exclusive / rare cards vote — dual-land staples would paint every
+    // color on every deck.
+    if ((df.get(n) ?? 0) > Math.max(2, candidates.length * 0.35)) continue;
+    const colors: PipColor[] = [];
+    let any = false;
+    for (const d of candidates) {
+      const { distinctive } = deckCardPool(d);
+      if (!distinctive.has(n)) continue;
+      any = true;
+      for (const c of d.colors ?? []) {
+        if (c !== "C") colors.push(c);
+      }
+    }
+    if (!any || !colors.length) continue;
+    // Intersection of colors across every deck that plays this card.
+    const uniq = [...new Set(colors)];
+    const shared = uniq.filter((c) =>
+      candidates.every((d) => {
+        const { distinctive } = deckCardPool(d);
+        if (!distinctive.has(n)) return true;
+        return (d.colors ?? []).includes(c);
+      }),
+    );
+    for (const c of shared) observed.add(c);
+  }
+  return observed;
+}
+
+function colorFitPenalty(
+  deck: Deck,
+  observed: Set<PipColor>,
+): number {
+  if (observed.size === 0) return 0;
+  const colors = new Set((deck.colors ?? []).filter((c) => c !== "C"));
+  if (colors.size === 0) return 0;
+  let missing = 0;
+  for (const c of observed) {
+    if (!colors.has(c)) missing++;
+  }
+  // Each observed color the deck lacks costs ~0.55 score points.
+  return missing * 0.55;
+}
+
+export type ScoredDeck = Omit<ArchetypeGuess, "confidence"> & {
+  score: number;
+  /** IDF-weighted hit mass (before color / density terms). */
+  weightedHits: number;
+};
+
+/**
  * Score one deck against the set of normalized card names the opponent has
- * shown. Pure — no I/O.
+ * shown. Pure — no I/O. Pass the field-wide DF map so rare cards outrank staples.
  */
 export function scoreDeckAgainstSeen(
   seenNames: Set<string>,
   deck: Deck,
-): Omit<ArchetypeGuess, "confidence"> & { score: number } {
-  const { all, distinctive } = deckCardPool(deck);
+  df?: Map<string, number>,
+  nDecks?: number,
+  observedColors?: Set<PipColor>,
+): ScoredDeck {
+  const { all, distinctive, key } = deckCardPool(deck);
+  const n = Math.max(1, nDecks ?? 1);
+  const freq = df ?? new Map<string, number>();
   const hits: string[] = [];
   let distinctiveHits = 0;
-  for (const n of seenNames) {
-    if (!all.has(n)) continue;
+  let weightedHits = 0;
+  for (const name of seenNames) {
+    if (!all.has(name)) continue;
     // Prefer displaying the deck's casing: scan mainboard for original name.
     const original =
-      deck.mainboard?.find((c) => normalizeCardName(c.name) === n)?.name ??
-      deck.keyCards?.find((k) => normalizeCardName(k) === n) ??
-      n;
+      deck.mainboard?.find((c) => normalizeCardName(c.name) === name)?.name ??
+      deck.sideboard?.find((c) => normalizeCardName(c.name) === name)?.name ??
+      deck.keyCards?.find((k) => normalizeCardName(k) === name) ??
+      name;
     hits.push(original);
-    if (distinctive.has(n)) distinctiveHits++;
+    if (distinctive.has(name)) {
+      distinctiveHits++;
+      let w = cardIdfWeight(name, freq, n);
+      // Signature tile cards are worth more than random one-ofs.
+      if (key.has(name)) w *= 1.65;
+      // Exclusive field presence (df === 1) is the strongest tell we have.
+      if ((freq.get(name) ?? 0) <= 1) w *= 1.35;
+      weightedHits += w;
+    }
   }
-  // Rank primarily by distinctive hits, then total hits, then denser lists.
   const pool = Math.max(1, distinctive.size);
   const density = distinctiveHits / pool;
-  const score = distinctiveHits * 3 + hits.length + density;
+  // Rank by weighted rarity mass first, then raw distinctive count, then
+  // density as a weak denser-list tiebreak.
+  const colorPenalty = observedColors
+    ? colorFitPenalty(deck, observedColors)
+    : 0;
+  const score =
+    weightedHits * 4 +
+    distinctiveHits * 1.5 +
+    hits.length * 0.25 +
+    density -
+    colorPenalty;
   return {
     archetype: deck.archetype || deck.name,
     deckId: deck.id,
     hits,
     distinctiveHits,
     poolSize: distinctive.size,
+    weightedHits,
     score,
   };
 }
@@ -103,6 +241,10 @@ export function confidenceFromHits(
   distinctiveHits: number,
   poolSize: number,
   seenDistinctive: number,
+  /** 0..1 how clearly #1 beat #2 (optional, defaults to mid). */
+  margin = 0.5,
+  /** Weighted rarity mass for this guess (optional). */
+  weightedHits = 0,
 ): number {
   if (distinctiveHits <= 0) return 0;
   const pool = Math.max(1, poolSize);
@@ -111,12 +253,26 @@ export function confidenceFromHits(
   const sample = Math.min(1, seenDistinctive / 6);
   // Need multiple signature cards before calling it a lock.
   const depth = Math.min(1, distinctiveHits / 4);
-  return Math.round(Math.min(1, coverage * 0.45 + sample * 0.25 + depth * 0.3) * 1000) / 1000;
+  // Exclusive / rare hits push confidence even when raw count is modest.
+  const rarity = Math.min(1, weightedHits / 3.5);
+  const marginTerm = Math.min(1, Math.max(0, margin));
+  return (
+    Math.round(
+      Math.min(
+        1,
+        coverage * 0.25 +
+          sample * 0.2 +
+          depth * 0.2 +
+          rarity * 0.2 +
+          marginTerm * 0.15,
+      ) * 1000,
+    ) / 1000
+  );
 }
 
 /**
  * Best meta-deck guess for the cards the opponent has revealed.
- * Returns null when evidence is too thin.
+ * Returns null when evidence is too thin or the field is a near-tie.
  */
 export function inferOpponentArchetype(
   seenGrpIds: number[] | undefined | null,
@@ -126,6 +282,7 @@ export function inferOpponentArchetype(
 ): ArchetypeGuess | null {
   const minHits = opts?.minHits ?? 2;
   const minConfidence = opts?.minConfidence ?? 0.35;
+  const minMargin = opts?.minMargin ?? 0.12;
   if (!seenGrpIds?.length || !candidates.length) return null;
 
   const seenNames = new Set<string>();
@@ -136,6 +293,9 @@ export function inferOpponentArchetype(
     if (n) seenNames.add(n);
   }
   if (seenNames.size === 0) return null;
+
+  const df = buildCardDocumentFrequency(candidates);
+  const nDecks = candidates.length;
 
   // Count how many seen names look non-land-ish by checking against all pools.
   // (Land filtering of *seen* names is approximate without type lines.)
@@ -150,34 +310,74 @@ export function inferOpponentArchetype(
     if (!landish.has(n)) seenDistinctive++;
   }
 
-  let best: (ReturnType<typeof scoreDeckAgainstSeen> & { confidence: number }) | null =
-    null;
-  for (const deck of candidates) {
-    const scored = scoreDeckAgainstSeen(seenNames, deck);
-    const confidence = confidenceFromHits(
-      scored.distinctiveHits,
-      scored.poolSize,
-      seenDistinctive,
-    );
-    if (scored.distinctiveHits < minHits && scored.hits.length < minHits + 1) {
-      continue;
-    }
-    if (confidence < minConfidence) continue;
-    if (
-      !best ||
-      scored.score > best.score ||
-      (scored.score === best.score && confidence > best.confidence)
-    ) {
-      best = { ...scored, confidence };
+  // First pass: raw hits so we can derive soft color observations.
+  const prelimHits: string[] = [];
+  for (const n of seenNames) {
+    for (const d of candidates) {
+      const { distinctive } = deckCardPool(d);
+      if (distinctive.has(n)) {
+        prelimHits.push(n);
+        break;
+      }
     }
   }
-  if (!best) return null;
+  const observed = observedColorsFromHits(prelimHits, candidates, df);
+
+  const scored: ScoredDeck[] = [];
+  for (const deck of candidates) {
+    const s = scoreDeckAgainstSeen(seenNames, deck, df, nDecks, observed);
+    if (s.distinctiveHits < minHits && s.hits.length < minHits + 1) continue;
+    scored.push(s);
+  }
+  if (!scored.length) return null;
+
+  scored.sort(
+    (a, b) =>
+      b.score - a.score ||
+      b.weightedHits - a.weightedHits ||
+      b.distinctiveHits - a.distinctiveHits,
+  );
+
+  // Collapse near-duplicate archetype names: keep the best list per label so
+  // Bo1/Bo3 twins of the same deck don't invent a fake runner-up margin.
+  const byArch = new Map<string, ScoredDeck>();
+  for (const s of scored) {
+    const prev = byArch.get(s.archetype);
+    if (!prev || s.score > prev.score) byArch.set(s.archetype, s);
+  }
+  const unique = [...byArch.values()].sort((a, b) => b.score - a.score);
+  const best = unique[0];
+  const second = unique[1];
+
+  const relativeMargin =
+    second && best.score > 0
+      ? (best.score - second.score) / best.score
+      : 1;
+  // Thin margin + both have real hits → refuse rather than coin-flip.
+  if (
+    second &&
+    second.distinctiveHits >= minHits &&
+    relativeMargin < minMargin &&
+    best.weightedHits - second.weightedHits < 0.8
+  ) {
+    return null;
+  }
+
+  const confidence = confidenceFromHits(
+    best.distinctiveHits,
+    best.poolSize,
+    seenDistinctive,
+    relativeMargin,
+    best.weightedHits,
+  );
+  if (confidence < minConfidence) return null;
+
   return {
     archetype: best.archetype,
     deckId: best.deckId,
     hits: best.hits,
     distinctiveHits: best.distinctiveHits,
-    confidence: best.confidence,
+    confidence,
     poolSize: best.poolSize,
   };
 }

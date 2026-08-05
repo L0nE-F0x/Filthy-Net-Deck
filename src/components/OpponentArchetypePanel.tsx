@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { decksForMode } from "../services/deckHelpers";
+import { inferenceCandidates } from "../services/deckHelpers";
 import {
   personalVsOpponentArchetypes,
   type VsArchetypeRow,
@@ -29,7 +29,7 @@ export function OpponentArchetypePanel() {
 
   const candidates = useMemo(() => {
     if (!meta || !fmt) return [];
-    return decksForMode(fmt, mode, meta.decks);
+    return inferenceCandidates(meta.decks, { format: fmt, mode });
   }, [meta, fmt, mode]);
 
   // All grpIds we need names for across history.

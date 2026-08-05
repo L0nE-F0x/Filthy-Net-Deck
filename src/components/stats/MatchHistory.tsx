@@ -4,7 +4,7 @@ import { deckKey, gameScore, queueLabel, timeAgo } from "../../services/tracker"
 import type { TrackedMatch } from "../../types/tracker";
 import { inferOpponentArchetype } from "../../services/opponentArchetype";
 import { peekArenaMeta, resolveArenaMetaBatch } from "../../services/arenaMeta";
-import { decksForMode } from "../../services/deckHelpers";
+import { inferenceCandidates } from "../../services/deckHelpers";
 import {
   MATCH_SORT_DEFAULTS,
   sortMatches,
@@ -91,7 +91,7 @@ export function MatchHistory({
       meta.formats.find((f) => f.featured) ??
       meta.formats[0];
     if (!fmt) return [];
-    return decksForMode(fmt, mode, meta.decks);
+    return inferenceCandidates(meta.decks, { format: fmt, mode });
   }, [meta, mode, dailyFormatId]);
 
   useEffect(() => {

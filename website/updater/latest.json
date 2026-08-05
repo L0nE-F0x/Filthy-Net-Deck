@@ -1,11 +1,11 @@
 {
-  "version": "2.5.4",
-  "notes": "v2.5.4: Optional tip jar in Settings -> About. Filthy Net Deck is free and stays free - nothing is gated and there is no nag. Also live on the web: the public meta pages at filthy-net-deck.com/meta-web now carry full decklists, mana curves and card breakdowns for every ranked archetype, with all 32 decks linked and indexable.",
-  "pub_date": "2026-07-30T09:48:20Z",
+  "version": "2.6.0",
+  "notes": "v2.6.0: Sharper opponent-deck reads (Lessons/Control twins no longer collapse), overlay remembers size between matches, full card galleries for every Standard set, and a post-match rank graph that moves with each win or loss inside a tier.",
+  "pub_date": "2026-08-05T08:40:07Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJYZDF2N2w5ZHVUUENKQ3BDYlFVd2hKT29FN0RSemRqS1hBZ1VnYXd3MHJqQkxjSVExZ3RjRXdPaVF6Nnd2K3dVZjVKdGJSei9FN1BZaEhNcUQ5M2c0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1NDA0ODU1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNS40X3g2NC1zZXR1cC5leGUKTDN2TTFaclpLSHVSemN4VFpYSVVSeDJ2YXdWQWNvT0U0c3lwc3o4UU1iS2Z4Y3VJS2JjRDlkMzBhUDRQU2RyUU4wWEp2UC9MYTd1RWJtdlUrb05TQVE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.5.4.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjRCZDZybE9JSkU5ajBhQ01RVkdSRUZCb1F0RXZyZk1WQVpRUmJhZ21wcWI5U1dlc283SGhkaWpYdWEyTnMrQ2wzS21qUldiRHdHNFJPL2ZGU1FjL3dJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1OTE5MTg4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4wX3g2NC1zZXR1cC5leGUKREVYcUFEV0E4WlZTWXlFeGEyTVUvUVpNNGN5bnhKSmE4Sm1FY1FHMlFIbE9VVkNTMlh2RVBlZWFTOENrZ0cxQU9WdS9tWGw0RGtPNnVmQm1Jd0dwQkE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.0.exe"
     }
   }
 }

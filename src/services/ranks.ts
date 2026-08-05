@@ -143,6 +143,14 @@ export function rankSeriesDomain(scores: number[]): { lo: number; hi: number } {
     }
     return { lo, hi };
   }
+  // Within a single division the path now carries fractional "pip momentum"
+  // (see applyWithinRankMomentum). Zoom into that band so W/L wiggles read as
+  // real movement instead of a flat line inside a 2-step floor/ceil pad.
+  const span = maxS - minS;
+  if (span > 0 && span < 1.25 && Math.floor(minS) === Math.floor(maxS)) {
+    const pad = Math.max(0.06, span * 0.35);
+    return { lo: minS - pad, hi: maxS + pad };
+  }
   let lo = Math.floor(minS);
   let hi = Math.ceil(maxS);
   if (hi - lo < 2) {

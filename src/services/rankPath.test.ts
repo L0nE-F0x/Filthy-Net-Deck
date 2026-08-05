@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildRankPath } from "./rankPath";
+import { applyWithinRankMomentum, buildRankPath } from "./rankPath";
 import type { TrackedMatch } from "../types/tracker";
 
 const NOW = Date.UTC(2026, 6, 28, 20, 0, 0);
@@ -197,5 +197,36 @@ describe("buildRankPath", () => {
     expect(path.points.map((p) => p.matchId)).toEqual(["tonight1", "tonight2"]);
     // Sanity: the gap really is over the 3h session threshold.
     expect(history[2].endedAt - history[1].endedAt).toBeGreaterThan(3 * HOUR);
+  });
+
+  it("wiggles within a single division so the sparkline is not a flat line", () => {
+    // Gold 4 for four games: W-W-L-W. Without momentum every point is 8.0 and
+    // the post-match graph reads as a dead horizontal line.
+    const history = [
+      m({ matchId: "g0", agoMin: 60, myRank: "Gold 4", result: "win" }),
+      m({ matchId: "g1", agoMin: 45, myRank: "Gold 4", result: "win" }),
+      m({ matchId: "g2", agoMin: 30, myRank: "Gold 4", result: "loss" }),
+      m({ matchId: "g3", agoMin: 5, myRank: "Gold 4", result: "win" }),
+    ];
+    const path = buildRankPath(history, { onDeck: onDeckA, nowMs: NOW })!;
+    const scores = path.points.map((p) => p.score);
+    expect(Math.max(...scores) - Math.min(...scores)).toBeGreaterThan(0.2);
+    // Never claims a full division promote from pip momentum alone.
+    expect(Math.floor(Math.max(...scores))).toBe(8); // Gold 4 floor
+    expect(scores[0]).toBeLessThan(scores[1]); // first win lifts the next sit-down
+    expect(scores[1]).toBeLessThan(scores[2]); // second win climbs further
+    expect(scores[3]).toBeLessThan(scores[2]); // loss pulls the following point back
+  });
+});
+
+describe("applyWithinRankMomentum", () => {
+  it("leaves Mythic scores alone", () => {
+    const pts = [
+      { score: 20.91, result: "win" as const, at: 1 },
+      { score: 20.93, result: "loss" as const, at: 2 },
+    ];
+    const out = applyWithinRankMomentum(pts);
+    expect(out[0].score).toBeCloseTo(20.91);
+    expect(out[1].score).toBeCloseTo(20.93);
   });
 });
