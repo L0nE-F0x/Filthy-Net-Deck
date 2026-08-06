@@ -6,32 +6,50 @@ import {
   reconcileArchetype,
 } from "./sources/colors.mjs";
 
-const colorsOf = (e) => e.colors;
+const costOf = (e) => e.cost;
 
 describe("listColorIdentity", () => {
-  it("reads the colors the nonland cards actually need", () => {
+  it("reads the colors the nonland cards must produce", () => {
     const main = [
-      { count: 4, colors: ["W"] },
-      { count: 4, colors: ["B"] }, // Ruin-Lurker Bat
-      { count: 20, land: true, colors: ["W"] },
+      { count: 4, cost: "{1}{W}" },
+      { count: 4, cost: "{B}" },
+      { count: 20, land: true, cost: "" },
     ];
-    expect(listColorIdentity(main, colorsOf)).toEqual(["W", "B"]);
+    expect(listColorIdentity(main, costOf)).toEqual(["W", "B"]);
+  });
+
+  it("ignores hybrid pips — {1}{R/G} is castable off green alone", () => {
+    const main = [
+      { count: 4, cost: "{G}" },
+      { count: 3, cost: "{1}{R/G}" }, // Spider Manifestation
+      { count: 4, cost: "{W/U}{W/U}" }, // Skyward Spider
+    ];
+    expect(listColorIdentity(main, costOf)).toEqual(["G"]);
+  });
+
+  it("ignores Phyrexian and twobrid pips too", () => {
+    const main = [
+      { count: 4, cost: "{R}" },
+      { count: 4, cost: "{2/W}" },
+      { count: 4, cost: "{B/P}" },
+    ];
+    expect(listColorIdentity(main, costOf)).toEqual(["R"]);
   });
 
   it("ignores a lone stray card", () => {
     const main = [
-      { count: 4, colors: ["R"] },
-      { count: 1, colors: ["G"] },
+      { count: 4, cost: "{R}" },
+      { count: 1, cost: "{G}" },
     ];
-    expect(listColorIdentity(main, colorsOf)).toEqual(["R"]);
+    expect(listColorIdentity(main, costOf)).toEqual(["R"]);
   });
 
   it("ignores lands so fixing can't repaint an archetype", () => {
     const main = [
-      { count: 4, colors: ["R"] },
-      { count: 4, land: true, colors: ["U", "R"] },
+      { count: 4, cost: "{R}" },
+      { count: 4, land: true, cost: "" },
     ];
-    expect(listColorIdentity(main, colorsOf)).toEqual(["R"]);
+    expect(listColorIdentity(main, costOf)).toEqual(["R"]);
   });
 });
 

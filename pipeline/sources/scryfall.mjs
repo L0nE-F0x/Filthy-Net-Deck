@@ -49,8 +49,9 @@ function keep(card) {
     // Front face decides what the card "is" for curve purposes (MDFC lands etc.)
     isLand: /^[^/]*\bLand\b/.test(front),
     type: typeBucket(front),
-    // Color identity, so a list's real colors can be checked against its label.
-    colorIdentity: Array.isArray(card.color_identity) ? card.color_identity : [],
+    // Front-face mana cost, so a list's real color requirements can be checked
+    // against its archetype label (identity would count hybrid pips + back faces).
+    manaCost: card.mana_cost || card.card_faces?.[0]?.mana_cost || "",
   };
 }
 
@@ -220,7 +221,7 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
         mainColors.push({
           count: entry.count,
           land: card.isLand,
-          colors: card.colorIdentity || [],
+          manaCost: card.manaCost || "",
         });
       }
       out.push({
@@ -246,7 +247,7 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
   // What the list actually casts — the tile's label can disagree, and when it
   // does the cards are right. Stashed on the deck (not on each entry) so it
   // rides along to the deck builder without bloating shipped JSON.
-  const colorIdentity = listColorIdentity(mainColors, (entry) => entry.colors);
+  const colorIdentity = listColorIdentity(mainColors, (entry) => entry.manaCost);
   deck.colorIdentity = colorIdentity;
   return {
     unknown: [...new Set(unknown)],

@@ -85,18 +85,34 @@ export function archetypeTheme(name) {
 }
 
 /**
- * Colors the mainboard actually plays. Lands are ignored (fixing lands say
- * little) and a color needs at least `minCopies` copies among nonland cards, so
- * one scraped stray can't repaint an archetype.
+ * Colors a mana cost *requires*. Only plain pips count: `{1}{R/G}` is castable
+ * off green alone and `{W/U}{W/U}` off white alone, so hybrid, twobrid and
+ * Phyrexian pips prove nothing. Color identity is the wrong signal here — it
+ * counts those pips plus DFC back faces, which relabelled Mono-White Auras as
+ * Azorius (4 Skyward Spider) and Selesnya Ouroboroid as Naya (3 Spider
+ * Manifestation) on this rule's first real run.
  */
-export function listColorIdentity(mainboard, colorsOf, minCopies = 2) {
+export function requiredColorsFromCost(manaCost) {
+  const out = new Set();
+  for (const m of String(manaCost || "").matchAll(/\{([^}]*)\}/g)) {
+    const sym = m[1].trim().toUpperCase();
+    if (COLOR_ORDER.includes(sym)) out.add(sym);
+  }
+  return out;
+}
+
+/**
+ * Colors the mainboard actually has to produce. Lands are ignored (fixing lands
+ * say little) and a color needs at least `minCopies` copies among nonland
+ * cards, so one scraped stray can't repaint an archetype.
+ */
+export function listColorIdentity(mainboard, costOf, minCopies = 2) {
   const copies = new Map();
   for (const entry of mainboard || []) {
     if (entry.land) continue;
     const n = Number(entry.count) || 0;
     if (n <= 0) continue;
-    for (const c of colorsOf(entry) || []) {
-      if (!COLOR_ORDER.includes(c)) continue;
+    for (const c of requiredColorsFromCost(costOf(entry))) {
       copies.set(c, (copies.get(c) ?? 0) + n);
     }
   }
