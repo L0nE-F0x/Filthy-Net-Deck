@@ -355,7 +355,7 @@ describe("off-color opponents (Orzhov Lifegain bug)", () => {
     2: { name: "Enduring Innocence", manaCost: "{2}{W}", typeLine: "Creature — Sheep" },
     3: { name: "Plains", isLand: true, typeLine: "Basic Land — Plains", colorIdentity: ["W"] },
     // Off-list black card the ranked field has never heard of.
-    4: { name: "Ruin-Lurker Bat", manaCost: "{B}", typeLine: "Creature — Bat" },
+    4: { name: "Cut Down", manaCost: "{B}", typeLine: "Instant" },
     5: { name: "Swamp", isLand: true, typeLine: "Basic Land — Swamp", colorIdentity: ["B"] },
   };
   const resolveCard = (id: number) => cards[id] ?? null;
