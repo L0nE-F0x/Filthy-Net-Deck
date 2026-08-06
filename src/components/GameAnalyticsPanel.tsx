@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
+import { peekSeenCard, resolveArenaMetaBatch } from "../services/arenaMeta";
 import {
   deckMatchupMatrix,
   firstLandStats,
@@ -86,7 +86,7 @@ export function GameAnalyticsPanel({
 
   const resolveName = useMemo(() => {
     void resolvedTick; // re-bind when the batch lands
-    return (grpId: number) => peekArenaMeta(grpId)?.name ?? null;
+    return (grpId: number) => peekSeenCard(grpId);
   }, [resolvedTick]);
 
   const side = useMemo(() => sideboardSplit(deckMatches), [deckMatches]);

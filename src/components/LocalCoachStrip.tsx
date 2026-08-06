@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { buildLocalCoachChips } from "../services/localCoach";
-import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
+import { peekSeenCard, resolveArenaMetaBatch } from "../services/arenaMeta";
 /**
  * Deterministic coach notes on Daily — no LLM, real aggregates only.
  */
@@ -33,7 +33,7 @@ export function LocalCoachStrip() {
 
   const resolveName = useMemo(() => {
     void tick;
-    return (id: number) => peekArenaMeta(id)?.name ?? null;
+    return (id: number) => peekSeenCard(id);
   }, [tick]);
 
   const chips = useMemo(

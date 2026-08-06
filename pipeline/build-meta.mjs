@@ -24,6 +24,7 @@ import { fileURLToPath } from "node:url";
 import { buildArenaImport, sleep } from "./sources/common.mjs";
 import { fetchMetagameTiles, fetchArchetypeDeck } from "./sources/goldfish.mjs";
 import { validateDeck } from "./sources/scryfall.mjs";
+import { reconcileArchetype } from "./sources/colors.mjs";
 import {
   collectMagicGgTournaments,
   fetchMagicGgListPool,
@@ -397,7 +398,20 @@ async function buildFormat(def, diagnostics) {
   // sideboard. No invented matchup notes or sideboard guides: those sections
   // stay empty until a real data source exists.
   const makeDeck = (p, mode, rank, stats) => {
-    const slug = slugify(p.tile.name);
+    // Tile label vs. the list we actually ship: the cards win. A "Mono-White
+    // Lifegain" tile whose list plays four Ruin-Lurker Bat is Orzhov Lifegain,
+    // and shipping it as mono-white made the in-game opponent read wrong.
+    const identity = reconcileArchetype(
+      p.tile.name,
+      p.tile.colors || [],
+      p.list.colorIdentity || [],
+    );
+    if (identity.adjusted) {
+      diagnostics.push(
+        `${def.id}/${mode}/${p.tile.name}: relabelled "${identity.name}" — list plays ${identity.added.join("")} the tile doesn't`,
+      );
+    }
+    const slug = slugify(identity.name);
     const fromTournament =
       p.listSource === "mtgo" || p.listSource === "magic.gg";
     const fromLadder = p.listSource === "untapped";
@@ -437,13 +451,13 @@ async function buildFormat(def, diagnostics) {
 
     return {
       id: `${def.id}-${mode}-${slug}`,
-      name: p.tile.name,
+      name: identity.name,
       format: def.id,
       mode,
       rank,
       tier: rank <= 3 ? 1 : rank <= 6 ? 2 : 3,
-      colors: p.tile.colors || [],
-      archetype: p.tile.name,
+      colors: identity.colors,
+      archetype: identity.name,
       description: stats.description,
       mainboard: p.list.mainboard,
       sideboard,

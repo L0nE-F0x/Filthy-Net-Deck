@@ -4,6 +4,7 @@
  */
 import { apiFetch } from "./http";
 import { scryfallCdnUrl } from "./scryfall";
+import type { ManaColor } from "../types/meta";
 
 export type ArenaCardMeta = {
   name: string;
@@ -16,10 +17,16 @@ export type ArenaCardMeta = {
   cmc: number | null;
   /** Front-face mana cost string, e.g. "{2}{U}{U}" (null when unknown). */
   manaCost: string | null;
+  /** Scryfall color identity, e.g. ["W","B"]. Lands included (what they tap for).
+   *  Optional: entries cached before v3 have none. */
+  colorIdentity?: ManaColor[];
 };
 
-/** v2: adds cmc + manaCost for overlay grouping / mana pips. */
-const LS_KEY = "bbi.arenaMeta.v2";
+/**
+ * v3: adds colorIdentity so archetype inference can tell that an opponent
+ * casting {B} spells / playing black lands is not on a mono-white list.
+ */
+const LS_KEY = "bbi.arenaMeta.v3";
 const mem = new Map<number, ArenaCardMeta | null>();
 const inflight = new Map<number, Promise<ArenaCardMeta | null>>();
 
@@ -70,6 +77,7 @@ type ScryfallArenaCard = {
   type_line?: string;
   mana_cost?: string;
   cmc?: number;
+  color_identity?: string[];
   card_faces?: {
     name?: string;
     type_line?: string;
@@ -97,6 +105,9 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
   const cmc = typeof data.cmc === "number" && Number.isFinite(data.cmc) ? data.cmc : null;
   const manaCost =
     data.mana_cost?.trim() || data.card_faces?.[0]?.mana_cost?.trim() || null;
+  const colorIdentity = (data.color_identity ?? [])
+    .map((c) => c.trim().toUpperCase())
+    .filter((c): c is ManaColor => /^[WUBRG]$/.test(c));
   return {
     name,
     typeLine,
@@ -105,6 +116,7 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
     artUrl,
     cmc,
     manaCost,
+    colorIdentity,
   };
 }
 
@@ -150,6 +162,30 @@ export async function resolveArenaMeta(
 
   inflight.set(grpId, p);
   return p;
+}
+
+/**
+ * Resolver for archetype inference: name plus the color evidence (mana cost,
+ * type line, color identity) so a mono-colored guess can be corrected when the
+ * opponent has demonstrably cast off-color spells or played off-color lands.
+ * Cache-only — call `resolveArenaMetaBatch` first to warm it.
+ */
+export function peekSeenCard(grpId: number): {
+  name: string;
+  manaCost: string | null;
+  typeLine: string;
+  isLand: boolean;
+  colorIdentity: ManaColor[];
+} | null {
+  const m = peekArenaMeta(grpId);
+  if (!m?.name) return null;
+  return {
+    name: m.name,
+    manaCost: m.manaCost ?? null,
+    typeLine: m.typeLine ?? "",
+    isLand: m.isLand,
+    colorIdentity: m.colorIdentity ?? [],
+  };
 }
 
 /** Resolve many ids with low concurrency (Scryfall-friendly). */

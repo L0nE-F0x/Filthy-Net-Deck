@@ -8,6 +8,8 @@
  * wrong card's art for any invented name).
  */
 
+import { listColorIdentity } from "./colors.mjs";
+
 const API = "https://api.scryfall.com";
 const HEADERS = {
   "Content-Type": "application/json",
@@ -47,6 +49,8 @@ function keep(card) {
     // Front face decides what the card "is" for curve purposes (MDFC lands etc.)
     isLand: /^[^/]*\bLand\b/.test(front),
     type: typeBucket(front),
+    // Color identity, so a list's real colors can be checked against its label.
+    colorIdentity: Array.isArray(card.color_identity) ? card.color_identity : [],
   };
 }
 
@@ -195,7 +199,12 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
   const unknown = [];
   const illegal = [];
 
-  const fix = (arr) => {
+  // Color identity per kept mainboard entry, captured while we still hold the
+  // Scryfall card (entry names get canonicalized below, so a later lookup by
+  // name isn't guaranteed to hit).
+  const mainColors = [];
+
+  const fix = (arr, collectColors = false) => {
     const out = [];
     for (const entry of arr || []) {
       const card = resolved.get(String(entry.name).trim().toLowerCase());
@@ -207,6 +216,13 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
       const isIllegal = status !== "legal" && status !== "restricted";
       if (isIllegal) illegal.push(card.name);
       if (dropIllegal && isIllegal) continue;
+      if (collectColors) {
+        mainColors.push({
+          count: entry.count,
+          land: card.isLand,
+          colors: card.colorIdentity || [],
+        });
+      }
       out.push({
         count: entry.count,
         name: card.name,
@@ -219,7 +235,7 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
     return out;
   };
 
-  deck.mainboard = fix(deck.mainboard);
+  deck.mainboard = fix(deck.mainboard, true);
   deck.sideboard = fix(deck.sideboard);
   if (deck.commander) {
     const card = resolved.get(deck.commander.trim().toLowerCase());
@@ -227,9 +243,15 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
   }
 
   const mainCount = deck.mainboard.reduce((s, c) => s + c.count, 0);
+  // What the list actually casts — the tile's label can disagree, and when it
+  // does the cards are right. Stashed on the deck (not on each entry) so it
+  // rides along to the deck builder without bloating shipped JSON.
+  const colorIdentity = listColorIdentity(mainColors, (entry) => entry.colors);
+  deck.colorIdentity = colorIdentity;
   return {
     unknown: [...new Set(unknown)],
     illegal: [...new Set(illegal)],
     mainCount,
+    colorIdentity,
   };
 }

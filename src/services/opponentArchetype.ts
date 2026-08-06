@@ -25,9 +25,26 @@ export function normalizeCardName(name: string): string {
     .replace(/\s+/g, " ");
 }
 
-export type NameResolver = (grpId: number) => string | null | undefined;
+/**
+ * What the tracker knows about one revealed card. A bare string (name only) is
+ * still accepted — color correction simply stays off for those callers.
+ */
+export interface SeenCardInfo {
+  name: string;
+  /** Front-face mana cost, e.g. "{1}{W}{B}". */
+  manaCost?: string | null;
+  typeLine?: string | null;
+  isLand?: boolean | null;
+  /** Scryfall color identity — the only color signal lands carry. */
+  colorIdentity?: readonly string[] | null;
+}
+
+export type NameResolver = (
+  grpId: number,
+) => string | SeenCardInfo | null | undefined;
 
 export interface ArchetypeGuess {
+  /** Display label — color-corrected when the opponent showed off-list colors. */
   archetype: string;
   deckId: string;
   /** Unique meta-list card names that matched a seen card. */
@@ -38,6 +55,12 @@ export interface ArchetypeGuess {
   confidence: number;
   /** How many unique non-land cards the candidate list has (for UI). */
   poolSize: number;
+  /** The ranked list's own name (differs from `archetype` when corrected). */
+  baseArchetype: string;
+  /** True when colors the opponent proved forced a relabel of the shell. */
+  colorAdjusted: boolean;
+  /** Colors the opponent demonstrably has (cast pips / mono-colored lands). */
+  observedColors: PipColor[];
 }
 
 export interface InferOptions {
@@ -114,12 +137,96 @@ export function cardIdfWeight(
   return Math.log((nDecks + 1) / (d + 0.5));
 }
 
+export type PipColor = Exclude<ManaColor, "C">;
+
+function isPipColor(c: string): c is PipColor {
+  return c === "W" || c === "U" || c === "B" || c === "R" || c === "G";
+}
+
+/**
+ * Colors a mana cost proves. A plain `{B}` pip means they produced black mana —
+ * hard evidence. Hybrid (`{W/B}`), twobrid (`{2/W}`) and Phyrexian (`{B/P}`)
+ * pips are payable other ways, so they only count as soft evidence.
+ */
+export function colorsFromManaCost(cost: string | null | undefined): {
+  hard: Set<PipColor>;
+  soft: Set<PipColor>;
+} {
+  const hard = new Set<PipColor>();
+  const soft = new Set<PipColor>();
+  if (!cost) return { hard, soft };
+  const re = /\{([^}]*)\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(cost)) !== null) {
+    const sym = m[1].trim().toUpperCase();
+    if (!sym) continue;
+    if (isPipColor(sym)) {
+      hard.add(sym);
+      continue;
+    }
+    for (const part of sym.split("/")) {
+      if (isPipColor(part)) soft.add(part);
+    }
+  }
+  for (const c of hard) soft.delete(c);
+  return { hard, soft };
+}
+
+export interface ColorEvidence {
+  /** Colors the opponent provably has — off-colour lists are near-eliminated. */
+  required: Set<PipColor>;
+  /** Weaker hints (hybrid pips, duals, colors inferred from the field). */
+  soft: Set<PipColor>;
+}
+
+function emptyEvidence(): ColorEvidence {
+  return { required: new Set(), soft: new Set() };
+}
+
+function isLandCard(card: SeenCardInfo): boolean {
+  if (typeof card.isLand === "boolean") return card.isLand;
+  return card.typeLine ? /(?:^|\s)Land\b/.test(card.typeLine) : false;
+}
+
+/**
+ * Read colors straight off the cards the opponent actually played, rather than
+ * inferring them from which meta lists happen to contain those cards. A cast
+ * `{B}` spell or a land that only makes black is proof of black — no ranked
+ * list needs to know the card for that to hold.
+ *
+ * Multi-color lands stay soft: a two-color land in play is strong but not
+ * airtight (fixing lands get played for utility, and one land shouldn't hard-
+ * gate a read on its own).
+ */
+export function observedColorsFromSeenCards(
+  cards: SeenCardInfo[],
+): ColorEvidence {
+  const out = emptyEvidence();
+  for (const card of cards) {
+    const identity = (card.colorIdentity ?? []).filter(isPipColor);
+    if (isLandCard(card)) {
+      if (identity.length === 1) out.required.add(identity[0]);
+      else for (const c of identity) out.soft.add(c);
+      continue;
+    }
+    const { hard, soft } = colorsFromManaCost(card.manaCost);
+    if (hard.size || soft.size) {
+      for (const c of hard) out.required.add(c);
+      for (const c of soft) out.soft.add(c);
+      continue;
+    }
+    // No cost on record (tokens, unresolved faces) — identity is a weak hint.
+    for (const c of identity) out.soft.add(c);
+  }
+  for (const c of out.required) out.soft.delete(c);
+  return out;
+}
+
 /**
  * Soft color-identity pressure. When every candidate that plays a seen card
  * shares a color, that color is "observed"; candidates missing an observed
  * color are nudged down (not eliminated — hybrid cards and splash decks exist).
  */
-type PipColor = Exclude<ManaColor, "C">;
 
 function observedColorsFromHits(
   hitNames: string[],
@@ -156,22 +263,35 @@ function observedColorsFromHits(
   return observed;
 }
 
-function colorFitPenalty(
-  deck: Deck,
-  observed: Set<PipColor>,
-): number {
-  if (observed.size === 0) return 0;
-  const colors = new Set((deck.colors ?? []).filter((c) => c !== "C"));
-  if (colors.size === 0) return 0;
-  let missing = 0;
-  for (const c of observed) {
-    if (!colors.has(c)) missing++;
-  }
-  // Each observed color the deck lacks costs ~0.55 score points.
-  return missing * 0.55;
+function deckColorSet(deck: Deck): Set<ManaColor> {
+  return new Set((deck.colors ?? []).filter((c) => c !== "C"));
 }
 
-export type ScoredDeck = Omit<ArchetypeGuess, "confidence"> & {
+/** Observed colors this deck's identity cannot account for. */
+export function missingColors(deck: Deck, observed: Set<PipColor>): PipColor[] {
+  const colors = deckColorSet(deck);
+  if (colors.size === 0) return [];
+  return [...observed].filter((c) => !colors.has(c));
+}
+
+function colorFitPenalty(deck: Deck, evidence: ColorEvidence): number {
+  const colors = deckColorSet(deck);
+  if (colors.size === 0) return 0;
+  // A proven color the list can't cast is close to disqualifying: it outweighs
+  // a couple of signature hits, so a black-mana opponent stops reading as
+  // Mono-White Lifegain just because the white half of their deck matched.
+  const hard = missingColors(deck, evidence.required).length * 3.2;
+  let soft = 0;
+  for (const c of evidence.soft) {
+    if (!colors.has(c)) soft += 0.55;
+  }
+  return hard + soft;
+}
+
+export type ScoredDeck = Omit<
+  ArchetypeGuess,
+  "confidence" | "baseArchetype" | "colorAdjusted" | "observedColors"
+> & {
   score: number;
   /** IDF-weighted hit mass (before color / density terms). */
   weightedHits: number;
@@ -186,7 +306,7 @@ export function scoreDeckAgainstSeen(
   deck: Deck,
   df?: Map<string, number>,
   nDecks?: number,
-  observedColors?: Set<PipColor>,
+  observedColors?: Set<PipColor> | ColorEvidence,
 ): ScoredDeck {
   const { all, distinctive, key } = deckCardPool(deck);
   const n = Math.max(1, nDecks ?? 1);
@@ -217,9 +337,12 @@ export function scoreDeckAgainstSeen(
   const density = distinctiveHits / pool;
   // Rank by weighted rarity mass first, then raw distinctive count, then
   // density as a weak denser-list tiebreak.
-  const colorPenalty = observedColors
-    ? colorFitPenalty(deck, observedColors)
-    : 0;
+  const evidence = observedColors
+    ? observedColors instanceof Set
+      ? { required: new Set<PipColor>(), soft: observedColors }
+      : observedColors
+    : null;
+  const colorPenalty = evidence ? colorFitPenalty(deck, evidence) : 0;
   const score =
     weightedHits * 4 +
     distinctiveHits * 1.5 +
@@ -270,6 +393,104 @@ export function confidenceFromHits(
   );
 }
 
+const MONO_NAME: Record<PipColor, string> = {
+  W: "Mono-White",
+  U: "Mono-Blue",
+  B: "Mono-Black",
+  R: "Mono-Red",
+  G: "Mono-Green",
+};
+
+const PAIR_NAME: Record<string, string> = {
+  WU: "Azorius",
+  UB: "Dimir",
+  BR: "Rakdos",
+  RG: "Gruul",
+  WG: "Selesnya",
+  WB: "Orzhov",
+  UR: "Izzet",
+  BG: "Golgari",
+  WR: "Boros",
+  UG: "Simic",
+};
+
+const TRIO_NAME: Record<string, string> = {
+  WUG: "Bant",
+  WUB: "Esper",
+  UBR: "Grixis",
+  BRG: "Jund",
+  WRG: "Naya",
+  WBG: "Abzan",
+  WUR: "Jeskai",
+  UBG: "Sultai",
+  WBR: "Mardu",
+  URG: "Temur",
+};
+
+const COLOR_ORDER: PipColor[] = ["W", "U", "B", "R", "G"];
+
+function colorKey(colors: Iterable<PipColor>): string {
+  const set = new Set(colors);
+  return COLOR_ORDER.filter((c) => set.has(c)).join("");
+}
+
+/** "WB" → "Orzhov", "W" → "Mono-White", four+ → "4c"/"5c". */
+export function colorGroupName(colors: Iterable<PipColor>): string | null {
+  const key = colorKey(colors);
+  if (!key) return null;
+  if (key.length === 1) return MONO_NAME[key as PipColor];
+  if (key.length === 2) return PAIR_NAME[key] ?? null;
+  if (key.length === 3) return TRIO_NAME[key] ?? null;
+  return key.length === 4 ? "4c" : "5c";
+}
+
+const COLOR_WORDS = new Set(
+  [
+    ...Object.values(MONO_NAME),
+    ...Object.values(PAIR_NAME),
+    ...Object.values(TRIO_NAME),
+    "4c",
+    "5c",
+    "Four-Color",
+    "Five-Color",
+  ].map((w) => w.toLowerCase()),
+);
+
+/**
+ * "Mono-White Lifegain" → "Lifegain". Null when the archetype has no color
+ * word to swap, so we never invent "Orzhov Domain" out of "Domain".
+ */
+export function archetypeTheme(archetype: string): string | null {
+  const parts = archetype.trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  if (!COLOR_WORDS.has(parts[0].toLowerCase())) return null;
+  const rest = parts.slice(1).join(" ").trim();
+  return rest || null;
+}
+
+/**
+ * Relabel a shell when the opponent has proven colors it doesn't play. The
+ * ranked list stays the closest match (it's still the right deck to compare
+ * against) but the name reflects what they actually showed: a Mono-White
+ * Lifegain shell plus black mana is Orzhov Lifegain, not mono-white.
+ */
+export function colorCorrectArchetype(
+  archetype: string,
+  deckColors: Iterable<ManaColor>,
+  observed: Set<PipColor>,
+): { archetype: string; adjusted: boolean } {
+  const colors = new Set<PipColor>(
+    [...deckColors].filter((c): c is PipColor => c !== "C"),
+  );
+  const missing = [...observed].filter((c) => !colors.has(c));
+  if (!missing.length || colors.size === 0) return { archetype, adjusted: false };
+  const theme = archetypeTheme(archetype);
+  if (!theme) return { archetype, adjusted: false };
+  const name = colorGroupName([...colors, ...missing]);
+  if (!name) return { archetype, adjusted: false };
+  return { archetype: `${name} ${theme}`, adjusted: true };
+}
+
 /**
  * Best meta-deck guess for the cards the opponent has revealed.
  * Returns null when evidence is too thin or the field is a near-tie.
@@ -286,13 +507,23 @@ export function inferOpponentArchetype(
   if (!seenGrpIds?.length || !candidates.length) return null;
 
   const seenNames = new Set<string>();
+  const seenCards: SeenCardInfo[] = [];
   for (const id of seenGrpIds) {
-    const name = resolveName(id);
-    if (!name) continue;
-    const n = normalizeCardName(name);
-    if (n) seenNames.add(n);
+    const resolved = resolveName(id);
+    if (!resolved) continue;
+    const card: SeenCardInfo =
+      typeof resolved === "string" ? { name: resolved } : resolved;
+    if (!card.name) continue;
+    const n = normalizeCardName(card.name);
+    if (!n || seenNames.has(n)) continue;
+    seenNames.add(n);
+    seenCards.push(card);
   }
   if (seenNames.size === 0) return null;
+
+  // Hard color evidence read off the cards themselves. Independent of the
+  // ranked field, so it holds even for cards no meta list plays.
+  const proven = observedColorsFromSeenCards(seenCards);
 
   const df = buildCardDocumentFrequency(candidates);
   const nDecks = candidates.length;
@@ -306,8 +537,12 @@ export function inferOpponentArchetype(
     }
   }
   let seenDistinctive = 0;
-  for (const n of seenNames) {
-    if (!landish.has(n)) seenDistinctive++;
+  for (const card of seenCards) {
+    // Real type lines when the resolver has them; the field's land list is the
+    // fallback for name-only resolvers.
+    const known = card.isLand ?? (card.typeLine ? isLandCard(card) : null);
+    const land = known ?? landish.has(normalizeCardName(card.name));
+    if (!land) seenDistinctive++;
   }
 
   // First pass: raw hits so we can derive soft color observations.
@@ -321,11 +556,16 @@ export function inferOpponentArchetype(
       }
     }
   }
-  const observed = observedColorsFromHits(prelimHits, candidates, df);
+  const inferredColors = observedColorsFromHits(prelimHits, candidates, df);
+  const evidence: ColorEvidence = {
+    required: proven.required,
+    soft: new Set<PipColor>([...proven.soft, ...inferredColors]),
+  };
+  for (const c of evidence.required) evidence.soft.delete(c);
 
   const scored: ScoredDeck[] = [];
   for (const deck of candidates) {
-    const s = scoreDeckAgainstSeen(seenNames, deck, df, nDecks, observed);
+    const s = scoreDeckAgainstSeen(seenNames, deck, df, nDecks, evidence);
     if (s.distinctiveHits < minHits && s.hits.length < minHits + 1) continue;
     scored.push(s);
   }
@@ -363,17 +603,32 @@ export function inferOpponentArchetype(
     return null;
   }
 
-  const confidence = confidenceFromHits(
+  const bestDeck = candidates.find((d) => d.id === best.deckId);
+  const corrected = colorCorrectArchetype(
+    best.archetype,
+    bestDeck?.colors ?? [],
+    proven.required,
+  );
+
+  let confidence = confidenceFromHits(
     best.distinctiveHits,
     best.poolSize,
     seenDistinctive,
     relativeMargin,
     best.weightedHits,
   );
+  // The shell matched but the colors didn't: it is not this exact 75, so the
+  // read is a notch less certain than the raw card overlap suggests.
+  if (corrected.adjusted) {
+    confidence = Math.round(Math.min(confidence * 0.8, 0.8) * 1000) / 1000;
+  }
   if (confidence < minConfidence) return null;
 
   return {
-    archetype: best.archetype,
+    archetype: corrected.archetype,
+    baseArchetype: best.archetype,
+    colorAdjusted: corrected.adjusted,
+    observedColors: COLOR_ORDER.filter((c) => proven.required.has(c)),
     deckId: best.deckId,
     hits: best.hits,
     distinctiveHits: best.distinctiveHits,

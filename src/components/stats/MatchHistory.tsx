@@ -3,7 +3,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { deckKey, gameScore, queueLabel, timeAgo } from "../../services/tracker";
 import type { TrackedMatch } from "../../types/tracker";
 import { inferOpponentArchetype } from "../../services/opponentArchetype";
-import { peekArenaMeta, resolveArenaMetaBatch } from "../../services/arenaMeta";
+import { peekSeenCard, resolveArenaMetaBatch } from "../../services/arenaMeta";
 import { inferenceCandidates } from "../../services/deckHelpers";
 import {
   MATCH_SORT_DEFAULTS,
@@ -113,7 +113,7 @@ export function MatchHistory({
     void namesTick;
     const map = new Map<string, string>();
     if (!candidates.length) return map;
-    const resolve = (id: number) => peekArenaMeta(id)?.name ?? null;
+    const resolve = (id: number) => peekSeenCard(id);
     for (const m of matches) {
       if (!m.opponentSeen?.length) continue;
       const g = inferOpponentArchetype(m.opponentSeen, resolve, candidates, {

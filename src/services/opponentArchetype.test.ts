@@ -1,13 +1,18 @@
 import { describe, expect, it } from "vitest";
-import type { Deck } from "../types/meta";
+import type { Deck, ManaColor } from "../types/meta";
 import {
+  archetypeTheme,
+  colorGroupName,
+  colorsFromManaCost,
   confidenceFromHits,
   formatGuessLabel,
   inferOpponentArchetype,
   normalizeCardName,
+  observedColorsFromSeenCards,
   personalVsOpponentArchetypes,
   scoreDeckAgainstSeen,
   selectOpponentSeenGrpIds,
+  type SeenCardInfo,
 } from "./opponentArchetype";
 import type { TrackedMatch } from "../types/tracker";
 
@@ -225,6 +230,9 @@ describe("helpers", () => {
         distinctiveHits: 2,
         confidence: 0.72,
         poolSize: 5,
+        baseArchetype: "Izzet Prowess",
+        colorAdjusted: false,
+        observedColors: [],
       }),
     ).toBe("Izzet Prowess · 72%");
   });
@@ -273,5 +281,129 @@ describe("selectOpponentSeenGrpIds", () => {
     expect(sel.grpIds).toEqual([2, 5, 1]);
     expect(sel.matchCount).toBe(2);
     expect(sel.sourceBestOf).toBe(1); // from freshest match
+  });
+});
+
+/** Deck builder with explicit colors — color reads are the point below. */
+function coloredDeck(
+  id: string,
+  archetype: string,
+  colors: ManaColor[],
+  cards: { name: string; land?: boolean }[],
+  keyCards: string[] = [],
+): Deck {
+  return { ...deck(id, archetype, cards, keyCards), colors };
+}
+
+describe("color evidence", () => {
+  it("reads hard colors from plain pips, soft from hybrids", () => {
+    expect([...colorsFromManaCost("{2}{W}{B}").hard].sort()).toEqual(["B", "W"]);
+    const hybrid = colorsFromManaCost("{W/B}{2/R}{G/P}");
+    expect([...hybrid.hard]).toEqual([]);
+    expect([...hybrid.soft].sort()).toEqual(["B", "G", "R", "W"]);
+  });
+
+  it("mono-colored lands prove a color, duals only hint", () => {
+    const cards: SeenCardInfo[] = [
+      { name: "Swamp", isLand: true, colorIdentity: ["B"] },
+      { name: "Godless Shrine", isLand: true, colorIdentity: ["W", "B"] },
+      { name: "Plains", isLand: true, colorIdentity: ["W"] },
+    ];
+    const ev = observedColorsFromSeenCards(cards);
+    expect([...ev.required].sort()).toEqual(["B", "W"]);
+    expect([...ev.soft]).toEqual([]);
+  });
+
+  it("names color groups and strips color words from archetypes", () => {
+    expect(colorGroupName(["W", "B"])).toBe("Orzhov");
+    expect(colorGroupName(["W"])).toBe("Mono-White");
+    expect(colorGroupName(["W", "U", "B", "R"])).toBe("4c");
+    expect(archetypeTheme("Mono-White Lifegain")).toBe("Lifegain");
+    expect(archetypeTheme("Jeskai Lessons")).toBe("Lessons");
+    expect(archetypeTheme("Domain")).toBeNull();
+  });
+});
+
+describe("off-color opponents (Orzhov Lifegain bug)", () => {
+  const monoWhiteLifegain = coloredDeck(
+    "std-mww",
+    "Mono-White Lifegain",
+    ["W"],
+    [
+      { name: "Sheltered by Ghosts" },
+      { name: "Anointed Chorister" },
+      { name: "Enduring Innocence" },
+      { name: "Plains", land: true },
+    ],
+    ["Sheltered by Ghosts", "Enduring Innocence"],
+  );
+  const monoBlackDemons = coloredDeck(
+    "std-mbd",
+    "Mono-Black Demons",
+    ["B"],
+    [
+      { name: "Unholy Annex" },
+      { name: "Liliana of the Veil" },
+      { name: "Swamp", land: true },
+    ],
+    ["Unholy Annex"],
+  );
+  const field = [monoWhiteLifegain, monoBlackDemons];
+
+  const cards: Record<number, SeenCardInfo> = {
+    1: { name: "Sheltered by Ghosts", manaCost: "{1}{W}", typeLine: "Enchantment — Aura" },
+    2: { name: "Enduring Innocence", manaCost: "{2}{W}", typeLine: "Creature — Sheep" },
+    3: { name: "Plains", isLand: true, typeLine: "Basic Land — Plains", colorIdentity: ["W"] },
+    // Off-list black card the ranked field has never heard of.
+    4: { name: "Ruin-Lurker Bat", manaCost: "{B}", typeLine: "Creature — Bat" },
+    5: { name: "Swamp", isLand: true, typeLine: "Basic Land — Swamp", colorIdentity: ["B"] },
+  };
+  const resolveCard = (id: number) => cards[id] ?? null;
+  const opts = { minHits: 2, minConfidence: 0.2 };
+
+  it("relabels a mono-white shell as Orzhov once black mana is proven", () => {
+    const guess = inferOpponentArchetype([1, 2, 3, 4, 5], resolveCard, field, opts);
+    expect(guess?.archetype).toBe("Orzhov Lifegain");
+    expect(guess?.baseArchetype).toBe("Mono-White Lifegain");
+    expect(guess?.colorAdjusted).toBe(true);
+    expect(guess?.observedColors).toEqual(["W", "B"]);
+    // Still the closest ranked list — that's what we compare/copy against.
+    expect(guess?.deckId).toBe("std-mww");
+  });
+
+  it("leaves an on-color read alone", () => {
+    const guess = inferOpponentArchetype([1, 2, 3], resolveCard, field, opts);
+    expect(guess?.archetype).toBe("Mono-White Lifegain");
+    expect(guess?.colorAdjusted).toBe(false);
+  });
+
+  it("prefers a list that can actually cast what was seen", () => {
+    const orzhovLifegain = coloredDeck(
+      "std-wb",
+      "Orzhov Lifegain",
+      ["W", "B"],
+      [
+        { name: "Sheltered by Ghosts" },
+        { name: "Enduring Innocence" },
+        { name: "Unholy Annex" },
+        { name: "Swamp", land: true },
+      ],
+      ["Sheltered by Ghosts", "Unholy Annex"],
+    );
+    const guess = inferOpponentArchetype(
+      [1, 2, 5],
+      resolveCard,
+      [monoWhiteLifegain, orzhovLifegain],
+      opts,
+    );
+    expect(guess?.deckId).toBe("std-wb");
+    expect(guess?.colorAdjusted).toBe(false);
+  });
+
+  it("name-only resolvers keep the old behaviour", () => {
+    const byName = (id: number) => cards[id]?.name ?? null;
+    const guess = inferOpponentArchetype([1, 2, 3, 4, 5], byName, field, opts);
+    expect(guess?.archetype).toBe("Mono-White Lifegain");
+    expect(guess?.colorAdjusted).toBe(false);
   });
 });

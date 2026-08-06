@@ -6,7 +6,7 @@ import {
   type VsArchetypeRow,
 } from "../services/opponentArchetype";
 import {
-  peekArenaMeta,
+  peekSeenCard,
   resolveArenaMetaBatch,
 } from "../services/arenaMeta";
 import type { FormatId } from "../types/meta";
@@ -55,7 +55,7 @@ export function OpponentArchetypePanel() {
 
   const resolveName = useMemo(() => {
     void resolvedTick; // re-bind when batch finishes
-    return (grpId: number) => peekArenaMeta(grpId)?.name ?? null;
+    return (grpId: number) => peekSeenCard(grpId);
   }, [resolvedTick]);
 
   const rows: VsArchetypeRow[] = useMemo(() => {

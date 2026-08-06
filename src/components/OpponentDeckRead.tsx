@@ -7,7 +7,11 @@ import {
   selectOpponentSeenGrpIds,
   type SeenScope,
 } from "../services/opponentArchetype";
-import { peekArenaMeta, resolveArenaMetaBatch } from "../services/arenaMeta";
+import {
+  peekArenaMeta,
+  peekSeenCard,
+  resolveArenaMetaBatch,
+} from "../services/arenaMeta";
 import { buildArenaImport, copyToClipboard } from "../services/arenaImport";
 import type { Deck, FormatId, PlayMode } from "../types/meta";
 import type { OppGroup } from "../services/matchupGroups";
@@ -19,6 +23,20 @@ function importFor(deck: Deck): string {
     sideboard: deck.sideboard ?? [],
     commander: deck.commander,
   });
+}
+
+const COLOR_NAME: Record<string, string> = {
+  W: "white",
+  U: "blue",
+  B: "black",
+  R: "red",
+  G: "green",
+};
+
+function listColors(colors: string[]): string {
+  const names = colors.map((c) => COLOR_NAME[c] ?? c);
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
 }
 
 interface RevealedCard {
@@ -79,7 +97,7 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
 
   const resolveName = useMemo(() => {
     void tick; // re-bind once the batch resolves
-    return (grpId: number) => peekArenaMeta(grpId)?.name ?? null;
+    return (grpId: number) => peekSeenCard(grpId);
   }, [tick]);
 
   const guess = useMemo(() => {
@@ -119,6 +137,10 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
 
   const guessDeck = guess ? (meta.decks[guess.deckId] ?? null) : null;
   const pct = guess ? Math.round(guess.confidence * 100) : 0;
+  // Proven colors the closest ranked list cannot cast.
+  const offColors = (guess?.observedColors ?? []).filter(
+    (c) => !(guessDeck?.colors ?? []).includes(c),
+  );
   const unresolved = revealed.length < selection.grpIds.length;
 
   const onCopy = async () => {
@@ -164,23 +186,35 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
       ) : (
         <>
           {guess && guessDeck ? (
-            <p className="text-sm m-0 mt-1">
-              Closest ranked list:{" "}
-              <button
-                type="button"
-                className="link-btn font-semibold"
-                onClick={() => openDeck(guess.deckId)}
-                title="Open the full ranked list"
-              >
-                {guess.archetype}
-              </button>{" "}
-              <span
-                className="opp-read-conf"
-                title={`${guess.distinctiveHits} signature card${guess.distinctiveHits === 1 ? "" : "s"} matched · ${fmt.name} ${mode.toUpperCase()}`}
-              >
-                ~{pct}% match
-              </span>
-            </p>
+            <>
+              <p className="text-sm m-0 mt-1">
+                {guess.colorAdjusted ? "They were on: " : "Closest ranked list: "}
+                <button
+                  type="button"
+                  className="link-btn font-semibold"
+                  onClick={() => openDeck(guess.deckId)}
+                  title={
+                    guess.colorAdjusted
+                      ? `Closest ranked list is ${guess.baseArchetype} — open it`
+                      : "Open the full ranked list"
+                  }
+                >
+                  {guess.archetype}
+                </button>{" "}
+                <span
+                  className="opp-read-conf"
+                  title={`${guess.distinctiveHits} signature card${guess.distinctiveHits === 1 ? "" : "s"} matched · ${fmt.name} ${mode.toUpperCase()}`}
+                >
+                  ~{pct}% match
+                </span>
+              </p>
+              {guess.colorAdjusted && offColors.length > 0 && (
+                <p className="text-[11px] text-muted m-0 mt-1 leading-relaxed">
+                  Cards match {guess.baseArchetype}, but they also played{" "}
+                  {listColors(offColors)} mana — so this isn&apos;t the stock list.
+                </p>
+              )}
+            </>
           ) : (
             <p className="text-xs text-muted m-0 mt-1 leading-relaxed">
               {revealed.length} card{revealed.length === 1 ? "" : "s"} seen, but not enough

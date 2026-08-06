@@ -14,6 +14,7 @@ import { deckKey, seasonKeyOf, currentSeasonKey } from "../services/tracker";
 import { bootThemeFromStorage } from "../services/theme";
 import {
   peekArenaMeta,
+  peekSeenCard,
   resolveArenaMetaBatch,
   type ArenaCardMeta,
 } from "../services/arenaMeta";
@@ -906,7 +907,7 @@ export function OverlayApp() {
       };
     }
     const bundle = loadMetaCache();
-    const resolveName = (id: number) => peekArenaMeta(id)?.name ?? null;
+    const resolveName = (id: number) => peekSeenCard(id);
     const inferOpts = { minHits: 2, minConfidence: 0.35 };
 
     let guess: string | null = null;

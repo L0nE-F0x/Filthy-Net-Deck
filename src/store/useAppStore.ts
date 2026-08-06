@@ -891,7 +891,7 @@ export const useAppStore = create<AppState>((set, get) => {
             void (async () => {
               try {
                 const { suggestOpponentTag } = await import("../services/tagSuggest");
-                const { peekArenaMeta, resolveArenaMetaBatch } = await import(
+                const { peekSeenCard, resolveArenaMetaBatch } = await import(
                   "../services/arenaMeta"
                 );
                 await resolveArenaMetaBatch(m.opponentSeen ?? []);
@@ -903,7 +903,7 @@ export const useAppStore = create<AppState>((set, get) => {
                 const candidates = inferenceCandidatesFromBundle(meta, mode);
                 const s = suggestOpponentTag(
                   m,
-                  (id) => peekArenaMeta(id)?.name ?? null,
+                  (id) => peekSeenCard(id),
                   candidates,
                 );
                 if (
@@ -938,7 +938,7 @@ export const useAppStore = create<AppState>((set, get) => {
             const history = [m, ...cur];
             void (async () => {
               const { matchEndToastBody } = await import("../services/matchNotify");
-              const { peekArenaMeta } = await import("../services/arenaMeta");
+              const { peekSeenCard } = await import("../services/arenaMeta");
               const meta = get().meta;
               const { inferenceCandidatesFromBundle } = await import(
                 "../services/deckHelpers"
@@ -946,7 +946,7 @@ export const useAppStore = create<AppState>((set, get) => {
               const mode = (m.bestOf ?? 1) >= 3 ? "bo3" : "bo1";
               const candidates = inferenceCandidatesFromBundle(meta, mode);
               const body = matchEndToastBody(m, history, {
-                resolveName: (grpId) => peekArenaMeta(grpId)?.name ?? null,
+                resolveName: (grpId) => peekSeenCard(grpId),
                 candidates,
               });
               await notifyDesktop("Filthy Net Deck", body);
