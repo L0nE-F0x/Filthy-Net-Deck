@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.6.0";
+export const APP_VERSION = "2.6.1";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Opponent deck reads are smarter — rare signature cards outweigh shared staples so Jeskai/Izzet Lessons and 4c Control stop getting mixed up",
-  "In-match overlay remembers the size you set — no more resizing every new queue",
-  "Every Standard set on the Sets page now opens a full card gallery (not just 14 previews)",
-  "Post-match rank graph ticks up or down each game inside a tier, not only when you promote"
+  "Opponent deck reads follow the colors they actually cast — a black card or black land can no longer read as a mono-white deck",
+  "Off-color decks get named for what they really are (Orzhov Lifegain, not Mono-White Lifegain), with the closest ranked list still one click away",
+  "Ranked lists whose cards disagree with their archetype label are relabelled at the source"
 ];

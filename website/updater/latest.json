@@ -1,11 +1,11 @@
 {
-  "version": "2.6.0",
-  "notes": "v2.6.0: Sharper opponent-deck reads (Lessons/Control twins no longer collapse), overlay remembers size between matches, full card galleries for every Standard set, and a post-match rank graph that moves with each win or loss inside a tier.",
-  "pub_date": "2026-08-05T08:40:07Z",
+  "version": "2.6.1",
+  "notes": "v2.6.1: Opponent deck reads now use the colors your opponent actually plays. A black card or black land means the read can't come back mono-white — an Orzhov Lifegain deck is named Orzhov Lifegain, not Mono-White Lifegain.",
+  "pub_date": "2026-08-06T09:48:00Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjRCZDZybE9JSkU5ajBhQ01RVkdSRUZCb1F0RXZyZk1WQVpRUmJhZ21wcWI5U1dlc283SGhkaWpYdWEyTnMrQ2wzS21qUldiRHdHNFJPL2ZGU1FjL3dJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg1OTE5MTg4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4wX3g2NC1zZXR1cC5leGUKREVYcUFEV0E4WlZTWXlFeGEyTVUvUVpNNGN5bnhKSmE4Sm1FY1FHMlFIbE9VVkNTMlh2RVBlZWFTOENrZ0cxQU9WdS9tWGw0RGtPNnVmQm1Jd0dwQkE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdYOU12eEFYSW5wYXl6V21senBET2JqTXhoNGtIZUFDTGRiWTZsWW9rNVlLWDE5bkZRK05pTDdhWUJrS01adFNuOGRCcGw4b1dUVXJld2RiRjR3WHdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MDA5NjU4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4xX3g2NC1zZXR1cC5leGUKQXBSQ2dXN0J2elI5cUlmUE05RnZYei9GSVJFN1htQW1QMlR6N1RPb3dOYkhPU2UrTmxYZ3BjeHVOZGxoWU5uVkZFTXczWCtpK3hwcThSV29ZUmlEQ3c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.1.exe"
     }
   }
 }
