@@ -531,15 +531,56 @@ struct PendingMatch {
     opponent_seen: HashSet<u32>,
 }
 
+/// Zones that mean one of my cards has physically left the library.
+/// Anything else (Limbo, Pending, Suppressed, unknown) is treated as
+/// "not yet gone" — GRE parks ghost ids in Limbo, and a false draw is a
+/// worse lie than a late one.
+fn zone_is_out(ty: &str) -> bool {
+    matches!(
+        ty,
+        "ZoneType_Battlefield"
+            | "ZoneType_Graveyard"
+            | "ZoneType_Exile"
+            | "ZoneType_Stack"
+            | "ZoneType_Hand"
+            | "ZoneType_Command"
+            | "ZoneType_Revealed"
+            | "ZoneType_Sideboard"
+    )
+}
+
+/// Zones that still count as "in the deck". `ZoneType_Top` is the scry /
+/// surveil staging area — those cards never left.
+fn zone_is_deck(ty: &str) -> bool {
+    matches!(ty, "ZoneType_Library" | "ZoneType_Top")
+}
+
 /// Live mainboard-in-library tracker driven by GRE zone + gameObject diffs.
+///
+/// Counts are *derived* from current zone membership rather than accumulated
+/// from draw events. GRE mints a brand-new `instanceId` every time a card
+/// changes zone (hand → stack → battlefield → graveyard), so an
+/// event-accumulating tracker decrements the same physical card once per hop —
+/// which is why played lands used to vanish from the count several times over.
+/// `alias` follows `AnnotationType_ObjectIdChanged` so every hop resolves back
+/// to one canonical instance, and re-deriving from zones means cards shuffled
+/// back into the library correctly reappear.
 #[derive(Debug, Default, Clone)]
 struct DeckTracker {
+    /// Derived each tick: grpId -> copies still in the library.
     remaining: HashMap<u32, u32>,
     totals: HashMap<u32, u32>,
-    /// Instance ids already counted as having left the library.
-    left_instances: HashSet<u32>,
     /// zoneId -> ZoneType_* string
     zone_types: HashMap<u32, String>,
+    /// zoneId -> instance ids currently in it (authoritative, replaces on each
+    /// message that lists the zone).
+    zone_members: HashMap<u32, HashSet<u32>>,
+    /// new instanceId -> the id it replaced.
+    alias: HashMap<u32, u32>,
+    /// canonical instanceId -> the grpId it had on the way out of the deck.
+    /// First sighting wins: an MDFC / adventure cast reports its other face's
+    /// grpId, which is not the one the decklist registered.
+    obj_grp: HashMap<u32, u32>,
     last_lib_count: Option<u32>,
 }
 
@@ -547,20 +588,40 @@ impl DeckTracker {
     fn reset_from_main(&mut self, cards: &[u32]) {
         self.remaining.clear();
         self.totals.clear();
-        self.left_instances.clear();
-        self.last_lib_count = None;
+        self.reset_game_state();
         for &id in cards {
             *self.remaining.entry(id).or_default() += 1;
             *self.totals.entry(id).or_default() += 1;
         }
     }
 
+    /// Drop everything tied to one game's object graph (ids are re-minted per
+    /// game); keep the registered decklist.
+    fn reset_game_state(&mut self) {
+        self.zone_types.clear();
+        self.zone_members.clear();
+        self.alias.clear();
+        self.obj_grp.clear();
+        self.last_lib_count = None;
+    }
+
     fn clear(&mut self) {
         self.remaining.clear();
         self.totals.clear();
-        self.left_instances.clear();
-        self.zone_types.clear();
-        self.last_lib_count = None;
+        self.reset_game_state();
+    }
+
+    /// Walk the id-change chain back to the instance we first knew.
+    /// Hop-capped so a malformed cycle can never hang the tail thread.
+    fn root(&self, instance: u32) -> u32 {
+        let mut id = instance;
+        for _ in 0..64 {
+            match self.alias.get(&id) {
+                Some(&prev) if prev != id => id = prev,
+                _ => break,
+            }
+        }
+        id
     }
 
     fn library_count(&self) -> Option<u32> {
@@ -597,8 +658,45 @@ impl DeckTracker {
 
     /// Apply one GRE GameStateMessage. Returns true when remaining counts changed.
     fn apply_game_state(&mut self, gsm: &serde_json::Value, my_seat: u32) -> bool {
-        let mut changed = false;
+        // 1. Id re-mappings first: the same message carries the new object.
+        if let Some(anns) = gsm.get("annotations").and_then(|a| a.as_array()) {
+            for ann in anns {
+                let is_id_change = ann
+                    .get("type")
+                    .and_then(|t| t.as_array())
+                    .is_some_and(|types| {
+                        types
+                            .iter()
+                            .any(|t| t.as_str() == Some("AnnotationType_ObjectIdChanged"))
+                    });
+                if !is_id_change {
+                    continue;
+                }
+                let (mut orig, mut new) = (None, None);
+                let empty: Vec<serde_json::Value> = Vec::new();
+                let details = ann.get("details").and_then(|d| d.as_array()).unwrap_or(&empty);
+                for d in details {
+                    let val = d
+                        .get("valueInt32")
+                        .and_then(|v| v.as_array())
+                        .and_then(|a| a.first())
+                        .and_then(|v| v.as_u64())
+                        .map(|v| v as u32);
+                    match d.get("key").and_then(|k| k.as_str()) {
+                        Some("orig_id") => orig = val,
+                        Some("new_id") => new = val,
+                        _ => {}
+                    }
+                }
+                if let (Some(o), Some(n)) = (orig, new) {
+                    if o != n {
+                        self.alias.insert(n, o);
+                    }
+                }
+            }
+        }
 
+        // 2. Zones are authoritative for where every instance currently sits.
         if let Some(zones) = gsm.get("zones").and_then(|z| z.as_array()) {
             let mut my_lib_count: Option<u32> = None;
             for z in zones {
@@ -607,6 +705,15 @@ impl DeckTracker {
                 };
                 if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
                     self.zone_types.insert(zid, ty.to_string());
+                }
+                if let Some(ids) = z.get("objectInstanceIds").and_then(|a| a.as_array()) {
+                    self.zone_members.insert(
+                        zid,
+                        ids.iter()
+                            .filter_map(|i| i.as_u64())
+                            .map(|i| i as u32)
+                            .collect(),
+                    );
                 }
                 let owner = z
                     .get("ownerSeatId")
@@ -623,72 +730,87 @@ impl DeckTracker {
                 }
             }
             if let Some(n) = my_lib_count {
-                if let Some(prev) = self.last_lib_count {
-                    // Library grew → mulligan / reshuffle put cards back. Re-baseline.
-                    if n > prev && !self.totals.is_empty() {
-                        self.remaining = self.totals.clone();
-                        self.left_instances.clear();
-                        changed = true;
-                    }
-                }
                 self.last_lib_count = Some(n);
             }
         }
 
-        let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) else {
-            return changed;
-        };
-        for go in gos {
-            let ty = go.get("type").and_then(|t| t.as_str()).unwrap_or("");
-            if ty != "GameObjectType_Card" {
-                continue;
-            }
-            let owner = go
-                .get("ownerSeatId")
-                .and_then(|o| o.as_u64())
-                .map(|o| o as u32);
-            if owner != Some(my_seat) {
-                continue;
-            }
-            let Some(instance) = go
-                .get("instanceId")
-                .and_then(|i| i.as_u64())
-                .map(|i| i as u32)
-            else {
-                continue;
-            };
-            if self.left_instances.contains(&instance) {
-                continue;
-            }
-            let zone_id = go.get("zoneId").and_then(|z| z.as_u64()).map(|z| z as u32);
-            let zone_ty = zone_id
-                .and_then(|z| self.zone_types.get(&z))
-                .map(|s| s.as_str())
-                .unwrap_or("");
-            // Still in deck areas — not drawn/milled yet.
-            if matches!(
-                zone_ty,
-                "ZoneType_Library" | "ZoneType_Sideboard" | "ZoneType_Pending" | ""
-            ) {
-                // Unknown zone: if we have no type yet, skip rather than false-draw.
-                continue;
-            }
-            // Limbo is used during mulligan animations — don't count until a real zone.
-            if zone_ty == "ZoneType_Limbo" {
-                continue;
-            }
-            let Some(grp) = go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32) else {
-                continue;
-            };
-            self.left_instances.insert(instance);
-            if let Some(slot) = self.remaining.get_mut(&grp) {
-                if *slot > 0 {
-                    *slot -= 1;
-                    changed = true;
+        // 3. Objects only teach us identity: which grpId an instance carries.
+        if let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) {
+            for go in gos {
+                if go.get("type").and_then(|t| t.as_str()) != Some("GameObjectType_Card") {
+                    continue;
                 }
+                let owner = go
+                    .get("ownerSeatId")
+                    .and_then(|o| o.as_u64())
+                    .map(|o| o as u32);
+                if owner != Some(my_seat) {
+                    continue;
+                }
+                let (Some(instance), Some(grp)) = (
+                    go.get("instanceId")
+                        .and_then(|i| i.as_u64())
+                        .map(|i| i as u32),
+                    go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32),
+                ) else {
+                    continue;
+                };
+                let root = self.root(instance);
+                self.obj_grp.entry(root).or_insert(grp);
+                self.obj_grp.entry(instance).or_insert(grp);
             }
         }
-        changed
+
+        self.recompute()
+    }
+
+    /// Re-derive `remaining` from current zone membership. Returns true when
+    /// the counts moved (the overlay only re-emits on a real change).
+    fn recompute(&mut self) -> bool {
+        if self.totals.is_empty() {
+            return false;
+        }
+        // Anything sitting in the library (or staged on top of it) is still in
+        // the deck no matter what stale copy of it another zone lists.
+        let mut in_deck: HashSet<u32> = HashSet::new();
+        for (zid, members) in &self.zone_members {
+            if !zone_is_deck(self.zone_types.get(zid).map(|s| s.as_str()).unwrap_or("")) {
+                continue;
+            }
+            for &iid in members {
+                in_deck.insert(self.root(iid));
+            }
+        }
+
+        let mut gone: HashMap<u32, u32> = HashMap::new();
+        let mut counted: HashSet<u32> = HashSet::new();
+        for (zid, members) in &self.zone_members {
+            if !zone_is_out(self.zone_types.get(zid).map(|s| s.as_str()).unwrap_or("")) {
+                continue;
+            }
+            for &iid in members {
+                let root = self.root(iid);
+                if in_deck.contains(&root) || !counted.insert(root) {
+                    continue;
+                }
+                // Identity as of leaving the deck, not the face now showing.
+                let Some(&grp) = self.obj_grp.get(&root).or_else(|| self.obj_grp.get(&iid)) else {
+                    continue;
+                };
+                *gone.entry(grp).or_default() += 1;
+            }
+        }
+
+        let next: HashMap<u32, u32> = self
+            .totals
+            .iter()
+            .map(|(&grp, &total)| (grp, total.saturating_sub(gone.get(&grp).copied().unwrap_or(0))))
+            .collect();
+        if next == self.remaining {
+            return false;
+        }
+        self.remaining = next;
+        true
     }
 }
 
@@ -2335,6 +2457,167 @@ mod tests {
         assert_eq!(c101.total, 4);
     }
 
+    /// Wrap one GameStateMessage body in the GRE envelope `feed_line` expects.
+    fn gre_gsm(body: &str) -> String {
+        format!(
+            r#"{{ "greToClientEvent": {{ "greToClientMessages": [ {{
+                "type": "GREMessageType_GameStateMessage",
+                "gameStateMessage": {body}
+            }} ] }} }}"#
+        )
+    }
+
+    /// Regression (owner report, 2026-08-07: "overlay said 6 lands left, it was
+    /// off by 6"). GRE mints a NEW instanceId every time a card changes zone —
+    /// hand → battlefield for a land, hand → stack → battlefield for a spell.
+    /// The old event-accumulating tracker counted each hop as a separate draw,
+    /// so a deck lost one phantom copy per land played.
+    #[test]
+    fn replayed_instance_ids_do_not_double_count() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-ids", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        assert_eq!(p.live_match().unwrap().library_total, Some(6));
+
+        // Draw two copies of 101 into hand.
+        p.feed_line(&gre_gsm(
+            r#"{
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [1, 2] },
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [3,4,5,6] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 1, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 2, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        assert_eq!(p.live_match().unwrap().library_total, Some(4));
+
+        // Play instance 1 — Arena re-ids it 1 → 20 on the way to the battlefield.
+        p.feed_line(&gre_gsm(
+            r#"{
+              "type": "GameStateType_Diff",
+              "annotations": [
+                { "affectedIds": [1], "type": ["AnnotationType_ObjectIdChanged"], "details": [
+                  { "key": "orig_id", "type": "KeyValuePairValueType_int32", "valueInt32": [1] },
+                  { "key": "new_id", "type": "KeyValuePairValueType_int32", "valueInt32": [20] } ] }
+              ],
+              "zones": [
+                { "zoneId": 34, "type": "ZoneType_Battlefield", "objectInstanceIds": [20] },
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [2] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 20, "grpId": 101, "zoneId": 34, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        let live = p.live_match().unwrap();
+        assert_eq!(live.library_total, Some(4), "playing a card is not a draw");
+
+        // It dies: 20 → 30 into the graveyard. Still the same physical card.
+        p.feed_line(&gre_gsm(
+            r#"{
+              "type": "GameStateType_Diff",
+              "annotations": [
+                { "affectedIds": [20], "type": ["AnnotationType_ObjectIdChanged"], "details": [
+                  { "key": "orig_id", "type": "KeyValuePairValueType_int32", "valueInt32": [20] },
+                  { "key": "new_id", "type": "KeyValuePairValueType_int32", "valueInt32": [30] } ] }
+              ],
+              "zones": [
+                { "zoneId": 34, "type": "ZoneType_Battlefield", "objectInstanceIds": [] },
+                { "zoneId": 37, "type": "ZoneType_Graveyard", "ownerSeatId": 2, "objectInstanceIds": [30] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 30, "grpId": 101, "zoneId": 37, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        let live = p.live_match().unwrap();
+        assert_eq!(live.library_total, Some(4), "dying is not a draw either");
+        let c101 = live.library.iter().find(|c| c.grp_id == 101).unwrap();
+        assert_eq!(c101.remaining, 2);
+    }
+
+    /// A card cast as its other face (MDFC back, Adventure half) reports a
+    /// different grpId than the decklist registered — the copy has to be
+    /// subtracted from the face the deck actually contains.
+    #[test]
+    fn alternate_face_is_charged_to_the_deck_face() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-mdfc", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        // 101 into hand, then cast as face 999.
+        p.feed_line(&gre_gsm(
+            r#"{
+              "zones": [
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [1] },
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [3,4,5,6,7] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 1, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        p.feed_line(&gre_gsm(
+            r#"{
+              "annotations": [
+                { "type": ["AnnotationType_ObjectIdChanged"], "details": [
+                  { "key": "orig_id", "valueInt32": [1] },
+                  { "key": "new_id", "valueInt32": [40] } ] }
+              ],
+              "zones": [
+                { "zoneId": 33, "type": "ZoneType_Stack", "objectInstanceIds": [40] },
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 40, "grpId": 999, "zoneId": 33, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        let live = p.live_match().unwrap();
+        assert_eq!(live.library_total, Some(5));
+        let c101 = live.library.iter().find(|c| c.grp_id == 101).unwrap();
+        assert_eq!(c101.remaining, 3, "the deck face lost the copy, not 999");
+        assert!(live.library.iter().all(|c| c.grp_id != 999));
+    }
+
+    /// Shuffled / put back on top: the count has to go back up. The old
+    /// tracker only ever decremented, so a Brainstorm silently ate two cards.
+    #[test]
+    fn cards_returned_to_library_come_back() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-back", "Ladder"));
+        p.feed_line(GRE_CONNECT);
+        p.feed_line(&gre_gsm(
+            r#"{
+              "zones": [
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [1, 2] },
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [3,4,5,6] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 1, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 },
+                { "type": "GameObjectType_Card", "instanceId": 2, "grpId": 101, "zoneId": 35, "ownerSeatId": 2 }
+              ]
+            }"#,
+        ));
+        assert_eq!(p.live_match().unwrap().library_total, Some(4));
+        // Both go back on top of the library.
+        p.feed_line(&gre_gsm(
+            r#"{
+              "zones": [
+                { "zoneId": 35, "type": "ZoneType_Hand", "ownerSeatId": 2, "objectInstanceIds": [] },
+                { "zoneId": 36, "type": "ZoneType_Library", "ownerSeatId": 2, "objectInstanceIds": [1,2,3,4,5,6] }
+              ]
+            }"#,
+        ));
+        assert_eq!(p.live_match().unwrap().library_total, Some(6));
+    }
+
     #[test]
     fn live_exposes_turn_on_play_and_mulligans() {
         let mut p = LogParser::new();
@@ -2894,5 +3177,54 @@ mod tests {
             }
         }
         eprintln!("== {earned}/{} results closed on a new rank", matches.len());
+    }
+
+    /// Ground-truth check for the library counter against a real Player.log.
+    /// Arena reports the true size of my library zone on every game state, so
+    /// the tracker's `library_total` must equal it on every single tick — the
+    /// overlay has no licence to be even one card off.
+    ///
+    /// `FND_REPLAY_LOG=".../Player.log" cargo test library_count_matches_arena
+    ///   -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn library_count_matches_arena_on_every_tick() {
+        let Ok(path) = std::env::var("FND_REPLAY_LOG") else {
+            eprintln!("FND_REPLAY_LOG not set — skipping");
+            return;
+        };
+        let text = fs::read(&path).expect("read log");
+        let text = String::from_utf8_lossy(&text);
+
+        let mut p = LogParser::new();
+        let (mut ticks, mut worst) = (0u32, 0i64);
+        let mut mismatches: Vec<(u32, u32)> = Vec::new();
+        for line in text.split('\n') {
+            p.feed_line(line);
+            // Only meaningful once a decklist is seeded and Arena has told us
+            // how big the library is.
+            let (Some(truth), Some(live)) = (p.deck_tracker.library_count(), p.live_match()) else {
+                continue;
+            };
+            let Some(total) = live.library_total else {
+                continue;
+            };
+            ticks += 1;
+            if total != truth {
+                let drift = total as i64 - truth as i64;
+                if drift.abs() > worst.abs() {
+                    worst = drift;
+                }
+                if mismatches.len() < 20 {
+                    mismatches.push((truth, total));
+                }
+            }
+        }
+        eprintln!("== {ticks} ticks checked, {} mismatched", mismatches.len());
+        assert!(ticks > 0, "no library ticks in {path} — wrong log?");
+        assert!(
+            mismatches.is_empty(),
+            "library count drifted (worst {worst:+}); first cases (arena, overlay): {mismatches:?}"
+        );
     }
 }
