@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.6.1";
+export const APP_VERSION = "2.6.2";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Opponent deck reads follow the colors they actually cast — a black card or black land can no longer read as a mono-white deck",
-  "Off-color decks get named for what they really are (Orzhov Lifegain, not Mono-White Lifegain), with the closest ranked list still one click away",
-  "Ranked lists whose cards disagree with their archetype label are relabelled at the source"
+  "Overlay library counts are exact: cards no longer vanish from the count each time they change zone, so the lands-left read finally matches the deck",
+  "Cards shuffled or put back on top of the library return to the count instead of staying gone",
+  "A modal or Adventure card cast as its other half is subtracted from the card your deck actually registered"
 ];

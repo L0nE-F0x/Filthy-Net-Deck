@@ -1,5 +1,5 @@
 {
-  "version": "2.6.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.1.exe",
-  "notes": "v2.6.1: Opponent deck reads now use the colors your opponent actually plays. A black card or black land means the read can't come back mono-white — an Orzhov Lifegain deck is named Orzhov Lifegain, not Mono-White Lifegain."
+  "version": "2.6.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.2.exe",
+  "notes": "v2.6.2: The overlay's library counter is exact. Arena renumbers a card every time it changes zone, and the tracker was subtracting a phantom copy on each hop — play six lands and the deck read six lands short. Counts are now derived from where cards actually are, verified card-for-card against 33,803 game states from real matches."
 }

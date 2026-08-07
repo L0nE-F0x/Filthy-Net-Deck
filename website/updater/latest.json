@@ -1,11 +1,11 @@
 {
-  "version": "2.6.1",
-  "notes": "v2.6.1: Opponent deck reads now use the colors your opponent actually plays. A black card or black land means the read can't come back mono-white — an Orzhov Lifegain deck is named Orzhov Lifegain, not Mono-White Lifegain.",
-  "pub_date": "2026-08-06T09:48:00Z",
+  "version": "2.6.2",
+  "notes": "v2.6.2: The overlay's library counter is exact. Arena renumbers a card every time it changes zone, and the tracker was subtracting a phantom copy on each hop — play six lands and the deck read six lands short. Counts are now derived from where cards actually are, verified card-for-card against 33,803 game states from real matches.",
+  "pub_date": "2026-08-07T08:42:19Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdYOU12eEFYSW5wYXl6V21senBET2JqTXhoNGtIZUFDTGRiWTZsWW9rNVlLWDE5bkZRK05pTDdhWUJrS01adFNuOGRCcGw4b1dUVXJld2RiRjR3WHdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MDA5NjU4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4xX3g2NC1zZXR1cC5leGUKQXBSQ2dXN0J2elI5cUlmUE05RnZYei9GSVJFN1htQW1QMlR6N1RPb3dOYkhPU2UrTmxYZ3BjeHVOZGxoWU5uVkZFTXczWCtpK3hwcThSV29ZUmlEQ3c9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdKY1ZvazBiL1VkVUZscXJCaUlybzBlT1l2SStTcEJXOXlOU1poWkZXL2hFZVpxcGdlblQyWEF4TVQ2OWM5TmN1NXhQVjdRVjdrN0diZ1V4Sm9kQmdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MDkyMTExCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4yX3g2NC1zZXR1cC5leGUKRmExRkwwNmdUR3NvSCtjM0FQazR3eXViVENwT3pjbW9TSUplRFZvaDMvbUdVaElySVVkd0hIYWtBOWpmMU5EeTVTckl4Q2llNWUvUE1tRXdkRUd3Qnc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.2.exe"
     }
   }
 }
