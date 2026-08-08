@@ -1,11 +1,11 @@
 {
-  "version": "2.6.2",
-  "notes": "v2.6.2: The overlay's library counter is exact. Arena renumbers a card every time it changes zone, and the tracker was subtracting a phantom copy on each hop — play six lands and the deck read six lands short. Counts are now derived from where cards actually are, verified card-for-card against 33,803 game states from real matches.",
-  "pub_date": "2026-08-07T08:42:19Z",
+  "version": "2.6.3",
+  "notes": "v2.6.3: The overlay finally sticks — size and minimized/expanded mode survive matches, restarts, and reboots. Bo3 sideboards show on a dedicated tab. Ranked vs unranked is labeled, and Play-queue games no longer paint as ladder losses on the post-match graph.",
+  "pub_date": "2026-08-08T09:00:42Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjdKY1ZvazBiL1VkVUZscXJCaUlybzBlT1l2SStTcEJXOXlOU1poWkZXL2hFZVpxcGdlblQyWEF4TVQ2OWM5TmN1NXhQVjdRVjdrN0diZ1V4Sm9kQmdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MDkyMTExCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4yX3g2NC1zZXR1cC5leGUKRmExRkwwNmdUR3NvSCtjM0FQazR3eXViVENwT3pjbW9TSUplRFZvaDMvbUdVaElySVVkd0hIYWtBOWpmMU5EeTVTckl4Q2llNWUvUE1tRXdkRUd3Qnc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjBnbXVLT1M5ejJwL005MzBFYmVZbU1adXJwVkEwckdTRWZHUkFmNWR4THYzVFkzR2ZtemdpODh3VWxQZGdrdm5MSWM2aFpKK1d1SlZXSFB3UkZLWXd3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MTc5NjI3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4zX3g2NC1zZXR1cC5leGUKL3dBYTN0Sld2eUhqK2NBRzJac09sdHFBQjFhM3dZaHJ5aktqVzNYTUlpc296WU5TQXFyWDcrNFY4MnByNmpXZForNDRqVU9HaUlIV1JXTG1NVGhyRFE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.3.exe"
     }
   }
 }

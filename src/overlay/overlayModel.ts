@@ -239,3 +239,18 @@ export function opponentCardsSeenCount(
   if (!opponentSeen?.length) return 0;
   return new Set(opponentSeen.filter((id) => Number.isFinite(id))).size;
 }
+
+/**
+ * Whether the overlay should show a Sideboard tab.
+ * Bo3 queues (bestOf > 1) always get the tab; Bo1 only if GRE actually
+ * reported sideboard cards (rare / edge cases).
+ */
+export function showSideboardTab(live: {
+  bestOf?: number | null;
+  sideboard?: LiveCardCount[] | null;
+  sideboardTotal?: number | null;
+}): boolean {
+  if ((live.bestOf ?? 1) > 1) return true;
+  if ((live.sideboardTotal ?? 0) > 0) return true;
+  return (live.sideboard?.length ?? 0) > 0;
+}

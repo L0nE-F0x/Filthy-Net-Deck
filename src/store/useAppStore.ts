@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { invoke } from "@tauri-apps/api/core";
 import { APP_VERSION } from "../version";
 import { fetchMetaBundle } from "../services/metaFeed";
 import { fetchSetsBundle } from "../services/setsFeed";
@@ -654,6 +655,27 @@ export const useAppStore = create<AppState>((set, get) => {
       savePrefs(next);
       set({ prefs: next });
       void pushOverlayPrefs();
+      // Mirror into disk geometry so the next match / restart uses this mode
+      // (size is preserved; only the expanded flag flips).
+      if (isTauri()) {
+        void (async () => {
+          try {
+            const geo = await invoke<{
+              x: number;
+              y: number;
+              width: number;
+              height: number;
+              expanded?: boolean;
+            } | null>("overlay_get_geometry");
+            if (!geo) return;
+            await invoke("overlay_save_geometry", {
+              geometry: { ...geo, expanded: overlayStartExpanded },
+            });
+          } catch {
+            /* ignore */
+          }
+        })();
+      }
     },
     setOverlayClickThrough: (overlayClickThrough) => {
       const next = { ...get().prefs, overlayClickThrough };

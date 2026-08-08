@@ -361,7 +361,11 @@ export function Settings() {
                 />
                 <span>
                   <strong>Start expanded</strong>
-                  <em>Open with the full deck list instead of the slim bar</em>
+                  <em>
+                    First-run default for the overlay. After you resize or
+                    collapse/expand once, that size and mode are remembered
+                    across matches and restarts
+                  </em>
                 </span>
               </label>
               <label className="settings-toggle-row">

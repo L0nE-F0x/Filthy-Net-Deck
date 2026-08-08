@@ -10,7 +10,12 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type { LiveCardCount, LiveMatch, TrackedMatch } from "../types/tracker";
-import { deckKey, seasonKeyOf, currentSeasonKey } from "../services/tracker";
+import {
+  currentSeasonKey,
+  deckKey,
+  queueLabel,
+  seasonKeyOf,
+} from "../services/tracker";
 import { bootThemeFromStorage } from "../services/theme";
 import {
   peekArenaMeta,
@@ -30,6 +35,7 @@ import {
   pipText,
   pipTone,
   playDrawLabel,
+  showSideboardTab,
   type OverlayGroup,
   type OverlayRow,
 } from "./overlayModel";
@@ -37,6 +43,7 @@ import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
 import { inferenceCandidates } from "../services/deckHelpers";
 import type { MetaBundle, PlayMode } from "../types/meta";
+import { queueRankedKind, rankedChipLabel } from "../services/ranks";
 import { PostMatchSummary } from "./PostMatchSummary";
 import {
   PREFS_KEY,
@@ -53,6 +60,17 @@ const COLLAPSED_H = 34;
 const MIN_EXPANDED_H = 120;
 /** Grow the panel to at least this tall while the post-match summary is up. */
 const SUMMARY_MIN_H = 252;
+
+/** Disk shape for overlay_save_geometry / overlay_get_geometry (Rust camelCase). */
+interface OverlayGeometry {
+  x: number;
+  y: number;
+  width: number;
+  /** Expanded-panel height — never the collapsed bar. */
+  height: number;
+  /** Last mode the user left the panel in. */
+  expanded: boolean;
+}
 
 
 function loadMetaCache(): MetaBundle | null {
@@ -113,7 +131,17 @@ async function applyPostMatch(enabled: boolean) {
   }
 }
 
-async function persistGeometry(heightOverride?: number) {
+/**
+ * Write position + size + expanded/collapsed to disk.
+ * `expandedHeight` is always the full-panel height (never COLLAPSED_H).
+ * `expanded` is the mode the user left the panel in — restored across matches,
+ * app restarts, and PC reboots (this was the missing piece: size alone was
+ * saved, then every new match re-applied the Settings "start expanded" pref).
+ */
+async function persistGeometry(opts: {
+  expandedHeight: number;
+  expanded: boolean;
+}): Promise<void> {
   if (!isTauri()) return;
   try {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
@@ -121,21 +149,34 @@ async function persistGeometry(heightOverride?: number) {
     const pos = await win.outerPosition();
     const size = await win.outerSize();
     const factor = await win.scaleFactor();
+    const height = Math.max(opts.expandedHeight, MIN_EXPANDED_H);
     await invoke("overlay_save_geometry", {
       geometry: {
         x: pos.x / factor,
         y: pos.y / factor,
         width: size.width / factor,
-        // Collapsed height is transient — keep the expanded height on disk.
-        height: heightOverride ?? size.height / factor,
-      },
+        height,
+        expanded: opts.expanded,
+      } satisfies OverlayGeometry,
     });
   } catch {
     /* ignore */
   }
 }
 
-async function snapToEdges(heightOverride?: number) {
+async function loadGeometry(): Promise<OverlayGeometry | null> {
+  if (!isTauri()) return null;
+  try {
+    return await invoke<OverlayGeometry | null>("overlay_get_geometry");
+  } catch {
+    return null;
+  }
+}
+
+async function snapToEdges(opts: {
+  expandedHeight: number;
+  expanded: boolean;
+}) {
   if (!isTauri()) return;
   try {
     const {
@@ -170,7 +211,7 @@ async function snapToEdges(heightOverride?: number) {
     if (x !== pos.x || y !== pos.y) {
       await win.setPosition(new LogicalPosition(x / factor, y / factor));
     }
-    await persistGeometry(heightOverride);
+    await persistGeometry(opts);
   } catch {
     /* ignore */
   }
@@ -410,13 +451,16 @@ const MatchClock = memo(function MatchClock({
 export function OverlayApp() {
   const [live, setLive] = useState<LiveMatch | null>(null);
   const [matches, setMatches] = useState<TrackedMatch[]>([]);
-  /** Default collapsed — far less invasive; expand for full tracker. */
+  /**
+   * Compact starts from the Settings fallback; mount immediately re-syncs from
+   * disk geometry (last user mode) so a restart does not flash the wrong size.
+   */
   const [compact, setCompact] = useState(() => !readOverlayPrefs().startExpanded);
   const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
   /** Quick-settings pill menu (footer of the expanded overlay). */
   const [menuOpen, setMenuOpen] = useState(false);
-  /** Expanded list panel: my library or the opponent's seen cards. */
-  const [view, setView] = useState<"deck" | "opp">("deck");
+  /** Expanded list panel: library, sideboard (Bo3), or opponent's seen cards. */
+  const [view, setView] = useState<"deck" | "side" | "opp">("deck");
   /** Idle-dim: true while the cursor is over the panel. */
   const [hot, setHot] = useState(false);
   const dragArmed = useRef(false);
@@ -424,21 +468,32 @@ export function OverlayApp() {
   const pendingLive = useRef<LiveMatch | null | undefined>(undefined);
   /** Expanded height to restore when leaving the collapsed bar. */
   const expandedH = useRef(168);
+  /** Last restored width from disk (kept so match-start can re-apply it). */
+  const expandedW = useRef(228);
   /** True while a programmatic collapse/expand resize is in flight. */
   const programmaticResize = useRef(false);
   const compactRef = useRef(compact);
   /**
-   * Latest "start expanded" pref. Read at mount and refreshed live via the
-   * prefs events; applied when each new match starts (the overlay webview is
-   * persistent, so mount-time-only would mean waiting for an app restart).
+   * Settings "start expanded" — only used when no geometry has been saved yet.
+   * After the user resizes/toggles once, disk geometry.expanded is the source
+   * of truth across matches and restarts.
    */
   const startExpandedRef = useRef(readOverlayPrefs().startExpanded);
-  /** matchId the startExpanded pref was last applied to (once per match). */
+  /** matchId geometry was last re-applied for (once per match). */
   const appliedMatchRef = useRef<string | null>(null);
   /** matchId the post-match summary was last auto-shown for (once per match). */
   const appliedSummaryRef = useRef<string | null>(null);
   /** Panel height before the summary grew it — restored on the next match. */
   const preSummaryH = useRef<number | null>(null);
+
+  /** Snapshot used by every persist path so saves stay consistent. */
+  const geometrySnapshot = useCallback(
+    () => ({
+      expandedHeight: expandedH.current,
+      expanded: !compactRef.current,
+    }),
+    [],
+  );
 
   useEffect(() => {
     compactRef.current = compact;
@@ -557,25 +612,49 @@ export function OverlayApp() {
           );
           const win = getCurrentWindow();
 
-          // Remember the expanded height, then honor the collapsed default.
+          // Restore last size + mode from disk (survives match / app / PC restart).
           try {
-            const geo = await invoke<{ height: number } | null>(
-              "overlay_get_geometry",
-            );
+            const geo = await loadGeometry();
             const size = await win.outerSize();
             const factor = await win.scaleFactor();
-            expandedH.current = Math.max(
-              geo?.height ?? size.height / factor,
-              MIN_EXPANDED_H,
-            );
-            if (compactRef.current) {
+            const curW = size.width / factor;
+            const curH = size.height / factor;
+            if (geo) {
+              expandedH.current = Math.max(geo.height, MIN_EXPANDED_H);
+              expandedW.current = geo.width;
+              const wantCompact = !geo.expanded;
+              compactRef.current = wantCompact;
+              setCompact(wantCompact);
               programmaticResize.current = true;
-              await win.setSize(
-                new LogicalSize(size.width / factor, COLLAPSED_H),
-              );
-              window.setTimeout(() => {
-                programmaticResize.current = false;
-              }, 400);
+              try {
+                await win.setSize(
+                  new LogicalSize(
+                    geo.width,
+                    wantCompact ? COLLAPSED_H : expandedH.current,
+                  ),
+                );
+              } finally {
+                window.setTimeout(() => {
+                  programmaticResize.current = false;
+                }, 400);
+              }
+            } else {
+              expandedH.current = Math.max(curH, MIN_EXPANDED_H);
+              expandedW.current = curW;
+              // First run: honor Settings "start expanded".
+              const wantCompact = !startExpandedRef.current;
+              compactRef.current = wantCompact;
+              setCompact(wantCompact);
+              if (wantCompact && curH > COLLAPSED_H + 4) {
+                programmaticResize.current = true;
+                try {
+                  await win.setSize(new LogicalSize(curW, COLLAPSED_H));
+                } finally {
+                  window.setTimeout(() => {
+                    programmaticResize.current = false;
+                  }, 400);
+                }
+              }
             }
           } catch {
             /* ignore */
@@ -584,25 +663,43 @@ export function OverlayApp() {
           unlistenMoved = await win.onMoved(() => {
             if (!dragArmed.current) return;
             window.clearTimeout(snapTimer);
-            snapTimer = window.setTimeout(
-              () =>
-                void snapToEdges(
-                  compactRef.current ? expandedH.current : undefined,
-                ),
-              140,
-            );
+            snapTimer = window.setTimeout(() => {
+              void snapToEdges({
+                expandedHeight: expandedH.current,
+                expanded: !compactRef.current,
+              });
+            }, 140);
           });
           unlistenResized = await win.onResized(() => {
             // Programmatic collapse/expand resizes are not user geometry.
             if (programmaticResize.current) return;
             window.clearTimeout(snapTimer);
-            snapTimer = window.setTimeout(
-              () =>
-                void persistGeometry(
-                  compactRef.current ? expandedH.current : undefined,
-                ),
-              200,
-            );
+            snapTimer = window.setTimeout(() => {
+              void (async () => {
+                try {
+                  const { getCurrentWindow } = await import(
+                    "@tauri-apps/api/window"
+                  );
+                  const w = getCurrentWindow();
+                  const factor = await w.scaleFactor();
+                  const size = await w.outerSize();
+                  const logicalH = size.height / factor;
+                  const logicalW = size.width / factor;
+                  expandedW.current = logicalW;
+                  // While expanded, the drag is changing the remembered height.
+                  // While collapsed, only width changes (height is the bar).
+                  if (!compactRef.current && logicalH >= MIN_EXPANDED_H) {
+                    expandedH.current = logicalH;
+                  }
+                  await persistGeometry({
+                    expandedHeight: expandedH.current,
+                    expanded: !compactRef.current,
+                  });
+                } catch {
+                  /* ignore */
+                }
+              })();
+            }, 250);
           });
         } catch {
           /* ignore */
@@ -624,17 +721,23 @@ export function OverlayApp() {
   const playing = live?.phase === "playing";
 
   const record = useMemo(() => seasonRecord(matches, live), [matches, live]);
-  // One meta map for both panels: my library and the opponent's seen cards.
+  // One meta map for library, sideboard, and the opponent's seen cards.
   const allIds = useMemo(() => {
     const ids = (live?.library ?? []).map((c) => c.grpId);
+    for (const c of live?.sideboard ?? []) ids.push(c.grpId);
     for (const id of live?.opponentSeen ?? []) ids.push(id);
     return ids;
-  }, [live?.library, live?.opponentSeen]);
+  }, [live?.library, live?.sideboard, live?.opponentSeen]);
   const metaMap = useArenaMetaMap(allIds);
 
   const groups = useMemo(
     () => groupLibrary(live?.library ?? [], (id) => metaMap.get(id)),
     [live?.library, metaMap],
+  );
+
+  const sideGroups = useMemo(
+    () => groupLibrary(live?.sideboard ?? [], (id) => metaMap.get(id)),
+    [live?.sideboard, metaMap],
   );
 
   const oppGroups = useMemo(
@@ -643,6 +746,8 @@ export function OverlayApp() {
   );
 
   const libTotal = live?.libraryTotal ?? 0;
+  const sideTotal = live?.sideboardTotal ?? 0;
+  const sideboardTab = live ? showSideboardTab(live) : false;
 
   const maxPct = useMemo(() => {
     let m = 0;
@@ -674,9 +779,9 @@ export function OverlayApp() {
   const onDragHandleUp = useCallback(() => {
     window.setTimeout(() => {
       dragArmed.current = false;
-      void snapToEdges(compactRef.current ? expandedH.current : undefined);
+      void snapToEdges(geometrySnapshot());
     }, 80);
-  }, []);
+  }, [geometrySnapshot]);
 
   const startResize = useCallback(
     (edge: "East" | "North" | "South" | "West" | "SouthEast") =>
@@ -688,13 +793,32 @@ export function OverlayApp() {
           try {
             const { getCurrentWindow } = await import("@tauri-apps/api/window");
             await getCurrentWindow().startResizeDragging(edge);
-            window.setTimeout(
-              () =>
-                void persistGeometry(
-                  compactRef.current ? expandedH.current : undefined,
-                ),
-              200,
-            );
+            // Resize drag ends asynchronously — sample size after it settles.
+            // onResized also persists; this is a belt-and-braces flush.
+            window.setTimeout(() => {
+              void (async () => {
+                try {
+                  const { getCurrentWindow } = await import(
+                    "@tauri-apps/api/window"
+                  );
+                  const win = getCurrentWindow();
+                  const factor = await win.scaleFactor();
+                  const size = await win.outerSize();
+                  const logicalH = size.height / factor;
+                  const logicalW = size.width / factor;
+                  expandedW.current = logicalW;
+                  if (!compactRef.current && logicalH >= MIN_EXPANDED_H) {
+                    expandedH.current = logicalH;
+                  }
+                  await persistGeometry({
+                    expandedHeight: expandedH.current,
+                    expanded: !compactRef.current,
+                  });
+                } catch {
+                  /* ignore */
+                }
+              })();
+            }, 400);
           } catch {
             /* ignore */
           }
@@ -710,6 +834,10 @@ export function OverlayApp() {
     // Captured synchronously: a summary-grown height must never become the
     // remembered expanded height when the panel collapses.
     const preGrownH = preSummaryH.current;
+    // Keep Settings "start expanded" in sync with the last mode the user chose
+    // so first-run fallback matches reality if geometry is ever wiped.
+    writeOverlayPrefs({ overlayStartExpanded: !next });
+    startExpandedRef.current = !next;
     if (!isTauri()) return;
     void (async () => {
       try {
@@ -721,11 +849,16 @@ export function OverlayApp() {
         const size = await win.outerSize();
         const w = size.width / factor;
         const curH = size.height / factor;
+        expandedW.current = w;
         programmaticResize.current = true;
         try {
           if (next) {
-            // Collapsing — remember the real expanded height.
-            expandedH.current = Math.max(preGrownH ?? curH, MIN_EXPANDED_H);
+            // Collapsing — remember the real expanded height (not summary grow).
+            if (preGrownH != null) {
+              expandedH.current = Math.max(preGrownH, MIN_EXPANDED_H);
+            } else if (curH >= MIN_EXPANDED_H) {
+              expandedH.current = curH;
+            }
             await win.setSize(new LogicalSize(w, COLLAPSED_H));
           } else {
             await win.setSize(
@@ -738,6 +871,12 @@ export function OverlayApp() {
             programmaticResize.current = false;
           }, 400);
         }
+        // Persist mode + expanded height immediately so the next match / reboot
+        // opens exactly how the user left it.
+        await persistGeometry({
+          expandedHeight: expandedH.current,
+          expanded: !next,
+        });
       } catch {
         /* ignore */
       }
@@ -756,15 +895,9 @@ export function OverlayApp() {
     startExpandedRef.current = p.startExpanded;
   }, []);
 
-  // Apply the "start expanded" pref once per match — live pref changes are
-  // pushed via `prefs:overlay`/storage into startExpandedRef, and take effect
-  // here on the next match start (never mid-match, so a manual collapse is
-  // not yanked back between Bo3 games).
-  //
-  // Also re-apply the user's saved width/height from disk. Without this, a
-  // post-match grow, a mid-session density change, or a transient resize can
-  // leave the panel at the wrong size every new queue pop — the complaint that
-  // "I have to resize it every match".
+  // Once per match: re-apply the *last saved* size + expanded/collapsed mode
+  // from disk. This undoes post-match summary grow and any transient drift,
+  // without forcing the Settings "start expanded" pref over a manual toggle.
   const liveMatchId = live?.matchId;
   const livePhase = live?.phase;
   useEffect(() => {
@@ -775,9 +908,9 @@ export function OverlayApp() {
     ) {
       appliedMatchRef.current = liveMatchId;
       setView("deck");
-      const wantExpanded = startExpandedRef.current;
       if (!isTauri()) {
-        setCompactMode(!wantExpanded);
+        // Browser demo: Settings fallback only.
+        setCompactMode(!startExpandedRef.current);
         return;
       }
       void (async () => {
@@ -788,13 +921,19 @@ export function OverlayApp() {
           const win = getCurrentWindow();
           const factor = await win.scaleFactor();
           const size = await win.outerSize();
-          const geo = await invoke<{
-            width: number;
-            height: number;
-          } | null>("overlay_get_geometry");
-          const w = geo?.width ?? size.width / factor;
-          const h = Math.max(geo?.height ?? expandedH.current, MIN_EXPANDED_H);
+          const geo = await loadGeometry();
+          const w = geo?.width ?? expandedW.current ?? size.width / factor;
+          const h = Math.max(
+            geo?.height ?? expandedH.current,
+            MIN_EXPANDED_H,
+          );
+          // Prefer disk mode; fall back to in-memory compact, then Settings.
+          const wantExpanded =
+            geo != null
+              ? geo.expanded
+              : startExpandedRef.current;
           expandedH.current = h;
+          expandedW.current = w;
           programmaticResize.current = true;
           try {
             if (wantExpanded) {
@@ -813,22 +952,25 @@ export function OverlayApp() {
             }, 400);
           }
         } catch {
-          setCompactMode(!wantExpanded);
+          /* leave current size alone */
         }
       })();
     }
   }, [liveMatchId, livePhase, setCompactMode]);
 
-  // Post-match summary: once per match, make sure the panel is expanded and
-  // tall enough to show the card; restore the user's height when the next
-  // match starts. Runs after the startExpanded effect so compactRef is final.
+  // Post-match summary: briefly expand tall enough for the card. Does NOT
+  // write geometry — the user's saved size/mode is restored on the next match.
   const summaryOn = livePhase === "ended" && prefs.postMatch;
   useEffect(() => {
     if (summaryOn && liveMatchId) {
       if (appliedSummaryRef.current === liveMatchId) return;
       appliedSummaryRef.current = liveMatchId;
       if (!isTauri()) {
-        if (compactRef.current) setCompactMode(false);
+        // Demo only — don't persist compact mode flip.
+        if (compactRef.current) {
+          compactRef.current = false;
+          setCompact(false);
+        }
         return;
       }
       void (async () => {
@@ -843,6 +985,7 @@ export function OverlayApp() {
           const curH = size.height / factor;
           const wasCompact = compactRef.current;
           if (!wasCompact && curH >= SUMMARY_MIN_H) return; // visible + tall enough
+          // Remember true expanded height so we never save the summary grow.
           preSummaryH.current = wasCompact ? expandedH.current : curH;
           if (wasCompact) {
             compactRef.current = false;
@@ -858,20 +1001,21 @@ export function OverlayApp() {
             );
             await ensureOnScreen();
           } finally {
+            // Hold the flag long enough that onResized cannot persist the grow.
             window.setTimeout(() => {
               programmaticResize.current = false;
-            }, 400);
+            }, 800);
           }
         } catch {
           /* ignore */
         }
       })();
     } else if (livePhase === "playing" && preSummaryH.current != null) {
-      const target = preSummaryH.current;
+      // Match-start effect already re-applies disk geometry; clear the stash.
       preSummaryH.current = null;
-      // Collapsed by the startExpanded effect — the collapse path already
-      // recorded `target` as the expanded height, nothing to resize.
       if (compactRef.current || !isTauri()) return;
+      // If match-start did not run (same match id edge case), shrink off grow.
+      const target = Math.max(expandedH.current, MIN_EXPANDED_H);
       void (async () => {
         try {
           const { getCurrentWindow, LogicalSize } = await import(
@@ -880,6 +1024,7 @@ export function OverlayApp() {
           const win = getCurrentWindow();
           const factor = await win.scaleFactor();
           const size = await win.outerSize();
+          if (size.height / factor <= target + 2) return;
           programmaticResize.current = true;
           try {
             await win.setSize(new LogicalSize(size.width / factor, target));
@@ -975,6 +1120,8 @@ export function OverlayApp() {
       : null;
 
   const playLabel = playDrawLabel(live.onPlay);
+  const rankedLabel = rankedChipLabel(live.eventId);
+  const rankedKind = queueRankedKind(live.eventId);
 
   // Quiet down while the mouse is elsewhere. Never while ended (result should
   // pop) and never with click-through (no hover events would ever wake it).
@@ -1090,6 +1237,14 @@ export function OverlayApp() {
               Bo3
             </span>
           ) : null}
+          {compact && rankedLabel ? (
+            <span
+              className={`overlay-mode-chip overlay-chip--queue is-${rankedKind}`}
+              title={queueLabel(live.eventId)}
+            >
+              {rankedLabel === "Ranked" ? "Ranked" : "Unrk"}
+            </span>
+          ) : null}
           {compact && prefs.barClock && playing ? (
             <MatchClock startedAt={live.startedAt} />
           ) : null}
@@ -1162,6 +1317,14 @@ export function OverlayApp() {
               <span className="overlay-mode-chip">
                 {live.bestOf > 1 ? `Bo${live.bestOf}` : "Bo1"}
               </span>
+              {rankedLabel ? (
+                <span
+                  className={`overlay-mode-chip overlay-chip--queue is-${rankedKind}`}
+                  title={queueLabel(live.eventId)}
+                >
+                  {rankedLabel}
+                </span>
+              ) : null}
               {playing ? <MatchClock startedAt={live.startedAt} /> : null}
             </span>
           </div>
@@ -1178,6 +1341,19 @@ export function OverlayApp() {
               >
                 My deck
               </button>
+              {sideboardTab ? (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={view === "side"}
+                  className={`overlay-tab${view === "side" ? " is-active" : ""}`}
+                  title="Your sideboard for this game (Bo3)"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => setView("side")}
+                >
+                  Sideboard{sideTotal > 0 ? ` · ${sideTotal}` : ""}
+                </button>
+              ) : null}
               <button
                 type="button"
                 role="tab"
@@ -1213,6 +1389,27 @@ export function OverlayApp() {
                 <p className="overlay-hint">
                   Nothing revealed yet…
                   <span>Opponent cards land here as they get played or shown</span>
+                </p>
+              )}
+            </div>
+          ) : view === "side" && sideboardTab ? (
+            <div className="overlay-decklist overlay-decklist--side">
+              {sideGroups.length > 0 ? (
+                sideGroups.map((g) => (
+                  <GroupSection
+                    key={g.id}
+                    group={g}
+                    // No next-draw odds for the sideboard — hide the % column.
+                    libraryTotal={0}
+                    maxPct={0}
+                  />
+                ))
+              ) : (
+                <p className="overlay-hint">
+                  Waiting for the sideboard list…
+                  <span>
+                    Arena sends it at game start — it refreshes after each board
+                  </span>
                 </p>
               )}
             </div>
@@ -1280,12 +1477,10 @@ export function OverlayApp() {
                 <label className="overlay-menu-row">
                   <input
                     type="checkbox"
-                    checked={prefs.startExpanded}
-                    onChange={(e) =>
-                      patchPrefs({ overlayStartExpanded: e.target.checked })
-                    }
+                    checked={!compact}
+                    onChange={(e) => setCompactMode(!e.target.checked)}
                   />
-                  <span>Start matches expanded</span>
+                  <span>Expanded (saved across matches &amp; restarts)</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input

@@ -6412,12 +6412,17 @@ html.overlay-macos .overlay-shell {
   transition: opacity 0.7s ease 1.2s;
 }
 
-/* Deck / Opponent tab strip */
+/* Deck / Sideboard / Opponent tab strip */
 .overlay-tabs {
   display: flex;
   gap: 3px;
   padding: 3px 8px 1px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.overlay-decklist--side .overlay-card-pct {
+  /* Sideboard rows have no next-draw odds — hide the dead "—" column. */
+  visibility: hidden;
 }
 .overlay-tab {
   border: 1px solid transparent;
@@ -6463,7 +6468,7 @@ html.overlay-macos .overlay-shell {
   background: none;
 }
 
-/* Turn / mulligan chips share the mode-chip shell */
+/* Turn / mulligan / queue chips share the mode-chip shell */
 .overlay-chip--turn {
   color: var(--color-azure-300);
   border-color: rgba(107, 154, 235, 0.35);
@@ -6471,6 +6476,14 @@ html.overlay-macos .overlay-shell {
 .overlay-chip--mull {
   color: #fca5a5;
   border-color: rgba(248, 113, 113, 0.35);
+}
+.overlay-chip--queue.is-ranked {
+  color: var(--color-good);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+.overlay-chip--queue.is-unranked {
+  color: var(--color-muted);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Density — compact is the product default; cozy is the old roomy look. */
@@ -6569,6 +6582,16 @@ html.overlay-macos .overlay-shell {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.postmatch-chip--queue.is-ranked {
+  color: var(--color-good);
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+.postmatch-chip--queue.is-unranked {
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 .postmatch-form {
   display: flex;

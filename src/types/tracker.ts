@@ -96,6 +96,12 @@ export interface LiveMatch {
   /** Cards still in library (mainboard). */
   library?: LiveCardCount[];
   libraryTotal?: number;
+  /**
+   * Current game's sideboard (GRE `sideboardCards`). Empty in Bo1.
+   * Static counts for the game — not live zone tracking.
+   */
+  sideboard?: LiveCardCount[];
+  sideboardTotal?: number;
   /** Opponent grpIds seen so far this match. */
   opponentSeen?: number[];
   /** Current turn number (GRE turnInfo) — absent until turn 1 registers. */

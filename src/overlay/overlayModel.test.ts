@@ -15,6 +15,7 @@ import {
   pipText,
   pipTone,
   playDrawLabel,
+  showSideboardTab,
 } from "./overlayModel";
 
 function meta(partial: Partial<ArenaCardMeta>): ArenaCardMeta {
@@ -233,5 +234,22 @@ describe("playDrawLabel", () => {
     expect(playDrawLabel(false)).toBe("Draw");
     expect(playDrawLabel(null)).toBeNull();
     expect(playDrawLabel(undefined)).toBeNull();
+  });
+});
+
+describe("showSideboardTab", () => {
+  it("shows for Bo3 even before sideboard cards arrive", () => {
+    expect(showSideboardTab({ bestOf: 3 })).toBe(true);
+    expect(showSideboardTab({ bestOf: 1 })).toBe(false);
+  });
+
+  it("shows when GRE reported sideboard cards (even on Bo1 edge cases)", () => {
+    expect(
+      showSideboardTab({
+        bestOf: 1,
+        sideboard: [{ grpId: 1, remaining: 2, total: 2 }],
+        sideboardTotal: 2,
+      }),
+    ).toBe(true);
   });
 });

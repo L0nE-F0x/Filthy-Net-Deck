@@ -8,12 +8,16 @@ import { memo, useCallback, useMemo } from "react";
 import type { LiveMatch, TrackedMatch } from "../types/tracker";
 import { deckKey } from "../services/tracker";
 import {
+  isLadderEvent,
   mythicAxisLabel,
+  queueRankedKind,
   rankLabelFromScore,
+  rankedChipLabel,
   rankSeriesDomain,
 } from "../services/ranks";
 import { buildRankPath, RANK_PATH_MAX_POINTS } from "../services/rankPath";
 import { sessionWindow } from "../services/recapStats";
+import { queueLabel } from "../services/tracker";
 
 /** Sparkline geometry (viewBox units; the SVG scales with panel width). */
 const SPARK_W = 180;
@@ -81,6 +85,15 @@ export const PostMatchSummary = memo(function PostMatchSummary({
     [matches, onDeck],
   );
 
+  /** Ladder-only slice — form + WR fallback must not paint Play/draft as ranked. */
+  const rankedDeckMatches = useMemo(
+    () => deckMatches.filter((m) => isLadderEvent(m.eventId)),
+    [deckMatches],
+  );
+
+  const liveRanked = queueRankedKind(live.eventId) === "ranked";
+  const queueChip = rankedChipLabel(live.eventId);
+
   /** Record within the current play session (same deck). */
   const session = useMemo(() => {
     const { fromMs } = sessionWindow(matches);
@@ -94,17 +107,28 @@ export const PostMatchSummary = memo(function PostMatchSummary({
     return wins + losses > 0 ? { wins, losses } : null;
   }, [matches, deckMatches]);
 
-  const form = useMemo(() => deckMatches.slice(-FORM_GAMES), [deckMatches]);
+  /**
+   * Form strip next to the rank graph: ladder games only when any exist, so an
+   * unranked loss never appears as a red pip on the ranked progression card.
+   * Pure unranked sessions still get form from whatever you actually played.
+   */
+  const form = useMemo(() => {
+    const pool =
+      rankedDeckMatches.length > 0 ? rankedDeckMatches : deckMatches;
+    return pool.slice(-FORM_GAMES);
+  }, [rankedDeckMatches, deckMatches]);
 
   const spark = useMemo<Spark | null>(() => {
     // Preferred: the ladder path this deck actually walked. Scoped to the
     // session (then the season) and to ranked queues — see rankPath.ts for
     // why an unscoped series drew a fresh deck a twelve-game climb.
+    // Never pin the endpoint on an unranked finish (Play stamps rank too).
     const path = buildRankPath(matches, {
       onDeck,
       maxPoints: SPARK_POINTS,
-      liveRank: live.rankNow,
-      liveMatchId: live.matchId,
+      liveRank: liveRanked ? live.rankNow : null,
+      liveMatchId: liveRanked ? live.matchId : null,
+      liveEventId: live.eventId,
     });
     if (path) {
       const values = path.points.map((p) => p.score);
@@ -130,13 +154,19 @@ export const PostMatchSummary = memo(function PostMatchSummary({
           `samples on this deck (${path.scope === "session" ? "this session" : "this season"}). ` +
           (path.endsNow
             ? `The last point is where this match just left you.`
-            : `Arena logs the rank this match earned a moment after the result.`),
+            : liveRanked
+              ? `Arena logs the rank this match earned a moment after the result.`
+              : `This match was unranked — the line only uses ladder games.`),
       };
     }
-    // Fallback: running winrate trend on this deck, same session-first scope.
+    // Fallback: running winrate on ladder games when available, so Play-queue
+    // losses never draw as the red tail of a "progression" graph after ranked.
     const { fromMs } = sessionWindow(matches);
-    const sessionGames = deckMatches.filter((m) => m.endedAt >= fromMs);
-    const recent = (sessionGames.length >= 2 ? sessionGames : deckMatches).slice(
+    const wrPool =
+      rankedDeckMatches.length >= 2 ? rankedDeckMatches : deckMatches;
+    const wrIsRanked = rankedDeckMatches.length >= 2;
+    const sessionGames = wrPool.filter((m) => m.endedAt >= fromMs);
+    const recent = (sessionGames.length >= 2 ? sessionGames : wrPool).slice(
       -SPARK_POINTS,
     );
     if (recent.length >= 2) {
@@ -148,20 +178,37 @@ export const PostMatchSummary = memo(function PostMatchSummary({
       });
       return {
         kind: "wr",
-        kindLabel: inSession ? "session wr" : "wr trend",
+        kindLabel: wrIsRanked
+          ? inSession
+            ? "session ranked wr"
+            : "ranked wr"
+          : inSession
+            ? "session wr"
+            : "wr trend",
         values,
         results: recent.map((m) => m.result),
         firstLabel: `${Math.round(values[0])}%`,
         lastLabel: `${Math.round(values[values.length - 1])}% WR`,
         hint:
-          `Running winrate across your last ${recent.length} games on this ` +
-          `deck (${inSession ? "this session" : "all recorded"}). ` +
-          `No ranked-ladder movement to plot yet.`,
+          `Running winrate across your last ${recent.length} ` +
+          `${wrIsRanked ? "ranked " : ""}games on this deck ` +
+          `(${inSession ? "this session" : "all recorded"}). ` +
+          (wrIsRanked
+            ? `Unranked queues are excluded from this trend.`
+            : `No ranked-ladder samples yet — all queues on this deck.`),
       };
     }
     return null;
-  }, [matches, deckMatches, onDeck, live.matchId, live.rankNow]);
-
+  }, [
+    matches,
+    deckMatches,
+    rankedDeckMatches,
+    onDeck,
+    live.matchId,
+    live.rankNow,
+    live.eventId,
+    liveRanked,
+  ]);
   const sparkGeom = useMemo(() => {
     if (!spark) return null;
     const n = spark.values.length;
@@ -197,6 +244,14 @@ export const PostMatchSummary = memo(function PostMatchSummary({
   return (
     <div className="postmatch" data-tauri-drag-region>
       <div className="postmatch-chips" data-tauri-drag-region>
+        {queueChip && (
+          <span
+            className={`postmatch-chip postmatch-chip--queue is-${queueRankedKind(live.eventId)}`}
+            title={queueLabel(live.eventId)}
+          >
+            {queueChip}
+          </span>
+        )}
         {record.wr != null && (
           <span
             className="postmatch-chip"
@@ -226,7 +281,11 @@ export const PostMatchSummary = memo(function PostMatchSummary({
       {form.length > 0 && (
         <div
           className="postmatch-form"
-          title={`Last ${form.length} on this deck: ${formWins}W ${form.length - formWins}L`}
+          title={
+            rankedDeckMatches.length > 0
+              ? `Last ${form.length} ranked on this deck: ${formWins}W ${form.length - formWins}L`
+              : `Last ${form.length} on this deck: ${formWins}W ${form.length - formWins}L`
+          }
         >
           {form.map((m) => (
             <span key={m.matchId} className={`postmatch-dot is-${m.result}`} />

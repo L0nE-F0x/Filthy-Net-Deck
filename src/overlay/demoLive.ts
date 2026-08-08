@@ -22,6 +22,11 @@ const row = (grpId: number, remaining: number, total: number): LiveCardCount => 
  * styled without waiting on a real Arena result.
  */
 export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
+  // `?demo&bo3` — Traditional queue with a sideboard so the Sideboard tab
+  // can be styled without a real Bo3 match.
+  const bo3 =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("bo3");
   const library: LiveCardCount[] = [
     row(105180, 12, 18), // Mountain
     row(91674, 2, 4), // Heartfire Hero
@@ -35,12 +40,23 @@ export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
     row(93792, 2, 4), // Boltwave
     row(95623, 3, 4), // Cori-Steel Cutter
   ];
+  const sideboard: LiveCardCount[] = bo3
+    ? [
+        row(93601, 3, 3), // Obliterating Bolt
+        row(90615, 2, 2), // Ghost Vacuum
+        row(93788, 2, 2), // Lithomantic Barrage
+        row(105819, 2, 2), // Shock
+        row(92243, 1, 1), // Screaming Nemesis
+        row(90492, 2, 2), // Slickshot Show-Off
+        row(95623, 3, 3), // Cori-Steel Cutter
+      ]
+    : [];
   return {
     matchId: "demo-match",
     phase: opts.ended ? "ended" : "playing",
     startedAt: Date.now() - 6 * 60_000 - 12_000,
-    eventId: "Ladder",
-    bestOf: 1,
+    eventId: bo3 ? "Traditional_Ladder" : "Ladder",
+    bestOf: bo3 ? 3 : 1,
     opponentName: "wraith",
     myPlayerName: "You",
     deckName: "Mono-Red Mice",
@@ -56,6 +72,8 @@ export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
     libraryTotal: opts.ended
       ? 0
       : library.reduce((n, c) => n + c.remaining, 0),
+    sideboard,
+    sideboardTotal: sideboard.reduce((n, c) => n + c.remaining, 0) || undefined,
     opponentSeen: [105175, 92125, 92117, 92218, 91611, 86758],
     turn: opts.ended ? undefined : 6,
     onPlay: true,

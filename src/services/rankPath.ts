@@ -60,9 +60,15 @@ export interface RankPathOptions {
    * Live rank from the ended frame (`LiveMatch.rankNow`) plus the match it
    * belongs to. Only closes the path when that match is the newest one in
    * scope — otherwise the move belongs to some other game.
+   *
+   * Never closes after an unranked queue: Play / draft stamp `rankNow` too,
+   * but they do not move the ladder — treating them as the path endpoint made
+   * unranked losses look like ranked dips on the post-match card.
    */
   liveRank?: string | null;
   liveMatchId?: string | null;
+  /** Queue id of the just-finished match (`LiveMatch.eventId`). */
+  liveEventId?: string | null;
   maxPoints?: number;
   nowMs?: number;
 }
@@ -184,12 +190,20 @@ export function buildRankPath(
   const { fromMs } = sessionWindow(matches, opts.nowMs ?? Date.now());
   const session = season.filter((m) => m.endedAt >= fromMs);
 
-  const liveScore = parseRank(opts.liveRank)?.score ?? null;
+  // Unranked queues still emit a constructed rank stamp — never pin the path
+  // endpoint to a game that could not have moved the ladder.
+  const liveIsLadder =
+    opts.liveEventId == null ||
+    opts.liveEventId === "" ||
+    isLadderEvent(opts.liveEventId);
+  const liveScore =
+    liveIsLadder ? parseRank(opts.liveRank)?.score ?? null : null;
+  const liveMatchId = liveIsLadder ? opts.liveMatchId : null;
   for (const [scope, window] of [
     ["session", session],
     ["season", season],
   ] as const) {
-    const points = toPoints(window, maxPoints, liveScore, opts.liveMatchId);
+    const points = toPoints(window, maxPoints, liveScore, liveMatchId);
     if (points.length >= 2) {
       return { points, scope, endsNow: !!points[points.length - 1].isNow };
     }

@@ -32,10 +32,9 @@ checkpoint is a measurement, not a build:** see "Waiting on data" below.
 | Gates last green | **365** vitest · lint/tsc clean · `typecheck:functions` (new) |
 | `WHATS_NEW` | 2 lines (tip jar + public meta pages) |
 
-Tree keeps current + previous Windows installers (2.5.2, 2.5.3, 2.5.4 exe) and
-**only** the current dmg. ⚠️ `Setup-2.5.2.exe` is **not** mirrored on GitHub
-Releases (v2.5.2 carries only the dmg) — mirror before pruning it. dmgs *are*
-mirrored, which is why the 2.5.3 one was safe to remove.
+Working tree keeps **current Windows** under `website/downloads/` (v2.6.3 exe + sig)
+and the last macOS dmg (v2.6.2 until `v2.6.3` tag CI rolls). Older installers
+are pruned per `docs/GIT-HISTORY-BLOAT.md`.
 
 ---
 
@@ -126,15 +125,15 @@ and the daily cron regenerated the full meta-web corpus with a same-day
 `lastmod`. Verification method for future doubt: check a response header or a
 generated marker, not a byte-diff against git.
 
-### 2. Owner marketing WIP (dirty / untracked — DO NOT TOUCH)
+### 2. Repo hygiene (2026-08-08)
 
-Leave alone unless the owner explicitly asks:
-
-- `website/assets/youtube*`, `video/`, `video_stills/`, `launch/`
-- `website/assets/_gen_youtube.py`, `_compose_youtube_community.py`
-- `website/assets/app-screenshot-decks.png`
-- `scripts/capture-app-stills.mjs`, `generate_marketing_*.py`
-- `goal/`
+Owner-approved cleanup removed iteration bulk: one-shot `do-*-bump` /
+`roll-macos-*` scripts, pre-2.6.2 installers under `website/downloads/`, unused
+Vite/Tauri default assets, mobile/store icon packs, and marketing WIP
+(`youtube-community*`, `video/`, `video_stills/`, `launch/`, generator scripts,
+`goal/`). Keep only current release binaries + reusable scripts
+(`bump-version.mjs`, `gen-mtgo-name-map.mjs`, `fix-website-mojibake.mjs`,
+`capture-theme-screens.mjs`).
 
 ---
 
@@ -149,7 +148,6 @@ may proceed on judgment. Ask before product decisions.
 | P2 eng | Major dep bumps **one branch at a time** | typescript 7, vite 8, vitest 4, plugin-react 6 — never batch |
 | P2 product-aware | Secondary-monitor toast/presence | Owner-aware; follow Arena’s display — real work |
 | P1 gated | Phase 1 **A** — 252 card pages | Only after Search Console shows indexing. `docs/PLATFORM-STRATEGY.md` §3 |
-| P2 hygiene | Mirror `Setup-2.5.2.exe` to GitHub Releases, then prune | It is the one binary **not** mirrored |
 | P3 owner-only | v3.0 accounts/sync (Phase 2, gated) · Scryfall attribution re-add · `.git` history purge | Ask first; attribution was a deliberate v2.2.1 trade |
 
 **Good first resume prompts (owner should choose):**
@@ -157,7 +155,6 @@ may proceed on judgment. Ask before product decisions.
 1. “Check Search Console indexing and decide on card pages” (the real next step).
 2. “Bump one dep on a branch” (e.g. vitest 4 alone).
 3. “Start secondary-monitor presence/toast” (product-ish — confirm first).
-4. Marketing WIP finish (owner assets only).
 
 ---
 
@@ -165,11 +162,11 @@ may proceed on judgment. Ask before product decisions.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.4.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.4-universal.dmg` |
-| Updater | `website/updater/latest.json` |
-| Soft | `website/version.json` + `public/version.json` |
-| Tag | `v2.5.4` |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.6.3.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.6.2-universal.dmg` (2.6.3 via tag CI) |
+| Updater | `website/updater/latest.json` → **2.6.3** |
+| Soft | `website/version.json` + `public/version.json` → **2.6.3** |
+| Tag | `v2.6.3` (macOS CI) |
 
 **Sign only** with key id **67FCA9900F523D49**
 (`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).

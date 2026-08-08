@@ -179,6 +179,13 @@ pub struct LiveMatch {
     /// Sum of `library.remaining` (quick badge).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_total: Option<u32>,
+    /// Current game's sideboard (from GRE `sideboardCards`). Empty in Bo1.
+    /// Counts are static for the game — they do not track mid-game zone moves.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sideboard: Vec<LiveCardCount>,
+    /// Sum of sideboard card copies (quick badge).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sideboard_total: Option<u32>,
     /// Opponent grpIds seen so far this match (sorted).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub opponent_seen: Vec<u32>,
@@ -829,6 +836,9 @@ pub struct LogParser {
     current_match_id: Option<String>,
     /// Live library counts for the current match/game.
     deck_tracker: DeckTracker,
+    /// Latest GRE `sideboardCards` for the current game (empty in Bo1).
+    /// Refreshed on every `deckMessage` so G2/G3 post-board lists replace G1.
+    live_sideboard: Vec<u32>,
     /// Set when the live HUD snapshot needs re-emit (avoids spamming every GRE tick).
     live_dirty: bool,
     pub parse_errors: u64,
@@ -848,6 +858,7 @@ impl LogParser {
         self.pending.clear();
         self.current_match_id = None;
         self.deck_tracker.clear();
+        self.live_sideboard.clear();
         self.live_dirty = true;
     }
 
@@ -881,6 +892,7 @@ impl LogParser {
             1
         };
         let (library, library_total) = self.deck_tracker.snapshot();
+        let (sideboard, sideboard_total) = sideboard_snapshot(&self.live_sideboard);
         Some(LiveMatch {
             match_id: match_id.clone(),
             phase: "playing".to_string(),
@@ -902,6 +914,8 @@ impl LogParser {
             result: None,
             library,
             library_total,
+            sideboard,
+            sideboard_total,
             opponent_seen: sorted_grp_ids(&pending.opponent_seen),
             turn: pending.cur_turn,
             on_play: pending.game_on_play.last().copied().flatten(),
@@ -1087,6 +1101,9 @@ impl LogParser {
                 if let Some((cards, side)) = find_deck_message(&v) {
                     // Opening list for this game — seed / re-seed the library tracker.
                     self.deck_tracker.reset_from_main(&cards);
+                    // Sideboard refreshes every game so G2/G3 post-board lists show
+                    // what is actually left in the board (not just the G1 register).
+                    self.live_sideboard = side.clone();
                     self.live_dirty = true;
                     if let Some(pending) = self.pending.get_mut(&match_id) {
                         // New GRE connection = new game; expect its turn-1 info next.
@@ -1267,6 +1284,7 @@ impl LogParser {
                     self.current_match_id = None;
                 }
                 self.deck_tracker.clear();
+                self.live_sideboard.clear();
                 self.live_dirty = true;
                 let pending = self.pending.remove(&match_id).unwrap_or_default();
                 let result_list = room
@@ -1704,6 +1722,28 @@ fn collect_courses(v: &serde_json::Value, out: &mut Vec<(String, CourseInfo)>) {
     }
 }
 
+/// Collapse raw Arena sideboard grpIds into overlay rows (qty = remaining = total).
+fn sideboard_snapshot(cards: &[u32]) -> (Vec<LiveCardCount>, Option<u32>) {
+    if cards.is_empty() {
+        return (Vec::new(), None);
+    }
+    let mut totals: HashMap<u32, u32> = HashMap::new();
+    for &id in cards {
+        *totals.entry(id).or_default() += 1;
+    }
+    let mut rows: Vec<LiveCardCount> = totals
+        .into_iter()
+        .map(|(grp_id, total)| LiveCardCount {
+            grp_id,
+            remaining: total,
+            total,
+        })
+        .collect();
+    rows.sort_by(|a, b| b.remaining.cmp(&a.remaining).then(a.grp_id.cmp(&b.grp_id)));
+    let sum = cards.len() as u32;
+    (rows, Some(sum))
+}
+
 /// Find `connectResp.deckMessage` anywhere in a GRE payload; returns
 /// `(deckCards, sideboardCards)` (sideboard empty when absent, e.g. Bo1).
 fn find_deck_message(v: &serde_json::Value) -> Option<(Vec<u32>, Vec<u32>)> {
@@ -2077,6 +2117,10 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
             result: Some(m.result.clone()),
             library: Vec::new(),
             library_total: None,
+            // Keep G1 sideboard on the ended frame so the HUD tab can still show
+            // what was registered (library is cleared once the match ends).
+            sideboard: sideboard_snapshot(m.deck_side.as_deref().unwrap_or(&[])).0,
+            sideboard_total: m.deck_side.as_ref().map(|s| s.len() as u32).filter(|&n| n > 0),
             opponent_seen: m.opponent_seen.clone().unwrap_or_default(),
             turn: None,
             on_play: m.games.last().and_then(|g| g.on_play),
@@ -2417,6 +2461,11 @@ mod tests {
         let live2 = p.live_match().expect("still playing");
         assert!(live2.deck_hash.is_some());
         assert_eq!(live2.library_total, Some(6)); // GRE_CONNECT deckCards length
+        // GRE_CONNECT includes sideboardCards: [103] — exposed for the overlay tab.
+        assert_eq!(live2.sideboard_total, Some(1));
+        assert_eq!(live2.sideboard.len(), 1);
+        assert_eq!(live2.sideboard[0].grp_id, 103);
+        assert_eq!(live2.sideboard[0].remaining, 1);
         p.feed_line(&room_completed(
             "m-live",
             "Ladder",
@@ -2424,6 +2473,23 @@ mod tests {
             2,
         ));
         assert!(p.live_match().is_none());
+    }
+
+    #[test]
+    fn bo3_live_snapshot_reports_best_of_and_sideboard() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-bo3", "Traditional_Ladder"));
+        let gre_bo3 = r#"{ "transactionId": "t4", "timestamp": "1783952720532", "greToClientEvent": { "greToClientMessages": [ { "type": "GREMessageType_ConnectResp", "systemSeatIds": [ 2 ], "connectResp": { "status": "ConnectionStatus_Success", "deckMessage": { "deckCards": [ 101, 101, 101, 101, 102, 102 ], "sideboardCards": [ 103, 103, 104 ] } } } ] } }"#;
+        p.feed_line(gre_bo3);
+        let live = p.live_match().expect("playing Bo3");
+        assert_eq!(live.best_of, 3);
+        assert_eq!(live.sideboard_total, Some(3));
+        let c103 = live.sideboard.iter().find(|c| c.grp_id == 103).unwrap();
+        assert_eq!(c103.remaining, 2);
+        assert_eq!(c103.total, 2);
+        let c104 = live.sideboard.iter().find(|c| c.grp_id == 104).unwrap();
+        assert_eq!(c104.remaining, 1);
     }
 
     #[test]

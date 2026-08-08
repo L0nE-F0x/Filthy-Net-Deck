@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildRankSeries,
   estimateMatchesPerStep,
   formatRank,
   isLadderEvent,
   mythicAxisLabel,
   parseRank,
+  queueRankedKind,
   rankLabelFromScore,
+  rankedChipLabel,
   rankSeriesDomain,
 } from "./ranks";
 
@@ -126,6 +129,48 @@ describe("isLadderEvent", () => {
     expect(isLadderEvent("QuickDraft_DSK_20260701")).toBe(false);
     expect(isLadderEvent("PremierDraft_TDM")).toBe(false);
     expect(isLadderEvent(undefined)).toBe(false);
+  });
+});
+
+describe("queueRankedKind / buildRankSeries ladder filter", () => {
+  it("labels ranked vs unranked queues", () => {
+    expect(queueRankedKind("Ladder")).toBe("ranked");
+    expect(queueRankedKind("Traditional_Ladder")).toBe("ranked");
+    expect(queueRankedKind("Play")).toBe("unranked");
+    expect(queueRankedKind("Traditional_Play")).toBe("unranked");
+    expect(queueRankedKind("PremierDraft_TDM")).toBe("unranked");
+    expect(queueRankedKind("")).toBe("unknown");
+    expect(queueRankedKind(undefined)).toBe("unknown");
+    expect(rankedChipLabel("Ladder")).toBe("Ranked");
+    expect(rankedChipLabel("Play")).toBe("Unranked");
+  });
+
+  it("drops Play/draft samples that only carry a constructed stamp", () => {
+    const series = buildRankSeries([
+      {
+        matchId: "r1",
+        endedAt: 100,
+        myRank: "Gold 4",
+        eventId: "Ladder",
+        result: "win",
+      },
+      {
+        matchId: "u1",
+        endedAt: 200,
+        myRank: "Gold 4",
+        eventId: "Play",
+        result: "loss",
+      },
+      {
+        matchId: "r2",
+        endedAt: 300,
+        myRank: "Gold 3",
+        eventId: "Ladder",
+        result: "win",
+      },
+    ]);
+    expect(series.map((p) => p.matchId)).toEqual(["r1", "r2"]);
+    expect(series.every((p) => p.result !== "loss")).toBe(true);
   });
 });
 

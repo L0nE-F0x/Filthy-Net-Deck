@@ -13,9 +13,8 @@ const ENABLED_FILE: &str = "overlay-enabled";
 const POST_MATCH_FILE: &str = "overlay-post-match";
 const GEOMETRY_FILE: &str = "overlay-geometry.json";
 
-/// Slim column; short default matches collapsed bar (+ room to expand).
+/// Slim column default width (expanded height lives in geometry.height).
 const DEFAULT_W: f64 = 228.0;
-const DEFAULT_H: f64 = 168.0;
 /// Minimal density (no card art) stays readable down to ~164 logical px.
 const MIN_W: f64 = 164.0;
 /// Collapsed bar = 2px accent + 30px bar + border — allow the JS shrink.
@@ -32,7 +31,13 @@ pub struct OverlayGeometry {
     pub x: f64,
     pub y: f64,
     pub width: f64,
+    /// Expanded-panel height (never the collapsed bar). Restored when opening
+    /// the deck list; the collapsed bar always uses a fixed chrome height.
     pub height: f64,
+    /// Last user-facing mode: expanded deck list vs minimized bar.
+    /// Missing in older files → treated as collapsed (product default).
+    #[serde(default)]
+    pub expanded: bool,
 }
 
 fn enabled_path(app: &AppHandle) -> Option<PathBuf> {
@@ -109,11 +114,22 @@ fn load_geometry(app: &AppHandle) -> Option<OverlayGeometry> {
     let path = geometry_path(app)?;
     let text = fs::read_to_string(path).ok()?;
     let g: OverlayGeometry = serde_json::from_str(&text).ok()?;
+    // Expanded height must stay tall enough to show the list; clamp floor to
+    // the expanded minimum so a bad write of the collapsed bar height (32–34)
+    // cannot brick the panel open-as-tiny forever.
+    const MIN_EXPANDED_H: f64 = 120.0;
+    let height = if g.expanded {
+        g.height.clamp(MIN_EXPANDED_H, MAX_H)
+    } else {
+        // File stores expanded height even when last mode was collapsed.
+        g.height.clamp(MIN_EXPANDED_H, MAX_H)
+    };
     Some(OverlayGeometry {
         x: g.x,
         y: g.y,
         width: g.width.clamp(MIN_W, MAX_W),
-        height: g.height.clamp(MIN_H, MAX_H),
+        height,
+        expanded: g.expanded,
     })
 }
 
@@ -174,10 +190,22 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
         let rects = monitor_rects(app);
         rects.is_empty() || geometry_reachable(g, &rects)
     });
-    let (w, h) = geo
+    // Open in the last mode the user left the panel in. Height on disk is the
+    // *expanded* height; the collapsed bar uses a fixed chrome height so a
+    // restart does not flash a tall empty column before JS boots.
+    const COLLAPSED_H: f64 = 34.0;
+    let (w, h, expanded) = geo
         .as_ref()
-        .map(|g| (g.width, g.height))
-        .unwrap_or((DEFAULT_W, DEFAULT_H));
+        .map(|g| {
+            let h = if g.expanded {
+                g.height
+            } else {
+                COLLAPSED_H
+            };
+            (g.width, h, g.expanded)
+        })
+        .unwrap_or((DEFAULT_W, COLLAPSED_H, false));
+    let _ = expanded; // JS re-syncs compact state from geometry on mount
 
     let url = WebviewUrl::App("index.html#/overlay".into());
     let builder = WebviewWindowBuilder::new(app, OVERLAY_LABEL, url)
@@ -255,14 +283,19 @@ pub fn overlay_get_geometry(app: AppHandle) -> Option<OverlayGeometry> {
     load_geometry(&app)
 }
 
-/// Persist size/position after the user drags, resizes, or edge-snaps.
+/// Persist size/position/mode after the user drags, resizes, snaps, or toggles.
 #[tauri::command]
 pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
+    // Never persist the collapsed bar height as the expanded height — that
+    // made the next expand open a ~34px stub the user then had to fight.
+    const MIN_EXPANDED_H: f64 = 120.0;
+    let height = geometry.height.max(MIN_EXPANDED_H).clamp(MIN_H, MAX_H);
     let g = OverlayGeometry {
         x: geometry.x,
         y: geometry.y,
         width: geometry.width.clamp(MIN_W, MAX_W),
-        height: geometry.height.clamp(MIN_H, MAX_H),
+        height,
+        expanded: geometry.expanded,
     };
     save_geometry(&app, &g);
 }
@@ -287,6 +320,7 @@ mod tests {
             y,
             width: 228.0,
             height: 300.0,
+            expanded: true,
         }
     }
 

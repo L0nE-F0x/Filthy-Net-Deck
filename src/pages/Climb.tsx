@@ -616,6 +616,8 @@ export function Climb() {
   );
 
   // Rank series with deck identity attached for chart color + tooltips.
+  // eventId is required so Play / draft stamps (same constructed rank string)
+  // never plot as ladder points — unranked losses were painting as ranked dips.
   const series = useMemo(() => {
     const enriched = seasonMatches.map((m) => ({
       endedAt: m.endedAt,
@@ -624,6 +626,7 @@ export function Climb() {
       deckKey: deckKey(m),
       deckName: m.deckName,
       result: m.result,
+      eventId: m.eventId,
     }));
     return buildRankSeries(enriched);
   }, [seasonMatches]);

@@ -178,6 +178,28 @@ export function isLadderEvent(eventId: string | undefined | null): boolean {
   return !!eventId && /(^|_)ladder(_|$)/i.test(eventId.trim());
 }
 
+/**
+ * Ranked vs unranked for UI chips.
+ * `unknown` when Arena has not given a queue id yet (or it is empty).
+ */
+export type QueueRankedKind = "ranked" | "unranked" | "unknown";
+
+export function queueRankedKind(
+  eventId: string | undefined | null,
+): QueueRankedKind {
+  const id = eventId?.trim();
+  if (!id || id === "Unknown") return "unknown";
+  return isLadderEvent(id) ? "ranked" : "unranked";
+}
+
+/** Short chip text for the overlay / post-match card. */
+export function rankedChipLabel(eventId: string | undefined | null): string | null {
+  const kind = queueRankedKind(eventId);
+  if (kind === "ranked") return "Ranked";
+  if (kind === "unranked") return "Unranked";
+  return null;
+}
+
 export interface RankPoint {
   at: number;
   rank: ParsedRank;
@@ -188,7 +210,14 @@ export interface RankPoint {
   result?: string;
 }
 
-/** Chronological rank samples from matches that recorded myRank. */
+/**
+ * Chronological rank samples from matches that recorded myRank.
+ *
+ * When a match carries an `eventId`, non-ladder queues are dropped — Play /
+ * draft / Brawl stamp the *constructed* rank but never move the ladder, so
+ * counting them as rank samples made unranked losses look like ladder dips.
+ * Rows with no `eventId` (legacy pure samples) are kept.
+ */
 export function buildRankSeries(
   matches: {
     endedAt: number;
@@ -197,11 +226,15 @@ export function buildRankSeries(
     deckKey?: string;
     deckName?: string;
     result?: string;
+    eventId?: string;
   }[],
 ): RankPoint[] {
   const asc = [...matches].sort((a, b) => a.endedAt - b.endedAt);
   const out: RankPoint[] = [];
   for (const m of asc) {
+    if (m.eventId != null && m.eventId !== "" && !isLadderEvent(m.eventId)) {
+      continue;
+    }
     const rank = parseRank(m.myRank);
     if (!rank) continue;
     out.push({

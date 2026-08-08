@@ -142,6 +142,32 @@ describe("buildRankPath", () => {
     expect(path.points.map((p) => p.matchId)).toEqual(["l1", "l2"]);
   });
 
+  it("does not pin the path endpoint on an unranked finish", () => {
+    // Ranked climb, then a Play-queue loss that stamps the same constructed rank
+    // (and would look like a ladder dip if used as the "now" point).
+    const history = [
+      m({ matchId: "r1", agoMin: 40, myRank: "Mythic 92.0%", result: "win" }),
+      m({ matchId: "r2", agoMin: 20, myRank: "Mythic 92.4%", result: "win" }),
+      m({
+        matchId: "play-loss",
+        agoMin: 3,
+        eventId: "Play",
+        myRank: "Mythic 92.4%",
+        result: "loss",
+      }),
+    ];
+    const path = buildRankPath(history, {
+      onDeck: onDeckA,
+      nowMs: NOW,
+      liveRank: "Mythic 92.4%",
+      liveMatchId: "play-loss",
+      liveEventId: "Play",
+    })!;
+    expect(path.points.map((p) => p.matchId)).toEqual(["r1", "r2"]);
+    expect(path.endsNow).toBe(false);
+    expect(path.points.every((p) => p.result !== "loss")).toBe(true);
+  });
+
   it("never spans a season reset", () => {
     const history = [
       m({ matchId: "old1", agoMin: 200, myRank: "Mythic 95%", seasonOrdinal: 90 }),

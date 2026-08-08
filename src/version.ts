@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.6.2";
+export const APP_VERSION = "2.6.3";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Overlay library counts are exact: cards no longer vanish from the count each time they change zone, so the lands-left read finally matches the deck",
-  "Cards shuffled or put back on top of the library return to the count instead of staying gone",
-  "A modal or Adventure card cast as its other half is subtracted from the card your deck actually registered"
+  "Overlay size and minimized/expanded mode are remembered across matches, app restarts, and reboots",
+  "Bo3 sideboard tab on the overlay — switch between library and board mid-match",
+  "Ranked vs unranked labeled; unranked losses no longer draw as ranked dips on the post-match graph"
 ];
