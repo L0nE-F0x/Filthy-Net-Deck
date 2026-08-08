@@ -32,8 +32,8 @@ checkpoint is a measurement, not a build:** see "Waiting on data" below.
 | Gates last green | **365** vitest · lint/tsc clean · `typecheck:functions` (new) |
 | `WHATS_NEW` | 2 lines (tip jar + public meta pages) |
 
-Working tree keeps **current Windows** under `website/downloads/` (v2.7.0 exe + sig)
-and the last macOS dmg (v2.6.3 until `v2.7.0` tag CI rolls). Older installers
+Working tree keeps **current installers** under `website/downloads/` (v2.7.0 exe + sig
+and the v2.7.0 universal dmg rolled from tag CI). Older installers
 are pruned per `docs/GIT-HISTORY-BLOAT.md`.
 
 ---
