@@ -668,20 +668,23 @@ impl DeckTracker {
         // 1. Id re-mappings first: the same message carries the new object.
         if let Some(anns) = gsm.get("annotations").and_then(|a| a.as_array()) {
             for ann in anns {
-                let is_id_change = ann
-                    .get("type")
-                    .and_then(|t| t.as_array())
-                    .is_some_and(|types| {
-                        types
-                            .iter()
-                            .any(|t| t.as_str() == Some("AnnotationType_ObjectIdChanged"))
-                    });
+                let is_id_change =
+                    ann.get("type")
+                        .and_then(|t| t.as_array())
+                        .is_some_and(|types| {
+                            types
+                                .iter()
+                                .any(|t| t.as_str() == Some("AnnotationType_ObjectIdChanged"))
+                        });
                 if !is_id_change {
                     continue;
                 }
                 let (mut orig, mut new) = (None, None);
                 let empty: Vec<serde_json::Value> = Vec::new();
-                let details = ann.get("details").and_then(|d| d.as_array()).unwrap_or(&empty);
+                let details = ann
+                    .get("details")
+                    .and_then(|d| d.as_array())
+                    .unwrap_or(&empty);
                 for d in details {
                     let val = d
                         .get("valueInt32")
@@ -811,7 +814,12 @@ impl DeckTracker {
         let next: HashMap<u32, u32> = self
             .totals
             .iter()
-            .map(|(&grp, &total)| (grp, total.saturating_sub(gone.get(&grp).copied().unwrap_or(0))))
+            .map(|(&grp, &total)| {
+                (
+                    grp,
+                    total.saturating_sub(gone.get(&grp).copied().unwrap_or(0)),
+                )
+            })
             .collect();
         if next == self.remaining {
             return false;
@@ -2120,7 +2128,11 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
             // Keep G1 sideboard on the ended frame so the HUD tab can still show
             // what was registered (library is cleared once the match ends).
             sideboard: sideboard_snapshot(m.deck_side.as_deref().unwrap_or(&[])).0,
-            sideboard_total: m.deck_side.as_ref().map(|s| s.len() as u32).filter(|&n| n > 0),
+            sideboard_total: m
+                .deck_side
+                .as_ref()
+                .map(|s| s.len() as u32)
+                .filter(|&n| n > 0),
             opponent_seen: m.opponent_seen.clone().unwrap_or_default(),
             turn: None,
             on_play: m.games.last().and_then(|g| g.on_play),
@@ -2461,7 +2473,7 @@ mod tests {
         let live2 = p.live_match().expect("still playing");
         assert!(live2.deck_hash.is_some());
         assert_eq!(live2.library_total, Some(6)); // GRE_CONNECT deckCards length
-        // GRE_CONNECT includes sideboardCards: [103] — exposed for the overlay tab.
+                                                  // GRE_CONNECT includes sideboardCards: [103] — exposed for the overlay tab.
         assert_eq!(live2.sideboard_total, Some(1));
         assert_eq!(live2.sideboard.len(), 1);
         assert_eq!(live2.sideboard[0].grp_id, 103);

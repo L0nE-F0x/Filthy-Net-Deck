@@ -163,7 +163,7 @@ may proceed on judgment. Ask before product decisions.
 | Target | File |
 |--------|------|
 | Windows | `website/downloads/Filthy-Net-Deck-Setup-2.6.3.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.6.2-universal.dmg` (2.6.3 via tag CI) |
+| macOS | `website/downloads/Filthy-Net-Deck-2.6.3-universal.dmg` (2.6.3 via tag CI) |
 | Updater | `website/updater/latest.json` → **2.6.3** |
 | Soft | `website/version.json` + `public/version.json` → **2.6.3** |
 | Tag | `v2.6.3` (macOS CI) |

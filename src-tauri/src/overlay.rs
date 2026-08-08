@@ -197,11 +197,7 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
     let (w, h, expanded) = geo
         .as_ref()
         .map(|g| {
-            let h = if g.expanded {
-                g.height
-            } else {
-                COLLAPSED_H
-            };
+            let h = if g.expanded { g.height } else { COLLAPSED_H };
             (g.width, h, g.expanded)
         })
         .unwrap_or((DEFAULT_W, COLLAPSED_H, false));
