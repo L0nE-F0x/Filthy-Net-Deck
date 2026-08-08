@@ -49,10 +49,11 @@ interface RevealedCard {
 }
 
 /**
- * "What they were playing" — infers the closest ranked list from the cards the
- * tracker saw the opponent play, shows that evidence, and lets you copy the list
- * (Arena import) or send it to Brew Lab to improve on. We copy the *closest
- * ranked meta list*, never claim it's their exact 75 — honest by design.
+ * "What they were playing" — infers the closest meta list from the cards the
+ * tracker saw the opponent play (ranked boards + off-meta recognition decks),
+ * shows that evidence, and lets you copy the list (Arena import) or send it to
+ * Brew Lab to improve on. When no list matches, a generic color/strategy label
+ * ("Gruul Midrange") is shown instead — we never claim it's their exact 75.
  */
 export function OpponentDeckRead({ group }: { group: OppGroup }) {
   const meta = useAppStore((s) => s.meta);
@@ -185,7 +186,23 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
         </p>
       ) : (
         <>
-          {guess && guessDeck ? (
+          {guess && guess.macroFallback ? (
+            <>
+              <p className="text-sm m-0 mt-1">
+                Off-meta read: <span className="font-semibold">{guess.archetype}</span>{" "}
+                <span
+                  className="opp-read-conf"
+                  title={`No meta list matched — generic color/strategy read from their revealed cards · ${fmt.name} ${mode.toUpperCase()}`}
+                >
+                  ~{pct}% match
+                </span>
+              </p>
+              <p className="text-[11px] text-muted m-0 mt-1 leading-relaxed">
+                No meta list shares enough of their cards — this label comes from their
+                curve, card types and colors, not a tracked deck.
+              </p>
+            </>
+          ) : guess && guessDeck ? (
             <>
               <p className="text-sm m-0 mt-1">
                 {guess.colorAdjusted ? "They were on: " : "Closest ranked list: "}

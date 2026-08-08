@@ -9,7 +9,7 @@ Since v0.8.2 the app has no manual Refresh button. It re-downloads the published
 | Step | What happens |
 |------|----------------|
 | 1 | `GET https://filthy-net-deck.com/meta/latest.json` (primary; falls back to `filthy-net-deck.netlify.app` — URL-override setting was removed in v0.8.3) |
-| 2 | Parse that JSON (formats, 8×8 decks, tournaments, sources) |
+| 2 | Parse that JSON (formats, 8×8 board decks + off-meta recognition decks, tournaments, sources) |
 | 3 | Diff vs last snapshot (meta movement) |
 | 4 | Cache in memory + local snapshot for offline/diff |
 | 5 | Check `version.json` for a newer **app** build (soft update banner) |
@@ -69,6 +69,17 @@ Modules: `pipeline/sources/{magic-gg,mtgo,melee,untapped,aggregate,common}.mjs`
 4. **Melee** remains event links only (no free full-list feed today).
 
 Goldfish tiles still own **rank / meta % / archetype name**. The *60* may come from MTGO, magic.gg, or Goldfish (in that order).
+
+**Off-meta recognition pool (2026-08-09):** beyond the 8+8 boards, each format
+also ships up to 24 off-meta decks flagged `offMeta: true` — sourced from the
+Goldfish *full* metagame tile tail (both formats) and the Untapped Bo1 ladder
+tail (Standard), lists assigned by the same C3 priority + Scryfall validation
+(archetypes with no real list are skipped, never fabricated). They never appear
+on the boards or the meta site; they exist so opponent-deck inference, tag
+suggestions, ⌘K search and deep links can name decks outside the top 8. When no
+list matches at all, the app's inference (`src/services/opponentArchetype.ts
+macroArchetypeFallback`) still labels the opponent's colors + macro strategy
+(e.g. "Gruul Midrange") from their revealed cards.
 
 **Policy (product rule):**
 

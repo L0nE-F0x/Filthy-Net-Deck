@@ -178,7 +178,10 @@ function keyCardStrip(deck) {
  * a reader who wants to compare.
  */
 function relatedDecks(bundle, deck) {
+  // Board decks only: off-meta recognition decks get no pages (see below),
+  // so linking them would 404.
   const siblings = Object.values(bundle.decks || {})
+    .filter((d) => !d.offMeta)
     .filter((d) => d.format === deck.format && d.mode === deck.mode && d.id !== deck.id)
     .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
     .slice(0, 6);
@@ -929,7 +932,9 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
     }
   }
 
-  const decks = Object.values(bundle.decks || {});
+  // Board decks only — off-meta recognition decks ship in the bundle for the
+  // app's inference/search, but the public site markets the ranked boards.
+  const decks = Object.values(bundle.decks || {}).filter((d) => !d.offMeta);
   for (const d of decks) {
     writeFileSync(join(OUT, "deck", `${d.id}.html`), buildDeck(bundle, history, d));
     paths.push(`/meta-web/deck/${d.id}.html`);

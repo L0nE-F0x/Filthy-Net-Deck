@@ -96,6 +96,38 @@ describe("resolveMetaDeck", () => {
   it("returns null when nothing matches", () => {
     expect(resolveMetaDeck(meta, "Boros Burn")).toBeNull();
   });
+
+  it("resolves off-meta decks that aren't on the ranked board", () => {
+    const offMeta = deck({
+      id: "std-bo3-gruul-mid",
+      name: "Gruul Midrange",
+      archetype: "Gruul Midrange",
+      mode: "bo3",
+      offMeta: true,
+    });
+    const wide: MetaBundle = {
+      ...meta,
+      decks: { ...meta.decks, [offMeta.id]: offMeta },
+    };
+    const hit = resolveMetaDeck(wide, "gruul");
+    expect(hit?.deckId).toBe("std-bo3-gruul-mid");
+    expect(hit?.mode).toBe("bo3");
+  });
+
+  it("still prefers the ranked board deck over an off-meta near-tie", () => {
+    const offMetaTwin = deck({
+      id: "std-bo3-izzet-off",
+      name: "Izzet Prowess",
+      archetype: "Izzet Prowess",
+      mode: "bo3",
+      offMeta: true,
+    });
+    const wide: MetaBundle = {
+      ...meta,
+      decks: { ...meta.decks, [offMetaTwin.id]: offMetaTwin },
+    };
+    expect(resolveMetaDeck(wide, "Izzet Prowess")?.deckId).toBe("std-bo1-izzet");
+  });
 });
 
 describe("metaOccurrencesForCard", () => {

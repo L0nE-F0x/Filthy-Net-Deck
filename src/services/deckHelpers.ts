@@ -1,7 +1,7 @@
-import type { Deck, FormatMeta, MetaBundle, PlayMode } from "../types/meta";
+import type { Deck, FormatId, FormatMeta, MetaBundle, PlayMode } from "../types/meta";
 import { sanitizeDeckDescription } from "./sanitizeSources";
 
-/** Resolve 8 ranked deck ids for a format + mode (supports legacy single-deck feeds). */
+/** Resolve the ranked board deck ids for a format + mode (supports legacy single-deck feeds). */
 export function deckIdsForMode(fmt: FormatMeta, mode: PlayMode): string[] {
   if (mode === "bo1") {
     if (fmt.bo1DeckIds?.length) return fmt.bo1DeckIds.slice(0, 8);
@@ -24,13 +24,53 @@ export function decksForMode(
 }
 
 /**
+ * Every deck of a format: the ranked Bo1+Bo3 boards first (ranked order),
+ * then any off-meta recognition decks in the bundle. Deduped by deck id.
+ * Use this for anything that should recognize the full archetype universe
+ * (search, deep links, card index) rather than just the 8-deck boards.
+ */
+export function allDecksForFormat(
+  fmt: FormatMeta,
+  decks: Record<string, Deck>,
+): Deck[] {
+  const out: Deck[] = [];
+  const seen = new Set<string>();
+  const push = (d: Deck | undefined) => {
+    if (!d || seen.has(d.id)) return;
+    seen.add(d.id);
+    out.push(d);
+  };
+  for (const d of decksForMode(fmt, "bo1", decks)) push(d);
+  for (const d of decksForMode(fmt, "bo3", decks)) push(d);
+  for (const d of Object.values(decks)) {
+    if (d.format === fmt.id) push(d);
+  }
+  return out;
+}
+
+/**
+ * Arena queue eventId → bundle format. Pioneer queues (`Pioneer_Ladder`,
+ * `Pioneer_Traditional_Ladder`, …) and Explorer (≈ Pioneer's card pool, the
+ * convention the Untapped source already uses) map to pioneer. Everything
+ * else returns null so callers fall back to the featured format (Standard).
+ */
+export function formatIdForEvent(
+  eventId: string | undefined | null,
+): FormatId | null {
+  const id = eventId?.trim();
+  if (!id) return null;
+  if (/pioneer|explorer/i.test(id)) return "pioneer";
+  return null;
+}
+
+/**
  * Candidate pool for opponent-archetype inference.
  *
  * Prefer the mode that matches the queue (Bo1 vs Bo3 lists can differ), then
- * fold in the other mode's lists and any remaining decks of the same format so
- * near-twins like Jeskai Lessons / Izzet Lessons / 4c Control all stay in the
- * field. Dedupes by deck id. When no format is known, falls back to every deck
- * in the bundle.
+ * fold in the other mode's board and every off-meta recognition deck of the
+ * same format, so near-twins like Jeskai Lessons / Izzet Lessons / 4c Control
+ * AND off-meta decks beyond the boards all stay in the field. Dedupes by deck
+ * id. When no format is known, falls back to every deck in the bundle.
  */
 export function inferenceCandidates(
   decks: Record<string, Deck>,

@@ -41,7 +41,7 @@ import {
 } from "./overlayModel";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
-import { inferenceCandidates } from "../services/deckHelpers";
+import { formatIdForEvent, inferenceCandidates } from "../services/deckHelpers";
 import type { MetaBundle, PlayMode } from "../types/meta";
 import { queueRankedKind, rankedChipLabel } from "../services/ranks";
 import { PostMatchSummary } from "./PostMatchSummary";
@@ -1058,7 +1058,13 @@ export function OverlayApp() {
     let guess: string | null = null;
     let candidates: ReturnType<typeof inferenceCandidates> = [];
     if (bundle) {
-      const fmt = bundle.formats.find((f) => f.featured) ?? bundle.formats[0];
+      // Pioneer/Explorer queues infer against the Pioneer field, not blindly
+      // against the featured format (Standard).
+      const eventFmt = formatIdForEvent(live.eventId);
+      const fmt =
+        bundle.formats.find((f) => f.id === eventFmt) ??
+        bundle.formats.find((f) => f.featured) ??
+        bundle.formats[0];
       if (fmt) {
         const mode: PlayMode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
         // Both modes + full format field so Lessons twins don't collapse.

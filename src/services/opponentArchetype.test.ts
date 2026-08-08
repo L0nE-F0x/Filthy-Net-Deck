@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Deck, ManaColor } from "../types/meta";
 import {
   archetypeTheme,
+  cmcFromManaCost,
   colorGroupName,
   colorsFromManaCost,
   confidenceFromHits,
@@ -405,5 +406,137 @@ describe("off-color opponents (Orzhov Lifegain bug)", () => {
     const guess = inferOpponentArchetype([1, 2, 3, 4, 5], byName, field, opts);
     expect(guess?.archetype).toBe("Mono-White Lifegain");
     expect(guess?.colorAdjusted).toBe(false);
+  });
+});
+
+describe("macro fallback (off-meta opponents)", () => {
+  it("parses rough mana values from cost strings", () => {
+    expect(cmcFromManaCost("{2}{W}{B}")).toBe(4);
+    expect(cmcFromManaCost("{X}{U}{U}")).toBe(2);
+    expect(cmcFromManaCost("{W/B}")).toBe(1);
+    expect(cmcFromManaCost("{0}")).toBe(0);
+    expect(cmcFromManaCost(undefined)).toBeNull();
+    expect(cmcFromManaCost("")).toBeNull();
+  });
+
+  // None of these candidates share a card with the seen sets below.
+  const unrelatedField = [
+    coloredDeck(
+      "std-domain",
+      "Domain",
+      ["W", "U", "B", "R", "G"],
+      [
+        { name: "Leyline Binding" },
+        { name: "Atraxa, Grand Unifier" },
+        { name: "Forest", land: true },
+      ],
+      ["Leyline Binding"],
+    ),
+  ];
+  const opts = { minHits: 2, minConfidence: 0.35 };
+
+  const redAggroCards: Record<number, SeenCardInfo> = {
+    1: { name: "Monastery Swiftspear", manaCost: "{R}", typeLine: "Creature — Human Monk" },
+    2: { name: "Emberheart Challenger", manaCost: "{1}{R}", typeLine: "Creature — Mouse Warrior" },
+    3: { name: "Slickshot Show-Off", manaCost: "{1}{R}", typeLine: "Creature — Lizard Wizard" },
+    4: { name: "Play with Fire", manaCost: "{R}", typeLine: "Instant" },
+    5: { name: "Lightning Strike", manaCost: "{1}{R}", typeLine: "Instant" },
+    6: { name: "Mountain", isLand: true, typeLine: "Basic Land — Mountain", colorIdentity: ["R"] },
+  };
+
+  it("labels an off-meta red rush as Mono-Red Aggro", () => {
+    const guess = inferOpponentArchetype(
+      [1, 2, 3, 4, 5, 6],
+      (id) => redAggroCards[id] ?? null,
+      unrelatedField,
+      opts,
+    );
+    expect(guess?.archetype).toBe("Mono-Red Aggro");
+    expect(guess?.macroFallback).toBe(true);
+    expect(guess?.deckId).toBe("");
+    expect(guess?.confidence).toBeGreaterThanOrEqual(0.35);
+    expect(guess?.confidence).toBeLessThanOrEqual(0.5);
+    expect(guess?.observedColors).toEqual(["R"]);
+  });
+
+  it("labels counters + sweepers + draw as Azorius Control", () => {
+    const controlCards: Record<number, SeenCardInfo> = {
+      1: { name: "Spell Pierce", manaCost: "{U}", typeLine: "Instant" },
+      2: { name: "Negate", manaCost: "{1}{U}", typeLine: "Instant" },
+      3: { name: "Temporary Lockdown", manaCost: "{1}{W}{W}", typeLine: "Enchantment" },
+      4: { name: "Memory Deluge", manaCost: "{2}{U}{U}", typeLine: "Instant" },
+      5: { name: "Island", isLand: true, typeLine: "Basic Land — Island", colorIdentity: ["U"] },
+      6: { name: "Plains", isLand: true, typeLine: "Basic Land — Plains", colorIdentity: ["W"] },
+    };
+    const guess = inferOpponentArchetype(
+      [1, 2, 3, 4, 5, 6],
+      (id) => controlCards[id] ?? null,
+      unrelatedField,
+      opts,
+    );
+    expect(guess?.archetype).toBe("Azorius Control");
+    expect(guess?.macroFallback).toBe(true);
+  });
+
+  it("still prefers a real list when one matches", () => {
+    const monoRed = coloredDeck(
+      "std-red",
+      "Mono-Red Prowess",
+      ["R"],
+      [
+        { name: "Monastery Swiftspear" },
+        { name: "Emberheart Challenger" },
+        { name: "Slickshot Show-Off" },
+        { name: "Play with Fire" },
+        { name: "Lightning Strike" },
+        { name: "Mountain", land: true },
+      ],
+      ["Monastery Swiftspear", "Slickshot Show-Off"],
+    );
+    const guess = inferOpponentArchetype(
+      [1, 2, 3, 4, 5, 6],
+      (id) => redAggroCards[id] ?? null,
+      [...unrelatedField, monoRed],
+      opts,
+    );
+    expect(guess?.deckId).toBe("std-red");
+    expect(guess?.macroFallback).toBeFalsy();
+  });
+
+  it("stays silent on thin evidence (fewer than 4 non-land cards)", () => {
+    const guess = inferOpponentArchetype(
+      [1, 4, 6],
+      (id) => redAggroCards[id] ?? null,
+      unrelatedField,
+      opts,
+    );
+    expect(guess).toBeNull();
+  });
+
+  it("stays silent when no color can be proven", () => {
+    const colorless: Record<number, SeenCardInfo> = {
+      1: { name: "Ornithopter", manaCost: "{0}", typeLine: "Artifact Creature — Thopter" },
+      2: { name: "Steel Overseer", manaCost: "{2}", typeLine: "Artifact Creature — Construct" },
+      3: { name: "Mystic Forge", manaCost: "{4}", typeLine: "Artifact" },
+      4: { name: "Darksteel Citadel", isLand: true, typeLine: "Artifact Land", colorIdentity: [] },
+      5: { name: "Warping Wail", manaCost: "{1}{C}", typeLine: "Instant" },
+    };
+    const guess = inferOpponentArchetype(
+      [1, 2, 3, 4, 5],
+      (id) => colorless[id] ?? null,
+      unrelatedField,
+      opts,
+    );
+    expect(guess).toBeNull();
+  });
+
+  it("can be disabled per call", () => {
+    const guess = inferOpponentArchetype(
+      [1, 2, 3, 4, 5, 6],
+      (id) => redAggroCards[id] ?? null,
+      unrelatedField,
+      { ...opts, macroFallback: false },
+    );
+    expect(guess).toBeNull();
   });
 });

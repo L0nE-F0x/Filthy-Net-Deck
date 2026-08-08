@@ -1,6 +1,8 @@
 /**
  * B1 accept-tag: pure suggestion of opponent archetype from cards seen.
- * Never invents names — only returns a ranked meta list's archetype.
+ * Returns a meta list's archetype when one matches; otherwise a generic
+ * color+macro label ("Mono-Red Aggro") from the macro fallback — never a
+ * made-up deck name.
  */
 
 import type { Deck } from "../types/meta";

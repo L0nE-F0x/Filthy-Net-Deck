@@ -37,7 +37,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-4c-lessons.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-jeskai-lessons.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -73,7 +73,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-jeskai-lessons.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo3-izzet-lessons.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -97,7 +97,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-4c-lessons.html</loc>
+    <loc>https://filthy-net-deck.com/meta-web/deck/standard-bo1-jeskai-lessons.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -163,6 +163,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-orzhov-greasefang.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo3-dimir-self-bounce.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>daily</changefreq>
@@ -200,6 +206,12 @@
   </url>
   <url>
     <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-izzet-lessons.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://filthy-net-deck.com/meta-web/deck/pioneer-bo1-orzhov-greasefang.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>

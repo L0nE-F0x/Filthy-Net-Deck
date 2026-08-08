@@ -61,6 +61,11 @@ export interface ArchetypeGuess {
   colorAdjusted: boolean;
   /** Colors the opponent demonstrably has (cast pips / mono-colored lands). */
   observedColors: PipColor[];
+  /**
+   * True when no meta list matched and the label is a generic color+strategy
+   * read (e.g. "Gruul Midrange") derived from the opponent's own cards.
+   */
+  macroFallback?: boolean;
 }
 
 export interface InferOptions {
@@ -73,6 +78,11 @@ export interface InferOptions {
    * 12% relative margin). Prevents coin-flip guesses between near-twins.
    */
   minMargin?: number;
+  /**
+   * When no list passes the gates, fall back to a generic color+macro label
+   * ("Azorius Control") read off the opponent's own cards (default true).
+   */
+  macroFallback?: boolean;
 }
 
 function deckCardPool(deck: Deck): {
@@ -491,9 +501,184 @@ export function colorCorrectArchetype(
   return { archetype: `${name} ${theme}`, adjusted: true };
 }
 
+/** Rough mana value from a cost string: numerals count full, X counts 0, every other symbol group counts one pip. Null when no cost is on record. */
+export function cmcFromManaCost(cost: string | null | undefined): number | null {
+  if (!cost) return null;
+  let total = 0;
+  let seen = false;
+  const re = /\{([^}]*)\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(cost)) !== null) {
+    seen = true;
+    const sym = m[1].trim().toUpperCase();
+    if (/^\d+$/.test(sym)) total += parseInt(sym, 10);
+    else if (sym === "X") total += 0;
+    else total += 1; // colored / hybrid / twobrid / phyrexian — one pip each
+  }
+  return seen ? total : null;
+}
+
+/** Counterspell names (normalized) — the hardest control tell a name can give. */
+const COUNTER_NAMES = new Set([
+  "negate",
+  "dispel",
+  "essence scatter",
+  "make disappear",
+  "spell pierce",
+  "no more lies",
+  "disdainful stroke",
+  "dovin's veto",
+  "absorb",
+  "sinister sabotage",
+  "three steps ahead",
+  "counterspell",
+  "mana leak",
+  "quench",
+  "stubborn denial",
+  "mystical dispute",
+  "arcane denial",
+  "wash away",
+  "geistlight snare",
+  "spell stutter",
+]);
+
+/** Board wipes — control tell. Matched on normalized names. */
+const SWEEPER_RE =
+  /\b(wrath of god|day of judgment|damnation|sunfall|depopulate|temporary lockdown|vanquish the horde|blasphemous act|brotherhood's end|path of peril|storm's wrath|burn down the house|the filigree sylex|hour of revelation|farewell|supreme verdict)\b/;
+
+/** Card selection / draw spells — control-leaning tell. */
+const DRAW_RE =
+  /\b(opt|consider|impulse|deduce|quick study|divination|sleight of hand|memory deluge|stock up|expressive iteration|behold the multiverse|chart a course|pieces of the puzzle|thirst for discovery|mazemind tome)\b/;
+
+/** Cheap burn — aggro tell. */
+const BURN_RE =
+  /\b(shock|lightning strike|lightning bolt|play with fire|monstrous rage|skewer the critics|scorching shot|searing blaze|fiery temper|boros charm|wizard's lightning|reckless rage|strangle)\b/;
+
+/** Mana acceleration — ramp tell. */
+const RAMP_RE =
+  /\b(rampant growth|cultivate|kodama's reach|llanowar elves|elvish mystic|gilded goose|paradise druid|topiary stomper|invasion of zendikar|nissa's pilgrimage|the world tree|up the beanstalk|escape to the wilds|storm the festival|old-growth troll)\b/;
+
+/** Rituals / engine pieces — combo tell. Needs 2+ hits before Combo can win. */
+const COMBO_RE =
+  /\b(dark ritual|rite of flame|seething song|lotus field|underworld breach|song of creation|hullbreaker horror|omniscience|tendrils of agony|grapeshot|brain freeze|show and tell|peer into the abyss|indomitable creativity|transmogrify|greasefang, okiba boss|creative outburst)\b/;
+
+export type MacroArchetype = "Aggro" | "Midrange" | "Control" | "Combo" | "Ramp";
+
+/**
+ * Generic color+strategy read — the floor of opponent recognition, used only
+ * when NO real list passes the matching gates. Derived purely from the
+ * opponent's own revealed cards: colors from cast pips / lands (hard evidence
+ * first, soft land hints otherwise), strategy from curve, card types and a few
+ * unmistakable card names (counterspells, sweepers, burn, rituals…).
+ *
+ * Conservative by design: needs 4+ non-land cards and at least one observed
+ * color, and confidence is capped low (≤ 0.5) so a real list match always
+ * outranks it. Returns labels like "Mono-Red Aggro" / "Azorius Control".
+ */
+export function macroArchetypeFallback(
+  seenCards: SeenCardInfo[],
+  evidence: ColorEvidence,
+  seenDistinctive: number,
+  minConfidence = 0.35,
+): ArchetypeGuess | null {
+  if (seenDistinctive < 4) return null;
+
+  let creaturesCheap = 0;
+  let creaturesMid = 0;
+  let spellsCheap = 0;
+  let expensive = 0;
+  let walkers = 0;
+  let counters = 0;
+  let sweepers = 0;
+  let draw = 0;
+  let burn = 0;
+  let rampHits = 0;
+  let comboHits = 0;
+
+  for (const card of seenCards) {
+    if (isLandCard(card)) continue;
+    const n = normalizeCardName(card.name);
+    if (!n) continue;
+    const cmc = cmcFromManaCost(card.manaCost);
+    const type = card.typeLine ?? "";
+    const creature = /\bCreature\b/.test(type);
+    const spell = /\b(?:Instant|Sorcery)\b/.test(type);
+    if (/\bPlaneswalker\b/.test(type)) walkers++;
+    if (cmc != null) {
+      if (creature && cmc <= 2) creaturesCheap++;
+      if (creature && cmc >= 3 && cmc <= 4) creaturesMid++;
+      if (spell && cmc <= 2) spellsCheap++;
+      if (cmc >= 5) expensive++;
+    }
+    if (COUNTER_NAMES.has(n)) counters++;
+    if (SWEEPER_RE.test(n)) sweepers++;
+    if (DRAW_RE.test(n)) draw++;
+    if (BURN_RE.test(n)) burn++;
+    if (RAMP_RE.test(n)) rampHits++;
+    if (COMBO_RE.test(n)) comboHits++;
+  }
+
+  const scores: [MacroArchetype, number][] = [
+    [
+      "Aggro",
+      1.2 * creaturesCheap +
+        0.9 * burn +
+        0.5 * spellsCheap +
+        0.3 * creaturesMid -
+        0.6 * expensive,
+    ],
+    [
+      "Control",
+      1.6 * counters +
+        1.6 * sweepers +
+        1.0 * draw +
+        0.8 * walkers +
+        0.5 * expensive -
+        0.6 * creaturesCheap,
+    ],
+    // Midrange is the default texture when nothing screams a polar plan.
+    ["Midrange", 1.0 + 0.4 * creaturesMid],
+    ["Ramp", rampHits >= 2 ? 1.8 * rampHits + 0.4 * expensive : -1],
+    ["Combo", comboHits >= 2 ? 2.2 * comboHits : -1],
+  ];
+  scores.sort((a, b) => b[1] - a[1]);
+  const [macro, top] = scores[0];
+  const margin = top - (scores[1]?.[1] ?? 0);
+
+  const colors = [
+    ...(evidence.required.size ? evidence.required : evidence.soft),
+  ].slice(0, 3);
+  const group = colorGroupName(colors);
+  if (!group) return null;
+
+  const confidence =
+    Math.round(
+      Math.min(
+        0.5,
+        0.3 + 0.02 * Math.min(seenDistinctive, 8) + (margin >= 1.5 ? 0.04 : 0),
+      ) * 1000,
+    ) / 1000;
+  if (confidence < minConfidence) return null;
+
+  const label = `${group} ${macro}`;
+  return {
+    archetype: label,
+    deckId: "",
+    hits: [],
+    distinctiveHits: 0,
+    confidence,
+    poolSize: 0,
+    baseArchetype: label,
+    colorAdjusted: false,
+    observedColors: COLOR_ORDER.filter((c) => evidence.required.has(c)),
+    macroFallback: true,
+  };
+}
+
 /**
  * Best meta-deck guess for the cards the opponent has revealed.
- * Returns null when evidence is too thin or the field is a near-tie.
+ * Falls back to a generic color+macro label (macroArchetypeFallback) when no
+ * list passes the gates; returns null when evidence is too thin for either.
  */
 export function inferOpponentArchetype(
   seenGrpIds: number[] | undefined | null,
@@ -563,13 +748,21 @@ export function inferOpponentArchetype(
   };
   for (const c of evidence.required) evidence.soft.delete(c);
 
+  // When no real list passes the gates below, fall back to a generic
+  // color+macro label read off the opponent's own cards, so off-meta decks
+  // still get named instead of vanishing.
+  const macroFallback = () =>
+    opts?.macroFallback === false
+      ? null
+      : macroArchetypeFallback(seenCards, proven, seenDistinctive, minConfidence);
+
   const scored: ScoredDeck[] = [];
   for (const deck of candidates) {
     const s = scoreDeckAgainstSeen(seenNames, deck, df, nDecks, evidence);
     if (s.distinctiveHits < minHits && s.hits.length < minHits + 1) continue;
     scored.push(s);
   }
-  if (!scored.length) return null;
+  if (!scored.length) return macroFallback();
 
   scored.sort(
     (a, b) =>
@@ -600,7 +793,7 @@ export function inferOpponentArchetype(
     relativeMargin < minMargin &&
     best.weightedHits - second.weightedHits < 0.8
   ) {
-    return null;
+    return macroFallback();
   }
 
   const bestDeck = candidates.find((d) => d.id === best.deckId);
@@ -622,7 +815,7 @@ export function inferOpponentArchetype(
   if (corrected.adjusted) {
     confidence = Math.round(Math.min(confidence * 0.8, 0.8) * 1000) / 1000;
   }
-  if (confidence < minConfidence) return null;
+  if (confidence < minConfidence) return macroFallback();
 
   return {
     archetype: corrected.archetype,

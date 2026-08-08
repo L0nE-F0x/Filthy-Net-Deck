@@ -1,5 +1,5 @@
 import type { CardEntry, FormatId, MetaBundle, PlayMode } from "../types/meta";
-import { decksForMode } from "./deckHelpers";
+import { allDecksForFormat } from "./deckHelpers";
 
 /** One appearance of a card in a meta decklist. A deck listed for both Bo1 and Bo3 produces one occurrence per mode. */
 export interface CardOccurrence {
@@ -36,8 +36,6 @@ export interface DeckSearchResult {
   tier: 1 | 2 | 3;
 }
 
-const MODES: PlayMode[] = ["bo1", "bo3"];
-
 function norm(s: string): string {
   return s.trim().toLowerCase();
 }
@@ -60,43 +58,41 @@ function compareOccurrences(a: CardOccurrence, b: CardOccurrence): number {
   );
 }
 
-/** Walk every format × mode and index each mainboard + sideboard entry. */
+/** Walk every deck of each format (ranked boards + off-meta recognition decks) and index each mainboard + sideboard entry. */
 export function buildCardIndex(meta: MetaBundle): CardIndex {
   const byName = new Map<string, CardOccurrence[]>();
   for (const fmt of meta.formats) {
-    for (const mode of MODES) {
-      decksForMode(fmt, mode, meta.decks).forEach((deck, pos) => {
-        const base = {
-          formatId: fmt.id,
-          formatName: fmt.name,
-          mode,
-          deckId: deck.id,
-          deckName: deck.name,
-          rank: deck.rank ?? pos + 1,
-          tier: deck.tier,
-          metaShare: deck.metaShare,
-        };
-        const boards: { board: "main" | "side"; entries: CardEntry[] }[] = [
-          { board: "main", entries: deck.mainboard },
-          { board: "side", entries: deck.sideboard },
-        ];
-        for (const { board, entries } of boards) {
-          for (const entry of entries) {
-            const key = norm(entry.name);
-            if (!key) continue;
-            const occurrence: CardOccurrence = {
-              ...base,
-              cardName: entry.name,
-              board,
-              count: entry.count,
-            };
-            const list = byName.get(key);
-            if (list) list.push(occurrence);
-            else byName.set(key, [occurrence]);
-          }
+    allDecksForFormat(fmt, meta.decks).forEach((deck, pos) => {
+      const base = {
+        formatId: fmt.id,
+        formatName: fmt.name,
+        mode: deck.mode,
+        deckId: deck.id,
+        deckName: deck.name,
+        rank: deck.rank ?? pos + 1,
+        tier: deck.tier,
+        metaShare: deck.metaShare,
+      };
+      const boards: { board: "main" | "side"; entries: CardEntry[] }[] = [
+        { board: "main", entries: deck.mainboard },
+        { board: "side", entries: deck.sideboard },
+      ];
+      for (const { board, entries } of boards) {
+        for (const entry of entries) {
+          const key = norm(entry.name);
+          if (!key) continue;
+          const occurrence: CardOccurrence = {
+            ...base,
+            cardName: entry.name,
+            board,
+            count: entry.count,
+          };
+          const list = byName.get(key);
+          if (list) list.push(occurrence);
+          else byName.set(key, [occurrence]);
         }
-      });
-    }
+      }
+    });
   }
   // Stable sort: for equal format/mode/rank, mainboard stays before sideboard.
   for (const list of byName.values()) list.sort(compareOccurrences);
@@ -129,7 +125,7 @@ export function searchCards(
     });
 }
 
-/** Deck name / archetype matches, one result per format × mode listing. */
+/** Deck name / archetype matches across ranked boards + off-meta decks, one result per deck. */
 export function searchDecks(
   meta: MetaBundle,
   query: string,
@@ -139,27 +135,25 @@ export function searchDecks(
   if (!q) return [];
   const scored: { result: DeckSearchResult; score: number }[] = [];
   for (const fmt of meta.formats) {
-    for (const mode of MODES) {
-      decksForMode(fmt, mode, meta.decks).forEach((deck, pos) => {
-        const score = Math.min(
-          matchScore(deck.name, q) ?? 3,
-          matchScore(deck.archetype, q) ?? 3,
-        );
-        if (score === 3) return;
-        scored.push({
-          score,
-          result: {
-            deckId: deck.id,
-            deckName: deck.name,
-            formatId: fmt.id,
-            formatName: fmt.name,
-            mode,
-            rank: deck.rank ?? pos + 1,
-            tier: deck.tier,
-          },
-        });
+    allDecksForFormat(fmt, meta.decks).forEach((deck, pos) => {
+      const score = Math.min(
+        matchScore(deck.name, q) ?? 3,
+        matchScore(deck.archetype, q) ?? 3,
+      );
+      if (score === 3) return;
+      scored.push({
+        score,
+        result: {
+          deckId: deck.id,
+          deckName: deck.name,
+          formatId: fmt.id,
+          formatName: fmt.name,
+          mode: deck.mode,
+          rank: deck.rank ?? pos + 1,
+          tier: deck.tier,
+        },
       });
-    }
+    });
   }
   scored.sort(
     (a, b) =>

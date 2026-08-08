@@ -62,9 +62,16 @@ export interface Deck {
   name: string;
   format: FormatId;
   mode: PlayMode;
-  /** Rank within the day's 8 for this format+mode (1 = top pick) */
+  /** Rank within the day's board for this format+mode (1 = top pick). Undefined on off-meta recognition decks. */
   rank?: number;
   tier: 1 | 2 | 3;
+  /**
+   * True for off-meta recognition decks: real Scryfall-verified lists beyond
+   * the ranked board (Goldfish full-metagame tiles / Untapped ladder tail).
+   * Never shown on the 8-deck boards — they exist so opponent inference, tag
+   * suggestions and search can name off-meta decks.
+   */
+  offMeta?: boolean;
   colors: ManaColor[];
   archetype: string;
   description: string;
@@ -93,9 +100,9 @@ export interface FormatMeta {
   name: string;
   featured?: boolean;
   shortLabel: string;
-  /** Exactly 8 recommended deck ids for Bo1, ranked */
+  /** Ranked board deck ids for Bo1 (up to 8; the bundle may carry extra off-meta decks outside these lists) */
   bo1DeckIds: string[];
-  /** Exactly 8 recommended deck ids for Bo3, ranked */
+  /** Ranked board deck ids for Bo3 (up to 8; see bo1DeckIds) */
   bo3DeckIds: string[];
   /** @deprecated use bo1DeckIds[0] — kept for older feeds */
   bo1?: { deckId: string };

@@ -24,7 +24,8 @@ function deck(partial: Partial<Deck> & { id: string; name: string }): Deck {
   };
 }
 
-// "mono-red" is listed for BOTH standard bo1 and bo3 → duplicate, mode-labeled
+// "Mono Red" is listed for BOTH standard bo1 and bo3 under distinct per-mode
+// ids (exactly how real feeds mirror a deck across modes) → mode-labeled
 // occurrences. "Lightning Strike" appears in its mainboard (4×) AND sideboard
 // (1×) to exercise board labels.
 const meta: MetaBundle = {
@@ -35,8 +36,8 @@ const meta: MetaBundle = {
       id: "standard",
       name: "Standard",
       shortLabel: "STD",
-      bo1DeckIds: ["mono-red", "azorius-ctrl"],
-      bo3DeckIds: ["mono-red"],
+      bo1DeckIds: ["mono-red-bo1", "azorius-ctrl"],
+      bo3DeckIds: ["mono-red-bo3"],
       tiers: [],
       metaNotes: "",
     },
@@ -51,9 +52,25 @@ const meta: MetaBundle = {
     },
   ],
   decks: {
-    "mono-red": deck({
-      id: "mono-red",
+    "mono-red-bo1": deck({
+      id: "mono-red-bo1",
       name: "Mono Red",
+      mode: "bo1",
+      tier: 1,
+      metaShare: 12.5,
+      mainboard: [
+        { count: 4, name: "Lightning Strike" },
+        { count: 4, name: "Monastery Swiftspear" },
+      ],
+      sideboard: [
+        { count: 1, name: "Lightning Strike" },
+        { count: 2, name: "Roiling Vortex" },
+      ],
+    }),
+    "mono-red-bo3": deck({
+      id: "mono-red-bo3",
+      name: "Mono Red",
+      mode: "bo3",
       tier: 1,
       metaShare: 12.5,
       mainboard: [
@@ -109,7 +126,7 @@ describe("buildCardIndex", () => {
       cardName: "Lightning Strike",
       formatId: "standard",
       formatName: "Standard",
-      deckId: "mono-red",
+      deckId: "mono-red-bo1",
       deckName: "Mono Red",
       rank: 1,
       tier: 1,
@@ -183,7 +200,7 @@ describe("searchDecks", () => {
       "standard:bo3",
     ]);
     expect(results[0]).toMatchObject({
-      deckId: "mono-red",
+      deckId: "mono-red-bo1",
       deckName: "Mono Red",
       formatName: "Standard",
       rank: 1,

@@ -12,6 +12,11 @@
  *   3. Every card name must validate against Scryfall (canonical name,
  *      per-format legality, scryfall id for exact CDN images).
  *
+ * Beyond the 8+8 boards, each format also emits up to 24 off-meta
+ * recognition decks (Goldfish full-metagame tail + Untapped Bo1 ladder
+ * tail, same validation bar) so the app can name off-meta opponents.
+ * They ship with `offMeta: true` and never appear on a board.
+ *
  * Formats: Standard (featured) and Pioneer. Nothing else.
  *
  * Usage: node pipeline/build-meta.mjs
@@ -64,6 +69,14 @@ const FORMAT_DEFS = [
 const DECKS_PER_FORMAT = 8;
 /** Below this many verified decks in a format, the whole run is discarded. */
 const MIN_DECKS_PER_FORMAT = 4;
+/**
+ * Off-meta recognition decks per format, beyond the 8+8 boards. These never
+ * appear on a board — they exist so the app can NAME off-meta opponents
+ * (overlay inference, tag suggestions, search). Same hard rule as the boards:
+ * real, Scryfall-validated lists only; no list source → skipped, never
+ * fabricated.
+ */
+const EXTENDED_DECKS_PER_FORMAT = 24;
 
 function slugify(name) {
   return String(name)
@@ -152,6 +165,27 @@ async function buildFormat(def, diagnostics) {
   } catch (e) {
     diagnostics.push(`${def.id}: magic.gg list pool failed (${e.message})`);
     console.warn(`  [${def.id}] magic.gg pool failed: ${e.message}`);
+  }
+
+  // Full metagame tile pool — the long tail beyond the front page. Used for
+  // list name-matching (Standard Bo1) and as the off-meta recognition
+  // candidate pool for BOTH formats.
+  let fullTiles = [];
+  try {
+    await sleep(450);
+    const full = await fetchMetagameTiles(`${def.goldfishPath}/full`);
+    fullTiles = full.tiles;
+    console.log(`  [${def.id}] full metagame pool: ${fullTiles.length} tiles`);
+  } catch (e) {
+    diagnostics.push(`${def.id}: full metagame pool failed (${e.message})`);
+  }
+
+  /** Every known tile by normalized name (front page + full pool). */
+  const tilesByNorm = new Map();
+  for (const t of [...tiles, ...fullTiles]) {
+    if (/^other$/i.test(t.name.trim())) continue;
+    const k = normalizeArchetypeName(t.name);
+    if (!tilesByNorm.has(k)) tilesByNorm.set(k, t);
   }
 
   const picked = [];
@@ -274,8 +308,70 @@ async function buildFormat(def, diagnostics) {
   // back to mirroring the Bo3 board (the previous behavior).
   let bo1Picks = null; // [{ row, p }] in ladder-share order
   let bo1Meta = null;
+  /** Standard Bo1 ladder (Untapped) — function scope so the off-meta pool reuses it. */
+  let ladder = null;
+  let ladderDeckPool = null;
+  /**
+   * Ladder-only archetypes (no tournament tile anywhere): the free deck pool
+   * behind Untapped's public decks page. Fetched lazily, decoded
+   * (deckstring → titleIds → names) and Scryfall-validated like any source.
+   */
+  const ladderPoolFor = async (norm) => {
+    if (!ladder) return [];
+    if (ladderDeckPool === null) {
+      try {
+        ladderDeckPool = await fetchBo1DeckPool(ladder.periodId, ladder.tags);
+        console.log(
+          `  [${def.id}] Untapped Bo1 deck pool: ${ladderDeckPool.size} archetypes`,
+        );
+      } catch (e) {
+        ladderDeckPool = new Map();
+        diagnostics.push(`${def.id}/bo1: ladder deck pool failed (${e.message})`);
+      }
+    }
+    return ladderDeckPool.get(norm) || [];
+  };
+
+  /**
+   * Most-played ladder list for an archetype no tournament source covers.
+   * Null when nothing validates — never invented.
+   */
+  const resolveLadderOnlyList = async (row) => {
+    for (const cand of (await ladderPoolFor(row.norm)).slice(0, 3)) {
+      const scratch = {
+        mainboard: cand.mainboard.map((c) => ({ ...c })),
+        sideboard: [],
+      };
+      const report = await validateDeck(scratch, def.id, { dropIllegal: true });
+      if (report.skipped) return null; // scryfall unreachable — stop trying
+      if (report.unknown.length > 2 || report.mainCount < 55) continue;
+      if (report.unknown.length || report.illegal.length) {
+        diagnostics.push(
+          `${def.id}/bo1/${row.name}: cleaned untapped list (dropped unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
+        );
+      }
+      console.log(
+        `  [${def.id}] ✓ ${row.name} — ${report.mainCount} cards (untapped ladder list, ${cand.matches} matches)`,
+      );
+      return {
+        tile: {
+          name: row.name,
+          slug: null,
+          colors: row.colors,
+          metaPct: row.sharePct,
+          sampleSize: row.matches,
+          keyCards: [],
+          url: "https://mtga.untapped.gg/constructed/standard/decks",
+        },
+        list: scratch,
+        listSource: "untapped",
+        listMeta: { matches: cand.matches },
+      };
+    }
+    return null;
+  };
+
   if (def.id === "standard") {
-    let ladder = null;
     try {
       ladder = await fetchStandardBo1Ladder();
       console.log(
@@ -287,47 +383,10 @@ async function buildFormat(def, diagnostics) {
       );
     }
     if (ladder) {
-      // Widen the list-source pool: the ladder meta contains archetypes the
-      // tournament top tiles never show (e.g. Mono-White Auras).
-      let fullTiles = [];
-      try {
-        await sleep(450);
-        const full = await fetchMetagameTiles(`${def.goldfishPath}/full`);
-        fullTiles = full.tiles;
-        console.log(`  [${def.id}] full metagame pool: ${fullTiles.length} tiles`);
-      } catch (e) {
-        diagnostics.push(`${def.id}: full metagame pool failed (${e.message})`);
-      }
-      const byNorm = new Map();
-      for (const t of [...tiles, ...fullTiles]) {
-        if (/^other$/i.test(t.name.trim())) continue;
-        const k = normalizeArchetypeName(t.name);
-        if (!byNorm.has(k)) byNorm.set(k, t);
-      }
-      // Ladder-only archetypes (no tournament tile anywhere): the free deck
-      // pool behind Untapped's public decks page. Fetched lazily, decoded
-      // (deckstring → titleIds → names) and Scryfall-validated like any
-      // other source.
-      let ladderDeckPool = null;
-      const ladderPoolFor = async (norm) => {
-        if (ladderDeckPool === null) {
-          try {
-            ladderDeckPool = await fetchBo1DeckPool(ladder.periodId, ladder.tags);
-            console.log(
-              `  [${def.id}] Untapped Bo1 deck pool: ${ladderDeckPool.size} archetypes`,
-            );
-          } catch (e) {
-            ladderDeckPool = new Map();
-            diagnostics.push(`${def.id}/bo1: ladder deck pool failed (${e.message})`);
-          }
-        }
-        return ladderDeckPool.get(norm) || [];
-      };
-
       const picks = [];
       for (const row of ladder.board) {
         if (picks.length >= DECKS_PER_FORMAT) break;
-        const tile = byNorm.get(row.norm);
+        const tile = tilesByNorm.get(row.norm);
         if (tile) {
           const slug = slugify(tile.name);
           let p = picked.find((x) => slugify(x.tile.name) === slug);
@@ -340,39 +399,7 @@ async function buildFormat(def, diagnostics) {
           continue;
         }
         // No tournament list anywhere — try the ladder's own most-played list.
-        let p = null;
-        for (const cand of (await ladderPoolFor(row.norm)).slice(0, 3)) {
-          const scratch = {
-            mainboard: cand.mainboard.map((c) => ({ ...c })),
-            sideboard: [],
-          };
-          const report = await validateDeck(scratch, def.id, { dropIllegal: true });
-          if (report.skipped) break; // scryfall unreachable — stop trying
-          if (report.unknown.length > 2 || report.mainCount < 55) continue;
-          if (report.unknown.length || report.illegal.length) {
-            diagnostics.push(
-              `${def.id}/bo1/${row.name}: cleaned untapped list (dropped unknown=${report.unknown.join("|") || "-"}, illegal=${report.illegal.join("|") || "-"})`,
-            );
-          }
-          p = {
-            tile: {
-              name: row.name,
-              slug: null,
-              colors: row.colors,
-              metaPct: row.sharePct,
-              sampleSize: row.matches,
-              keyCards: [],
-              url: "https://mtga.untapped.gg/constructed/standard/decks",
-            },
-            list: scratch,
-            listSource: "untapped",
-            listMeta: { matches: cand.matches },
-          };
-          console.log(
-            `  [${def.id}] ✓ ${row.name} — ${report.mainCount} cards (untapped ladder list, ${cand.matches} matches)`,
-          );
-          break;
-        }
+        const p = await resolveLadderOnlyList(row);
         if (!p) {
           diagnostics.push(
             `${def.id}/bo1: no list source for ladder archetype "${row.name}" (${row.sharePct}%) — skipped`,
@@ -390,6 +417,65 @@ async function buildFormat(def, diagnostics) {
         );
       }
     }
+  }
+
+  // —— Off-meta recognition pool ——
+  // The boards stay at 8 per mode, but people queue plenty of decks beyond
+  // them. Everything below exists so the app can still NAME those opponents
+  // (overlay inference, tag suggestions, search). Same hard rule as the
+  // boards: real Scryfall-validated lists only — an archetype with no list
+  // source is skipped, never fabricated.
+  const boardNorms = new Set();
+  for (const p of picked) boardNorms.add(normalizeArchetypeName(p.tile.name));
+  for (const { row, p } of bo1Picks ?? []) {
+    boardNorms.add(row.norm);
+    boardNorms.add(normalizeArchetypeName(p.tile.name));
+  }
+
+  const extendedCandidates = [];
+  const seenCandidateNorms = new Set(boardNorms);
+  // Arena Bo1 ladder tail first — the off-meta decks users actually queue
+  // into, with real match volumes attached.
+  for (const row of ladder?.board ?? []) {
+    if (seenCandidateNorms.has(row.norm)) continue;
+    seenCandidateNorms.add(row.norm);
+    extendedCandidates.push({ row, tile: tilesByNorm.get(row.norm) ?? null });
+  }
+  // Then the tournament long tail (both formats), biggest share first.
+  const tailTiles = [...tiles, ...fullTiles]
+    .filter((t) => !/^other$/i.test(t.name.trim()))
+    .sort((a, b) => (b.metaPct ?? 0) - (a.metaPct ?? 0));
+  for (const tile of tailTiles) {
+    const norm = normalizeArchetypeName(tile.name);
+    if (seenCandidateNorms.has(norm)) continue;
+    seenCandidateNorms.add(norm);
+    extendedCandidates.push({ row: null, tile });
+  }
+
+  const extendedPicks = []; // [{ row|null, p }]
+  let extendedAttempts = 0;
+  const maxExtendedAttempts = EXTENDED_DECKS_PER_FORMAT * 2;
+  for (const cand of extendedCandidates) {
+    if (extendedPicks.length >= EXTENDED_DECKS_PER_FORMAT) break;
+    if (extendedAttempts >= maxExtendedAttempts) break;
+    extendedAttempts++;
+    let p;
+    if (cand.tile) {
+      const slug = slugify(cand.tile.name);
+      if (usedSlugs.has(slug)) continue;
+      p = await resolveTileList(cand.tile);
+      if (!p) continue;
+      usedSlugs.add(slug);
+    } else {
+      p = await resolveLadderOnlyList(cand.row);
+      if (!p) continue;
+    }
+    extendedPicks.push({ row: cand.row, p });
+  }
+  if (extendedPicks.length) {
+    console.log(
+      `  [${def.id}] +${extendedPicks.length} off-meta recognition decks`,
+    );
   }
 
   // Deck objects, one board per mode. Bo3 rank = Goldfish tournament share
@@ -470,6 +556,7 @@ async function buildFormat(def, diagnostics) {
       listQuality: "authoritative",
       listNote,
       listSource: p.listSource,
+      ...(stats.offMeta ? { offMeta: true } : {}),
     };
   };
 
@@ -490,6 +577,21 @@ async function buildFormat(def, diagnostics) {
     description: `${row.sharePct}% of Standard Bo1 ladder matches (${row.matches.toLocaleString("en-US")} matches this meta period${row.winratePct != null ? `, ${row.winratePct}% ladder winrate` : ""}). Representative verified list.`,
   });
 
+  /** Off-meta recognition deck from a tournament tail tile. */
+  const extendedGoldfishStats = (p) => ({
+    metaShare: p.tile.metaPct,
+    description: `Off-meta ${def.name} archetype tracked beyond the ranked board${p.tile.metaPct != null ? ` (${p.tile.metaPct}% of tracked decks)` : ""}. Representative verified list.`,
+    offMeta: true,
+  });
+
+  /** Off-meta recognition deck from the Arena Bo1 ladder tail. */
+  const extendedLadderStats = (row) => ({
+    metaShare: row.sharePct,
+    untappedUrl: bo1Meta?.url,
+    description: `Off-meta Standard Bo1 ladder archetype tracked beyond the ranked board (${row.matches.toLocaleString("en-US")} matches this meta period). Representative verified list.`,
+    offMeta: true,
+  });
+
   const decks = [];
   picked.forEach((p, idx) => decks.push(makeDeck(p, "bo3", idx + 1, goldfishStats(p))));
   if (bo1Picks) {
@@ -498,6 +600,18 @@ async function buildFormat(def, diagnostics) {
     );
   } else {
     picked.forEach((p, idx) => decks.push(makeDeck(p, "bo1", idx + 1, goldfishStats(p))));
+  }
+  // Off-meta decks keep one list per archetype: ladder lists as Bo1 (no
+  // sideboard), tournament lists as Bo3 (sideboard carries archetype tells).
+  // Skip any whose reconciled name collides with a deck already emitted.
+  const emittedIds = new Set(decks.map((d) => d.id));
+  for (const { row, p } of extendedPicks) {
+    const mode = p.listSource === "untapped" ? "bo1" : "bo3";
+    const stats = row ? extendedLadderStats(row) : extendedGoldfishStats(p);
+    const d = makeDeck(p, mode, undefined, stats);
+    if (emittedIds.has(d.id)) continue;
+    emittedIds.add(d.id);
+    decks.push(d);
   }
   return decks;
 }
@@ -626,8 +740,10 @@ async function main() {
     }
 
     // Boards can diverge per mode now — gate each mode on its own count.
-    const bo1Count = built.filter((d) => d.mode === "bo1").length;
-    const bo3Count = built.filter((d) => d.mode === "bo3").length;
+    // Off-meta recognition decks never count toward (or appear on) a board.
+    const board = built.filter((d) => !d.offMeta);
+    const bo1Count = board.filter((d) => d.mode === "bo1").length;
+    const bo3Count = board.filter((d) => d.mode === "bo3").length;
     if (Math.min(bo1Count, bo3Count) < MIN_DECKS_PER_FORMAT) {
       console.error(
         `ABORT: ${def.id} produced only bo1=${bo1Count}/bo3=${bo3Count} verified decks (< ${MIN_DECKS_PER_FORMAT}). Nothing written — previous published data stays live.`,
@@ -637,8 +753,8 @@ async function main() {
 
     for (const d of built) decks[d.id] = d;
 
-    const bo1DeckIds = built.filter((d) => d.mode === "bo1").map((d) => d.id);
-    const bo3DeckIds = built.filter((d) => d.mode === "bo3").map((d) => d.id);
+    const bo1DeckIds = board.filter((d) => d.mode === "bo1").map((d) => d.id);
+    const bo3DeckIds = board.filter((d) => d.mode === "bo3").map((d) => d.id);
     const topIds = bo3DeckIds;
     const tiers = { 1: [], 2: [], 3: [] };
     for (const id of topIds) {

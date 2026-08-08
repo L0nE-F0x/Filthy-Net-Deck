@@ -74,6 +74,15 @@ never silently stale-as-fresh).
    (legacy trend decoder + free-archetypes decoder + two real deckstrings).
    Pioneer/Explorer Bo1 stats are premium-walled — Pioneer intentionally
    mirrors Bo3.
+5d. **Off-meta recognition pool** — beyond the 8+8 boards, each format ships
+   up to 24 extra decks (`offMeta: true`) from the Goldfish `/full` metagame
+   tile tail (both formats) + Untapped Bo1 ladder tail (Standard), same C3
+   list priority + Scryfall gates. Healthy run logs `+N off-meta recognition
+   decks` per format and `full metagame pool: N tiles`. If Goldfish restructures
+   the `/full` page, the pool silently shrinks (boards unaffected) — symptom:
+   the log line drops toward +0 and the app stops naming off-meta opponents.
+   These decks never appear on boards or `meta-web` pages; they feed overlay
+   inference, tag suggestions, ⌘K search and deep links only.
 5b. **MTGO alias map** — when a new Universes Beyond set with dual-identity
    printings (printed alias ≠ canonical name, like OM1 Marvel) enters
    Standard/Pioneer, rerun `node scripts/gen-mtgo-name-map.mjs om1 <newset>`

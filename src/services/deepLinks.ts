@@ -4,7 +4,7 @@
  */
 
 import type { Deck, FormatId, MetaBundle, PlayMode } from "../types/meta";
-import { decksForMode } from "./deckHelpers";
+import { allDecksForFormat } from "./deckHelpers";
 import { buildCardIndex, type CardOccurrence } from "./cardWatch";
 
 function norm(s: string): string {
@@ -41,7 +41,12 @@ export interface MetaDeckHit {
   mode: PlayMode;
 }
 
-/** Find a ranked meta deck by archetype/name for a format+mode (defaults bo1). */
+/**
+ * Find a meta deck by archetype/name for a format+mode (defaults bo1).
+ * Ranked board decks are searched first, then off-meta recognition decks of
+ * the same format — a tag like "Gruul Midrange" resolves even when the deck
+ * isn't on today's board. Ties go to the earlier (ranked) deck.
+ */
 export function resolveMetaDeck(
   meta: MetaBundle | null | undefined,
   nameOrArchetype: string,
@@ -57,7 +62,10 @@ export function resolveMetaDeck(
   let bestLen = -1;
 
   for (const fmt of formats) {
-    const decks = decksForMode(fmt, mode, meta.decks);
+    // Ranked boards first, then off-meta decks; requested mode first on ties.
+    const decks = [...allDecksForFormat(fmt, meta.decks)].sort(
+      (a, b) => (a.mode === mode ? 0 : 1) - (b.mode === mode ? 0 : 1),
+    );
     for (const deck of decks) {
       const labels = [deck.name, deck.archetype].filter(Boolean) as string[];
       for (const label of labels) {
@@ -67,7 +75,7 @@ export function resolveMetaDeck(
           const score = k === q ? 10_000 + k.length : k.length;
           if (score > bestLen) {
             bestLen = score;
-            best = { deckId: deck.id, deck, formatId: fmt.id, mode };
+            best = { deckId: deck.id, deck, formatId: fmt.id, mode: deck.mode ?? mode };
           }
         }
       }

@@ -32,8 +32,8 @@ checkpoint is a measurement, not a build:** see "Waiting on data" below.
 | Gates last green | **365** vitest · lint/tsc clean · `typecheck:functions` (new) |
 | `WHATS_NEW` | 2 lines (tip jar + public meta pages) |
 
-Working tree keeps **current Windows** under `website/downloads/` (v2.6.3 exe + sig)
-and the last macOS dmg (v2.6.2 until `v2.6.3` tag CI rolls). Older installers
+Working tree keeps **current Windows** under `website/downloads/` (v2.7.0 exe + sig)
+and the last macOS dmg (v2.6.3 until `v2.7.0` tag CI rolls). Older installers
 are pruned per `docs/GIT-HISTORY-BLOAT.md`.
 
 ---
@@ -162,11 +162,11 @@ may proceed on judgment. Ask before product decisions.
 
 | Target | File |
 |--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.6.3.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.6.3-universal.dmg` (2.6.3 via tag CI) |
-| Updater | `website/updater/latest.json` → **2.6.3** |
-| Soft | `website/version.json` + `public/version.json` → **2.6.3** |
-| Tag | `v2.6.3` (macOS CI) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.0.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.7.0-universal.dmg` (2.7.0 via tag CI) |
+| Updater | `website/updater/latest.json` → **2.7.0** |
+| Soft | `website/version.json` + `public/version.json` → **2.7.0** |
+| Tag | `v2.7.0` (macOS CI) |
 
 **Sign only** with key id **67FCA9900F523D49**
 (`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).

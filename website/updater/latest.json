@@ -1,11 +1,11 @@
 {
-  "version": "2.6.3",
-  "notes": "v2.6.3: The overlay finally sticks — size and minimized/expanded mode survive matches, restarts, and reboots. Bo3 sideboards show on a dedicated tab. Ranked vs unranked is labeled, and Play-queue games no longer paint as ladder losses on the post-match graph.",
-  "pub_date": "2026-08-08T09:00:42Z",
+  "version": "2.7.0",
+  "notes": "v2.7.0: Opponent reads now reach far beyond the top 8 — 40+ extra off-meta archetypes per format ship daily (Mono-Blue Elementals, Boros Heroic, Nykthos Ramp, Quintorius Combo…), so overlay reads, tags and search can name them. Pioneer queues infer against the Pioneer field, and decks no list recognizes still get a color + strategy read (e.g. 'Gruul Midrange').",
+  "pub_date": "2026-08-08T16:40:43Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjBnbXVLT1M5ejJwL005MzBFYmVZbU1adXJwVkEwckdTRWZHUkFmNWR4THYzVFkzR2ZtemdpODh3VWxQZGdrdm5MSWM2aFpKK1d1SlZXSFB3UkZLWXd3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MTc5NjI3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNi4zX3g2NC1zZXR1cC5leGUKL3dBYTN0Sld2eUhqK2NBRzJac09sdHFBQjFhM3dZaHJ5aktqVzNYTUlpc296WU5TQXFyWDcrNFY4MnByNmpXZForNDRqVU9HaUlIV1JXTG1NVGhyRFE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.6.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJEbUg3ZVc5Wm9vNi95aDU1anV6a1l3a1hWMy9WTFQ0UlhJb1pyd3VEWGZMRjhydks5d2x6SnZHaHcyYkJUQXRiaWI4TWhPNHcrSU52OUZmVFY0bkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MjA3MTkyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy4wX3g2NC1zZXR1cC5leGUKdFh6cExOR2JLUHgvTTFvcUZ4dDVNOEJoQXRJeDErbmJaa242RkpBczlpMjZjZHUxQ0QyYTZHUmlnb25UWWRNdG9NR0JJWE5RS0Q1MUZ4SVNWNjhYRFE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.0.exe"
     }
   }
 }
