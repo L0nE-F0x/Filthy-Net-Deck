@@ -263,7 +263,35 @@ function SetGallery({
   // Stable ref so the drawer's focus/Escape effect doesn't re-run per render.
   const closeFocus = useCallback(() => setFocus(null), []);
 
-  const all = useMemo(() => setGalleryCards(set), [set]);
+  // Live/released sets ship without full cards[] — pull gallery on open.
+  const [resolved, setResolved] = useState<UpcomingSet>(set);
+  const [galleryLoading, setGalleryLoading] = useState(
+    () => !set.cards?.length && (set.spoiledCount > 0 || (set.previews?.length ?? 0) > 0),
+  );
+  useEffect(() => {
+    setResolved(set);
+    if (set.cards?.length) {
+      setGalleryLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setGalleryLoading(true);
+    void import("../services/setsFeed")
+      .then((m) => m.fetchSetGallery(set.code))
+      .then((cards) => {
+        if (cancelled) return;
+        if (cards?.length) setResolved({ ...set, cards });
+        setGalleryLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) setGalleryLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [set]);
+
+  const all = useMemo(() => setGalleryCards(resolved), [resolved]);
   const unreleased = set.status === "spoiling" || set.status === "announced";
   const filteredRef = useRef<SetPreviewCard[]>([]);
   // ←/→ browse within the CURRENT filter/sort, wrapping at the ends.
@@ -354,8 +382,12 @@ function SetGallery({
           <p className="text-sm text-muted mt-1 mb-0">
             <span className={statusClass(set.status)}>{statusLabel(set.status)}</span>
             <span className="ml-2">
-              {all.length} card{all.length === 1 ? "" : "s"}
-              {set.cardCount > 0 && all.length < set.cardCount
+              {galleryLoading
+                ? "Loading full gallery…"
+                : `${all.length} card${all.length === 1 ? "" : "s"}`}
+              {!galleryLoading &&
+                set.cardCount > 0 &&
+                all.length < set.cardCount
                 ? ` · ${set.cardCount} expected`
                 : ""}
               {newCount > 0 ? ` · ${newCount} new since last visit` : ""}

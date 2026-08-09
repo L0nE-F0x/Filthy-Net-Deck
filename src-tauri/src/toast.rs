@@ -76,7 +76,8 @@ fn set_enabled(app: &AppHandle, enabled: bool) {
         let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
     }
     if !enabled {
-        hide(app);
+        // Drop the renderer when the feature is off — no reason to hold RAM.
+        destroy(app);
     }
 }
 
@@ -122,20 +123,14 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Build the toast webview at startup so no alert ever pays for it.
+/// Tear down the toast webview entirely.
 ///
-/// Belt and braces with the ordering in [`show_toast`]: with the window
-/// already up, `ensure_window` is a cheap early return on every alert, and
-/// the very first toast of a session behaves like all the others.
-pub fn prewarm(app: &AppHandle) {
-    if let Err(e) = ensure_window(app) {
-        eprintln!("[toast] prewarm: {e}");
-    }
-}
-
-pub fn hide(app: &AppHandle) {
+/// Each WebView2 window is a real Chromium renderer (~tens of MB idle). Toasts
+/// fire a few times per session at most, so keeping a hidden webview warm is a
+/// poor trade — recreate on the next alert instead (see [`show_toast`]).
+pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(TOAST_LABEL) {
-        let _ = win.hide();
+        let _ = win.destroy();
     }
 }
 
@@ -192,7 +187,10 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
             return;
         }
         let target = app_hide.clone();
-        let _ = app_hide.run_on_main_thread(move || hide(&target));
+        // Destroy (not merely hide): free the WebView2 renderer between alerts.
+        // The next toast rebuilds via ensure_window — same path as a cold first
+        // alert, which is already deadlock-safe (create off the main-thread hop).
+        let _ = app_hide.run_on_main_thread(move || destroy(&target));
     });
 }
 

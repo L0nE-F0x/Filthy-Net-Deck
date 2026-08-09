@@ -1,9 +1,5 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import { OverlayApp } from "./overlay/OverlayApp";
-import { ToastApp } from "./toast/ToastApp";
-import { PresenceApp } from "./presence/PresenceApp";
 import "./index.css";
 import { bootThemeFromStorage } from "./services/theme";
 
@@ -14,6 +10,23 @@ const hash = typeof window !== "undefined" ? window.location.hash : "";
 const routed = (name: string) =>
   hash === `#/${name}` || hash.startsWith(`#/${name}?`);
 
+/*
+ * Route-level code splitting: each Tauri webview (main / overlay / toast /
+ * presence) loads only its own JS. Eager imports used to pull the full main
+ * app (all pages + store + meta services) into every secondary window, so a
+ * 30-line toast paid for the whole companion.
+ */
+const App = lazy(() => import("./App"));
+const OverlayApp = lazy(() =>
+  import("./overlay/OverlayApp").then((m) => ({ default: m.OverlayApp })),
+);
+const ToastApp = lazy(() =>
+  import("./toast/ToastApp").then((m) => ({ default: m.ToastApp })),
+);
+const PresenceApp = lazy(() =>
+  import("./presence/PresenceApp").then((m) => ({ default: m.PresenceApp })),
+);
+
 function Root() {
   if (routed("overlay")) return <OverlayApp />;
   if (routed("toast")) return <ToastApp />;
@@ -23,6 +36,8 @@ function Root() {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <Root />
+    <Suspense fallback={null}>
+      <Root />
+    </Suspense>
   </React.StrictMode>,
 );

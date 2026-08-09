@@ -124,7 +124,9 @@ pub fn run() {
             overlay::load_enabled(app.handle());
             overlay::load_post_match(app.handle());
             toast::load_enabled(app.handle());
-            toast::prewarm(app.handle());
+            // Do not prewarm toast/overlay/presence at boot — each is a full
+            // WebView2 renderer. Overlay + presence warm when Arena launches;
+            // toast builds on the first alert and is destroyed after it fades.
             presence::load_enabled(app.handle());
             tracker::load_notify_match_end(app.handle());
 

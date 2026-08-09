@@ -117,9 +117,12 @@ pub fn show(app: &AppHandle) {
     }
 }
 
-pub fn hide(app: &AppHandle) {
+/// Tear down the presence webview entirely (frees its WebView2 renderer).
+/// Used when Arena quits or the user turns the badge off — it is only useful
+/// while the game is open.
+pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(PRESENCE_LABEL) {
-        let _ = win.hide();
+        let _ = win.destroy();
     }
 }
 
@@ -134,7 +137,7 @@ fn set_enabled(app: &AppHandle, enabled: bool) {
     if enabled {
         show(app);
     } else {
-        hide(app);
+        destroy(app);
     }
 }
 

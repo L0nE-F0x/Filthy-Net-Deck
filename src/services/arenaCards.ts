@@ -67,12 +67,28 @@ function loadCache(): Record<number, ArenaCardInfo> {
   return memCache;
 }
 
+/** Soft cap so a multi-season card dictionary cannot grow without bound. */
+const MAX_CACHE_ENTRIES = 6_000;
+
 function saveCache(cache: Record<number, ArenaCardInfo>) {
-  memCache = cache;
+  let next = cache;
+  const keys = Object.keys(next);
+  if (keys.length > MAX_CACHE_ENTRIES) {
+    // Drop the lowest arena ids first (oldest printings) — recent Standard
+    // cards sit at higher ids and are more likely to appear again.
+    const keep = keys
+      .map(Number)
+      .filter(Number.isFinite)
+      .sort((a, b) => b - a)
+      .slice(0, MAX_CACHE_ENTRIES);
+    next = {};
+    for (const id of keep) next[id] = cache[id];
+  }
+  memCache = next;
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    localStorage.setItem(CACHE_KEY, JSON.stringify(next));
   } catch {
-    /* ignore */
+    /* quota — keep the in-memory copy; next write may succeed after a prune */
   }
 }
 

@@ -1,15 +1,7 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { nextArenaDropInDays } from "./services/setPulse";
 import { useAppStore } from "./store/useAppStore";
-import { Daily } from "./pages/Daily";
-import { FormatView } from "./pages/FormatView";
-import { DeckView } from "./pages/DeckView";
-import { MetaPulse } from "./pages/MetaPulse";
-import { Stats } from "./pages/Stats";
-import { Matchups } from "./pages/Matchups";
-import { Climb } from "./pages/Climb";
-import { Settings } from "./pages/Settings";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -34,11 +26,25 @@ import { openExternal } from "./services/openExternal";
 import { applyFullscreen, closeToTray, toggleFullscreen } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
 import { syncOverlayPrefFromStore } from "./services/overlay";
-import { Sets } from "./pages/Sets";
-import { FormatHubPage } from "./pages/FormatHub";
-import { BrewLab } from "./pages/BrewLab";
 import { HelpGuide } from "./components/HelpGuide";
 import { listen } from "@tauri-apps/api/event";
+
+/** Page-level code split — only the active view's module stays hot. */
+const Daily = lazy(() => import("./pages/Daily").then((m) => ({ default: m.Daily })));
+const FormatView = lazy(() =>
+  import("./pages/FormatView").then((m) => ({ default: m.FormatView })),
+);
+const DeckView = lazy(() => import("./pages/DeckView").then((m) => ({ default: m.DeckView })));
+const MetaPulse = lazy(() => import("./pages/MetaPulse").then((m) => ({ default: m.MetaPulse })));
+const Stats = lazy(() => import("./pages/Stats").then((m) => ({ default: m.Stats })));
+const Matchups = lazy(() => import("./pages/Matchups").then((m) => ({ default: m.Matchups })));
+const Climb = lazy(() => import("./pages/Climb").then((m) => ({ default: m.Climb })));
+const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
+const Sets = lazy(() => import("./pages/Sets").then((m) => ({ default: m.Sets })));
+const FormatHubPage = lazy(() =>
+  import("./pages/FormatHub").then((m) => ({ default: m.FormatHubPage })),
+);
+const BrewLab = lazy(() => import("./pages/BrewLab").then((m) => ({ default: m.BrewLab })));
 
 /** Nav order: Decks → personal loop → Brew Lab → world → Settings. Keys 1–9. */
 const NAV: {
@@ -452,7 +458,7 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <>
+            <Suspense fallback={null}>
               {page === "daily" && <Daily />}
               {page === "format" && <FormatView />}
               {page === "deck" && <DeckView />}
@@ -464,7 +470,7 @@ export default function App() {
               {page === "brewlab" && <BrewLab />}
               {page === "formats" && <FormatHubPage />}
               {page === "settings" && <Settings />}
-            </>
+            </Suspense>
           )}
         </main>
       </div>

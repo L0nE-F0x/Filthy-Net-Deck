@@ -1,18 +1,36 @@
 /**
  * Build Arena-first set radar JSON for the app.
- * Writes website/meta/sets.json + public/meta/sets.json.
+ * Writes:
+ *   - website/meta/sets.json + public/meta/sets.json  (slim index)
+ *   - website/meta/sets/<code>.json + public/meta/sets/<code>.json  (full galleries)
  *
  * Usage: node pipeline/build-sets.mjs
  * Safe to run independently of the deck meta pipeline.
  */
 
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSetsBundle } from "./sources/sets.mjs";
+import { splitSetsBundle } from "./slim-sets-feed.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+function writeTree(dir, indexJson, galleries) {
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "sets.json"), indexJson);
+  const galDir = join(dir, "sets");
+  if (existsSync(galDir)) {
+    rmSync(galDir, { recursive: true, force: true });
+  }
+  mkdirSync(galDir, { recursive: true });
+  for (const [code, payload] of Object.entries(galleries)) {
+    const safe = String(code).toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    if (!safe) continue;
+    writeFileSync(join(galDir, `${safe}.json`), JSON.stringify(payload));
+  }
+}
 
 async function main() {
   const bundle = await buildSetsBundle();
@@ -21,24 +39,19 @@ async function main() {
     process.exit(1);
   }
 
-  // Slim feed: drop previews when full cards[] is present; minify for CDN size.
-  const slim = {
-    ...bundle,
-    sets: (bundle.sets || []).map((s) => {
-      if (s.cards?.length && s.previews) {
-        const { previews: _drop, ...rest } = s;
-        return rest;
-      }
-      return s;
-    }),
-  };
-  const json = JSON.stringify(slim);
+  const { index, galleries } = splitSetsBundle(bundle);
+  const indexJson = JSON.stringify(index);
+  const galleryCount = Object.keys(galleries).length;
+  const indexKb = Math.round(Buffer.byteLength(indexJson) / 1024);
+
   for (const dir of [join(root, "website", "meta"), join(root, "public", "meta")]) {
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "sets.json"), json);
+    writeTree(dir, indexJson, galleries);
   }
+
   console.log(
-    `\nWrote sets.json · ${bundle.sets.length} sets · ${bundle.date} → website/meta + public/meta`,
+    `\nWrote sets.json · ${bundle.sets.length} sets · ${bundle.date}` +
+      ` · index ${indexKb}KB · ${galleryCount} lazy galleries` +
+      ` → website/meta + public/meta`,
   );
 }
 

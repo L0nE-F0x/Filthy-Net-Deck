@@ -1,11 +1,11 @@
 {
-  "version": "2.7.0",
-  "notes": "v2.7.0: Opponent reads now reach far beyond the top 8 — 40+ extra off-meta archetypes per format ship daily (Mono-Blue Elementals, Boros Heroic, Nykthos Ramp, Quintorius Combo…), so overlay reads, tags and search can name them. Pioneer queues infer against the Pioneer field, and decks no list recognizes still get a color + strategy read (e.g. 'Gruul Midrange').",
-  "pub_date": "2026-08-08T16:40:43Z",
+  "version": "2.7.1",
+  "notes": "v2.7.1: leaner memory — secondary WebViews (toast, overlay, presence) only live when needed and drop when Arena quits; sets radar is ~10× smaller with full galleries loaded on demand.",
+  "pub_date": "2026-08-09T04:10:14Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJEbUg3ZVc5Wm9vNi95aDU1anV6a1l3a1hWMy9WTFQ0UlhJb1pyd3VEWGZMRjhydks5d2x6SnZHaHcyYkJUQXRiaWI4TWhPNHcrSU52OUZmVFY0bkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MjA3MTkyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy4wX3g2NC1zZXR1cC5leGUKdFh6cExOR2JLUHgvTTFvcUZ4dDVNOEJoQXRJeDErbmJaa242RkpBczlpMjZjZHUxQ0QyYTZHUmlnb25UWWRNdG9NR0JJWE5RS0Q1MUZ4SVNWNjhYRFE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitiUVB1UmNweTVtZW92SkdkRHplSmNJbnB0Q2QwS2pVOTl2T2NQZUthNW1lK2t2QUwzeWIyRUVpQXNPdS9FRW50d3duVnNiMzFNV2VTRzBtd2hYZndJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MjQ4NjA0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy4xX3g2NC1zZXR1cC5leGUKU3RZa282NGhObVJXUStJdmYraUZiODMvWWEvTW9VanMwc1A1QzF2WEN4a2pQVTZ5UHpOcVlWd1ArVlZCQno2SDdlZ3NMY0w5dXhoR3JwNG9jT0ZrQ2c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.1.exe"
     }
   }
 }

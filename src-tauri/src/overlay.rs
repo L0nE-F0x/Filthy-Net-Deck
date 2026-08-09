@@ -251,11 +251,33 @@ pub fn hide(app: &AppHandle) {
     }
 }
 
+/// Fully tear down the overlay webview (frees its WebView2 renderer).
+///
+/// Prefer this over [`hide`] when the HUD will not be needed for a while —
+/// e.g. Arena quit, or the user turned the overlay off in Settings. Match
+/// mid-session still uses [`hide`] so the next game does not pay cold start.
+pub fn destroy(app: &AppHandle) {
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        let _ = win.destroy();
+    }
+}
+
+/// Build the overlay webview (hidden) so the first match of a session is snappy.
+/// Only call while Arena is running and the overlay is enabled.
+pub fn prewarm_if_enabled(app: &AppHandle) {
+    if !is_enabled() {
+        return;
+    }
+    if let Err(e) = ensure_window(app) {
+        eprintln!("[overlay] prewarm: {e}");
+    }
+}
+
 pub fn set_enabled(app: &AppHandle, enabled: bool) {
     ENABLED.store(enabled, Ordering::SeqCst);
     persist_enabled(app, enabled);
     if !enabled {
-        hide(app);
+        destroy(app);
     }
 }
 

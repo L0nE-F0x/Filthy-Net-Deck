@@ -1,10 +1,13 @@
-import type { SetsBundle } from "../types/sets";
+import type { SetPreviewCard, SetsBundle } from "../types/sets";
 import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
 const DEFAULT_SETS_URL = `${SITE_ORIGIN}/meta/sets.json`;
 const SETS_URLS = SITE_ORIGINS.map((o) => `${o}/meta/sets.json`);
 const LOCAL_SETS_PATH = "/meta/sets.json";
 const CACHE_KEY = "bbi.sets.lastGood";
+
+/** In-session cache of lazy per-set galleries (code → cards). */
+const galleryMem = new Map<string, SetPreviewCard[]>();
 
 function getSetsUrl(): string {
   // Relative path only on the Vite dev server — see getMetaUrl in metaFeed.ts:
@@ -19,9 +22,32 @@ function isValidBundle(data: unknown): data is SetsBundle {
   return Boolean(b?.sets && Array.isArray(b.sets) && b.date);
 }
 
+/**
+ * Offline cache should not hold multi‑MB full card galleries for every live
+ * set — that alone is ~4MB of localStorage + a second parsed copy on cold
+ * boot. Keep full `cards[]` only for sets that are still spoiling (where the
+ * in-app gallery is the product); live/released rows fall back to previews
+ * offline and the next network refresh restores full galleries.
+ */
+function slimForCache(bundle: SetsBundle): SetsBundle {
+  return {
+    ...bundle,
+    sets: bundle.sets.map((set) => {
+      if (set.status === "spoiling" || set.status === "announced") return set;
+      if (!set.cards?.length) return set;
+      const { cards: _drop, ...rest } = set;
+      // Prefer an existing previews rail; otherwise keep a short sample so
+      // offline still has *something* to show on the set card.
+      const previews =
+        rest.previews?.length ? rest.previews : set.cards.slice(0, 12);
+      return { ...rest, previews };
+    }),
+  };
+}
+
 function saveLastGood(bundle: SetsBundle) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(bundle));
+    localStorage.setItem(CACHE_KEY, JSON.stringify(slimForCache(bundle)));
   } catch {
     /* ignore */
   }
@@ -75,4 +101,44 @@ export async function fetchSetsBundle(): Promise<{
   throw new Error(
     "Could not download the set radar and no cached copy exists. Check your connection — the app retries when you’re back online.",
   );
+}
+
+function galleryUrls(code: string): string[] {
+  const safe = String(code || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "");
+  if (!safe) return [];
+  if (import.meta.env.DEV) return [`/meta/sets/${safe}.json`];
+  return SITE_ORIGINS.map((o) => `${o}/meta/sets/${safe}.json`);
+}
+
+async function tryFetchGallery(url: string): Promise<SetPreviewCard[] | null> {
+  try {
+    const res = await fetch(url, { cache: "default" });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { cards?: SetPreviewCard[] };
+    return Array.isArray(data?.cards) && data.cards.length ? data.cards : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Full card gallery for one set — lazy companion to the slim sets index.
+ * Live/released Standard-pool sets ship without `cards[]` in sets.json;
+ * open the gallery to pull `meta/sets/<code>.json` once per session.
+ */
+export async function fetchSetGallery(code: string): Promise<SetPreviewCard[] | null> {
+  const key = String(code || "").toLowerCase();
+  if (!key) return null;
+  if (galleryMem.has(key)) return galleryMem.get(key) ?? null;
+
+  for (const url of galleryUrls(key)) {
+    const cards = await tryFetchGallery(url);
+    if (cards) {
+      galleryMem.set(key, cards);
+      return cards;
+    }
+  }
+  return null;
 }

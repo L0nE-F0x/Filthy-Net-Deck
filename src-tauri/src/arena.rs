@@ -61,11 +61,23 @@ pub fn start(app: AppHandle) {
             let previous = RUNNING.swap(now, Ordering::SeqCst);
             if let Some(running) = running_transition(previous, now) {
                 let _ = app.emit("arena:running", running);
-                if running {
-                    crate::presence::show(&app);
-                } else {
-                    crate::presence::hide(&app);
-                }
+                let handle = app.clone();
+                // Window create/destroy must not run off the event loop on
+                // Windows (WebView2 + Tauri can deadlock or drop the work).
+                let _ = app.run_on_main_thread(move || {
+                    if running {
+                        crate::presence::show(&handle);
+                        // Warm the match HUD only while Arena is up — avoids a
+                        // cold WebView2 create on the first game without paying
+                        // for a second renderer all day when the game is closed.
+                        crate::overlay::prewarm_if_enabled(&handle);
+                    } else {
+                        // Drop secondary webviews when Arena quits. Each is a
+                        // full Chromium renderer; hiding leaves that RAM held.
+                        crate::presence::destroy(&handle);
+                        crate::overlay::destroy(&handle);
+                    }
+                });
             }
             std::thread::sleep(POLL);
         }
