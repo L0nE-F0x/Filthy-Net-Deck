@@ -3,12 +3,13 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude ↔ Opus ↔ Grok ↔ Kimi).
 
-**Live product version: v2.7.1** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.7.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
-**Session wrap (2026-08-09, Grok):** **v2.7.1 fully shipped** — leaner Windows
-memory (WebView lifecycle + code-splitting), slim sets radar with lazy
-galleries, signed Windows installer, macOS universal dmg rolled from tag CI,
-site + OG + updater live. Working tree clean vs `origin/main` at wrap.
+**Session wrap (2026-08-09, Grok):** **v2.7.2 fully shipped** — desktop
+performance pass (splash re-render loop, nav prefetch / no remount, tracker
+no-op polls, leaner CardArt + Daily paint), signed Windows installer, macOS
+universal dmg rolled from tag CI, site + OG + updater live. Working tree
+clean vs `origin/main` at wrap.
 
 ---
 
@@ -16,101 +17,78 @@ site + OG + updater live. Working tree clean vs `origin/main` at wrap.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.7.1** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`, `Cargo.lock`) |
+| App version | **v2.7.2** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`, `Cargo.lock`) |
 | Branch | `main` = `origin/main` |
-| Key commits | `5e91ac5` release v2.7.1 · `4e756d1` macOS dmg roll |
-| Tag | `v2.7.1` (points at release commit; macOS CI green) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.1.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.7.1-universal.dmg` (~20 MB) |
-| Updater | `website/updater/latest.json` → **2.7.1** + signature |
-| Soft channel | `website/version.json` + `public/version.json` → **2.7.1** |
-| Site | Download buttons + OG `?v=2.7.1`, og-image regenerated |
-| Live Netlify | version / updater / setup.exe / .sig / dmg / slim `meta/sets.json` / `meta/sets/fdn.json` all **200** @ 2.7.1 |
-| Gates last green | **409** vitest · `tsc` clean · release build signed |
-| `WHATS_NEW` | Leaner memory · slim sets radar · code-splitting |
+| Key commits | `0a9e402` release v2.7.2 · `27b22cf` CI lint fix · `dc97589` macOS dmg roll |
+| Tag | `v2.7.2` (points at release commit `0a9e402`; macOS CI green) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.2.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.7.2-universal.dmg` (~20 MB) |
+| Updater | `website/updater/latest.json` → **2.7.2** + signature |
+| Soft channel | `website/version.json` + `public/version.json` → **2.7.2** |
+| Site | Download buttons + OG `?v=2.7.2`, og-image regenerated |
+| Live Netlify | version / updater / setup.exe / .sig / dmg all **200** @ 2.7.2 |
+| Gates last green | **409** vitest · `tsc` clean · eslint clean · signed Windows build |
+| `WHATS_NEW` | Snappier nav · fixed splash re-render loop · leaner home paint |
 
-**Also still in tree (optional prune):** v2.7.0 exe/sig/dmg under
-`website/downloads/`. Policy prefers current-only (see
+**Also still in tree (optional prune):** older `website/downloads/*2.7.0*` and
+`*2.7.1*` installers. Policy prefers current-only (see
 `docs/GIT-HISTORY-BLOAT.md` / `docs/MAINTENANCE.md`); not blocking.
 
 ---
 
-## What v2.7.1 shipped (this session)
+## What v2.7.2 shipped (this session)
 
-### 1. Memory / WebView lifecycle (no feature loss)
+### 1. Performance pass (no feature loss)
 
-Task Manager was showing ~400+ MB under WebView2 for Filthy Net Deck because
-**each Tauri webview is a full Chromium renderer**, and secondary windows were
-kept warm forever.
+User-reported lag after v2.7.1: sluggish mouse/nav even between menu pages.
 
-| Window | Before | After (v2.7.1) |
-|--------|--------|----------------|
-| **toast** | Prewarmed at boot; hide only | **No prewarm**; create on first alert; **`destroy` after linger** |
-| **overlay** | Created on first match; hide only | Hide between matches (snappy next game); **`destroy` when Arena quits** or overlay disabled; **prewarm only while Arena is running** |
-| **presence** | Show/hide with Arena | **`destroy` when Arena quits** or badge disabled |
-| **main** | Always | Unchanged |
+| Cause | Fix |
+|-------|-----|
+| Splash tip `setInterval` never stopped after dismiss → full app re-render every **900ms** | Stop interval when gone; early-return children once dismissed (`SplashScreen.tsx`) |
+| `refreshTracker` 12s poll always replaced `trackerMatches` array | Fingerprint status + matches; skip `set` when unchanged (`useAppStore.ts`) |
+| `key={page}` remounted `<main>` + pageIn animation every nav click | Drop key; swap active page child only (`App.tsx`) |
+| Lazy page chunks cold on first click | Idle prefetch all pages after boot; hover/focus prefetch on nav |
+| Heavy page mounts blocked click paint | `startTransition` on all page navigations in the store |
+| CardArt loading state for every scryfallId thumb | Sync CDN URL when id present; `memo` art strip (`CardArt.tsx`) |
+| Daily coach/timeline/personal panels blocked first paint | Defer secondary panels one idle tick; memo deck cards (`Daily.tsx`) |
+| Command palette rebuilt card index while closed | Index only while open |
+| CSS transform page-in + expensive deck-card paint | Opacity-only enter; `content-visibility` / contain on deck cards |
 
-Rust modules: `src-tauri/src/{toast,overlay,presence,arena,lib}.rs`.
-Arena process watcher hops create/destroy onto the **main thread** (Windows
-WebView2 deadlock trap).
+Pages memoized: Daily, Stats, Matchups, Climb, Settings.
 
-**Expected impact:** clearest RAM drop with **Arena closed** (one Filthy
-WebView2 renderer, not 2–3). GPU process is Chromium tax and stays while any
-window exists.
+### 2. CI follow-up
 
-### 2. Frontend code-splitting
+Release CI failed on pre-existing eslint: unused `_drop` in
+`src/services/setsFeed.ts` slim-cache destructure. Fixed in `27b22cf` by using
+the destructured `cards` for the offline previews sample.
 
-- `src/main.tsx` — `React.lazy` per route (`App` / `OverlayApp` / `ToastApp` /
-  `PresenceApp`). Secondary webviews no longer parse the full main-app graph.
-- `src/App.tsx` — page-level `lazy()` + `Suspense` (Daily, Stats, Sets, …).
-- Build shape: entry ~198 KB gzip-friendly shell; toast chunk ~2 KB; pages
-  load on demand.
+### 3. Release train (complete)
 
-### 3. Slim sets feed + lazy galleries
-
-**Problem:** `sets.json` was ~4.6 MB almost entirely full `cards[]` for live
-Standard-pool sets, held in network response + Zustand + localStorage.
-
-**Shape now:**
-
-| Path | Contents |
-|------|----------|
-| `website/meta/sets.json` (+ `public/meta/`) | **Slim index** (~0.5 MB). Full `cards[]` **inline only** for `spoiling` / `announced`. Live/released keep a short `previews[]` rail. |
-| `website/meta/sets/<code>.json` (+ `public/meta/sets/`) | Full gallery per set; fetched when the user opens a gallery. |
-
-**Code:**
-
-- `pipeline/slim-sets-feed.mjs` + tests — pure split helpers
-- `pipeline/build-sets.mjs` — writes index + gallery tree
-- `src/services/setsFeed.ts` — `fetchSetGallery(code)` + slim offline cache
-- `src/pages/Sets.tsx` — `SetGallery` loads full cards on open if missing
-
-**Do not regress:** CI `sets-refresh` / `npm run sets` must keep writing both
-the index **and** `meta/sets/*.json`. If a future agent “simplifies” back to
-one fat JSON, RAM and cold-start cost return.
-
-App offline cache (`bbi.sets.lastGood`) also strips live full galleries
-(same policy). Network refresh restores full galleries via per-code files.
-
-### 4. Small hygiene
-
-- Arena card id cache soft-capped at 6 000 entries (`src/services/arenaCards.ts`).
-
-### 5. Release train (complete)
-
-Full `AGENTS.md` checklist for **2.7.1**:
+Full `AGENTS.md` checklist for **2.7.2**:
 
 - Signed NSIS with key `%USERPROFILE%\.tauri\filthy-net-deck.key` (password
-  is **local only** — never commit; last used for this release was provided
-  interactively by the owner).
-- Tag `v2.7.1` → macOS workflow attached dmg to GitHub Release → rolled into
-  `website/downloads/` in `4e756d1`.
+  **local only** — never commit; cleared from shell after build).
+- Tag `v2.7.2` → macOS workflow attached dmg → rolled in `dc97589`.
+- Remote had set-radar commits; release rebased onto `origin/main` before push;
+  tag force-updated once so macOS CI built the rebased tip (two tag builds
+  both green — expected).
 
 ---
 
 ## Hard-won facts (do not re-derive)
 
-### WebView memory
+### UI performance
+
+- **Splash wrappers that keep state + interval after exit will re-render the
+  entire app.** Prefer early-return unwrapped children once the splash is gone.
+- Zustand `set({ trackerMatches: newArray })` on a no-op poll is expensive —
+  any page subscribed to matches re-renders. Fingerprint before set.
+- Page-level `lazy()` without idle/hover prefetch makes first nav click feel
+  broken; Suspense `null` fallback makes it worse.
+- `key={page}` on the content shell is usually wrong for “snappy nav” — it
+  forces remount + CSS enter animation every click.
+
+### WebView memory (still true from v2.7.1)
 
 - Counting “WebView2 Manager (N)” in Task Manager: one browser process + GPU +
   utility + **one renderer per webview window**. Secondary labels
@@ -121,28 +99,22 @@ Full `AGENTS.md` checklist for **2.7.1**:
 - Creating WebView windows **inside** `run_on_main_thread` on Windows can
   **deadlock** (see toast.rs comments). Create off that hop; show/destroy on
   main when required.
-- Tauri 2.11 exposes wry’s `MemoryUsageLevel` poorly — lifecycle (destroy)
-  is the practical win, not an undocumented low-memory API.
 
-### Sets feed
+### Sets feed (still true from v2.7.1)
 
-- Full-gallery-in-index for every live set was a **v2.6-era** choice for
-  offline gallery UX; **v2.7.1 reverts that for live/released only**, with
-  lazy `meta/sets/<code>.json`. Spoiling sets stay fat inline (product focus).
-- Offline transform of an existing fat feed (without re-scraping Scryfall):
-  `splitSetsBundle` in `pipeline/slim-sets-feed.mjs`.
-- On Windows, `git show … > file` can write **UTF-16**; prefer
-  `execSync('git show …', { encoding: 'buffer' })` + UTF-8 parse when scripting.
+- Live/released sets: slim index + lazy `meta/sets/<code>.json`. Spoiling sets
+  stay fat inline. Do not regress to full-gallery-in-index for every live set.
+- Offline cache (`bbi.sets.lastGood`) strips live full galleries (same policy).
 
 ### Release / git
 
 - `main` can move under you via scheduled set-radar commits. Rebase release
-  onto `origin/main` and **re-slim** if remote rewrote fat `sets.json`.
-- Tag may fire **two** macOS builds if rewritten (force-push tag); both green
-  is fine — use the release asset.
-- Signing: `npx tauri signer sign <setup.exe>` with
-  `TAURI_SIGNING_PRIVATE_KEY` + `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` envs;
-  clear password from the shell after.
+  onto `origin/main` before push; retarget the version tag if it was created
+  pre-rebase (force-push tag — may fire two macOS builds).
+- Signing: `TAURI_SIGNING_PRIVATE_KEY` (file contents) +
+  `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`; clear from the shell after.
+- PowerShell mangles HEREDOC / JSON argv — use temp files or node scripts for
+  multi-line commits and version bumps on Windows.
 
 ### Unchanged product rules (still true)
 
@@ -158,10 +130,10 @@ Full `AGENTS.md` checklist for **2.7.1**:
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| Optional | Prune `website/downloads/*2.7.0*` | Keep current-only per hygiene docs |
-| Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still dev-box-only archive |
-| Measurement | Search Console / updater Observability | From older handoff — still the growth checkpoint, not a build |
-| Later | Further RAM | Sets in-memory slim-on-open for live sets already; main WebView + images are the remaining floor |
+| Optional | Prune `website/downloads/*2.7.0*` / older `2.7.1` | Keep current-only per hygiene docs |
+| Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still site CDN + local archive |
+| Measurement | Search Console / updater Observability | Growth checkpoint, not a build |
+| Later | Further RAM | Main WebView + card images are the remaining floor |
 | Later | macOS signed updater | Workflow explicitly disables updater artifacts; key is local-only |
 
 **No open engineering defect from this session.** Ship is complete.
@@ -189,9 +161,8 @@ downloads + updater + version.json + site + OG + Netlify live + tag/macOS).
 | File | Why |
 |------|-----|
 | `handoff.md` | This file — session state for next agent |
-| `docs/DATA-AND-UPDATES.md` | Slim sets + lazy galleries (replaces “full gallery always” note) |
-| `docs/MAINTENANCE.md` | Sets pipeline outputs + memory lifecycle note |
-| `docs/GIT-HISTORY-BLOAT.md` | Current working-tree example → v2.7.1 |
+
+(No pipeline/docs process change in 2.7.2 — pure app perf + release.)
 
 ---
 
@@ -201,3 +172,4 @@ downloads + updater + version.json + site + OG + Netlify live + tag/macOS).
 - Install counting post-mortem: `docs/INSTALL-COUNTING.md`
 - Long-form roadmap: `ROADMAP.md` / `100X-ROADMAP.md`
 - Prior release audit sample: `docs/AUDIT-2026-07-22-v2.5.0.md`
+- v2.7.1 memory / slim-sets detail: still accurate in git history of this file
