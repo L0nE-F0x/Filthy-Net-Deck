@@ -35,11 +35,12 @@ function slimForCache(bundle: SetsBundle): SetsBundle {
     sets: bundle.sets.map((set) => {
       if (set.status === "spoiling" || set.status === "announced") return set;
       if (!set.cards?.length) return set;
-      const { cards: _drop, ...rest } = set;
+      // Drop full gallery from offline cache for live/released sets.
+      const { cards, ...rest } = set;
       // Prefer an existing previews rail; otherwise keep a short sample so
       // offline still has *something* to show on the set card.
       const previews =
-        rest.previews?.length ? rest.previews : set.cards.slice(0, 12);
+        rest.previews?.length ? rest.previews : cards.slice(0, 12);
       return { ...rest, previews };
     }),
   };
