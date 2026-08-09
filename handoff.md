@@ -3,14 +3,12 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude ↔ Opus ↔ Grok ↔ Kimi).
 
-**Live product version: v2.5.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.7.1** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
-**Session wrap (2026-07-30, Opus 5):** release train **complete** for **v2.5.4**
-(Windows + macOS + updater + site), and the owner verified in-app *Update &
-restart* plus the new tip jar on a real client. This session was mostly
-**business/growth work, not app work** — see `docs/PLATFORM-STRATEGY.md`, which
-is now the live plan alongside this file. No open engineering work. **Next
-checkpoint is a measurement, not a build:** see "Waiting on data" below.
+**Session wrap (2026-08-09, Grok):** **v2.7.1 fully shipped** — leaner Windows
+memory (WebView lifecycle + code-splitting), slim sets radar with lazy
+galleries, signed Windows installer, macOS universal dmg rolled from tag CI,
+site + OG + updater live. Working tree clean vs `origin/main` at wrap.
 
 ---
 
@@ -18,212 +16,188 @@ checkpoint is a measurement, not a build:** see "Waiting on data" below.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.5.4** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`) |
-| Branch | `main` synced with `origin/main` |
-| Key commits | `22d681f` Ko-fi tip jar · `776bfa1` meta-web SEO · `5b36e94` release · `6053b52` macOS roll |
-| Tag | `v2.5.4` (macOS CI green) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.5.4.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.5.4-universal.dmg` |
-| Updater | `website/updater/latest.json` → 2.5.4 (key **67FCA9900F523D49**, key id cross-checked pre-publish, live sig byte-matched to build) |
-| Soft channel | `website/version.json` + `public/version.json` → 2.5.4 |
-| Site | Download buttons + OG `?v=2.5.4`, og-image regenerated |
-| Live Netlify | version.json / updater / setup.exe / .sig / dmg all **200** @ 2.5.4 |
-| Owner-verified | in-app **Update & restart** worked; tip jar link works |
-| Gates last green | **365** vitest · lint/tsc clean · `typecheck:functions` (new) |
-| `WHATS_NEW` | 2 lines (tip jar + public meta pages) |
+| App version | **v2.7.1** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`, `Cargo.lock`) |
+| Branch | `main` = `origin/main` |
+| Key commits | `5e91ac5` release v2.7.1 · `4e756d1` macOS dmg roll |
+| Tag | `v2.7.1` (points at release commit; macOS CI green) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.1.exe` + `.sig` |
+| macOS | `website/downloads/Filthy-Net-Deck-2.7.1-universal.dmg` (~20 MB) |
+| Updater | `website/updater/latest.json` → **2.7.1** + signature |
+| Soft channel | `website/version.json` + `public/version.json` → **2.7.1** |
+| Site | Download buttons + OG `?v=2.7.1`, og-image regenerated |
+| Live Netlify | version / updater / setup.exe / .sig / dmg / slim `meta/sets.json` / `meta/sets/fdn.json` all **200** @ 2.7.1 |
+| Gates last green | **409** vitest · `tsc` clean · release build signed |
+| `WHATS_NEW` | Leaner memory · slim sets radar · code-splitting |
 
-Working tree keeps **current installers** under `website/downloads/` (v2.7.0 exe + sig
-and the v2.7.0 universal dmg rolled from tag CI). Older installers
-are pruned per `docs/GIT-HISTORY-BLOAT.md`.
-
----
-
-## What this session shipped (2026-07-30)
-
-Mostly growth/ops rather than app code. The app diff is three files.
-
-1. **`docs/PLATFORM-STRATEGY.md`** (new) — the business plan around the app:
-   honest audience read, straight answers on backend/monetization/social, a
-   gated five-phase sequence, cut list, risk table. **Read it before proposing
-   product work.** Phase 0 done, Phase 1 partially done, Phase 2 gated.
-2. **Install counting — attempted, withdrawn.** Full post-mortem in
-   `docs/INSTALL-COUNTING.md`. `/version.json` turned out to be a *fallback*
-   endpoint: `useAppStore::checkForUpdates` tries the signed Tauri updater
-   first and returns early, so real installs never request it. **The per-launch
-   signal is `/updater/latest.json`** — read it in Netlify **Observability**
-   (URL filter), not Web Analytics, which has no path breakdown for JSON.
-   Measured baseline: ~325 updater checks/7d, ~15–25 daily actives, ~5 new
-   installs/day. Function code is retained but routed to nothing.
-3. **Ko-fi tip jar** — site + Settings → About, one `DONATE_URL` constant in
-   `src/services/site.ts` (empty string hides it everywhere). Ko-fi rather than
-   PayPal.Me, which Indonesian personal accounts cannot create.
-4. **meta-web SEO (`776bfa1`)** — hub linked only 5 of 32 decks; now links all
-   32, deck pages gained 6 sibling links each (192 corpus-wide), plus mana
-   curve, composition, key-card art, JSON-LD, `lastmod` sitemap. Google Search
-   Console verified, sitemap submitted, three pages queued for indexing.
-5. **v2.5.4 release** — the tip jar, shipped through the full AGENTS checklist.
-
-### Hard-won facts (do not re-derive)
-
-- **Both `netlify.toml` files are live, for different things.** Repo-root =
-  `publish` + `[functions]`. `website/netlify.toml` = **headers and redirects**
-  (it sits inside the publish dir). A redirect added to the root file silently
-  does nothing.
-- **Netlify Pretty URLs rewrites deployed HTML** (`href="x.html"` →
-  `href='/meta-web/x'`). Live HTML never byte-matches git. Verify deploys with a
-  response header or generated marker, never a byte-diff.
-- **Nothing with a dot in its basename may live in `netlify/functions/`** — a
-  test file there became a function named `version.test` and failed every
-  production deploy for ~15 minutes.
-- **Read the Netlify deploy log before theorising.** Three wrong diagnoses this
-  session came from inferring via response headers while the log said it plainly.
-
-## Waiting on data — the next checkpoint is a measurement, not a build
-
-Owner is away ~2 days; the real check is **~2 weeks out (from 2026-07-30)**.
-
-**Google Search Console → Indexing → Pages.** The meta-web corpus (35 URLs) was
-made crawlable for the first time on 2026-07-30; sitemap submitted, hub + both
-format pages queued for indexing.
-
-- **Climbing toward 35** → the crawlability work landed. Option **A** (252 card
-  pages, one per unique card, ~1 day, pure Node in `build-meta-site.mjs`) becomes
-  clearly worth building, and Phase 2's gate comes into view.
-- **Stuck in single digits** → do **not** add more pages. Diagnose discovery first.
-
-Also worth a glance: Netlify **Observability** filtered to `/updater/latest.json`
-(install trend), and the Ko-fi page (willingness-to-pay signal long before it is
-income).
-
-**Phase 2 (accounts, Discord OAuth, public profiles, then cloud sync) is gated on
-this and should not be started early** — see `docs/PLATFORM-STRATEGY.md` §3.
+**Also still in tree (optional prune):** v2.7.0 exe/sig/dmg under
+`website/downloads/`. Policy prefers current-only (see
+`docs/GIT-HISTORY-BLOAT.md` / `docs/MAINTENANCE.md`); not blocking.
 
 ---
 
-## OPEN — needs owner (not agent-solo)
+## What v2.7.1 shipped (this session)
 
-### 1. Netlify meta-web prod↔git drift — ✅ CLOSED 2026-07-30 (not a drift)
+### 1. Memory / WebView lifecycle (no feature loss)
 
-Both halves of this had mundane explanations. No deploy was ever pinned and
-auto-publish was never off.
+Task Manager was showing ~400+ MB under WebView2 for Filthy Net Deck because
+**each Tauri webview is a full Chromium renderer**, and secondary windows were
+kept warm forever.
 
-**"Live HTML matches no git commit"** — Netlify's **Pretty URLs** post-processing
-rewrites HTML on deploy: `href="deck/x.html"` becomes `href='/meta-web/deck/x'`
-(absolute, extension stripped, single-quoted). Live HTML will therefore *never*
-byte-match git, by design. Both forms return 200 and every canonical points at
-the `.html` form, so indexing consolidates correctly. Nothing to fix.
+| Window | Before | After (v2.7.1) |
+|--------|--------|----------------|
+| **toast** | Prewarmed at boot; hide only | **No prewarm**; create on first alert; **`destroy` after linger** |
+| **overlay** | Created on first match; hide only | Hide between matches (snappy next game); **`destroy` when Arena quits** or overlay disabled; **prewarm only while Arena is running** |
+| **presence** | Show/hide with Arena | **`destroy` when Arena quits** or badge disabled |
+| **main** | Always | Unchanged |
 
-**"`max-age=300` never showed up live"** — correct, and it never will: that rule
-lives in the repo-root `netlify.toml`, which Netlify does not read for headers.
-Headers come from `website/netlify.toml` (it sits inside the publish directory).
-More to the point, **the rule was not worth having** — live pages serve
-`max-age=0, must-revalidate`, which is *fresher* than the 300s the "fix" would
-have imposed. See the note at the top of the root `netlify.toml`.
+Rust modules: `src-tauri/src/{toast,overlay,presence,arena,lib}.rs`.
+Arena process watcher hops create/destroy onto the **main thread** (Windows
+WebView2 deadlock trap).
 
-**Confirmed working:** deploys land from git push (multiple verified 2026-07-30),
-and the daily cron regenerated the full meta-web corpus with a same-day
-`lastmod`. Verification method for future doubt: check a response header or a
-generated marker, not a byte-diff against git.
+**Expected impact:** clearest RAM drop with **Arena closed** (one Filthy
+WebView2 renderer, not 2–3). GPU process is Chromium tax and stays while any
+window exists.
 
-### 2. Repo hygiene (2026-08-08)
+### 2. Frontend code-splitting
 
-Owner-approved cleanup removed iteration bulk: one-shot `do-*-bump` /
-`roll-macos-*` scripts, pre-2.6.2 installers under `website/downloads/`, unused
-Vite/Tauri default assets, mobile/store icon packs, and marketing WIP
-(`youtube-community*`, `video/`, `video_stills/`, `launch/`, generator scripts,
-`goal/`). Keep only current release binaries + reusable scripts
-(`bump-version.mjs`, `gen-mtgo-name-map.mjs`, `fix-website-mojibake.mjs`,
-`capture-theme-screens.mjs`).
+- `src/main.tsx` — `React.lazy` per route (`App` / `OverlayApp` / `ToastApp` /
+  `PresenceApp`). Secondary webviews no longer parse the full main-app graph.
+- `src/App.tsx` — page-level `lazy()` + `Suspense` (Daily, Stats, Sets, …).
+- Build shape: entry ~198 KB gzip-friendly shell; toast chunk ~2 KB; pages
+  load on demand.
+
+### 3. Slim sets feed + lazy galleries
+
+**Problem:** `sets.json` was ~4.6 MB almost entirely full `cards[]` for live
+Standard-pool sets, held in network response + Zustand + localStorage.
+
+**Shape now:**
+
+| Path | Contents |
+|------|----------|
+| `website/meta/sets.json` (+ `public/meta/`) | **Slim index** (~0.5 MB). Full `cards[]` **inline only** for `spoiling` / `announced`. Live/released keep a short `previews[]` rail. |
+| `website/meta/sets/<code>.json` (+ `public/meta/sets/`) | Full gallery per set; fetched when the user opens a gallery. |
+
+**Code:**
+
+- `pipeline/slim-sets-feed.mjs` + tests — pure split helpers
+- `pipeline/build-sets.mjs` — writes index + gallery tree
+- `src/services/setsFeed.ts` — `fetchSetGallery(code)` + slim offline cache
+- `src/pages/Sets.tsx` — `SetGallery` loads full cards on open if missing
+
+**Do not regress:** CI `sets-refresh` / `npm run sets` must keep writing both
+the index **and** `meta/sets/*.json`. If a future agent “simplifies” back to
+one fat JSON, RAM and cold-start cost return.
+
+App offline cache (`bbi.sets.lastGood`) also strips live full galleries
+(same policy). Network refresh restores full galleries via per-code files.
+
+### 4. Small hygiene
+
+- Arena card id cache soft-capped at 6 000 entries (`src/services/arenaCards.ts`).
+
+### 5. Release train (complete)
+
+Full `AGENTS.md` checklist for **2.7.1**:
+
+- Signed NSIS with key `%USERPROFILE%\.tauri\filthy-net-deck.key` (password
+  is **local only** — never commit; last used for this release was provided
+  interactively by the owner).
+- Tag `v2.7.1` → macOS workflow attached dmg to GitHub Release → rolled into
+  `website/downloads/` in `4e756d1`.
 
 ---
 
-## Backlog for the next agent (pick with owner, or hygiene only)
+## Hard-won facts (do not re-derive)
 
-**Do not cut a release unsolicited.** Batch product work; engineering hygiene
-may proceed on judgment. Ask before product decisions.
+### WebView memory
+
+- Counting “WebView2 Manager (N)” in Task Manager: one browser process + GPU +
+  utility + **one renderer per webview window**. Secondary labels
+  `toast` / `overlay` / `presence` are intentional product surfaces, not
+  leaks — but they must not outlive their need.
+- **Never prewarm toast at boot** again for “first-toast latency” without
+  measuring RAM cost.
+- Creating WebView windows **inside** `run_on_main_thread` on Windows can
+  **deadlock** (see toast.rs comments). Create off that hop; show/destroy on
+  main when required.
+- Tauri 2.11 exposes wry’s `MemoryUsageLevel` poorly — lifecycle (destroy)
+  is the practical win, not an undocumented low-memory API.
+
+### Sets feed
+
+- Full-gallery-in-index for every live set was a **v2.6-era** choice for
+  offline gallery UX; **v2.7.1 reverts that for live/released only**, with
+  lazy `meta/sets/<code>.json`. Spoiling sets stay fat inline (product focus).
+- Offline transform of an existing fat feed (without re-scraping Scryfall):
+  `splitSetsBundle` in `pipeline/slim-sets-feed.mjs`.
+- On Windows, `git show … > file` can write **UTF-16**; prefer
+  `execSync('git show …', { encoding: 'buffer' })` + UTF-8 parse when scripting.
+
+### Release / git
+
+- `main` can move under you via scheduled set-radar commits. Rebase release
+  onto `origin/main` and **re-slim** if remote rewrote fat `sets.json`.
+- Tag may fire **two** macOS builds if rewritten (force-push tag); both green
+  is fine — use the release asset.
+- Signing: `npx tauri signer sign <setup.exe>` with
+  `TAURI_SIGNING_PRIVATE_KEY` + `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` envs;
+  clear password from the shell after.
+
+### Unchanged product rules (still true)
+
+- See `docs/PLATFORM-STRATEGY.md` for growth phases (Phase 2 still gated).
+- Install counting: signal is **`/updater/latest.json`**, not `/version.json`
+  (`docs/INSTALL-COUNTING.md`).
+- Dual Netlify config: root `netlify.toml` ≠ `website/netlify.toml` headers.
+- Desktop only for Arena log tracking.
+
+---
+
+## OPEN / next (not blocking)
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| ~~Optional smoke~~ | ~~In-app Update & restart~~ | ✅ Owner verified on v2.5.4, 2026-07-30 |
-| P2 eng | Major dep bumps **one branch at a time** | typescript 7, vite 8, vitest 4, plugin-react 6 — never batch |
-| P2 product-aware | Secondary-monitor toast/presence | Owner-aware; follow Arena’s display — real work |
-| P1 gated | Phase 1 **A** — 252 card pages | Only after Search Console shows indexing. `docs/PLATFORM-STRATEGY.md` §3 |
-| P3 owner-only | v3.0 accounts/sync (Phase 2, gated) · Scryfall attribution re-add · `.git` history purge | Ask first; attribution was a deliberate v2.2.1 trade |
+| Optional | Prune `website/downloads/*2.7.0*` | Keep current-only per hygiene docs |
+| Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still dev-box-only archive |
+| Measurement | Search Console / updater Observability | From older handoff — still the growth checkpoint, not a build |
+| Later | Further RAM | Sets in-memory slim-on-open for live sets already; main WebView + images are the remaining floor |
+| Later | macOS signed updater | Workflow explicitly disables updater artifacts; key is local-only |
 
-**Good first resume prompts (owner should choose):**
-
-1. “Check Search Console indexing and decide on card pages” (the real next step).
-2. “Bump one dep on a branch” (e.g. vitest 4 alone).
-3. “Start secondary-monitor presence/toast” (product-ish — confirm first).
+**No open engineering defect from this session.** Ship is complete.
 
 ---
 
-## Release artifacts (current)
+## Dev / release commands (reminder)
 
-| Target | File |
-|--------|------|
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.0.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.7.0-universal.dmg` (2.7.0 via tag CI) |
-| Updater | `website/updater/latest.json` → **2.7.0** |
-| Soft | `website/version.json` + `public/version.json` → **2.7.0** |
-| Tag | `v2.7.0` (macOS CI) |
+```bash
+npm install
+npm run tauri:dev
+npm test
+npm run sets          # rebuild slim sets index + galleries
+npm run meta          # daily meta (no app bump required)
+npm run tauri:build   # set TAURI_SIGNING_* for Windows updater artifacts
+```
 
-**Sign only** with key id **67FCA9900F523D49**
-(`%USERPROFILE%\.tauri\filthy-net-deck.key` + `filthy-net-deck-key-password.txt`).
-Repo-root `filthy-net-deck.key` is abandoned (wrong pubkey — breaks auto-update).
-Never commit keys; never echo password.
-
-Full definition of done: **`AGENTS.md`**.
+Release definition of done: root **`AGENTS.md`** checklist (binary +
+downloads + updater + version.json + site + OG + Netlify live + tag/macOS).
 
 ---
 
-## Full local gate before every push
+## Docs touched this wrap
 
-```
-npm run lint && npx tsc --noEmit && npm test
-cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
-```
+| File | Why |
+|------|-----|
+| `handoff.md` | This file — session state for next agent |
+| `docs/DATA-AND-UPDATES.md` | Slim sets + lazy galleries (replaces “full gallery always” note) |
+| `docs/MAINTENANCE.md` | Sets pipeline outputs + memory lifecycle note |
+| `docs/GIT-HISTORY-BLOAT.md` | Current working-tree example → v2.7.1 |
 
-## Verification without Arena
+---
 
-`npm run dev`, then seed:
+## Older context (still valid, not re-audited)
 
-```js
-window.__fndStore.setState({ trackerMatches: [/* real grpIds e.g. Ethereal Armor 92065 */] })
-```
-
-Overlay/toast/presence demos: `/?demo#/overlay` (add `&phase=ended` for the
-post-match card, `&fresh` for its day-one state).
-
-## Architecture must-knows
-
-- **Four webviews:** `main` · `overlay` · `toast` · `presence`. Every new
-  window label MUST be in `src-tauri/capabilities/default.json` `windows`.
-  `.transparent()` stays `#[cfg(not(macos))]` or dmg CI breaks.
-- **Feed entry:** only `normalizeMetaBundle` in `src/services/deckHelpers.ts`.
-- **Stats UI:** panels under `src/components/stats/`; page shell
-  `src/pages/Stats.tsx`.
-- **Meta pipeline:** `pipeline/build-meta.mjs`, `build-sets.mjs`,
-  `build-meta-site.mjs` (`npm run meta:site` in daily cron).
-
-## Owner preferences (non-negotiable)
-
-- Desktop only — no mobile / Android WR promises.
-- Distribution: website + signed in-app updater only (no winget/Homebrew/Store/Linux).
-- Prefer **Update & restart** over browser `.exe` download.
-- Formats: **Standard + Pioneer only**; real lists only. Brew Lab stays pure.
-- Batch features per release; ask before product-scale decisions or unsolicited releases.
-
-## Quick map
-
-| Need | Where |
-|------|--------|
-| Version / What's New | `package.json`, `src/version.ts`, `src-tauri/{Cargo.toml,tauri.conf.json}`, `*/version.json` |
-| My Stats | `src/components/stats/*`, `src/pages/Stats.tsx` |
-| Tracker / ranks | `src-tauri/src/tracker.rs`, `src/types/tracker.ts` |
-| Arena open watcher | `src-tauri/src/arena.rs`, `presence.rs` |
-| Overlay / toast | `src/overlay/*`, `src/toast/*` |
-| Meta pipeline | `pipeline/*` |
-| Release rules | **`AGENTS.md`** |
-| Self-maintenance | `docs/MAINTENANCE.md` |
-| Audit + backlog detail | `docs/AUDIT-2026-07-22-v2.5.0.md` |
+- Platform/growth plan: `docs/PLATFORM-STRATEGY.md`
+- Install counting post-mortem: `docs/INSTALL-COUNTING.md`
+- Long-form roadmap: `ROADMAP.md` / `100X-ROADMAP.md`
+- Prior release audit sample: `docs/AUDIT-2026-07-22-v2.5.0.md`

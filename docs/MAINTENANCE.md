@@ -7,7 +7,7 @@ This page says exactly which parts run themselves and which need a human.
 
 | Surface | Mechanism | Lag |
 |---------|-----------|-----|
-| New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (every 4h) + daily meta job (06:00 UTC) rebuild `sets.json` → Netlify → apps auto-sync | Hours (Scryfall) + ≤4h (CI) + ≤90min (app) |
+| New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (every 4h) + daily meta job (06:00 UTC) rebuild **slim** `sets.json` + `meta/sets/<code>.json` galleries → Netlify → apps auto-sync (gallery files load on demand in-app) | Hours (Scryfall) + ≤4h (CI) + ≤90min (app) |
 | **Fresh spoilers (ahead of Scryfall)** | `pipeline/sources/mythicspoiler.mjs` scrapes MythicSpoiler new-spoilers → cards Scryfall hasn't cataloged attach as `freshSpoilers[]` on upcoming/spoiling sets → gallery "Just spoiled · unconfirmed" strip. Self-heals: each card drops the moment Scryfall catalogs it (normalized-name match). Fail-soft | ≤4h (CI) + ≤90min (app) |
 | Deck meta (Standard + Pioneer 8×8) | `daily-meta.yml` scrapes magic.gg / MTGO / Goldfish / Melee / Untapped, Scryfall-validates, commits `latest.json` | ≤24h |
 | **Public meta-web deck pages** | Same daily cron runs `npm run meta:site` after `npm run meta`, regenerating every static page under `website/meta-web/` from the fresh feed, then commits `website/meta-web/` + sitemap. Without this step the HTML was staged but never rebuilt (audit 2026-07-22). | ≤24h |
@@ -115,6 +115,10 @@ never silently stale-as-fresh).
 - **`.git` pack bloat** from historical installers — working tree is pruned each
   release; shrinking history requires a coordinated filter-repo force-push.
   See `docs/GIT-HISTORY-BLOAT.md`. Do **not** force-push from CI/agents.
+- **WebView2 RAM floor** — the main window is Chromium; Task Manager will never
+  look like a tiny native tool. v2.7.1 destroys toast/overlay/presence when
+  unused (Arena closed, toast after linger). Do not re-prewarm toast at boot.
+  Details: root `handoff.md` (session 2026-08-09).
 
 ## Release download hygiene
 
@@ -134,8 +138,8 @@ release needs to live there** — that is the URL the updater
 just grow the tree and every Netlify deploy.
 
 - **Policy:** when cutting a release, the new installer set (exe/sig/dmg)
-  replaces the old one in `website/downloads/`; don't accumulate. As of the
-  2026-07-19 audit the dir was trimmed to **1.1.1-only** (383 MB → 23 MB).
+  replaces the old one in `website/downloads/`; don't accumulate. After v2.7.1
+  the dir may still hold the prior pair until pruned — safe optional cleanup.
 - **Archive:** macOS dmgs are attached to each GitHub Release automatically
   (`macos-build.yml`). Old installers also remain in git history.
 - **Deferred — Windows-exe archival:** Releases currently have **only the dmg**,

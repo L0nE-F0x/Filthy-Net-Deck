@@ -1,12 +1,12 @@
 # Git history bloat — installers in pack
 
-## Status (2026-07-20)
+## Status (updated 2026-08-09)
 
 | Surface | State |
 |---------|--------|
-| **Working tree** | Only current release under `website/downloads/` (e.g. v1.8.0 exe + dmg + sig) |
+| **Working tree** | Prefer **current-only** under `website/downloads/` (e.g. v2.7.1 exe + dmg + sig). Older pair (e.g. 2.7.0) may linger one release — prune when convenient |
 | **`public/downloads/`** | Gitignored — never re-add installers here (Vite would ship them in the app bundle) |
-| **`.git` pack** | ~480+ MiB — historical Setup/dmg blobs from past releases still in pack history |
+| **`.git` pack** | Hundreds of MiB — historical Setup/dmg blobs from past releases still in pack history |
 
 The product is fine. Clones and CI checkouts are slow because old NSIS/dmg binaries remain in object history even after HEAD pruning.
 

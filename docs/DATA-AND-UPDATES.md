@@ -119,17 +119,20 @@ These often live inside the Nuxt SSR payload (`\u003Cdeck-list…`). Parser: `pi
 
 ---
 
-## Set radar (`sets.json`)
+## Set radar (`sets.json` + lazy galleries)
 
 Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 
 | Piece | Role |
 |-------|------|
-| `npm run sets` | `pipeline/build-sets.mjs` → Scryfall `/sets` + spoiled cards |
+| `npm run sets` | `pipeline/build-sets.mjs` → Scryfall `/sets` + spoiled cards → **slim index + per-code galleries** |
+| `pipeline/slim-sets-feed.mjs` | Pure split: live/released galleries out of the index; spoiling stays inline |
 | `pipeline/sources/mythicspoiler.mjs` | Fresh (unconfirmed) spoilers ahead of Scryfall |
 | `pipeline/sources/set-calendar-overrides.json` | Optional official Arena / spoiler dates |
-| `website/meta/sets.json` (+ `public/meta/`) | Published feed the app downloads |
-| App page **Sets** | Countdown (Arena emphasized), spoiler rail, fresh-spoiler strip, Scryfall link |
+| `website/meta/sets.json` (+ `public/meta/`) | **Slim** published index the app downloads (~0.5 MB) |
+| `website/meta/sets/<code>.json` (+ `public/meta/sets/`) | Full card gallery for that set — loaded when the user opens Gallery |
+| App page **Sets** | Countdown, spoiler rail, fresh-spoiler strip; gallery fetches lazy file on open |
+| App `fetchSetGallery` | `src/services/setsFeed.ts` — session-cached fetch of `meta/sets/<code>.json` |
 
 **Fresh spoilers (ahead of Scryfall).** Scryfall usually catalogs new cards within
 hours, but during spoiler season a leaked/previewed card often lands on a visual
@@ -149,12 +152,21 @@ image host (`mythicspoiler.com`) is allowlisted in the Tauri CSP `img-src`. Addi
 another spoiler source later = one more module returning `{ bySetCode }` merged
 the same way.
 
-**Recently live window.** The radar ships (1) all future/spoiling constructed
-products and (2) every expansion still legal in Standard (whatsinstandard pool —
-Foundations through current), each with a **full** Scryfall gallery so Sets →
-open always shows Gallery(N) rather than a 14-card preview rail. (Pre-2.6.0
-builds used a slim mythic/rare sample for older Standard sets to keep the feed
-small; desktop clients tolerate the larger payload.)
+**Slim index + lazy galleries (v2.7.1+).** The radar still ships (1) all
+future/spoiling constructed products and (2) every expansion still legal in
+Standard (whatsinstandard pool). Full `cards[]` stay **inline only** for
+`spoiling` / `announced` (active spoiler product). Live / released sets keep a
+short `previews[]` rail on the index; opening Gallery loads
+`meta/sets/<code>.json` once per session. That cut the published index from
+~4.6 MB to ~0.5 MB without losing full-gallery UX online.
+
+- **Offline cache** (`bbi.sets.lastGood`) uses the same slim policy so localStorage
+  does not retain multi‑MB live galleries.
+- **Do not “simplify” back to one fat `sets.json`.** CI (`sets-refresh.yml`, daily
+  meta’s sets step) and `npm run sets` must keep writing both the index and the
+  `meta/sets/` tree. Tests: `pipeline/slim-sets-feed.test.mjs`.
+- Historical note: v2.6.x put full galleries for every live Standard set in the
+  index for offline gallery UX; that regressed desktop memory and is reversed.
 
 The sets feed also carries a `formats` hub (Standard/Pioneer legality, rotation
 calendar, ban lists) built from Scryfall legalities + whatsinstandard. Since 0.21
