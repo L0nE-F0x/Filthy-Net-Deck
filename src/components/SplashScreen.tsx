@@ -30,12 +30,15 @@ export function SplashScreen({
     return () => window.clearTimeout(t);
   }, []);
 
+  // Tips only while the splash is visible — an open interval after `gone`
+  // re-renders this shell (and the whole app tree under it) every 900ms forever.
   useEffect(() => {
+    if (gone) return;
     const t = window.setInterval(() => {
       setTipIndex((i) => (i + 1) % TIPS.length);
     }, 900);
     return () => window.clearInterval(t);
-  }, []);
+  }, [gone]);
 
   useEffect(() => {
     if (!ready || !minElapsed || fadeOut || gone) return;
@@ -46,57 +49,57 @@ export function SplashScreen({
 
   const tip = useMemo(() => TIPS[tipIndex], [tipIndex]);
 
+  // Once the splash is dismissed, stop wrapping the tree so tip/fade state
+  // can never force a full-app re-render again.
+  if (gone) return <>{children}</>;
+
   return (
     <>
       {children}
-      {!gone && (
-        <div
-          className={`splash-root${fadeOut ? " splash-exit" : ""}`}
-          role="status"
-          aria-live="polite"
-          aria-busy={!ready}
-          aria-label="Loading Filthy Net Deck"
-        >
-          <div className="splash-fx" aria-hidden="true">
-            <div className="splash-orb splash-orb-a" />
-            <div className="splash-orb splash-orb-b" />
-            <div className="splash-orb splash-orb-c" />
-            <div className="splash-grid" />
-            <div className="splash-noise" />
-          </div>
-
-          <div className="splash-core">
-            <div className="splash-ring" aria-hidden="true">
-              <div className="splash-ring-spin" />
-              <div className="splash-icon-wrap">
-                <img src="/app-icon.png" alt="" width={72} height={72} />
-              </div>
-            </div>
-
-            <div className="splash-copy">
-              <p className="splash-eyebrow">
-                <span className="splash-live-dot" />
-                MTG Arena companion
-              </p>
-              <h1 className="splash-title">
-                Filthy Net Deck
-              </h1>
-              <p className="splash-tagline">
-                Netdeck dirty. <span>Climb clean.</span>
-              </p>
-              <p className="splash-tip" key={tipIndex}>
-                {tip}
-              </p>
-            </div>
-
-            <div className="splash-bar" aria-hidden="true">
-              <div className="splash-bar-fill" />
-            </div>
-
-            <p className="splash-version">v{APP_VERSION}</p>
-          </div>
+      <div
+        className={`splash-root${fadeOut ? " splash-exit" : ""}`}
+        role="status"
+        aria-live="polite"
+        aria-busy={!ready}
+        aria-label="Loading Filthy Net Deck"
+      >
+        <div className="splash-fx" aria-hidden="true">
+          <div className="splash-orb splash-orb-a" />
+          <div className="splash-orb splash-orb-b" />
+          <div className="splash-orb splash-orb-c" />
+          <div className="splash-grid" />
+          <div className="splash-noise" />
         </div>
-      )}
+
+        <div className="splash-core">
+          <div className="splash-ring" aria-hidden="true">
+            <div className="splash-ring-spin" />
+            <div className="splash-icon-wrap">
+              <img src="/app-icon.png" alt="" width={72} height={72} />
+            </div>
+          </div>
+
+          <div className="splash-copy">
+            <p className="splash-eyebrow">
+              <span className="splash-live-dot" />
+              MTG Arena companion
+            </p>
+            <h1 className="splash-title">Filthy Net Deck</h1>
+            <p className="splash-tagline">
+              Netdeck dirty. <span>Climb clean.</span>
+            </p>
+            <p className="splash-tip" key={tipIndex}>
+              {tip}
+            </p>
+          </div>
+
+          <div className="splash-bar" aria-hidden="true">
+            <div className="splash-bar-fill" />
+          </div>
+
+          <p className="splash-version">v{APP_VERSION}</p>
+        </div>
+      </div>
     </>
   );
 }

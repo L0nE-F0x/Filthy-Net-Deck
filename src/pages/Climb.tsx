@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
@@ -586,7 +586,7 @@ function SeasonCompareCell({
 /** Stretches shown before the "Show all" toggle — recent history is the story. */
 const LEGS_PREVIEW = 10;
 
-export function Climb() {
+export const Climb = memo(function Climb() {
   const matches = useAppStore((s) => s.trackerMatches);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
@@ -1051,4 +1051,4 @@ export function Climb() {
       </div>
     </div>
   );
-}
+});

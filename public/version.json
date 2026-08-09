@@ -1,5 +1,5 @@
 {
-  "version": "2.7.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.1.exe",
-  "notes": "v2.7.1: leaner memory — secondary WebViews (toast, overlay, presence) only live when needed and drop when Arena quits; sets radar is ~10× smaller with full galleries loaded on demand."
+  "version": "2.7.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.2.exe",
+  "notes": "v2.7.2: snappier desktop UI — fixed a splash timer that re-rendered the whole app every second, faster page switches with prefetch, fewer wasted tracker re-renders, and leaner card art mounting."
 }

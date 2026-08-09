@@ -92,14 +92,19 @@ export function CommandPalette(): ReactNode {
     };
   }, [open]);
 
-  const index = useMemo(() => (meta ? buildCardIndex(meta) : null), [meta]);
+  // Only index when open — buildCardIndex walks every decklist and would run
+  // on every meta refresh while the palette sat closed in the shell.
+  const index = useMemo(
+    () => (open && meta ? buildCardIndex(meta) : null),
+    [open, meta],
+  );
   const cards = useMemo(
     () => (index ? searchCards(index, query, MAX_CARDS) : []),
     [index, query],
   );
   const decks = useMemo(
-    () => (meta ? searchDecks(meta, query, MAX_DECKS) : []),
-    [meta, query],
+    () => (open && meta ? searchDecks(meta, query, MAX_DECKS) : []),
+    [open, meta, query],
   );
   const q = query.trim().toLowerCase();
   const pages = useMemo(

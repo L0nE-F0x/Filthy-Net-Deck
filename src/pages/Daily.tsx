@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
@@ -16,6 +16,30 @@ import { recordVsTags, listTaggedOpponentCount } from "../services/matchupNotes"
 import { needsOnboardingCoach } from "../services/trackerHealth";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
+
+/** Mount secondary panels after first paint so nav + board feel instant. */
+function useAfterPaint(ms = 0): boolean {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let id = 0;
+    const kick = () => setReady(true);
+    if (ms > 0) {
+      id = window.setTimeout(kick, ms);
+      return () => window.clearTimeout(id);
+    }
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (w.requestIdleCallback) {
+      id = w.requestIdleCallback(kick, { timeout: 300 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    id = window.setTimeout(kick, 0);
+    return () => window.clearTimeout(id);
+  }, [ms]);
+  return ready;
+}
 
 type VsRecord = { wins: number; losses: number };
 
@@ -87,7 +111,7 @@ function MovementChip({ move }: { move: Movement | undefined }) {
   );
 }
 
-function DeckMiniCard({
+const DeckMiniCard = memo(function DeckMiniCard({
   d,
   vs,
   move,
@@ -110,6 +134,7 @@ function DeckMiniCard({
   ]
     .filter(Boolean)
     .join(" · ");
+  const preview = useMemo(() => pickPreviewCards(d), [d]);
   return (
     <article
       className="panel deck-card"
@@ -141,12 +166,12 @@ function DeckMiniCard({
         {d.metaShare != null ? `${d.metaShare}% · ` : ""}
         {d.archetype}
       </p>
-      <CardArtStrip cards={pickPreviewCards(d)} max={4} />
+      <CardArtStrip cards={preview} max={4} />
     </article>
   );
-}
+});
 
-export function Daily() {
+export const Daily = memo(function Daily() {
   const meta = useAppStore((s) => s.meta);
   const mode = useAppStore((s) => s.mode);
   const openFormat = useAppStore((s) => s.openFormat);
@@ -163,6 +188,8 @@ export function Daily() {
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
   const trackerMatches = useAppStore((s) => s.trackerMatches);
   const trackerStatus = useAppStore((s) => s.trackerStatus);
+  // Secondary coach / history panels wait one idle tick so the board paints first.
+  const showSecondary = useAfterPaint();
   const showOnboarding = useMemo(() => {
     const tagged = listTaggedOpponentCount();
     return needsOnboardingCoach(trackerStatus, trackerMatches, tagged);
@@ -170,8 +197,6 @@ export function Daily() {
 
   // Your record vs tagged archetypes (Matchup Lab) keyed by lowercased tag.
   const vsTagMap = useMemo(() => recordVsTags(trackerMatches), [trackerMatches]);
-  const vsFor = (d: Deck): VsRecord | undefined =>
-    vsTagMap[d.name.toLowerCase()] ?? vsTagMap[d.archetype.toLowerCase()];
 
   // Default to featured Standard when meta loads
   useEffect(() => {
@@ -209,6 +234,28 @@ export function Daily() {
     return out;
   }, [metaDiff, activeFmtIdForDiff, mode]);
 
+  const activeDecks = useMemo(() => {
+    if (!activeFmt || !meta) return [];
+    return filterDecks(
+      decksForMode(activeFmt, mode, meta.decks),
+      filterOpts.q,
+      filterOpts.tier,
+      filterOpts.colors,
+    );
+  }, [activeFmt, meta, mode, filterOpts]);
+
+  const hero = useMemo(
+    () => (activeFmt && meta ? topDeckForMode(activeFmt, mode, meta.decks) : undefined),
+    [activeFmt, meta, mode],
+  );
+  const heroArt = useMemo(
+    () => (hero ? pickPreviewCards(hero)[0] : undefined),
+    [hero],
+  );
+  const heroVs = hero
+    ? vsTagMap[hero.name.toLowerCase()] ?? vsTagMap[hero.archetype.toLowerCase()]
+    : undefined;
+
   if (!meta) {
     return (
       <div className="empty-state">
@@ -219,18 +266,6 @@ export function Daily() {
     );
   }
 
-  const activeDecks = activeFmt
-    ? filterDecks(
-        decksForMode(activeFmt, mode, meta.decks),
-        filterOpts.q,
-        filterOpts.tier,
-        filterOpts.colors,
-      )
-    : [];
-  const hero = activeFmt ? topDeckForMode(activeFmt, mode, meta.decks) : undefined;
-  const heroArt = hero ? pickPreviewCards(hero)[0] : undefined;
-  const heroVs = hero ? vsFor(hero) : undefined;
-
   return (
     <div className="flex flex-col gap-3">
       {/* D1 — activation strip on home until first-session loop is done */}
@@ -239,7 +274,7 @@ export function Daily() {
           <TrackerOnboarding showHealthDetail />
         </div>
       )}
-      <SessionWrapBanner />
+      {showSecondary && <SessionWrapBanner />}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>
@@ -407,10 +442,13 @@ export function Daily() {
                 <DeckMiniCard
                   key={d.id}
                   d={d}
-                  vs={vsFor(d)}
+                  vs={
+                    vsTagMap[d.name.toLowerCase()] ??
+                    vsTagMap[d.archetype.toLowerCase()]
+                  }
                   move={movementByName.get(d.name.toLowerCase())}
                   onOpen={() => openDeck(d.id)}
-                  onOpenTag={(tag) => openMatchupTag(tag)}
+                  onOpenTag={openMatchupTag}
                 />
               ))}
             </div>
@@ -418,18 +456,21 @@ export function Daily() {
         </section>
       )}
 
-      {/* Personal layer lives below the board: catch-up + coach, then the
-          meta panels. Movement since yesterday is already on the cards (chips)
-          and in the timeline's Movers line, so no separate diff panel. */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
-        <DailyDigestStrip formatId={activeFmt?.id} />
-        <LocalCoachStrip />
-      </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
-        <MetaShareTimeline />
-        <PersonalMetaPanel />
-      </div>
-      <OpponentArchetypePanel />
+      {/* Personal layer below the board — deferred one idle tick so the
+          ranked grid + hero paint before coach/history work runs. */}
+      {showSecondary && (
+        <>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
+            <DailyDigestStrip formatId={activeFmt?.id} />
+            <LocalCoachStrip />
+          </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
+            <MetaShareTimeline />
+            <PersonalMetaPanel />
+          </div>
+          <OpponentArchetypePanel />
+        </>
+      )}
     </div>
   );
-}
+});

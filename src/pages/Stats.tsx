@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import {
   currentSeasonKey,
@@ -42,7 +42,7 @@ import {
 // Page
 // ---------------------------------------------------------------------------
 
-export function Stats() {
+export const Stats = memo(function Stats() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
   const clearTracker = useAppStore((s) => s.clearTracker);
@@ -454,4 +454,4 @@ export function Stats() {
       )}
     </div>
   );
-}
+});

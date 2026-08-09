@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { LANDING_PAGES, useAppStore, type DecklistView } from "../store/useAppStore";
 import type { Page } from "../types/meta";
 import { BoModeToggle } from "../components/BoModeToggle";
@@ -124,7 +124,7 @@ function KeyboardCheatSheet() {
   );
 }
 
-export function Settings() {
+export const Settings = memo(function Settings() {
   const prefs = useAppStore((s) => s.prefs);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
@@ -768,4 +768,4 @@ export function Settings() {
       </div>
     </div>
   );
-}
+});

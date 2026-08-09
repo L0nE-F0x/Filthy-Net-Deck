@@ -28,7 +28,14 @@ describe("Stats extract barrel", () => {
     }
   });
 
-  it("page entry Stats is still a function component", () => {
-    expect(Stats).toEqual(expect.any(Function));
+  it("page entry Stats is still a function (or memo) component", () => {
+    // memo() wraps the page export for parent-render bailout — still a valid
+    // component (function or React.memo object with .type).
+    const ok =
+      typeof Stats === "function" ||
+      (typeof Stats === "object" &&
+        Stats != null &&
+        typeof (Stats as { type?: unknown }).type === "function");
+    expect(ok).toBe(true);
   });
 });

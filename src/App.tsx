@@ -29,22 +29,74 @@ import { syncOverlayPrefFromStore } from "./services/overlay";
 import { HelpGuide } from "./components/HelpGuide";
 import { listen } from "@tauri-apps/api/event";
 
-/** Page-level code split — only the active view's module stays hot. */
-const Daily = lazy(() => import("./pages/Daily").then((m) => ({ default: m.Daily })));
+/**
+ * Page-level code split — only the active view's module stays hot.
+ * Loaders are shared so we can prefetch on idle / nav hover without
+ * double-fetching a second import graph.
+ */
+const pageImports = {
+  daily: () => import("./pages/Daily"),
+  format: () => import("./pages/FormatView"),
+  deck: () => import("./pages/DeckView"),
+  meta: () => import("./pages/MetaPulse"),
+  stats: () => import("./pages/Stats"),
+  matchups: () => import("./pages/Matchups"),
+  climb: () => import("./pages/Climb"),
+  settings: () => import("./pages/Settings"),
+  sets: () => import("./pages/Sets"),
+  formats: () => import("./pages/FormatHub"),
+  brewlab: () => import("./pages/BrewLab"),
+} as const;
+
+const Daily = lazy(() => pageImports.daily().then((m) => ({ default: m.Daily })));
 const FormatView = lazy(() =>
-  import("./pages/FormatView").then((m) => ({ default: m.FormatView })),
+  pageImports.format().then((m) => ({ default: m.FormatView })),
 );
-const DeckView = lazy(() => import("./pages/DeckView").then((m) => ({ default: m.DeckView })));
-const MetaPulse = lazy(() => import("./pages/MetaPulse").then((m) => ({ default: m.MetaPulse })));
-const Stats = lazy(() => import("./pages/Stats").then((m) => ({ default: m.Stats })));
-const Matchups = lazy(() => import("./pages/Matchups").then((m) => ({ default: m.Matchups })));
-const Climb = lazy(() => import("./pages/Climb").then((m) => ({ default: m.Climb })));
-const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
-const Sets = lazy(() => import("./pages/Sets").then((m) => ({ default: m.Sets })));
+const DeckView = lazy(() => pageImports.deck().then((m) => ({ default: m.DeckView })));
+const MetaPulse = lazy(() => pageImports.meta().then((m) => ({ default: m.MetaPulse })));
+const Stats = lazy(() => pageImports.stats().then((m) => ({ default: m.Stats })));
+const Matchups = lazy(() =>
+  pageImports.matchups().then((m) => ({ default: m.Matchups })),
+);
+const Climb = lazy(() => pageImports.climb().then((m) => ({ default: m.Climb })));
+const Settings = lazy(() =>
+  pageImports.settings().then((m) => ({ default: m.Settings })),
+);
+const Sets = lazy(() => pageImports.sets().then((m) => ({ default: m.Sets })));
 const FormatHubPage = lazy(() =>
-  import("./pages/FormatHub").then((m) => ({ default: m.FormatHubPage })),
+  pageImports.formats().then((m) => ({ default: m.FormatHubPage })),
 );
-const BrewLab = lazy(() => import("./pages/BrewLab").then((m) => ({ default: m.BrewLab })));
+const BrewLab = lazy(() => pageImports.brewlab().then((m) => ({ default: m.BrewLab })));
+
+/** Warm the chunk for a nav target (and related sub-pages for Decks). */
+function prefetchPage(id: Page) {
+  const run = pageImports[id as keyof typeof pageImports];
+  if (run) void run();
+  if (id === "daily") {
+    void pageImports.format();
+    void pageImports.deck();
+  }
+}
+
+function prefetchAllPages() {
+  for (const run of Object.values(pageImports)) void run();
+}
+
+function navigateTo(page: Page) {
+  // setPage itself is transition-wrapped in the store; call is direct.
+  useAppStore.getState().setPage(page);
+}
+
+/** Thin placeholder while a lazy page chunk is still arriving. */
+function PageFallback() {
+  return (
+    <div className="page-fallback" aria-busy="true" aria-label="Loading page">
+      <div className="skel skel-line w-48" />
+      <div className="skel skel-line w-72 mt-2" />
+      <div className="skel skel-line w-56 mt-2" />
+    </div>
+  );
+}
 
 /** Nav order: Decks → personal loop → Brew Lab → world → Settings. Keys 1–9. */
 const NAV: {
@@ -111,7 +163,6 @@ function feedLabel(status: string | null): string {
 
 export default function App() {
   const page = useAppStore((s) => s.page);
-  const setPage = useAppStore((s) => s.setPage);
   const mode = useAppStore((s) => s.mode);
   const setMode = useAppStore((s) => s.setMode);
   const refreshMeta = useAppStore((s) => s.refreshMeta);
@@ -157,6 +208,26 @@ export default function App() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // After splash settles, warm every page chunk so the first click is instant.
+  useEffect(() => {
+    if (!bootDone) return;
+    const ric = (
+      window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+        cancelIdleCallback?: (id: number) => void;
+      }
+    ).requestIdleCallback;
+    if (ric) {
+      const id = ric(() => prefetchAllPages(), { timeout: 1500 });
+      return () =>
+        (
+          window as Window & { cancelIdleCallback?: (id: number) => void }
+        ).cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(prefetchAllPages, 400);
+    return () => window.clearTimeout(t);
+  }, [bootDone]);
 
   // Tracker recovery: while the window is hidden in the tray, WebView can miss
   // live `tracker:match` events even though Rust is still writing matches to
@@ -229,7 +300,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Keyboard shortcuts 1–8 jump to main nav pages (order matches NAV).
+  // Keyboard shortcuts 1–9 jump to main nav pages (order matches NAV).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -246,12 +317,12 @@ export default function App() {
       const idx = Number(e.key) - 1;
       if (idx >= 0 && idx < NAV.length) {
         e.preventDefault();
-        setPage(NAV[idx].id);
+        navigateTo(NAV[idx].id);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [setPage]);
+  }, []);
 
   // No manual Refresh button: the app syncs itself — on launch, on focus or
   // hourly when the copy is >90 min old, and immediately when connectivity
@@ -297,7 +368,9 @@ export default function App() {
               key={item.id}
               type="button"
               className={`nav-btn${active ? " active" : ""}`}
-              onClick={() => setPage(item.id)}
+              onClick={() => navigateTo(item.id)}
+              onMouseEnter={() => prefetchPage(item.id)}
+              onFocus={() => prefetchPage(item.id)}
             >
               <item.icon />
               {item.label}
@@ -441,7 +514,11 @@ export default function App() {
           </div>
         )}
 
-        <main className="content" key={page}>
+        {/*
+          No key={page}: remounting main re-ran pageIn animation and dropped
+          any in-page state on every nav click. Swap only the active child.
+        */}
+        <main className="content">
           {!meta && !loading && !LOCAL_PAGES.includes(page) ? (
             <div className="empty-state">
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
@@ -458,7 +535,7 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <Suspense fallback={null}>
+            <Suspense fallback={<PageFallback />}>
               {page === "daily" && <Daily />}
               {page === "format" && <FormatView />}
               {page === "deck" && <DeckView />}
