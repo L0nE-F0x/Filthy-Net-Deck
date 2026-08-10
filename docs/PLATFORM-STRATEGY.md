@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-07-29 · from the owner's growth/monetization brief + a repo and site read
 **Product at time of writing:** v2.5.3 · Tauri 2 + React 19 + TS + Tailwind 4 + Zustand 5 · ~33.5k lines TS/TSX · ~2.4k Rust · 250+ vitest tests · four webviews
-**Status:** Reviewed and in progress. **Phase 0 is done** (see §3) — install counting is measured via Netlify Observability, the Ko-fi tip jar is shipped, and Discord + email capture were cut by the owner. Phase 1 (reach) is next. §0's install estimate has since been replaced by real measured data — see Phase 0.
+**Status:** Reviewed and in progress. **Phase 0 done** (one ⬜ tail: the opt-in parser-health ping). **Phase 1 partially done** — items C and B shipped; A (card pages) still the largest available corpus expansion. **Phase 2 started 2026-08-10** after the owner waived its gate on measured data (see §3). Design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md).
 
 > This document answers three questions the owner asked: (1) is the plan viable, honestly; (2) what's the sequence to build it; (3) what's obviously missing. It supersedes nothing — `ROADMAP.md` and `100X-ROADMAP.md` cover the *app*. This covers the *business around the app*.
 
@@ -274,16 +274,37 @@ Owner selected **C + B** on 2026-07-30 and cut the rest for now.
 **Netlify rewrites the deployed HTML.** Pretty URLs turns `href="deck/x.html"` into `href='/meta-web/deck/x'` — absolute, no extension, single-quoted. Both forms return 200 and every canonical points at the `.html` form, so indexing consolidates correctly. Worth knowing before diffing local output against production and concluding a deploy failed.
 
 **Goal:** acquisition that compounds without daily effort.
-**Gate to Phase 2:** organic search traffic visibly non-zero and installs meaningfully growing. **Do not start Phase 2 before this.** As of 2026-07-30 that gate is **not met** — the SEO work is hours old and needs weeks to be crawled. Measuring it requires Google Search Console, which is not yet set up.
+**Gate to Phase 2:** ~~organic search traffic visibly non-zero and installs meaningfully growing~~ — **waived by the owner 2026-08-10.**
+
+**Measured before waiving** (Search Console, 28 days to 2026-08-08):
+
+| Metric | Value |
+|---|---|
+| Clicks | 3 |
+| Impressions | 32 |
+| CTR | 9.4% |
+| **Average position** | **11.2** |
+
+Read honestly: the volume is tiny, but **position 11.2 is the informative
+number** — Google is ranking the corpus, not ignoring it, and a 9.4% CTR is well
+above the ~1–2% typical at that position, so the pages convert when they surface.
+The constraint is how few queries 36 pages can match, not page quality. That is
+the case *for* Phase 1 item **A** (252 card pages) whenever it is picked up —
+the corpus is working, there is just not enough of it.
+
+Owner's call: Netlify Web Analytics shows real and growing app usage, so proceed
+to Phase 2 rather than wait out another SEO cycle. The gate did its job — it
+forced the measurement before the spend.
 
 ### Phase 2 — Accounts + public profiles
-*~4–6 weeks · first backend*
+*~4–6 weeks · first backend* · **full design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md)**
 
 - **Supabase** (Postgres + auth + row-level security) — chosen for velocity as a solo dev. Abstract the boundary so a move to Cloudflare Workers/D1 is possible if costs bite.
-- **Discord OAuth** via system browser → deep-link callback into the app. `src/services/deepLinks.ts` already exists.
+- **Discord OAuth** via system browser → deep-link callback into the app.
+  > ⚠️ **Corrected 2026-08-10.** This previously said "`src/services/deepLinks.ts` already exists", implying the callback plumbing was partly done. It is not: that file is pure in-app routing for meta decks, tags and cards. There is no `tauri-plugin-deep-link` and no custom URI scheme in `tauri.conf.json`. Budget the OAuth callback as real work, and verify the scheme registration in an **installed** build — it is an NSIS/registry concern that `tauri:dev` cannot exercise.
 - **First feature: public profile pages + shareable deck pages.** Acquisition-visible.
 - **Second feature: cloud sync.** Quiet, useful, invisible.
-- Consent screen per §1.2 rules.
+- Consent screen per §1.2 rules — note the design splits this into **two independent opt-ins** (match sharing vs. deck/profile sharing), because a shared match is partly about the *opponent*, who never consented. See `BACKEND-PHASE-2.md` §0.
 
 **Goal:** the platform everything else needs, shipped in acquisition-first order.
 **Gate to Phase 3:** enough opted-in users for statistically honest aggregates.
