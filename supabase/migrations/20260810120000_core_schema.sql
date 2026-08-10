@@ -128,6 +128,11 @@ grant all on public.shared_matches to service_role;
 grant select, insert, delete on public.shared_matches to authenticated;
 revoke all on public.shared_matches from anon;
 
+-- `id` is bigserial, so INSERT also needs USAGE on the backing sequence. Table
+-- grants alone are not enough: without this every authenticated insert fails
+-- with 42501, and the message points at the table rather than the sequence.
+grant usage, select on sequence public.shared_matches_id_seq to authenticated, service_role;
+
 -- Own rows only, in every direction. There is deliberately no public read:
 -- raw matches are never exposed, only aggregates.
 drop policy if exists matches_own_select on public.shared_matches;
@@ -227,12 +232,26 @@ begin
     select format, best_of, a_archetype, b_archetype, sum(games) as total
     from per_user group by 1, 2, 3, 4
   ),
-  -- Cap any one user at 5% of the cell (minimum 1 game, so small cells still work).
+  -- Cap any one user at 5% of the cell (minimum 1 game, so small cells work).
+  --
+  -- Wins are scaled PROPORTIONALLY, not clamped independently. Clamping both
+  -- with least() inflates the result: a user on 10 games / 8 wins capped to 5
+  -- games would keep all 5 capped wins and land at 100%, biasing the very cell
+  -- the cap exists to protect. Scale to preserve their rate, then round.
   capped as (
     select p.format, p.best_of, p.a_archetype, p.b_archetype, p.user_id,
            least(p.games, greatest(1, (t.total * 0.05)::int)) as games,
-           least(p.wins,  greatest(1, (t.total * 0.05)::int)) as wins,
-           p.on_play_games, p.on_play_wins
+           round(
+             p.wins::numeric
+             * least(p.games, greatest(1, (t.total * 0.05)::int))
+             / nullif(p.games, 0)
+           )::int as wins,
+           least(p.on_play_games, greatest(1, (t.total * 0.05)::int)) as on_play_games,
+           round(
+             p.on_play_wins::numeric
+             * least(p.on_play_games, greatest(1, (t.total * 0.05)::int))
+             / nullif(p.on_play_games, 0)
+           )::int as on_play_wins
     from per_user p
     join cell_totals t using (format, best_of, a_archetype, b_archetype)
   )
