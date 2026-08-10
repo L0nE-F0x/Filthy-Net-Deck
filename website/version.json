@@ -1,5 +1,5 @@
 {
-  "version": "2.7.5",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.5.exe",
-  "notes": "v2.7.5: New in Settings \u2192 Data & privacy \u2014 you can opt in to a once-a-day status check that helps spot when an Arena update breaks match tracking, so it gets fixed fast. It's off unless you turn it on, and Settings lists exactly what it sends."
+  "version": "2.7.6",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.6.exe",
+  "notes": "v2.7.6: Matchups rebuilt \u2014 your win rate against every archetype, worked out automatically from the cards your opponents show, with no tagging. Add a free optional account (Google, Discord or an email code) and opt in to match sharing to see community matchup rates next to your own, so you can tell whether a matchup is genuinely bad or just bad for you."
 }

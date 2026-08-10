@@ -1,11 +1,11 @@
 {
-  "version": "2.7.5",
-  "notes": "v2.7.5: New in Settings \u2192 Data & privacy \u2014 you can opt in to a once-a-day status check that helps spot when an Arena update breaks match tracking, so it gets fixed fast. It's off unless you turn it on, and Settings lists exactly what it sends.",
-  "pub_date": "2026-08-10T07:37:11Z",
+  "version": "2.7.6",
+  "notes": "v2.7.6: Matchups rebuilt \u2014 your win rate against every archetype, worked out automatically from the cards your opponents show, with no tagging. Add a free optional account (Google, Discord or an email code) and opt in to match sharing to see community matchup rates next to your own, so you can tell whether a matchup is genuinely bad or just bad for you.",
+  "pub_date": "2026-08-10T23:38:29Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnpEWnZaNjZUOGRKTTIvelpvSWFGT1NlOWRIK3ZFWWNNNkNpWlRZQmR4UkJ2eE9IcHg1WEhEcVppSDE4VjJTcFdZMkJ4MUFmM0NwM1R2NnYyeW54RVFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MzQ3MzU0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy41X3g2NC1zZXR1cC5leGUKMFZLTGsrTEdvSGMrQmRrMXhuamh3UW1mbVRzcFd6aEFWYnVmUm1DbUNZRE5JTVNpL09SMUVYdTk5dVU3ZTY2YXhMb3FicCtoRWxmaU82ODJ3ZE5LQVE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.5.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjk3SlV0TkZ3cEx6a3NOU3JvZXJGL3BuajVWa3lMUTJlYys0VWgwTUhZTW9wTmtleGJvNVVaMmNRU1ZqK2JNQ2VVVXMyZkc3QkRaK1BjcmZpcVVnY2dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDA1MDgyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy42X3g2NC1zZXR1cC5leGUKdnVSTC84cE1UK3laUkw4SlpyY2NaeFVKbkZDZEJubHM3Qnh3WDgzd2lqWUZuN3pmZEFkeVdRc1hjMG9nSjVxZCtsakhzalVqS1NkazZVc0Q0aUh1QlE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.6.exe"
     }
   }
 }

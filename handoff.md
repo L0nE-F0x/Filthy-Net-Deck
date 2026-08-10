@@ -3,14 +3,54 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.7.5** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
+**Live product version: v2.7.6** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
-**Do not cut a version yet.** Owner asked to finish the Matchups + crowd path
-fully, then release. App still markets **v2.7.5**.
+**v2.7.6 = the Matchups + crowd release.** The full loop is shipped: optional
+free account (Google / Discord / email code), opt-in match sharing, community
+matchup rates joined to your own record.
 
 ---
 
-## Resume here (2026-08-10 evening -> next morning)
+## Resume here (2026-08-11)
+
+### Session wrap (Claude, 2026-08-11) — Phase 2 complete, v2.7.6 shipped
+
+Finished every remaining slice and cut the release.
+
+| Done | Detail |
+|------|--------|
+| Core schema | `supabase/migrations/20260810120000_core_schema.sql` **run on the live DB** — profiles (+signup trigger), archetypes, shared_matches, matchup_rollup, rollup + trust functions |
+| Crowd fetch | Matchups reads `matchup_rollup` oriented to **your** deck; verified the mirror, suppression, deltas and sort in-browser |
+| Upload | `syncRunner.syncMatchesNow()` on launch (+12s) and 5s after `tracker:match`, debounced, capped 200/run, in-flight guarded |
+| Dead code | Removed `openMatchupOpponent` / `matchupsFocusOpponent` and the whole B1 tag-nudge (it ran card resolution + inference on **every match** for a screen that no longer exists) |
+| Release | v2.7.6 full AGENTS train |
+
+**Two SQL bugs caught by re-reading before the first run** (both would have been
+silent): `shared_matches.id` is bigserial so INSERT needs `usage` on the
+sequence, not just the table; and the 5% per-user cap clamped games and wins
+independently, which *inflates* a capped user's rate to 100% and biases the
+cell the cap exists to protect. Wins now scale proportionally.
+
+**Subject orientation is the load-bearing rule on Matchups.** Community rows are
+"A vs B", so a field rate is only comparable to yours when both describe the
+same deck facing the same opponent. `subjectArchetype()` requires a 60% majority
+recognised deck; no clear subject means **no comparison is offered at all**.
+Do not "fix" that by falling back to a field average — it is not comparable.
+
+### Next up (nothing is blocking)
+
+1. **Slice 4 — public profile pages** `/u/<handle>`. The acquisition-visible
+   half of Phase 2 and still unbuilt; §2.3 argues it ships before deck sync.
+2. **Slice 7 — cloud deck sync.**
+3. **Phase 1 item A — 252 card pages.** Still the largest SEO corpus expansion,
+   and the GSC read (position 11.2, 9.4% CTR) says the corpus works, there is
+   just too little of it.
+4. **Schedule the rollup**: `select cron.schedule('fnd-rollup', '17 * * * *', $$select public.refresh_trust(); select public.rebuild_matchup_rollup(30);$$)` — until this runs, `matchup_rollup` stays empty and the field column never fills.
+5. `src/services/tagSuggest.ts` is now referenced only by its own test — delete when convenient.
+
+---
+
+## Older: resume notes (2026-08-10 evening)
 
 ### Session wrap (Grok, 2026-08-10)
 
