@@ -100,22 +100,11 @@ export const Matchups = memo(function Matchups() {
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
   const matchupsFocusTag = useAppStore((s) => s.matchupsFocusTag);
   const clearMatchupsFocus = useAppStore((s) => s.clearMatchupsFocus);
-  // Clear stale opponent-focus / tag-nudge leftovers from the old lab.
-  const matchupsFocusOpponent = useAppStore((s) => s.matchupsFocusOpponent);
-  const tagNudgeOpponent = useAppStore((s) => s.tagNudgeOpponent);
-  const clearTagNudge = useAppStore((s) => s.clearTagNudge);
 
   useEffect(() => {
     void refreshTracker();
   }, [refreshTracker]);
 
-  useEffect(() => {
-    if (matchupsFocusOpponent) clearMatchupsFocus();
-  }, [matchupsFocusOpponent, clearMatchupsFocus]);
-
-  useEffect(() => {
-    if (tagNudgeOpponent) clearTagNudge();
-  }, [tagNudgeOpponent, clearTagNudge]);
 
   const [season, setSeason] = useState<string | null>(null);
   const [deckFilter, setDeckFilter] = useState<string | null>(null);

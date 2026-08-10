@@ -358,21 +358,14 @@ interface AppState {
   statsCompareDeckKey: string | null;
   clearStatsCompareDeck: () => void;
   openStatsCompare: (keyA: string, keyB: string) => void;
-  /** Matchup Lab focus: opponent key and/or tag filter. */
-  matchupsFocusOpponent: string | null;
+  /** Matchups focus: which archetype to open the page on. */
   matchupsFocusTag: string | null;
   clearMatchupsFocus: () => void;
-  openMatchupOpponent: (opponentName: string) => void;
   openMatchupTag: (tag: string) => void;
   /** Optional Format Hub tab preference. */
   formatsFocusTab: "standard" | "pioneer" | null;
   openFormatHub: (tab?: "standard" | "pioneer") => void;
   clearFormatsFocus: () => void;
-  /** Pending nudge to tag last opponent (M2). */
-  tagNudgeOpponent: string | null;
-  /** B1-suggested archetype tag for the nudged opponent (or null). */
-  tagNudgeSuggested: string | null;
-  clearTagNudge: () => void;
   /** Latest rank-up moment (ladder climb) — shown once in the main app. */
   rankUpMoment: RankUpMoment | null;
   clearRankUpMoment: () => void;
@@ -545,11 +538,8 @@ export const useAppStore = create<AppState>((set, get) => {
     selectedDeckId: null,
     statsFocusDeckKey: null,
     statsCompareDeckKey: null,
-    matchupsFocusOpponent: null,
     matchupsFocusTag: null,
     formatsFocusTab: null,
-    tagNudgeOpponent: null,
-    tagNudgeSuggested: null,
     rankUpMoment: null,
     climbFocusDeckKey: null,
     brewLabFocusDeckKey: null,
@@ -627,29 +617,18 @@ export const useAppStore = create<AppState>((set, get) => {
         page: "stats",
         showFavoritesOnly: false,
       }),
-    openMatchupOpponent: (opponentName) =>
-      set({
-        matchupsFocusOpponent: opponentName,
-        matchupsFocusTag: null,
-        page: "matchups",
-        tagNudgeOpponent: null,
-        tagNudgeSuggested: null,
-      }),
     openMatchupTag: (tag) =>
       set({
         matchupsFocusTag: tag,
-        matchupsFocusOpponent: null,
         page: "matchups",
       }),
-    clearMatchupsFocus: () =>
-      set({ matchupsFocusOpponent: null, matchupsFocusTag: null }),
+    clearMatchupsFocus: () => set({ matchupsFocusTag: null }),
     openFormatHub: (tab) =>
       set({
         formatsFocusTab: tab ?? "standard",
         page: "formats",
       }),
     clearFormatsFocus: () => set({ formatsFocusTab: null }),
-    clearTagNudge: () => set({ tagNudgeOpponent: null, tagNudgeSuggested: null }),
     clearRankUpMoment: () => set({ rankUpMoment: null }),
     openClimbDeck: (trackerDeckKey) =>
       set({
@@ -1034,8 +1013,6 @@ export const useAppStore = create<AppState>((set, get) => {
           const prevCount = cur.length;
           set({
             trackerMatches: [m, ...cur],
-            // M2: offer tagging when we know the opponent name
-            tagNudgeOpponent: m.opponentName?.trim() || get().tagNudgeOpponent,
             rankUpMoment: rankUp ?? get().rankUpMoment,
           });
           // D1: one-shot first-match celebration toast
@@ -1048,37 +1025,12 @@ export const useAppStore = create<AppState>((set, get) => {
               mod.markFirstMatchCelebrated();
             }
           });
-          // B1 accept-tag: async suggestion when cards were seen
-          if (m.opponentName?.trim() && (m.opponentSeen?.length ?? 0) > 0) {
-            void (async () => {
-              try {
-                const { suggestOpponentTag } = await import("../services/tagSuggest");
-                const { peekSeenCard, resolveArenaMetaBatch } = await import(
-                  "../services/arenaMeta"
-                );
-                await resolveArenaMetaBatch(m.opponentSeen ?? []);
-                const meta = get().meta;
-                const { inferenceCandidatesFromBundle } = await import(
-                  "../services/deckHelpers"
-                );
-                const mode = (m.bestOf ?? 1) >= 3 ? "bo3" : "bo1";
-                const candidates = inferenceCandidatesFromBundle(meta, mode);
-                const s = suggestOpponentTag(
-                  m,
-                  (id) => peekSeenCard(id),
-                  candidates,
-                );
-                if (
-                  s &&
-                  get().tagNudgeOpponent === s.opponentName
-                ) {
-                  set({ tagNudgeSuggested: s.archetype });
-                }
-              } catch {
-                /* ignore */
-              }
-            })();
-          }
+          // The B1 "accept tag" nudge lived here: it resolved the opponent's
+          // cards and ran full archetype inference on every recorded match to
+          // pre-fill a tag suggestion. Removed 2026-08-10 with the per-opponent
+          // Matchup Lab UI that consumed it — Matchups now infers archetypes
+          // itself, on demand, so this was doing a card-resolution round trip
+          // per match for a screen that no longer exists.
           // Soft match-end + rank-up cues (main app only; opt-in).
           const prefs = get().prefs;
           if (prefs.soundEnabled) {
