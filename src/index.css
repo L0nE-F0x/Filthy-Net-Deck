@@ -752,10 +752,13 @@ select,
 .panel {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-/* Keep deck-card paints cheap: skip offscreen work, isolate layout. */
+/* Keep deck-card paints cheap: skip offscreen work, isolate layout.
+   Placeholder height is measured (a rendered card is ~191px) — undershooting it
+   makes the scrollbar jump as offscreen cards resolve. `auto` means the real
+   size is remembered after first render, so this only governs the cold pass. */
 .deck-card {
   content-visibility: auto;
-  contain-intrinsic-size: auto 160px;
+  contain-intrinsic-size: auto 191px;
   contain: layout style;
 }
 .deck-card:hover {
@@ -765,12 +768,6 @@ select,
   transition: background 0.12s ease, color 0.12s ease;
 }
 .nav-btn:active { transform: scale(0.98); }
-.page-fallback {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.5rem 0;
-}
 .btn {
   transition: filter 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }

@@ -1,7 +1,18 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { nextArenaDropInDays } from "./services/setPulse";
 import { useAppStore } from "./store/useAppStore";
+import { Daily } from "./pages/Daily";
+import { FormatView } from "./pages/FormatView";
+import { DeckView } from "./pages/DeckView";
+import { MetaPulse } from "./pages/MetaPulse";
+import { Stats } from "./pages/Stats";
+import { Matchups } from "./pages/Matchups";
+import { Climb } from "./pages/Climb";
+import { Settings } from "./pages/Settings";
+import { Sets } from "./pages/Sets";
+import { FormatHubPage } from "./pages/FormatHub";
+import { BrewLab } from "./pages/BrewLab";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -29,73 +40,23 @@ import { syncOverlayPrefFromStore } from "./services/overlay";
 import { HelpGuide } from "./components/HelpGuide";
 import { listen } from "@tauri-apps/api/event";
 
-/**
- * Page-level code split — only the active view's module stays hot.
- * Loaders are shared so we can prefetch on idle / nav hover without
- * double-fetching a second import graph.
+/*
+ * Pages are imported statically on purpose.
+ *
+ * v2.7.2 split them behind `React.lazy` + `Suspense`, then prefetched every
+ * chunk on idle — so nothing was ever actually deferred, while `lazy` still
+ * renders its fallback once before resolving. Net effect: a skeleton flashed on
+ * the first visit to every page, forever, in exchange for no saved bytes
+ * (measured: all page chunks downloaded ~1.2s after boot regardless).
+ *
+ * The split that *does* pay is in `main.tsx`, which lazy-loads App vs. the
+ * overlay / toast / presence roots — that keeps the whole main app out of the
+ * three secondary WebView2 renderers. Pages live inside the App chunk either
+ * way, and all of them together are ~250KB served from local disk.
  */
-const pageImports = {
-  daily: () => import("./pages/Daily"),
-  format: () => import("./pages/FormatView"),
-  deck: () => import("./pages/DeckView"),
-  meta: () => import("./pages/MetaPulse"),
-  stats: () => import("./pages/Stats"),
-  matchups: () => import("./pages/Matchups"),
-  climb: () => import("./pages/Climb"),
-  settings: () => import("./pages/Settings"),
-  sets: () => import("./pages/Sets"),
-  formats: () => import("./pages/FormatHub"),
-  brewlab: () => import("./pages/BrewLab"),
-} as const;
-
-const Daily = lazy(() => pageImports.daily().then((m) => ({ default: m.Daily })));
-const FormatView = lazy(() =>
-  pageImports.format().then((m) => ({ default: m.FormatView })),
-);
-const DeckView = lazy(() => pageImports.deck().then((m) => ({ default: m.DeckView })));
-const MetaPulse = lazy(() => pageImports.meta().then((m) => ({ default: m.MetaPulse })));
-const Stats = lazy(() => pageImports.stats().then((m) => ({ default: m.Stats })));
-const Matchups = lazy(() =>
-  pageImports.matchups().then((m) => ({ default: m.Matchups })),
-);
-const Climb = lazy(() => pageImports.climb().then((m) => ({ default: m.Climb })));
-const Settings = lazy(() =>
-  pageImports.settings().then((m) => ({ default: m.Settings })),
-);
-const Sets = lazy(() => pageImports.sets().then((m) => ({ default: m.Sets })));
-const FormatHubPage = lazy(() =>
-  pageImports.formats().then((m) => ({ default: m.FormatHubPage })),
-);
-const BrewLab = lazy(() => pageImports.brewlab().then((m) => ({ default: m.BrewLab })));
-
-/** Warm the chunk for a nav target (and related sub-pages for Decks). */
-function prefetchPage(id: Page) {
-  const run = pageImports[id as keyof typeof pageImports];
-  if (run) void run();
-  if (id === "daily") {
-    void pageImports.format();
-    void pageImports.deck();
-  }
-}
-
-function prefetchAllPages() {
-  for (const run of Object.values(pageImports)) void run();
-}
 
 function navigateTo(page: Page) {
-  // setPage itself is transition-wrapped in the store; call is direct.
   useAppStore.getState().setPage(page);
-}
-
-/** Thin placeholder while a lazy page chunk is still arriving. */
-function PageFallback() {
-  return (
-    <div className="page-fallback" aria-busy="true" aria-label="Loading page">
-      <div className="skel skel-line w-48" />
-      <div className="skel skel-line w-72 mt-2" />
-      <div className="skel skel-line w-56 mt-2" />
-    </div>
-  );
 }
 
 /** Nav order: Decks → personal loop → Brew Lab → world → Settings. Keys 1–9. */
@@ -176,6 +137,19 @@ export default function App() {
   const sets = useAppStore((s) => s.sets);
   const [bootDone, setBootDone] = useState(false);
   const fullscreen = useAppStore((s) => s.prefs.fullscreen);
+  const contentRef = useRef<HTMLElement>(null);
+
+  // Page-change fade. `.content` is deliberately un-keyed (remounting it reset
+  // in-page state on every nav click), so restart the animation by hand instead
+  // of relying on a mount. Opacity only — no transform, no composite churn.
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    el.classList.remove("content-enter");
+    // Force reflow so removing + re-adding actually restarts the animation.
+    void el.offsetWidth;
+    el.classList.add("content-enter");
+  }, [page]);
 
   // Small countdown chip on the Sets nav item (14-day window, like the pulse).
   const arenaDropIn = useMemo(() => {
@@ -208,26 +182,6 @@ export default function App() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // After splash settles, warm every page chunk so the first click is instant.
-  useEffect(() => {
-    if (!bootDone) return;
-    const ric = (
-      window as Window & {
-        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-        cancelIdleCallback?: (id: number) => void;
-      }
-    ).requestIdleCallback;
-    if (ric) {
-      const id = ric(() => prefetchAllPages(), { timeout: 1500 });
-      return () =>
-        (
-          window as Window & { cancelIdleCallback?: (id: number) => void }
-        ).cancelIdleCallback?.(id);
-    }
-    const t = window.setTimeout(prefetchAllPages, 400);
-    return () => window.clearTimeout(t);
-  }, [bootDone]);
 
   // Tracker recovery: while the window is hidden in the tray, WebView can miss
   // live `tracker:match` events even though Rust is still writing matches to
@@ -374,8 +328,6 @@ export default function App() {
               type="button"
               className={`nav-btn${active ? " active" : ""}`}
               onClick={() => navigateTo(item.id)}
-              onMouseEnter={() => prefetchPage(item.id)}
-              onFocus={() => prefetchPage(item.id)}
             >
               <item.icon />
               {item.label}
@@ -520,10 +472,11 @@ export default function App() {
         )}
 
         {/*
-          No key={page}: remounting main re-ran pageIn animation and dropped
-          any in-page state on every nav click. Swap only the active child.
+          No key={page}: remounting main dropped any in-page state on every nav
+          click. Swap only the active child; the fade is restarted by the
+          `content-enter` effect above.
         */}
-        <main className="content">
+        <main className="content" ref={contentRef}>
           {!meta && !loading && !LOCAL_PAGES.includes(page) ? (
             <div className="empty-state">
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
@@ -540,7 +493,7 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <Suspense fallback={<PageFallback />}>
+            <>
               {page === "daily" && <Daily />}
               {page === "format" && <FormatView />}
               {page === "deck" && <DeckView />}
@@ -552,7 +505,7 @@ export default function App() {
               {page === "brewlab" && <BrewLab />}
               {page === "formats" && <FormatHubPage />}
               {page === "settings" && <Settings />}
-            </Suspense>
+            </>
           )}
         </main>
       </div>

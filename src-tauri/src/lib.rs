@@ -71,7 +71,16 @@ fn notify_tray_hint_once(app: &tauri::AppHandle) {
     let _ = std::fs::write(&marker, b"1");
     const TITLE: &str = "Still running in the tray";
     const BODY: &str = "Filthy Net Deck keeps tracking Arena from the system tray. Right-click the tray icon to quit for real.";
-    toast::show_toast(app, TITLE, BODY);
+    // Off the calling thread on purpose. Both call sites (the CloseRequested
+    // window event and the `main_window_hide_to_tray` command) run on the main
+    // thread, and `show_toast` has to *build* the toast webview now that it is
+    // no longer prewarmed at boot. `WebviewWindowBuilder::build()` on the event
+    // loop deadlocks it on Windows, which would wedge the tray menu's
+    // `app.exit(0)` — the exact bug that made Quit require Task Manager.
+    let handle = app.clone();
+    std::thread::spawn(move || {
+        toast::show_toast(&handle, TITLE, BODY);
+    });
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

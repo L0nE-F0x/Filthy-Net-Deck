@@ -61,23 +61,29 @@ pub fn start(app: AppHandle) {
             let previous = RUNNING.swap(now, Ordering::SeqCst);
             if let Some(running) = running_transition(previous, now) {
                 let _ = app.emit("arena:running", running);
-                let handle = app.clone();
-                // Window create/destroy must not run off the event loop on
-                // Windows (WebView2 + Tauri can deadlock or drop the work).
-                let _ = app.run_on_main_thread(move || {
-                    if running {
-                        crate::presence::show(&handle);
-                        // Warm the match HUD only while Arena is up — avoids a
-                        // cold WebView2 create on the first game without paying
-                        // for a second renderer all day when the game is closed.
-                        crate::overlay::prewarm_if_enabled(&handle);
-                    } else {
-                        // Drop secondary webviews when Arena quits. Each is a
-                        // full Chromium renderer; hiding leaves that RAM held.
+                if running {
+                    // Build from THIS thread, never from inside
+                    // `run_on_main_thread`: `WebviewWindowBuilder::build()`
+                    // called on the event loop deadlocks it on Windows — the
+                    // window is created but `build()` never returns, wedging
+                    // every later main-thread task (tray Quit included).
+                    // Tauri does its own thread hop internally. Same rule as
+                    // `toast::show_toast` and `tracker.rs`'s `overlay::show`.
+                    crate::presence::show(&app);
+                    // Warm the match HUD only while Arena is up — avoids a
+                    // cold WebView2 create on the first game without paying
+                    // for a second renderer all day when the game is closed.
+                    crate::overlay::prewarm_if_enabled(&app);
+                } else {
+                    // Drop secondary webviews when Arena quits. Each is a full
+                    // Chromium renderer; hiding leaves that RAM held. Teardown
+                    // (unlike create) is safe on the main thread.
+                    let handle = app.clone();
+                    let _ = app.run_on_main_thread(move || {
                         crate::presence::destroy(&handle);
                         crate::overlay::destroy(&handle);
-                    }
-                });
+                    });
+                }
             }
             std::thread::sleep(POLL);
         }

@@ -1,4 +1,3 @@
-import { startTransition } from "react";
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { APP_VERSION } from "../version";
@@ -458,6 +457,41 @@ function mapFeedStatus(from: "network" | "cache"): FeedStatus {
   return from === "network" ? "live" : "cached";
 }
 
+/**
+ * True when two tracker snapshots are field-for-field identical, so the 12s
+ * safety poll can skip `set()` and spare every tracker-aware page a re-render
+ * with a fresh array reference.
+ *
+ * Compares *every* match shallowly rather than sampling endpoints: matches are
+ * edited in place (opponent tags, deck reassignment, corrected results), and a
+ * first/last-only check treats those as "no change" and strands the UI.
+ */
+function sameMatchList(a: TrackedMatch[], b: TrackedMatch[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i] as unknown as Record<string, unknown>;
+    const y = b[i] as unknown as Record<string, unknown>;
+    if (x === y) continue;
+    const kx = Object.keys(x);
+    if (kx.length !== Object.keys(y).length) return false;
+    for (const k of kx) {
+      const vx = x[k];
+      const vy = y[k];
+      if (vx === vy) continue;
+      // One level deeper for the nested game/rank objects the tracker attaches.
+      if (
+        vx && vy && typeof vx === "object" && typeof vy === "object" &&
+        JSON.stringify(vx) === JSON.stringify(vy)
+      ) {
+        continue;
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
 // Dev-only handle for driving the store from a plain browser (no Tauri).
 declare global {
   interface Window {
@@ -519,9 +553,11 @@ export const useAppStore = create<AppState>((set, get) => {
     setsNewByCode: {},
     banChanges: [],
 
-    // Page transitions go through startTransition so the nav highlight can
-    // paint before the heavy page tree mounts (keeps clicks feeling instant).
-    setPage: (page) => startTransition(() => set({ page })),
+    // Note: do NOT wrap these in startTransition. Zustand reaches React through
+    // `useSyncExternalStore`, and React always renders external-store updates
+    // synchronously — the wrapper deferred nothing and only hid that fact. Page
+    // chunks are kept warm by App's idle prefetch instead.
+    setPage: (page) => set({ page }),
     setMode: (mode) => set({ mode }),
     setDailyFormatId: (dailyFormatId) => {
       if (dailyFormatId) {
@@ -536,92 +572,72 @@ export const useAppStore = create<AppState>((set, get) => {
       const resolved = resolveFormatId(String(id)) ?? (id as FormatId);
       const next = { ...get().prefs, lastFormatId: resolved };
       savePrefs(next);
-      startTransition(() =>
-        set({
-          selectedFormatId: resolved,
-          dailyFormatId: resolved,
-          page: "format",
-          selectedDeckId: null,
-          showFavoritesOnly: false,
-          prefs: next,
-        }),
-      );
+      set({
+        selectedFormatId: resolved,
+        dailyFormatId: resolved,
+        page: "format",
+        selectedDeckId: null,
+        showFavoritesOnly: false,
+        prefs: next,
+      });
     },
     openDeck: (deckId) =>
-      startTransition(() =>
-        set({ selectedDeckId: deckId, page: "deck", showFavoritesOnly: false }),
-      ),
+      set({ selectedDeckId: deckId, page: "deck", showFavoritesOnly: false }),
     openStatsDeck: (trackerDeckKey) =>
-      startTransition(() =>
-        set({
-          statsFocusDeckKey: trackerDeckKey,
-          statsCompareDeckKey: null,
-          page: "stats",
-          showFavoritesOnly: false,
-        }),
-      ),
+      set({
+        statsFocusDeckKey: trackerDeckKey,
+        statsCompareDeckKey: null,
+        page: "stats",
+        showFavoritesOnly: false,
+      }),
     clearStatsFocusDeck: () => set({ statsFocusDeckKey: null }),
     clearStatsCompareDeck: () => set({ statsCompareDeckKey: null }),
     openStatsCompare: (keyA, keyB) =>
-      startTransition(() =>
-        set({
-          statsFocusDeckKey: keyA,
-          statsCompareDeckKey: keyB,
-          page: "stats",
-          showFavoritesOnly: false,
-        }),
-      ),
+      set({
+        statsFocusDeckKey: keyA,
+        statsCompareDeckKey: keyB,
+        page: "stats",
+        showFavoritesOnly: false,
+      }),
     openMatchupOpponent: (opponentName) =>
-      startTransition(() =>
-        set({
-          matchupsFocusOpponent: opponentName,
-          matchupsFocusTag: null,
-          page: "matchups",
-          tagNudgeOpponent: null,
-          tagNudgeSuggested: null,
-        }),
-      ),
+      set({
+        matchupsFocusOpponent: opponentName,
+        matchupsFocusTag: null,
+        page: "matchups",
+        tagNudgeOpponent: null,
+        tagNudgeSuggested: null,
+      }),
     openMatchupTag: (tag) =>
-      startTransition(() =>
-        set({
-          matchupsFocusTag: tag,
-          matchupsFocusOpponent: null,
-          page: "matchups",
-        }),
-      ),
+      set({
+        matchupsFocusTag: tag,
+        matchupsFocusOpponent: null,
+        page: "matchups",
+      }),
     clearMatchupsFocus: () =>
       set({ matchupsFocusOpponent: null, matchupsFocusTag: null }),
     openFormatHub: (tab) =>
-      startTransition(() =>
-        set({
-          formatsFocusTab: tab ?? "standard",
-          page: "formats",
-        }),
-      ),
+      set({
+        formatsFocusTab: tab ?? "standard",
+        page: "formats",
+      }),
     clearFormatsFocus: () => set({ formatsFocusTab: null }),
     clearTagNudge: () => set({ tagNudgeOpponent: null, tagNudgeSuggested: null }),
     clearRankUpMoment: () => set({ rankUpMoment: null }),
     openClimbDeck: (trackerDeckKey) =>
-      startTransition(() =>
-        set({
-          climbFocusDeckKey: trackerDeckKey,
-          page: "climb",
-        }),
-      ),
+      set({
+        climbFocusDeckKey: trackerDeckKey,
+        page: "climb",
+      }),
     clearClimbFocus: () => set({ climbFocusDeckKey: null }),
     openBrewLabDeck: (trackerDeckKey) =>
-      startTransition(() =>
-        set({ brewLabFocusDeckKey: trackerDeckKey, page: "brewlab" }),
-      ),
+      set({ brewLabFocusDeckKey: trackerDeckKey, page: "brewlab" }),
     clearBrewLabFocus: () => set({ brewLabFocusDeckKey: null }),
     openBrewLabText: (arenaImport) =>
-      startTransition(() =>
-        set({
-          brewLabSeedText: arenaImport,
-          brewLabFocusDeckKey: null,
-          page: "brewlab",
-        }),
-      ),
+      set({
+        brewLabSeedText: arenaImport,
+        brewLabFocusDeckKey: null,
+        page: "brewlab",
+      }),
     clearBrewLabSeed: () => set({ brewLabSeedText: null }),
     setHelpOpen: (helpOpen) => set({ helpOpen }),
     setDefaultMode: (m) => {
@@ -909,16 +925,11 @@ export const useAppStore = create<AppState>((set, get) => {
             prevS.parseErrors === status.parseErrors &&
             prevS.localPlayer === status.localPlayer &&
             prevS.backfillDone === status.backfillDone);
-        const prevM = prev.trackerMatches;
-        const sameMatches =
-          prevM.length === matches.length &&
-          (matches.length === 0 ||
-            (prevM[0]?.matchId === matches[0]?.matchId &&
-              prevM[0]?.endedAt === matches[0]?.endedAt &&
-              prevM[prevM.length - 1]?.matchId ===
-                matches[matches.length - 1]?.matchId &&
-              prevM[prevM.length - 1]?.endedAt ===
-                matches[matches.length - 1]?.endedAt));
+        // Every match, not just the endpoints: a first/last-only sample misses
+        // in-place edits (an opponent tag, a deck reassignment, a corrected
+        // result) whenever the list length is unchanged, and the UI would then
+        // never show them. A few hundred shallow compares every 12s is free.
+        const sameMatches = sameMatchList(prev.trackerMatches, matches);
         if (sameStatus && sameMatches) return;
         // Rust is the source of truth — replace, don't merge (avoids stale gaps
         // after the WebView missed live events while the window was hidden).

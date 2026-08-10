@@ -247,4 +247,4 @@ Do these five and the remaining pillars have a hardened, discoverable, different
 
 ---
 
-*Companion to `ROADMAP.md`, `docs/PAGE-10X.md`, and `AGENTS.md`. The 10× program (page-level narrative/actions) shipped in v1.0; the 100× program is reach × reliability × moat. Keep the guardrails in §4 non-negotiable.*
+*Companion to `ROADMAP.md` and `AGENTS.md`. The 10× program (page-level narrative/actions) shipped in v1.0 — its ticket detail (`docs/PAGE-10X.md`) was removed 2026-08-10 and lives in git history. The 100× program is reach × reliability × moat, and is likewise closed; the live plan is `docs/PLATFORM-STRATEGY.md`. Keep the guardrails in §4 non-negotiable.*

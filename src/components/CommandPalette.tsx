@@ -92,12 +92,21 @@ export function CommandPalette(): ReactNode {
     };
   }, [open]);
 
-  // Only index when open — buildCardIndex walks every decklist and would run
-  // on every meta refresh while the palette sat closed in the shell.
-  const index = useMemo(
-    () => (open && meta ? buildCardIndex(meta) : null),
-    [open, meta],
+  // Lazy, but cached across opens. buildCardIndex walks every decklist, so we
+  // neither build it eagerly on each meta refresh while the palette sits closed
+  // *nor* rebuild it on every ⌘K — a plain `useMemo([open, meta])` did the
+  // latter, so each open re-walked the whole feed before the panel could paint.
+  // The cache is keyed on the meta object, so a refresh invalidates it once.
+  const indexCache = useRef<{ meta: unknown; index: ReturnType<typeof buildCardIndex> } | null>(
+    null,
   );
+  const index = useMemo(() => {
+    if (!open || !meta) return null;
+    if (indexCache.current?.meta !== meta) {
+      indexCache.current = { meta, index: buildCardIndex(meta) };
+    }
+    return indexCache.current.index;
+  }, [open, meta]);
   const cards = useMemo(
     () => (index ? searchCards(index, query, MAX_CARDS) : []),
     [index, query],

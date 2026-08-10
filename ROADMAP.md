@@ -1,8 +1,11 @@
 # Filthy Net Deck — Production Roadmap
 
-> **▶ NEXT PROGRAM: [`100X-ROADMAP.md`](100X-ROADMAP.md)** — reach × reliability × moat. Start there (Phase 0: CI/test gate) before new page work. `handoff.md` carries the top-of-todo checklist.
+> **▶ HISTORICAL.** The 10× page program and the 100× program are both closed.
+> The live plan is **[`docs/PLATFORM-STRATEGY.md`](docs/PLATFORM-STRATEGY.md)**
+> (reach → backend/crowd-meta → revenue); the live checklist is **`handoff.md`**.
+> Keep this file for the deferral list below, which is still binding.
 
-**Current release:** **v1.5.1** (custom domain + dual host). App `main` may be ahead of published binaries (see `handoff.md`).
+**Current release:** **v2.7.3** (2026-08-10). App `main` may be ahead of published binaries (see `handoff.md`).
 **How to use:** Work top to bottom. Check items off as they ship. Any user-visible change ships via the **full AGENTS.md release checklist**. Source-only pushes are not releases.  
 **Handoff:** Read `handoff.md` + `AGENTS.md` first. Signing: `%USERPROFILE%\.tauri\filthy-net-deck.key` (password local only — never commit).
 
@@ -33,7 +36,9 @@ Limited/Draft hub · **in-draft** overlay · cloud sync · Alchemy · prices · 
 
 ### 10× SKIP (still closed)
 
-D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 — see `docs/PAGE-10X.md`. (X4 test toast ships with v1.3.)
+D1, D4, D5 · M3, M5 · Z1 · all E\* · X3 stay closed. (X4 test toast shipped in v1.3.)
+The 10× ticket detail lived in `docs/PAGE-10X.md`, removed 2026-08-10 as a
+shipped historical plan — recover from git history if a SKIP id ever reopens.
 
 ---
 

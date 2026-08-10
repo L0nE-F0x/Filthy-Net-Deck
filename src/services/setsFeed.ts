@@ -110,7 +110,14 @@ function galleryUrls(code: string): string[] {
     .replace(/[^a-z0-9_-]/g, "");
   if (!safe) return [];
   if (import.meta.env.DEV) return [`/meta/sets/${safe}.json`];
-  return SITE_ORIGINS.map((o) => `${o}/meta/sets/${safe}.json`);
+  // CDN first (same reasoning as getSetsUrl — the bundled copy is frozen at
+  // build time), then the bundled copy as an offline floor. Without that last
+  // entry an offline gallery has nothing to fall back on: `slimForCache` drops
+  // `cards[]` from the localStorage bundle for live/released sets.
+  return [
+    ...SITE_ORIGINS.map((o) => `${o}/meta/sets/${safe}.json`),
+    `/meta/sets/${safe}.json`,
+  ];
 }
 
 async function tryFetchGallery(url: string): Promise<SetPreviewCard[] | null> {
