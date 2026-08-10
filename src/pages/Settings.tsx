@@ -137,6 +137,47 @@ export const Settings = memo(function Settings() {
   const authPending = useAppStore((s) => s.authPending);
   const signOutCloud = useAppStore((s) => s.signOutCloud);
 
+  const [cloudEnabled, setCloudEnabled] = useState(false);
+  const [cloudBusy, setCloudBusy] = useState(false);
+
+  // Read the server-side opt-in whenever the signed-in identity changes.
+  useEffect(() => {
+    if (!authName) {
+      setCloudEnabled(false);
+      return;
+    }
+    let cancelled = false;
+    void import("../services/cloud/sync")
+      .then((m) => m.isCloudEnabled())
+      .then((on) => {
+        if (!cancelled) setCloudEnabled(on);
+      })
+      .catch(() => {
+        /* leave it off — the toggle is safe to under-report */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authName]);
+
+  const toggleCloud = async (on: boolean) => {
+    setCloudBusy(true);
+    // Optimistic: the checkbox should not lag a click.
+    setCloudEnabled(on);
+    try {
+      const m = await import("../services/cloud/sync");
+      await m.setCloudEnabled(on);
+    } catch (e) {
+      setCloudEnabled(!on);
+      useAppStore.getState().setAuthResult({
+        status: "error",
+        message: e instanceof Error ? e.message : "Could not update sharing.",
+      });
+    } finally {
+      setCloudBusy(false);
+    }
+  };
+
   const [emailStage, setEmailStage] = useState<"idle" | "code">("idle");
   const [emailValue, setEmailValue] = useState("");
   const [codeValue, setCodeValue] = useState("");
@@ -797,6 +838,44 @@ export const Settings = memo(function Settings() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* The cloud opt-in. Signing in never starts an upload by itself. */}
+            {authName && (
+              <>
+                <div className="settings-toggle-list mt-3">
+                  <label className="settings-toggle-row">
+                    <input
+                      type="checkbox"
+                      checked={cloudEnabled}
+                      disabled={cloudBusy}
+                      onChange={(e) => void toggleCloud(e.target.checked)}
+                    />
+                    <span>
+                      <strong>Share my matches, get community matchup data</strong>
+                      <em>
+                        A trade, not a grab — your results feed the shared
+                        winrates, and you get everyone else&apos;s back
+                      </em>
+                    </span>
+                  </label>
+                </div>
+                <div className="settings-note mt-2">
+                  <p className="m-0 mb-1 text-xs text-muted">
+                    <strong className="text-foam">What gets shared</strong>, per match:
+                  </p>
+                  <ul className="text-xs text-muted m-0 pl-4 leading-relaxed">
+                    <li>which archetype you played and which you faced</li>
+                    <li>win or loss, who was on the play, and the format</li>
+                    <li>your rank and when it happened</li>
+                  </ul>
+                  <p className="m-0 mt-2 text-xs text-muted">
+                    Never your opponent&apos;s name, your Arena name, or your
+                    decklists. Turning this off deletes everything you&apos;ve
+                    shared from the server, not just future matches.
+                  </p>
+                </div>
+              </>
             )}
 
             {authError && (
