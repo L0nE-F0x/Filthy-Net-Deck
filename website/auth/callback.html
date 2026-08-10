@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Signing you in — Filthy Net Deck</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center;
+        background: #050604; color: #f2f4ea;
+        font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        text-align: center; padding: 1.5rem;
+      }
+      .card { max-width: 30rem; }
+      img { width: 64px; height: 64px; border-radius: 14px; }
+      h1 { font-size: 1.35rem; margin: 1rem 0 0.4rem; letter-spacing: -0.01em; }
+      p { color: #9aa38a; margin: 0.4rem 0; font-size: 0.9rem; }
+      .btn {
+        display: inline-block; margin-top: 1.1rem; padding: 0.6rem 1.1rem;
+        border-radius: 0.5rem; background: #b8f000; color: #050604;
+        font-weight: 650; text-decoration: none; font-size: 0.9rem;
+      }
+      .err { color: #ff8f7a; }
+      code {
+        background: #12140f; padding: 0.15rem 0.35rem; border-radius: 0.25rem;
+        font-size: 0.82rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <img src="/assets/app-icon.png" alt="" />
+      <h1 id="title">Signing you in…</h1>
+      <p id="msg">Returning you to Filthy Net Deck.</p>
+      <p id="hint" style="display: none">
+        You can close this tab and go back to the app.
+      </p>
+      <a id="retry" class="btn" style="display: none" href="#">Open Filthy Net Deck</a>
+    </div>
+
+    <script>
+      /*
+       * OAuth bounce. Supabase sends the browser here after the provider
+       * authenticates; we hand the result to the desktop app over the `fnd://`
+       * scheme it registers at install time.
+       *
+       * The whole query string is forwarded verbatim rather than being parsed:
+       * PKCE sends `?code=`, implicit sends `#access_token=`, and errors send
+       * `?error=`. Parsing here would mean tracking Supabase's flow changes in
+       * two places, so the app owns that.
+       *
+       * Nothing is stored, logged, or sent anywhere by this page.
+       */
+      (function () {
+        var search = window.location.search || "";
+        var hash = window.location.hash ? window.location.hash.slice(1) : "";
+        var payload = search.replace(/^\?/, "");
+        if (hash) payload = payload ? payload + "&" + hash : hash;
+
+        var params = new URLSearchParams(payload);
+        var title = document.getElementById("title");
+        var msg = document.getElementById("msg");
+        var hint = document.getElementById("hint");
+        var retry = document.getElementById("retry");
+
+        if (params.get("error")) {
+          title.textContent = "Sign-in didn't complete";
+          title.className = "err";
+          msg.innerHTML =
+            "The provider reported: <code>" +
+            String(params.get("error_description") || params.get("error"))
+              .replace(/[<>&]/g, "") +
+            "</code>";
+          hint.textContent = "Close this tab and try again from the app.";
+          hint.style.display = "";
+          return;
+        }
+
+        if (!payload) {
+          title.textContent = "Nothing to sign in with";
+          msg.textContent =
+            "This page is the sign-in return point for the desktop app. " +
+            "Open it from Filthy Net Deck rather than directly.";
+          return;
+        }
+
+        var target = "fnd://auth?" + payload;
+        retry.href = target;
+
+        // Browsers block custom-scheme navigation without a user gesture in
+        // some configurations, so show a manual fallback shortly after trying.
+        window.location.href = target;
+        window.setTimeout(function () {
+          title.textContent = "Almost there";
+          msg.textContent = "If the app didn't come to the front, use the button below.";
+          hint.style.display = "";
+          retry.style.display = "";
+        }, 1600);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 mod arena;
+mod deeplink;
 mod install_id;
 mod overlay;
 mod presence;
@@ -128,8 +129,15 @@ pub fn run() {
     // instead of spawning a duplicate app + second tray icon.
     #[cfg(desktop)]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        // A second launch surfaces the running window instead of spawning a
+        // duplicate. It is also how `fnd://` deep links reach an already-running
+        // app on Windows: the OS starts a new process with the URL in argv and
+        // this hook forwards that argv here. Dropping `args` on the floor would
+        // silently break the OAuth callback in the *common* case — the user
+        // clicked "sign in" from inside the running app.
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             show_main_window(app);
+            deeplink::handle_argv(app, &args);
         }));
     }
 
@@ -196,6 +204,28 @@ pub fn run() {
                 if std::env::args().any(|a| a == "--hidden") {
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.hide();
+                    }
+                }
+
+                app.handle().plugin(tauri_plugin_deep_link::init())?;
+                {
+                    use tauri_plugin_deep_link::DeepLinkExt;
+                    // Cold-start route: the app was NOT running when the link
+                    // was opened. (The already-running route goes through the
+                    // single-instance hook above — both are needed.)
+                    let handle = app.handle().clone();
+                    app.deep_link().on_open_url(move |event| {
+                        for url in event.urls() {
+                            deeplink::handle_url(&handle, url.as_str());
+                        }
+                    });
+                    // Dev builds are not installed, so nothing registered the
+                    // scheme in the registry. Do it at runtime so `tauri:dev`
+                    // can exercise the flow at all; in a release build the NSIS
+                    // installer owns this and the call is a harmless no-op.
+                    #[cfg(debug_assertions)]
+                    if let Err(e) = app.deep_link().register_all() {
+                        eprintln!("[deeplink] dev scheme registration failed: {e}");
                     }
                 }
             }

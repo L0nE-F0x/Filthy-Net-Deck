@@ -183,6 +183,26 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // OAuth callback. Rust forwards every `fnd://` URL here (from a cold start
+  // or, more commonly, via the single-instance hook when the app was already
+  // running). Only auth links are consumed, so future `fnd://` routes can be
+  // added without disturbing this one.
+  useEffect(() => {
+    if (!isTauri()) return;
+    let un: (() => void) | undefined;
+    void listen<string>("deep-link", (e) => {
+      const url = String(e.payload ?? "");
+      void import("./services/cloud/auth").then(async (m) => {
+        if (!m.isAuthDeepLink(url)) return;
+        const result = await m.completeSignIn(url);
+        useAppStore.getState().setAuthResult(result);
+      });
+    }).then((f) => {
+      un = f;
+    });
+    return () => un?.();
+  }, []);
+
   // Opt-in health ping, at most once a day. Waits for boot so the tracker
   // status it reports is real, and is deliberately fire-and-forget — a backend
   // outage must never be visible in the app. See docs/BACKEND-PHASE-2.md §7.1.

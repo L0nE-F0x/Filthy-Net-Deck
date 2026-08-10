@@ -132,6 +132,24 @@ export const Settings = memo(function Settings() {
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
   const setHealthPing = useAppStore((s) => s.setHealthPing);
+  const authName = useAppStore((s) => s.authName);
+  const authError = useAppStore((s) => s.authError);
+  const authPending = useAppStore((s) => s.authPending);
+  const signOutCloud = useAppStore((s) => s.signOutCloud);
+
+  /** Open the provider in the system browser; the session arrives by deep link. */
+  const beginSignIn = async (provider: "google" | "discord") => {
+    useAppStore.getState().setAuthPending(true);
+    try {
+      const m = await import("../services/cloud/auth");
+      await m.startSignIn(provider);
+    } catch (e) {
+      useAppStore.getState().setAuthResult({
+        status: "error",
+        message: e instanceof Error ? e.message : "Could not start sign-in.",
+      });
+    }
+  };
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setPresenceEnabled = useAppStore((s) => s.setPresenceEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
@@ -629,6 +647,66 @@ export const Settings = memo(function Settings() {
             </div>
           )}
         </section>
+
+        {/* —— Account (optional) —— */}
+        {isTauri() && (
+          <section className="panel settings-card settings-card-span2">
+            <h3 className="settings-card-title">Account</h3>
+            <p className="settings-card-desc">
+              Entirely optional — everything in Filthy Net Deck works signed out,
+              and always will. An account is only needed for features that live
+              on a server, like syncing between machines.
+            </p>
+            {authName ? (
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <span className="text-sm">
+                  Signed in as <strong className="text-foam">{authName}</strong>
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => void signOutCloud()}
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={authPending}
+                  onClick={() => void beginSignIn("google")}
+                >
+                  Sign in with Google
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={authPending}
+                  onClick={() => void beginSignIn("discord")}
+                >
+                  Sign in with Discord
+                </button>
+                {authPending && (
+                  <span className="text-muted text-xs">
+                    Finish signing in in your browser…
+                  </span>
+                )}
+              </div>
+            )}
+            {authError && (
+              <p className="text-xs mt-2 m-0" style={{ color: "var(--color-loss)" }}>
+                {authError}
+              </p>
+            )}
+            <p className="text-xs text-muted m-0 mt-2">
+              Sign-in opens your normal browser rather than a window inside the
+              app, so you can see the real address bar — and because Google
+              refuses sign-in from embedded windows.
+            </p>
+          </section>
+        )}
 
         {/* —— Data & privacy —— */}
         <section className="panel settings-card settings-card-span2">

@@ -4,6 +4,11 @@
   "version": "2.7.5",
   "identifier": "com.filthynetdeck.desktop",
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["fnd"]
+      }
+    },
     "updater": {
       "endpoints": [
         "https://filthy-net-deck.com/updater/latest.json",

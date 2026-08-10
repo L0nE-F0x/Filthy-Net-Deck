@@ -402,6 +402,18 @@ interface AppState {
    * install id, so re-enabling mints a fresh one rather than resuming.
    */
   setHealthPing: (v: boolean) => void;
+  /** Signed-in user's display name, or null when signed out. */
+  authName: string | null;
+  /** Last sign-in error, surfaced in Settings; cleared on the next attempt. */
+  authError: string | null;
+  /** True between opening the browser and the deep link coming back. */
+  authPending: boolean;
+  setAuthPending: (v: boolean) => void;
+  /** Apply the outcome of a `fnd://auth` callback. */
+  setAuthResult: (r: { status: "signed-in"; user: unknown } | { status: "error"; message: string }) => void;
+  /** Pull the current session at boot (no network when signed out). */
+  refreshAuth: () => Promise<void>;
+  signOutCloud: () => Promise<void>;
   setOverlayEnabled: (v: boolean) => void;
   setPresenceEnabled: (v: boolean) => void;
   /** Overlay panel opacity (0.55–1) — read live by the overlay window. */
@@ -689,6 +701,33 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, notifyMetaMovers };
       savePrefs(next);
       set({ prefs: next });
+    },
+    authName: null,
+    authError: null,
+    authPending: false,
+    setAuthPending: (authPending) => set({ authPending, authError: null }),
+    setAuthResult: (r) => {
+      if (r.status === "error") {
+        set({ authError: r.message, authPending: false });
+        return;
+      }
+      void import("../services/cloud/auth").then((m) =>
+        set({
+          authName: m.displayNameFor(r.user as Parameters<typeof m.displayNameFor>[0]),
+          authError: null,
+          authPending: false,
+        }),
+      );
+    },
+    refreshAuth: async () => {
+      const m = await import("../services/cloud/auth");
+      const user = await m.getCurrentUser();
+      set({ authName: m.displayNameFor(user) });
+    },
+    signOutCloud: async () => {
+      const m = await import("../services/cloud/auth");
+      await m.signOut();
+      set({ authName: null, authError: null, authPending: false });
     },
     setHealthPing: (healthPing) => {
       const next = { ...get().prefs, healthPing };

@@ -30,3 +30,6 @@ tauri-plugin-process = "2"
 tauri-plugin-autostart = "2"
 tauri-plugin-window-state = "2"
 tauri-plugin-single-instance = "2"
+# OAuth callback: the system browser hands the app back a `fnd://auth?...` URL.
+# Google refuses OAuth from embedded webviews, so this hop is mandatory.
+tauri-plugin-deep-link = "2"
