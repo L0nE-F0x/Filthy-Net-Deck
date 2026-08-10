@@ -1,5 +1,5 @@
 {
-  "version": "2.7.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.2.exe",
-  "notes": "v2.7.2: snappier desktop UI — fixed a splash timer that re-rendered the whole app every second, faster page switches with prefetch, fewer wasted tracker re-renders, and leaner card art mounting."
+  "version": "2.7.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.3.exe",
+  "notes": "v2.7.3: Exit fullscreen and Close to tray work again on Windows — leave exclusive fullscreen before hide so the buttons actually take effect, and keep F11/Settings in sync with the real window."
 }

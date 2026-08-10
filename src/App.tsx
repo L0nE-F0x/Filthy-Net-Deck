@@ -23,7 +23,7 @@ import {
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
-import { applyFullscreen, closeToTray, toggleFullscreen } from "./services/windowMode";
+import { applyFullscreen, closeToTray } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
 import { syncOverlayPrefFromStore } from "./services/overlay";
 import { HelpGuide } from "./components/HelpGuide";
@@ -240,7 +240,11 @@ export default function App() {
     };
 
     const onVis = () => {
-      if (document.visibilityState === "visible") pull();
+      if (document.visibilityState !== "visible") return;
+      pull();
+      // hide_to_tray drops OS fullscreen so Windows will actually hide; put it
+      // back when the user reopens from the tray if they still prefer fullscreen.
+      if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
     };
     const onFocus = () => pull();
     document.addEventListener("visibilitychange", onVis);
@@ -288,13 +292,14 @@ export default function App() {
   }, []);
 
   // F11 toggles fullscreen (and remembers the choice for next launch).
+  // Prefs are the source of truth — isFullscreen() can desync after tray hide
+  // or a failed OS fullscreen call, which made Exit look dead.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "F11") return;
       e.preventDefault();
-      void toggleFullscreen().then((now) => {
-        if (now != null) useAppStore.getState().setFullscreenPref(now);
-      });
+      const cur = useAppStore.getState().prefs.fullscreen;
+      useAppStore.getState().setFullscreenPref(!cur);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -434,11 +439,11 @@ export default function App() {
                   type="button"
                   className="fs-btn"
                   title="Exit fullscreen (F11)"
-                  onClick={() =>
-                    void toggleFullscreen().then((now) => {
-                      if (now != null) useAppStore.getState().setFullscreenPref(now);
-                    })
-                  }
+                  onClick={() => {
+                    // Always exit — never toggle via isFullscreen(), which can
+                    // desync from prefs and re-enter fullscreen instead.
+                    useAppStore.getState().setFullscreenPref(false);
+                  }}
                 >
                   <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
                     <path

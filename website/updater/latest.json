@@ -1,11 +1,11 @@
 {
-  "version": "2.7.2",
-  "notes": "v2.7.2: snappier desktop UI — fixed a splash timer that re-rendered the whole app every second, faster page switches with prefetch, fewer wasted tracker re-renders, and leaner card art mounting.",
-  "pub_date": "2026-08-09T13:52:43Z",
+  "version": "2.7.3",
+  "notes": "v2.7.3: Exit fullscreen and Close to tray work again on Windows — leave exclusive fullscreen before hide so the buttons actually take effect, and keep F11/Settings in sync with the real window.",
+  "pub_date": "2026-08-10T02:55:53Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjNSRDBLdzgzaGxvQXRkcXYzcUxrb3JsSVFWZEtqOFNaRkZwUlNhM2IxZVFQTE9hUzFpVEFTS1ZreVZzTXNZdnNLamhJUTBzVzQ0UkNXN2xnaEVDMmdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MjgzNTQ0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy4yX3g2NC1zZXR1cC5leGUKUUNqSTIvSXg1d014aWtodFRRZDZHa3V4SyttajRNMUtpL1k1NVBnMmZLTVpob2NXNTFTVWkwT3ZvT2RkWVlrWHJwRkhvSm9qbU40RGdsSTkvbVNtQVE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjladEpBTGl0eEhONDJ4b3BWTjdHTEYyT1VPejB5eG15elF3bXNzTVVoQnEwVmkxVDRYdEw1WFZucC9TWnFvL0QwdUN1SlJNTVVDdWs0RU5qUkxYVHdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2MzMwNTQwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy4zX3g2NC1zZXR1cC5leGUKcXZaQWxXZnQrV01kTjdjMEpYQ0s5R3ZsQU1SMytrLzY0WDNrTEk1KzU5VWo2cWVyLzkzeUdMbHJmQkh0Zk5RTkhyN1pTS2lFNEVuSTQyU1QvSk05RHc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.3.exe"
     }
   }
 }

@@ -433,6 +433,8 @@ select,
   justify-content: flex-end;
   gap: 0.45rem;
   min-width: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .topbar h1 {
@@ -2323,7 +2325,7 @@ select,
   font-weight: 600;
 }
 
-/* Fullscreen window controls â€” sit in the topbar action row (never float over it). */
+/* Fullscreen window controls — sit in the topbar action row (never float over it). */
 .fs-btn {
   display: inline-flex;
   align-items: center;
@@ -2337,6 +2339,9 @@ select,
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
 }
 .fs-btn:hover {
   border-color: color-mix(in srgb, var(--color-gold-500) 55%, transparent);

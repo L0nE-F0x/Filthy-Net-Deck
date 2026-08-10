@@ -26,7 +26,35 @@ fn show_main_window(app: &tauri::AppHandle) {
 }
 
 fn hide_to_tray(window: &tauri::Window) {
+    // Windows frequently ignores hide()/close while the window is still in
+    // exclusive fullscreen — Exit / Close-to-tray then look dead. Drop
+    // fullscreen first so the hide sticks.
+    let _ = window.set_fullscreen(false);
     let _ = window.hide();
+}
+
+/// Frontend: set main-window fullscreen. Prefer this over the raw window
+/// plugin from JS so we always target the `main` label (not overlay/toast).
+#[tauri::command]
+fn main_window_set_fullscreen(app: tauri::AppHandle, on: bool) -> Result<(), String> {
+    let win = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window missing".to_string())?;
+    win.set_fullscreen(on).map_err(|e| e.to_string())
+}
+
+/// Frontend: exit fullscreen (if any) and hide to tray. Same path as the
+/// titlebar ✕, including the one-time "still running in the tray" hint.
+#[tauri::command]
+fn main_window_hide_to_tray(app: tauri::AppHandle) -> Result<(), String> {
+    let win = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window missing".to_string())?;
+    // WebviewWindow and Window share set_fullscreen / hide on the handle.
+    let _ = win.set_fullscreen(false);
+    let _ = win.hide();
+    notify_tray_hint_once(&app);
+    Ok(())
 }
 
 /// One-time toast the first time the window closes to the tray, so users
@@ -88,7 +116,9 @@ pub fn run() {
             presence::presence_is_enabled,
             presence::presence_set_size,
             presence::presence_open_main,
-            arena::arena_is_running
+            arena::arena_is_running,
+            main_window_set_fullscreen,
+            main_window_hide_to_tray
         ])
         .setup(|app| {
             #[cfg(desktop)]
