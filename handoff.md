@@ -3,14 +3,15 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude ↔ Opus ↔ Grok ↔ Kimi).
 
-**Live product version: v2.7.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
+**Live product version: v2.7.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
-**Session (2026-08-10, Claude):** regression audit of the v2.7.0–v2.7.3
-weekend work — see **`docs/AUDIT-2026-08-10-v2.7.3.md`**. Ten issues found and
-fixed; the P0 was a Windows event-loop deadlock with **four** entry points
-(including any sync `#[tauri::command]`), now guarded in code by
-`refuse_if_main_thread`. **All paths verified live in `tauri:dev` by the owner.**
-Source-only — **not released**, needs a version bump + release train.
+**Session (2026-08-10, Claude): v2.7.4 SHIPPED.** Regression audit of the
+v2.7.0–v2.7.3 weekend work (built with Kimi K3 / Grok 4.5) — see
+**`docs/AUDIT-2026-08-10-v2.7.3.md`**. Ten issues found and fixed; the P0 was a
+Windows event-loop deadlock with **four** entry points (including any sync
+`#[tauri::command]`), now guarded in code by `refuse_if_main_thread`. All paths
+verified live in `tauri:dev` by the owner. Windows release train complete and
+byte-verified live; macOS dmg rolls from tag CI.
 
 **Session wrap (2026-08-09, Grok):** **v2.7.2 fully shipped** — desktop
 performance pass (splash re-render loop, nav prefetch / no remount, tracker
@@ -24,23 +25,30 @@ clean vs `origin/main` at wrap.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.7.2** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`, `Cargo.lock`) |
+| App version | **v2.7.4** (`package.json`, `src/version.ts`, Cargo, `tauri.conf.json`, `Cargo.lock`) |
 | Branch | `main` = `origin/main` |
-| Key commits | `0a9e402` release v2.7.2 · `27b22cf` CI lint fix · `dc97589` macOS dmg roll |
-| Tag | `v2.7.2` (points at release commit `0a9e402`; macOS CI green) |
-| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.2.exe` + `.sig` |
-| macOS | `website/downloads/Filthy-Net-Deck-2.7.2-universal.dmg` (~20 MB) |
-| Updater | `website/updater/latest.json` → **2.7.2** + signature |
-| Soft channel | `website/version.json` + `public/version.json` → **2.7.2** |
-| Site | Download buttons + OG `?v=2.7.2`, og-image regenerated |
-| Live Netlify | version / updater / setup.exe / .sig / dmg all **200** @ 2.7.2 |
-| Gates last green | **409** vitest · `tsc` clean · eslint clean · signed Windows build |
-| `WHATS_NEW` | Snappier nav · fixed splash re-render loop · leaner home paint |
+| Key commits | `e109e21` release v2.7.4 · `2f18a52` deadlock (all 4 entry points) · `1a6f730` perf regressions |
+| Tag | `v2.7.4` (macOS CI triggered on push) |
+| Windows | `website/downloads/Filthy-Net-Deck-Setup-2.7.4.exe` + `.sig` — **live, 6,652,265 bytes** |
+| macOS | dmg rolls from tag CI (follow-up commit) |
+| Updater | `website/updater/latest.json` → **2.7.4**; published signature byte-matches the local `.sig` |
+| Soft channel | `website/version.json` + `public/version.json` → **2.7.4** |
+| Site | Download buttons + OG `?v=2.7.4`, og-image regenerated |
+| Live Netlify | version + updater **200 @ 2.7.4** on both custom domain and netlify alias |
+| Gates last green | **409** vitest · `tsc` · eslint · `cargo fmt`/`clippy` · **39** cargo tests |
+| `WHATS_NEW` | Arena-launch freeze fixed · instant page switching · faster ⌘K |
 
-**Downloads pruned 2026-08-10:** `website/downloads/` now holds 2.7.3 + 2.7.2
-only (current + one prior, per `docs/MAINTENANCE.md`). The 2.7.0/2.7.1
+**Downloads pruned 2026-08-10:** `website/downloads/` holds 2.7.4 + 2.7.3 only
+(current + one prior, per `docs/MAINTENANCE.md`). The 2.7.0/2.7.1/2.7.2
 exe/sig/dmg were removed — recoverable from git history, and macOS dmgs are on
 their GitHub Releases.
+
+**Windows-release gotcha (cost a build cycle 2026-08-10):** do **not** bump
+versions with PowerShell `Set-Content -Encoding utf8` — PS 5.1 writes a BOM and
+`package.json` then fails to parse mid-build (`Unexpected token '﻿'`). A
+`ReadAllText`/`WriteAllText` round-trip also mojibakes the em-dashes in
+`Cargo.toml` / `tauri.conf.json`. Use the editor tool (or a UTF-8-no-BOM writer)
+and diff-check for `â€"` before building.
 
 ---
 
@@ -158,8 +166,8 @@ Full `AGENTS.md` checklist for **2.7.2**:
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| **Next** | Cut **v2.7.4** | P0 fixes are verified live; just needs the AGENTS.md release train |
-| **Next** | Backend / crowd-meta (`docs/PLATFORM-STRATEGY.md` §1.1) | The plan the owner wants to resume |
+| **Next** | Backend / crowd-meta (`docs/PLATFORM-STRATEGY.md` §1.1) | The plan the owner wants to resume. §1.2 local-first-forever is a hard constraint |
+| Tail | Roll the v2.7.4 macOS dmg into `website/downloads/` | Site already links it; 404s until the tag CI artifact is committed |
 | Measurement | Search Console (checkpoint ~2026-08-24) | Two weeks from the 08-10 check; one week elapsed so far |
 | Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still site CDN + local archive |
 | Disk | `cargo clean` — `src-tauri/target/` is 8.8 GB | Owner call; costs one full rebuild |
