@@ -241,7 +241,32 @@ D1/Workers is a driver swap, per §3's instruction.
 
 ---
 
-## 6. Auth — and a correction to the parent doc
+## 6. Auth — providers, and a correction to the parent doc
+
+**Providers: Google first, Discord second.** Google is the broadest-reach default;
+Discord is where the MTG audience already is. Both are provider toggles in
+Supabase Auth plus an OAuth client with each vendor — **not** an architectural
+choice, and not a reason to change backend.
+
+> **Firebase was considered and rejected (owner asked 2026-08-10).** The reason
+> given was Google login — but Supabase supports Google OAuth natively, so the
+> premise did not hold. Evaluated on merits anyway, Firebase is the wrong fit
+> here for three reasons:
+> 1. **The crowd meta is a relational aggregate.** Matchup rollups are a
+>    `GROUP BY` over archetype pairs. Firestore has no joins and no `GROUP BY`;
+>    every aggregate would be hand-maintained denormalised state in Cloud
+>    Functions.
+> 2. **Per-document read billing punishes exactly this workload.** The nightly
+>    rollup must scan the whole window — ~600k document reads per run at 1,000
+>    sharers, every night. Postgres does it in one indexed query on capacity
+>    already paid for.
+> 3. **Profile pages must be crawlable** (§2.3 — they are the SEO loop). The
+>    site already builds static HTML in a pipeline; querying Postgres at build
+>    time slots into `build-meta-site.mjs` naturally.
+>
+> Firebase's genuine strengths — real-time sync, push messaging — are unused
+> here: chat was cut in §1.5 and this is a desktop app. Supabase Pro is already
+> being paid for. **Decision: stay on Supabase.**
 
 > `PLATFORM-STRATEGY.md` §3 Phase 2 says *"Discord OAuth via system browser →
 > deep-link callback into the app. `src/services/deepLinks.ts` already exists."*
@@ -250,10 +275,12 @@ D1/Workers is a driver swap, per §3's instruction.
 > URI scheme registered in `tauri.conf.json`. The OAuth callback plumbing is
 > entirely unbuilt — budget it as real work, not as wiring.
 
-Flow:
+Flow (identical for every provider — and note **Google refuses OAuth from
+embedded webviews**, so the system-browser hop is mandatory, not a preference):
 
-1. App opens the system browser to Supabase's Discord OAuth URL with a PKCE
-   challenge and `redirect_to` pointing at a page on `filthy-net-deck.com`.
+1. App opens the **system browser** to Supabase's OAuth URL for the chosen
+   provider, with a PKCE challenge and `redirect_to` pointing at a page on
+   `filthy-net-deck.com`.
 2. That page bounces to `fnd://auth?code=…`.
 3. `tauri-plugin-deep-link` (new dependency) receives it on the `main` window.
 4. Client exchanges the code for a session; refresh token in the OS keychain via
@@ -274,7 +301,7 @@ Acquisition-visible first, per §2.3 — profiles before sync.
 | # | Slice | Ships |
 |---|---|---|
 | 1 | Supabase project, schema, RLS, archetype seeding from the meta feed | Nothing user-visible |
-| 2 | Deep-link scheme + Discord OAuth, verified in an **installed** build | Sign-in, nothing else |
+| 2 | Deep-link scheme + Google & Discord OAuth, verified in an **installed** build | Sign-in, nothing else |
 | 3 | Consent screen (§1.2 wording), two toggles, one-click delete | The trust surface |
 | 4 | **Public profile pages** `/u/<handle>` — season climb, archetypes played | The viral loop |
 | 5 | Match upload (queue, retry, idempotent), nightly rollup job | Data starts accruing |

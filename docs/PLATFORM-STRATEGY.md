@@ -300,7 +300,7 @@ forced the measurement before the spend.
 *~4–6 weeks · first backend* · **full design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md)**
 
 - **Supabase** (Postgres + auth + row-level security) — chosen for velocity as a solo dev. Abstract the boundary so a move to Cloudflare Workers/D1 is possible if costs bite.
-- **Discord OAuth** via system browser → deep-link callback into the app.
+- **Google + Discord OAuth** via system browser → deep-link callback into the app. (Firebase was considered 2026-08-10 for Google login and rejected — Supabase does Google natively, and Firestore is the wrong shape for a `GROUP BY`-driven crowd meta. Reasoning in `BACKEND-PHASE-2.md` §6.) Google refuses OAuth from embedded webviews, so the system-browser hop is mandatory.
   > ⚠️ **Corrected 2026-08-10.** This previously said "`src/services/deepLinks.ts` already exists", implying the callback plumbing was partly done. It is not: that file is pure in-app routing for meta decks, tags and cards. There is no `tauri-plugin-deep-link` and no custom URI scheme in `tauri.conf.json`. Budget the OAuth callback as real work, and verify the scheme registration in an **installed** build — it is an NSIS/registry concern that `tauri:dev` cannot exercise.
 - **First feature: public profile pages + shareable deck pages.** Acquisition-visible.
 - **Second feature: cloud sync.** Quiet, useful, invisible.
