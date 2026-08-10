@@ -77,10 +77,11 @@ describe("trackerHealth", () => {
     expect(early.live).toBe(false);
     expect(early.done).toBe(0);
 
+    // A recorded match also completes the Matchups step (inference is automatic).
     const live = onboardingProgress(buildOnboardingSteps(status({}), 1, 0));
     expect(live.live).toBe(true);
-    expect(live.done).toBe(2);
-    expect(live.pct).toBe(67);
+    expect(live.done).toBe(3);
+    expect(live.pct).toBe(100);
   });
 });
 

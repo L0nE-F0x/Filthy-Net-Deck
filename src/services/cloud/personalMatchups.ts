@@ -176,3 +176,28 @@ export function readDelta(m: MergedMatchup): string | null {
     ? `You beat this matchup ${gap} points harder than the field does.`
     : `You lose this ${gap} points more than the field does — worth practising.`;
 }
+
+
+/** Find a personal row by meta deck name / archetype label (Daily + DeckView chips). */
+export function recordForArchetypeName(
+  records: readonly PersonalRecord[],
+  formatId: FormatId | string | null | undefined,
+  name: string | null | undefined,
+): PersonalRecord | null {
+  const slug = archetypeSlug(formatId, name);
+  if (slug) {
+    const hit = records.find((r) => r.slug === slug);
+    if (hit) return hit;
+  }
+  const want = String(name ?? "")
+    .trim()
+    .toLowerCase();
+  if (!want) return null;
+  const compact = want.replace(/[^a-z0-9]+/g, "");
+  return (
+    records.find((r) => r.label.toLowerCase() === want) ??
+    records.find((r) => r.label.toLowerCase().replace(/[^a-z0-9]+/g, "") === compact) ??
+    null
+  );
+}
+

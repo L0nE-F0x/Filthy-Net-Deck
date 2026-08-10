@@ -132,15 +132,15 @@ const TOPICS: Topic[] = [
   },
   {
     id: "matchups",
-    label: "Matchup Lab",
+    label: "Matchups",
     page: "matchups",
     body: (
       <>
         <p>
-          Book-keeping on opponents: tag them by archetype (FND suggests a tag from cards seen),
-          jot matchup notes, and read your personal win rate against each archetype. The overlay
-          uses this — mid-match it shows your historical record versus the deck it thinks you’re
-          facing.
+          Your win rate against each archetype, inferred automatically from cards seen - no
+          tagging required. When community data is available, each row shows how you compare
+          to the field. The overlay still uses this mid-match against the deck it thinks you
+          are facing.
         </p>
       </>
     ),

@@ -51,7 +51,7 @@ export const Stats = memo(function Stats() {
   const statsCompareDeckKey = useAppStore((s) => s.statsCompareDeckKey);
   const clearStatsFocusDeck = useAppStore((s) => s.clearStatsFocusDeck);
   const clearStatsCompareDeck = useAppStore((s) => s.clearStatsCompareDeck);
-  const openMatchupOpponent = useAppStore((s) => s.openMatchupOpponent);
+  const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const [queue, setQueue] = useState<string | null>(null);
   const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
@@ -392,7 +392,7 @@ export const Stats = memo(function Stats() {
           <DeckBreakdown decks={decks} onSelect={setSelectedDeck} />
           <MatchHistory
             matches={filtered}
-            onOpponent={(name) => openMatchupOpponent(name)}
+            onArchetype={(arch) => openMatchupTag(arch)}
             onDeck={(key) => setSelectedDeck(key)}
           />
 

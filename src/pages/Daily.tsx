@@ -11,8 +11,19 @@ import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { DailyDigestStrip } from "../components/DailyDigestStrip";
 import { SessionWrapBanner } from "../components/SessionWrapBanner";
 import { LocalCoachStrip } from "../components/LocalCoachStrip";
-import { decksForMode, topDeckForMode } from "../services/deckHelpers";
-import { recordVsTags, listTaggedOpponentCount } from "../services/matchupNotes";
+import {
+  decksForMode,
+  topDeckForMode,
+  formatIdForEvent,
+  inferenceCandidatesFromBundle,
+} from "../services/deckHelpers";
+import { getOpponentNote, listTaggedOpponentCount } from "../services/matchupNotes";
+import { peekSeenCard } from "../services/arenaMeta";
+import {
+  personalRecords,
+  recordForArchetypeName,
+  type ResolveOpts,
+} from "../services/cloud/personalMatchups";
 import { needsOnboardingCoach } from "../services/trackerHealth";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import type { Deck, FormatId, ManaColor } from "../types/meta";
@@ -43,7 +54,7 @@ function useAfterPaint(ms = 0): boolean {
 
 type VsRecord = { wins: number; losses: number };
 
-/** "You vs this archetype" chip — opens Matchup Lab filtered by tag (D2). */
+/** "You vs this archetype" chip — opens Matchups filtered by tag (D2). */
 function VsYouChip({
   rec,
   tag,
@@ -60,7 +71,7 @@ function VsYouChip({
     <button
       type="button"
       className={`vs-you-chip favor-${favor} vs-you-chip-btn`}
-      title={`Your record vs “${tag}”: ${rec.wins}–${rec.losses} (${Math.round(rate * 100)}%) — open Matchup Lab`}
+      title={`Your record vs “${tag}”: ${rec.wins}–${rec.losses} (${Math.round(rate * 100)}%) — open Matchups`}
       onClick={(e) => {
         e.stopPropagation();
         onOpenTag(tag);
@@ -194,9 +205,22 @@ export const Daily = memo(function Daily() {
     const tagged = listTaggedOpponentCount();
     return needsOnboardingCoach(trackerStatus, trackerMatches, tagged);
   }, [trackerStatus, trackerMatches]);
+  // Your record vs archetypes (inferred + optional manual tags), keyed for chips.
+  const personalRows = useMemo(() => {
+    const opts: ResolveOpts = {
+      resolveName: (id) => peekSeenCard(id),
+      candidates: inferenceCandidatesFromBundle(meta, mode),
+      tagFor: (m) => getOpponentNote(m.opponentName)?.tag?.trim() || null,
+      formatFor: (m) => formatIdForEvent(m.eventId) ?? dailyFormatId ?? "standard",
+    };
+    return personalRecords(trackerMatches, opts);
+  }, [trackerMatches, meta, mode, dailyFormatId]);
 
-  // Your record vs tagged archetypes (Matchup Lab) keyed by lowercased tag.
-  const vsTagMap = useMemo(() => recordVsTags(trackerMatches), [trackerMatches]);
+  const vsFor = (name: string, archetype: string): VsRecord | undefined => {
+    const hit = recordForArchetypeName(personalRows, dailyFormatId, archetype || name);
+    if (!hit || hit.wins + hit.losses === 0) return undefined;
+    return { wins: hit.wins, losses: hit.losses };
+  };
 
   // Default to featured Standard when meta loads
   useEffect(() => {
@@ -253,7 +277,7 @@ export const Daily = memo(function Daily() {
     [hero],
   );
   const heroVs = hero
-    ? vsTagMap[hero.name.toLowerCase()] ?? vsTagMap[hero.archetype.toLowerCase()]
+    ? vsFor(hero.name, hero.archetype)
     : undefined;
 
   if (!meta) {
@@ -375,7 +399,7 @@ export const Daily = memo(function Daily() {
                   type="button"
                   className="daily-hero-stat daily-hero-stat-btn"
                   onClick={() => openMatchupTag(hero.archetype || hero.name)}
-                  title="Open Matchup Lab for this tag"
+                  title="Open Matchups for this archetype"
                 >
                   <strong
                     className={
@@ -443,8 +467,7 @@ export const Daily = memo(function Daily() {
                   key={d.id}
                   d={d}
                   vs={
-                    vsTagMap[d.name.toLowerCase()] ??
-                    vsTagMap[d.archetype.toLowerCase()]
+                    vsFor(d.name, d.archetype)
                   }
                   move={movementByName.get(d.name.toLowerCase())}
                   onOpen={() => openDeck(d.id)}

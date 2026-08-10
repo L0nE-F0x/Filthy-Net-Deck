@@ -19,12 +19,12 @@ import {
 
 function MatchRow({
   m,
-  onOpponent,
+  onArchetype,
   onDeck,
   oppArch,
 }: {
   m: TrackedMatch;
-  onOpponent: (name: string) => void;
+  onArchetype: (archetype: string) => void;
   onDeck: (key: string) => void;
   oppArch?: string | null;
 }) {
@@ -32,17 +32,27 @@ function MatchRow({
   return (
     <div className="match-row">
       <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
-      <button
-        type="button"
-        className="match-opponent link-btn text-left"
-        title={m.opponentPlatform ?? "Open in Matchup Lab"}
-        onClick={() => onOpponent(m.opponentName ?? "Unknown")}
-      >
-        vs {m.opponentName ?? "Unknown"}
-        {oppArch ? (
+      {/*
+        Links to the *archetype*, not the player. A record against one ladder
+        opponent never accumulates — you rarely meet them twice — whereas the
+        record against what they were playing is the useful question. Plain
+        text when the deck could not be identified, rather than a dead click.
+      */}
+      {oppArch ? (
+        <button
+          type="button"
+          className="match-opponent link-btn text-left"
+          title={`Your record vs ${oppArch}`}
+          onClick={() => onArchetype(oppArch)}
+        >
+          vs {m.opponentName ?? "Unknown"}
           <span className="text-muted font-normal"> · {oppArch}</span>
-        ) : null}
-      </button>
+        </button>
+      ) : (
+        <span className="match-opponent text-left" title={m.opponentPlatform ?? undefined}>
+          vs {m.opponentName ?? "Unknown"}
+        </span>
+      )}
       <span className="match-detail">
         <button
           type="button"
@@ -67,11 +77,11 @@ function MatchRow({
 
 export function MatchHistory({
   matches,
-  onOpponent,
+  onArchetype,
   onDeck,
 }: {
   matches: TrackedMatch[];
-  onOpponent: (name: string) => void;
+  onArchetype: (archetype: string) => void;
   onDeck: (key: string) => void;
 }) {
   const meta = useAppStore((s) => s.meta);
@@ -168,7 +178,7 @@ export function MatchHistory({
           <MatchRow
             key={m.matchId}
             m={m}
-            onOpponent={onOpponent}
+            onArchetype={onArchetype}
             onDeck={onDeck}
             oppArch={archByMatch.get(m.matchId)}
           />

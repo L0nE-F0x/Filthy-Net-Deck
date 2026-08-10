@@ -355,7 +355,7 @@ export function DeckDetail({
   const deleteMatches = useAppStore((s) => s.deleteMatches);
   const meta = useAppStore((s) => s.meta);
   const openDeck = useAppStore((s) => s.openDeck);
-  const openMatchupOpponent = useAppStore((s) => s.openMatchupOpponent);
+  const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const openClimbDeck = useAppStore((s) => s.openClimbDeck);
   const openBrewLabDeck = useAppStore((s) => s.openBrewLabDeck);
   const openStatsCompare = useAppStore((s) => s.openStatsCompare);
@@ -568,7 +568,7 @@ export function DeckDetail({
           <VersionHistory deckMatches={deck.matches} />
           <MatchHistory
             matches={visibleMatches}
-            onOpponent={(name) => openMatchupOpponent(name)}
+            onArchetype={(arch) => openMatchupTag(arch)}
             onDeck={(key) => {
               if (key !== deck.key) openStatsDeck(key);
             }}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
@@ -12,8 +12,17 @@ import { scryfallCdnUrl } from "../services/scryfall";
 import { CardArt, CardArtStrip, pickPreviewCards } from "../components/CardArt";
 import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
 import { deckRotationImpact, rotationWhen } from "../services/rotationImpact";
-import { recordVsArchetypeTag } from "../services/statsInsights";
-import { loadAllOpponentNotes } from "../services/matchupNotes";
+import { getOpponentNote } from "../services/matchupNotes";
+import { peekSeenCard } from "../services/arenaMeta";
+import {
+  formatIdForEvent,
+  inferenceCandidatesFromBundle,
+} from "../services/deckHelpers";
+import {
+  personalRecords,
+  recordForArchetypeName,
+  type ResolveOpts,
+} from "../services/cloud/personalMatchups";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import type { CardEntry } from "../types/meta";
 
@@ -114,6 +123,7 @@ export function DeckView() {
   const setPage = useAppStore((s) => s.setPage);
   const openFormat = useAppStore((s) => s.openFormat);
   const openMatchupTag = useAppStore((s) => s.openMatchupTag);
+  const mode = useAppStore((s) => s.mode);
   const trackerMatches = useAppStore((s) => s.trackerMatches);
   const trackerStatus = useAppStore((s) => s.trackerStatus);
   const [toast, setToast] = useState<string | null>(null);
@@ -147,6 +157,30 @@ export function DeckView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deck?.id]);
 
+  // Your record vs this archetype - inferred from cards seen; manual tags still override.
+  const yourRecord = useMemo(() => {
+    if (!deck) return { wins: 0, losses: 0, rate: null as number | null };
+    const opts: ResolveOpts = {
+      resolveName: (id) => peekSeenCard(id),
+      candidates: inferenceCandidatesFromBundle(meta, mode),
+      tagFor: (m) => getOpponentNote(m.opponentName)?.tag?.trim() || null,
+      formatFor: (m) =>
+        formatIdForEvent(m.eventId) ?? (deck.format as typeof deck.format) ?? "standard",
+    };
+    const rows = personalRecords(trackerMatches, opts);
+    const hit = recordForArchetypeName(
+      rows,
+      deck.format,
+      deck.archetype || deck.name,
+    );
+    if (!hit) return { wins: 0, losses: 0, rate: null as number | null };
+    return {
+      wins: hit.wins,
+      losses: hit.losses,
+      rate: hit.winrate != null ? hit.winrate / 100 : null,
+    };
+  }, [trackerMatches, meta, mode, deck]);
+
   if (!deck) {
     return (
       <div className="empty-state">
@@ -170,16 +204,6 @@ export function DeckView() {
   const rotatingNames = new Set(
     (rotation?.hits ?? []).map((h) => h.name.toLowerCase()),
   );
-
-  // D3: real tagged record vs this archetype (Matchup Lab tags only)
-  const yourRecord = recordVsArchetypeTag(
-    trackerMatches,
-    (deck.archetype || deck.name).trim(),
-    loadAllOpponentNotes(),
-    (n) => (n ?? "").trim().toLowerCase() || "unknown",
-  );
-
-  // Always rebuild (or sanitize) so "Front // Back" names never hit Arena's importer.
   const arenaText = sanitizeArenaImportText(
     buildArenaImport({
       mainboard: deck.mainboard,
@@ -386,7 +410,7 @@ export function DeckView() {
             {yourRecord.wins + yourRecord.losses > 0 ? (
               <div className="flex flex-wrap items-center gap-3">
                 <p className="text-sm m-0">
-                  vs opponents tagged{" "}
+                  vs{" "}
                   <strong className="text-foam">{deck.archetype || deck.name}</strong>:{" "}
                   <strong>
                     {yourRecord.wins}–{yourRecord.losses}
@@ -401,10 +425,10 @@ export function DeckView() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  title={`Open Matchup Lab filtered to tag “${deck.archetype || deck.name}”`}
+                  title={`Open Matchups for “${deck.archetype || deck.name}”`}
                   onClick={() => openMatchupTag(deck.archetype || deck.name)}
                 >
-                  Matchup Lab →
+                  Matchups →
                 </button>
               </div>
             ) : trackerMatches.length === 0 && trackerStatus ? (
@@ -413,9 +437,7 @@ export function DeckView() {
               <TrackerOnboarding compact showHealthDetail={false} />
             ) : (
               <p className="text-xs text-muted m-0 leading-relaxed">
-                No tagged games yet against this archetype. In Matchup Lab, tag opponents with
-                &quot;{deck.archetype || deck.name}&quot; after you play them — records stay on
-                this PC.
+                No identified games against this archetype yet. Play with tracking on - cards seen build your record automatically.
               </p>
             )}
           </section>

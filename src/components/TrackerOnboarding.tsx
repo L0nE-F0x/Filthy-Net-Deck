@@ -10,7 +10,7 @@ import {
 import { listTaggedOpponentCount } from "../services/matchupNotes";
 
 /**
- * First-session coach: log → first match → first tag (D1).
+ * First-session coach: log → first match → matchups (D1).
  * Guided checklist + "you're live" moment when the first match lands.
  * Shown on Daily (activation), My Stats / Matchups / Climb empties, Settings.
  */
@@ -114,7 +114,7 @@ export function TrackerOnboarding({
             </p>
           ) : tagged === 0 ? (
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setPage("matchups")}>
-              Open Matchups to tag →
+              Open Matchups →
             </button>
           ) : (
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("climb")}>

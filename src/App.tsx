@@ -102,7 +102,7 @@ function pageTitle(page: Page): string {
     case "stats":
       return "My Stats";
     case "matchups":
-      return "Matchup Lab";
+      return "Matchups";
     case "climb":
       return "Climb Tracker";
     case "brewlab":

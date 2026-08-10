@@ -39,7 +39,7 @@ export function buildOnboardingSteps(
 ): OnboardingStep[] {
   const logOk = !!status?.logFound && status.detailedLogs !== false;
   const matchOk = matchCount > 0;
-  const tagOk = taggedOpponentCount > 0;
+  const tagOk = taggedOpponentCount > 0 || matchCount > 0;
   return [
     {
       id: "log",
@@ -59,11 +59,11 @@ export function buildOnboardingSteps(
     },
     {
       id: "tag",
-      label: "First opponent tagged",
+      label: "Matchups started",
       done: tagOk,
       hint: tagOk
-        ? "Matchup Lab is learning your field"
-        : "After a match, tag the opponent’s archetype in Matchups",
+        ? "Matchups is learning your field"
+        : "Play with Detailed Logs on - archetypes fill in automatically",
     },
   ];
 }
