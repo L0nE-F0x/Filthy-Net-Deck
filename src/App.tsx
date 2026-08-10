@@ -203,6 +203,38 @@ export default function App() {
     return () => un?.();
   }, []);
 
+  // Opt-in match sharing. Fires once after boot to drain any backlog, then
+  // after each recorded match. Both are no-ops unless signed in AND opted in
+  // (gated inside uploadNewMatches), and neither can surface an error in the
+  // app — a backend problem just means the next trigger retries.
+  useEffect(() => {
+    if (!bootDone || !isTauri()) return;
+    const t = window.setTimeout(() => {
+      void import("./services/cloud/syncRunner").then((m) => m.syncMatchesNow());
+    }, 12_000);
+    return () => window.clearTimeout(t);
+  }, [bootDone]);
+
+  useEffect(() => {
+    if (!isTauri()) return;
+    let un: (() => void) | undefined;
+    let debounce = 0;
+    void listen("tracker:match", () => {
+      // A Bo3 can emit in quick succession; coalesce rather than uploading
+      // once per game-end event.
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(() => {
+        void import("./services/cloud/syncRunner").then((m) => m.syncMatchesNow());
+      }, 5_000);
+    }).then((f) => {
+      un = f;
+    });
+    return () => {
+      window.clearTimeout(debounce);
+      un?.();
+    };
+  }, []);
+
   // Opt-in health ping, at most once a day. Waits for boot so the tracker
   // status it reports is real, and is deliberately fire-and-forget — a backend
   // outage must never be visible in the app. See docs/BACKEND-PHASE-2.md §7.1.

@@ -90,6 +90,12 @@ export interface UploadOutcome {
   skipped: number;
 }
 
+/** Matches processed per run — see the backlog note in `uploadNewMatches`. */
+export const MAX_PER_RUN = 200;
+
+/** Guards against a launch upload and a match-end upload overlapping. */
+let inFlight = false;
+
 /**
  * Send matches newer than the watermark. Idempotent server-side (unique on
  * `user_id, client_hash`), so a duplicate run costs nothing and a failure can
@@ -102,13 +108,44 @@ export async function uploadNewMatches(args: {
   oppArchetypeFor?: (m: TrackedMatch) => { name: string | null; confidence: number | null };
 }): Promise<UploadOutcome> {
   const empty = { attempted: 0, uploaded: 0, skipped: 0 };
+  // A launch sync and a match-end sync can fire close together; running both
+  // would double the inference work and race on the watermark.
+  if (inFlight) return empty;
   if (!(await isCloudEnabled())) return empty;
   const user = await getCurrentUser();
   if (!user) return empty;
+  inFlight = true;
+  try {
+    return await runUpload(user.id, args);
+  } finally {
+    inFlight = false;
+  }
+}
+
+async function runUpload(
+  userId: string,
+  args: {
+    matches: readonly TrackedMatch[];
+    meta: MetaBundle | null;
+    decks?: readonly Deck[];
+    oppArchetypeFor?: (m: TrackedMatch) => { name: string | null; confidence: number | null };
+  },
+): Promise<UploadOutcome> {
+  const empty = { attempted: 0, uploaded: 0, skipped: 0 };
+  const user = { id: userId };
 
   const since = uploadedThrough();
-  const fresh = args.matches.filter((m) => m.endedAt > since);
-  if (!fresh.length) return empty;
+  // Oldest first, so the high-water mark advances monotonically and a capped
+  // run resumes exactly where it stopped.
+  const pending = args.matches
+    .filter((m) => m.endedAt > since)
+    .sort((a, b) => a.endedAt - b.endedAt);
+  if (!pending.length) return empty;
+
+  // First run after opting in has the entire history to send, and each match
+  // costs an archetype inference. Cap the batch so a long-time user's backlog
+  // drains over a few launches instead of stalling one.
+  const fresh = pending.slice(0, MAX_PER_RUN);
 
   const rows = [];
   for (const m of fresh) {
