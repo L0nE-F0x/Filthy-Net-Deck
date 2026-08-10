@@ -321,6 +321,22 @@ forced the measurement before the spend.
 
 ### Phase 4 — Pro tier
 
+> **DEFERRED INDEFINITELY — owner decision 2026-08-10.** Monetization stays
+> **donation-only via the existing Ko-fi tip jar** until there is a large user
+> base. Nothing in the app charges anyone, and no paid tier is being built.
+>
+> Two consequences worth holding on to:
+> - **§2.6's legal work is deferred with it.** The WotC Fan Content Policy and
+>   Scryfall commercial-use checks gate *taking money*, not shipping features —
+>   so they are not blocking, but they must be done **before** this phase is ever
+>   un-deferred, not after. Do not let a future session treat Phase 4 as ready.
+> - **§1.4's design rule survives the deferral.** "Never paywall anything that
+>   runs locally; server-side value only" is what makes the Phase 2/3
+>   architecture correct regardless of whether it is ever charged for. Keep
+>   building to it.
+
+When and if it is revived:
+
 - Server-side-only paywall per §1.4 table
 - Stripe, server-validated entitlement
 - Capped Founder's Lifetime tier at launch
@@ -353,7 +369,7 @@ forced the measurement before the spend.
 | Arena patch breaks the parser | **Existential** | §2.7 — fast-response process, status page, health ping |
 | WotC / Scryfall terms block monetization | **High** | §2.6 — verify before taking money, not after |
 | Cloud features erode the privacy positioning | **High** | §1.2 rules, enforced without exception |
-| Backend cost outruns revenue | Medium | Free tier costs nothing server-side by design; cost-per-user budgeted before Phase 2 |
+| Backend cost outruns revenue | Medium | Supabase **Pro** ($25/mo, already active) has headroom to ~5–8k sharers; read rollups only so egress scales with readers, not writers. With Phase 4 deferred there is no revenue to outrun — treat the $25 as a fixed cost of running the project, and keep it there. See `BACKEND-PHASE-2.md` §5 |
 | Solo-dev bandwidth | Medium | Gates exist precisely to prevent building the wrong thing at the wrong time |
 | Crowd data is too thin to be honest | Medium | Phase 3 gate + sample-size discipline; ship nothing rather than ship noise |
 | Reach never materialises | Medium | Phase 1 gate stops the spend before the backend exists |

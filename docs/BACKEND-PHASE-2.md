@@ -204,22 +204,37 @@ MTG tool attracts, which is the right target — same threat-model logic as
 
 ## 5. Cost model
 
-Supabase free tier: 500 MB database, 5 GB egress/month, 50k MAU auth.
+**The project is already on Supabase Pro** (owner, 2026-08-10) — 8 GB database,
+250 GB egress, 100k MAU included, $25/mo. Overage: ~$0.125/GB/mo storage,
+~$0.09/GB egress. The standing instruction is still *keep costs as low as
+possible*.
 
-A `shared_matches` row is ~180 bytes. At **1,000 opted-in users × 20 matches/day**:
+A `shared_matches` row is ~180 bytes of payload, but budget **~350 B effective**
+once Postgres row overhead and the `(played_on, format, archetypes)` index are
+counted.
 
-- 3.6 MB/day raw → **~430 MB at 120-day retention.** That is essentially the
-  entire free-tier database on raw matches alone.
-- Rollups are trivial by comparison: bounded by archetype pairs (~60 × 60 × 2
-  formats × 2 Bo) ≈ 15k rows, a few MB permanently.
+| Opted-in sharers | Raw/day | At 120-day retention |
+|---|---|---|
+| 1,000 | ~7 MB | **~0.8 GB** — comfortable |
+| 5,000 | ~35 MB | **~4.2 GB** — over half the included 8 GB |
+| 10,000 | ~70 MB | **~8.4 GB** — exceeds it; retention or overage required |
 
-**Conclusions:**
-1. The 120-day retention window is **load-bearing**, not a nicety. Without it the
-   free tier breaks at roughly 1,000 active sharers.
-2. The app must read **rollups only**, never raw matches. Egress stays flat as
-   users grow.
-3. First paid step is Supabase Pro at $25/mo, which should land around
-   2–3k sharers. Budget it against the Ko-fi signal before crossing.
+Rollups are negligible by comparison: bounded by archetype pairs (~60 × 60 × 2
+formats × 2 Bo) ≈ 15k rows, a few MB, permanent.
+
+**Conclusions under Pro:**
+1. Storage is **not** the near-term constraint it would be on free — there is
+   headroom to roughly **5–8k active sharers** before it bites. Nothing here
+   needs to be over-engineered for cost on day one.
+2. The 120-day retention window is therefore justified **primarily as a privacy
+   property** — "we delete raw matches after 120 days" is a claim worth making
+   and worth advertising — with cost control as the secondary benefit. It should
+   not be dropped just because Pro has room.
+3. **Read rollups only, never raw.** This is the rule that actually matters for
+   cost, because egress scales with *readers*, not writers. 250 GB is generous,
+   but a client that queries raw matches would burn it unpredictably.
+4. Keep the data layer behind `src/services/cloud/*` per §3, so the escape hatch
+   to Cloudflare D1/Workers stays open if the economics change.
 
 Abstract the data layer behind `src/services/cloud/*` so a move to Cloudflare
 D1/Workers is a driver swap, per §3's instruction.
