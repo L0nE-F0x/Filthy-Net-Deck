@@ -49,21 +49,39 @@ If a few thousand users opt in to sharing match results, **FND becomes its own d
 
 Build the backend for the **crowd meta**, not for deck storage.
 
-### 1.2 The privacy collision — the most important decision in this document
+### 1.2 Privacy — **downgraded from a pillar to an ordinary constraint (owner, 2026-08-10)**
 
-The README says: *"entirely on your PC. Nothing is uploaded anywhere."* `100X-ROADMAP.md` lists local-only tracking as a **principled constraint to keep forever.** That is the counterpositioning against Untapped, whose business model *is* harvesting player data.
+> **This section used to be titled "the most important decision in this document."
+> It isn't.** The owner's call, and the evidence agrees: privacy is a weak
+> *purchase driver* for an MTG tracker. Untapped is dominant precisely while
+> harvesting player data, which is strong evidence that players do not choose on
+> this axis. Treating it as the central strategic pillar over-complicated the
+> design for a benefit the market does not appear to reward.
+>
+> **What this changes:** privacy stops gating and complicating every downstream
+> decision. Concretely — one opt-in instead of two, exact timestamps and ranks
+> instead of coarsened ones, exact counts instead of buckets, and data retention
+> justified by **cost** rather than as a marketing claim. Simpler to build, and a
+> richer dataset.
 
-A cloud-by-default FND is an underfunded Untapped. That is a losing position.
+**What survives, and why** — these are cheap, and the alternative is a real
+problem rather than a lost talking point:
 
-**The resolution — non-negotiable rules if the backend happens:**
+1. **The app stays fully functional with no account.** Not a privacy stance — an
+   audience one. Forcing sign-up on a passion-project tracker kills adoption.
+2. **Cloud features are explicitly opt-in.** Owner's standing requirement.
+3. **Never upload another player's identity.** `opponentName` and `opponentSeen`
+   stay on the machine. This is not positioning: an Arena handle identifies a
+   real person who consented to nothing, and UK/EU users bring GDPR with them
+   regardless of how the app is marketed. Costs one line in an allowlist.
+4. **Announce the change, don't make it silently.** The README currently promises
+   *"entirely on your PC. Nothing is uploaded anywhere."* That is still true
+   today and stays until the first upload ships — at which point it gets
+   rewritten precisely *and* mentioned in release notes. This is about not
+   surprising people who already installed on that promise.
 
-1. Local-first stays the **default forever**. The app must remain fully functional, forever, with no account.
-2. Cloud is **explicitly opt-in**, with a plain-language consent screen naming exactly what leaves the machine.
-3. The opt-in is framed as a **trade, not a grab**: *"share your matches, get community matchup data."*
-4. Opt-out must be one click, and must delete server-side data.
-5. The README's promise gets **rewritten precisely**, not quietly dropped. "Local by default. Nothing leaves your PC unless you turn it on."
-
-Handled this way, the privacy story gets *stronger*, not weaker — neither competitor can honestly say the same thing.
+Everything else formerly in this section is now an ordinary design note in
+[`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md), not a rule.
 
 ### 1.3 Donation button — **do it, but understand what it's for**
 
@@ -233,7 +251,13 @@ The entire moat is an unofficial parser against a format that can change without
 
 Untapped has millions of aggregated matches. **That gap will not close for years**, and chasing it head-on is a losing fight against a funded team.
 
-Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, privacy, honest data, responsiveness, a real human behind it, and creator integration. The goal is not *"better in every way"* — it is ***"clearly better for players who dislike Untapped."*** That is winnable and defensible.
+Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, honest data, responsiveness, a real human behind it, and creator integration. The goal is not *"better in every way"* — it is ***"clearly better for players who dislike Untapped."*** That is winnable and defensible.
+
+**Updated 2026-08-10:** "privacy" is dropped from that list (§1.2). The strongest
+remaining edges are **the creator channel** — the owner streams Arena to an
+existing YouTube audience, which a funded competitor cannot replicate — and
+**honest data**, which is enforced in code rather than claimed in marketing.
+Route effort there rather than at feature parity.
 
 ---
 
@@ -368,7 +392,7 @@ When and if it is revived:
 |---|---|---|
 | Arena patch breaks the parser | **Existential** | §2.7 — fast-response process, status page, health ping |
 | WotC / Scryfall terms block monetization | **High** | §2.6 — verify before taking money, not after |
-| Cloud features erode the privacy positioning | **High** | §1.2 rules, enforced without exception |
+| ~~Cloud features erode the privacy positioning~~ | **Downgraded 2026-08-10** | Privacy is no longer a strategic pillar (§1.2). Residual risk is narrow: don't upload another player's identity, and announce the README change rather than making it quietly |
 | Backend cost outruns revenue | Medium | Supabase **Pro** ($25/mo, already active) has headroom to ~5–8k sharers; read rollups only so egress scales with readers, not writers. With Phase 4 deferred there is no revenue to outrun — treat the $25 as a fixed cost of running the project, and keep it there. See `BACKEND-PHASE-2.md` §5 |
 | Solo-dev bandwidth | Medium | Gates exist precisely to prevent building the wrong thing at the wrong time |
 | Crowd data is too thin to be honest | Medium | Phase 3 gate + sample-size discipline; ship nothing rather than ship noise |

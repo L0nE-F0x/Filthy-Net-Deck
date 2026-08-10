@@ -10,29 +10,35 @@ Analytics shows real and growing app usage). Recorded in `PLATFORM-STRATEGY.md` 
 
 ---
 
-## 0. The one decision that shapes everything else
+## 0. Scope of the cloud opt-in
 
-**Match sharing and deck sharing are two separate opt-ins, not one.**
+**Revised 2026-08-10.** Privacy was demoted from a strategic pillar to an ordinary
+constraint (`PLATFORM-STRATEGY.md` §1.2), which simplifies this design
+considerably. An earlier draft split match-sharing and deck-sharing into two
+separate opt-ins and coarsened several fields. Both are gone:
 
-The strategy doc treats "cloud" as a single toggle. It cannot be, because the two
-asks have completely different trust profiles:
-
-| | Match sharing | Deck / profile sharing |
+| Was | Now | Why |
 |---|---|---|
-| What leaves | Archetype vs archetype, result, on-play, rank tier | Your actual decklists |
-| Who it's about | You **and your opponent** | Only you |
-| Why a user says yes | To get community matchup data back | To show off / sync devices |
-| Reconstructable | Nothing personal | Your collection, partially |
+| Two opt-ins (matches / decks) | **One** — "Sync & community data" | Simpler to explain and to build |
+| `playedOn` day only | Exact `endedAt` timestamp | More useful; the fingerprinting concern was over-weighted |
+| `rankTier` ("Diamond") | Full rank ("Diamond 1") | Genuinely better data for climb analysis |
+| Bucketed match counts | Exact counts | Ditto |
+| Retention justified as privacy | Retention justified by **cost** | Honest about the real reason |
 
-Bundling them means a user who just wants a shareable profile page is also
-uploading their play history, and a user who wants to contribute to the crowd
-meta is also uploading their brews. Two checkboxes, two consent strings, two
-server-side delete paths.
+**Two things stay, and they are not about positioning:**
 
-**A second, non-obvious consequence:** a shared match is partly *about someone
-else*. `TrackedMatch.opponentName` is a real player's Arena handle. It must never
-leave the machine — not hashed, not salted, not "anonymised." The upload payload
-is built by an explicit allowlist, never by serialising `TrackedMatch`.
+1. **Never upload another player's identity.** `opponentName` and `opponentSeen`
+   do not leave the machine — not hashed, not "anonymised". An Arena handle
+   identifies a real person who consented to nothing, and UK/EU users bring GDPR
+   with them regardless of how the app is marketed. Infer the archetype locally,
+   upload the *label*. Cost: one line in an allowlist.
+2. **Build the payload from an explicit allowlist**, never by serialising
+   `TrackedMatch`. This is ordinary engineering hygiene — it means a new field
+   added to the tracker cannot silently start being uploaded.
+
+The app also stays **fully functional with no account**. That is an adoption
+requirement, not a privacy one: forcing sign-up on a passion-project tracker
+kills the funnel.
 
 ---
 
@@ -42,38 +48,36 @@ Derived from the real type in `src/types/tracker.ts`. **Allowlist, not blocklist
 
 ```ts
 interface SharedMatch {
-  clientHash: string;      // sha256(matchId + userId salt) — dedupe only, not reversible
-  playedOn: string;        // "2026-08-10" — DAY, not a timestamp
+  clientHash: string;      // sha256(matchId + user salt) — dedupe key, not reversible
+  startedAt: number;       // unix ms, exact
+  endedAt: number;
   format: "standard" | "pioneer";
   bestOf: 1 | 3;
   ranked: boolean;         // isLadderEvent(eventId)
-  rankTier: string | null; // "Diamond" — tier only, never "Diamond 1"
+  rank: string | null;     // "Diamond 1" — full rank
   seasonOrdinal: number | null;
   myArchetype: string;     // canonical slug, resolved locally
+  myDeckHash: string | null;     // groups a user's own matches by list
   oppArchetype: string | null;   // inferOpponentArchetype(), null when unconfident
   oppConfidence: number | null;  // so the server can weight or reject
   result: "win" | "loss" | "draw";
-  games: { onPlay: boolean | null; won: boolean }[];
+  games: { onPlay: boolean | null; won: boolean; mulligans: number | null }[];
 }
 ```
 
-**Explicitly never uploaded:** `opponentName`, `myPlayerName`, `matchId` (raw),
-`deckMain` / `deckSide`, `deckName`, `deckId`, `opponentSeen`, `startedAt` /
-`endedAt` (exact ms), `opponentPlatform`.
+Decklists (`deckMain` / `deckSide` / `deckName`) ride the same opt-in but go to
+the `decks` table, not onto every match row — that is a normalisation choice, not
+a privacy one.
 
-Three of those deserve their reasoning stated, because each is a tempting
-inclusion:
+**Not uploaded:** `opponentName`, `opponentSeen`, `opponentPlatform`,
+`myPlayerName`, raw `matchId`.
 
-- **`opponentSeen`** (raw grpIds the opponent revealed) would give far better
-  archetype inference server-side, and it is the single most valuable field for
-  the crowd meta. It still must not go: it is a detailed behavioural record of
-  another player who never consented. Infer locally, upload the *label*.
-- **Exact timestamps** are a fingerprint. Two users' match streams can be
-  correlated by timing alone — and if both uploaded, you could reconstruct who
-  played whom. Day granularity kills that.
-- **`rankTier` without the division.** "Diamond 1" plus a season plus a day is
-  close to uniquely identifying at the top of the ladder. Mythic is the sharp
-  case: bucket all of Mythic together, never a percentile or rank number.
+The first two are the ones that matter and the reasoning is worth keeping:
+`opponentSeen` (the raw grpIds an opponent revealed) would genuinely give better
+server-side archetype inference — it is the single most useful field the crowd
+meta could have — but it is a detailed behavioural record of a player who never
+opted in to anything. Infer locally, upload the label. `myPlayerName` and raw
+`matchId` are simply not needed for any query.
 
 ---
 
@@ -95,9 +99,9 @@ create table profiles (
   handle          citext unique not null,       -- /u/<handle>
   display_name    text,
   created_at      timestamptz not null default now(),
-  -- Two independent opt-ins. Both default FALSE. See §0.
-  share_matches   boolean not null default false,
-  share_decks     boolean not null default false,
+  -- One cloud opt-in (§0), default FALSE. Profile visibility is separate
+  -- because it is a publishing choice, not a data-sharing one.
+  cloud_enabled   boolean not null default false,
   profile_public  boolean not null default false,
   -- Anti-abuse (see §4)
   trust           smallint not null default 0
@@ -107,11 +111,13 @@ create table shared_matches (
   id              bigserial primary key,
   user_id         uuid not null references profiles on delete cascade,
   client_hash     text not null,
-  played_on       date not null,
+  started_at      timestamptz not null,
+  ended_at        timestamptz not null,
   format          text not null,
   best_of         smallint not null,
   ranked          boolean not null,
-  rank_tier       text,
+  rank            text,
+  my_deck_hash    text,
   season_ordinal  int,
   my_archetype    text references archetypes(slug),
   opp_archetype   text references archetypes(slug),
@@ -121,7 +127,7 @@ create table shared_matches (
   created_at      timestamptz not null default now(),
   unique (user_id, client_hash)          -- idempotent upload, safe to retry
 );
-create index on shared_matches (played_on, format, my_archetype, opp_archetype);
+create index on shared_matches (ended_at, format, my_archetype, opp_archetype);
 
 -- Aggregated nightly. This is what the app reads; raw rows are never queried live.
 create table matchup_rollup (
@@ -137,7 +143,7 @@ create table matchup_rollup (
   primary key (format, best_of, a_archetype, b_archetype, period)
 );
 
-create table decks (               -- share_decks opt-in only
+create table decks (               -- cloud_enabled only
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references profiles on delete cascade,
   name        text not null,
@@ -155,8 +161,9 @@ only**. `matchup_rollup` and `archetypes` are public read, service-role write.
 `profile_public`**, and full read/write for the owner.
 
 **Retention.** Raw `shared_matches` are dropped after 120 days; the rollups are
-permanent. This is both a privacy property worth advertising and the thing that
-keeps the database inside the free tier (see §5).
+permanent. The justification is **cost and unbounded growth** (§5), not privacy —
+revised 2026-08-10. Note this trades away a user's own long-term history, so
+revisit the window if per-user history turns out to matter more than the storage.
 
 ---
 
@@ -226,10 +233,10 @@ formats × 2 Bo) ≈ 15k rows, a few MB, permanent.
 1. Storage is **not** the near-term constraint it would be on free — there is
    headroom to roughly **5–8k active sharers** before it bites. Nothing here
    needs to be over-engineered for cost on day one.
-2. The 120-day retention window is therefore justified **primarily as a privacy
-   property** — "we delete raw matches after 120 days" is a claim worth making
-   and worth advertising — with cost control as the secondary benefit. It should
-   not be dropped just because Pro has room.
+2. The 120-day retention window is justified by **cost and unbounded growth**,
+   not privacy (revised 2026-08-10). With Pro's headroom it could be extended —
+   the question to ask is whether users want more than 120 days of their own
+   history, not whether shorter is "safer".
 3. **Read rollups only, never raw.** This is the rule that actually matters for
    cost, because egress scales with *readers*, not writers. 250 GB is generous,
    but a client that queries raw matches would burn it unpredictably.
@@ -303,7 +310,7 @@ Acquisition-visible first, per §2.3 — profiles before sync.
 | **0** | **Opt-in parser-health ping** (§7.1) | Early warning + true install counts |
 | 1 | Supabase project, schema, RLS, archetype seeding from the meta feed | Nothing user-visible |
 | 2 | Deep-link scheme + Google & Discord OAuth, verified in an **installed** build | Sign-in, nothing else |
-| 3 | Consent screen (§1.2 wording), two toggles, one-click delete | The trust surface |
+| 3 | Consent screen, one cloud toggle, one-click delete | The trust surface |
 | 4 | **Public profile pages** `/u/<handle>` — season climb, archetypes played | The viral loop |
 | 5 | Match upload (queue, retry, idempotent), nightly rollup job | Data starts accruing |
 | 6 | Crowd matchup UI in-app, gated on `games >= 30` | The payoff for opting in |
@@ -343,16 +350,15 @@ interface HealthPing {
   logFound: boolean;
   detailedLogs: boolean | null;
   parseErrors: number;         // TrackerStatus.parseErrors
-  matchesLast24h: "0" | "1-5" | "6-20" | "21+";   // bucketed, never exact
+  matchesLast24h: number;      // exact — revised 2026-08-10
 }
 ```
 
-`matchesLast24h` is **bucketed on purpose.** The health signal needed is
-"is this install still recording anything?" — a population where that goes to
-`0` overnight is a broken parser. An exact count would be a personal record of
-how much someone plays, which is not needed to answer the question.
+`matchesLast24h` was bucketed in the first draft on privacy grounds; with §1.2
+downgraded it is an exact count, which makes "did recording stop across the
+population overnight?" a sharper signal.
 
-Nothing else is sent. No decks, matches, ranks, opponents, Arena username, file
+Nothing else is sent. No decks, match detail, opponents, Arena username, file
 paths, or IP-derived location.
 
 #### Transport
@@ -376,7 +382,7 @@ create table health_pings (
   log_found        boolean,
   detailed_logs    boolean,
   parse_errors     int  not null default 0,
-  matches_bucket   text,
+  matches_last_24h int,
   updated_at       timestamptz not null default now(),
   primary key (install_id, day)
 );
@@ -389,7 +395,8 @@ Volume is trivial: one row/install/day. 10,000 daily actives for a year is
 #### Client behaviour
 
 - **Default OFF.** Explicit opt-in in Settings → Data & privacy, with the field
-  list shown in plain language, not a link to a policy.
+  list shown in plain language rather than a link to a policy — cheap to do, and
+  it is the kind of thing a streamer audience will screenshot approvingly.
 - Fires **at most once per day**, on launch, after a short delay so it never
   competes with boot.
 - Fails silently and never retries aggressively — this must never affect app
@@ -400,24 +407,32 @@ Volume is trivial: one row/install/day. 10,000 daily actives for a year is
   fresh id — a discontinuity in the counts is the correct trade for honouring
   §1.2 rule 4.
 
-#### The honest tradeoff, stated plainly
+#### The honest tradeoff
 
-`installId` is a persistent identifier for a machine. This is **pseudonymous,
-not anonymous** — it makes "this install has been active 60 days" knowable. That
-is a real, if small, step away from "nothing leaves your PC", which is exactly
-why it is opt-in, off by default, and why the consent copy names every field.
-Given privacy is the differentiator, the ping's own privacy story has to be
-airtight or it undermines the thing it is protecting.
+`installId` is a persistent identifier for a machine — **pseudonymous, not
+anonymous**. It makes "this install has been active 60 days" knowable. That is
+the whole point (it is how unique installs get counted at all), and with §1.2
+downgraded it needs no special defence beyond being opt-in and saying plainly
+what it sends.
+
+One judgement call worth flagging: **default off** is kept even though a default-on
+ping would give far better coverage. Reason is practical rather than
+philosophical — the README currently promises nothing is uploaded, and flipping
+that to on-by-default in an update is the kind of thing that produces a bad
+thread. Ship it off, explain it, and revisit if uptake is too low to be useful.
 
 ---
 
 ## 8. What must change outside the code
 
-- **README.** §1.2 rule 5: *"Local by default. Nothing leaves your PC unless you
-  turn it on."* Rewritten precisely, not quietly dropped. This is the promise the
-  whole privacy position rests on.
-- **A privacy page on the site**, naming the exact field list from §1 — the
-  allowlist is short enough to publish in full, which is itself the argument.
-- **§2.6 legal items are still open** and gate *taking money*, not this phase.
-  Nothing here charges anyone, so Phase 2 is not blocked — but Phase 4 is, and
-  the WotC Fan Content / Scryfall terms check has not been done yet.
+- **README**, at the moment the first upload ships — not before. It currently
+  says *"entirely on your PC. Nothing is uploaded anywhere,"* which is **true
+  today** and should stay until slice 0 lands. Then: *"Local by default. Nothing
+  leaves your PC unless you turn it on."* Mention it in the release notes too;
+  existing users installed on the old promise.
+- **A short privacy page on the site** listing the field allowlist verbatim. The
+  list is short enough to publish in full, which makes it self-evidently honest
+  at roughly zero cost.
+- **§2.6 legal items** (WotC Fan Content Policy, Scryfall commercial terms) gate
+  *taking money*, and Phase 4 is deferred indefinitely — so nothing here is
+  blocked. They must be done before Phase 4 is ever revived.

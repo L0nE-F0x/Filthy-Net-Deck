@@ -63,4 +63,19 @@ Nothing is uploaded anywhere.
 
 ## License / IP
 
-Fan project. Card images via Scryfall.
+**Code is [MIT](LICENSE).** Fork it, learn from it, build on it.
+
+Three things the licence does *not* cover, because they are not the project's to
+give away:
+
+- **The name and branding.** "Filthy Net Deck", the logo, `app-icon.png`, and the
+  OG/marketing art are not part of the MIT grant. A fork is welcome — just ship
+  it under your own name so users can tell the two apart. (Trademark is separate
+  from copyright; MIT licenses the code, never the brand.)
+- **The meta data.** Everything under `meta/` is derived from third parties
+  (MTGGoldfish, MTGO, magic.gg, Melee, Untapped) and is republished under their
+  terms, not relicensable here.
+- **Card names, text and images** come from **Scryfall**, subject to Scryfall's
+  API terms. Card art and card design remain © Wizards of the Coast.
+
+Fan project. Not affiliated with Wizards of the Coast.
