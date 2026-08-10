@@ -160,6 +160,18 @@ only**. `matchup_rollup` and `archetypes` are public read, service-role write.
 `profiles` is public read of `(handle, display_name)` **only when
 `profile_public`**, and full read/write for the owner.
 
+> ⚠️ **Grants are not automatic on this project.** "Automatically expose new
+> tables" is deliberately OFF, so every new table starts with **no** privileges
+> for the Data API roles — `service_role` included. Each migration must say
+> `grant … to service_role;` explicitly. Symptom when forgotten: an Edge
+> Function write fails with Postgres `42501` even though its key is correct,
+> which looks like a database fault rather than a config one (hit 2026-08-10 on
+> `health_pings`).
+>
+> Also note **RLS is row-level, not column-level** — a `select` policy exposes
+> the whole row. To publish only `(handle, display_name)` from `profiles`, use a
+> view over a locked-down base table, not a policy.
+
 **Retention.** Raw `shared_matches` are dropped after 120 days; the rollups are
 permanent. The justification is **cost and unbounded growth** (§5), not privacy —
 revised 2026-08-10. Note this trades away a user's own long-term history, so

@@ -28,6 +28,14 @@ create index if not exists health_pings_day_errors_idx
   on public.health_pings (day) where parse_errors > 0;
 
 alter table public.health_pings enable row level security;
+
+-- Grants must be explicit on this project: "Automatically expose new tables" is
+-- OFF, so a new table starts with NO privileges for the Data API roles —
+-- including `service_role`, which the Edge Function uses. Without this the
+-- function's write fails with 42501 (insufficient_privilege) even though its
+-- key is correct, which reads like a database fault rather than a config one.
+-- Every future table needs the same two lines.
+grant all on public.health_pings to service_role;
 revoke all on public.health_pings from anon, authenticated;
 
 comment on table public.health_pings is

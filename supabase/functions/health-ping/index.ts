@@ -92,19 +92,44 @@ Deno.serve(async (req) => {
     updated_at: new Date().toISOString(),
   };
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    { auth: { persistSession: false } },
-  );
+  // Privileged key. Supabase's newer projects use the `sb_secret_…` key system
+  // and inject it under a different name than the legacy service-role key, so
+  // accept either. Getting this wrong is silent: `createClient` with an
+  // undefined key still builds, then every write lands as `anon` and RLS
+  // (correctly) refuses it — which looks like a database fault, not a config one.
+  const url = Deno.env.get("SUPABASE_URL");
+  const secret =
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ??
+    Deno.env.get("SUPABASE_SECRET_KEY") ??
+    Deno.env.get("SERVICE_ROLE_KEY");
+
+  if (!url || !secret) {
+    console.error(
+      "health-ping: no privileged key in env. Checked " +
+        "SUPABASE_SERVICE_ROLE_KEY, SUPABASE_SECRET_KEY, SERVICE_ROLE_KEY.",
+    );
+    return new Response(
+      JSON.stringify({ ok: false, stage: "config", haveUrl: Boolean(url) }),
+      { status: 500, headers: { ...CORS, "content-type": "application/json" } },
+    );
+  }
+
+  const supabase = createClient(url, secret, {
+    auth: { persistSession: false },
+  });
 
   const { error } = await supabase
     .from("health_pings")
     .upsert(row, { onConflict: "install_id,day" });
 
   if (error) {
-    console.error("health-ping upsert failed", error.message);
-    return new Response("write failed", { status: 500, headers: CORS });
+    // Log the full error server-side; return only the Postgres error code.
+    // The endpoint is public, so the message itself stays out of the response.
+    console.error("health-ping upsert failed", error.code, error.message);
+    return new Response(
+      JSON.stringify({ ok: false, stage: "upsert", code: error.code ?? null }),
+      { status: 500, headers: { ...CORS, "content-type": "application/json" } },
+    );
   }
   return new Response(JSON.stringify({ ok: true }), {
     headers: { ...CORS, "content-type": "application/json" },
