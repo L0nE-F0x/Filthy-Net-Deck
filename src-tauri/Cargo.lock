@@ -1098,6 +1098,7 @@ dependencies = [
 name = "filthy-net-deck"
 version = "2.7.4"
 dependencies = [
+ "getrandom 0.3.4",
  "serde",
  "serde_json",
  "sysinfo",

@@ -1,4 +1,5 @@
 mod arena;
+mod install_id;
 mod overlay;
 mod presence;
 mod toast;
@@ -161,7 +162,10 @@ pub fn run() {
             presence::presence_open_main,
             arena::arena_is_running,
             main_window_set_fullscreen,
-            main_window_hide_to_tray
+            main_window_hide_to_tray,
+            install_id::install_id_get,
+            install_id::install_id_ensure,
+            install_id::install_id_clear
         ])
         .setup(|app| {
             // Baseline for `refuse_if_main_thread` — setup runs on the event loop.

@@ -183,6 +183,25 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Opt-in health ping, at most once a day. Waits for boot so the tracker
+  // status it reports is real, and is deliberately fire-and-forget — a backend
+  // outage must never be visible in the app. See docs/BACKEND-PHASE-2.md §7.1.
+  useEffect(() => {
+    if (!bootDone) return;
+    const t = window.setTimeout(() => {
+      const s = useAppStore.getState();
+      if (!s.prefs.healthPing) return;
+      void import("./services/cloud/healthPing").then((m) =>
+        m.maybeSendHealthPing({
+          enabled: true,
+          status: s.trackerStatus,
+          matches: s.trackerMatches,
+        }),
+      );
+    }, 8000);
+    return () => window.clearTimeout(t);
+  }, [bootDone]);
+
   // Tracker recovery: while the window is hidden in the tray, WebView can miss
   // live `tracker:match` events even though Rust is still writing matches to
   // disk. Re-pull from Rust whenever we become visible/focused, and poll lightly.

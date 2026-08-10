@@ -1,0 +1,112 @@
+/**
+ * health-ping — Phase 2 slice 0.
+ * Design: docs/BACKEND-PHASE-2.md §7.1
+ *
+ * The client never touches the database directly: it POSTs here and this
+ * function writes with the service-role key. That keeps every privileged
+ * credential server-side and lets the schema change without shipping an app
+ * update.
+ *
+ * Deploy:  supabase functions deploy health-ping
+ * Secrets: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are injected by the
+ *          platform — do not add them by hand, and never put them in the repo.
+ */
+
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-headers": "authorization, content-type",
+  "access-control-allow-methods": "POST, OPTIONS",
+};
+
+/** Very cheap in-memory IP throttle. Instances are recycled, so this is a speed
+ *  bump against a trivial flood, not a security control — the real cap is the
+ *  (install_id, day) primary key, which makes repeat writes idempotent. */
+const seen = new Map<string, number>();
+const MAX_PER_MINUTE = 30;
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const minute = Math.floor(now / 60_000);
+  const key = `${ip}:${minute}`;
+  const n = (seen.get(key) ?? 0) + 1;
+  seen.set(key, n);
+  if (seen.size > 5_000) seen.clear(); // bound memory
+  return n > MAX_PER_MINUTE;
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function clampInt(v: unknown, lo: number, hi: number): number | null {
+  const n = typeof v === "number" && Number.isFinite(v) ? Math.trunc(v) : null;
+  if (n === null) return null;
+  return Math.min(hi, Math.max(lo, n));
+}
+
+function shortStr(v: unknown, max: number): string | null {
+  return typeof v === "string" && v.length > 0 ? v.slice(0, max) : null;
+}
+
+function boolOrNull(v: unknown): boolean | null {
+  return typeof v === "boolean" ? v : null;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") {
+    return new Response("method not allowed", { status: 405, headers: CORS });
+  }
+
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (rateLimited(ip)) {
+    return new Response("slow down", { status: 429, headers: CORS });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response("bad json", { status: 400, headers: CORS });
+  }
+
+  const installId = shortStr(body.installId, 36);
+  if (!installId || !UUID_RE.test(installId)) {
+    return new Response("bad installId", { status: 400, headers: CORS });
+  }
+
+  // Allowlist + clamp. Anything not named here is dropped on the floor, so a
+  // future client that sends extra fields cannot silently start storing them.
+  const row = {
+    install_id: installId,
+    day: new Date().toISOString().slice(0, 10), // server-side date; clients lie
+    app_version: shortStr(body.appVersion, 20) ?? "unknown",
+    parser_version: shortStr(body.parserVersion, 20),
+    os: shortStr(body.os, 16),
+    log_found: boolOrNull(body.logFound),
+    detailed_logs: boolOrNull(body.detailedLogs),
+    parse_errors: clampInt(body.parseErrors, 0, 1_000_000) ?? 0,
+    matches_last_24h: clampInt(body.matchesLast24h, 0, 1_000),
+    updated_at: new Date().toISOString(),
+  };
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    { auth: { persistSession: false } },
+  );
+
+  const { error } = await supabase
+    .from("health_pings")
+    .upsert(row, { onConflict: "install_id,day" });
+
+  if (error) {
+    console.error("health-ping upsert failed", error.message);
+    return new Response("write failed", { status: 500, headers: CORS });
+  }
+  return new Response(JSON.stringify({ ok: true }), {
+    headers: { ...CORS, "content-type": "application/json" },
+  });
+});

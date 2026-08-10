@@ -131,6 +131,7 @@ export const Settings = memo(function Settings() {
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
   const setNotifyBanlist = useAppStore((s) => s.setNotifyBanlist);
   const setNotifyMetaMovers = useAppStore((s) => s.setNotifyMetaMovers);
+  const setHealthPing = useAppStore((s) => s.setHealthPing);
   const setOverlayEnabled = useAppStore((s) => s.setOverlayEnabled);
   const setPresenceEnabled = useAppStore((s) => s.setPresenceEnabled);
   const setOverlayOpacity = useAppStore((s) => s.setOverlayOpacity);
@@ -627,6 +628,49 @@ export const Settings = memo(function Settings() {
               )}
             </div>
           )}
+        </section>
+
+        {/* —— Data & privacy —— */}
+        <section className="panel settings-card settings-card-span2">
+          <h3 className="settings-card-title">Data &amp; privacy</h3>
+          <p className="settings-card-desc">
+            Your matches, decks and stats live on this PC and are not uploaded.
+            The one optional exception is below — it is off unless you turn it on.
+          </p>
+          <div className="settings-toggle-list">
+            <label className="settings-toggle-row">
+              <input
+                type="checkbox"
+                checked={prefs.healthPing}
+                onChange={(e) => setHealthPing(e.target.checked)}
+              />
+              <span>
+                <strong>Help spot broken tracking</strong>
+                <em>
+                  Sends a once-a-day status check so an Arena update that breaks
+                  match tracking gets noticed and fixed fast
+                </em>
+              </span>
+            </label>
+          </div>
+          <div className="settings-note mt-2">
+            <p className="m-0 mb-1 text-xs text-muted">
+              <strong className="text-foam">Exactly what it sends</strong>, once a day —
+              nothing else, ever:
+            </p>
+            <ul className="text-xs text-muted m-0 pl-4 leading-relaxed">
+              <li>a random ID for this install (not your name or account)</li>
+              <li>app version, and which log-parser version it uses</li>
+              <li>Windows or macOS</li>
+              <li>whether the Arena log was found, and how many lines failed to parse</li>
+              <li>how many matches were recorded in the last 24 hours</li>
+            </ul>
+            <p className="m-0 mt-2 text-xs text-muted">
+              It never sends your decks, your match results, your rank, your
+              opponents, your Arena name, or any file paths. Turning this off
+              deletes the random ID, so switching it back on starts fresh.
+            </p>
+          </div>
         </section>
 
         {/* —— Plumbing last: health, shortcuts, updates, about —— */}

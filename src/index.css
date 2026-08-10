@@ -4125,6 +4125,16 @@ html[data-theme="light"] .live-set-icon {
   line-height: 1.45;
   color: var(--color-muted);
 }
+/* Inset "here is exactly what this sends" block under a consent toggle. */
+.settings-note {
+  border-left: 2px solid color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  background: color-mix(in srgb, var(--color-foam) 3%, transparent);
+  border-radius: 0 0.4rem 0.4rem 0;
+  padding: 0.55rem 0.7rem;
+}
+.settings-note ul {
+  list-style: disc;
+}
 .settings-check {
   display: flex;
   align-items: center;

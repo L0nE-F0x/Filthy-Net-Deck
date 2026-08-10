@@ -104,6 +104,13 @@ interface Prefs {
   notifyBanlist: boolean;
   /** Tray ping when daily meta board moves (rose / new on board). */
   notifyMetaMovers: boolean;
+  /**
+   * Opt-in parser-health ping (default **OFF**). Sends a random install id,
+   * app/parser version, OS, and whether log parsing is failing — once a day,
+   * nothing else. It is the only way to see an Arena update break the parser
+   * before users do. See `docs/BACKEND-PHASE-2.md` §7.1.
+   */
+  healthPing: boolean;
   /** Always-on-top match HUD during Arena games (default on). */
   overlayEnabled: boolean;
   /**
@@ -163,6 +170,7 @@ function loadPrefs(): Prefs {
         notifyTopmost?: boolean;
         notifyBanlist?: boolean;
         notifyMetaMovers?: boolean;
+        healthPing?: boolean;
         overlayEnabled?: boolean;
         presenceEnabled?: boolean;
         overlayOpacity?: number;
@@ -192,6 +200,8 @@ function loadPrefs(): Prefs {
         notifyTopmost: parsed.notifyTopmost !== false,
         notifyBanlist: parsed.notifyBanlist !== false,
         notifyMetaMovers: parsed.notifyMetaMovers !== false,
+        // Opt-in: only true when explicitly turned on (=== true, not !== false).
+        healthPing: parsed.healthPing === true,
         overlayEnabled: parsed.overlayEnabled !== false,
         presenceEnabled: parsed.presenceEnabled !== false,
         overlayOpacity: normalizeOpacity(parsed.overlayOpacity),
@@ -233,6 +243,7 @@ function loadPrefs(): Prefs {
     notifyTopmost: true,
     notifyBanlist: true,
     notifyMetaMovers: true,
+    healthPing: false,
     overlayEnabled: true,
     presenceEnabled: true,
     overlayOpacity: 0.92,
@@ -386,6 +397,11 @@ interface AppState {
   setNotifyTopmost: (v: boolean) => void;
   setNotifyBanlist: (v: boolean) => void;
   setNotifyMetaMovers: (v: boolean) => void;
+  /**
+   * Opt in/out of the parser-health ping. Turning it OFF deletes the local
+   * install id, so re-enabling mints a fresh one rather than resuming.
+   */
+  setHealthPing: (v: boolean) => void;
   setOverlayEnabled: (v: boolean) => void;
   setPresenceEnabled: (v: boolean) => void;
   /** Overlay panel opacity (0.55–1) — read live by the overlay window. */
@@ -673,6 +689,25 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = { ...get().prefs, notifyMetaMovers };
       savePrefs(next);
       set({ prefs: next });
+    },
+    setHealthPing: (healthPing) => {
+      const next = { ...get().prefs, healthPing };
+      savePrefs(next);
+      set({ prefs: next });
+      if (healthPing) {
+        // Send immediately so the toggle visibly does something, rather than
+        // waiting for the next launch.
+        void import("../services/cloud/healthPing").then((m) =>
+          m.maybeSendHealthPing({
+            enabled: true,
+            status: get().trackerStatus,
+            matches: get().trackerMatches,
+          }),
+        );
+      } else {
+        // Opting out is a reset, not a pause: drop the install id entirely.
+        void import("../services/cloud/healthPing").then((m) => m.forgetInstall());
+      }
     },
     setOverlayEnabled: (overlayEnabled) => {
       const next = { ...get().prefs, overlayEnabled };
