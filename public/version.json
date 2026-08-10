@@ -1,5 +1,5 @@
 {
-  "version": "2.7.4",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.4.exe",
-  "notes": "v2.7.4: Fixes a freeze that could hit when MTG Arena launched or when you toggled the corner badge, plus a big responsiveness pass \u2014 instant page switching and a search palette that opens straight away."
+  "version": "2.7.5",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.5.exe",
+  "notes": "v2.7.5: New in Settings \u2192 Data & privacy \u2014 you can opt in to a once-a-day status check that helps spot when an Arena update breaks match tracking, so it gets fixed fast. It's off unless you turn it on, and Settings lists exactly what it sends."
 }

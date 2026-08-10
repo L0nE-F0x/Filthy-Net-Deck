@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "filthy-net-deck"
-version = "2.7.4"
+version = "2.7.5"
 dependencies = [
  "getrandom 0.3.4",
  "serde",

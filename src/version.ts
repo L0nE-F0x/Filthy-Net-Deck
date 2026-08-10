@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.7.4";
+export const APP_VERSION = "2.7.5";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Fixed a freeze when Arena launched or you toggled the corner badge",
-  "Instant page switching again — no more loading flash between pages",
-  "⌘K search opens immediately instead of re-scanning every deck",
+  "New in Settings → Data & privacy: opt in to help spot broken tracking",
+  "It sends a once-a-day status check so an Arena update that breaks match tracking gets caught fast",
+  "Off unless you turn it on — Settings lists exactly what it sends",
 ];

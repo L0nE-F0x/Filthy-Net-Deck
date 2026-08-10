@@ -12,6 +12,13 @@
  * offline/no-backend path trivially testable.
  */
 
+/**
+ * ⚠️ This origin must also appear in `connect-src` in
+ * `src-tauri/tauri.conf.json`. The Vite dev server does not enforce that CSP,
+ * so a missing entry works perfectly in `tauri:dev` and is blocked for every
+ * real user — caught just before shipping 2.7.5. Any new cloud host needs the
+ * same treatment, and the check only means something in an installed build.
+ */
 export const SUPABASE_URL = "https://bzcryoocsapqtyhiwzbe.supabase.co";
 export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_tHajCDbl4J4AIvaoWnEpWg_XiQPkESE";
 
