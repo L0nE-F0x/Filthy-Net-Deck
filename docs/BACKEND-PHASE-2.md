@@ -300,6 +300,7 @@ Acquisition-visible first, per §2.3 — profiles before sync.
 
 | # | Slice | Ships |
 |---|---|---|
+| **0** | **Opt-in parser-health ping** (§7.1) | Early warning + true install counts |
 | 1 | Supabase project, schema, RLS, archetype seeding from the meta feed | Nothing user-visible |
 | 2 | Deep-link scheme + Google & Discord OAuth, verified in an **installed** build | Sign-in, nothing else |
 | 3 | Consent screen (§1.2 wording), two toggles, one-click delete | The trust surface |
@@ -308,10 +309,105 @@ Acquisition-visible first, per §2.3 — profiles before sync.
 | 6 | Crowd matchup UI in-app, gated on `games >= 30` | The payoff for opting in |
 | 7 | Cloud deck sync | The quiet one |
 
-**Slices 1–4 are shippable without a single match ever being uploaded.** That
+**Slices 0–4 are shippable without a single match ever being uploaded.** That
 ordering means the privacy-sensitive part (5) ships only after the trust surface
 (3) and the acquisition win (4) are already live — and if reach still hasn't
 moved by then, you can stop after 4 having lost nothing.
+
+Slice 0 has no dependency on the rest and can ship in the next release.
+
+---
+
+### 7.1 Slice 0 — the parser-health ping
+
+Closes the last ⬜ in `PLATFORM-STRATEGY.md` Phase 0. Two jobs, in priority
+order:
+
+1. **Detect a broken parser within hours instead of via a bad review.** §2.7
+   calls Arena patch risk *existential*: the log format is unofficial and can
+   change without notice, and when it does, tracking silently dies for everyone
+   at once. A population-level spike in parse errors is the only early signal
+   that exists.
+2. **Count true unique installs.** `/updater/latest.json` hits cannot distinguish
+   325 people once from 15 people twenty times, and counting IPs would be both
+   unreliable and *more* invasive than this.
+
+#### Payload
+
+```ts
+interface HealthPing {
+  installId: string;      // random UUID, generated once on opt-in
+  appVersion: string;     // "2.7.4"
+  parserVersion: string;  // bumped when tracker.rs parsing changes
+  os: string;             // "windows" | "macos" — not the build number
+  logFound: boolean;
+  detailedLogs: boolean | null;
+  parseErrors: number;         // TrackerStatus.parseErrors
+  matchesLast24h: "0" | "1-5" | "6-20" | "21+";   // bucketed, never exact
+}
+```
+
+`matchesLast24h` is **bucketed on purpose.** The health signal needed is
+"is this install still recording anything?" — a population where that goes to
+`0` overnight is a broken parser. An exact count would be a personal record of
+how much someone plays, which is not needed to answer the question.
+
+Nothing else is sent. No decks, matches, ranks, opponents, Arena username, file
+paths, or IP-derived location.
+
+#### Transport
+
+A Supabase **Edge Function**, not a direct table write:
+
+- Client never holds a database credential, and the schema can change without
+  shipping an app update.
+- Rate-limit by IP at the edge; the client is in a public repo, so a shared
+  secret would be theatre.
+- Upsert on `(install_id, day)` — **at most one row per install per day.** That
+  caps volume by construction, makes retries free, and yields DAU directly.
+
+```sql
+create table health_pings (
+  install_id       uuid not null,
+  day              date not null,
+  app_version      text not null,
+  parser_version   text,
+  os               text,
+  log_found        boolean,
+  detailed_logs    boolean,
+  parse_errors     int  not null default 0,
+  matches_bucket   text,
+  updated_at       timestamptz not null default now(),
+  primary key (install_id, day)
+);
+create index on health_pings (day, app_version);
+```
+
+Volume is trivial: one row/install/day. 10,000 daily actives for a year is
+~3.6M rows of ~80 B — well inside Pro. Retain 180 days.
+
+#### Client behaviour
+
+- **Default OFF.** Explicit opt-in in Settings → Data & privacy, with the field
+  list shown in plain language, not a link to a policy.
+- Fires **at most once per day**, on launch, after a short delay so it never
+  competes with boot.
+- Fails silently and never retries aggressively — this must never affect app
+  behaviour or startup time.
+- `installId` lives in the Rust app-data dir (alongside `presence-enabled`), not
+  `localStorage`, so it survives a webview storage clear.
+- **Opt-out deletes the server rows and the local id.** Re-opting-in generates a
+  fresh id — a discontinuity in the counts is the correct trade for honouring
+  §1.2 rule 4.
+
+#### The honest tradeoff, stated plainly
+
+`installId` is a persistent identifier for a machine. This is **pseudonymous,
+not anonymous** — it makes "this install has been active 60 days" knowable. That
+is a real, if small, step away from "nothing leaves your PC", which is exactly
+why it is opt-in, off by default, and why the consent copy names every field.
+Given privacy is the differentiator, the ping's own privacy story has to be
+airtight or it undermines the thing it is protecting.
 
 ---
 

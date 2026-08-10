@@ -248,7 +248,7 @@ Compete asymmetrically. Win on: native desktop performance, no ads, no bloat, pr
 - ✅ **Ko-fi tip jar** — site + Settings → About (Ko-fi pays through to PayPal; PayPal.Me is not offered to Indonesian personal accounts). Single `DONATE_URL` constant in `src/services/site.ts`; empty string hides it everywhere. Gates nothing.
 - ❌ **Discord server** — *cut by owner 2026-07-30.*
 - ❌ **Email capture** — *cut by owner 2026-07-30.*
-- ⬜ **Opt-in parser-health ping** — now the only way to get true unique-install counts, since no passive endpoint distinguishes machines. Ship with a release.
+- ⬜ **Opt-in parser-health ping** — now the only way to get true unique-install counts, since no passive endpoint distinguishes machines. **Moved into Phase 2 as slice 0** (owner, 2026-08-10) so it can share the Supabase project rather than needing its own endpoint. Full design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md) §7.1. It has no dependency on the rest of Phase 2 and can ship in the next release.
 
 **Revised install estimate:** the measured data puts the base in the **low hundreds**, below the 200–350 guessed in §0 from visitor numbers. That *strengthens* the §0 conclusion rather than changing it — with daily actives in the teens, reach is unambiguously the binding constraint, and Phase 1 matters more than anything on the backend.
 
