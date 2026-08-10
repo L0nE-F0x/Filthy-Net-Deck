@@ -184,6 +184,9 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
     if app.get_webview_window(OVERLAY_LABEL).is_some() {
         return Ok(());
     }
+    if crate::refuse_if_main_thread("overlay::ensure_window") {
+        return Err("refused: webview build on the main thread".into());
+    }
     let geo = load_geometry(app);
     // Monitor layout changed since the save → keep the size, drop the position.
     let pos_ok = geo.as_ref().is_some_and(|g| {

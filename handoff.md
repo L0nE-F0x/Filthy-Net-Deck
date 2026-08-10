@@ -6,10 +6,11 @@
 **Live product version: v2.7.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **`main`**.
 
 **Session (2026-08-10, Claude):** regression audit of the v2.7.0–v2.7.3
-weekend work — see **`docs/AUDIT-2026-08-10-v2.7.3.md`**. Nine issues found and
-fixed, two of them P0 Windows deadlocks (one of which reintroduced a bug this
-repo had already documented). **Source-only so far — not released.** Needs a
-`tauri:dev` pass with Arena launching/quitting before a version bump.
+weekend work — see **`docs/AUDIT-2026-08-10-v2.7.3.md`**. Ten issues found and
+fixed; the P0 was a Windows event-loop deadlock with **four** entry points
+(including any sync `#[tauri::command]`), now guarded in code by
+`refuse_if_main_thread`. **All paths verified live in `tauri:dev` by the owner.**
+Source-only — **not released**, needs a version bump + release train.
 
 **Session wrap (2026-08-09, Grok):** **v2.7.2 fully shipped** — desktop
 performance pass (splash re-render loop, nav prefetch / no remount, tracker
@@ -110,14 +111,22 @@ Full `AGENTS.md` checklist for **2.7.2**:
   leaks — but they must not outlive their need.
 - **Never prewarm toast at boot** again for “first-toast latency” without
   measuring RAM cost.
-- ⚠️ Creating WebView windows **inside** `run_on_main_thread` on Windows
-  **deadlocks the event loop** (see toast.rs comments). Create off that hop;
-  show/destroy on main when required. **This has now been reintroduced twice** —
-  in `toast.rs` (2026-07-22) and in `arena.rs` (2026-08-09, found in the
-  2026-08-10 audit). Anything that reaches `ensure_window` counts, including
-  `presence::show`, `overlay::show` / `prewarm_if_enabled`, and
-  `toast::show_toast`. That last one also fires from `notify_tray_hint_once`,
-  which runs on the event loop — so it must be raised off-thread.
+- ⚠️ **Never build a WebView window on the event-loop thread** on Windows — it
+  deadlocks: the window is created, `build()` never returns, and every later
+  main-thread task is wedged (tray Quit included). Reintroduced **four times**
+  from four directions: `toast.rs` (2026-07-22), then `arena.rs`,
+  `presence_set_enabled` and `toast_show` (2026-08-09, all found 2026-08-10).
+  You reach the event loop from **three non-obvious places**:
+  1. inside a `run_on_main_thread` closure;
+  2. an `on_window_event` handler (this is how `notify_tray_hint_once` got there);
+  3. **any synchronous `#[tauri::command]`** — Tauri 2 runs those on the main
+     thread. This is the one that keeps catching people.
+
+  There is now a guard: `refuse_if_main_thread()` in `lib.rs`, called at the top
+  of every `ensure_window`. It refuses and names the offender instead of hanging,
+  and `debug_assert!`s so `tauri:dev` fails loudly. **Call it from any new
+  webview builder.** Create on a worker thread (Tauri hops internally); only
+  show/destroy on main.
 
 ### Sets feed (still true from v2.7.1)
 
@@ -149,7 +158,7 @@ Full `AGENTS.md` checklist for **2.7.2**:
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| **Next** | Verify the two P0 Rust fixes in `tauri:dev` | Launch/quit Arena; first close-to-tray with no `tray-hint-shown` marker. Then cut **v2.7.4** |
+| **Next** | Cut **v2.7.4** | P0 fixes are verified live; just needs the AGENTS.md release train |
 | **Next** | Backend / crowd-meta (`docs/PLATFORM-STRATEGY.md` §1.1) | The plan the owner wants to resume |
 | Measurement | Search Console (checkpoint ~2026-08-24) | Two weeks from the 08-10 check; one week elapsed so far |
 | Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still site CDN + local archive |

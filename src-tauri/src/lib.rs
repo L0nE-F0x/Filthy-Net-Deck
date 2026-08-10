@@ -17,6 +17,40 @@ use tauri::{
 /// (Task Manager was the only way out).
 static QUITTING: AtomicBool = AtomicBool::new(false);
 
+/// Thread that owns the event loop, captured in `setup()`.
+static MAIN_THREAD: std::sync::OnceLock<std::thread::ThreadId> = std::sync::OnceLock::new();
+
+/// Guard against this crate's most expensive recurring bug.
+///
+/// `WebviewWindowBuilder::build()` **must not** run on the event-loop thread on
+/// Windows: the window is created but `build()` never returns, wedging every
+/// later main-thread task — tray Quit included. It has now been reintroduced
+/// four times (toast.rs 2026-07-22; arena.rs, `presence_set_enabled` and
+/// `toast_show` 2026-08-09), each time from a different direction, because
+/// "am I on the main thread?" is invisible at the call site — synchronous
+/// `#[tauri::command]`s and `on_window_event` handlers both run there.
+///
+/// Call this at the top of any function that builds a webview. It refuses the
+/// build rather than hanging the app, and panics in debug so it is caught in
+/// `tauri:dev` rather than in a user's release build.
+#[must_use]
+pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
+    let Some(main) = MAIN_THREAD.get() else {
+        return false; // setup() hasn't run — nothing is built this early.
+    };
+    if *main != std::thread::current().id() {
+        return false;
+    }
+    let msg = format!(
+        "[fnd] REFUSED: {who} tried to build a webview on the main thread — \
+         that deadlocks the Windows event loop. Do the create on a worker \
+         thread (Tauri hops internally); keep only show/destroy on main."
+    );
+    eprintln!("{msg}");
+    debug_assert!(false, "{}", msg);
+    true
+}
+
 fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -130,6 +164,8 @@ pub fn run() {
             main_window_hide_to_tray
         ])
         .setup(|app| {
+            // Baseline for `refuse_if_main_thread` — setup runs on the event loop.
+            let _ = MAIN_THREAD.set(std::thread::current().id());
             #[cfg(desktop)]
             {
                 app.handle()

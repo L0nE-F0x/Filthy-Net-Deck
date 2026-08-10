@@ -96,6 +96,9 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     if app.get_webview_window(TOAST_LABEL).is_some() {
         return Ok(());
     }
+    if crate::refuse_if_main_thread("toast::ensure_window") {
+        return Err("refused: webview build on the main thread".into());
+    }
     let url = WebviewUrl::App("index.html#/toast".into());
     let builder = WebviewWindowBuilder::new(app, TOAST_LABEL, url)
         .title("Filthy Net Deck — Alert")
@@ -204,7 +207,11 @@ pub fn toast_set_enabled(app: AppHandle, enabled: bool) {
 /// they clear fullscreen the same way match-end does.
 #[tauri::command]
 pub fn toast_show(app: AppHandle, title: String, body: String) {
-    show_toast(&app, &title, &body);
+    // Off the main thread: a synchronous `#[tauri::command]` runs on it, and
+    // `show_toast` has to build the toast webview when one is not already up
+    // (it is no longer prewarmed at boot). Building on the event loop
+    // deadlocks it on Windows — see the comment in `show_toast`.
+    std::thread::spawn(move || show_toast(&app, &title, &body));
 }
 
 /// The alert still inside its linger window, with the remaining time. The

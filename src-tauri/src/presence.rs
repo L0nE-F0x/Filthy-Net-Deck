@@ -71,6 +71,9 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     if app.get_webview_window(PRESENCE_LABEL).is_some() {
         return Ok(());
     }
+    if crate::refuse_if_main_thread("presence::ensure_window") {
+        return Err("refused: webview build on the main thread".into());
+    }
     let url = WebviewUrl::App("index.html#/presence".into());
     let builder = WebviewWindowBuilder::new(app, PRESENCE_LABEL, url)
         .title("Filthy Net Deck — Running")
@@ -135,8 +138,15 @@ fn set_enabled(app: &AppHandle, enabled: bool) {
         let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
     }
     if enabled {
-        show(app);
+        // `show` creates the webview, and this runs from a *synchronous*
+        // `#[tauri::command]` — which Tauri 2 executes on the main thread.
+        // `WebviewWindowBuilder::build()` there deadlocks the Windows event
+        // loop (see toast.rs). Hand the create to a worker thread; Tauri does
+        // its own hop internally.
+        let handle = app.clone();
+        std::thread::spawn(move || show(&handle));
     } else {
+        // Teardown on the calling thread is safe.
         destroy(app);
     }
 }
