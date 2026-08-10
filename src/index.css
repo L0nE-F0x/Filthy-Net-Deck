@@ -4135,6 +4135,27 @@ html[data-theme="light"] .live-set-icon {
 .settings-note ul {
   list-style: disc;
 }
+/* Inputs are not skinned globally in this app — each context styles its own
+   (see `.filter-bar input[type="search"]`). Match that treatment so the sign-in
+   fields don't render as white browser defaults on the dark theme. */
+.settings-note input[type="email"],
+.settings-note input[type="text"] {
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  background: var(--color-ink-900);
+  color: var(--color-foam);
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  width: 100%;
+}
+.settings-note input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-gold-500) 60%, transparent);
+  outline-offset: 1px;
+}
+.settings-note input::placeholder {
+  color: color-mix(in srgb, var(--color-muted) 80%, transparent);
+}
 .settings-check {
   display: flex;
   align-items: center;

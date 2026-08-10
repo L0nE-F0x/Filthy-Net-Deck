@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { isAuthDeepLink, parseAuthDeepLink, displayNameFor, AUTH_REDIRECT } from "./auth";
+import {
+  isAuthDeepLink,
+  parseAuthDeepLink,
+  displayNameFor,
+  looksLikeEmail,
+  normalizeCode,
+  AUTH_REDIRECT,
+} from "./auth";
 import type { User } from "@supabase/supabase-js";
 
 function user(meta: Record<string, unknown>, email?: string): User {
@@ -69,6 +76,36 @@ describe("displayNameFor", () => {
 
   it("ignores blank metadata rather than showing an empty name", () => {
     expect(displayNameFor(user({ full_name: "   " }, "a@b.com"))).toBe("a@b.com");
+  });
+});
+
+describe("looksLikeEmail", () => {
+  it("accepts ordinary addresses", () => {
+    expect(looksLikeEmail("a@b.com")).toBe(true);
+    expect(looksLikeEmail("  first.last+tag@sub.example.co.uk  ")).toBe(true);
+  });
+
+  it("rejects the common typos before a network round trip", () => {
+    expect(looksLikeEmail("")).toBe(false);
+    expect(looksLikeEmail("nope")).toBe(false);
+    expect(looksLikeEmail("a@b")).toBe(false); // no TLD
+    expect(looksLikeEmail("a b@c.com")).toBe(false); // space
+    expect(looksLikeEmail("a@@b.com")).toBe(false);
+    expect(looksLikeEmail(`${"x".repeat(250)}@b.com`)).toBe(false); // too long
+  });
+});
+
+describe("normalizeCode", () => {
+  it("strips whatever the mail client pasted in", () => {
+    expect(normalizeCode("123456")).toBe("123456");
+    expect(normalizeCode(" 123 456 ")).toBe("123456");
+    expect(normalizeCode("123-456")).toBe("123456");
+  });
+
+  it("caps at six digits and drops letters", () => {
+    expect(normalizeCode("1234567890")).toBe("123456");
+    expect(normalizeCode("abc123")).toBe("123");
+    expect(normalizeCode("")).toBe("");
   });
 });
 

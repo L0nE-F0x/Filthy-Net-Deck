@@ -262,10 +262,32 @@ D1/Workers is a driver swap, per §3's instruction.
 
 ## 6. Auth — providers, and a correction to the parent doc
 
-**Providers: Google first, Discord second.** Google is the broadest-reach default;
-Discord is where the MTG audience already is. Both are provider toggles in
-Supabase Auth plus an OAuth client with each vendor — **not** an architectural
-choice, and not a reason to change backend.
+**Three ways in (owner, 2026-08-10): Google, Discord, and email.** Google is the
+broadest-reach default; Discord fits an MTG audience; email is the fallback for
+anyone who wants neither. The two OAuth providers are dashboard toggles plus an
+app registered with each vendor — **not** an architectural choice, and not a
+reason to change backend.
+
+**Email uses a 6-digit code, not a password.** `signInWithOtp` →
+`verifyOtp`. Rationale: no password to store, leak, or reset; no "forgot
+password" flow to build; no email-confirmation deep link, because the code is
+typed straight into the app rather than clicked in a browser. For a desktop app
+this is strictly less machinery than email+password for the same result. (A
+magic *link* would be worse here — it would need the deep-link hop again just to
+get back into the app.)
+
+### The tier model — clarified by the owner 2026-08-10
+
+- **Signed out:** everything the app does today, unchanged, forever. No account,
+  no nag, no degradation.
+- **Signed in (free):** unlocks *additional* features — profile pages, crowd
+  meta, deck sync. **Costs nothing.**
+- **Paid:** possible one day, deferred indefinitely (`PLATFORM-STRATEGY.md`
+  Phase 4). Nothing is being built toward it.
+
+The distinction that matters when designing: **account-gated ≠ paid.** Do not
+put an existing local feature behind sign-in, and do not treat sign-in as a
+monetization step.
 
 > **Firebase was considered and rejected (owner asked 2026-08-10).** The reason
 > given was Google login — but Supabase supports Google OAuth natively, so the

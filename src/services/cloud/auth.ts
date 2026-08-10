@@ -138,6 +138,62 @@ export async function completeSignIn(url: string): Promise<SignInResult> {
   return { status: "error", message: "no credentials in callback" };
 }
 
+// ---------------------------------------------------------------------------
+// Email sign-in — a 6-digit code, deliberately not a password
+// ---------------------------------------------------------------------------
+//
+// No password to store, leak or reset; no "forgot password" flow; and unlike a
+// magic *link*, the code is typed into the app so it needs no deep-link hop.
+// Same account either way: signing in later with a Google address that matches
+// an email account lands on the same user.
+
+/** Basic shape check so obvious typos fail before a network round trip. */
+export function looksLikeEmail(value: string): boolean {
+  const v = value.trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) && v.length <= 254;
+}
+
+/** Send the code. Creates the account on first use. */
+export async function sendEmailCode(email: string): Promise<void> {
+  const address = email.trim().toLowerCase();
+  if (!looksLikeEmail(address)) throw new Error("That doesn't look like an email address.");
+  const supabase = await getSupabase();
+  const { error } = await supabase.auth.signInWithOtp({
+    email: address,
+    options: { shouldCreateUser: true },
+  });
+  if (error) throw error;
+}
+
+/** Codes are 6 digits; tolerate spaces people paste in from a mail client. */
+export function normalizeCode(code: string): string {
+  return code.replace(/\D+/g, "").slice(0, 6);
+}
+
+export async function verifyEmailCode(email: string, code: string): Promise<SignInResult> {
+  const address = email.trim().toLowerCase();
+  const token = normalizeCode(code);
+  if (token.length !== 6) {
+    return { status: "error", message: "Enter the 6-digit code from the email." };
+  }
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: address,
+      token,
+      type: "email",
+    });
+    if (error) return { status: "error", message: error.message };
+    if (data.user) return { status: "signed-in", user: data.user };
+    return { status: "error", message: "That code didn't work. Try again." };
+  } catch (e) {
+    return {
+      status: "error",
+      message: e instanceof Error ? e.message : "Sign-in failed.",
+    };
+  }
+}
+
 export async function getCurrentUser(): Promise<User | null> {
   if (!cloudConfigured() || !isTauri()) return null;
   try {

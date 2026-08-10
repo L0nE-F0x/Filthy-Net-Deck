@@ -137,6 +137,44 @@ export const Settings = memo(function Settings() {
   const authPending = useAppStore((s) => s.authPending);
   const signOutCloud = useAppStore((s) => s.signOutCloud);
 
+  const [emailStage, setEmailStage] = useState<"idle" | "code">("idle");
+  const [emailValue, setEmailValue] = useState("");
+  const [codeValue, setCodeValue] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
+
+  const sendCode = async () => {
+    setEmailBusy(true);
+    useAppStore.getState().setAuthPending(false);
+    try {
+      const m = await import("../services/cloud/auth");
+      await m.sendEmailCode(emailValue);
+      setEmailStage("code");
+    } catch (e) {
+      useAppStore.getState().setAuthResult({
+        status: "error",
+        message: e instanceof Error ? e.message : "Could not send the code.",
+      });
+    } finally {
+      setEmailBusy(false);
+    }
+  };
+
+  const submitCode = async () => {
+    setEmailBusy(true);
+    try {
+      const m = await import("../services/cloud/auth");
+      const result = await m.verifyEmailCode(emailValue, codeValue);
+      useAppStore.getState().setAuthResult(result);
+      if (result.status === "signed-in") {
+        setEmailStage("idle");
+        setCodeValue("");
+        setEmailValue("");
+      }
+    } finally {
+      setEmailBusy(false);
+    }
+  };
+
   /** Open the provider in the system browser; the session arrives by deep link. */
   const beginSignIn = async (provider: "google" | "discord") => {
     useAppStore.getState().setAuthPending(true);
@@ -653,9 +691,9 @@ export const Settings = memo(function Settings() {
           <section className="panel settings-card settings-card-span2">
             <h3 className="settings-card-title">Account</h3>
             <p className="settings-card-desc">
-              Entirely optional — everything in Filthy Net Deck works signed out,
-              and always will. An account is only needed for features that live
-              on a server, like syncing between machines.
+              Entirely optional and free. Everything the app does today keeps
+              working signed out, and always will — an account only adds extra
+              features that need a server, like syncing between machines.
             </p>
             {authName ? (
               <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -695,15 +733,82 @@ export const Settings = memo(function Settings() {
                 )}
               </div>
             )}
+
+            {/* Email route — a 6-digit code, no password to forget. */}
+            {!authName && (
+              <div className="settings-note mt-3">
+                {emailStage === "idle" ? (
+                  <div className="flex flex-wrap items-end gap-2">
+                    <label className="flex flex-col gap-1 grow" style={{ minWidth: "14rem" }}>
+                      <span className="text-xs text-muted">Or use your email</span>
+                      <input
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        value={emailValue}
+                        onChange={(e) => setEmailValue(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={emailBusy || !emailValue.trim()}
+                      onClick={() => void sendCode()}
+                    >
+                      {emailBusy ? "Sending…" : "Email me a code"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-end gap-2">
+                    <label className="flex flex-col gap-1" style={{ minWidth: "10rem" }}>
+                      <span className="text-xs text-muted">
+                        6-digit code sent to {emailValue.trim()}
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        placeholder="123456"
+                        maxLength={7}
+                        value={codeValue}
+                        onChange={(e) => setCodeValue(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={emailBusy || codeValue.replace(/\D/g, "").length !== 6}
+                      onClick={() => void submitCode()}
+                    >
+                      {emailBusy ? "Checking…" : "Sign in"}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={emailBusy}
+                      onClick={() => {
+                        setEmailStage("idle");
+                        setCodeValue("");
+                      }}
+                    >
+                      Use a different email
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {authError && (
               <p className="text-xs mt-2 m-0" style={{ color: "var(--color-loss)" }}>
                 {authError}
               </p>
             )}
             <p className="text-xs text-muted m-0 mt-2">
-              Sign-in opens your normal browser rather than a window inside the
-              app, so you can see the real address bar — and because Google
-              refuses sign-in from embedded windows.
+              Google and Discord open your normal browser rather than a window
+              inside the app, so you can see the real address bar — and because
+              Google refuses sign-in from embedded windows. The email route never
+              asks for a password: you get a one-time code instead.
             </p>
           </section>
         )}
