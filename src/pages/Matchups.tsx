@@ -25,10 +25,19 @@ import {
   mergeMatchups,
   personalRecords,
   readDelta,
+  subjectArchetype,
   type MergedMatchup,
   type ResolveOpts,
 } from "../services/cloud/personalMatchups";
-import { describe as describeCrowd } from "../services/cloud/crowdMeta";
+import {
+  describe as describeCrowd,
+  matchupsFor,
+  MIN_GAMES,
+  type RollupRow,
+} from "../services/cloud/crowdMeta";
+import { myArchetypeName } from "../services/cloud/matchSync";
+import { fetchRollup } from "../services/cloud/sync";
+import { labelFromSlug } from "../services/cloud/archetypeSlug";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -177,9 +186,57 @@ export const Matchups = memo(function Matchups() {
     [filtered, resolveOpts],
   );
 
-  // Community rollup fetch lands with the opt-in upload path. Until then the
-  // outer join still shows your side honestly; community cells stay empty.
-  const community = useMemo(() => [] as const, []);
+  // Which archetype *you* are playing. Community rows are "A vs B", so a
+  // comparison is only honest when both sides describe the same deck facing the
+  // same opponent — see subjectArchetype. Null on a mixed or unrecognised deck
+  // history, and we then show the personal side alone rather than invent one.
+  const subject = useMemo(
+    () =>
+      subjectArchetype(filtered, {
+        formatFor: formatForMatch,
+        myArchetypeFor: (m) => myArchetypeName(m, candidates),
+      }),
+    [filtered, candidates],
+  );
+
+  const subjectFormat = useMemo<"standard" | "pioneer" | null>(() => {
+    if (!subject) return null;
+    return subject.startsWith("pioneer-") ? "pioneer" : "standard";
+  }, [subject]);
+
+  const [rollup, setRollup] = useState<RollupRow[]>([]);
+  const [crowdState, setCrowdState] = useState<"idle" | "loading" | "ready">("idle");
+
+  useEffect(() => {
+    if (!subject || !subjectFormat) {
+      setRollup([]);
+      setCrowdState("idle");
+      return;
+    }
+    let cancelled = false;
+    setCrowdState("loading");
+    void fetchRollup(subjectFormat, mode === "bo3" ? 3 : 1)
+      .then((rows) => {
+        if (cancelled) return;
+        setRollup(rows);
+        setCrowdState("ready");
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRollup([]);
+          setCrowdState("ready");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [subject, subjectFormat, mode]);
+
+  /** Community rows oriented to your archetype, thin cells already suppressed. */
+  const community = useMemo(() => {
+    if (!subject || rollup.length === 0) return [];
+    return matchupsFor(rollup, subject).shown;
+  }, [rollup, subject]);
 
   const merged = useMemo(
     () => mergeMatchups(personal, community),
@@ -396,10 +453,34 @@ export const Matchups = memo(function Matchups() {
               })}
             </div>
           )}
+          {/*
+            Four honest states, because a community number is only comparable to
+            yours when both describe the same deck facing the same opponent.
+          */}
           <p className="text-xs text-muted m-0 mt-3 leading-relaxed">
-            Community rates appear once enough opted-in matches are shared
-            (sample ≥ 30). Until then this page is still useful — it is your
-            real record against each archetype, sorted by how much it hurts.
+            {!subject ? (
+              <>
+                Community rates need to know which deck <em>you</em> are playing —
+                a field winrate is only comparable deck-for-deck. Filter to a
+                single recognised deck above and the field column fills in.
+                Until then this is your own record, sorted by how much it hurts.
+              </>
+            ) : crowdState === "loading" ? (
+              <>Loading community rates for {labelFromSlug(subject)}…</>
+            ) : community.length > 0 ? (
+              <>
+                Field rates are for <strong>{labelFromSlug(subject)}</strong> —
+                the deck you are playing — against each archetype. Cells with
+                fewer than {MIN_GAMES} shared games are withheld rather than
+                shown as a percentage.
+              </>
+            ) : (
+              <>
+                No community data for {labelFromSlug(subject)} yet — it appears
+                once enough players opt in to match sharing and a matchup passes{" "}
+                {MIN_GAMES} games. Your own record below is unaffected.
+              </>
+            )}
           </p>
         </div>
 
@@ -487,9 +568,9 @@ export const Matchups = memo(function Matchups() {
             )}
             {!selected.community && (
               <p className="text-xs text-muted m-0 mb-3 leading-relaxed">
-                No community sample for this matchup yet. Opt in to match sharing
-                in Settings when you are ready — that is how the field number
-                fills in.
+                {!subject
+                  ? "Filter to a single deck above to compare this against the field — a community winrate only means something deck-for-deck."
+                  : `No community sample for ${labelFromSlug(subject)} in this matchup yet (needs ${MIN_GAMES}+ shared games). Opt in to match sharing in Settings to help it fill in.`}
               </p>
             )}
 

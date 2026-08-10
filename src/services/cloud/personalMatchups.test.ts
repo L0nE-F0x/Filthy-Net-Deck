@@ -4,6 +4,7 @@ import {
   mergeMatchups,
   readDelta,
   archetypeForMatch,
+  subjectArchetype,
   MIN_PERSONAL_GAMES,
   type PersonalRecord,
   type ResolveOpts,
@@ -199,6 +200,48 @@ describe("mergeMatchups", () => {
       [comm()],
     );
     expect(m.delta).toBeNull();
+  });
+});
+
+describe("subjectArchetype", () => {
+  const opts = (arch: (m: TrackedMatch) => string | null) => ({
+    formatFor: () => STANDARD,
+    myArchetypeFor: arch,
+  });
+
+  it("returns the archetype you actually play", () => {
+    const ms = Array.from({ length: 10 }, () => match());
+    expect(subjectArchetype(ms, opts(() => "Azorius Control"))).toBe(
+      "standard-azorius-control",
+    );
+  });
+
+  it("returns null on a mixed deck history — no honest comparison exists", () => {
+    const ms = Array.from({ length: 10 }, (_, i) => match({ matchId: `m${i}` }));
+    let i = 0;
+    const mixed = subjectArchetype(
+      ms,
+      opts(() => (i++ % 2 === 0 ? "Azorius Control" : "Mono-Red Aggro")),
+    );
+    expect(mixed).toBeNull();
+  });
+
+  it("tolerates a minority of other decks", () => {
+    const ms = Array.from({ length: 10 }, (_, i) => match({ matchId: `m${i}` }));
+    let i = 0;
+    // 8 of 10 on one deck — above the 0.6 share floor.
+    expect(
+      subjectArchetype(ms, opts(() => (i++ < 8 ? "Azorius Control" : "Mono-Red Aggro"))),
+    ).toBe("standard-azorius-control");
+  });
+
+  it("returns null when the deck is not a recognised archetype", () => {
+    const ms = Array.from({ length: 5 }, () => match());
+    expect(subjectArchetype(ms, opts(() => null))).toBeNull();
+  });
+
+  it("returns null for an empty history", () => {
+    expect(subjectArchetype([], opts(() => "Azorius Control"))).toBeNull();
   });
 });
 

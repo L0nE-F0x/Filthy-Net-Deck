@@ -178,6 +178,54 @@ export function readDelta(m: MergedMatchup): string | null {
 }
 
 
+/**
+ * Which archetype *you* were playing — the subject the community rate must be
+ * for, if the comparison is to mean anything.
+ *
+ * This is the load-bearing decision on the Matchups page. Community rows are
+ * "archetype A vs archetype B", so putting your record next to a community
+ * number only makes sense when both describe the same deck facing the same
+ * opponent. Comparing your Jank Brew's record against Mono-Red to *Azorius
+ * Control's* record against Mono-Red is apples to oranges, and dressing it up
+ * as a delta would be exactly the fabrication this product refuses elsewhere.
+ *
+ * So: resolve your deck to a recognised meta archetype, require a clear
+ * majority, and return null otherwise. Callers show the personal side alone and
+ * say why rather than inventing a comparison.
+ */
+export function subjectArchetype(
+  matches: readonly TrackedMatch[],
+  o: {
+    formatFor: (m: TrackedMatch) => FormatId | null;
+    /** Recognised archetype for the user's own deck, or null when unknown. */
+    myArchetypeFor: (m: TrackedMatch) => string | null;
+    /** Share of matches the top archetype must hold. */
+    minShare?: number;
+  },
+): string | null {
+  const minShare = o.minShare ?? 0.6;
+  const counts = new Map<string, number>();
+  let total = 0;
+  for (const m of matches) {
+    const fmt = o.formatFor(m);
+    const name = o.myArchetypeFor(m);
+    const slug = archetypeSlug(fmt, name);
+    if (!slug) continue;
+    counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    total++;
+  }
+  if (!total) return null;
+  let best: string | null = null;
+  let bestN = 0;
+  for (const [slug, n] of counts) {
+    if (n > bestN) {
+      best = slug;
+      bestN = n;
+    }
+  }
+  return best && bestN / total >= minShare ? best : null;
+}
+
 /** Find a personal row by meta deck name / archetype label (Daily + DeckView chips). */
 export function recordForArchetypeName(
   records: readonly PersonalRecord[],
