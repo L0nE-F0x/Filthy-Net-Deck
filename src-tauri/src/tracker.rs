@@ -26,7 +26,7 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -339,7 +339,18 @@ pub fn tracker_export_diagnostic(
     app: AppHandle,
     state: State<'_, TrackerShared>,
 ) -> Result<String, String> {
-    let status = state.0.lock().expect("tracker lock").status.clone();
+    let (status, data_file) = {
+        let d = state.0.lock().expect("tracker lock");
+        (d.status.clone(), d.data_file.clone())
+    };
+    // Count lines actually on disk. The gap between this and `matchesRecorded`
+    // is the whole diagnosis: equal means persistence is healthy, and a large
+    // shortfall means history exists only in memory and dies with the logs.
+    let disk_count = data_file
+        .as_ref()
+        .and_then(|f| fs::read_to_string(f).ok())
+        .map(|t| t.lines().filter(|l| !l.trim().is_empty()).count());
+
     let report = serde_json::json!({
         "app": "filthy-net-deck",
         "version": env!("CARGO_PKG_VERSION"),
@@ -354,6 +365,13 @@ pub fn tracker_export_diagnostic(
             "parseErrors": status.parse_errors,
             "lastEventAt": status.last_event_at,
             "lastEventDate": status.last_event_at.map(iso_date),
+            // Persistence health. `matchesRecorded` counts what is in MEMORY;
+            // history is re-derived from Arena's logs on every launch, so a
+            // broken write is invisible there until the logs rotate and the
+            // un-persisted matches are gone. These two make it visible.
+            "matchesOnDisk": disk_count,
+            "writeErrors": write_error_count(),
+            "lastWriteError": last_write_error(),
         },
     });
     let body = serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?;
@@ -2317,15 +2335,57 @@ fn save_deleted(file: &Path, ids: &HashSet<String>) {
     }
 }
 
+/// Count of match writes that failed, and the last OS error.
+///
+/// These exist because this function used to swallow every error. On the
+/// owner's machine (2026-08-11) the app held **373 matches in memory while the
+/// file on disk had 25**, last written three weeks earlier — tracking, parsing
+/// and the UI all looked perfect, because history is re-derived from Arena's
+/// logs on every launch. The loss only becomes visible when Arena rotates
+/// `Player-prev.log` and takes the un-persisted matches with it.
+///
+/// A persistence failure must never be silent again.
+static WRITE_ERRORS: AtomicUsize = AtomicUsize::new(0);
+static LAST_WRITE_ERROR: Mutex<Option<String>> = Mutex::new(None);
+
+pub fn write_error_count() -> usize {
+    WRITE_ERRORS.load(Ordering::SeqCst)
+}
+
+pub fn last_write_error() -> Option<String> {
+    LAST_WRITE_ERROR.lock().ok().and_then(|e| e.clone())
+}
+
+fn note_write_error(what: &str, e: &dyn std::fmt::Display) {
+    WRITE_ERRORS.fetch_add(1, Ordering::SeqCst);
+    let msg = format!("{what}: {e}");
+    eprintln!("[tracker] MATCH NOT SAVED — {msg}");
+    if let Ok(mut slot) = LAST_WRITE_ERROR.lock() {
+        *slot = Some(msg);
+    }
+}
+
 fn append_match(file: &Path, m: &TrackedMatch) {
     if let Some(dir) = file.parent() {
-        let _ = fs::create_dir_all(dir);
+        if let Err(e) = fs::create_dir_all(dir) {
+            note_write_error("create_dir_all", &e);
+            return;
+        }
     }
-    let Ok(json) = serde_json::to_string(m) else {
-        return;
+    let json = match serde_json::to_string(m) {
+        Ok(j) => j,
+        Err(e) => {
+            note_write_error("serialize", &e);
+            return;
+        }
     };
-    if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(file) {
-        let _ = writeln!(f, "{json}");
+    match fs::OpenOptions::new().create(true).append(true).open(file) {
+        Ok(mut f) => {
+            if let Err(e) = writeln!(f, "{json}") {
+                note_write_error("write", &e);
+            }
+        }
+        Err(e) => note_write_error("open", &e),
     }
 }
 
