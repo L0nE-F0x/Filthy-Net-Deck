@@ -3,58 +3,71 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.7.7** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
+**Live product version: v2.8.0** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
-**Phase 2 is complete — all 8 slices.** Optional free account (Google /
-Discord / email code), opt-in match sharing, community matchup rates joined to
-your own record, public profile pages at `/u/<handle>`, and cloud deck sync.
-Slices 0–6 are verified live against a real installed build; **slice 7 is built
-but not yet live** — its migration has not been run (START HERE §1).
+**Phase 2 is complete — all 8 slices, all shipped.** Optional free account
+(Google / Discord / email code), opt-in match sharing, community matchup rates
+joined to your own record, public profile pages at `/u/<handle>`, and cloud
+deck sync. The `decks` migration was run on the live DB by the owner on
+2026-08-11 and v2.8.0 shipped the same evening.
 
 ---
 
 # ▶ START HERE — next session, in this order
 
-## 1. Run the `decks` migration on the live DB (owner, 2 minutes)
+## 1. Confirm v2.8.0 lands on a real client
 
-`supabase/migrations/20260811190000_decks.sql` is written and committed but
-**has not been run**. Until it is, deck sync uploads fail soft (the code
-handles it — no error surfaces, no watermark advances) and nothing is backed
-up. Paste it into the Supabase SQL editor the same way the other four went in.
+Everything server-side is verified live (below). The one thing that cannot be
+checked from here is the client half:
 
-> ⚠️ The previous handoff said the `decks` table "already exists in the
-> core-schema migration". It did not — `20260810120000_core_schema.sql` has
-> profiles, archetypes, shared_matches and matchup_rollup, and no decks table.
-> Verify before trusting a claim like that; this one cost nothing only because
-> it was checked.
+- **In-app Check for updates offers "Update & restart"**, not just a browser
+  download. This is the primary update path and the only step of the release
+  checklist still unticked.
+- **Deck backup actually writes.** Sign in, make sure sharing is on, play a
+  match; Settings should then say "N lists saved". If it stays at nothing, the
+  Supabase `decks` grants are the first suspect (42501), not the client.
+- **`persistRepairs` in a fresh diagnostic export.** If it is non-zero the
+  reconcile pass is doing real work every session, which means the *append*
+  path is still broken and the root cause is still out there. Zero means the
+  fast path is healthy and the 22 July stall was situational.
 
-## 2. Ship the three fixes below in a release
+## 2. Then: nothing is queued
 
-Everything in "Session log (Claude, 2026-08-11 evening)" is on `main` and
-green, but **unreleased** — live version is still v2.7.7. Full AGENTS.md train
-when the owner is ready: version bump, signed Windows installer, updater
-manifest, version.json, site + OG, Netlify, tag.
+No feature work is outstanding. The roadmap programs are closed, Phase 2 is
+done, and Phase 4 (paid tier) is deferred indefinitely. The next scheduled item
+is a **measurement, not a build**: Search Console checkpoint ~2026-08-24
+(baseline 2026-08-11: 3 clicks, 32 impressions, avg position 11.2).
 
-## 3. Still open (nothing blocks the above)
+Candidates if the owner wants work: Phase 1 item A (252 card pages — the
+largest remaining SEO corpus expansion; the position-11.2 read is the argument
+*for* it, not against), or public decks on profile pages, which slice 7 left
+one view away (`decks.is_public` exists and nothing reads it — publish via a
+view, never a policy, because RLS is row-level).
 
-- **Tracker persistence root cause.** The *consequence* is now fixed — the file
-  is reconciled against memory after every batch and at startup — but why
-  appends stalled on 22 July is still unknown. The next diagnostic export from
-  a build with this fix will show `persistRepairs` > 0 if the fast path is
-  still broken; that is the trail to it. `writeErrors` / `lastWriteError` name
-  the cause if it is an OS error.
+## 3. Owner actions, not code
+
 - **Email OTP needs custom SMTP** before promoting to a real audience.
   Supabase's built-in mailer is rate-limited per project and users would
-  silently stop getting codes. Owner action (Supabase dashboard).
+  silently stop getting codes.
 - **§2.6 legal check** (WotC Fan Content, Scryfall commercial terms) — gates
-  Phase 4 only, deferred indefinitely. Owner action, not a code task.
-- Search Console checkpoint ~2026-08-24. Baseline 2026-08-11: 3 clicks, 32
-  impressions, avg position 11.2.
+  Phase 4 only. Deferred.
 - Disk: `src-tauri/target/` ~9 GB (`cargo clean` reclaims it), `.git` ~1.4 GB
   (needs the coordinated filter-repo in `docs/GIT-HISTORY-BLOAT.md` — **never
   from CI or an agent**).
 
 ---
+
+## Released v2.8.0 (2026-08-11)
+
+Full AGENTS train, verified live: `version.json` 2.8.0, `updater/latest.json`
+2.8.0 with a signature byte-identical to the shipped `.exe.sig`, both
+installers and the universal dmg HTTP 200, homepage title + OG card on
+`?v=2.8.0`. Signing key id **67FCA9900F523D49** — checked against the pubkey in
+`tauri.conf.json` before publishing, because a sig from the abandoned repo-root
+key looks fine and breaks auto-update.
+
+`downloads/` pruned to current + 1 (2.7.6 artifacts dropped; git history and
+the GitHub Release still hold them).
 
 ## Session log (Claude, 2026-08-11 evening)
 
@@ -285,12 +298,12 @@ hitting the session limit. Service layer was already on main
 
 | Item | Status |
 |------|--------|
-| App version | **v2.7.7** live on Windows + macOS. `main` is ahead of it by three unreleased fixes |
-| Branch | `main`, clean — **not pushed** as of this wrap |
+| App version | **v2.8.0** — live on Windows + macOS, every surface verified against production |
+| Branch | `main` = `origin/main`, clean, tag `v2.8.0` pushed |
 | Gates last green | **526** vitest · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-11 evening) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
-| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. Migrations run: health_pings, core schema, public profiles, display-name privacy. **`20260811190000_decks.sql` written but NOT run** |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. All **five** migrations run: health_pings, core schema, public profiles, display-name privacy, decks |
 | Auth | Google **and** Discord enabled + verified live; email OTP available (Supabase's built-in mailer is rate-limited — needs custom SMTP before promoting to a real audience) |
 | Cron | `fnd-rollup` scheduled hourly (`select cron.schedule(...)`, job id 1) — without it `matchup_rollup` never fills |
 | Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |
@@ -301,7 +314,7 @@ hitting the session limit. Service layer was already on main
   `callback.html` → `fnd://` deep link → app), signup trigger creating the
   profile row, match upload (371 rows), profile page render + OG tags + 404 +
   handle sanitisation, health ping, Matchups crowd orientation/suppression.
-- **Built, never exercised for real:** cloud deck sync (its migration has not been run — nothing has ever been written to `decks`), Discord sign-in (configured, unused),
+- **Built, never exercised for real:** cloud deck sync end-to-end (schema is live; no client has written a deck row yet — START HERE §1), Discord sign-in (configured, unused),
   email OTP sign-in, community matchup *cells* (need 30+ shared games from
   accounts with 25+ matches and 7+ days — expect empty for a while **by
   design**, that is the honesty discipline, not a fault).
