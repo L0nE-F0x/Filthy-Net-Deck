@@ -205,6 +205,48 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
+/**
+ * Who is signed in according to the **stored** session, for restoring UI state
+ * at startup.
+ *
+ * Deliberately `getSession()` and not `getUser()`: the session lives in
+ * `auth.json` and reading it is local, whereas `getUser()` validates against
+ * the server. On a cold start with no network — Arena is running, the app just
+ * launched, wifi is not up yet — `getUser()` answers null and the app would
+ * report the user signed out when they are not. It still refreshes an expired
+ * access token when it can, so a returning session is honoured either way.
+ */
+export async function getStoredUser(): Promise<User | null> {
+  if (!cloudConfigured() || !isTauri()) return null;
+  try {
+    const supabase = await getSupabase();
+    const { data } = await supabase.auth.getSession();
+    return data.session?.user ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Follow the session for the life of the window: token refreshes, sign-out from
+ * another surface, and the deep-link sign-in all arrive here. Returns an
+ * unsubscribe.
+ */
+export async function onAuthChange(
+  cb: (user: User | null) => void,
+): Promise<() => void> {
+  if (!cloudConfigured() || !isTauri()) return () => {};
+  try {
+    const supabase = await getSupabase();
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      cb(session?.user ?? null);
+    });
+    return () => data.subscription.unsubscribe();
+  } catch {
+    return () => {};
+  }
+}
+
 export async function signOut(): Promise<void> {
   try {
     const supabase = await getSupabase();

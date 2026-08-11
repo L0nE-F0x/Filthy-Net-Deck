@@ -183,6 +183,29 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Restore the signed-in user from the stored session, then follow it.
+  //
+  // Without this the app looks signed out after every launch *and* every
+  // webview reload, because the store starts at `authName: null` and only the
+  // deep link ever filled it in — so the user signed in again to fix something
+  // that was never actually broken. The session itself was always on disk in
+  // `auth.json`; nothing asked it who was there.
+  //
+  // The subscription covers the rest of the window's life: token refreshes,
+  // sign-out, and the deep-link sign-in all land here, so no surface has to
+  // remember to update the store by hand.
+  useEffect(() => {
+    if (!isTauri()) return;
+    void useAppStore.getState().refreshAuth();
+    let un: (() => void) | undefined;
+    void import("./services/cloud/auth").then(async (m) => {
+      un = await m.onAuthChange((user) => {
+        useAppStore.setState({ authName: m.displayNameFor(user) });
+      });
+    });
+    return () => un?.();
+  }, []);
+
   // OAuth callback. Rust forwards every `fnd://` URL here (from a cold start
   // or, more commonly, via the single-instance hook when the app was already
   // running). Only auth links are consumed, so future `fnd://` routes can be

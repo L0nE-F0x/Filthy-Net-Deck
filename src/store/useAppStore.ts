@@ -700,7 +700,9 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     refreshAuth: async () => {
       const m = await import("../services/cloud/auth");
-      const user = await m.getCurrentUser();
+      // Stored session, not a server round trip — see getStoredUser. A cold
+      // start with no network must not report a signed-in user as signed out.
+      const user = await m.getStoredUser();
       set({ authName: m.displayNameFor(user) });
     },
     signOutCloud: async () => {
