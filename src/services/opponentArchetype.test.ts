@@ -304,15 +304,26 @@ describe("color evidence", () => {
     expect([...hybrid.soft].sort()).toEqual(["B", "G", "R", "W"]);
   });
 
-  it("mono-colored lands prove a color, duals only hint", () => {
-    const cards: SeenCardInfo[] = [
-      { name: "Swamp", isLand: true, colorIdentity: ["B"] },
-      { name: "Godless Shrine", isLand: true, colorIdentity: ["W", "B"] },
-      { name: "Plains", isLand: true, colorIdentity: ["W"] },
-    ];
-    const ev = observedColorsFromSeenCards(cards);
-    expect([...ev.required].sort()).toEqual(["B", "W"]);
-    expect([...ev.soft]).toEqual([]);
+  /**
+   * Changed 2026-08-11. This asserted that any mono-colour land proves its
+   * colour, including basics. Reality disproved the premise for basics: their
+   * Arena grpIds are not stable identities, and a real log had a Swamp
+   * (`superTypes:["SuperType_Basic"], subtypes:["SubType_Swamp"]`) carrying an
+   * id that resolves to Island — which invented blue and read a Rakdos
+   * opponent as Grixis.
+   *
+   * Non-basic lands are unique cards and still prove their colour.
+   */
+  it("non-basic mono lands prove a color; basics and duals only hint", () => {
+    const ev = observedColorsFromSeenCards([
+      { name: "Swamp", isLand: true, typeLine: "Basic Land — Swamp", colorIdentity: ["B"] },
+      { name: "Godless Shrine", isLand: true, typeLine: "Land — Plains Swamp", colorIdentity: ["W", "B"] },
+      { name: "Castle Locthwain", isLand: true, typeLine: "Land", colorIdentity: ["B"] },
+    ]);
+    // Only the unique mono-colour land is proof.
+    expect([...ev.required]).toEqual(["B"]);
+    // The basic and the dual are hints.
+    expect([...ev.soft].sort()).toEqual(["W"]);
   });
 
   it("names color groups and strips color words from archetypes", () => {
@@ -391,8 +402,13 @@ describe("off-color opponents (Orzhov Lifegain bug)", () => {
       ],
       ["Sheltered by Ghosts", "Unholy Annex"],
     );
+    // Card 4 is `Cut Down {B}` — a cast spell. Basics stopped being proof on
+    // 2026-08-11 (see the note above), so the black evidence here has to come
+    // from mana actually spent. That is the honest version of this scenario
+    // anyway: a lone Swamp on the battlefield was never as certain as a
+    // resolved black spell, and it turned out not to be trustworthy at all.
     const guess = inferOpponentArchetype(
-      [1, 2, 5],
+      [1, 2, 4, 5],
       resolveCard,
       [monoWhiteLifegain, orzhovLifegain],
       opts,

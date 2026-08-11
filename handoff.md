@@ -48,6 +48,30 @@ frozen the whole time. `daily-meta.yml` stages whole directories and never
 broke. **Stage directories, not file lists**, in any workflow that commits
 pipeline output.
 
+### Open follow-up: basic-land colour evidence (2026-08-11)
+
+**Arena basic-land grpIds are not stable identities.** Verified against a real
+`Player.log`: a game object Arena described as
+`superTypes:["SuperType_Basic"], subtypes:["SubType_Swamp"]` carried grpId
+**87457**, which resolves through the card API to **Island**. That phantom
+Island put `U` into the *required* colour set and reported a Rakdos opponent as
+**"Grixis Control"** — and would have uploaded them under that archetype into
+the shared matchup data.
+
+**Shipped mitigation:** basics are now *soft* evidence
+(`observedColorsFromSeenCards`); non-basic mono-colour lands still prove their
+colour. A single mis-resolved land can no longer invent a colour.
+
+**Cost of the mitigation:** early-game reads are weaker when only basics are
+down. Two existing tests asserted a lone basic proves its colour and were
+updated — the premise was disproven, not the assertion inconvenient.
+
+**Proper fix, not done:** stop resolving basics by id at all and read Arena's
+own `subtypes` from the game object. The tracker already sees them in
+`note_opponent_cards` but keeps only grpIds. Needs a per-match set of opponent
+basic types plumbed through `TrackedMatch` / `LiveMatch` into the inference.
+~40 lines across Rust and TS, and it restores the lost signal.
+
 ### Next up (nothing is blocking)
 
 1. **Slice 4 — public profile pages** `/u/<handle>`. The acquisition-visible

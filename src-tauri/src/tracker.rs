@@ -3287,6 +3287,17 @@ mod tests {
                 m.my_rank,
                 m.games.iter().map(|g| g.on_play).collect::<Vec<_>>()
             );
+            // Opponent-revealed card ids. Set FND_REPLAY_OPP=<name substring>
+            // to dump them for one opponent — this is what the archetype read
+            // is actually built from, so it is the ground truth when a guess
+            // looks impossible (e.g. a blue colour call with no blue cards).
+            if let Ok(want) = std::env::var("FND_REPLAY_OPP") {
+                let name = m.opponent_name.as_deref().unwrap_or("");
+                if !want.is_empty() && name.to_lowercase().contains(&want.to_lowercase()) {
+                    let seen = m.opponent_seen.clone().unwrap_or_default();
+                    eprintln!("    opponentSeen ({}): {:?}", seen.len(), seen);
+                }
+            }
         }
 
         // `my_rank` is frozen at match start, so a ranked result should be

@@ -199,6 +199,19 @@ function isLandCard(card: SeenCardInfo): boolean {
 }
 
 /**
+ * Basic lands specifically — their Arena grpIds are not stable identities
+ * (they vary by printing and art), so a resolved basic can name the wrong card
+ * entirely. Everything else with a Land type is a unique card and resolves
+ * reliably. Name is the fallback for resolvers that only return a string.
+ */
+function isBasicLandCard(card: SeenCardInfo): boolean {
+  if (card.typeLine) return /\bBasic\b/.test(card.typeLine);
+  return /^(?:snow-covered\s+)?(?:plains|island|swamp|mountain|forest|wastes)$/i.test(
+    card.name.trim(),
+  );
+}
+
+/**
  * Read colors straight off the cards the opponent actually played, rather than
  * inferring them from which meta lists happen to contain those cards. A cast
  * `{B}` spell or a land that only makes black is proof of black — no ranked
@@ -215,7 +228,25 @@ export function observedColorsFromSeenCards(
   for (const card of cards) {
     const identity = (card.colorIdentity ?? []).filter(isPipColor);
     if (isLandCard(card)) {
-      if (identity.length === 1) out.required.add(identity[0]);
+      // A NON-basic mono-colour land still proves its colour: those are unique
+      // cards whose Arena ids resolve reliably.
+      //
+      // A *basic* never does. Basic-land grpIds are not stable identities —
+      // they vary by printing and art. Verified 2026-08-11 against a real
+      // Player.log: an object Arena itself described as
+      // `"superTypes":["SuperType_Basic"], "subtypes":["SubType_Swamp"]`
+      // carried grpId 87457, which resolves through the card API to **Island**.
+      // That one phantom Island put U into `required`, and a Rakdos opponent
+      // was reported as "Grixis Control" in the overlay — and, worse, would
+      // have been uploaded under that archetype into the shared matchup data.
+      //
+      // Demoting basics to soft keeps them useful as corroboration while
+      // making it impossible for a single mis-resolved land to invent a colour
+      // no spell ever demonstrated. The complete fix is to read Arena's own
+      // `subtypes` instead of resolving the id at all — see the follow-up note
+      // in handoff.md.
+      const basic = isBasicLandCard(card);
+      if (!basic && identity.length === 1) out.required.add(identity[0]);
       else for (const c of identity) out.soft.add(c);
       continue;
     }
