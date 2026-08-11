@@ -37,6 +37,17 @@ same deck facing the same opponent. `subjectArchetype()` requires a 60% majority
 recognised deck; no clear subject means **no comparison is offered at all**.
 Do not "fix" that by falling back to a field average — it is not comparable.
 
+### CI lesson (2026-08-11) — narrow `git add` lists rot silently
+
+`sets-refresh.yml` hand-listed the two files to stage. v2.7.1 added per-set lazy
+galleries, so `npm run sets` began writing ~19 more; they stayed unstaged, the
+following `git pull --rebase` refused, and the job exited **128 every 4 hours
+for two days** — with the *build step still reporting success*, so the emails
+read like flaky CI rather than "the data pipeline is down". The set radar was
+frozen the whole time. `daily-meta.yml` stages whole directories and never
+broke. **Stage directories, not file lists**, in any workflow that commits
+pipeline output.
+
 ### Next up (nothing is blocking)
 
 1. **Slice 4 — public profile pages** `/u/<handle>`. The acquisition-visible
