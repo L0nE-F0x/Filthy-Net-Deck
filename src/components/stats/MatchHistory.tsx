@@ -129,6 +129,7 @@ export function MatchHistory({
       const g = inferOpponentArchetype(m.opponentSeen, resolve, candidates, {
         minHits: 2,
         minConfidence: 0.3,
+        basicLandTypes: m.opponentBasics,
       });
       if (g) map.set(m.matchId, g.archetype);
     }

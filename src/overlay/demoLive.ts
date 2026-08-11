@@ -75,6 +75,7 @@ export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
     sideboard,
     sideboardTotal: sideboard.reduce((n, c) => n + c.remaining, 0) || undefined,
     opponentSeen: [105175, 92125, 92117, 92218, 91611, 86758],
+    opponentBasics: ["Island", "Mountain"],
     turn: opts.ended ? undefined : 6,
     onPlay: true,
     mulligans: 1,

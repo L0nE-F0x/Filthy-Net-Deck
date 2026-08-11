@@ -61,7 +61,10 @@ export async function syncMatchesNow(): Promise<UploadOutcome> {
         m.opponentSeen,
         (id) => peekSeenCard(id),
         candidates,
-        { minConfidence: MIN_INFER_CONFIDENCE },
+        {
+          minConfidence: MIN_INFER_CONFIDENCE,
+          basicLandTypes: m.opponentBasics,
+        },
       );
       return guess
         ? { name: guess.archetype, confidence: guess.confidence }

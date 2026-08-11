@@ -55,6 +55,7 @@ export function archetypeForMatch(m: TrackedMatch, o: ResolveOpts): string | nul
   if (!m.opponentSeen?.length || !o.candidates.length) return null;
   const guess = inferOpponentArchetype(m.opponentSeen, o.resolveName, o.candidates, {
     minConfidence: MIN_INFER_CONFIDENCE,
+    basicLandTypes: m.opponentBasics,
   });
   if (!guess) return null;
   return archetypeSlug(fmt, guess.archetype);

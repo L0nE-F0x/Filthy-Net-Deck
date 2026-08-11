@@ -312,18 +312,27 @@ describe("color evidence", () => {
    * id that resolves to Island — which invented blue and read a Rakdos
    * opponent as Grixis.
    *
-   * Non-basic lands are unique cards and still prove their colour.
+   * Non-basic lands are unique cards and still prove their colour — and as of
+   * the follow-up fix a basic proves its colour too, just via Arena's own
+   * `subtypes` (second assertion) rather than via its id.
    */
   it("non-basic mono lands prove a color; basics and duals only hint", () => {
-    const ev = observedColorsFromSeenCards([
+    const lands: SeenCardInfo[] = [
       { name: "Swamp", isLand: true, typeLine: "Basic Land — Swamp", colorIdentity: ["B"] },
       { name: "Godless Shrine", isLand: true, typeLine: "Land — Plains Swamp", colorIdentity: ["W", "B"] },
       { name: "Castle Locthwain", isLand: true, typeLine: "Land", colorIdentity: ["B"] },
-    ]);
+    ];
+    const ev = observedColorsFromSeenCards(lands);
     // Only the unique mono-colour land is proof.
     expect([...ev.required]).toEqual(["B"]);
     // The basic and the dual are hints.
     expect([...ev.soft].sort()).toEqual(["W"]);
+
+    // Same lands, but with what Arena reported for the basic: white is now
+    // proven by the Plains the opponent actually had, not by the shockland.
+    const withTypes = observedColorsFromSeenCards(lands, ["Swamp", "Plains"]);
+    expect([...withTypes.required].sort()).toEqual(["B", "W"]);
+    expect(withTypes.soft.size).toBe(0);
   });
 
   it("names color groups and strips color words from archetypes", () => {

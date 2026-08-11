@@ -144,7 +144,10 @@ export function deckMatchupMatrix(
 
   for (const m of chronological) {
     if (m.result !== "win" && m.result !== "loss") continue;
-    const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, opts);
+    const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, {
+      ...opts,
+      basicLandTypes: m.opponentBasics,
+    });
     if (!guess) continue;
 
     const row =

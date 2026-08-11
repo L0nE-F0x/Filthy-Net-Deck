@@ -106,8 +106,9 @@ export function OpponentDeckRead({ group }: { group: OppGroup }) {
     return inferOpponentArchetype(selection.grpIds, resolveName, candidates, {
       minHits: 2,
       minConfidence: 0.3,
+      basicLandTypes: selection.basicLandTypes,
     });
-  }, [candidates, selection.grpIds, resolveName]);
+  }, [candidates, selection.grpIds, selection.basicLandTypes, resolveName]);
 
   const revealed: RevealedCard[] = useMemo(() => {
     void tick;

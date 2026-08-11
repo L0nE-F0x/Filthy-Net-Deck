@@ -45,6 +45,13 @@ export interface TrackedMatch {
    * (battlefield / gy / exile / stack / hand). Used to infer meta archetype.
    */
   opponentSeen?: number[];
+  /**
+   * Basic land types Arena itself reported for the opponent, e.g.
+   * `["Island","Swamp"]`. Read from the game object's `subtypes` — basic-land
+   * grpIds are not stable identities, so this is the only trustworthy colour
+   * signal a basic carries.
+   */
+  opponentBasics?: string[];
 }
 
 export interface TrackerStatus {
@@ -104,6 +111,8 @@ export interface LiveMatch {
   sideboardTotal?: number;
   /** Opponent grpIds seen so far this match. */
   opponentSeen?: number[];
+  /** Basic land types Arena reported for the opponent (see TrackedMatch). */
+  opponentBasics?: string[];
   /** Current turn number (GRE turnInfo) — absent until turn 1 registers. */
   turn?: number;
   /** Local player on the play this game (absent until turn 1 locks). */

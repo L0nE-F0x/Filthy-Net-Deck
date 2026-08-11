@@ -1073,7 +1073,9 @@ export function OverlayApp() {
           live.opponentSeen,
           resolveName,
           candidates,
-          inferOpts,
+          // Arena's own basic-land types for this match only — the historical
+          // matrix below reads each past match's own basics.
+          { ...inferOpts, basicLandTypes: live.opponentBasics },
         );
         guess = g ? g.archetype : null;
       }

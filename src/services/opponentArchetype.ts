@@ -83,6 +83,12 @@ export interface InferOptions {
    * ("Azorius Control") read off the opponent's own cards (default true).
    */
   macroFallback?: boolean;
+  /**
+   * Basic land types Arena reported for the opponent — `TrackedMatch`/
+   * `LiveMatch` `opponentBasics`. Hard colour evidence, and the only correct
+   * way to read a basic: its grpId is not a stable identity.
+   */
+  basicLandTypes?: readonly string[] | null;
 }
 
 function deckCardPool(deck: Deck): {
@@ -211,6 +217,35 @@ function isBasicLandCard(card: SeenCardInfo): boolean {
   );
 }
 
+/** Colour a basic land of each type produces. Arena spells these `SubType_*`. */
+const BASIC_LAND_COLOR: Record<string, PipColor> = {
+  plains: "W",
+  island: "U",
+  swamp: "B",
+  mountain: "R",
+  forest: "G",
+};
+
+/**
+ * Colors proved by the basic land types Arena reported for the opponent.
+ *
+ * These come off the game object's own `subtypes`, never from resolving a
+ * grpId, which is what makes them trustworthy: a basic Swamp taps for black,
+ * full stop. Accepts either bare types ("Swamp") or Arena's raw
+ * `SubType_Swamp` form so the caller can pass the log's strings through.
+ */
+export function colorsFromBasicLandTypes(
+  types: readonly string[] | null | undefined,
+): Set<PipColor> {
+  const out = new Set<PipColor>();
+  for (const raw of types ?? []) {
+    const key = raw.replace(/^SubType_/i, "").trim().toLowerCase();
+    const color = BASIC_LAND_COLOR[key];
+    if (color) out.add(color);
+  }
+  return out;
+}
+
 /**
  * Read colors straight off the cards the opponent actually played, rather than
  * inferring them from which meta lists happen to contain those cards. A cast
@@ -220,11 +255,18 @@ function isBasicLandCard(card: SeenCardInfo): boolean {
  * Multi-color lands stay soft: a two-color land in play is strong but not
  * airtight (fixing lands get played for utility, and one land shouldn't hard-
  * gate a read on its own).
+ *
+ * `basicLandTypes` is Arena's own report of the basics the opponent revealed
+ * (`TrackedMatch.opponentBasics`). Those are hard evidence — see the note on
+ * the basic-land branch below for why the *resolved* version of the same land
+ * is not.
  */
 export function observedColorsFromSeenCards(
   cards: SeenCardInfo[],
+  basicLandTypes?: readonly string[] | null,
 ): ColorEvidence {
   const out = emptyEvidence();
+  for (const c of colorsFromBasicLandTypes(basicLandTypes)) out.required.add(c);
   for (const card of cards) {
     const identity = (card.colorIdentity ?? []).filter(isPipColor);
     if (isLandCard(card)) {
@@ -242,9 +284,11 @@ export function observedColorsFromSeenCards(
       //
       // Demoting basics to soft keeps them useful as corroboration while
       // making it impossible for a single mis-resolved land to invent a colour
-      // no spell ever demonstrated. The complete fix is to read Arena's own
-      // `subtypes` instead of resolving the id at all — see the follow-up note
-      // in handoff.md.
+      // no spell ever demonstrated. The signal itself is not lost: the tracker
+      // now carries Arena's own `subtypes` for opponent basics
+      // (`TrackedMatch.opponentBasics`), and those come in through the
+      // `basicLandTypes` argument above as hard evidence — trustworthy exactly
+      // because no id resolution happens on that path.
       const basic = isBasicLandCard(card);
       if (!basic && identity.length === 1) out.required.add(identity[0]);
       else for (const c of identity) out.soft.add(c);
@@ -739,7 +783,7 @@ export function inferOpponentArchetype(
 
   // Hard color evidence read off the cards themselves. Independent of the
   // ranked field, so it holds even for cards no meta list plays.
-  const proven = observedColorsFromSeenCards(seenCards);
+  const proven = observedColorsFromSeenCards(seenCards, opts?.basicLandTypes);
 
   const df = buildCardDocumentFrequency(candidates);
   const nDecks = candidates.length;
@@ -891,7 +935,10 @@ export function personalVsOpponentArchetypes(
 
   for (const m of chronological) {
     if (m.result !== "win" && m.result !== "loss") continue;
-    const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, opts);
+    const guess = inferOpponentArchetype(m.opponentSeen, resolveName, candidates, {
+      ...opts,
+      basicLandTypes: m.opponentBasics,
+    });
     if (!guess) continue;
     const key = guess.archetype;
     const row =
@@ -946,9 +993,14 @@ export interface OpponentSeenSelection {
   sourceEndedAt: number | null;
   /** bestOf of the freshest contributing match — picks Bo1 vs Bo3 lists. */
   sourceBestOf: number | null;
+  /** Basic land types Arena reported across the contributing matches. */
+  basicLandTypes: string[];
 }
 
-type SeenMatch = Pick<TrackedMatch, "opponentSeen" | "endedAt" | "bestOf">;
+type SeenMatch = Pick<
+  TrackedMatch,
+  "opponentSeen" | "opponentBasics" | "endedAt" | "bestOf"
+>;
 
 /**
  * Pick the opponent grpIds to infer from. "recent" uses only the most recent
@@ -969,6 +1021,7 @@ export function selectOpponentSeenGrpIds(
     seenMatchCount: 0,
     sourceEndedAt: null,
     sourceBestOf: null,
+    basicLandTypes: [],
   };
   if (!seen.length) return empty;
 
@@ -976,12 +1029,14 @@ export function selectOpponentSeenGrpIds(
   const contributing = scope === "recent" ? [source] : seen;
   const grpIds: number[] = [];
   const dedupe = new Set<number>();
+  const basics = new Set<string>();
   for (const m of contributing) {
     for (const id of m.opponentSeen ?? []) {
       if (dedupe.has(id)) continue;
       dedupe.add(id);
       grpIds.push(id);
     }
+    for (const t of m.opponentBasics ?? []) basics.add(t);
   }
   return {
     grpIds,
@@ -989,5 +1044,6 @@ export function selectOpponentSeenGrpIds(
     seenMatchCount: seen.length,
     sourceEndedAt: source.endedAt ?? null,
     sourceBestOf: source.bestOf ?? null,
+    basicLandTypes: [...basics].sort(),
   };
 }

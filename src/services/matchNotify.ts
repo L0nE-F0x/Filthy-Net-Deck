@@ -52,6 +52,7 @@ export function matchEndToastBody(
     const guess = inferOpponentArchetype(m.opponentSeen, resolve, cands, {
       minHits: 2,
       minConfidence: 0.3,
+      basicLandTypes: m.opponentBasics,
     });
     if (guess) {
       bits.push(guess.archetype);
@@ -61,6 +62,7 @@ export function matchEndToastBody(
         const g = inferOpponentArchetype(x.opponentSeen, resolve, cands, {
           minHits: 2,
           minConfidence: 0.3,
+          basicLandTypes: x.opponentBasics,
         });
         return g?.archetype === guess.archetype;
       });

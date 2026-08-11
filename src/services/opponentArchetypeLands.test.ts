@@ -97,3 +97,50 @@ describe("colour evidence from lands", () => {
     expect(ev.soft.has("B")).toBe(true);
   });
 });
+
+/**
+ * The signal the mitigation above gave up, restored from the one source that
+ * cannot be wrong about a basic: Arena's own `subtypes` on the game object.
+ * The tracker now records those per match (`TrackedMatch.opponentBasics`), so
+ * the colour never round-trips through a grpId lookup.
+ */
+describe("colour evidence from Arena's own basic-land types", () => {
+  it("a reported basic proves its colour", () => {
+    const ev = observedColorsFromSeenCards([], ["Swamp"]);
+    expect([...ev.required]).toEqual(["B"]);
+  });
+
+  it("accepts Arena's raw SubType_ form", () => {
+    const ev = observedColorsFromSeenCards([], ["SubType_Mountain"]);
+    expect([...ev.required]).toEqual(["R"]);
+  });
+
+  it("maps every basic type and ignores anything else", () => {
+    const ev = observedColorsFromSeenCards(
+      [],
+      ["Plains", "Island", "Swamp", "Mountain", "Forest", "Wastes", "Cave"],
+    );
+    expect([...ev.required].sort()).toEqual(["B", "G", "R", "U", "W"]);
+  });
+
+  it("the real case, fixed at the source: the log said Swamp + Mountain", () => {
+    // Same match as above — 24 revealed ids including the 87457 that resolves
+    // to Island — but now with what Arena actually reported for their lands.
+    const ev = observedColorsFromSeenCards(
+      [duress, burstLightning, swampMisreadAsIsland, hybridLesson],
+      ["Mountain", "Swamp"],
+    );
+    expect([...ev.required].sort()).toEqual(["B", "R"]);
+    expect(ev.required.has("U")).toBe(false);
+    // Blue survives only as the hint it always was.
+    expect(ev.soft.has("U")).toBe(true);
+  });
+
+  it("proves colour with no spells at all — the early-game read", () => {
+    // Turn one, a single basic down and nothing cast. This is exactly the
+    // strength the id-based mitigation cost, and why reading `subtypes` was
+    // worth doing rather than living with soft basics.
+    const ev = observedColorsFromSeenCards([swampMisreadAsIsland], ["Swamp"]);
+    expect([...ev.required]).toEqual(["B"]);
+  });
+});

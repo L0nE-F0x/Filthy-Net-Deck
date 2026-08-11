@@ -109,6 +109,16 @@ pub struct TrackedMatch {
     /// meta archetype. Empty when detailed logs never revealed opponent cards.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub opponent_seen: Option<Vec<u32>>,
+    /// Basic land types Arena itself reported for opponent permanents this
+    /// match, e.g. `["Island","Swamp"]` (sorted, de-duplicated).
+    ///
+    /// Read from the game object's own `subtypes` rather than resolved from
+    /// `grpId`: basic-land grpIds are *not* stable identities (verified
+    /// 2026-08-11 — an object Arena described as `SubType_Swamp` carried grpId
+    /// 87457, which the card API resolves to Island). Arena's own type line is
+    /// the only trustworthy colour signal a basic carries.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opponent_basics: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -189,6 +199,11 @@ pub struct LiveMatch {
     /// Opponent grpIds seen so far this match (sorted).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub opponent_seen: Vec<u32>,
+    /// Basic land types Arena reported for opponent permanents (sorted).
+    /// See `TrackedMatch::opponent_basics` — the overlay infers live, so it
+    /// needs the same evidence the finished match carries.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub opponent_basics: Vec<String>,
     /// Current turn number (GRE turnInfo) — None until turn 1 registers.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub turn: Option<u32>,
@@ -554,6 +569,8 @@ struct PendingMatch {
     cur_turn: Option<u32>,
     /// Opponent cards (grpId) revealed via GRE this match.
     opponent_seen: HashSet<u32>,
+    /// Basic land types ("Swamp", …) Arena reported on opponent permanents.
+    opponent_basics: HashSet<String>,
 }
 
 /// Zones that mean one of my cards has physically left the library.
@@ -943,6 +960,7 @@ impl LogParser {
             sideboard,
             sideboard_total,
             opponent_seen: sorted_grp_ids(&pending.opponent_seen),
+            opponent_basics: sorted_strings(&pending.opponent_basics),
             turn: pending.cur_turn,
             on_play: pending.game_on_play.last().copied().flatten(),
             mulligans: pending.game_mulligans.last().copied().flatten(),
@@ -1184,6 +1202,7 @@ impl LogParser {
                                     changed |= note_opponent_cards(
                                         &mut self.deck_tracker.zone_types,
                                         &mut pending.opponent_seen,
+                                        &mut pending.opponent_basics,
                                         gsm,
                                         my_seat,
                                     );
@@ -1203,6 +1222,7 @@ impl LogParser {
                             changed |= note_opponent_cards(
                                 &mut self.deck_tracker.zone_types,
                                 &mut pending.opponent_seen,
+                                &mut pending.opponent_basics,
                                 gsm,
                                 my_seat,
                             );
@@ -1389,6 +1409,12 @@ fn sorted_grp_ids(set: &HashSet<u32>) -> Vec<u32> {
     v
 }
 
+fn sorted_strings(set: &HashSet<String>) -> Vec<String> {
+    let mut v: Vec<String> = set.iter().cloned().collect();
+    v.sort_unstable();
+    v
+}
+
 /// Zones where an opponent card's grpId is "seen" by the local player.
 fn zone_reveals_card(ty: &str) -> bool {
     matches!(
@@ -1503,10 +1529,45 @@ fn note_first_land(
     false
 }
 
+/// Basic land type carried by a game object's own `subtypes`, if any.
+///
+/// Only genuine basics qualify (`SuperType_Basic`): a basic Swamp taps for
+/// black and nothing else, which makes Arena's type line airtight colour
+/// evidence — unlike the object's `grpId`, which for basics varies by printing
+/// and art and can resolve to an entirely different land. Non-basic lands that
+/// merely *have* land subtypes (shocks, duals) are deliberately excluded; those
+/// resolve reliably by id and the inference already weighs them.
+fn basic_land_types(go: &serde_json::Value) -> Vec<String> {
+    let is_basic = go
+        .get("superTypes")
+        .and_then(|s| s.as_array())
+        .is_some_and(|a| a.iter().any(|t| t.as_str() == Some("SuperType_Basic")));
+    if !is_basic {
+        return Vec::new();
+    }
+    let is_land = go
+        .get("cardTypes")
+        .and_then(|c| c.as_array())
+        .is_some_and(|a| a.iter().any(|t| t.as_str() == Some("CardType_Land")));
+    if !is_land {
+        return Vec::new();
+    }
+    let Some(subs) = go.get("subtypes").and_then(|s| s.as_array()) else {
+        return Vec::new();
+    };
+    subs.iter()
+        .filter_map(|s| s.as_str())
+        .filter_map(|s| s.strip_prefix("SubType_"))
+        .filter(|s| matches!(*s, "Plains" | "Island" | "Swamp" | "Mountain" | "Forest"))
+        .map(str::to_string)
+        .collect()
+}
+
 /// Record opponent-owned cards that appear in revealed zones. Returns true if set grew.
 fn note_opponent_cards(
     zone_types: &mut HashMap<u32, String>,
     seen: &mut HashSet<u32>,
+    basics: &mut HashSet<String>,
     gsm: &serde_json::Value,
     my_seat: u32,
 ) -> bool {
@@ -1543,6 +1604,11 @@ fn note_opponent_cards(
             .unwrap_or("");
         if !zone_reveals_card(zone_ty) {
             continue;
+        }
+        for ty in basic_land_types(go) {
+            if basics.insert(ty) {
+                changed = true;
+            }
         }
         let Some(grp) = go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32) else {
             continue;
@@ -1664,6 +1730,15 @@ fn finalize_match(
         season_ordinal: pending.season_ordinal,
         opponent_seen: {
             let mut v: Vec<u32> = pending.opponent_seen.into_iter().collect();
+            v.sort_unstable();
+            if v.is_empty() {
+                None
+            } else {
+                Some(v)
+            }
+        },
+        opponent_basics: {
+            let mut v: Vec<String> = pending.opponent_basics.into_iter().collect();
             v.sort_unstable();
             if v.is_empty() {
                 None
@@ -2152,6 +2227,7 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
                 .map(|s| s.len() as u32)
                 .filter(|&n| n > 0),
             opponent_seen: m.opponent_seen.clone().unwrap_or_default(),
+            opponent_basics: m.opponent_basics.clone().unwrap_or_default(),
             turn: None,
             on_play: m.games.last().and_then(|g| g.on_play),
             mulligans: m.games.last().and_then(|g| g.mulligans),
@@ -3112,6 +3188,58 @@ mod tests {
         assert_eq!(seen, &vec![777, 888]);
     }
 
+    /// Basic lands carry their colour in Arena's own `subtypes`, not in a
+    /// resolvable grpId. Shape copied from a real Player.log game object.
+    #[test]
+    fn opponent_basic_land_types_come_from_subtypes() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-basics", "Ladder"));
+        // Opponent (seat 1) has a basic Swamp and a Hallowed Fountain-alike on
+        // the battlefield, plus a basic Island still in their library. Our own
+        // basic Mountain (seat 2) must never count as their evidence.
+        let gsm = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50, 53] },
+                { "zoneId": 31, "type": "ZoneType_Library", "ownerSeatId": 1, "objectInstanceIds": [51] },
+                { "zoneId": 12, "type": "ZoneType_Battlefield", "ownerSeatId": 2, "objectInstanceIds": [52] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 50, "grpId": 87457, "zoneId": 10, "ownerSeatId": 1,
+                  "superTypes": ["SuperType_Basic"], "cardTypes": ["CardType_Land"], "subtypes": ["SubType_Swamp"] },
+                { "type": "GameObjectType_Card", "instanceId": 53, "grpId": 91234, "zoneId": 10, "ownerSeatId": 1,
+                  "cardTypes": ["CardType_Land"], "subtypes": ["SubType_Plains", "SubType_Island"] },
+                { "type": "GameObjectType_Card", "instanceId": 51, "grpId": 95817, "zoneId": 31, "ownerSeatId": 1,
+                  "superTypes": ["SuperType_Basic"], "cardTypes": ["CardType_Land"], "subtypes": ["SubType_Island"] },
+                { "type": "GameObjectType_Card", "instanceId": 52, "grpId": 60001, "zoneId": 12, "ownerSeatId": 2,
+                  "superTypes": ["SuperType_Basic"], "cardTypes": ["CardType_Land"], "subtypes": ["SubType_Mountain"] }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(gsm);
+        let live = p.live_match().expect("playing");
+        assert_eq!(
+            live.opponent_basics,
+            vec!["Swamp".to_string()],
+            "only the opponent's revealed basic; not their library, not a \
+             non-basic dual, not our own Mountain"
+        );
+        let done = p.feed_line(&room_completed(
+            "m-basics",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done.len(), 1);
+        assert_eq!(
+            done[0].opponent_basics.as_ref().expect("persisted"),
+            &vec!["Swamp".to_string()]
+        );
+    }
+
     /// B2 — library growth before turn 1 counts as a mulligan; first land turn stamps.
     #[test]
     fn mulligans_and_first_land_turn_from_gre() {
@@ -3288,14 +3416,22 @@ mod tests {
                 m.games.iter().map(|g| g.on_play).collect::<Vec<_>>()
             );
             // Opponent-revealed card ids. Set FND_REPLAY_OPP=<name substring>
-            // to dump them for one opponent — this is what the archetype read
-            // is actually built from, so it is the ground truth when a guess
-            // looks impossible (e.g. a blue colour call with no blue cards).
+            // to dump them for one opponent, or `*` for every match — this is
+            // what the archetype read is actually built from, so it is the
+            // ground truth when a guess looks impossible (e.g. a blue colour
+            // call with no blue cards).
             if let Ok(want) = std::env::var("FND_REPLAY_OPP") {
                 let name = m.opponent_name.as_deref().unwrap_or("");
-                if !want.is_empty() && name.to_lowercase().contains(&want.to_lowercase()) {
+                let hit = want == "*" || name.to_lowercase().contains(&want.to_lowercase());
+                if !want.is_empty() && hit {
                     let seen = m.opponent_seen.clone().unwrap_or_default();
                     eprintln!("    opponentSeen ({}): {:?}", seen.len(), seen);
+                    // Arena's own basic-land types for that seat — the colour
+                    // evidence that does *not* depend on resolving a grpId.
+                    eprintln!(
+                        "    opponentBasics: {:?}",
+                        m.opponent_basics.clone().unwrap_or_default()
+                    );
                 }
             }
         }
