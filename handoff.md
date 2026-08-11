@@ -15,70 +15,101 @@ deck sync. The `decks` migration was run on the live DB by the owner on
 
 # ▶ START HERE — next session, in this order
 
-## 1. Confirm v2.8.1 lands on a real client
+## 1. Run TWO migrations on the live DB (owner, 5 minutes)
 
-Everything server-side is verified live. The client half cannot be checked from
-a dev machine and is the only thing outstanding:
+Both are written, committed and unrun. Until they are pasted into the
+Supabase SQL editor, the features below are dark — the app fails soft, so
+nothing breaks, but nothing works either.
 
-- **You stay signed in.** v2.8.1's whole point. Close and reopen the app: it
-  should still say "Signed in as …" without a fresh login.
-- **In-app Check for updates offers "Update & restart"**, not just a browser
-  download. This is the primary update path.
-- **Deck backup actually writes.** With sharing on, play a match; Settings
-  should then say "N lists saved". If it stays empty, suspect the Supabase
-  `decks` grants (42501) before the client.
-- **`persistRepairs` in a fresh diagnostic export.** Non-zero means the
-  reconcile pass is doing real work every session — the *append* path is still
-  broken and the root cause is still out there. Zero means it is healthy and
-  the 22 July stall was situational.
+| Migration | Unlocks |
+|-----------|---------|
+| `supabase/migrations/20260812020000_public_decks.sql` | "Show on profile" on a deck, and the Published decks table on `/u/<handle>` |
+| `supabase/migrations/20260812030000_friends.sql` | Friend codes in Settings, and the Friends race on Climb |
 
-### The auth bug, for the record (fixed in v2.8.1)
+## 2. Release train for v2.8.2
 
-Signing in again on every launch *and* every webview reload was never a token
-problem. The session was always written to `auth.json` — a valid
-`sb-…-auth-token` with a live refresh token was sitting there the whole time.
-Nothing ever read it back: the store started at `authName: null` and only the
-OAuth deep link ever filled it in, so the app reported "signed out" over a
-perfectly good session. `refreshAuth` existed in the store **with zero
-callers**.
+`main` is **four features ahead of the live v2.8.1** and none of it has
+shipped. The inference fix is the one that matters — it is the answer to
+"why did it say 4c Control".
 
-Boot now restores from the stored session and subscribes to
-`onAuthStateChange`. Two rules worth keeping:
+Before cutting it, one trade-off is the owner's to accept (numbers in the
+inference section below): when the opponent IS on a known list, exact naming
+falls 94.8% → 86.6%, in exchange for wrong-colour reads on off-meta
+opponents falling 25.8% → 5.9% on the owner's own match history.
 
-- Restore reads `getSession()` (local), never `getUser()` (server round trip).
-  A launch with wifi still coming up must not report a signed-in user as signed
-  out — that is the same bug wearing a new hat.
-- State that a surface can only learn from an event needs a subscription, not a
-  one-shot write at the moment the event happens. The deep-link handler wrote
-  `authName` once and nothing maintained it afterwards.
+## 3. What is still open
 
-**Look for this shape elsewhere.** Any store field that is only ever set by a
-handler, never read back from its source of truth at boot, has the same latent
-bug.
-
-## 2. Then: nothing is queued
-
-No feature work is outstanding. The roadmap programs are closed, Phase 2 is
-done, and Phase 4 (paid tier) is deferred indefinitely. The next scheduled item
-is a **measurement, not a build**: Search Console checkpoint ~2026-08-24
-(baseline 2026-08-11: 3 clicks, 32 impressions, avg position 11.2).
-
-Candidates if the owner wants work: Phase 1 item A (252 card pages — the
-largest remaining SEO corpus expansion; the position-11.2 read is the argument
-*for* it, not against), or public decks on profile pages, which slice 7 left
-one view away (`decks.is_public` exists and nothing reads it — publish via a
-view, never a policy, because RLS is row-level).
-
-## 3. Owner actions, not code
-
+- **Phase 3 (crowd meta) is gated on population, not code.** Its machinery
+  shipped inside Phase 2 slices 5/6 — upload, hourly rollup, Wilson
+  intervals, ≥30-game suppression. Cells stay empty until enough opted-in
+  users exist. Building more there will not fill them; users will.
 - **Email OTP needs custom SMTP** before promoting to a real audience.
-  Supabase's built-in mailer is rate-limited per project and users would
-  silently stop getting codes.
-- **§2.6 legal check** (WotC Fan Content, Scryfall commercial terms) — gates
-  Phase 4 only. Deferred.
-- Disk: `src-tauri/target/` ~9 GB (`cargo clean` reclaims it), `.git` ~1.4 GB
-  (needs the coordinated filter-repo in `docs/GIT-HISTORY-BLOAT.md` — **never
-  from CI or an agent**).
+- **§2.6 legal check** — gates Phase 4 only, deferred.
+- Disk: `src-tauri/target/` ~9 GB, `.git` ~1.4 GB (`docs/GIT-HISTORY-BLOAT.md`
+  — **never from CI or an agent**).
+
+---
+
+## Session log (2026-08-12, early hours)
+
+### Opponent inference — the "4c Control" bug, diagnosed and fixed
+
+An Esper opponent (Kaito, black removal, a white instant) was reported as
+**4c Control**, a deck they shared no card with. Reproduced exactly by
+replaying their nine revealed cards through the overlay's own code path. The
+guess named its own cause:
+
+```
+hits: ["Watery Grave","Bleachbone Verge","Multiversal Passage","Requiting Hex"]
+distinctiveHits: 1
+```
+
+Three of four "matches" were **lands**. Two compounding defects:
+
+1. The gate accepted a list on land overlap alone. A four-colour pile plays
+   every dual and utility land in the format, so it matched whatever anyone
+   put on the table and out-hit the single card that identified the deck.
+2. Extra colours were free — the penalty only punished a list for *missing*
+   a proven colour, so WUBR facing a WUB opponent paid nothing.
+
+Both fixed. Lands now corroborate but never carry; an unseen colour costs,
+scaled by how much of the deck we have actually seen, and is disqualifying
+once the sample is real unless three cards no other list plays say otherwise.
+
+**Measured on the owner's own 322 tracked matches** (5+ revealed cards each),
+old engine vs new:
+
+|                                        | old   | new  |
+|----------------------------------------|-------|------|
+| named a deck needing an untraced colour | 25.8% | 5.9% |
+| named a deck missing a *proven* colour  | 0.0%  | 0.0% |
+| gave a read at all                      | 95.3% | 92.9%|
+
+Synthetic, each list held OUT of the field (the ordinary ladder case, where
+the opponent is brewing): late-game wrong-colour reads 28.4% → 1.7%, exactly
+right colours 42.1% → 57.0%.
+
+**The tooling matters more than the fix.** Nobody could previously tell
+whether an inference change helped. There are now two harnesses — a held-out
+synthetic benchmark over the whole field, and a replay over real tracked
+history. Rebuild them before touching the engine again; the numbers above are
+the baseline.
+
+### Phase 1 item A — 316 card pages
+
+`/meta-web/card/<slug>.html` for every distinct card in the ranked field,
+plus `/meta-web/cards.html`. The corpus goes 32 pages → 348, and the internal
+link graph 192 edges → ~7,800. New `pipeline/meta-site-links.test.mjs`
+resolves every internal link and asserts no card page is orphaned — written
+after adding one nav entry silently broke 32 deck pages.
+
+### Public decks + Phase 5 social
+
+Both are new Supabase surfaces (see §1) plus their UI. The public deck page
+prints deck, format, size and last played — **not the list**: `main` is Arena
+card ids and there is no id→name map on the server. Resolving 60 ids per
+request through Scryfall would be slow and rude to a public API. If card
+names on public decks are wanted later, ship an id→name map first.
 
 ---
 
