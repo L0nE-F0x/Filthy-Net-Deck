@@ -74,10 +74,31 @@ function esc(s: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * Kept in sync with `labelFromSlug` in src/services/cloud/archetypeSlug.ts.
+ * Duplicated rather than imported because this function is bundled by Netlify
+ * under its own tsconfig and cannot reach into the app's `src/`. If you edit
+ * one, edit the other — a mismatch means the same deck is titled differently
+ * in the app and on the shared page.
+ */
+const UPPERCASE_TOKENS = new Set([
+  "uw", "ub", "ur", "ug", "wb", "wr", "wg", "br", "bg", "rg",
+  "wub", "wur", "wug", "wbr", "wbg", "wrg", "ubr", "ubg", "urg", "brg",
+  "wubr", "wubg", "wurg", "wbrg", "ubrg", "wubrg",
+  "bo1", "bo3", "mtg", "gy", "etb", "cmc",
+]);
+
 function label(slug: string): string {
   const parts = slug.split("-");
   if (parts[0] === "standard" || parts[0] === "pioneer") parts.shift();
-  return parts.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  return parts
+    .filter(Boolean)
+    .map((w) => {
+      if (UPPERCASE_TOKENS.has(w)) return w.toUpperCase();
+      if (/^\d[a-z]$/.test(w)) return w[0] + w[1].toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+    .join(" ");
 }
 
 function pct(wins: number, decided: number): string {

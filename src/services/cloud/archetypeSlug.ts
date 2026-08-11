@@ -47,6 +47,19 @@ export function archetypeSlug(
   return /^[a-z0-9-]{1,80}$/.test(slug) ? slug : null;
 }
 
+/**
+ * Words that are abbreviations, not names — naive title-casing turns "uw" into
+ * "Uw". Guild colour pairs are spelled out by the meta feed ("Azorius"), but
+ * players type the shorthand in their own deck names, and those slugs reach the
+ * public profile page.
+ */
+const UPPERCASE_TOKENS = new Set([
+  "uw", "ub", "ur", "ug", "wb", "wr", "wg", "br", "bg", "rg",
+  "wub", "wur", "wug", "wbr", "wbg", "wrg", "ubr", "ubg", "urg", "brg",
+  "wubr", "wubg", "wurg", "wbrg", "ubrg", "wubrg",
+  "bo1", "bo3", "mtg", "gy", "etb", "cmc",
+]);
+
 /** Human label back out of a slug, for display when the registry lacks a name. */
 export function labelFromSlug(slug: string): string {
   const parts = slug.split("-");
@@ -55,6 +68,11 @@ export function labelFromSlug(slug: string): string {
   }
   return parts
     .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((w) => {
+      if (UPPERCASE_TOKENS.has(w)) return w.toUpperCase();
+      // "4c" / "5c" — a digit then a letter reads as a colour count.
+      if (/^\d[a-z]$/.test(w)) return w[0] + w[1].toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
     .join(" ");
 }

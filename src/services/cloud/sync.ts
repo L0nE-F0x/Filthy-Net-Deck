@@ -217,6 +217,38 @@ export function handleProblem(raw: string): string | null {
 export interface ProfileSettings {
   handle: string | null;
   profilePublic: boolean;
+  /**
+   * Optional, and **never** seeded from the identity provider. Google returns
+   * the user's legal name, and the public profile page would publish it — see
+   * migration 20260811060000. Null means the page shows the handle, which the
+   * user chose.
+   */
+  displayName: string | null;
+}
+
+/** Public profile names are shown to strangers; keep them short and printable. */
+export function displayNameProblem(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null; // empty is fine — the page falls back to the handle
+  if (v.length > 40) return "Keep it under 40 characters.";
+  // eslint-disable-next-line no-control-regex
+  if (/[ -<>]/.test(v)) return "No angle brackets or control characters.";
+  return null;
+}
+
+export async function setDisplayName(name: string): Promise<string | null> {
+  const problem = displayNameProblem(name);
+  if (problem) throw new Error(problem);
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Sign in first.");
+  const value = name.trim() || null;
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ display_name: value })
+    .eq("id", user.id);
+  if (error) throw error;
+  return value;
 }
 
 export async function fetchProfileSettings(): Promise<ProfileSettings | null> {
@@ -226,12 +258,13 @@ export async function fetchProfileSettings(): Promise<ProfileSettings | null> {
     const supabase = await getSupabase();
     const { data } = await supabase
       .from("profiles")
-      .select("handle, profile_public")
+      .select("handle, profile_public, display_name")
       .eq("id", user.id)
       .maybeSingle();
     return {
       handle: (data?.handle as string | null) ?? null,
       profilePublic: Boolean(data?.profile_public),
+      displayName: (data?.display_name as string | null) ?? null,
     };
   } catch {
     return null;

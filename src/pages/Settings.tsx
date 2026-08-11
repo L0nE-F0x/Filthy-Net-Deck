@@ -144,6 +144,20 @@ export const Settings = memo(function Settings() {
   const [profilePublic, setProfilePublic] = useState(false);
   const [profileBusy, setProfileBusy] = useState(false);
   const [handleMsg, setHandleMsg] = useState<string | null>(null);
+  const [displayNameValue, setDisplayNameValue] = useState("");
+
+  const saveDisplayName = async () => {
+    setProfileBusy(true);
+    setHandleMsg(null);
+    try {
+      const m = await import("../services/cloud/sync");
+      await m.setDisplayName(displayNameValue);
+    } catch (e) {
+      setHandleMsg(e instanceof Error ? e.message : "Could not save that name.");
+    } finally {
+      setProfileBusy(false);
+    }
+  };
 
   // Pull the saved handle / visibility whenever the signed-in identity changes.
   useEffect(() => {
@@ -161,6 +175,7 @@ export const Settings = memo(function Settings() {
         setSavedHandle(p.handle);
         setProfilePublic(p.profilePublic);
         if (p.handle) setHandleValue(p.handle);
+        setDisplayNameValue(p.displayName ?? "");
       })
       .catch(() => {
         /* leave blank — claiming will surface any real problem */
@@ -962,6 +977,32 @@ export const Settings = memo(function Settings() {
                   )}
                   {savedHandle && (
                     <>
+                      <div className="flex flex-wrap items-end gap-2 mt-2">
+                        <label className="flex flex-col gap-1 grow" style={{ minWidth: "12rem" }}>
+                          <span className="text-xs text-muted">
+                            Display name (optional) — blank shows your handle
+                          </span>
+                          <input
+                            type="text"
+                            placeholder={savedHandle}
+                            maxLength={40}
+                            value={displayNameValue}
+                            onChange={(e) => setDisplayNameValue(e.target.value)}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={profileBusy}
+                          onClick={() => void saveDisplayName()}
+                        >
+                          Save name
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted m-0 mt-1">
+                        Your real name is never used here — this is blank unless
+                        you fill it in.
+                      </p>
                       <label className="settings-toggle-row mt-2">
                         <input
                           type="checkbox"
