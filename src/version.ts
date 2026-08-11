@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.8.1";
+export const APP_VERSION = "2.8.2";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "You stay signed in — no more logging in again every time the app opens",
-  "Your decklists are backed up now — they come back on any machine you sign in on",
-  "Opponent colours are read from Arena's own land types, so early reads are right sooner",
+  "Opponent colours stay honest — dual lands no longer invent a fourth colour on the overlay",
+  "Friend codes and a seasonal race on Climb — compare win rates with people you actually play",
+  "Publish a deck to your public profile page — format, size, and last played, on your terms",
 ];

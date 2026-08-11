@@ -3,41 +3,26 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.8.1** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
+**Live product version: v2.8.2** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
 **Phase 2 is complete — all 8 slices, all shipped.** Optional free account
 (Google / Discord / email code), opt-in match sharing, community matchup rates
 joined to your own record, public profile pages at `/u/<handle>`, and cloud
-deck sync. The `decks` migration was run on the live DB by the owner on
-2026-08-11 and v2.8.0 shipped the same evening.
+deck sync. Public decks + friends migrations were run on the live DB by the
+owner before the v2.8.2 cut (2026-08-12).
 
 ---
 
 # ▶ START HERE — next session, in this order
 
-## 1. Run TWO migrations on the live DB (owner, 5 minutes)
+## 1. Confirm v2.8.2 is live end-to-end
 
-Both are written, committed and unrun. Until they are pasted into the
-Supabase SQL editor, the features below are dark — the app fails soft, so
-nothing breaks, but nothing works either.
+If this handoff is read mid-deploy: `version.json` + `updater/latest.json`
+must both say **2.8.2**, Windows installer HTTP 200, and in-app
+**Check for updates** should offer **Update & restart** (not only a browser
+download). macOS dmg rolls in after tag CI (`Roll v2.8.2 out to macOS`).
 
-| Migration | Unlocks |
-|-----------|---------|
-| `supabase/migrations/20260812020000_public_decks.sql` | "Show on profile" on a deck, and the Published decks table on `/u/<handle>` |
-| `supabase/migrations/20260812030000_friends.sql` | Friend codes in Settings, and the Friends race on Climb |
-
-## 2. Release train for v2.8.2
-
-`main` is **four features ahead of the live v2.8.1** and none of it has
-shipped. The inference fix is the one that matters — it is the answer to
-"why did it say 4c Control".
-
-Before cutting it, one trade-off is the owner's to accept (numbers in the
-inference section below): when the opponent IS on a known list, exact naming
-falls 94.8% → 86.6%, in exchange for wrong-colour reads on off-meta
-opponents falling 25.8% → 5.9% on the owner's own match history.
-
-## 3. What is still open
+## 2. What is still open
 
 - **Phase 3 (crowd meta) is gated on population, not code.** Its machinery
   shipped inside Phase 2 slices 5/6 — upload, hourly rollup, Wilson
@@ -49,6 +34,15 @@ opponents falling 25.8% → 5.9% on the owner's own match history.
   — **never from CI or an agent**).
 
 ---
+
+## Released v2.8.2 (2026-08-12) — honest reads, friends, public decks
+
+Full AGENTS train. Inference trade accepted by owner: wrong-colour reads on
+the owner's history 25.8% → 5.9%, exact naming when opponent is on a known
+list 94.8% → 86.6%. Migrations for public decks + friends already on live DB.
+
+Ships: land-cannot-carry inference fix, 316 card pages on the site, publish
+a deck to your profile, friend codes + seasonal race on Climb.
 
 ## Session log (2026-08-12, early hours)
 
