@@ -3,19 +3,72 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.7.6** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
+**Live product version: v2.7.7** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
-**v2.7.6 = the Matchups + crowd release.** The full loop is shipped: optional
-free account (Google / Discord / email code), opt-in match sharing, community
-matchup rates joined to your own record.
+**Phase 2 is essentially complete.** Optional free account (Google / Discord /
+email code), opt-in match sharing, community matchup rates joined to your own
+record, and public profile pages at `/u/<handle>`. All verified live against a
+real installed build. Only slice 7 (cloud deck sync) remains.
 
 ---
 
-## Resume here (2026-08-11)
+# ▶ START HERE — next session, in this order
 
-### Session wrap (Claude, 2026-08-11) — Phase 2 complete, v2.7.6 shipped
+## 1. Basic-land colour fix (owner's pick, do first)
 
-Finished every remaining slice and cut the release.
+The **proper** fix for the bug mitigated on 2026-08-11 — full detail in
+"Open follow-up: basic-land colour evidence" below. Short version:
+
+- Arena basic-land grpIds are **not stable identities**. A real log had an
+  object Arena described as `subtypes:["SubType_Swamp"]` carrying grpId 87457,
+  which resolves through the card API to **Island**. One phantom Island made a
+  Rakdos opponent read as "Grixis Control".
+- Shipped mitigation: basics are *soft* colour evidence. That stops wrong data
+  but **costs early-game read strength** when only basics are down.
+- Proper fix: read Arena's own `subtypes` off the game object instead of
+  resolving basics by id. `note_opponent_cards` in `tracker.rs` already sees
+  them and throws them away. Needs a per-match set of opponent basic land types
+  plumbed through `TrackedMatch` **and** `LiveMatch` (the overlay needs it too)
+  into `observedColorsFromSeenCards`. ~40 lines Rust + TS. Restores the signal.
+- Then revisit the two tests in `opponentArchetype.test.ts` marked
+  "Changed 2026-08-11" — with real subtypes they can assert proof again.
+
+**Diagnostic that cracked it, reuse it:**
+```
+cd src-tauri
+FND_REPLAY_LOG=<Player.log> FND_REPLAY_OPP=<opponent name> \
+  cargo test replay_real_log -- --nocapture --ignored
+```
+Dumps one opponent's revealed grpIds from a real log. Resolve them at
+`https://api.scryfall.com/cards/arena/<id>`.
+
+## 2. Slice 7 — cloud deck sync
+
+The last unbuilt piece of Phase 2. Design: `docs/BACKEND-PHASE-2.md`. The
+`decks` table already exists in the core-schema migration (RLS: own rows only,
+public read when `is_public`) and is unused. Nothing else blocks it.
+
+## 3. Still open (not blocking either of the above)
+
+- **Tracker persistence.** The app had **373 matches in memory, 25 on disk**,
+  file last written 22 July. History is re-derived from Arena's logs each
+  launch, so nothing looks wrong until the logs rotate and the un-persisted
+  matches are gone. `append_match` used to swallow every error; it now counts
+  and logs them, and the diagnostic export carries `matchesOnDisk`,
+  `writeErrors`, `lastWriteError`. **Get a fresh diagnostic from a v2.7.7+
+  build — `lastWriteError` should name the cause in one line.** Root cause not
+  yet found: the file is writable from another process and `data_file` resolves.
+- **§2.6 legal check** (WotC Fan Content, Scryfall commercial terms) — gates
+  Phase 4 only, which is deferred indefinitely. Not blocking.
+- `src/services/tagSuggest.ts` is referenced only by its own test. Delete when
+  convenient.
+
+---
+
+## Session log (Claude, 2026-08-10 → 08-11)
+
+Three releases shipped: **v2.7.5** (health ping), **v2.7.6** (Matchups rebuild +
+accounts + crowd data), **v2.7.7** (public profiles + Discord).
 
 | Done | Detail |
 |------|--------|
@@ -72,20 +125,22 @@ own `subtypes` from the game object. The tracker already sees them in
 basic types plumbed through `TrackedMatch` / `LiveMatch` into the inference.
 ~40 lines across Rust and TS, and it restores the lost signal.
 
-### Next up (nothing is blocking)
+### After slices 1 and 2 above
 
-1. **Slice 4 — public profile pages** `/u/<handle>`. The acquisition-visible
-   half of Phase 2 and still unbuilt; §2.3 argues it ships before deck sync.
-2. **Slice 7 — cloud deck sync.**
-3. **Phase 1 item A — 252 card pages.** Still the largest SEO corpus expansion,
-   and the GSC read (position 11.2, 9.4% CTR) says the corpus works, there is
-   just too little of it.
-4. **Schedule the rollup**: `select cron.schedule('fnd-rollup', '17 * * * *', $$select public.refresh_trust(); select public.rebuild_matchup_rollup(30);$$)` — until this runs, `matchup_rollup` stays empty and the field column never fills.
-5. `src/services/tagSuggest.ts` is now referenced only by its own test — delete when convenient.
+**Phase 1 item A — 252 card pages.** The largest remaining SEO corpus
+expansion. The Search Console read (3 clicks / 32 impressions / **avg position
+11.2** / 9.4% CTR over 28 days) is the argument *for* it: Google ranks the
+existing 36 pages and they convert when surfaced — there simply are not enough
+of them to match many queries. Do not read that as "SEO isn't working".
 
 ---
 
-## Older: resume notes (2026-08-10 evening)
+## Older: resume notes (2026-08-10 evening) — SUPERSEDED
+
+> ⚠️ Everything below this line is history. Its "next steps" were completed on
+> 2026-08-11: the crowd fetch, the upload path, slice 4 profiles and the release
+> train are all done. Read it for context only — **START HERE at the top of this
+> file is the live list.**
 
 ### Session wrap (Grok, 2026-08-10)
 
@@ -133,8 +188,15 @@ hitting the session limit. Service layer was already on main
 | src/pages/Matchups.tsx | New archetype-centric page |
 | src/services/cloud/personalMatchups.ts | archetypeForMatch, personalRecords, mergeMatchups, readDelta, recordForArchetypeName |
 | src/services/cloud/crowdMeta.ts | Wilson intervals, matchupsFor, MIN_GAMES = 30 |
-| src/services/cloud/matchSync.ts | Shared match allowlist builder (upload not fully wired) |
-| src/services/cloud/archetypeSlug.ts | Canonical slug join key |
+| src/services/cloud/matchSync.ts | Shared-match allowlist builder — upload payload, never serialise TrackedMatch |
+| src/services/cloud/archetypeSlug.ts | Canonical slug join key (+ `labelFromSlug`, duplicated in the profile function) |
+| src/services/cloud/sync.ts | isCloudEnabled/setCloudEnabled, upload, fetchRollup, handle + display-name |
+| src/services/cloud/syncRunner.ts | Pulls live state + inference, calls the upload. The only trigger point |
+| src/services/cloud/auth.ts | OAuth (system browser + `fnd://`), email OTP, session |
+| src/services/opponentArchetype.ts | Inference. `observedColorsFromSeenCards` is where the basic-land fix lands |
+| src-tauri/src/deeplink.rs | `fnd://` — handles BOTH cold start and the single-instance argv route |
+| netlify/functions/profile.mts | Server-rendered `/u/<handle>` (config.path routing) |
+| supabase/migrations/ | 4 migrations, all run on the live DB |
 | src/components/stats/MatchHistory.tsx | onArchetype deep link |
 | docs/BACKEND-PHASE-2.md | Schema + slice plan |
 | docs/PLATFORM-STRATEGY.md | Growth phases |
@@ -152,13 +214,26 @@ hitting the session limit. Service layer was already on main
 
 | Item | Status |
 |------|--------|
-| App version | **v2.7.5** live; **no bump yet** for Matchups UI |
-| Branch | main (Matchups UI + this handoff committed together) |
-| Matchups UI | Rebuilt; personal half works; community empty |
-| Backend | Supabase Pro live; health ping shipped; core schema / match sharing code present - see recent feat(cloud) commits |
-| Gates last green | **475** vitest, tsc clean |
-| Licence | MIT |
-| Monetization | Ko-fi only; Phase 4 paid deferred |
+| App version | **v2.7.7** — live on Windows + macOS, updater signature verified |
+| Branch | `main` = `origin/main`, clean |
+| Gates last green | **504** vitest · tsc · eslint · functions typecheck · `cargo fmt`/`clippy` · **46** cargo tests |
+| Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
+| Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. Migrations run: health_pings, core schema, public profiles, display-name privacy |
+| Auth | Google **and** Discord enabled + verified live; email OTP available (Supabase's built-in mailer is rate-limited — needs custom SMTP before promoting to a real audience) |
+| Cron | `fnd-rollup` scheduled hourly (`select cron.schedule(...)`, job id 1) — without it `matchup_rollup` never fills |
+| Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |
+
+### Verified live vs merely built
+
+- **Verified against production:** Google sign-in (system browser → Supabase →
+  `callback.html` → `fnd://` deep link → app), signup trigger creating the
+  profile row, match upload (371 rows), profile page render + OG tags + 404 +
+  handle sanitisation, health ping, Matchups crowd orientation/suppression.
+- **Built, never exercised for real:** Discord sign-in (configured, unused),
+  email OTP sign-in, community matchup *cells* (need 30+ shared games from
+  accounts with 25+ matches and 7+ days — expect empty for a while **by
+  design**, that is the honesty discipline, not a fault).
 
 ---
 
@@ -254,20 +329,17 @@ hitting the session limit. Service layer was already on main
 
 ---
 
-## OPEN / next (not blocking)
+## Background queue (nothing here blocks the START HERE list)
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| **Next** | Backend / crowd-meta (`docs/PLATFORM-STRATEGY.md` §1.1) | The plan the owner wants to resume. §1.2 local-first-forever is a hard constraint |
-| Tail | Roll the v2.7.4 macOS dmg into `website/downloads/` | Site already links it; 404s until the tag CI artifact is committed |
-| Measurement | Search Console (checkpoint ~2026-08-24) | Two weeks from the 08-10 check; one week elapsed so far |
-| Optional | Upload Windows exe/sig to GitHub Release | macOS dmg is there; Windows is still site CDN + local archive |
-| Disk | `cargo clean` — `src-tauri/target/` is 8.8 GB | Owner call; costs one full rebuild |
-| Later | Further RAM | Main WebView + card images are the remaining floor |
-| Later | macOS signed updater | Workflow explicitly disables updater artifacts; key is local-only |
-
-**Open defects: none.** Nine found in the 2026-08-10 audit, all fixed in tree
-and unreleased — see `docs/AUDIT-2026-08-10-v2.7.3.md`.
+| Defect | Tracker persistence (373 in memory / 25 on disk) | See START HERE §3. Needs a fresh diagnostic from a v2.7.7+ build |
+| Measurement | Search Console checkpoint ~2026-08-24 | Baseline 2026-08-11: 3 clicks, 32 impressions, position 11.2 |
+| Product | Email OTP needs custom SMTP | Supabase's built-in mailer is rate-limited per project; users would silently stop getting codes. Do before promoting to the YouTube audience |
+| Optional | Upload Windows exe/sig to GitHub Releases | macOS dmgs are there; Windows lives on the site CDN + local archive only |
+| Disk | `src-tauri/target/` regrows to ~9 GB | `cargo clean` reclaims it at the cost of one full rebuild |
+| Later | macOS signed updater | Workflow disables updater artifacts; key is local-only |
+| Later | `.git` is ~1.4 GB | Needs the coordinated filter-repo in `docs/GIT-HISTORY-BLOAT.md`. **Never from CI or an agent** |
 
 ---
 
