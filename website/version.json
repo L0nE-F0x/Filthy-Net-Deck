@@ -1,5 +1,5 @@
 {
-  "version": "2.7.7",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.7.exe",
-  "notes": "v2.7.7: Claim a public profile page at filthy-net-deck.com/u/yourname and share your record and the decks you play. Discord joins Google and email codes as a sign-in option, and switching on match sharing now starts uploading straight away instead of waiting for the next launch."
+  "version": "2.8.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.0.exe",
+  "notes": "v2.8.0: Your decklists are backed up with match sharing, so a list survives a reinstall and comes back on any machine you sign in on. Opponent colours are now read from Arena's own land types instead of card ids, which fixes reads that named a colour the opponent never played. Match history is checked against the file after every game rather than written and hoped for."
 }

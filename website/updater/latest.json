@@ -1,11 +1,11 @@
 {
-  "version": "2.7.7",
-  "notes": "v2.7.7: Claim a public profile page at filthy-net-deck.com/u/yourname and share your record and the decks you play. Discord joins Google and email codes as a sign-in option, and switching on match sharing now starts uploading straight away instead of waiting for the next launch.",
-  "pub_date": "2026-08-11T05:00:30Z",
+  "version": "2.8.0",
+  "notes": "v2.8.0: Your decklists are backed up with match sharing, so a list survives a reinstall and comes back on any machine you sign in on. Opponent colours are now read from Arena's own land types instead of card ids, which fixes reads that named a colour the opponent never played. Match history is checked against the file after every game rather than written and hoped for.",
+  "pub_date": "2026-08-11T12:15:47Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZYcXBaelAzdTlYLzFORkI1YU4vRy9DcmxjNm5tVUxXVkpZc1U2bHNPd1dBM1hiSU5XcnRNZGRkam5Xc2d2Z0lKRTg4QzQwcVhwR1J0UE01VW04eHdFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDI0NDAwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy43X3g2NC1zZXR1cC5leGUKbFVDYTQrN1duTGM4U1hqWDAyNzIyL1ZabC9FK1VZMnhoOFdzZEVkWVJpWUZBRTNTQ0taRkJ3S2JYMElUOHZlaWRDWWxaaWk3MDZYMWhLMmRtWGhjREE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.7.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnd0NW9MOTZad0ZTNUduSG45VVNJTHNjY2twWVBwczFYVVdkRHRrZm9nbnY3VjJOanYzeDhHWEVJcTRxQ1dQQmhpNVNxaXVMdEcrNndnN1EzT1BGR3dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDUwNTIwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuOC4wX3g2NC1zZXR1cC5leGUKSVVuRFFpWms0dU1FaDNacURhRy80dmN5TUVLWGlPM0F3UnFkNlJZRFBxNFpGTk1rRVdpVlFpUWxXQThHWU12TDdFTm53cTZKeGNVTUhPZ01KNThaQ2c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.0.exe"
     }
   }
 }
