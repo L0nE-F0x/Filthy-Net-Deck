@@ -1,11 +1,11 @@
 {
-  "version": "2.7.6",
-  "notes": "v2.7.6: Matchups rebuilt \u2014 your win rate against every archetype, worked out automatically from the cards your opponents show, with no tagging. Add a free optional account (Google, Discord or an email code) and opt in to match sharing to see community matchup rates next to your own, so you can tell whether a matchup is genuinely bad or just bad for you.",
-  "pub_date": "2026-08-10T23:38:29Z",
+  "version": "2.7.7",
+  "notes": "v2.7.7: Claim a public profile page at filthy-net-deck.com/u/yourname and share your record and the decks you play. Discord joins Google and email codes as a sign-in option, and switching on match sharing now starts uploading straight away instead of waiting for the next launch.",
+  "pub_date": "2026-08-11T05:00:30Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjk3SlV0TkZ3cEx6a3NOU3JvZXJGL3BuajVWa3lMUTJlYys0VWgwTUhZTW9wTmtleGJvNVVaMmNRU1ZqK2JNQ2VVVXMyZkc3QkRaK1BjcmZpcVVnY2dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDA1MDgyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy42X3g2NC1zZXR1cC5leGUKdnVSTC84cE1UK3laUkw4SlpyY2NaeFVKbkZDZEJubHM3Qnh3WDgzd2lqWUZuN3pmZEFkeVdRc1hjMG9nSjVxZCtsakhzalVqS1NkazZVc0Q0aUh1QlE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.6.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZYcXBaelAzdTlYLzFORkI1YU4vRy9DcmxjNm5tVUxXVkpZc1U2bHNPd1dBM1hiSU5XcnRNZGRkam5Xc2d2Z0lKRTg4QzQwcVhwR1J0UE01VW04eHdFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDI0NDAwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuNy43X3g2NC1zZXR1cC5leGUKbFVDYTQrN1duTGM4U1hqWDAyNzIyL1ZabC9FK1VZMnhoOFdzZEVkWVJpWUZBRTNTQ0taRkJ3S2JYMElUOHZlaWRDWWxaaWk3MDZYMWhLMmRtWGhjREE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.7.exe"
     }
   }
 }

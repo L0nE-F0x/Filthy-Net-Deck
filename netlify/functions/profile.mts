@@ -32,6 +32,16 @@ const SUPABASE_URL = "https://bzcryoocsapqtyhiwzbe.supabase.co";
 const PUBLISHABLE_KEY = "sb_publishable_tHajCDbl4J4AIvaoWnEpWg_XiQPkESE";
 const SITE = "https://filthy-net-deck.com";
 
+/**
+ * Cache-buster for the shared OG card. Bump with each release alongside
+ * `website/index.html`.
+ *
+ * Kept as ONE constant on purpose: the homepage's og:image sat pinned at
+ * `?v=1.5.1` for eight releases because the value was inline in several places,
+ * and social caches served a stale card the whole time. One name, one edit.
+ */
+const OG_VERSION = "2.7.7";
+
 interface ProfileRow {
   handle: string;
   display_name: string | null;
@@ -97,11 +107,11 @@ ${opts.noindex ? '<meta name="robots" content="noindex" />' : ""}
 <meta property="og:title" content="${esc(opts.title)}" />
 <meta property="og:description" content="${esc(opts.desc)}" />
 <meta property="og:url" content="${esc(opts.url)}" />
-<meta property="og:image" content="${SITE}/assets/og-image.png?v=2.7.6" />
+<meta property="og:image" content="${SITE}/assets/og-image.png?v=${OG_VERSION}" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${esc(opts.title)}" />
 <meta name="twitter:description" content="${esc(opts.desc)}" />
-<meta name="twitter:image" content="${SITE}/assets/og-image.png?v=2.7.6" />
+<meta name="twitter:image" content="${SITE}/assets/og-image.png?v=${OG_VERSION}" />
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }

@@ -1,5 +1,5 @@
 {
-  "version": "2.7.6",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.6.exe",
-  "notes": "v2.7.6: Matchups rebuilt \u2014 your win rate against every archetype, worked out automatically from the cards your opponents show, with no tagging. Add a free optional account (Google, Discord or an email code) and opt in to match sharing to see community matchup rates next to your own, so you can tell whether a matchup is genuinely bad or just bad for you."
+  "version": "2.7.7",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.7.7.exe",
+  "notes": "v2.7.7: Claim a public profile page at filthy-net-deck.com/u/yourname and share your record and the decks you play. Discord joins Google and email codes as a sign-in option, and switching on match sharing now starts uploading straight away instead of waiting for the next launch."
 }
