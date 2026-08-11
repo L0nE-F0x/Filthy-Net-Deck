@@ -1,11 +1,11 @@
 {
-  "version": "2.8.0",
-  "notes": "v2.8.0: Your decklists are backed up with match sharing, so a list survives a reinstall and comes back on any machine you sign in on. Opponent colours are now read from Arena's own land types instead of card ids, which fixes reads that named a colour the opponent never played. Match history is checked against the file after every game rather than written and hoped for.",
-  "pub_date": "2026-08-11T12:15:47Z",
+  "version": "2.8.1",
+  "notes": "v2.8.1: You stay signed in. The app was asking you to log in again on every launch even though your session was saved the whole time — it just never read it back. Sign in once and it sticks, including after the window reloads.",
+  "pub_date": "2026-08-11T15:11:20Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnd0NW9MOTZad0ZTNUduSG45VVNJTHNjY2twWVBwczFYVVdkRHRrZm9nbnY3VjJOanYzeDhHWEVJcTRxQ1dQQmhpNVNxaXVMdEcrNndnN1EzT1BGR3dzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDUwNTIwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuOC4wX3g2NC1zZXR1cC5leGUKSVVuRFFpWms0dU1FaDNacURhRy80dmN5TUVLWGlPM0F3UnFkNlJZRFBxNFpGTk1rRVdpVlFpUWxXQThHWU12TDdFTm53cTZKeGNVTUhPZ01KNThaQ2c9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjNyUm5uMlJMcFd2Unlaa3RZSzBEdkFVOEplUlV6aE5SRXhaVUNQRS8vcHlYRS8yMm9zQkp3SEl1Zk9HNjFEM0hGcVdlU08rbUJYeWExR01idDJQa1FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDYxMDcwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuOC4xX3g2NC1zZXR1cC5leGUKQXB2aG5iZlhlcC9wQ2ZZOGRxV1BaMng0T0xKaWswMElvZHJMbUdJLzZLRlo4Sy9TckQrazVXZFB1L3NnNUorYTVLM1NiSU9pNVVhdTJhT3VIOUNGRFE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.1.exe"
     }
   }
 }
