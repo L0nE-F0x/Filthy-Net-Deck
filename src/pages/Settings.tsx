@@ -139,6 +139,65 @@ export const Settings = memo(function Settings() {
 
   const [cloudEnabled, setCloudEnabled] = useState(false);
   const [cloudBusy, setCloudBusy] = useState(false);
+  const [handleValue, setHandleValue] = useState("");
+  const [savedHandle, setSavedHandle] = useState<string | null>(null);
+  const [profilePublic, setProfilePublic] = useState(false);
+  const [profileBusy, setProfileBusy] = useState(false);
+  const [handleMsg, setHandleMsg] = useState<string | null>(null);
+
+  // Pull the saved handle / visibility whenever the signed-in identity changes.
+  useEffect(() => {
+    if (!authName) {
+      setSavedHandle(null);
+      setProfilePublic(false);
+      setHandleValue("");
+      return;
+    }
+    let cancelled = false;
+    void import("../services/cloud/sync")
+      .then((m) => m.fetchProfileSettings())
+      .then((p) => {
+        if (cancelled || !p) return;
+        setSavedHandle(p.handle);
+        setProfilePublic(p.profilePublic);
+        if (p.handle) setHandleValue(p.handle);
+      })
+      .catch(() => {
+        /* leave blank — claiming will surface any real problem */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authName]);
+
+  const saveHandle = async () => {
+    setProfileBusy(true);
+    setHandleMsg(null);
+    try {
+      const m = await import("../services/cloud/sync");
+      const claimed = await m.claimHandle(handleValue);
+      setSavedHandle(claimed);
+      setHandleValue(claimed);
+    } catch (e) {
+      setHandleMsg(e instanceof Error ? e.message : "Could not save that name.");
+    } finally {
+      setProfileBusy(false);
+    }
+  };
+
+  const toggleProfilePublic = async (on: boolean) => {
+    setProfileBusy(true);
+    setProfilePublic(on);
+    try {
+      const m = await import("../services/cloud/sync");
+      await m.setProfilePublic(on);
+    } catch (e) {
+      setProfilePublic(!on);
+      setHandleMsg(e instanceof Error ? e.message : "Could not update visibility.");
+    } finally {
+      setProfileBusy(false);
+    }
+  };
 
   // Read the server-side opt-in whenever the signed-in identity changes.
   useEffect(() => {
@@ -860,6 +919,78 @@ export const Settings = memo(function Settings() {
                     </span>
                   </label>
                 </div>
+                {/* Public profile page — the shareable half of an account. */}
+                <div className="settings-note mt-3">
+                  <p className="m-0 mb-2 text-xs text-muted">
+                    <strong className="text-foam">Your profile page</strong> — a
+                    public page you can share, showing your record and the decks
+                    you play. Off unless you turn it on.
+                  </p>
+                  <div className="flex flex-wrap items-end gap-2">
+                    <label className="flex flex-col gap-1 grow" style={{ minWidth: "12rem" }}>
+                      <span className="text-xs text-muted">
+                        filthy-net-deck.com/u/
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="your-name"
+                        maxLength={24}
+                        value={handleValue}
+                        onChange={(e) => setHandleValue(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={profileBusy || !handleValue.trim()}
+                      onClick={() => void saveHandle()}
+                    >
+                      {profileBusy ? "Saving…" : savedHandle ? "Change" : "Claim"}
+                    </button>
+                  </div>
+                  {handleMsg && (
+                    <p className="text-xs m-0 mt-2" style={{ color: "var(--color-loss)" }}>
+                      {handleMsg}
+                    </p>
+                  )}
+                  {savedHandle && (
+                    <>
+                      <label className="settings-toggle-row mt-2">
+                        <input
+                          type="checkbox"
+                          checked={profilePublic}
+                          disabled={profileBusy}
+                          onChange={(e) => void toggleProfilePublic(e.target.checked)}
+                        />
+                        <span>
+                          <strong>Make my profile page public</strong>
+                          <em>
+                            Anyone with the link can see it — and search engines
+                            can index it
+                          </em>
+                        </span>
+                      </label>
+                      {profilePublic && (
+                        <p className="text-xs text-muted m-0 mt-2">
+                          Live at{" "}
+                          <button
+                            type="button"
+                            className="link-btn"
+                            onClick={() =>
+                              void openExternal(
+                                `https://filthy-net-deck.com/u/${savedHandle}`,
+                              )
+                            }
+                          >
+                            filthy-net-deck.com/u/{savedHandle}
+                          </button>
+                          . Stats only appear while match sharing is on.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 <div className="settings-note mt-2">
                   <p className="m-0 mb-1 text-xs text-muted">
                     <strong className="text-foam">What gets shared</strong>, per match:

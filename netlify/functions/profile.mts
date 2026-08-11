@@ -1,0 +1,288 @@
+/**
+ * /u/<handle> — public player profile, server-rendered.
+ *
+ * WHY SERVER-RENDERED
+ * This page's job is acquisition, not UI (PLATFORM-STRATEGY.md §2.3): a player
+ * shares it, which makes it an indexable page, which drives installs, which
+ * feed the crowd data. A client-rendered page would be invisible to crawlers
+ * and the whole loop would not close. So: HTML out of the function, on
+ * filthy-net-deck.com, with real OG tags.
+ *
+ * DATA
+ * Reads three read-only views (public_profiles, public_profile_stats,
+ * public_profile_archetypes) with the PUBLISHABLE key. Those views are the
+ * access control — RLS is row-level, so the underlying `profiles` table stays
+ * locked and the views expose a curated column set for opted-in users only.
+ * Nothing here can reach a private profile or an unshared match.
+ *
+ * FAILURE POLICY
+ * A backend problem must render as "profile unavailable", never a stack trace
+ * and never a 500 that a crawler will remember. Unknown handles are a real 404
+ * so they do not get indexed.
+ *
+ * ROUTING
+ * `config.path` below. Verified live 2026-08-11: /api/fnd-stats returns 401
+ * (its own auth check) rather than 404, which proves Netlify honours
+ * config.path routing on this site — the repo-root netlify.toml comment
+ * claiming functions are "inert" is stale.
+ */
+import type { Config, Context } from "@netlify/functions";
+
+const SUPABASE_URL = "https://bzcryoocsapqtyhiwzbe.supabase.co";
+const PUBLISHABLE_KEY = "sb_publishable_tHajCDbl4J4AIvaoWnEpWg_XiQPkESE";
+const SITE = "https://filthy-net-deck.com";
+
+interface ProfileRow {
+  handle: string;
+  display_name: string | null;
+  created_at: string;
+}
+interface StatsRow {
+  matches: number;
+  wins: number;
+  losses: number;
+  archetypes: number;
+  first_match: string | null;
+  last_match: string | null;
+}
+interface ArchetypeRow {
+  archetype: string;
+  format: string;
+  matches: number;
+  wins: number;
+  losses: number;
+}
+
+/** Escape everything user-controlled. Handles and display names come from
+ *  third-party identity providers and are not trustworthy input. */
+function esc(s: unknown): string {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function label(slug: string): string {
+  const parts = slug.split("-");
+  if (parts[0] === "standard" || parts[0] === "pioneer") parts.shift();
+  return parts.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+function pct(wins: number, decided: number): string {
+  if (!decided) return "—";
+  return `${Math.round((wins / decided) * 100)}%`;
+}
+
+async function sb<T>(path: string): Promise<T[]> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: { apikey: PUBLISHABLE_KEY, authorization: `Bearer ${PUBLISHABLE_KEY}` },
+  });
+  if (!res.ok) return [];
+  return (await res.json()) as T[];
+}
+
+function page(body: string, opts: { title: string; desc: string; url: string; noindex?: boolean }) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(opts.title)}</title>
+<meta name="description" content="${esc(opts.desc)}" />
+${opts.noindex ? '<meta name="robots" content="noindex" />' : ""}
+<link rel="canonical" href="${esc(opts.url)}" />
+<meta property="og:type" content="profile" />
+<meta property="og:title" content="${esc(opts.title)}" />
+<meta property="og:description" content="${esc(opts.desc)}" />
+<meta property="og:url" content="${esc(opts.url)}" />
+<meta property="og:image" content="${SITE}/assets/og-image.png?v=2.7.6" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${esc(opts.title)}" />
+<meta name="twitter:description" content="${esc(opts.desc)}" />
+<meta name="twitter:image" content="${SITE}/assets/og-image.png?v=2.7.6" />
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#050604; color:#f2f4ea; padding:2rem 1rem;
+    font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  .wrap { max-width: 46rem; margin: 0 auto; }
+  a { color:#b8f000; }
+  header { display:flex; align-items:center; gap:.9rem; margin-bottom:1.5rem; }
+  header img { width:52px; height:52px; border-radius:12px; }
+  h1 { font-size:1.6rem; margin:0; letter-spacing:-0.02em; }
+  .sub { color:#9aa38a; font-size:.85rem; margin:.15rem 0 0; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(8rem,1fr)); gap:.7rem; margin:1.4rem 0; }
+  .card { background:#0e100b; border:1px solid #23261c; border-radius:.6rem; padding:.85rem; }
+  .card b { display:block; font-size:1.5rem; letter-spacing:-0.02em; }
+  .card span { color:#9aa38a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
+  table { width:100%; border-collapse:collapse; margin-top:.5rem; font-size:.9rem; }
+  th,td { text-align:left; padding:.5rem .4rem; border-bottom:1px solid #1b1e15; }
+  th { color:#9aa38a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .cta { margin-top:2rem; padding:1rem; background:#0e100b; border:1px solid #23261c; border-radius:.6rem; }
+  .btn { display:inline-block; margin-top:.6rem; padding:.55rem 1rem; border-radius:.5rem;
+    background:#b8f000; color:#050604; font-weight:650; text-decoration:none; font-size:.9rem; }
+  footer { margin-top:2.5rem; color:#6c7460; font-size:.75rem; }
+  .empty { color:#9aa38a; }
+</style>
+</head>
+<body><div class="wrap">${body}
+<footer>
+  <p>Not affiliated with Wizards of the Coast. MTG and MTG Arena are trademarks of Wizards of the Coast LLC.</p>
+</footer>
+</div></body></html>`;
+}
+
+const CTA = `<div class="cta">
+  <strong>Filthy Net Deck</strong> — a free MTG Arena companion for Standard &amp; Pioneer.
+  Daily ranked decks, a local winrate tracker, and an in-game overlay.
+  <br /><a class="btn" href="${SITE}/">Download free</a>
+</div>`;
+
+export default async (_req: Request, ctx: Context) => {
+  const raw = String(ctx.params?.handle ?? "").toLowerCase();
+  const handle = raw.replace(/[^a-z0-9_-]/g, "").slice(0, 24);
+
+  if (!handle) {
+    return new Response(
+      page(`<h1>No such profile</h1><p class="sub">That link is missing a player name.</p>${CTA}`, {
+        title: "Profile not found — Filthy Net Deck",
+        desc: "That profile does not exist.",
+        url: `${SITE}/u/`,
+        noindex: true,
+      }),
+      { status: 404, headers: { "content-type": "text/html; charset=utf-8" } },
+    );
+  }
+
+  const url = `${SITE}/u/${handle}`;
+
+  try {
+    const [profiles, stats, archetypes] = await Promise.all([
+      sb<ProfileRow>(`public_profiles?handle=eq.${encodeURIComponent(handle)}&select=*`),
+      sb<StatsRow>(`public_profile_stats?handle=eq.${encodeURIComponent(handle)}&select=*`),
+      sb<ArchetypeRow>(
+        `public_profile_archetypes?handle=eq.${encodeURIComponent(handle)}&select=*&order=matches.desc&limit=25`,
+      ),
+    ]);
+
+    const profile = profiles[0];
+    if (!profile) {
+      // A real 404 so a wrong or private handle never gets indexed.
+      return new Response(
+        page(
+          `<h1>No such profile</h1>
+           <p class="sub">Nobody is using <strong>${esc(handle)}</strong>, or that profile is private.</p>${CTA}`,
+          {
+            title: "Profile not found — Filthy Net Deck",
+            desc: "That profile does not exist or is private.",
+            url,
+            noindex: true,
+          },
+        ),
+        { status: 404, headers: { "content-type": "text/html; charset=utf-8" } },
+      );
+    }
+
+    const name = profile.display_name?.trim() || profile.handle;
+    const s = stats[0];
+    const decided = s ? s.wins + s.losses : 0;
+    const rate = s ? pct(s.wins, decided) : "—";
+
+    const head = `<header>
+        <img src="${SITE}/assets/app-icon.png" alt="" />
+        <div>
+          <h1>${esc(name)}</h1>
+          <p class="sub">/u/${esc(profile.handle)} · Filthy Net Deck</p>
+        </div>
+      </header>`;
+
+    if (!s || s.matches === 0) {
+      return new Response(
+        page(
+          `${head}<p class="empty">This player hasn't shared any match results yet.</p>${CTA}`,
+          {
+            title: `${name} — Filthy Net Deck`,
+            desc: `${name}'s MTG Arena profile on Filthy Net Deck.`,
+            url,
+          },
+        ),
+        {
+          status: 200,
+          headers: {
+            "content-type": "text/html; charset=utf-8",
+            "cache-control": "public, max-age=300",
+          },
+        },
+      );
+    }
+
+    const rows = archetypes
+      .map((a) => {
+        const d = a.wins + a.losses;
+        return `<tr>
+          <td>${esc(label(a.archetype))}</td>
+          <td>${esc(a.format)}</td>
+          <td class="num">${a.matches}</td>
+          <td class="num">${a.wins}–${a.losses}</td>
+          <td class="num">${pct(a.wins, d)}</td>
+        </tr>`;
+      })
+      .join("");
+
+    const body = `${head}
+      <div class="cards">
+        <div class="card"><b>${s.matches}</b><span>Matches</span></div>
+        <div class="card"><b>${rate}</b><span>Win rate</span></div>
+        <div class="card"><b>${s.wins}–${s.losses}</b><span>Record</span></div>
+        <div class="card"><b>${s.archetypes}</b><span>Decks played</span></div>
+      </div>
+      <h2 style="font-size:1rem;margin:1.5rem 0 0">Decks played</h2>
+      <table>
+        <thead><tr>
+          <th>Deck</th><th>Format</th>
+          <th class="num">Matches</th><th class="num">W–L</th><th class="num">Win rate</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${CTA}`;
+
+    return new Response(
+      page(body, {
+        title: `${name} — ${s.matches} MTG Arena matches, ${rate} win rate | Filthy Net Deck`,
+        desc: `${name} has played ${s.matches} tracked MTG Arena matches across ${s.archetypes} decks, with a ${rate} win rate. Tracked with Filthy Net Deck.`,
+        url,
+      }),
+      {
+        status: 200,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          // Short cache: profiles change as people play, but a crawler or a
+          // burst of shares must not hit the database per request.
+          "cache-control": "public, max-age=300",
+        },
+      },
+    );
+  } catch {
+    // Never a 500 — a crawler remembers those, and there is nothing the visitor
+    // can do about it either.
+    return new Response(
+      page(
+        `<h1>Profile unavailable</h1><p class="sub">Something went wrong loading this profile. Try again shortly.</p>${CTA}`,
+        {
+          title: "Profile unavailable — Filthy Net Deck",
+          desc: "This profile could not be loaded.",
+          url,
+          noindex: true,
+        },
+      ),
+      { status: 200, headers: { "content-type": "text/html; charset=utf-8" } },
+    );
+  }
+};
+
+export const config: Config = {
+  path: "/u/:handle",
+};

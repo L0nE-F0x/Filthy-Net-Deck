@@ -188,6 +188,89 @@ async function runUpload(
   return { attempted: fresh.length, uploaded, skipped: fresh.length - uploaded };
 }
 
+// ---------------------------------------------------------------------------
+// Public profile (slice 4)
+// ---------------------------------------------------------------------------
+
+/** Same shape the server enforces, so bad input fails before a round trip. */
+const HANDLE_RE = /^[a-z0-9][a-z0-9_-]{1,22}[a-z0-9]$/;
+
+export const RESERVED_HANDLES = new Set([
+  "admin", "root", "api", "www", "app", "support", "help", "about", "settings",
+  "login", "signin", "signup", "account", "filthynetdeck", "fnd", "official",
+  "staff", "mod", "moderator", "system", "null", "undefined", "u",
+]);
+
+/** null when fine, otherwise a message to show the user. */
+export function handleProblem(raw: string): string | null {
+  const h = raw.trim().toLowerCase();
+  if (!h) return "Pick a name for your profile link.";
+  if (h.length < 3) return "Too short — 3 characters minimum.";
+  if (h.length > 24) return "Too long — 24 characters maximum.";
+  if (!HANDLE_RE.test(h)) {
+    return "Use letters, numbers, hyphens or underscores, starting and ending with a letter or number.";
+  }
+  if (RESERVED_HANDLES.has(h)) return "That name is reserved. Try another.";
+  return null;
+}
+
+export interface ProfileSettings {
+  handle: string | null;
+  profilePublic: boolean;
+}
+
+export async function fetchProfileSettings(): Promise<ProfileSettings | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  try {
+    const supabase = await getSupabase();
+    const { data } = await supabase
+      .from("profiles")
+      .select("handle, profile_public")
+      .eq("id", user.id)
+      .maybeSingle();
+    return {
+      handle: (data?.handle as string | null) ?? null,
+      profilePublic: Boolean(data?.profile_public),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Claim a handle. Goes through the `claim_handle` function rather than a direct
+ * update so a collision comes back as something the UI can say out loud instead
+ * of a raw 23505, and so a user can only ever set their own.
+ */
+export async function claimHandle(raw: string): Promise<string> {
+  const problem = handleProblem(raw);
+  if (problem) throw new Error(problem);
+  const supabase = await getSupabase();
+  const { data, error } = await supabase.rpc("claim_handle", {
+    new_handle: raw.trim().toLowerCase(),
+  });
+  if (error) {
+    throw new Error(
+      /unique|taken|duplicate/i.test(error.message)
+        ? "That name is already taken."
+        : error.message,
+    );
+  }
+  return String(data ?? raw.trim().toLowerCase());
+}
+
+export async function setProfilePublic(on: boolean): Promise<void> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Sign in first.");
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ profile_public: on })
+    .eq("id", user.id);
+  if (error) throw error;
+}
+
 /**
  * Community matchup rows for a format. Reads the rollup only — raw matches are
  * never queried, so egress stays flat as uploads grow.
