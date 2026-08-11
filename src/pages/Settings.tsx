@@ -226,6 +226,13 @@ export const Settings = memo(function Settings() {
     try {
       const m = await import("../services/cloud/sync");
       await m.setCloudEnabled(on);
+      if (on) {
+        // Send straight away rather than waiting for the next launch or match.
+        // Opting in and seeing nothing happen reads as broken, and the first
+        // run is exactly when there is a backlog worth sending.
+        const runner = await import("../services/cloud/syncRunner");
+        void runner.syncMatchesNow();
+      }
     } catch (e) {
       setCloudEnabled(!on);
       useAppStore.getState().setAuthResult({
