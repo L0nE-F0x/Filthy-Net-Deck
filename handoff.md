@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.8.0** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
+**Live product version: v2.8.1** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
 **Phase 2 is complete — all 8 slices, all shipped.** Optional free account
 (Google / Discord / email code), opt-in match sharing, community matchup rates
@@ -15,21 +15,46 @@ deck sync. The `decks` migration was run on the live DB by the owner on
 
 # ▶ START HERE — next session, in this order
 
-## 1. Confirm v2.8.0 lands on a real client
+## 1. Confirm v2.8.1 lands on a real client
 
-Everything server-side is verified live (below). The one thing that cannot be
-checked from here is the client half:
+Everything server-side is verified live. The client half cannot be checked from
+a dev machine and is the only thing outstanding:
 
+- **You stay signed in.** v2.8.1's whole point. Close and reopen the app: it
+  should still say "Signed in as …" without a fresh login.
 - **In-app Check for updates offers "Update & restart"**, not just a browser
-  download. This is the primary update path and the only step of the release
-  checklist still unticked.
-- **Deck backup actually writes.** Sign in, make sure sharing is on, play a
-  match; Settings should then say "N lists saved". If it stays at nothing, the
-  Supabase `decks` grants are the first suspect (42501), not the client.
-- **`persistRepairs` in a fresh diagnostic export.** If it is non-zero the
-  reconcile pass is doing real work every session, which means the *append*
-  path is still broken and the root cause is still out there. Zero means the
-  fast path is healthy and the 22 July stall was situational.
+  download. This is the primary update path.
+- **Deck backup actually writes.** With sharing on, play a match; Settings
+  should then say "N lists saved". If it stays empty, suspect the Supabase
+  `decks` grants (42501) before the client.
+- **`persistRepairs` in a fresh diagnostic export.** Non-zero means the
+  reconcile pass is doing real work every session — the *append* path is still
+  broken and the root cause is still out there. Zero means it is healthy and
+  the 22 July stall was situational.
+
+### The auth bug, for the record (fixed in v2.8.1)
+
+Signing in again on every launch *and* every webview reload was never a token
+problem. The session was always written to `auth.json` — a valid
+`sb-…-auth-token` with a live refresh token was sitting there the whole time.
+Nothing ever read it back: the store started at `authName: null` and only the
+OAuth deep link ever filled it in, so the app reported "signed out" over a
+perfectly good session. `refreshAuth` existed in the store **with zero
+callers**.
+
+Boot now restores from the stored session and subscribes to
+`onAuthStateChange`. Two rules worth keeping:
+
+- Restore reads `getSession()` (local), never `getUser()` (server round trip).
+  A launch with wifi still coming up must not report a signed-in user as signed
+  out — that is the same bug wearing a new hat.
+- State that a surface can only learn from an event needs a subscription, not a
+  one-shot write at the moment the event happens. The deep-link handler wrote
+  `authName` once and nothing maintained it afterwards.
+
+**Look for this shape elsewhere.** Any store field that is only ever set by a
+handler, never read back from its source of truth at boot, has the same latent
+bug.
 
 ## 2. Then: nothing is queued
 
@@ -56,6 +81,14 @@ view, never a policy, because RLS is row-level).
   from CI or an agent**).
 
 ---
+
+## Released v2.8.1 (2026-08-11) — session restore
+
+Patch on top of v2.8.0, same evening: numbers and notes only, no marketing
+rewrite (the workflow's rule for fix releases). Verified live: `version.json`
+2.8.1, updater signature byte-identical to the shipped `.exe.sig`, both
+installers and the universal dmg HTTP 200, homepage title and OG card on
+`?v=2.8.1`. `downloads/` pruned to current + 1 again.
 
 ## Released v2.8.0 (2026-08-11)
 
@@ -298,8 +331,8 @@ hitting the session limit. Service layer was already on main
 
 | Item | Status |
 |------|--------|
-| App version | **v2.8.0** — live on Windows + macOS, every surface verified against production |
-| Branch | `main` = `origin/main`, clean, tag `v2.8.0` pushed |
+| App version | **v2.8.1** — live on Windows + macOS, every surface verified against production |
+| Branch | `main` = `origin/main`, clean, tags `v2.8.0` + `v2.8.1` pushed |
 | Gates last green | **526** vitest · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-11 evening) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
