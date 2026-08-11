@@ -15,7 +15,8 @@ import { inferOpponentArchetype } from "../opponentArchetype";
 import { peekSeenCard, resolveArenaMetaBatch } from "../arenaMeta";
 import { getOpponentNote } from "../matchupNotes";
 import { MIN_INFER_CONFIDENCE } from "./personalMatchups";
-import { uploadNewMatches, type UploadOutcome } from "./sync";
+import { fetchCloudDecks, uploadDecks, uploadNewMatches, type UploadOutcome } from "./sync";
+import type { CloudDeck } from "./deckSync";
 import type { TrackedMatch } from "../../types/tracker";
 
 /**
@@ -71,14 +72,35 @@ export async function syncMatchesNow(): Promise<UploadOutcome> {
         : { name: null, confidence: null };
     };
 
-    return await uploadNewMatches({
+    const outcome = await uploadNewMatches({
       matches,
       meta,
       decks: [...bo1, ...bo3],
       oppArchetypeFor,
     });
+
+    // Decklists ride the same opt-in and the same trigger. Deliberately after
+    // the matches — matches feed the crowd data everyone shares, decks are the
+    // user's own backup, so if only one of the two gets through it should be
+    // the one other people are waiting on. Its own guards make it cheap when
+    // the library has not changed.
+    void uploadDecks({ matches, meta, decks: [...bo1, ...bo3] });
+
+    return outcome;
   } catch {
     return empty;
+  }
+}
+
+/**
+ * Deck lists the user has backed up, newest first. Empty unless signed in and
+ * opted in — the same single gate as everything else here.
+ */
+export async function cloudDecksNow(): Promise<CloudDeck[]> {
+  try {
+    return await fetchCloudDecks();
+  } catch {
+    return [];
   }
 }
 

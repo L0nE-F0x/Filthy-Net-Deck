@@ -138,6 +138,8 @@ export const Settings = memo(function Settings() {
   const signOutCloud = useAppStore((s) => s.signOutCloud);
 
   const [cloudEnabled, setCloudEnabled] = useState(false);
+  /** Decklists currently backed up; null until the count is known. */
+  const [deckBackupCount, setDeckBackupCount] = useState<number | null>(null);
   const [cloudBusy, setCloudBusy] = useState(false);
   const [handleValue, setHandleValue] = useState("");
   const [savedHandle, setSavedHandle] = useState<string | null>(null);
@@ -234,13 +236,39 @@ export const Settings = memo(function Settings() {
     };
   }, [authName]);
 
+  // How many lists are actually backed up. Best effort: the line above simply
+  // drops the count when this fails, rather than claiming zero.
+  useEffect(() => {
+    if (!authName || !cloudEnabled) {
+      setDeckBackupCount(null);
+      return;
+    }
+    let cancelled = false;
+    void import("../services/cloud/syncRunner")
+      .then((m) => m.cloudDecksNow())
+      .then((decks) => {
+        if (!cancelled) setDeckBackupCount(decks.length);
+      })
+      .catch(() => {
+        /* leave the count unknown */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authName, cloudEnabled]);
+
   const toggleCloud = async (on: boolean) => {
     setCloudBusy(true);
     // Optimistic: the checkbox should not lag a click.
     setCloudEnabled(on);
+    if (!on) setDeckBackupCount(null);
     try {
       const m = await import("../services/cloud/sync");
       await m.setCloudEnabled(on);
+      // The backup was just deleted (or is about to be rebuilt) — a memoised
+      // copy of the old library would outlive it.
+      const cache = await import("../services/cloud/useCloudDecks");
+      cache.clearCloudDeckCache();
       if (on) {
         // Send straight away rather than waiting for the next launch or match.
         // Opting in and seeing nothing happen reads as broken, and the first
@@ -941,6 +969,22 @@ export const Settings = memo(function Settings() {
                     </span>
                   </label>
                 </div>
+                {/*
+                  Decklists ride this same opt-in (one toggle, by design), so
+                  the consent line has to say so — a backup the user did not
+                  know they switched on is not consent.
+                */}
+                {cloudEnabled && (
+                  <p className="settings-note mt-2 m-0 text-xs text-muted">
+                    Your own decklists are backed up with this
+                    {deckBackupCount != null && deckBackupCount > 0
+                      ? ` — ${deckBackupCount} list${deckBackupCount === 1 ? "" : "s"} saved`
+                      : ""}
+                    . Arena&apos;s logs rotate and take old lists with them; these
+                    come back on any machine you sign in on. Turning this off
+                    deletes them along with your shared matches.
+                  </p>
+                )}
                 {/* Public profile page — the shareable half of an account. */}
                 <div className="settings-note mt-3">
                   <p className="m-0 mb-2 text-xs text-muted">

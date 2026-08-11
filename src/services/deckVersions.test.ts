@@ -55,6 +55,33 @@ describe("buildVersions", () => {
   it("skips matches without a hash", () => {
     expect(buildVersions([m({ deckMain: [1] })])).toEqual([]);
   });
+
+  it("fills a missing list from the cloud backup, and says so", () => {
+    // History survived (it is persisted) but the log that carried the list has
+    // rotated — the exact gap cloud deck sync exists to close.
+    const vs = buildVersions(
+      [m({ deckHash: "h1" })],
+      new Map([["h1", { main: [1, 1, 2], side: [9] }]]),
+    );
+    expect(vs[0].main).toEqual([1, 1, 2]);
+    expect(vs[0].side).toEqual([9]);
+    expect(vs[0].fromCloud).toBe(true);
+  });
+
+  it("never lets a backup override a list the log actually recorded", () => {
+    const vs = buildVersions(
+      [m({ deckHash: "h1", deckMain: [7] })],
+      new Map([["h1", { main: [1, 2, 3] }]]),
+    );
+    expect(vs[0].main).toEqual([7]);
+    expect(vs[0].fromCloud).toBe(false);
+  });
+
+  it("leaves a version alone when the backup has nothing for it", () => {
+    const vs = buildVersions([m({ deckHash: "h1" })], new Map());
+    expect(vs[0].main).toBeUndefined();
+    expect(vs[0].fromCloud).toBeUndefined();
+  });
 });
 
 describe("diffLists", () => {

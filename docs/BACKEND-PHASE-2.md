@@ -350,6 +350,23 @@ Acquisition-visible first, per §2.3 — profiles before sync.
 | 6 | Crowd matchup UI in-app, gated on `games >= 30` | The payoff for opting in |
 | 7 | Cloud deck sync | The quiet one |
 
+**Slice 7, as built (2026-08-11).** The app has no hand-authored deck library —
+"your decks" are the lists Arena registers at the start of each match, so a deck
+row is match history collapsed by `deckHash`. That history is re-derived from
+Arena's logs on every launch, which is the whole argument for backing it up: the
+logs rotate, and a list whose matches predate the surviving log is gone with no
+way to ask Arena for it again. Restored lists fill `buildVersions` and are
+labelled "restored" in the UI; a locally recorded list always wins.
+
+Two details worth keeping:
+
+- The `decks` table gained `deck_hash` with `unique (user_id, deck_hash)`. A
+  list's identity *is* its contents, and upserting on it is what makes repeat
+  runs free.
+- Deck sync has **no high-water mark**. A list can be renamed with no new match,
+  so "newer than X" would miss it; the client stores a fingerprint of the last
+  successful upload instead.
+
 **Slices 0–4 are shippable without a single match ever being uploaded.** That
 ordering means the privacy-sensitive part (5) ships only after the trust surface
 (3) and the acquisition win (4) are already live — and if reach still hasn't

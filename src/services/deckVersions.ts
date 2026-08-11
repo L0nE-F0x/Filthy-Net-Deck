@@ -12,10 +12,29 @@ export interface DeckVersion {
   matches: TrackedMatch[];
   firstAt: number;
   lastAt: number;
+  /** True when the list came from the cloud backup, not from local history. */
+  fromCloud?: boolean;
 }
 
-/** Versions in order of first appearance; a version = a distinct card list. */
-export function buildVersions(deckMatches: TrackedMatch[]): DeckVersion[] {
+/** A backed-up list, keyed by deckHash (`services/cloud/deckSync`). */
+export interface RestoredList {
+  main: number[];
+  side?: number[];
+}
+
+/**
+ * Versions in order of first appearance; a version = a distinct card list.
+ *
+ * `restored` fills versions whose list is missing locally. Only game 1 of a
+ * match registers a list, and history is re-derived from Arena's logs each
+ * launch — so once the logs rotate, a deck the user still has matches for can
+ * lose the 75 cards it was. Cloud backup is exactly the gap this closes, and a
+ * local list always wins: it came from the log itself.
+ */
+export function buildVersions(
+  deckMatches: TrackedMatch[],
+  restored?: ReadonlyMap<string, RestoredList> | null,
+): DeckVersion[] {
   const asc = [...deckMatches].sort((a, b) => a.startedAt - b.startedAt);
   const byHash = new Map<string, DeckVersion>();
   for (const m of asc) {
@@ -35,6 +54,17 @@ export function buildVersions(deckMatches: TrackedMatch[]): DeckVersion[] {
     if (!v.main && m.deckMain) {
       v.main = m.deckMain;
       v.side = m.deckSide;
+      v.fromCloud = false;
+    }
+  }
+  if (restored?.size) {
+    for (const v of byHash.values()) {
+      if (v.main) continue;
+      const list = restored.get(v.hash);
+      if (!list?.main.length) continue;
+      v.main = list.main;
+      v.side = list.side;
+      v.fromCloud = true;
     }
   }
   return [...byHash.values()];

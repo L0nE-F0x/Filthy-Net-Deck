@@ -11,6 +11,12 @@ import type { Deck, FormatId, MetaBundle } from "../../types/meta";
 import type { TrackedMatch } from "../../types/tracker";
 import { getSupabase, getCurrentUser } from "./auth";
 import { buildSharedMatch, chunk, clientHash, myArchetypeName } from "./matchSync";
+import {
+  collectDeckRows,
+  deckSyncFingerprint,
+  toCloudDeck,
+  type CloudDeck,
+} from "./deckSync";
 import type { RollupRow } from "./crowdMeta";
 import { cloudConfigured } from "./config";
 
@@ -37,6 +43,38 @@ function setUploadedThrough(ms: number) {
 export function resetUploadWatermark() {
   try {
     localStorage.removeItem(UPLOADED_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Deck sync has no high-water mark: a list can change name without any new
+ * match, so "newer than X" would miss it. What is stored instead is a
+ * fingerprint of the last successful upload, which makes an unchanged library
+ * a string comparison rather than a round trip.
+ */
+const DECKS_KEY = "bbi.cloud.deckSyncMark";
+
+function deckSyncMark(): string {
+  try {
+    return localStorage.getItem(DECKS_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function setDeckSyncMark(fingerprint: string) {
+  try {
+    localStorage.setItem(DECKS_KEY, fingerprint);
+  } catch {
+    /* best effort */
+  }
+}
+
+export function resetDeckSyncMark() {
+  try {
+    localStorage.removeItem(DECKS_KEY);
   } catch {
     /* ignore */
   }
@@ -70,9 +108,13 @@ export async function setCloudEnabled(on: boolean): Promise<void> {
   if (error) throw error;
   if (!on) {
     // Opting out deletes what was shared. "Stop sending" is not the same as
-    // "take it back", and the toggle promises the latter.
+    // "take it back", and the toggle promises the latter. Decks ride the same
+    // opt-in, so they go too — leaving a deck library behind after the user
+    // switched sharing off would break exactly that promise.
     await supabase.from("shared_matches").delete().eq("user_id", user.id);
+    await supabase.from("decks").delete().eq("user_id", user.id);
     resetUploadWatermark();
+    resetDeckSyncMark();
   }
 }
 
@@ -186,6 +228,92 @@ async function runUpload(
 
   if (uploaded > 0) setUploadedThrough(highest);
   return { attempted: fresh.length, uploaded, skipped: fresh.length - uploaded };
+}
+
+// ---------------------------------------------------------------------------
+// Deck sync (slice 7)
+// ---------------------------------------------------------------------------
+
+export interface DeckSyncOutcome {
+  /** Distinct lists the local history could offer. */
+  found: number;
+  /** Rows actually written this run (0 when nothing changed). */
+  uploaded: number;
+}
+
+let decksInFlight = false;
+
+/**
+ * Back up the user's own decklists. Same opt-in as matches, no second toggle.
+ *
+ * Upserts on `(user_id, deck_hash)`, so re-running is free and a rename simply
+ * updates the row it already has.
+ */
+export async function uploadDecks(args: {
+  matches: readonly TrackedMatch[];
+  meta: MetaBundle | null;
+  decks?: readonly Deck[];
+}): Promise<DeckSyncOutcome> {
+  const empty: DeckSyncOutcome = { found: 0, uploaded: 0 };
+  if (decksInFlight) return empty;
+  if (!(await isCloudEnabled())) return empty;
+  const user = await getCurrentUser();
+  if (!user) return empty;
+
+  decksInFlight = true;
+  try {
+    const rows = collectDeckRows(user.id, args.matches, {
+      formatFor: (m) => formatFor(m, args.meta),
+      decks: args.decks,
+    });
+    if (!rows.length) return empty;
+
+    const fingerprint = deckSyncFingerprint(rows);
+    if (fingerprint === deckSyncMark()) return { found: rows.length, uploaded: 0 };
+
+    const supabase: SupabaseClient = await getSupabase();
+    let uploaded = 0;
+    for (const part of chunk(rows)) {
+      const { error } = await supabase
+        .from("decks")
+        .upsert(part, { onConflict: "user_id,deck_hash" });
+      // Stop at the first failure and leave the mark alone, so the next run
+      // retries the whole set rather than recording a partial success.
+      if (error) return { found: rows.length, uploaded };
+      uploaded += part.length;
+    }
+    setDeckSyncMark(fingerprint);
+    return { found: rows.length, uploaded };
+  } catch {
+    return empty;
+  } finally {
+    decksInFlight = false;
+  }
+}
+
+/**
+ * The user's backed-up lists. Useful on a machine whose Arena logs have since
+ * rotated: the match history survives (it was persisted), but the registered
+ * list that only ever lived in a log line does not.
+ */
+export async function fetchCloudDecks(): Promise<CloudDeck[]> {
+  if (!cloudConfigured()) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+      .from("decks")
+      .select("deck_hash,name,format,main,side,played_at")
+      .eq("user_id", user.id)
+      .order("played_at", { ascending: false });
+    if (error || !data) return [];
+    return data
+      .map(toCloudDeck)
+      .filter((d): d is CloudDeck => d !== null);
+  } catch {
+    return [];
+  }
 }
 
 // ---------------------------------------------------------------------------

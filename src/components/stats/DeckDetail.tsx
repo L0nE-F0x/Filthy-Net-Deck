@@ -33,6 +33,7 @@ import {
   latestDecklist,
   latestMainboard,
 } from "../../services/deckVersions";
+import { useCloudDeckLists } from "../../services/cloud/useCloudDecks";
 import { SummaryTiles } from "./SummaryTiles";
 import { SplitsPanel } from "./SplitsPanel";
 import { MatchHistory } from "./MatchHistory";
@@ -224,7 +225,13 @@ function DiffArt({
 }
 
 function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
-  const versions = useMemo(() => buildVersions(deckMatches), [deckMatches]);
+  // Lists the cloud backup can restore for builds whose log has since rotated.
+  // Empty unless the user is signed in and opted in.
+  const restored = useCloudDeckLists();
+  const versions = useMemo(
+    () => buildVersions(deckMatches, restored),
+    [deckMatches, restored],
+  );
 
   // Diff cards + a preview of each build's mainboard for art.
   const allIds = useMemo(() => {
@@ -294,6 +301,15 @@ function VersionHistory({ deckMatches }: { deckMatches: TrackedMatch[] }) {
                   Build {i + 1}
                   {i === versions.length - 1 && (
                     <span className="text-gold-300"> · current</span>
+                  )}
+                  {v.fromCloud && (
+                    <span
+                      className="text-xs text-muted"
+                      title="This list was restored from your cloud backup — Arena's log for it has rotated away."
+                    >
+                      {" "}
+                      · restored
+                    </span>
                   )}
                 </span>
                 <span className="text-xs text-muted">
