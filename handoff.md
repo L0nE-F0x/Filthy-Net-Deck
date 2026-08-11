@@ -5,63 +5,134 @@
 
 **Live product version: v2.7.7** - repo L0nE-F0x/Filthy-Net-Deck - branch **main**.
 
-**Phase 2 is essentially complete.** Optional free account (Google / Discord /
-email code), opt-in match sharing, community matchup rates joined to your own
-record, and public profile pages at `/u/<handle>`. All verified live against a
-real installed build. Only slice 7 (cloud deck sync) remains.
+**Phase 2 is complete — all 8 slices.** Optional free account (Google /
+Discord / email code), opt-in match sharing, community matchup rates joined to
+your own record, public profile pages at `/u/<handle>`, and cloud deck sync.
+Slices 0–6 are verified live against a real installed build; **slice 7 is built
+but not yet live** — its migration has not been run (START HERE §1).
 
 ---
 
 # ▶ START HERE — next session, in this order
 
-## 1. Basic-land colour fix (owner's pick, do first)
+## 1. Run the `decks` migration on the live DB (owner, 2 minutes)
 
-The **proper** fix for the bug mitigated on 2026-08-11 — full detail in
-"Open follow-up: basic-land colour evidence" below. Short version:
+`supabase/migrations/20260811190000_decks.sql` is written and committed but
+**has not been run**. Until it is, deck sync uploads fail soft (the code
+handles it — no error surfaces, no watermark advances) and nothing is backed
+up. Paste it into the Supabase SQL editor the same way the other four went in.
 
-- Arena basic-land grpIds are **not stable identities**. A real log had an
-  object Arena described as `subtypes:["SubType_Swamp"]` carrying grpId 87457,
-  which resolves through the card API to **Island**. One phantom Island made a
-  Rakdos opponent read as "Grixis Control".
-- Shipped mitigation: basics are *soft* colour evidence. That stops wrong data
-  but **costs early-game read strength** when only basics are down.
-- Proper fix: read Arena's own `subtypes` off the game object instead of
-  resolving basics by id. `note_opponent_cards` in `tracker.rs` already sees
-  them and throws them away. Needs a per-match set of opponent basic land types
-  plumbed through `TrackedMatch` **and** `LiveMatch` (the overlay needs it too)
-  into `observedColorsFromSeenCards`. ~40 lines Rust + TS. Restores the signal.
-- Then revisit the two tests in `opponentArchetype.test.ts` marked
-  "Changed 2026-08-11" — with real subtypes they can assert proof again.
+> ⚠️ The previous handoff said the `decks` table "already exists in the
+> core-schema migration". It did not — `20260810120000_core_schema.sql` has
+> profiles, archetypes, shared_matches and matchup_rollup, and no decks table.
+> Verify before trusting a claim like that; this one cost nothing only because
+> it was checked.
 
-**Diagnostic that cracked it, reuse it:**
+## 2. Ship the three fixes below in a release
+
+Everything in "Session log (Claude, 2026-08-11 evening)" is on `main` and
+green, but **unreleased** — live version is still v2.7.7. Full AGENTS.md train
+when the owner is ready: version bump, signed Windows installer, updater
+manifest, version.json, site + OG, Netlify, tag.
+
+## 3. Still open (nothing blocks the above)
+
+- **Tracker persistence root cause.** The *consequence* is now fixed — the file
+  is reconciled against memory after every batch and at startup — but why
+  appends stalled on 22 July is still unknown. The next diagnostic export from
+  a build with this fix will show `persistRepairs` > 0 if the fast path is
+  still broken; that is the trail to it. `writeErrors` / `lastWriteError` name
+  the cause if it is an OS error.
+- **Email OTP needs custom SMTP** before promoting to a real audience.
+  Supabase's built-in mailer is rate-limited per project and users would
+  silently stop getting codes. Owner action (Supabase dashboard).
+- **§2.6 legal check** (WotC Fan Content, Scryfall commercial terms) — gates
+  Phase 4 only, deferred indefinitely. Owner action, not a code task.
+- Search Console checkpoint ~2026-08-24. Baseline 2026-08-11: 3 clicks, 32
+  impressions, avg position 11.2.
+- Disk: `src-tauri/target/` ~9 GB (`cargo clean` reclaims it), `.git` ~1.4 GB
+  (needs the coordinated filter-repo in `docs/GIT-HISTORY-BLOAT.md` — **never
+  from CI or an agent**).
+
+---
+
+## Session log (Claude, 2026-08-11 evening)
+
+Three items, all committed to `main`, all gates green (**526** vitest · tsc ·
+eslint · `cargo fmt`/`clippy` · **48** cargo tests). Nothing released yet.
+
+### Basic-land colour fix — done properly (`b629c43`)
+
+The tracker now records what **Arena itself** says about opponent basics —
+`superTypes:["SuperType_Basic"]` + `subtypes:["SubType_Swamp"]` off the game
+object — per match, on both `TrackedMatch.opponentBasics` and `LiveMatch`, and
+the inference takes those as *hard* colour evidence. No id resolution on that
+path, so no phantom colour is possible, and the early-game read the soft-basics
+mitigation cost is back.
+
+Verified against the owner's real `Player.log`: the exact match that produced
+the bug — 24 revealed ids including 87457, which the card API resolves to
+Island — now reports `opponentBasics ["Mountain","Swamp"]`. Rakdos, not Grixis.
+
+The mitigation stays: a basic resolved *by id* is still only soft evidence, and
+its tests still assert that. The two tests marked "Changed 2026-08-11" now
+assert proof again through the new argument.
+
+Diagnostics, both reusable:
 ```
 cd src-tauri
-FND_REPLAY_LOG=<Player.log> FND_REPLAY_OPP=<opponent name> \
-  cargo test replay_real_log -- --nocapture --ignored
+FND_REPLAY_LOG=<Player.log> FND_REPLAY_OPP='*'   cargo test replay_real_log -- --nocapture --ignored
 ```
-Dumps one opponent's revealed grpIds from a real log. Resolve them at
-`https://api.scryfall.com/cards/arena/<id>`.
+`FND_REPLAY_OPP=*` dumps every match; a name substring still filters to one.
+Output now includes `opponentBasics` next to `opponentSeen`.
 
-## 2. Slice 7 — cloud deck sync
+### Slice 7 — cloud deck sync (`342298b`)
 
-The last unbuilt piece of Phase 2. Design: `docs/BACKEND-PHASE-2.md`. The
-`decks` table already exists in the core-schema migration (RLS: own rows only,
-public read when `is_public`) and is unused. Nothing else blocks it.
+Phase 2 is now complete. Decklists ride the **existing** opt-in (one toggle, by
+design) and the Settings consent line says so out loud.
 
-## 3. Still open (not blocking either of the above)
+The app has no hand-authored deck library: "your decks" are the lists Arena
+registers at match start, so a deck row is match history collapsed by
+`deckHash`. That history is re-derived from Arena's logs each launch, which is
+the whole argument for backing it up — once a log rotates, the 75 cards a deck
+was are gone locally and Arena will not give them back. Restored lists fill
+`buildVersions` and show as "restored" in Version history; a locally recorded
+list always wins.
 
-- **Tracker persistence.** The app had **373 matches in memory, 25 on disk**,
-  file last written 22 July. History is re-derived from Arena's logs each
-  launch, so nothing looks wrong until the logs rotate and the un-persisted
-  matches are gone. `append_match` used to swallow every error; it now counts
-  and logs them, and the diagnostic export carries `matchesOnDisk`,
-  `writeErrors`, `lastWriteError`. **Get a fresh diagnostic from a v2.7.7+
-  build — `lastWriteError` should name the cause in one line.** Root cause not
-  yet found: the file is writable from another process and `data_file` resolves.
-- **§2.6 legal check** (WotC Fan Content, Scryfall commercial terms) — gates
-  Phase 4 only, which is deferred indefinitely. Not blocking.
-- `src/services/tagSuggest.ts` is referenced only by its own test. Delete when
-  convenient.
+Two decisions worth keeping:
+- `decks` gained `deck_hash` + `unique (user_id, deck_hash)`. A list's identity
+  *is* its contents, and upserting on it makes repeat runs free.
+- Deck sync has **no high-water mark**. A rename changes no timestamp, so
+  "newer than X" would miss it; the client stores a fingerprint of the last
+  successful upload instead.
+- No public read policy on `decks`, not even for `is_public` rows. RLS is
+  row-level, so publishing decks later needs a view, exactly like
+  `public_profiles`.
+
+### Tracker persistence — fixed at the consequence (`684c65a`, `bc63fbe`)
+
+373 in memory / 25 on disk, file untouched since 22 July. Rather than wait to
+identify why the appends stalled, the append is no longer trusted: after every
+batch and once at startup, the file is compared against memory and rewritten
+atomically (temp + rename) when short. Deleted matches are not in memory, so a
+repair cannot resurrect them, and every repair is counted as `persistRepairs`
+in the diagnostic export.
+
+The last silent path is closed too — a missing data file used to return quietly,
+which is exactly how this stayed invisible for three weeks; it is now a counted
+write error.
+
+Verified on a **copy** of the owner's real app data: 25 on disk → 71 after the
+repair, 53 recovered from the two surviving logs, no tombstone resurrected.
+```
+FND_DATA_DIR=<copy of app data dir> FND_LOG_DIR=<MTGA dir>   cargo test replay_persistence_repair -- --nocapture --ignored
+```
+Point it at a copy — it rewrites the matches file, as the app now would.
+
+The gap between 71 and the 373 the app once held is the real cost of the three
+silent weeks: those logs have rotated and that history is unrecoverable.
+
+Also deleted `src/services/tagSuggest.ts` + its test (referenced by nothing).
 
 ---
 
@@ -214,12 +285,12 @@ hitting the session limit. Service layer was already on main
 
 | Item | Status |
 |------|--------|
-| App version | **v2.7.7** — live on Windows + macOS, updater signature verified |
-| Branch | `main` = `origin/main`, clean |
-| Gates last green | **504** vitest · tsc · eslint · functions typecheck · `cargo fmt`/`clippy` · **46** cargo tests |
+| App version | **v2.7.7** live on Windows + macOS. `main` is ahead of it by three unreleased fixes |
+| Branch | `main`, clean — **not pushed** as of this wrap |
+| Gates last green | **526** vitest · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-11 evening) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
-| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. Migrations run: health_pings, core schema, public profiles, display-name privacy |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. Migrations run: health_pings, core schema, public profiles, display-name privacy. **`20260811190000_decks.sql` written but NOT run** |
 | Auth | Google **and** Discord enabled + verified live; email OTP available (Supabase's built-in mailer is rate-limited — needs custom SMTP before promoting to a real audience) |
 | Cron | `fnd-rollup` scheduled hourly (`select cron.schedule(...)`, job id 1) — without it `matchup_rollup` never fills |
 | Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |
@@ -230,7 +301,7 @@ hitting the session limit. Service layer was already on main
   `callback.html` → `fnd://` deep link → app), signup trigger creating the
   profile row, match upload (371 rows), profile page render + OG tags + 404 +
   handle sanitisation, health ping, Matchups crowd orientation/suppression.
-- **Built, never exercised for real:** Discord sign-in (configured, unused),
+- **Built, never exercised for real:** cloud deck sync (its migration has not been run — nothing has ever been written to `decks`), Discord sign-in (configured, unused),
   email OTP sign-in, community matchup *cells* (need 30+ shared games from
   accounts with 25+ matches and 7+ days — expect empty for a while **by
   design**, that is the honesty discipline, not a fault).
@@ -333,7 +404,7 @@ hitting the session limit. Service layer was already on main
 
 | Priority | Item | Notes |
 |----------|------|--------|
-| Defect | Tracker persistence (373 in memory / 25 on disk) | See START HERE §3. Needs a fresh diagnostic from a v2.7.7+ build |
+| Defect | Tracker persistence — root cause | Data loss FIXED (reconcile pass, 2026-08-11). Why appends stalled is still unknown; `persistRepairs` in the next diagnostic is the trail |
 | Measurement | Search Console checkpoint ~2026-08-24 | Baseline 2026-08-11: 3 clicks, 32 impressions, position 11.2 |
 | Product | Email OTP needs custom SMTP | Supabase's built-in mailer is rate-limited per project; users would silently stop getting codes. Do before promoting to the YouTube audience |
 | Optional | Upload Windows exe/sig to GitHub Releases | macOS dmgs are there; Windows lives on the site CDN + local archive only |
@@ -364,6 +435,7 @@ downloads + updater + version.json + site + OG + Netlify live + tag/macOS).
 | File | Why |
 |------|-----|
 | `handoff.md` | This file — session state for next agent |
+| `docs/BACKEND-PHASE-2.md` | Slice 7 recorded as built (deck_hash key, no high-water mark) |
 
 (No pipeline/docs process change in 2.7.2 — pure app perf + release.)
 
