@@ -253,6 +253,7 @@ function layout({ title, description, canonicalPath, body, active, jsonLd }) {
       <a href="index.html" class="${active === "hub" ? "on" : ""}">Today</a>
       <a href="standard.html" class="${active === "standard" ? "on" : ""}">Standard</a>
       <a href="pioneer.html" class="${active === "pioneer" ? "on" : ""}">Pioneer</a>
+      <a href="cards.html" class="${active === "cards" ? "on" : ""}">Cards</a>
       <a class="cta" href="../#download">Download free</a>
     </nav>
   </header>
@@ -320,7 +321,15 @@ function listCards(cards, title) {
       const thumb = img
         ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy" width="40" height="56" />`
         : `<span class="thumb empty"></span>`;
-      return `<li>${thumb}<span class="qty">${esc(c.count)}×</span><span class="cname">${esc(c.name)}</span></li>`;
+      // Every card name is a link to its own page. This is the other half of
+      // the corpus expansion: the deck pages that already rank now feed ~320
+      // card pages, and each card page links back.
+      const slug = cardSlug(c.name);
+      const label = esc(cardDisplayName(c.name));
+      const name = slug
+        ? `<a class="cname" href="../card/${esc(slug)}.html">${label}</a>`
+        : `<span class="cname">${label}</span>`;
+      return `<li>${thumb}<span class="qty">${esc(c.count)}×</span>${name}</li>`;
     })
     .join("\n");
   return `
@@ -476,6 +485,340 @@ function buildFormat(bundle, history, fmtId) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Card pages (Phase 1 item A)
+// ---------------------------------------------------------------------------
+//
+// One page per distinct card in the ranked field — the largest corpus
+// expansion available to this site: 32 deck pages become ~320 card pages, each
+// answering a query people actually type ("what decks play <card>"), and each
+// linking back into the deck pages that already rank.
+//
+// Every number here is counted from the same feed the app uses. There is no
+// oracle text in that feed, so these pages never describe what a card *does* —
+// inventing that would break the no-fabrication rule the rest of the pipeline
+// keeps.
+
+/** URL-safe, stable slug. DFC front face only, matching the app's convention. */
+function cardSlug(name) {
+  return String(name ?? "")
+    .split("//")[0]
+    .trim()
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** Front-face display name, so an "A // B" card reads as "A". */
+function cardDisplayName(name) {
+  return String(name ?? "").split("//")[0].trim();
+}
+
+/**
+ * Every distinct card across the ranked boards, with the decks that play it.
+ * Off-meta recognition decks are excluded for the same reason deck pages skip
+ * them: they have no page to link to.
+ */
+function collectCards(bundle) {
+  const out = new Map();
+  const decks = Object.values(bundle.decks || {}).filter((d) => !d.offMeta);
+  for (const deck of decks) {
+    const add = (entry, board) => {
+      const slug = cardSlug(entry.name);
+      if (!slug) return;
+      let card = out.get(slug);
+      if (!card) {
+        card = {
+          slug,
+          name: cardDisplayName(entry.name),
+          scryfallId: entry.scryfallId,
+          cmc: entry.cmc,
+          type: entry.type,
+          land: Boolean(entry.land),
+          plays: [],
+        };
+        out.set(slug, card);
+      }
+      // First sighting wins for art; later ones only fill gaps.
+      if (!card.scryfallId && entry.scryfallId) card.scryfallId = entry.scryfallId;
+      if (card.cmc == null && entry.cmc != null) card.cmc = entry.cmc;
+      if (!card.type && entry.type) card.type = entry.type;
+      const existing = card.plays.find((p) => p.deck.id === deck.id);
+      if (existing) {
+        existing[board] += entry.count || 0;
+      } else {
+        card.plays.push({
+          deck,
+          main: board === "main" ? entry.count || 0 : 0,
+          side: board === "side" ? entry.count || 0 : 0,
+        });
+      }
+    };
+    for (const c of deck.mainboard || []) add(c, "main");
+    for (const c of deck.sideboard || []) add(c, "side");
+  }
+  for (const card of out.values()) {
+    card.plays.sort(
+      (a, b) =>
+        b.main + b.side - (a.main + a.side) || (a.deck.rank ?? 99) - (b.deck.rank ?? 99),
+    );
+  }
+  return out;
+}
+
+/** Cards sharing the most decks with this one — internal links that earn it. */
+function alsoPlayed(card, cardsBySlug, limit = 8) {
+  const mine = new Set(card.plays.map((p) => p.deck.id));
+  const scored = [];
+  for (const other of cardsBySlug.values()) {
+    if (other.slug === card.slug) continue;
+    const shared = other.plays.filter((p) => mine.has(p.deck.id)).length;
+    if (shared > 0) scored.push({ card: other, shared });
+  }
+  return scored
+    .sort(
+      (a, b) =>
+        b.shared - a.shared ||
+        a.card.plays.length - b.card.plays.length ||
+        a.card.name.localeCompare(b.card.name),
+    )
+    .slice(0, limit);
+}
+
+function typeLabel(card) {
+  if (card.land) return "Land";
+  if (!card.type) return "Spell";
+  return String(card.type).charAt(0).toUpperCase() + String(card.type).slice(1);
+}
+
+function buildCard(bundle, card, cardsBySlug) {
+  const date = bundle.date;
+  const boards = Object.values(bundle.decks || {}).filter((d) => !d.offMeta);
+  const formats = [...new Set(card.plays.map((p) => p.deck.format))];
+  const fmtNames = formats.map((f) => (f === "pioneer" ? "Pioneer" : "Standard"));
+  // The denominator has to be the same population the sentence names. Counting
+  // "2 of the 32 ranked Pioneer decks" when only 16 are Pioneer is exactly the
+  // kind of true-ish number the rest of this pipeline refuses to print.
+  const peers = boards.filter((d) => formats.includes(d.format));
+  const totalCopies = card.plays.reduce((n, p) => n + p.main + p.side, 0);
+  const avg = card.plays.length ? (totalCopies / card.plays.length).toFixed(1) : "0";
+  const img = scryfallImg(card);
+
+  // "7 of 16 Standard Bo1 decks" — counted per format+mode, so the denominator
+  // is a real comparison group rather than the whole field.
+  const groups = [];
+  for (const fmt of ["standard", "pioneer"]) {
+    for (const mode of ["bo1", "bo3"]) {
+      const pool = boards.filter((d) => d.format === fmt && d.mode === mode);
+      if (!pool.length) continue;
+      const playing = card.plays.filter(
+        (p) => p.deck.format === fmt && p.deck.mode === mode,
+      ).length;
+      if (!playing) continue;
+      groups.push({
+        label: `${fmt === "pioneer" ? "Pioneer" : "Standard"} ${modeLabel(mode)}`,
+        playing,
+        total: pool.length,
+      });
+    }
+  }
+
+  const rows = card.plays
+    .map((p) => {
+      const fmtName = p.deck.format === "pioneer" ? "Pioneer" : "Standard";
+      const copies = [p.main ? `${p.main}× main` : "", p.side ? `${p.side}× side` : ""]
+        .filter(Boolean)
+        .join(" · ");
+      const share =
+        p.deck.metaShare != null
+          ? ` · ${esc(Number(p.deck.metaShare).toFixed(1))}% meta`
+          : "";
+      return `<li>
+        <a href="../deck/${esc(p.deck.id)}.html">
+          <span class="r-rank">#${esc(p.deck.rank)}</span>
+          <span class="r-name">${esc(p.deck.name)}</span>
+          <span class="r-pct">${esc(copies)}</span>
+        </a>
+        <span class="hint">${esc(fmtName)} ${esc(modeLabel(p.deck.mode))}${share}</span>
+      </li>`;
+    })
+    .join("\n");
+
+  const also = alsoPlayed(card, cardsBySlug);
+  const alsoBlock = also.length
+    ? `<section class="related">
+        <h2>Often played alongside</h2>
+        <ul class="related-list">
+          ${also
+            .map(
+              (a) => `<li><a href="${esc(a.card.slug)}.html">
+                <span class="r-name">${esc(a.card.name)}</span>
+                <span class="r-pct">${esc(a.shared)} shared deck${a.shared === 1 ? "" : "s"}</span>
+              </a></li>`,
+            )
+            .join("")}
+        </ul>
+      </section>`
+    : "";
+
+  const body = `
+    <section class="hero slim">
+      <p class="eyebrow">
+        <a href="index.html">Meta</a> /
+        <a href="cards.html">Cards</a> /
+        ${esc(date)}
+      </p>
+      <div class="card-head">
+        ${
+          img
+            ? `<img class="card-art" src="${esc(img)}" alt="${esc(card.name)}" width="240" height="176" loading="lazy" />`
+            : ""
+        }
+        <div>
+          <h1>${esc(card.name)}</h1>
+          <p class="meta-line big">
+            <span class="pill">${esc(typeLabel(card))}</span>
+            ${card.land ? "" : `<span class="pill soft">Mana value ${esc(card.cmc ?? "-")}</span>`}
+            <span class="pct">${esc(card.plays.length)} ranked deck${card.plays.length === 1 ? "" : "s"}</span>
+          </p>
+          <p class="lede">
+            ${esc(card.name)} appears in ${esc(card.plays.length)} of the ${esc(peers.length)}
+            ranked ${esc(fmtNames.join(" and ") || "Standard")} decks tracked on ${esc(date)},
+            at an average of ${esc(avg)} copies per deck that plays it.
+          </p>
+        </div>
+      </div>
+    </section>
+    ${downloadBanner(date, 1)}
+    ${
+      groups.length
+        ? `<section class="list-block">
+            <h2>Field presence</h2>
+            <ul class="presence">
+              ${groups
+                .map(
+                  (g) => `<li><strong>${esc(g.playing)} of ${esc(g.total)}</strong>
+                    <span>${esc(g.label)} decks</span></li>`,
+                )
+                .join("")}
+            </ul>
+            <p class="hint">Counted from today's ranked boards — not an estimate.</p>
+          </section>`
+        : ""
+    }
+    <section class="related">
+      <h2>Decks playing ${esc(card.name)}</h2>
+      <ul class="related-list wide">${rows}</ul>
+    </section>
+    ${alsoBlock}
+    <p class="hint"><a href="cards.html">← Every card in the ranked field</a></p>
+  `;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Meta", item: `${SITE}/meta-web/` },
+      { "@type": "ListItem", position: 2, name: "Cards", item: `${SITE}/meta-web/cards.html` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: card.name,
+        item: `${SITE}/meta-web/card/${card.slug}.html`,
+      },
+    ],
+  };
+
+  let html = layout({
+    title: `${card.name} — which decks play it (${date}) · Filthy Net Deck`,
+    description: `Which ranked ${fmtNames.join(" and ") || "Standard"} decks play ${card.name} on ${date}: ${card.plays.length} of ${peers.length} tracked lists, ${avg} copies on average. Real decklists, Scryfall-verified.`,
+    canonicalPath: `/meta-web/card/${card.slug}.html`,
+    body,
+    active: "cards",
+    jsonLd,
+  });
+
+  // Nested one level under meta-web/, same rewrite the deck pages need.
+  html = html
+    .replaceAll('href="../"', 'href="../../"')
+    .replaceAll('href="../#download"', 'href="../../#download"')
+    .replaceAll('href="../assets/', 'href="../../assets/')
+    .replaceAll('src="../assets/', 'src="../../assets/')
+    .replaceAll('href="site.css"', 'href="../site.css"')
+    .replaceAll('href="index.html"', 'href="../index.html"')
+    .replaceAll('href="standard.html"', 'href="../standard.html"')
+    .replaceAll('href="pioneer.html"', 'href="../pioneer.html"')
+    .replaceAll('href="cards.html"', 'href="../cards.html"')
+    .replaceAll(`href="${resolveDownloads().win}"`, `href="${resolveDownloads().winDeep}"`)
+    .replaceAll(`href="${resolveDownloads().mac}"`, `href="${resolveDownloads().macDeep}"`);
+
+  return html;
+}
+
+/** The index that keeps 300+ card pages from being orphans. */
+function buildCardIndex(bundle, cardsBySlug) {
+  const date = bundle.date;
+  const cards = [...cardsBySlug.values()].sort((a, b) => a.name.localeCompare(b.name));
+  const byLetter = new Map();
+  for (const c of cards) {
+    const ch = /^[a-z]/i.test(c.name) ? c.name[0].toUpperCase() : "#";
+    if (!byLetter.has(ch)) byLetter.set(ch, []);
+    byLetter.get(ch).push(c);
+  }
+  const anchorFor = (l) => (l === "#" ? "num" : l.toLowerCase());
+  const sections = [...byLetter.entries()]
+    .map(
+      ([letter, list]) => `
+      <section class="list-block">
+        <h2 id="${esc(anchorFor(letter))}">${esc(letter)}</h2>
+        <ul class="card-index">
+          ${list
+            .map(
+              (c) => `<li><a href="card/${esc(c.slug)}.html">${esc(c.name)}</a>
+                <span class="qty">${esc(c.plays.length)}</span></li>`,
+            )
+            .join("")}
+        </ul>
+      </section>`,
+    )
+    .join("\n");
+
+  const jumps = [...byLetter.keys()]
+    .map((l) => `<a href="#${esc(anchorFor(l))}">${esc(l)}</a>`)
+    .join(" ");
+
+  const body = `
+    <section class="hero slim">
+      <p class="eyebrow"><a href="index.html">Meta</a> / Cards / ${esc(date)}</p>
+      <h1>Every card in the ranked field</h1>
+      <p class="lede">
+        ${esc(cards.length)} distinct cards across today's ranked Standard and Pioneer
+        decks. Each page lists exactly which decks play it and how many copies —
+        counted from the same lists the app tracks, updated ${esc(date)}.
+      </p>
+      <p class="jump">${jumps}</p>
+    </section>
+    ${downloadBanner(date)}
+    ${sections}
+  `;
+
+  return layout({
+    title: `Every card in the ranked Standard & Pioneer field (${date}) · Filthy Net Deck`,
+    description: `All ${cards.length} cards played across today's ranked Standard and Pioneer decks, each with the decks that play it and how many copies. Updated ${date}.`,
+    canonicalPath: `/meta-web/cards.html`,
+    body,
+    active: "cards",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Cards in the ranked field",
+      url: `${SITE}/meta-web/cards.html`,
+      numberOfItems: cards.length,
+    },
+  });
+}
+
 function buildDeck(bundle, history, deck) {
   const date = bundle.date;
   const fmtName = deck.format === "pioneer" ? "Pioneer" : "Standard";
@@ -566,6 +909,7 @@ function buildDeck(bundle, history, deck) {
     .replaceAll('href="index.html"', 'href="../index.html"')
     .replaceAll('href="standard.html"', 'href="../standard.html"')
     .replaceAll('href="pioneer.html"', 'href="../pioneer.html"')
+    .replaceAll('href="cards.html"', 'href="../cards.html"')
     .replaceAll(`href="${resolveDownloads().win}"`, `href="${resolveDownloads().winDeep}"`)
     .replaceAll(`href="${resolveDownloads().mac}"`, `href="${resolveDownloads().macDeep}"`);
 
@@ -835,6 +1179,30 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
 .r-name { flex: 1; }
 .r-pct { color: #b8f000; font-weight: 600; }
 
+/* Card pages */
+.card-head { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.card-art { border-radius: 10px; display: block; max-width: 240px; height: auto; }
+.card-head > div { flex: 1; min-width: 260px; }
+.presence { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.presence li { padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.04); }
+.presence strong { display: block; color: #b8f000; font-size: 1.05rem; }
+.presence span { color: var(--muted, #9aa38a); font-size: 0.8rem; }
+.related-list.wide li { display: grid; gap: 0; }
+.related-list.wide .hint { padding: 0 9px 6px; margin: 0; }
+.card-index { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 2px; }
+.card-index li { display: flex; align-items: baseline; gap: 8px; padding: 4px 8px; border-radius: 6px; font-size: 0.86rem; }
+.card-index li:hover { background: rgba(184,240,0,0.08); }
+.card-index a { flex: 1; color: inherit; text-decoration: none; }
+.card-index a:hover { color: #b8f000; }
+.jump { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.jump a {
+  padding: 2px 9px; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+  background: rgba(255,255,255,0.05); color: inherit; text-decoration: none;
+}
+.jump a:hover { background: rgba(184,240,0,0.14); color: #b8f000; }
+a.cname { color: var(--foam); text-decoration: none; }
+a.cname:hover { color: #b8f000; text-decoration: underline; }
+
 /* Hub: link every deck, not just the featured five */
 .all-decks { margin-top: 18px; }
 .all-decks h3 { font-size: 0.85rem; color: var(--muted, #9aa38a); margin: 0 0 8px; font-weight: 600; }
@@ -861,8 +1229,12 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
 function sitemapPriority(p) {
   if (p === "/meta-web/" || p === "/meta-web/index.html") return "0.9";
   if (/^\/meta-web\/(standard|pioneer)\.html$/.test(p)) return "0.8";
+  if (p === "/meta-web/cards.html") return "0.7";
   if (p.startsWith("/meta-web/deck/")) return "0.6";
-  return "0.5";
+  // Card pages are the long tail: many of them, each narrow. Below the deck
+  // pages they support, above nothing.
+  if (p.startsWith("/meta-web/card/")) return "0.5";
+  return "0.4";
 }
 
 function writeSitemap(paths, lastmod) {
@@ -920,6 +1292,7 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
     rmSync(OUT, { recursive: true, force: true });
   }
   mkdirSync(join(OUT, "deck"), { recursive: true });
+  mkdirSync(join(OUT, "card"), { recursive: true });
   writeFileSync(join(OUT, "site.css"), CSS);
   writeFileSync(join(OUT, "index.html"), buildHub(bundle));
 
@@ -940,13 +1313,22 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
     paths.push(`/meta-web/deck/${d.id}.html`);
   }
 
+  // Card pages last: they need every deck to have been collected first.
+  const cardsBySlug = collectCards(bundle);
+  writeFileSync(join(OUT, "cards.html"), buildCardIndex(bundle, cardsBySlug));
+  paths.push("/meta-web/cards.html");
+  for (const card of cardsBySlug.values()) {
+    writeFileSync(join(OUT, "card", `${card.slug}.html`), buildCard(bundle, card, cardsBySlug));
+    paths.push(`/meta-web/card/${card.slug}.html`);
+  }
+
   writeSitemap([...new Set(paths)], bundle.date);
   writeRobots();
 
   console.log(
-    `  meta-web: ${decks.length} deck pages + hub + 2 formats (date=${bundle.date}) → website/meta-web/`,
+    `  meta-web: ${decks.length} deck pages + ${cardsBySlug.size} card pages + hub + index + 2 formats (date=${bundle.date}) → website/meta-web/`,
   );
-  return { deckPages: decks.length, date: bundle.date };
+  return { deckPages: decks.length, cardPages: cardsBySlug.size, date: bundle.date };
 }
 
 // CLI

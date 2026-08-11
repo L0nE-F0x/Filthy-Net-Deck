@@ -261,6 +261,30 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
 .r-name { flex: 1; }
 .r-pct { color: #b8f000; font-weight: 600; }
 
+/* Card pages */
+.card-head { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.card-art { border-radius: 10px; display: block; max-width: 240px; height: auto; }
+.card-head > div { flex: 1; min-width: 260px; }
+.presence { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.presence li { padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.04); }
+.presence strong { display: block; color: #b8f000; font-size: 1.05rem; }
+.presence span { color: var(--muted, #9aa38a); font-size: 0.8rem; }
+.related-list.wide li { display: grid; gap: 0; }
+.related-list.wide .hint { padding: 0 9px 6px; margin: 0; }
+.card-index { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 2px; }
+.card-index li { display: flex; align-items: baseline; gap: 8px; padding: 4px 8px; border-radius: 6px; font-size: 0.86rem; }
+.card-index li:hover { background: rgba(184,240,0,0.08); }
+.card-index a { flex: 1; color: inherit; text-decoration: none; }
+.card-index a:hover { color: #b8f000; }
+.jump { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.jump a {
+  padding: 2px 9px; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+  background: rgba(255,255,255,0.05); color: inherit; text-decoration: none;
+}
+.jump a:hover { background: rgba(184,240,0,0.14); color: #b8f000; }
+a.cname { color: var(--foam); text-decoration: none; }
+a.cname:hover { color: #b8f000; text-decoration: underline; }
+
 /* Hub: link every deck, not just the featured five */
 .all-decks { margin-top: 18px; }
 .all-decks h3 { font-size: 0.85rem; color: var(--muted, #9aa38a); margin: 0 0 8px; font-weight: 600; }
