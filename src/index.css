@@ -7235,3 +7235,72 @@ html.overlay-macos .overlay-shell {
   border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
   color: var(--color-gold-200);
 }
+
+/* --- Phase 5: friend codes + the seasonal race ------------------------- */
+
+/* The code is read aloud and typed by hand, so it gets a monospace face and
+   generous tracking — I/L/O/0/1 are absent from the alphabet for the same
+   reason. */
+.friend-code {
+  font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  background: var(--color-ink-900);
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
+  color: var(--color-gold-300);
+  user-select: all;
+}
+
+.friend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.friend-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.friend-list li:hover {
+  background: color-mix(in srgb, var(--color-foam) 5%, transparent);
+}
+
+.friend-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+.friend-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  padding: 0.2rem 0.4rem;
+}
+.friend-table td {
+  padding: 0.3rem 0.4rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink-600) 45%, transparent);
+}
+.friend-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.friend-pos {
+  color: var(--color-muted);
+  width: 2rem;
+}
+/* Your own line, so the eye finds it without hunting. */
+.friend-table tr.friend-me td {
+  background: color-mix(in srgb, var(--color-gold-500) 8%, transparent);
+}

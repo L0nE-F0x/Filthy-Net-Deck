@@ -70,7 +70,7 @@ export function PublishDeck({ deckHash }: { deckHash: string | undefined }) {
     <span className="flex items-center gap-2 flex-wrap">
       <button
         type="button"
-        className={`btn btn-sm ${isPublic ? "" : "btn-ghost"}`}
+        className={`btn btn-sm ${isPublic ? "btn-primary" : "btn-ghost"}`}
         disabled={busy}
         title={
           isPublic

@@ -4,6 +4,7 @@ import type { Page } from "../types/meta";
 import { BoModeToggle } from "../components/BoModeToggle";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { FriendCodes } from "../components/FriendCodes";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { DONATE_URL } from "../services/site";
@@ -985,6 +986,7 @@ export const Settings = memo(function Settings() {
                     deletes them along with your shared matches.
                   </p>
                 )}
+                <FriendCodes />
                 {/* Public profile page — the shareable half of an account. */}
                 <div className="settings-note mt-3">
                   <p className="m-0 mb-2 text-xs text-muted">

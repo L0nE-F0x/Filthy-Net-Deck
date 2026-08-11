@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
+import { FriendRace } from "../components/FriendRace";
 import {
   currentSeasonKey,
   deckKey,
@@ -615,6 +616,16 @@ export const Climb = memo(function Climb() {
     [matches, seasonKey],
   );
 
+  // Arena's own season number for the selected window, so the friend race
+  // compares the same season the chart is showing. Calendar months and Arena
+  // seasons line up, but the shared data is keyed on Arena's ordinal.
+  const seasonOrdinal = useMemo(() => {
+    for (const m of seasonMatches) {
+      if (m.seasonOrdinal != null) return m.seasonOrdinal;
+    }
+    return null;
+  }, [seasonMatches]);
+
   // Rank series with deck identity attached for chart color + tooltips.
   // eventId is required so Play / draft stamps (same constructed rank string)
   // never plot as ladder points — unranked losses were painting as ranked dips.
@@ -848,6 +859,8 @@ export const Climb = memo(function Climb() {
           </span>
         </div>
       </div>
+
+      <FriendRace seasonOrdinal={seasonOrdinal} />
 
       <div className="panel">
         <h3 className="dash-title">Rank over time</h3>
