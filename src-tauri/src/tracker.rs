@@ -3481,6 +3481,66 @@ mod tests {
         assert_eq!(matches[0].match_id, "m-fixture-draw");
     }
 
+    /// Local check of the persistence repair against real data (not run in CI):
+    /// `FND_DATA_DIR=<copy of the app data dir> FND_LOG_DIR=<MTGA dir>
+    ///  cargo test replay_persistence_repair -- --nocapture --ignored`
+    ///
+    /// Point it at a **copy** — it rewrites the matches file, exactly as the
+    /// running app now would. Reports what the launch sequence recovers.
+    #[test]
+    #[ignore]
+    fn replay_persistence_repair() {
+        let (Ok(data_dir), Ok(log_dir)) =
+            (std::env::var("FND_DATA_DIR"), std::env::var("FND_LOG_DIR"))
+        else {
+            eprintln!("FND_DATA_DIR / FND_LOG_DIR not set — skipping");
+            return;
+        };
+        let data_dir = PathBuf::from(data_dir);
+        let file = data_dir.join(MATCHES_FILE);
+        let deleted = load_deleted(&data_dir.join(DELETED_FILE));
+
+        // Same order as run_loop: tombstones, then the file, then the logs.
+        let mut recorded: HashSet<String> = deleted.clone();
+        let mut memory: Vec<TrackedMatch> = Vec::new();
+        for m in load_matches(&file) {
+            if recorded.insert(m.match_id.clone()) {
+                memory.push(m);
+            }
+        }
+        let before = memory.len();
+        eprintln!("on disk at launch: {before}, tombstones: {}", deleted.len());
+
+        for name in ["Player-prev.log", "Player.log"] {
+            let path = PathBuf::from(&log_dir).join(name);
+            let Ok(bytes) = fs::read(&path) else { continue };
+            let text = String::from_utf8_lossy(&bytes);
+            let mut p = LogParser::new();
+            for line in text.split('\n') {
+                for m in p.feed_line(line) {
+                    if recorded.insert(m.match_id.clone()) {
+                        memory.push(m);
+                    }
+                }
+            }
+        }
+        eprintln!("in memory after backfill: {}", memory.len());
+
+        rewrite_matches(&file, &memory).expect("repair");
+        let after = disk_match_count(&file).expect("count");
+        eprintln!(
+            "on disk after repair: {after} (recovered {})",
+            after - before
+        );
+        assert_eq!(after, memory.len(), "repair must persist all of memory");
+        for m in load_matches(&file) {
+            assert!(
+                !deleted.contains(&m.match_id),
+                "a repair resurrected a deleted match"
+            );
+        }
+    }
+
     /// Optional local debug against a real Player.log (not run in CI):
     /// `FND_REPLAY_LOG=path cargo test replay_real_log -- --nocapture --ignored`
     #[test]
