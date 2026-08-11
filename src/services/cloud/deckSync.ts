@@ -39,6 +39,8 @@ export interface CloudDeck {
   main: number[];
   side: number[];
   playedAt: number | null;
+  /** Shown on the owner's public profile page. Off unless they said so. */
+  isPublic: boolean;
 }
 
 function isSyncableFormat(id: FormatId | string | null | undefined): id is
@@ -127,6 +129,9 @@ export function toCloudDeck(row: unknown): CloudDeck | null {
     main,
     side: nums(r.side),
     playedAt: Number.isFinite(playedAt) ? playedAt : null,
+    // Absent or malformed reads as private. Publishing is a decision the user
+    // makes; it is never something a parsing default should do for them.
+    isPublic: r.is_public === true,
   };
 }
 

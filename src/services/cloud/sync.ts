@@ -304,7 +304,7 @@ export async function fetchCloudDecks(): Promise<CloudDeck[]> {
     const supabase = await getSupabase();
     const { data, error } = await supabase
       .from("decks")
-      .select("deck_hash,name,format,main,side,played_at")
+      .select("deck_hash,name,format,main,side,played_at,is_public")
       .eq("user_id", user.id)
       .order("played_at", { ascending: false });
     if (error || !data) return [];
@@ -314,6 +314,32 @@ export async function fetchCloudDecks(): Promise<CloudDeck[]> {
   } catch {
     return [];
   }
+}
+
+/**
+ * Show one deck on the public profile page, or take it down again.
+ *
+ * Goes through the `set_deck_public` function rather than updating the column,
+ * so "you need a public profile first" comes back as something the UI can say
+ * instead of a silently ignored write. Returns false when the deck has not
+ * been backed up yet — a list only exists in the cloud once a sync has run.
+ */
+export async function setDeckPublic(deckHash: string, on: boolean): Promise<boolean> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Sign in first.");
+  const supabase = await getSupabase();
+  const { data, error } = await supabase.rpc("set_deck_public", {
+    deck_hash_in: deckHash,
+    make_public: on,
+  });
+  if (error) {
+    throw new Error(
+      /profile is not public/i.test(error.message)
+        ? "Turn your profile page on first, then publish a deck to it."
+        : error.message,
+    );
+  }
+  return data === true;
 }
 
 // ---------------------------------------------------------------------------

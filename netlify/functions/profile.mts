@@ -62,6 +62,21 @@ interface ArchetypeRow {
   wins: number;
   losses: number;
 }
+/**
+ * A deck the player chose to publish. `main`/`side` are Arena card ids, which
+ * nothing here can turn into card names — there is no id→name map on the
+ * server and resolving 60 ids per request through Scryfall would be both slow
+ * and rude to a public API. So the page publishes what it can state exactly:
+ * the deck, its format, its size, and when it was last played.
+ */
+interface DeckRow {
+  deck_id: string;
+  name: string;
+  format: string;
+  main: number[] | null;
+  side: number[] | null;
+  played_at: string | null;
+}
 
 /** Escape everything user-controlled. Handles and display names come from
  *  third-party identity providers and are not trustworthy input. */
@@ -191,11 +206,14 @@ export default async (_req: Request, ctx: Context) => {
   const url = `${SITE}/u/${handle}`;
 
   try {
-    const [profiles, stats, archetypes] = await Promise.all([
+    const [profiles, stats, archetypes, decks] = await Promise.all([
       sb<ProfileRow>(`public_profiles?handle=eq.${encodeURIComponent(handle)}&select=*`),
       sb<StatsRow>(`public_profile_stats?handle=eq.${encodeURIComponent(handle)}&select=*`),
       sb<ArchetypeRow>(
         `public_profile_archetypes?handle=eq.${encodeURIComponent(handle)}&select=*&order=matches.desc&limit=25`,
+      ),
+      sb<DeckRow>(
+        `public_profile_decks?handle=eq.${encodeURIComponent(handle)}&select=*&order=played_at.desc&limit=12`,
       ),
     ]);
 
@@ -263,6 +281,37 @@ export default async (_req: Request, ctx: Context) => {
       })
       .join("");
 
+    // Decks the player explicitly published. Empty for everyone who has not,
+    // which is the default — the section simply does not appear.
+    const deckRows = decks
+      .map((d) => {
+        const size = Array.isArray(d.main) ? d.main.length : 0;
+        const side = Array.isArray(d.side) ? d.side.length : 0;
+        const when = d.played_at ? new Date(d.played_at) : null;
+        const played =
+          when && !Number.isNaN(when.valueOf())
+            ? when.toISOString().slice(0, 10)
+            : "—";
+        return `<tr>
+          <td>${esc(d.name)}</td>
+          <td>${esc(d.format)}</td>
+          <td class="num">${size}${side ? ` <span class="sub">+${side}</span>` : ""}</td>
+          <td class="num">${esc(played)}</td>
+        </tr>`;
+      })
+      .join("");
+
+    const deckSection = deckRows
+      ? `<h2 style="font-size:1rem;margin:1.5rem 0 0">Published decks</h2>
+         <table>
+           <thead><tr>
+             <th>Deck</th><th>Format</th>
+             <th class="num">Cards</th><th class="num">Last played</th>
+           </tr></thead>
+           <tbody>${deckRows}</tbody>
+         </table>`
+      : "";
+
     const body = `${head}
       <div class="cards">
         <div class="card"><b>${s.matches}</b><span>Matches</span></div>
@@ -278,6 +327,7 @@ export default async (_req: Request, ctx: Context) => {
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      ${deckSection}
       ${CTA}`;
 
     return new Response(

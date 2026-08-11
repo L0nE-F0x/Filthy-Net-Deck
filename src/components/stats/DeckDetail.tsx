@@ -34,6 +34,7 @@ import {
   latestMainboard,
 } from "../../services/deckVersions";
 import { useCloudDeckLists } from "../../services/cloud/useCloudDecks";
+import { PublishDeck } from "./PublishDeck";
 import { SummaryTiles } from "./SummaryTiles";
 import { SplitsPanel } from "./SplitsPanel";
 import { MatchHistory } from "./MatchHistory";
@@ -420,6 +421,7 @@ export function DeckDetail({
             <h3 className="dash-title m-0 truncate">{deck.name}</h3>
           </span>
           <span className="flex items-center gap-2 flex-wrap">
+            <PublishDeck deckHash={deck.matches.find((m) => m.deckHash)?.deckHash} />
             {runStart === undefined ? (
               <button
                 type="button"

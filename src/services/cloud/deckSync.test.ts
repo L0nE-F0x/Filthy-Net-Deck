@@ -156,6 +156,7 @@ describe("toCloudDeck", () => {
       main: [1, 2],
       side: [3],
       playedAt: Date.UTC(2026, 7, 10, 12, 0, 0),
+      isPublic: false,
     });
   });
 
@@ -164,6 +165,14 @@ describe("toCloudDeck", () => {
     expect(toCloudDeck({ name: "no hash", main: [1] })).toBeNull();
     expect(toCloudDeck({ deck_hash: "a", main: [] })).toBeNull();
     expect(toCloudDeck({ deck_hash: "a", main: "not an array" })).toBeNull();
+  });
+
+  it("treats an absent is_public as private", () => {
+    // Publishing is a decision the user makes. A parsing default must never
+    // make it for them.
+    expect(toCloudDeck({ deck_hash: "a", main: [1] })!.isPublic).toBe(false);
+    expect(toCloudDeck({ deck_hash: "a", main: [1], is_public: "yes" })!.isPublic).toBe(false);
+    expect(toCloudDeck({ deck_hash: "a", main: [1], is_public: true })!.isPublic).toBe(true);
   });
 
   it("tolerates a missing side and an unparseable date", () => {
@@ -176,7 +185,7 @@ describe("toCloudDeck", () => {
 describe("indexByHash", () => {
   it("keys restored lists for local lookup", () => {
     const map = indexByHash([
-      { deckHash: "a", name: "A", format: "standard", main: [1], side: [], playedAt: null },
+      { deckHash: "a", name: "A", format: "standard", main: [1], side: [], playedAt: null, isPublic: false },
     ]);
     expect(map.get("a")?.main).toEqual([1]);
     expect(map.has("b")).toBe(false);
