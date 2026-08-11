@@ -85,16 +85,32 @@ export function archetypeTheme(name) {
 }
 
 /**
- * Colors a mana cost *requires*. Only plain pips count: `{1}{R/G}` is castable
- * off green alone and `{W/U}{W/U}` off white alone, so hybrid, twobrid and
- * Phyrexian pips prove nothing. Color identity is the wrong signal here — it
- * counts those pips plus DFC back faces, which relabelled Mono-White Auras as
- * Azorius (4 Skyward Spider) and Selesnya Ouroboroid as Naya (3 Spider
- * Manifestation) on this rule's first real run.
+ * Split a Scryfall mana cost into faces. Adventure / MDFC cards arrive as
+ * `"{1}{B} // {R}"` — counting the union of both faces is what turned a pure
+ * Izzet Prowess list (3 Sell-Sword, 4 Elusive Otter) into "4c Prowess".
+ */
+export function facesFromCost(manaCost) {
+  return String(manaCost || "")
+    .split("//")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Colors a single face's mana cost *requires*. Only plain pips count:
+ * `{1}{R/G}` is castable off green alone and `{W/U}{W/U}` off white alone, so
+ * hybrid, twobrid and Phyrexian pips prove nothing. Color identity is the wrong
+ * signal here — it counts those pips plus DFC back faces, which relabelled
+ * Mono-White Auras as Azorius (4 Skyward Spider) and Selesnya Ouroboroid as
+ * Naya (3 Spider Manifestation) on this rule's first real run.
+ *
+ * When handed a multi-face string, only the **front** face is read — callers
+ * that need the adventure/back half should split with `facesFromCost` first.
  */
 export function requiredColorsFromCost(manaCost) {
+  const front = facesFromCost(manaCost)[0] || "";
   const out = new Set();
-  for (const m of String(manaCost || "").matchAll(/\{([^}]*)\}/g)) {
+  for (const m of front.matchAll(/\{([^}]*)\}/g)) {
     const sym = m[1].trim().toUpperCase();
     if (COLOR_ORDER.includes(sym)) out.add(sym);
   }
@@ -105,17 +121,49 @@ export function requiredColorsFromCost(manaCost) {
  * Colors the mainboard actually has to produce. Lands are ignored (fixing lands
  * say little) and a color needs at least `minCopies` copies among nonland
  * cards, so one scraped stray can't repaint an archetype.
+ *
+ * Multi-face cards (adventures, MDFCs) are special: you only need to cast
+ * **one** face. Pass 1 builds a base palette from single-face spells; pass 2
+ * credits a multi-face card only for a face that is castable off that base
+ * (or colourless). If no face is castable, the front face is the splash —
+ * that's how 4 Ruin-Lurker Bat still pulls Mono-White → Orzhov, while 3
+ * Callous Sell-Sword in Izzet (adventure is just `{R}`) leaves the label alone.
  */
 export function listColorIdentity(mainboard, costOf, minCopies = 2) {
-  const copies = new Map();
+  const singles = [];
+  const multis = [];
   for (const entry of mainboard || []) {
     if (entry.land) continue;
     const n = Number(entry.count) || 0;
     if (n <= 0) continue;
-    for (const c of requiredColorsFromCost(costOf(entry))) {
-      copies.set(c, (copies.get(c) ?? 0) + n);
+    const faces = facesFromCost(costOf(entry));
+    if (faces.length <= 1) {
+      singles.push({ n, colors: [...requiredColorsFromCost(faces[0] || "")] });
+    } else {
+      multis.push({
+        n,
+        faces: faces.map((f) => [...requiredColorsFromCost(f)]),
+      });
     }
   }
+
+  const copies = new Map();
+  for (const { n, colors } of singles) {
+    for (const c of colors) copies.set(c, (copies.get(c) ?? 0) + n);
+  }
+  const base = new Set(
+    COLOR_ORDER.filter((c) => (copies.get(c) ?? 0) >= minCopies),
+  );
+
+  for (const { n, faces } of multis) {
+    const castable =
+      faces.find((fc) => fc.every((c) => base.has(c))) ??
+      // No face plays off the base palette → the front face is a real splash.
+      faces[0] ??
+      [];
+    for (const c of castable) copies.set(c, (copies.get(c) ?? 0) + n);
+  }
+
   return COLOR_ORDER.filter((c) => (copies.get(c) ?? 0) >= minCopies);
 }
 

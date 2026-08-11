@@ -49,9 +49,14 @@ function keep(card) {
     // Front face decides what the card "is" for curve purposes (MDFC lands etc.)
     isLand: /^[^/]*\bLand\b/.test(front),
     type: typeBucket(front),
-    // Front-face mana cost, so a list's real color requirements can be checked
-    // against its archetype label (identity would count hybrid pips + back faces).
-    manaCost: card.mana_cost || card.card_faces?.[0]?.mana_cost || "",
+    // Keep the full Scryfall cost, including adventure/MDFC `//` faces.
+    // listColorIdentity knows how to credit only a castable face; stripping
+    // here would force the front face alone (Sell-Sword = black) and relabel
+    // Izzet Prowess as Grixis just for a red adventure people actually cast.
+    manaCost:
+      card.mana_cost ||
+      card.card_faces?.map((f) => f.mana_cost || "").filter(Boolean).join(" // ") ||
+      "",
   };
 }
 
