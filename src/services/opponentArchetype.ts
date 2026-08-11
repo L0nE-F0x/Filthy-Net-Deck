@@ -193,6 +193,17 @@ export interface ColorEvidence {
   required: Set<PipColor>;
   /** Weaker hints (hybrid pips, duals, colors inferred from the field). */
   soft: Set<PipColor>;
+  /**
+   * Every colour that appears anywhere in what they revealed — pips, hybrids,
+   * and the colour identity of their lands. A colour *absent* from this set
+   * after a real sample of their deck is evidence they are not playing it.
+   */
+  evidenced?: Set<PipColor>;
+  /**
+   * 0..1 — how much of their deck we have actually seen, which is how much the
+   * absence above is worth. See `evidenceMass`.
+   */
+  mass?: number;
 }
 
 function emptyEvidence(): ColorEvidence {
@@ -359,6 +370,47 @@ export function missingColors(deck: Deck, observed: Set<PipColor>): PipColor[] {
   return [...observed].filter((c) => !colors.has(c));
 }
 
+/**
+ * Every colour anywhere in the revealed cards — cast pips, hybrid halves, and
+ * the colour identity of lands. This is the set a colour must be missing from
+ * to count as *unseen*, and it is read only off the opponent's own cards, never
+ * off the candidate lists, so it cannot argue in a circle.
+ */
+export function evidencedColors(cards: SeenCardInfo[]): Set<PipColor> {
+  const out = new Set<PipColor>();
+  for (const card of cards) {
+    for (const c of card.colorIdentity ?? []) if (isPipColor(c)) out.add(c);
+    const { hard, soft } = colorsFromManaCost(card.manaCost);
+    for (const c of hard) out.add(c);
+    for (const c of soft) out.add(c);
+  }
+  return out;
+}
+
+/**
+ * How much of the opponent's deck we have actually seen, 0..1.
+ *
+ * Lands count for more than spells: a mana base is on the table every single
+ * turn, so four lands with no red among them says far more about the absence of
+ * red than four spells would. Saturates deliberately — past a point, more cards
+ * do not make an absent colour any more absent.
+ */
+export function evidenceMass(cards: SeenCardInfo[]): number {
+  let lands = 0;
+  let spells = 0;
+  for (const c of cards) {
+    // A card whose colour we could not look up tells us nothing about which
+    // colours are absent. Only cards we actually resolved count — otherwise a
+    // name-only resolver would "prove" the opponent plays no colours at all
+    // and eliminate the entire field.
+    const known = c.manaCost != null || (c.colorIdentity?.length ?? 0) > 0;
+    if (!known) continue;
+    if (isLandCard(c)) lands++;
+    else spells++;
+  }
+  return Math.min(1, lands * 0.22 + spells * 0.14);
+}
+
 function colorFitPenalty(deck: Deck, evidence: ColorEvidence): number {
   const colors = deckColorSet(deck);
   if (colors.size === 0) return 0;
@@ -370,7 +422,22 @@ function colorFitPenalty(deck: Deck, evidence: ColorEvidence): number {
   for (const c of evidence.soft) {
     if (!colors.has(c)) soft += 0.55;
   }
-  return hard + soft;
+  // The other direction, which used to be free and is why a WUB opponent could
+  // be reported as 4c Control: a candidate that needs a colour the opponent has
+  // shown NO trace of. Absence is only evidence once there is a real sample, so
+  // it scales with how much of their deck we have seen — near nothing at two
+  // cards, decisive once a mana base is on the table. Without this, a four- or
+  // five-colour "goodstuff" list is literally uncontradictable: it contains
+  // every proven colour by construction and pays nothing for the rest.
+  let unseen = 0;
+  const evidenced = evidence.evidenced;
+  const mass = evidence.mass ?? 0;
+  if (evidenced && mass > 0) {
+    for (const c of colors) {
+      if (isPipColor(c) && !evidenced.has(c)) unseen += 2.4 * mass;
+    }
+  }
+  return hard + soft + unseen;
 }
 
 export type ScoredDeck = Omit<
@@ -380,6 +447,8 @@ export type ScoredDeck = Omit<
   score: number;
   /** IDF-weighted hit mass (before color / density terms). */
   weightedHits: number;
+  /** Hits on cards no other list in the field plays. */
+  exclusiveHits: number;
 };
 
 /**
@@ -399,6 +468,8 @@ export function scoreDeckAgainstSeen(
   const hits: string[] = [];
   let distinctiveHits = 0;
   let weightedHits = 0;
+  /** Hits on cards only ONE list in the field plays — a smoking gun. */
+  let exclusiveHits = 0;
   for (const name of seenNames) {
     if (!all.has(name)) continue;
     // Prefer displaying the deck's casing: scan mainboard for original name.
@@ -414,12 +485,21 @@ export function scoreDeckAgainstSeen(
       // Signature tile cards are worth more than random one-ofs.
       if (key.has(name)) w *= 1.65;
       // Exclusive field presence (df === 1) is the strongest tell we have.
-      if ((freq.get(name) ?? 0) <= 1) w *= 1.35;
+      if ((freq.get(name) ?? 0) <= 1) {
+        w *= 1.35;
+        exclusiveHits++;
+      }
       weightedHits += w;
     }
   }
   const pool = Math.max(1, distinctive.size);
   const density = distinctiveHits / pool;
+  // Everything in `all` that is not `distinctive` is a land, by construction.
+  // Lands are the least discriminating cards in the format — a four-colour pile
+  // plays every dual and utility land there is, so it "matches" whatever anyone
+  // puts on the table. They may corroborate a read; they must never carry one,
+  // so their contribution is capped at roughly one distinctive card.
+  const landHits = hits.length - distinctiveHits;
   // Rank by weighted rarity mass first, then raw distinctive count, then
   // density as a weak denser-list tiebreak.
   const evidence = observedColors
@@ -431,7 +511,7 @@ export function scoreDeckAgainstSeen(
   const score =
     weightedHits * 4 +
     distinctiveHits * 1.5 +
-    hits.length * 0.25 +
+    Math.min(landHits, 2) * 0.15 +
     density -
     colorPenalty;
   return {
@@ -439,6 +519,7 @@ export function scoreDeckAgainstSeen(
     deckId: deck.id,
     hits,
     distinctiveHits,
+    exclusiveHits,
     poolSize: distinctive.size,
     weightedHits,
     score,
@@ -820,6 +901,11 @@ export function inferOpponentArchetype(
   const evidence: ColorEvidence = {
     required: proven.required,
     soft: new Set<PipColor>([...proven.soft, ...inferredColors]),
+    // Read off their cards only — `inferredColors` comes from the candidate
+    // lists and must not feed back in here, or a list would end up justifying
+    // its own colours.
+    evidenced: evidencedColors(seenCards),
+    mass: evidenceMass(seenCards),
   };
   for (const c of evidence.required) evidence.soft.delete(c);
 
@@ -831,10 +917,41 @@ export function inferOpponentArchetype(
       ? null
       : macroArchetypeFallback(seenCards, proven, seenDistinctive, minConfidence);
 
+  // Once we have actually seen a sample of their deck — a mana base plus some
+  // spells — a candidate that needs a colour they have shown *no trace of* is
+  // out, not merely penalised. Four lands and five spells without a single red
+  // card is not weak evidence against a red deck; it is the ordinary way you
+  // know someone is not playing red. Below that threshold this does nothing
+  // and the graded penalty in colorFitPenalty carries it.
+  // Measured, not assumed: restricting this to three-plus-colour lists (on the
+  // theory that a two-colour deck can hide its second colour) let the original
+  // failure back in — colours claimed with no evidence went from 1.1% to 9.9%
+  // of late-game reads. Applying it to every list is what holds.
+  const sampleIsReal = (evidence.mass ?? 0) >= 0.65;
+  const unseenColorRules = (deck: Deck) => {
+    if (!sampleIsReal || !evidence.evidenced) return false;
+    return (deck.colors ?? []).some(
+      (c) => c !== "C" && isPipColor(c) && !evidence.evidenced!.has(c),
+    );
+  };
+
   const scored: ScoredDeck[] = [];
   for (const deck of candidates) {
     const s = scoreDeckAgainstSeen(seenNames, deck, df, nDecks, evidence);
-    if (s.distinctiveHits < minHits && s.hits.length < minHits + 1) continue;
+    // Cards can overrule the colour argument, but only real ones: two cards
+    // that no other list in the field plays outweigh "we have not seen red
+    // yet". One does not — that is how a single shared staple used to drag a
+    // whole four-colour list into the answer.
+    if (unseenColorRules(deck) && s.exclusiveHits < 3) continue;
+    // Real cards only. This used to read `|| s.hits.length < minHits + 1`,
+    // which admitted a list on land overlap alone — three shared duals and no
+    // actual spell was enough to name a deck. That is how a Dimir opponent got
+    // reported as 4c Control: the four-colour list plays every land anyone
+    // plays, so it out-hit the one card (Kaito) that identified the real deck.
+    // One card that NO other list in the field plays identifies a deck on its
+    // own — refusing to say "Dimir Midrange" when they have cast the only copy
+    // of Kaito in the format is a different kind of wrong.
+    if (s.distinctiveHits < minHits && s.exclusiveHits < 1) continue;
     scored.push(s);
   }
   if (!scored.length) return macroFallback();
