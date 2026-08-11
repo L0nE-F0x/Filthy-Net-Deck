@@ -387,6 +387,10 @@ pub fn tracker_export_diagnostic(
             "matchesOnDisk": disk_count,
             "writeErrors": write_error_count(),
             "lastWriteError": last_write_error(),
+            // Non-zero means appends were failing and the reconcile pass had to
+            // rewrite the file. History is intact — but something is wrong with
+            // the fast path and this is the trail to it.
+            "persistRepairs": persist_repair_count(),
         },
     });
     let body = serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?;
@@ -1975,6 +1979,10 @@ fn run_loop(app: AppHandle) {
         }
     }
 
+    // Catch a file that fell behind in an earlier session, even if this one
+    // never sees a new match.
+    reconcile_persistence(&app);
+
     let mut pos: u64 = 0;
     let mut carry = String::new();
 
@@ -2199,6 +2207,9 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
         }
         data.status.matches_recorded = data.matches.len();
     }
+    // The append above is best-effort; this is what actually guarantees the
+    // match survives the next log rotation.
+    reconcile_persistence(app);
     for (m, toast) in fresh {
         // Brief "ended" live frame so the overlay can flash the result, then idle.
         let ended = LiveMatch {
@@ -2424,8 +2435,15 @@ fn save_deleted(file: &Path, ids: &HashSet<String>) {
 static WRITE_ERRORS: AtomicUsize = AtomicUsize::new(0);
 static LAST_WRITE_ERROR: Mutex<Option<String>> = Mutex::new(None);
 
+/// Times the reconcile pass found the file short of memory and rewrote it.
+static PERSIST_REPAIRS: AtomicUsize = AtomicUsize::new(0);
+
 pub fn write_error_count() -> usize {
     WRITE_ERRORS.load(Ordering::SeqCst)
+}
+
+pub fn persist_repair_count() -> usize {
+    PERSIST_REPAIRS.load(Ordering::SeqCst)
 }
 
 pub fn last_write_error() -> Option<String> {
@@ -2438,6 +2456,56 @@ fn note_write_error(what: &str, e: &dyn std::fmt::Display) {
     eprintln!("[tracker] MATCH NOT SAVED — {msg}");
     if let Ok(mut slot) = LAST_WRITE_ERROR.lock() {
         *slot = Some(msg);
+    }
+}
+
+/// Lines actually in the matches file. `None` when it cannot be read at all,
+/// which is itself a persistence failure rather than "no matches yet".
+fn disk_match_count(file: &Path) -> Option<usize> {
+    if !file.exists() {
+        return Some(0);
+    }
+    fs::read_to_string(file)
+        .ok()
+        .map(|t| t.lines().filter(|l| !l.trim().is_empty()).count())
+}
+
+/// Make the file agree with memory, rewriting it when it has fallen behind.
+///
+/// Appending per match is the fast path, but it has failed in the field: the
+/// owner's install held **373 matches in memory against 25 on disk**, the file
+/// untouched for three weeks, with no visible symptom — history is re-derived
+/// from Arena's logs on every launch, so everything looked right until the logs
+/// rotated. The root cause of that stall was never identified.
+///
+/// So rather than trusting the append, verify it. This runs after every batch:
+/// if the file is short, the whole of memory is rewritten atomically (temp file
+/// + rename, so an interrupted repair cannot lose what was already there).
+///
+/// Deleted matches are not in memory, so a repair cannot resurrect them.
+///
+/// Cheap by construction — a few hundred JSONL lines, once per match end — and
+/// each repair is counted, so a silent write failure now shows up in the
+/// diagnostic as a non-zero `persistRepairs` instead of as missing history.
+fn reconcile_persistence(app: &AppHandle) {
+    let shared = app.state::<TrackerShared>();
+    let data = shared.0.lock().expect("tracker lock");
+    let Some(file) = data.data_file.clone() else {
+        // The one remaining silent path: no file to write to at all. Report it
+        // rather than returning quietly, which is how this stayed invisible.
+        note_write_error("no data file", &"app_data_dir did not resolve");
+        return;
+    };
+    let in_memory = data.matches.len();
+    match disk_match_count(&file) {
+        Some(on_disk) if on_disk >= in_memory => {}
+        Some(_) | None => match rewrite_matches(&file, &data.matches) {
+            Ok(()) => {
+                PERSIST_REPAIRS.fetch_add(1, Ordering::SeqCst);
+                eprintln!("[tracker] rewrote match history — {in_memory} matches");
+            }
+            Err(e) => note_write_error("repair rewrite", &e),
+        },
     }
 }
 
@@ -3125,6 +3193,35 @@ mod tests {
         save_deleted(&deleted_file, &ids);
         assert!(load_matches(&matches_file).is_empty());
         assert!(load_deleted(&deleted_file).contains("m-1"));
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    /// The repair the reconcile pass performs: whatever caused appends to stop,
+    /// a file that is short of memory gets rewritten from memory.
+    #[test]
+    fn a_short_file_is_rewritten_from_memory() {
+        let dir = std::env::temp_dir().join(format!("fnd-reconcile-{}", std::process::id()));
+        let file = dir.join(MATCHES_FILE);
+        let _ = fs::remove_dir_all(&dir);
+
+        let mut p = LogParser::new();
+        let all = full_match(&mut p);
+        assert_eq!(all.len(), 1);
+
+        // Memory has the match; the file was never written — the field failure.
+        assert_eq!(disk_match_count(&file), Some(0));
+        rewrite_matches(&file, &all).expect("repair");
+        assert_eq!(disk_match_count(&file), Some(1));
+        assert_eq!(load_matches(&file).len(), 1);
+
+        // Idempotent: a second repair with the same memory is a no-op in effect.
+        rewrite_matches(&file, &all).expect("repair again");
+        assert_eq!(disk_match_count(&file), Some(1));
+
+        // A deleted match is not in memory, so a repair cannot resurrect it.
+        rewrite_matches(&file, &[]).expect("repair empty");
+        assert_eq!(disk_match_count(&file), Some(0));
 
         let _ = fs::remove_dir_all(&dir);
     }
