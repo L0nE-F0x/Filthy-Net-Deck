@@ -47,3 +47,11 @@ export const DONATE_URL = "https://ko-fi.com/filthynetdeck";
  * something a user has to go looking for on the website.
  */
 export const PRIVACY_URL = `${SITE_ORIGIN_PRIMARY}/privacy.html`;
+
+/**
+ * Public status page — the "we know, fix incoming" channel for an Arena update
+ * that breaks log parsing (`docs/PLATFORM-STRATEGY.md` §2.7). Backed by
+ * `website/status.json`, which the in-app banner reads too, so the page and the
+ * app can never disagree about whether there is an incident.
+ */
+export const STATUS_URL = `${SITE_ORIGIN_PRIMARY}/status.html`;

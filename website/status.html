@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Status — Filthy Net Deck</title>
+    <meta
+      name="description"
+      content="Is Filthy Net Deck's match tracking working? Current status, and what to do if an Arena update has broken it."
+    />
+    <meta name="theme-color" content="#070806" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://filthy-net-deck.com/status.html" />
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .doc {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 120px 24px 80px;
+      }
+      .doc h1 {
+        font-size: clamp(1.9rem, 5vw, 2.6rem);
+        margin: 0 0 8px;
+      }
+      .doc h2 {
+        font-size: 1.2rem;
+        margin: 44px 0 10px;
+        color: var(--acid-bright);
+      }
+      .doc p,
+      .doc li {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .doc strong {
+        color: var(--foam);
+      }
+      .status-card {
+        border: 1px solid var(--ink-700);
+        border-radius: var(--radius);
+        background: var(--ink-900);
+        padding: 26px 28px;
+        margin: 28px 0 8px;
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+      }
+      .status-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+        margin-top: 7px;
+        background: var(--muted);
+      }
+      .status-card.is-operational {
+        border-color: color-mix(in srgb, var(--good) 40%, var(--ink-700));
+      }
+      .status-card.is-operational .status-dot {
+        background: var(--good);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 18%, transparent);
+      }
+      .status-card.is-degraded {
+        border-color: color-mix(in srgb, var(--gold) 45%, var(--ink-700));
+      }
+      .status-card.is-degraded .status-dot {
+        background: var(--gold);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 18%, transparent);
+      }
+      .status-card.is-down {
+        border-color: #b4462f;
+      }
+      .status-card.is-down .status-dot {
+        background: #e0603f;
+        box-shadow: 0 0 0 4px rgba(224, 96, 63, 0.18);
+      }
+      .status-headline {
+        font-size: 1.22rem;
+        color: var(--foam);
+        margin: 0 0 6px;
+        font-weight: 600;
+      }
+      .status-detail {
+        margin: 0;
+      }
+      .status-updated {
+        color: var(--muted);
+        font-size: 0.86rem;
+        margin: 0 0 40px;
+      }
+      .doc code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.88em;
+        color: var(--acid-bright);
+        background: var(--ink-850);
+        padding: 2px 6px;
+        border-radius: 5px;
+      }
+      .doc-back {
+        display: inline-block;
+        margin-top: 48px;
+        color: var(--acid);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .doc-back:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fx-root" aria-hidden="true">
+      <div class="fx-orb fx-orb-a"></div>
+      <div class="fx-orb fx-orb-b"></div>
+      <div class="fx-grid"></div>
+    </div>
+
+    <header class="nav">
+      <a class="brand" href="/">
+        <img src="assets/app-icon.png" alt="" width="40" height="40" />
+        <span>
+          <strong>Filthy Net Deck</strong>
+          <small>MTG Arena companion</small>
+        </span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="meta-web/">Public meta</a>
+        <a href="/#download" class="nav-cta">Download</a>
+      </nav>
+    </header>
+
+    <main class="doc">
+      <p class="eyebrow">Status</p>
+      <h1>Is tracking working?</h1>
+
+      <div class="status-card" id="card">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div>
+          <p class="status-headline" id="headline">Checking…</p>
+          <p class="status-detail" id="detail"></p>
+        </div>
+      </div>
+      <p class="status-updated" id="updated"></p>
+
+      <h2>Why this page exists</h2>
+      <p>
+        Filthy Net Deck reads Magic: The Gathering Arena's own log file to record your
+        matches. That format is <strong>unofficial</strong> — Wizards can change it in any
+        client update, without notice, and when they do, match tracking can break for
+        everybody at once through no fault of your install.
+      </p>
+      <p>
+        This page is where that gets said out loud. If tracking has broken, it will say so
+        here, and reinstalling or fiddling with your settings will not help — a new build
+        is the fix, and it will arrive through the app's own updater.
+      </p>
+
+      <h2>If your matches are not being recorded</h2>
+      <p>Two things are worth checking before assuming it is us:</p>
+      <ul>
+        <li>
+          <strong>Detailed Logs.</strong> Arena → Options → Account → <em>Detailed Logs
+          (Plugin Support)</em> must be on. The app will tell you if it is off, and
+          Arena needs a restart after enabling it.
+        </li>
+        <li>
+          <strong>You are on the current build.</strong> Settings → Updates →
+          <em>Check for updates</em>.
+        </li>
+      </ul>
+      <p>
+        If both are fine and this page says everything is normal, that is worth reporting —
+        <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck/issues">open an issue</a> and
+        attach the diagnostic from Settings → Tracker health. It contains no match data
+        and no account details.
+      </p>
+
+      <h2>What this page does not cover</h2>
+      <p>
+        The daily meta feed is built by a pipeline that <strong>aborts rather than
+        publishing anything it could not verify</strong>, so if a source goes down the app
+        keeps showing the last real data with an "offline" marker rather than going blank
+        or inventing lists. That is working as intended, not an outage.
+      </p>
+
+      <a class="doc-back" href="/">← Back to Filthy Net Deck</a>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="brand footer-brand">
+          <img src="assets/app-icon.png" alt="" width="32" height="32" />
+          <strong>Filthy Net Deck</strong>
+        </div>
+        <p>
+          Fan-made companion — <strong>not affiliated with Wizards of the Coast</strong>.
+          Magic: The Gathering and MTG Arena are trademarks of Wizards of the Coast LLC.
+        </p>
+        <p class="footer-credit"><a href="privacy.html">Privacy</a> · <a href="status.html">Status</a></p>
+      </div>
+    </footer>
+
+    <script>
+      // Single source of truth is status.json, which the app reads too — so the
+      // page and the in-app banner can never disagree about an incident.
+      (function () {
+        var card = document.getElementById("card");
+        var headline = document.getElementById("headline");
+        var detail = document.getElementById("detail");
+        var updated = document.getElementById("updated");
+
+        function fail() {
+          // Never claim "operational" when the check itself failed. Saying
+          // nothing is known is the honest answer and matches how the app
+          // handles a feed it could not verify.
+          card.className = "status-card";
+          headline.textContent = "Could not load the current status.";
+          detail.textContent =
+            "That is a problem with this page, not necessarily with the app.";
+          updated.textContent = "";
+        }
+
+        fetch("status.json", { cache: "no-cache" })
+          .then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
+            return r.json();
+          })
+          .then(function (s) {
+            var state =
+              s.state === "degraded" || s.state === "down" ? s.state : "operational";
+            card.className = "status-card is-" + state;
+            headline.textContent =
+              s.headline ||
+              (state === "operational"
+                ? "Everything is running normally."
+                : "Something is affecting tracking.");
+            detail.textContent = s.detail || "";
+            detail.style.display = s.detail ? "" : "none";
+            if (s.updated) {
+              var d = new Date(s.updated);
+              updated.textContent = isNaN(d.valueOf())
+                ? ""
+                : "Last updated " + d.toISOString().slice(0, 16).replace("T", " ") + " UTC";
+            }
+          })
+          .catch(fail);
+      })();
+    </script>
+  </body>
+</html>

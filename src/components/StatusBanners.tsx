@@ -1,9 +1,45 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { APP_VERSION, WHATS_NEW } from "../version";
-import { downloadInstaller } from "../services/openExternal";
+import { downloadInstaller, openExternal } from "../services/openExternal";
+import { STATUS_URL } from "../services/site";
+import {
+  fetchServiceStatus,
+  isIncident,
+  type ServiceStatus,
+} from "../services/serviceStatus";
 
 const LAST_SEEN_VERSION_KEY = "bbi.lastSeenVersion";
+
+/**
+ * Poll the published status so an Arena update that breaks tracking can be
+ * announced *inside* the app (`docs/PLATFORM-STRATEGY.md` §2.7).
+ *
+ * Hourly, and deliberately late on first run: this must never compete with boot
+ * or delay the splash, and an incident that started five minutes ago can wait
+ * another thirty seconds to be shown.
+ */
+function useServiceStatus(): ServiceStatus | null {
+  const [status, setStatus] = useState<ServiceStatus | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const check = () => {
+      void fetchServiceStatus().then((s) => {
+        if (alive) setStatus(s);
+      });
+    };
+    const first = window.setTimeout(check, 30_000);
+    const repeat = window.setInterval(check, 60 * 60 * 1000);
+    return () => {
+      alive = false;
+      window.clearTimeout(first);
+      window.clearInterval(repeat);
+    };
+  }, []);
+
+  return status;
+}
 
 /**
  * True exactly once per version: when a previously-run version differs from
@@ -42,8 +78,35 @@ export function StatusBanners() {
   const clearRankUpMoment = useAppStore((s) => s.clearRankUpMoment);
   const setPage = useAppStore((s) => s.setPage);
   const [showWhatsNew, setShowWhatsNew] = useState(() => shouldShowWhatsNew());
+  const service = useServiceStatus();
 
   const banners: { key: string; className: string; body: ReactNode }[] = [];
+
+  // First, and not dismissible. If tracking is known to be broken, that outranks
+  // everything else here — the alternative is a user reinstalling, toggling
+  // Arena settings and eventually writing a review, to fix something that is
+  // not on their machine.
+  if (isIncident(service)) {
+    banners.push({
+      key: "service-status",
+      className: `banner ${service.state === "down" ? "banner-warn" : "banner-gold"}`,
+      body: (
+        <>
+          <strong>{service.state === "down" ? "Tracking is down" : "Tracking is degraded"}</strong>
+          {" — "}
+          {service.headline}
+          {service.detail ? ` ${service.detail}` : ""}{" "}
+          <button
+            type="button"
+            className="update-dl"
+            onClick={() => void openExternal(STATUS_URL)}
+          >
+            Details
+          </button>
+        </>
+      ),
+    });
+  }
 
   if (rankUpMoment) {
     banners.push({

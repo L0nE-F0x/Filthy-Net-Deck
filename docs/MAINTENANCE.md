@@ -52,6 +52,26 @@ never silently stale-as-fresh).
    My Stats; if the parse-error warning shows, run the replay harness
    (`FND_REPLAY_LOG=<Player.log> cargo test replay_real_log -- --nocapture
    --ignored` in `src-tauri`) and fix `tracker.rs`.
+
+   **Say so publicly first — before fixing.** Editing `website/status.json` and
+   pushing takes a minute and lights up both the status page *and* a banner
+   inside every running app. Without it, an Arena-side break looks to the user
+   like their install is broken: they reinstall, toggle Arena settings, and
+   eventually leave a review, all for something not on their machine. At 300
+   users that is a support ticket; at 10,000 it is review-bombing
+   (`PLATFORM-STRATEGY.md` §2.7).
+
+   ```json
+   { "state": "down",
+     "headline": "Match tracking is broken after the 2026.62 Arena update.",
+     "detail": "A fix is in progress — the app will update itself.",
+     "updated": "2026-08-12T09:30:00Z" }
+   ```
+
+   `state` is `operational` | `degraded` | `down`; anything else is treated as
+   `operational` by both readers, so a typo cannot put mystery text in front of
+   users. **Set it back to `operational` when the fix ships** — a stale incident
+   banner is its own bug.
 5. **Source quality spot-check** — in the app, glance at deck `listQuality`
    badges / Settings sources. If everything degraded to Goldfish-only or
    `partial`, a scraper (magic.gg / MTGO) probably changed its HTML — check the

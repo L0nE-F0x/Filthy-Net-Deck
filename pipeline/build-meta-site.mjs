@@ -1269,6 +1269,11 @@ function writeSitemap(paths, lastmod) {
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>${SITE}/status.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.4</priority>
+  </url>
 ${urls}
 </urlset>
 `;

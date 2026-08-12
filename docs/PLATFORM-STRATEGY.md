@@ -279,9 +279,22 @@ Three things were named as needed before scale. Status as of v2.8.2:
 | Item | State |
 |---|---|
 | Early detection | ✅ The health ping (§2.1) gives a population-level spike in `parseErrors` within hours |
-| In-app "we know" channel | ⚠️ **Partial.** My Stats degrades honestly rather than recording garbage, which is the important half — but there is no way to tell users a fix is coming |
-| **Public status page** | ❌ **Not built.** Still the gap |
-| Documented fast-response process | ⚠️ `docs/MAINTENANCE.md` item 4 covers the *repair* (replay harness → fix `tracker.rs`), but not the communication |
+| In-app "we know" channel | ✅ **v3.0.0.** My Stats already degraded honestly rather than recording garbage; now an incident also raises a non-dismissible banner in the app itself, where the affected user actually is |
+| **Public status page** | ✅ **v3.0.0** — `filthy-net-deck.com/status.html` |
+| Documented fast-response process | ✅ `docs/MAINTENANCE.md` item 4 covers the repair; the communication step is now in the same place |
+
+**How it works, and one decision worth keeping.** Both surfaces read a single
+`website/status.json`, so the page and the in-app banner cannot disagree about
+whether there is an incident. Flipping `state` to `degraded` or `down` and
+pushing is the whole process.
+
+It is **deliberately not automated off health-ping data.** The ping is opt-in
+and default-off, so the reporting population is small — deriving "all systems
+operational" from a handful of installs would be exactly the fabricated
+confidence this project refuses everywhere else. A human sets it when they know
+something, and it says nothing when nobody does. `fetchServiceStatus()`
+returning `null` means *"could not check"*, never *"all clear"*, and the tests
+assert that distinction.
 
 ### 2.8 Reality-check on "better in every way than Untapped"
 

@@ -13,6 +13,11 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://filthy-net-deck.com/status.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://filthy-net-deck.com/meta-web/</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>daily</changefreq>
