@@ -8,6 +8,7 @@
  */
 
 import { apiFetch } from "./http";
+import { loadNameGap } from "./arenaNameGap";
 
 export type ArenaCardInfo = {
   name: string;
@@ -16,6 +17,21 @@ export type ArenaCardInfo = {
   typeLine?: string;
   manaCost?: string;
   cmc?: number;
+  /**
+   * Land-ness straight from Arena's own card table, for gap-map entries that
+   * have no `typeLine` to read it from. Group by this first (see `partial`).
+   */
+  isLand?: boolean;
+  /**
+   * Filled from the published gap map because Scryfall could not resolve this
+   * Arena id (see `arenaNameGap`). There is no Scryfall id, so no art, and no
+   * oracle `typeLine` — so a `partial` card groups by `isLand` alone.
+   *
+   * Never written to the disk cache: once Scryfall assigns the arena_id the
+   * real record has to win, and a persisted stub would shadow it forever
+   * because a cached hit is not re-fetched.
+   */
+  partial?: true;
 };
 
 const CACHE_KEY = "bbi.arenaCards.v3";
@@ -175,7 +191,31 @@ export async function resolveArenaCards(
     saveCache(cache);
   }
 
-  return cache;
+  // Anything Scryfall still cannot resolve — this call's 404s and ids already in
+  // `notFound` from an earlier one — gets a name from the published gap map, so
+  // a brand-new set reads as "Smaug the Magnificent" instead of "Card #103489".
+  // Merged onto the returned map but deliberately not into the saved cache.
+  const unresolved = [...new Set(ids)].filter(
+    (id) => Number.isFinite(id) && cache[id] === undefined,
+  );
+  if (unresolved.length === 0) return cache;
+
+  const gap = await loadNameGap();
+  const partials: Record<number, ArenaCardInfo> = {};
+  for (const id of unresolved) {
+    const card = gap.get(id);
+    if (!card) continue;
+    partials[id] = {
+      name: card.name,
+      manaCost: card.manaCost ?? undefined,
+      cmc: card.cmc ?? undefined,
+      isLand: card.isLand,
+      partial: true,
+    };
+  }
+  // A fresh object, because `saveCache` above kept `cache` as the live in-memory
+  // cache — writing partials into it would put them in line to be persisted.
+  return Object.keys(partials).length ? { ...cache, ...partials } : cache;
 }
 
 /** Back-compat: name map only. */

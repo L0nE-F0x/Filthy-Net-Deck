@@ -4,91 +4,8 @@
  */
 import { apiFetch } from "./http";
 import { scryfallCdnUrl } from "./scryfall";
-import { SITE_ORIGINS } from "./site";
+import { gapCard } from "./arenaNameGap";
 import type { ManaColor } from "../types/meta";
-
-/**
- * Names for Arena cards Scryfall cannot resolve yet, published by
- * `pipeline/sources/arena-names.mjs`.
- *
- * There is a window where a set is playable on Arena but Scryfall has not
- * assigned its `arena_id`s. Hit for real on 2026-08-12 with **The Hobbit**:
- * every card showed as `Card #103529` in the deck list and the overlay, because
- * `/cards/arena/103529` returned 404 while Scryfall's own entry for that card
- * said `games: ["paper","mtgo","arena"], arena_id: null`.
- *
- * This is a **name-only** fallback. It deliberately does not synthesise a full
- * `ArenaCardMeta`: no Scryfall id means no art and no reliable colour identity,
- * and inventing those would feed archetype inference values it cannot stand
- * behind. A name is the honest maximum, and it is what the deck list and
- * overlay actually need.
- *
- * Fetched lazily — only after a Scryfall lookup has actually missed — so the
- * overwhelmingly common case (Scryfall knows everything) costs nothing.
- */
-const GAP_PATH = "/meta/arena-names.json";
-
-/** Wire shape: n name, c cmc, i colour identity, m mana cost, l land. */
-type GapEntry = { n?: unknown; c?: unknown; i?: unknown; m?: unknown; l?: unknown };
-type GapCard = {
-  name: string;
-  cmc: number | null;
-  colorIdentity: ManaColor[];
-  manaCost: string | null;
-  isLand: boolean;
-};
-
-let gapMap: Map<number, GapCard> | null = null;
-let gapInflight: Promise<Map<number, GapCard>> | null = null;
-
-function parseGapEntry(v: unknown): GapCard | null {
-  // Tolerates the v3.0.1 shape, which was a bare name string.
-  if (typeof v === "string") {
-    const name = v.trim();
-    return name ? { name, cmc: null, colorIdentity: [], manaCost: null, isLand: false } : null;
-  }
-  if (!v || typeof v !== "object") return null;
-  const e = v as GapEntry;
-  const name = typeof e.n === "string" ? e.n.trim() : "";
-  if (!name) return null;
-  const cmc = typeof e.c === "number" && Number.isFinite(e.c) ? e.c : null;
-  const colorIdentity =
-    typeof e.i === "string"
-      ? ([...e.i].filter((c): c is ManaColor => /^[WUBRG]$/.test(c)) as ManaColor[])
-      : [];
-  const manaCost = typeof e.m === "string" && e.m.trim() ? e.m.trim() : null;
-  return { name, cmc, colorIdentity, manaCost, isLand: e.l === 1 || e.l === true };
-}
-
-async function loadNameGap(): Promise<Map<number, GapCard>> {
-  if (gapMap) return gapMap;
-  if (gapInflight) return gapInflight;
-  gapInflight = (async () => {
-    for (const origin of SITE_ORIGINS) {
-      try {
-        const res = await apiFetch(`${origin}${GAP_PATH}`, {
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) continue;
-        const raw = (await res.json()) as Record<string, unknown>;
-        const m = new Map<number, GapCard>();
-        for (const [k, v] of Object.entries(raw ?? {})) {
-          const id = Number(k);
-          const card = parseGapEntry(v);
-          if (Number.isFinite(id) && card) m.set(id, card);
-        }
-        gapMap = m;
-        return m;
-      } catch {
-        /* try the legacy origin, then give up */
-      }
-    }
-    // Empty map, cached: one failed attempt per session, not one per card.
-    gapMap = new Map();
-    return gapMap;
-  })();
-  return gapInflight;
-}
 
 export type ArenaCardMeta = {
   name: string;
@@ -214,22 +131,14 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
 }
 
 /**
- * What Arena itself says about a card Scryfall cannot resolve: name, mana
- * value, colour identity, and whether it is a land.
+ * What Arena itself says about a card Scryfall cannot resolve (see
+ * `arenaNameGap`), shaped as an `ArenaCardMeta`.
  *
- * Everything here comes from Arena's own card table keyed by the same `grpId`
- * the log emits, so there is no cross-mapping that could disagree — which is
- * precisely what went wrong in the basic-land bug, where a Swamp in the game
- * object resolved to an Island through the card API.
- *
- * What is still absent stays absent: no `scryfallId` means no art, and
- * `typeLine` and `manaCost` are left empty rather than reconstructed. An
- * omitted `cmc` stays `null` and an omitted colour identity stays empty, so
- * "Arena did not say" remains distinguishable from "colourless" and cannot be
- * read as evidence.
+ * What is absent stays absent: no `scryfallId` means no art, and `typeLine` is
+ * left empty rather than reconstructed.
  */
 async function nameOnlyFallback(grpId: number): Promise<ArenaCardMeta | null> {
-  const card = (await loadNameGap()).get(grpId);
+  const card = await gapCard(grpId);
   if (!card) return null;
   return {
     name: card.name,

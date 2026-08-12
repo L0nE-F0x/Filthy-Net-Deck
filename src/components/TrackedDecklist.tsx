@@ -20,8 +20,14 @@ const TYPE_GROUPS: { key: string; label: string }[] = [
   { key: "land", label: "Lands" },
 ];
 
-function typeBucket(typeLine: string | undefined): string {
-  const t = (typeLine || "").toLowerCase();
+/**
+ * Type group for a row. `info.isLand` is checked first because a gap-map card
+ * (new set, Scryfall has no arena_id yet) has no type line at all — Arena's
+ * own land flag is the only thing that keeps its lands out of "Other".
+ */
+function typeBucket(info: ArenaCardInfo | undefined): string {
+  if (info?.isLand) return "land";
+  const t = (info?.typeLine || "").toLowerCase();
   if (t.includes("land")) return "land";
   if (t.includes("creature")) return "creature";
   if (t.includes("planeswalker")) return "planeswalker";
@@ -127,7 +133,7 @@ function StackedView({
     const nonland = new Map<number, ListRow[]>();
     const lands: ListRow[] = [];
     for (const r of mainRows) {
-      if (typeBucket(r.info?.typeLine) === "land") {
+      if (typeBucket(r.info) === "land") {
         lands.push(r);
         continue;
       }
@@ -194,7 +200,7 @@ function CompactView({
   const groups = useMemo(() => {
     const byKey = new Map<string, ListRow[]>();
     for (const r of mainRows) {
-      const k = typeBucket(r.info?.typeLine);
+      const k = typeBucket(r.info);
       const list = byKey.get(k) ?? [];
       list.push(r);
       byKey.set(k, list);
@@ -285,7 +291,7 @@ export function TrackedDecklist({
   const groups = useMemo(() => {
     const byKey = new Map<string, ListRow[]>();
     for (const r of mainRows) {
-      const k = typeBucket(r.info?.typeLine);
+      const k = typeBucket(r.info);
       const list = byKey.get(k) ?? [];
       list.push(r);
       byKey.set(k, list);
@@ -305,7 +311,7 @@ export function TrackedDecklist({
           name: r.info!.name,
           count: r.count,
           cmc: r.info!.cmc,
-          land: typeBucket(r.info!.typeLine) === "land",
+          land: typeBucket(r.info) === "land",
         })),
     [mainRows],
   );

@@ -86,8 +86,10 @@ export function manaColorOf(manaCost: string | null | undefined): DeckColor {
   return only.toLowerCase() as DeckColor;
 }
 
-function groupIdFor(typeLine: string | undefined): DeckGroupId {
-  const t = typeLine ?? "";
+/** `isLand` first: a gap-map card (new set) has no type line to read. */
+function groupIdFor(info: ArenaCardInfo | undefined): DeckGroupId {
+  if (info?.isLand) return "land";
+  const t = info?.typeLine ?? "";
   if (/(?:^| )\bLand\b/.test(t)) return "land";
   if (/\bCreature\b/.test(t)) return "creature";
   return "spell";
@@ -133,7 +135,7 @@ export function aggregateDeck(
       unresolved: !resolved,
     };
     total += count;
-    const gid = groupIdFor(info?.typeLine);
+    const gid = groupIdFor(info);
     const list = buckets.get(gid);
     if (list) list.push(row);
     else buckets.set(gid, [row]);
