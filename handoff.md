@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.0.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+**Live product version: v3.0.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
 
 v3.0.0 is the polish release, cut for a public push to the owner's YouTube + X
 audience. It is a **quality** release, not a feature one: an audit of everything
@@ -39,7 +39,8 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | ✅ | **UI/UX polish** | Empty states verified across all nine pages; ~700 lines of dead Matchup-Lab-era code removed (incl. a share card branded with the retired product name); typography and tooltip fixes; `index.css` comment encoding repaired |
 | ⚠️ | **Launch readiness** | ✅ Status page + in-app incident banner shipped (§2.7 closed). ✅ §4 anti-abuse verified — two of six were missing and are now implemented. **Not done:** what a 500-signup day does to Supabase quotas |
 | ✅ | **Roll the macOS dmg** | v2.8.2's dmg rolled in and links fixed (macOS visitors had been served 2.8.1). A checklist line in `AGENTS.md` now guards against a repeat |
-| ⬜ | **v3.0.0 release train** | Full `AGENTS.md` checklist |
+| ✅ | **v3.0.0 release train** | Shipped. Signed installer (key id verified), updater manifest, site, OG, tag, macOS dmg rolled |
+| ✅ | **v3.0.1 / v3.0.2 — new-set cards** | The Hobbit shipped on Arena before Scryfall assigned its `arena_id`s, so every card showed as `Card #103529`. New `meta/arena-names.json` gap map + client fallback. **3.0.1** restored names (v3.0.0's installer predated the client half); **3.0.2** added mana value, colours and land-ness from Arena's own table, so the curve and pips are right too |
 
 ## Known-open, not blocking v3.0.0
 
@@ -58,9 +59,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v2.8.2** live on Windows; **macOS site link is stale at 2.8.1** (see above) |
+| App version | **v3.0.2** on Windows. macOS button held at the 3.0.0 dmg until tag CI rolls 3.0.2 — never link a dmg before it exists |
 | Branch | `main`, v3.0.0 work in progress |
-| Gates last green | **563** vitest / 80 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
+| Gates last green | **567** vitest / 79 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |
@@ -101,11 +102,13 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | `src/services/site.ts` | `SITE_*`, `DONATE_URL`, `PRIVACY_URL`, `STATUS_URL` — empty string hides an affordance everywhere |
 | `src/services/serviceStatus.ts` | Reads `website/status.json`; drives the in-app incident banner |
 | `website/status.json` | **Flip this during an Arena-break incident** — see `docs/MAINTENANCE.md` item 4 |
+| `pipeline/sources/arena-names.mjs` | Names for Arena cards Scryfall has no `arena_id` for; publishes `meta/arena-names.json`, self-healing |
+| `src/services/arenaMeta.ts` | grpId → card meta. Scryfall first, gap map only on 404, `partial` entries never persisted |
 | `src-tauri/src/deeplink.rs` | `fnd://` — handles BOTH cold start and the single-instance argv route |
 | `netlify/functions/profile.mts` | Server-rendered `/u/<handle>` (config.path routing) |
 | `pipeline/build-meta-site.mjs` | The `/meta-web/` corpus + sitemap. Static pages are hardcoded there, not in `paths` |
 | `website/privacy.html` | The published field allowlist |
-| `supabase/migrations/` | 8 migrations. **The 8th (`20260812060000`) is NOT yet run on the live DB** — it carries the P0 rollup fix |
+| `supabase/migrations/` | 8 migrations, **all run on the live DB** (the 8th, `20260812060000`, carries the P0 rollup fix — run by the owner 2026-08-12) |
 
 ---
 

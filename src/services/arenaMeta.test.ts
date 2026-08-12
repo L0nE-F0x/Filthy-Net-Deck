@@ -66,7 +66,12 @@ describe("resolveArenaMeta — Scryfall 404s", () => {
       const url = String(u);
       if (url.includes("/cards/arena/")) return Promise.resolve(res(null, false));
       if (url.includes("arena-names.json")) {
-        return Promise.resolve(res({ "103529": "Bolg's Company", "103538": "The Great Goblin" }));
+        return Promise.resolve(
+          res({
+            "103529": { n: "Bolg's Company", c: 2, i: "BR", m: "{B}{R}" },
+            "103538": { n: "The Great Goblin", c: 3, i: "BR" },
+          }),
+        );
       }
       return Promise.resolve(res(null, false));
     }) as unknown as typeof fetch;
@@ -81,7 +86,8 @@ describe("resolveArenaMeta — Scryfall 404s", () => {
     // up, because resolveArenaMeta short-circuits on any cached hit.
     globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
       const url = String(u);
-      if (url.includes("arena-names.json")) return Promise.resolve(res({ "103529": "Bolg's Company" }));
+      if (url.includes("arena-names.json"))
+        return Promise.resolve(res({ "103529": { n: "Bolg's Company", c: 2, i: "BR", m: "{B}{R}" } }));
       return Promise.resolve(res(null, false));
     }) as unknown as typeof fetch;
 
@@ -95,14 +101,64 @@ describe("resolveArenaMeta — Scryfall 404s", () => {
     });
   });
 
-  it("claims nothing it cannot support", async () => {
-    // No Scryfall id means no art and no colour identity. Empty here is the
-    // ABSENCE of evidence, and inference reads it that way -- an unresolved
-    // card must not be able to push an archetype guess the way a phantom
-    // colour once did.
+  it("carries mana value, colours and land-ness through", async () => {
+    // Without these the card lands in the "0" column of the mana curve with no
+    // pips, which is what the first cut of this fix shipped.
     globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
       const url = String(u);
-      if (url.includes("arena-names.json")) return Promise.resolve(res({ "103529": "Bolg's Company" }));
+      if (url.includes("arena-names.json")) {
+        return Promise.resolve(
+          res({
+            "103529": { n: "Bolg's Company", c: 2, i: "BR", m: "{B}{R}" },
+            "103565": { n: "Elven Passage", l: 1 },
+          }),
+        );
+      }
+      return Promise.resolve(res(null, false));
+    }) as unknown as typeof fetch;
+
+    const m = await freshModule();
+    expect(await m.resolveArenaMeta(103529)).toMatchObject({
+      name: "Bolg's Company",
+      cmc: 2,
+      colorIdentity: ["B", "R"],
+      manaCost: "{B}{R}",
+      isLand: false,
+    });
+    // A land has no mana value; `cmc` must stay null rather than becoming 0.
+    expect(await m.resolveArenaMeta(103565)).toMatchObject({
+      name: "Elven Passage",
+      cmc: null,
+      colorIdentity: [],
+      isLand: true,
+    });
+  });
+
+  it("still reads the older name-only shape", async () => {
+    // A client can meet a map published before the shape changed.
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      const url = String(u);
+      if (url.includes("arena-names.json"))
+        return Promise.resolve(res({ "103529": "Bolg's Company" }));
+      return Promise.resolve(res(null, false));
+    }) as unknown as typeof fetch;
+
+    const m = await freshModule();
+    expect(await m.resolveArenaMeta(103529)).toMatchObject({
+      name: "Bolg's Company",
+      cmc: null,
+      colorIdentity: [],
+    });
+  });
+
+  it("claims nothing it cannot support", async () => {
+    // Arena's table gives name, mana value, colours and land-ness. It does not
+    // give a Scryfall id, so there is no art and no oracle type line, and those
+    // stay empty rather than being reconstructed.
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      const url = String(u);
+      if (url.includes("arena-names.json"))
+        return Promise.resolve(res({ "103529": { n: "Bolg's Company", c: 2, i: "BR", m: "{B}{R}" } }));
       return Promise.resolve(res(null, false));
     }) as unknown as typeof fetch;
 
@@ -110,13 +166,27 @@ describe("resolveArenaMeta — Scryfall 404s", () => {
     const meta = await m.resolveArenaMeta(103529);
     expect(meta).toMatchObject({
       name: "Bolg's Company",
-      isLand: false,
       scryfallId: "",
       artUrl: null,
-      cmc: null,
-      manaCost: null,
-      colorIdentity: [],
+      typeLine: "",
     });
+  });
+
+  it("treats a missing colour as unknown, not as colourless", async () => {
+    // The distinction that stops an unresolved card pushing an archetype guess
+    // the way the phantom-Island basic-land bug did. An entry with no `i` must
+    // produce an empty identity, which inference reads as no evidence.
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      const url = String(u);
+      if (url.includes("arena-names.json"))
+        return Promise.resolve(res({ "1": { n: "Unstated" }, "2": { n: "Junk", i: "XZ" } }));
+      return Promise.resolve(res(null, false));
+    }) as unknown as typeof fetch;
+
+    const m = await freshModule();
+    expect((await m.resolveArenaMeta(1))?.colorIdentity).toEqual([]);
+    // Unrecognised colour letters are dropped, never passed through.
+    expect((await m.resolveArenaMeta(2))?.colorIdentity).toEqual([]);
   });
 
   it("still returns null when the gap map does not have it either", async () => {

@@ -1,5 +1,5 @@
 {
-  "version": "3.0.1",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.1.exe",
-  "notes": "v3.0.1: Brand-new set cards get their real names again — no more \"Card #103529\" while Scryfall catches up on a release."
+  "version": "3.0.2",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.2.exe",
+  "notes": "v3.0.2: Brand-new set cards now show their real name, mana value and colours — the mana curve and colour pips are right straight away, instead of waiting for Scryfall to catch up on a release."
 }

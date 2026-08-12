@@ -27,10 +27,40 @@ import type { ManaColor } from "../types/meta";
  * overwhelmingly common case (Scryfall knows everything) costs nothing.
  */
 const GAP_PATH = "/meta/arena-names.json";
-let gapMap: Map<number, string> | null = null;
-let gapInflight: Promise<Map<number, string>> | null = null;
 
-async function loadNameGap(): Promise<Map<number, string>> {
+/** Wire shape: n name, c cmc, i colour identity, m mana cost, l land. */
+type GapEntry = { n?: unknown; c?: unknown; i?: unknown; m?: unknown; l?: unknown };
+type GapCard = {
+  name: string;
+  cmc: number | null;
+  colorIdentity: ManaColor[];
+  manaCost: string | null;
+  isLand: boolean;
+};
+
+let gapMap: Map<number, GapCard> | null = null;
+let gapInflight: Promise<Map<number, GapCard>> | null = null;
+
+function parseGapEntry(v: unknown): GapCard | null {
+  // Tolerates the v3.0.1 shape, which was a bare name string.
+  if (typeof v === "string") {
+    const name = v.trim();
+    return name ? { name, cmc: null, colorIdentity: [], manaCost: null, isLand: false } : null;
+  }
+  if (!v || typeof v !== "object") return null;
+  const e = v as GapEntry;
+  const name = typeof e.n === "string" ? e.n.trim() : "";
+  if (!name) return null;
+  const cmc = typeof e.c === "number" && Number.isFinite(e.c) ? e.c : null;
+  const colorIdentity =
+    typeof e.i === "string"
+      ? ([...e.i].filter((c): c is ManaColor => /^[WUBRG]$/.test(c)) as ManaColor[])
+      : [];
+  const manaCost = typeof e.m === "string" && e.m.trim() ? e.m.trim() : null;
+  return { name, cmc, colorIdentity, manaCost, isLand: e.l === 1 || e.l === true };
+}
+
+async function loadNameGap(): Promise<Map<number, GapCard>> {
   if (gapMap) return gapMap;
   if (gapInflight) return gapInflight;
   gapInflight = (async () => {
@@ -41,12 +71,11 @@ async function loadNameGap(): Promise<Map<number, string>> {
         });
         if (!res.ok) continue;
         const raw = (await res.json()) as Record<string, unknown>;
-        const m = new Map<number, string>();
+        const m = new Map<number, GapCard>();
         for (const [k, v] of Object.entries(raw ?? {})) {
           const id = Number(k);
-          if (Number.isFinite(id) && typeof v === "string" && v.trim()) {
-            m.set(id, v.trim());
-          }
+          const card = parseGapEntry(v);
+          if (Number.isFinite(id) && card) m.set(id, card);
         }
         gapMap = m;
         return m;
@@ -185,26 +214,32 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
 }
 
 /**
- * A name, and nothing invented around it.
+ * What Arena itself says about a card Scryfall cannot resolve: name, mana
+ * value, colour identity, and whether it is a land.
  *
- * `isLand: false` and empty `colorIdentity` are the *absence* of evidence, not
- * claims — and they are read that way downstream: `observedColorsFromSeenCards`
- * contributes nothing for an empty identity, so an unresolved card cannot push
- * an archetype guess the way a phantom colour once did (the basic-land bug).
- * Getting the name onto the screen is the whole job here.
+ * Everything here comes from Arena's own card table keyed by the same `grpId`
+ * the log emits, so there is no cross-mapping that could disagree — which is
+ * precisely what went wrong in the basic-land bug, where a Swamp in the game
+ * object resolved to an Island through the card API.
+ *
+ * What is still absent stays absent: no `scryfallId` means no art, and
+ * `typeLine` and `manaCost` are left empty rather than reconstructed. An
+ * omitted `cmc` stays `null` and an omitted colour identity stays empty, so
+ * "Arena did not say" remains distinguishable from "colourless" and cannot be
+ * read as evidence.
  */
 async function nameOnlyFallback(grpId: number): Promise<ArenaCardMeta | null> {
-  const name = (await loadNameGap()).get(grpId);
-  if (!name) return null;
+  const card = (await loadNameGap()).get(grpId);
+  if (!card) return null;
   return {
-    name,
+    name: card.name,
     typeLine: "",
-    isLand: false,
+    isLand: card.isLand,
     scryfallId: "",
     artUrl: null,
-    cmc: null,
-    manaCost: null,
-    colorIdentity: [],
+    cmc: card.cmc,
+    manaCost: card.manaCost,
+    colorIdentity: card.colorIdentity,
     partial: true,
   };
 }

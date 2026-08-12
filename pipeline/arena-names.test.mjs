@@ -1,5 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { recentSetCodes } from "./sources/arena-names.mjs";
+import { colorsFromIds, manaCostFromArena, recentSetCodes } from "./sources/arena-names.mjs";
+
+describe("colorsFromIds", () => {
+  it("maps Arena's colour enum, verified against the five basics", () => {
+    // Plains [1], Island [2], Swamp [3], Mountain [4], Forest [5] in mtgajson.
+    expect(colorsFromIds([1])).toBe("W");
+    expect(colorsFromIds([2])).toBe("U");
+    expect(colorsFromIds([3])).toBe("B");
+    expect(colorsFromIds([4])).toBe("R");
+    expect(colorsFromIds([5])).toBe("G");
+  });
+
+  it("normalises to WUBRG order regardless of input order", () => {
+    expect(colorsFromIds([4, 3])).toBe("BR");
+    expect(colorsFromIds([5, 1])).toBe("WG");
+    expect(colorsFromIds([3, 1, 5])).toBe("WBG");
+  });
+
+  it("returns empty for unknown or absent input rather than guessing", () => {
+    // Empty must stay distinguishable from a real colourless card downstream,
+    // so this never invents a value.
+    expect(colorsFromIds(null)).toBe("");
+    expect(colorsFromIds([])).toBe("");
+    expect(colorsFromIds([99, 0, -1])).toBe("");
+    expect(colorsFromIds("BR")).toBe("");
+  });
+
+  it("de-duplicates", () => {
+    expect(colorsFromIds([3, 3, 4])).toBe("BR");
+  });
+});
 
 const NOW = Date.parse("2026-08-12T00:00:00Z");
 const day = 24 * 60 * 60 * 1000;
@@ -35,5 +65,31 @@ describe("recentSetCodes", () => {
   it("ignores junk rows rather than throwing", () => {
     expect(recentSetCodes([null, {}, { code: "" }, undefined], NOW).size).toBe(0);
     expect(recentSetCodes(null, NOW).size).toBe(0);
+  });
+});
+
+describe("manaCostFromArena", () => {
+  it("converts Arena's o-prefixed notation to Scryfall's", () => {
+    // Pips in the deck list and the overlay come from manaCost, not colour
+    // identity, so without this a card has the right curve slot and no pips.
+    expect(manaCostFromArena("oBoR")).toBe("{B}{R}");
+    expect(manaCostFromArena("o1o(B/R)o(B/R)")).toBe("{1}{B/R}{B/R}");
+    expect(manaCostFromArena("o2oWoW")).toBe("{2}{W}{W}");
+  });
+
+  it("handles the awkward atoms", () => {
+    expect(manaCostFromArena("oX")).toBe("{X}");
+    expect(manaCostFromArena("o10")).toBe("{10}"); // two digits, not {1}{0}
+    expect(manaCostFromArena("oC")).toBe("{C}");
+    expect(manaCostFromArena("o(B/P)")).toBe("{B/P}"); // Phyrexian
+    expect(manaCostFromArena("o0")).toBe("{0}");
+  });
+
+  it("returns null rather than an empty cost when there is nothing to read", () => {
+    // A land has no casting cost; null keeps that distinct from "{0}".
+    expect(manaCostFromArena(null)).toBeNull();
+    expect(manaCostFromArena("")).toBeNull();
+    expect(manaCostFromArena(undefined)).toBeNull();
+    expect(manaCostFromArena(42)).toBeNull();
   });
 });

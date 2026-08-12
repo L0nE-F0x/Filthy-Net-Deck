@@ -222,8 +222,18 @@ archetype signal either. That window lands exactly when a new set matters most.
 | Piece | Role |
 |-------|------|
 | `pipeline/sources/arena-names.mjs` | Builds the gap map |
-| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: name }`, ~23 KB |
+| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?} }`, ~38 KB |
 | `src/services/arenaMeta.ts` | Consults it **only after** a Scryfall 404 |
+
+Wire shape is compact because every client that meets an unresolvable card
+fetches it: `n` name, `c` mana value, `i` colour identity (`"BR"`), `l` land.
+`c` and `i` are **omitted** rather than defaulted when Arena does not state
+them, so the client can tell *unknown* from *colourless* / *zero-cost*. The
+reader also still accepts the v3.0.1 shape, where a value was a bare name
+string.
+
+Arena's enums, verified empirically against the five basic lands rather than
+assumed: colours `1=W 2=U 3=B 4=R 5=G`, and `types` containing `5` means Land.
 
 **Source.** `mtgajson.untapped.gg` republishes Arena's own card + localisation
 tables, so it is keyed by `grpid` by construction and has a set the day Arena
@@ -237,11 +247,17 @@ disappear on their own — nobody has to remember to prune anything.
 
 Three deliberate decisions worth keeping:
 
-1. **Name only.** No Scryfall id means no art and no reliable colour identity.
-   The fallback fills in `name` and leaves the rest empty rather than inventing
-   it — empty `colorIdentity` reads downstream as *absence of evidence*, so an
-   unresolved card cannot shove an archetype guess the way a phantom colour once
-   did (the basic-land bug).
+1. **Only what Arena states.** Name, mana value, colour identity and land-ness
+   come straight from Arena's own table; `scryfallId`, `artUrl` and `typeLine`
+   stay empty because there is no Scryfall record to take them from, and are
+   never reconstructed. Anything Arena omits stays `null`/empty so *unknown*
+   remains distinguishable from *colourless*.
+
+   Publishing colours from a non-Scryfall source deserves the suspicion the
+   basic-land bug earned — but that bug came from a **cross-mapping that
+   disagreed** (grpId 87457 was a Swamp in the game object and an Island through
+   the card API). mtgajson *is* Arena's table, keyed by the same grpId the log
+   emits, so there is no second mapping able to disagree.
 2. **Never persisted.** Gap entries are marked `partial` and stay in memory for
    the session. A stub written to `localStorage` would shadow the real card
    forever once Scryfall caught up, because the resolver short-circuits on any

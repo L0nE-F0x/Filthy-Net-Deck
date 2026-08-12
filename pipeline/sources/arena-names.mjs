@@ -26,6 +26,19 @@
  * pipeline already depends on it for `decodeUntappedDeckString`, so this adds a
  * source of truth rather than a dependency.
  *
+ * ## Why it is safe to publish colours here
+ *
+ * Feeding archetype inference a colour from a non-Scryfall source deserves
+ * suspicion — the basic-land bug put a phantom Island into an opponent's colour
+ * set and reported Rakdos as Grixis. But that bug came from resolving a grpId
+ * through a mapping that did not agree with Arena's (`grpId 87457` was a Swamp
+ * in the game object and an Island through the card API).
+ *
+ * This is the opposite situation: mtgajson *is* Arena's card table, keyed by
+ * the same `grpid` the log emits, so there is no cross-mapping to disagree.
+ * `cmc`, `colorIdentity` and `types` are omitted rather than guessed when Arena
+ * does not state them, so "unknown" stays distinguishable from "colourless".
+ *
  * ## Why this is self-healing
  *
  * Only grpIds Scryfall **cannot** resolve are emitted, checked per set against
@@ -40,6 +53,53 @@
 
 const MTGAJSON = "https://mtgajson.untapped.gg/v1/latest";
 const SCRYFALL = "https://api.scryfall.com";
+
+/**
+ * Arena's colour enum. Verified empirically against the five basic lands in
+ * mtgajson rather than assumed — Plains is `[1]`, Island `[2]`, Swamp `[3]`,
+ * Mountain `[4]`, Forest `[5]`.
+ */
+const COLOR_BY_ID = { 1: "W", 2: "U", 3: "B", 4: "R", 5: "G" };
+
+/** Arena's card-type enum: 5 is Land (every basic is `types: [5]`). */
+const TYPE_LAND = 5;
+
+/**
+ * Arena's casting-cost notation → Scryfall's.
+ *
+ * Arena prefixes every symbol with `o` and parenthesises hybrids:
+ *   `oBoR`             → `{B}{R}`
+ *   `o1o(B/R)o(B/R)`   → `{1}{B/R}{B/R}`
+ *   `oXo10o(B/P)`      → `{X}{10}{B/P}`
+ *
+ * Worth converting rather than skipping: the deck list and the overlay draw
+ * their colour pips from `manaCost`, not from colour identity, so without this
+ * a card would have the right curve position and still no pips.
+ *
+ * Verified against all 703 distinct cost strings in mtgajson: every atom is
+ * either a bare token (`1`, `B`, `X`, `C`, `10`) or a parenthesised hybrid, and
+ * none contains a literal `o`, which is what makes the split unambiguous.
+ */
+export function manaCostFromArena(cc) {
+  if (typeof cc !== "string" || !cc) return null;
+  const out = [];
+  for (const [, atom] of cc.matchAll(/o(\([^)]*\)|[^o]+)/g)) {
+    const sym = atom.replace(/[()]/g, "").trim();
+    if (sym) out.push(`{${sym}}`);
+  }
+  return out.length ? out.join("") : null;
+}
+
+/** `[3,4]` → `"BR"`, in WUBRG order. Empty string when unknown. */
+export function colorsFromIds(ids) {
+  if (!Array.isArray(ids)) return "";
+  const seen = new Set();
+  for (const n of ids) {
+    const c = COLOR_BY_ID[n];
+    if (c) seen.add(c);
+  }
+  return ["W", "U", "B", "R", "G"].filter((c) => seen.has(c)).join("");
+}
 
 /** Only look at sets this new — the gap only ever exists around release. */
 const RECENT_DAYS = 180;
@@ -111,7 +171,8 @@ export async function scryfallArenaIdsForSet(code) {
 }
 
 /**
- * Build `{ [grpId]: name }` for Arena cards Scryfall cannot resolve.
+ * Build `{ [grpId]: { n, c?, i?, l? } }` for Arena cards Scryfall cannot
+ * resolve — name, converted mana cost, colour identity, and land-ness.
  *
  * Self-contained: fetches its own `/sets` list rather than taking one, because
  * the sets bundle does not carry the raw Scryfall payload. Costs one list
@@ -170,7 +231,20 @@ export async function buildArenaNameGap(opts = {}) {
       if (!Number.isFinite(grp) || known.has(grp)) continue;
       const name = nameByTitle.get(c?.titleId);
       if (!name) continue;
-      gap[String(grp)] = name;
+      // Compact on purpose — this is fetched by every client that meets an
+      // unresolvable card, and it is one entry per card in a whole set.
+      //   n = name, c = cmc, i = colour identity, m = mana cost, l = is a land
+      // `c` and `i` are omitted when Arena does not state them, so the client
+      // can tell "colourless" from "unknown" — the distinction that keeps an
+      // unresolved card from pushing an archetype guess.
+      const entry = { n: name };
+      if (typeof c.cmc === "number" && Number.isFinite(c.cmc)) entry.c = c.cmc;
+      const ci = colorsFromIds(c.colorIdentity);
+      if (ci) entry.i = ci;
+      const mc = manaCostFromArena(c.castingcost);
+      if (mc) entry.m = mc;
+      if (Array.isArray(c.types) && c.types.includes(TYPE_LAND)) entry.l = 1;
+      gap[String(grp)] = entry;
       added++;
     }
     if (added) log(`  arena-names: +${added} from ${code} (Scryfall has no arena_id yet)`);
