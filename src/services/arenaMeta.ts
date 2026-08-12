@@ -4,7 +4,62 @@
  */
 import { apiFetch } from "./http";
 import { scryfallCdnUrl } from "./scryfall";
+import { SITE_ORIGINS } from "./site";
 import type { ManaColor } from "../types/meta";
+
+/**
+ * Names for Arena cards Scryfall cannot resolve yet, published by
+ * `pipeline/sources/arena-names.mjs`.
+ *
+ * There is a window where a set is playable on Arena but Scryfall has not
+ * assigned its `arena_id`s. Hit for real on 2026-08-12 with **The Hobbit**:
+ * every card showed as `Card #103529` in the deck list and the overlay, because
+ * `/cards/arena/103529` returned 404 while Scryfall's own entry for that card
+ * said `games: ["paper","mtgo","arena"], arena_id: null`.
+ *
+ * This is a **name-only** fallback. It deliberately does not synthesise a full
+ * `ArenaCardMeta`: no Scryfall id means no art and no reliable colour identity,
+ * and inventing those would feed archetype inference values it cannot stand
+ * behind. A name is the honest maximum, and it is what the deck list and
+ * overlay actually need.
+ *
+ * Fetched lazily — only after a Scryfall lookup has actually missed — so the
+ * overwhelmingly common case (Scryfall knows everything) costs nothing.
+ */
+const GAP_PATH = "/meta/arena-names.json";
+let gapMap: Map<number, string> | null = null;
+let gapInflight: Promise<Map<number, string>> | null = null;
+
+async function loadNameGap(): Promise<Map<number, string>> {
+  if (gapMap) return gapMap;
+  if (gapInflight) return gapInflight;
+  gapInflight = (async () => {
+    for (const origin of SITE_ORIGINS) {
+      try {
+        const res = await apiFetch(`${origin}${GAP_PATH}`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) continue;
+        const raw = (await res.json()) as Record<string, unknown>;
+        const m = new Map<number, string>();
+        for (const [k, v] of Object.entries(raw ?? {})) {
+          const id = Number(k);
+          if (Number.isFinite(id) && typeof v === "string" && v.trim()) {
+            m.set(id, v.trim());
+          }
+        }
+        gapMap = m;
+        return m;
+      } catch {
+        /* try the legacy origin, then give up */
+      }
+    }
+    // Empty map, cached: one failed attempt per session, not one per card.
+    gapMap = new Map();
+    return gapMap;
+  })();
+  return gapInflight;
+}
 
 export type ArenaCardMeta = {
   name: string;
@@ -20,6 +75,14 @@ export type ArenaCardMeta = {
   /** Scryfall color identity, e.g. ["W","B"]. Lands included (what they tap for).
    *  Optional: entries cached before v3 have none. */
   colorIdentity?: ManaColor[];
+  /**
+   * Name-only entry from the gap map — Scryfall could not resolve this Arena id
+   * (see `nameOnlyFallback`). Everything except `name` is absent rather than
+   * known, so these are **never written to disk**: once Scryfall assigns the
+   * arena_id the real record should win, and a persisted stub would shadow it
+   * forever because `resolveArenaMeta` short-circuits on any cached hit.
+   */
+  partial?: true;
 };
 
 /**
@@ -56,11 +119,12 @@ function schedulePersist(): void {
       // Cap cache size so localStorage stays small.
       let n = 0;
       for (const [id, meta] of mem) {
-        // Persist only successful resolves. A null is a failed/absent lookup
-        // (often a transient offline hit at match start) — keep it in memory
-        // for this session, never on disk, so the next session retries instead
-        // of showing "Card {grpId}" until a cache-key bump.
-        if (!meta) continue;
+        // Persist only complete, successful resolves. A null is a failed/absent
+        // lookup (often a transient offline hit at match start) and a `partial`
+        // is a name-only gap-map entry — both stay in memory for this session
+        // and never on disk, so the next session retries Scryfall instead of
+        // being stuck with "Card {grpId}" or a stub until a cache-key bump.
+        if (!meta || meta.partial) continue;
         if (n++ > 4000) break;
         obj[String(id)] = meta;
       }
@@ -120,6 +184,31 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
   };
 }
 
+/**
+ * A name, and nothing invented around it.
+ *
+ * `isLand: false` and empty `colorIdentity` are the *absence* of evidence, not
+ * claims — and they are read that way downstream: `observedColorsFromSeenCards`
+ * contributes nothing for an empty identity, so an unresolved card cannot push
+ * an archetype guess the way a phantom colour once did (the basic-land bug).
+ * Getting the name onto the screen is the whole job here.
+ */
+async function nameOnlyFallback(grpId: number): Promise<ArenaCardMeta | null> {
+  const name = (await loadNameGap()).get(grpId);
+  if (!name) return null;
+  return {
+    name,
+    typeLine: "",
+    isLand: false,
+    scryfallId: "",
+    artUrl: null,
+    cmc: null,
+    manaCost: null,
+    colorIdentity: [],
+    partial: true,
+  };
+}
+
 export function peekArenaMeta(grpId: number): ArenaCardMeta | null | undefined {
   loadDisk();
   return mem.has(grpId) ? mem.get(grpId) : undefined;
@@ -140,9 +229,14 @@ export async function resolveArenaMeta(
         { headers: { Accept: "application/json" } },
       );
       if (!res.ok) {
-        mem.set(grpId, null);
+        // Scryfall does not know this Arena id. Before giving up, check the
+        // published gap map — a set that is live on Arena but whose arena_ids
+        // Scryfall has not assigned lands here, and a name is much better than
+        // "Card #103529".
+        const fallback = await nameOnlyFallback(grpId);
+        mem.set(grpId, fallback);
         schedulePersist();
-        return null;
+        return fallback;
       }
       const data = (await res.json()) as ScryfallArenaCard;
       const meta = fromScryfall(data);

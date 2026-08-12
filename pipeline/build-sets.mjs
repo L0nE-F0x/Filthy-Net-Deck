@@ -13,6 +13,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSetsBundle } from "./sources/sets.mjs";
 import { splitSetsBundle } from "./slim-sets-feed.mjs";
+import { buildArenaNameGap } from "./sources/arena-names.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -53,6 +54,34 @@ async function main() {
       ` · index ${indexKb}KB · ${galleryCount} lazy galleries` +
       ` → website/meta + public/meta`,
   );
+
+  // Names for Arena cards Scryfall cannot resolve yet (see arena-names.mjs).
+  // Written only when non-empty: an empty result is far more likely to mean
+  // "mtgajson was unreachable" than "Scryfall caught up on every set at once",
+  // and overwriting a good map with {} would silently reopen the very gap this
+  // closes. A genuinely-caught-up map is pruned by the next successful run that
+  // *does* return entries, or by hand.
+  try {
+    const gap = await buildArenaNameGap({ log: (m) => console.log(m) });
+    const n = Object.keys(gap).length;
+    if (n) {
+      const json = JSON.stringify(gap);
+      for (const dir of [join(root, "website", "meta"), join(root, "public", "meta")]) {
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(join(dir, "arena-names.json"), json);
+      }
+      console.log(
+        `Wrote arena-names.json · ${n} grpIds Scryfall has no arena_id for` +
+          ` · ${Math.round(Buffer.byteLength(json) / 1024)}KB`,
+      );
+    } else {
+      console.log("arena-names: nothing to publish — existing file left untouched");
+    }
+  } catch (e) {
+    // Fail-soft by design: this is a fallback for a fallback and must never be
+    // able to break the set radar.
+    console.log(`arena-names: skipped (${e?.message || e})`);
+  }
 }
 
 main().catch((e) => {

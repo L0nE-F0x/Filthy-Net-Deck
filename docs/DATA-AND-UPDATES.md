@@ -206,6 +206,56 @@ Titanbreach etc. The Sets page plays them in an in-app player
 
 ---
 
+## Arena card names Scryfall cannot resolve (`meta/arena-names.json`)
+
+The app turns an Arena `grpId` into a card name with
+`https://api.scryfall.com/cards/arena/<grpId>`. That covers almost everything,
+almost always — but **not a set in the window between "playable on Arena" and
+"Scryfall has assigned its `arena_id`s".**
+
+Hit for real on **2026-08-12** with **The Hobbit** (`hob`, paper release 08-14):
+all 193 Scryfall entries said `games: ["paper","mtgo","arena"]` and
+`arena_id: null`, so every Hobbit card a player cast rendered in the deck list
+*and the overlay* as `Card #103529` — no name, no cost, no colour, and so no
+archetype signal either. That window lands exactly when a new set matters most.
+
+| Piece | Role |
+|-------|------|
+| `pipeline/sources/arena-names.mjs` | Builds the gap map |
+| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: name }`, ~23 KB |
+| `src/services/arenaMeta.ts` | Consults it **only after** a Scryfall 404 |
+
+**Source.** `mtgajson.untapped.gg` republishes Arena's own card + localisation
+tables, so it is keyed by `grpid` by construction and has a set the day Arena
+does. The pipeline already used it for `decodeUntappedDeckString`, so this adds
+a source of truth rather than a dependency.
+
+**Self-healing, the same way `freshSpoilers` is.** Only grpIds Scryfall
+*cannot* resolve are emitted, re-checked per set against live Scryfall on every
+run (7×/day via the sets build). As Scryfall assigns arena_ids the entries
+disappear on their own — nobody has to remember to prune anything.
+
+Three deliberate decisions worth keeping:
+
+1. **Name only.** No Scryfall id means no art and no reliable colour identity.
+   The fallback fills in `name` and leaves the rest empty rather than inventing
+   it — empty `colorIdentity` reads downstream as *absence of evidence*, so an
+   unresolved card cannot shove an archetype guess the way a phantom colour once
+   did (the basic-land bug).
+2. **Never persisted.** Gap entries are marked `partial` and stay in memory for
+   the session. A stub written to `localStorage` would shadow the real card
+   forever once Scryfall caught up, because the resolver short-circuits on any
+   cached hit.
+3. **An empty result never overwrites a good file.** Empty far more likely means
+   "mtgajson was unreachable" than "Scryfall caught up on every set at once", so
+   the build leaves the previous map in place.
+
+Fail-soft throughout: a network problem anywhere yields no map and the app
+simply behaves as it did before. Symptom that it has broken: new-set cards go
+back to showing `Card #<grpId>` while `arena-names.json` stops changing.
+
+---
+
 ## Built-in app updater
 
 | Mode | Behavior |
