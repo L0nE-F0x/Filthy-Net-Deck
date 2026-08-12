@@ -222,8 +222,19 @@ archetype signal either. That window lands exactly when a new set matters most.
 | Piece | Role |
 |-------|------|
 | `pipeline/sources/arena-names.mjs` | Builds the gap map |
-| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?} }`, ~38 KB |
-| `src/services/arenaMeta.ts` | Consults it **only after** a Scryfall 404 |
+| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?} }`, ~49 KB |
+| `src/services/arenaNameGap.ts` | Owns the client-side map — fetched once per session, **only after** a Scryfall 404 |
+| `src/services/arenaMeta.ts` | Resolver for the overlay, archetype inference, Matchups, DeckView |
+| `src/services/arenaCards.ts` | Resolver for the My Stats decklist, Brew Lab, deck share |
+
+**There are two resolvers, and a fallback has to be in both.** v3.0.1/v3.0.2
+put the gap map inside `arenaMeta` alone, so the overlay had the Hobbit names
+while My Stats still showed `Card #103482` — with the map live and correct and
+both ids in it. v3.0.3 moved the map into `arenaNameGap` so neither resolver owns
+it. Anything that changes how a grpId becomes a name belongs there, not in a
+caller. A gap card has no type line at all, so grouping keys off Arena's own
+`isLand` flag first (`TrackedDecklist.typeBucket`, `deckShare.groupIdFor`);
+nonlands land in "Other" rather than being guessed into a type.
 
 Wire shape is compact because every client that meets an unresolvable card
 fetches it: `n` name, `c` mana value, `i` colour identity (`"BR"`), `l` land.

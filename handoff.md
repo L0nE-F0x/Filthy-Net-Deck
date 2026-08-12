@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.0.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+**Live product version: v3.0.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
 
 v3.0.0 is the polish release, cut for a public push to the owner's YouTube + X
 audience. It is a **quality** release, not a feature one: an audit of everything
@@ -41,6 +41,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | ✅ | **Roll the macOS dmg** | v2.8.2's dmg rolled in and links fixed (macOS visitors had been served 2.8.1). A checklist line in `AGENTS.md` now guards against a repeat |
 | ✅ | **v3.0.0 release train** | Shipped. Signed installer (key id verified), updater manifest, site, OG, tag, macOS dmg rolled |
 | ✅ | **v3.0.1 / v3.0.2 — new-set cards** | The Hobbit shipped on Arena before Scryfall assigned its `arena_id`s, so every card showed as `Card #103529`. New `meta/arena-names.json` gap map + client fallback. **3.0.1** restored names (v3.0.0's installer predated the client half); **3.0.2** added mana value, colours and land-ness from Arena's own table, so the curve and pips are right too |
+| ✅ | **v3.0.3 — the gap map was in only one of two resolvers** | Owner reported the Hobbit cards *still* unnamed in My Stats after the 3.0.2 fix and the data restore. Both were fine: `arenaMeta` (overlay, inference) had the fallback and `arenaCards` (My Stats decklist, Brew Lab, deck share) never did. The map now lives in `src/services/arenaNameGap.ts`, owned by neither — see `docs/DATA-AND-UPDATES.md`. Two data incidents plus this one came out of that one feature; treat "which resolver?" as the first question on any card-name bug |
 
 ## Known-open, not blocking v3.0.0
 

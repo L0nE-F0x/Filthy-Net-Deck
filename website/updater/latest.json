@@ -1,11 +1,11 @@
 {
-  "version": "3.0.2",
-  "notes": "v3.0.2: Brand-new set cards now show their real name, mana value and colours — the mana curve and colour pips are right straight away, instead of waiting for Scryfall to catch up on a release.",
-  "pub_date": "2026-08-12T05:32:39Z",
+  "version": "3.0.3",
+  "notes": "v3.0.3: Brand-new set cards are named on every screen now. My Stats and Brew Lab were still showing them as card numbers while the overlay had their names all along.",
+  "pub_date": "2026-08-12T08:39:14Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnpIWFpJVXlPaENBUTM3OS8zaXJuQ0d3TEpuY1BDMStGM29nd0VZWHd3K3RDblpTY0hWM203bENyT1hsMS8vYVRmQ1dvNnFuamJOdWhuZzFuV1l0ZWdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTEyNzE1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4yX3g2NC1zZXR1cC5leGUKOXVxbGZQTElIU0F0MC90S0w5TG9TOUVZOG0wUERoMnJmRXF5Y2wzaUZHVDJYWVpQVndnNUNXeXVPTFZwZERIMnhEMWs1QU5VWmlORmFRWDRucldTRFE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFnUUhNK25zSTJFbjhQcktHUkNMVlE3d240ZGhyUW03cE54azJZMXljYXFJOGJRQ1llaFdrQTNhRm5neUpUTHdTNU9pQ0YxNFVnY3hqY0ZaMFdjNUE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTIzOTE4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4zX3g2NC1zZXR1cC5leGUKaktJS0tkSEl1ME43UG5oVDFCTHZzL3JYZGpHb2RzZkR3cWVWRDd0WTlwdWZTL0dsc01EeDB0SURYMCtMUDNPTi9oeFY2aVY4UWRZWktCbHdYbmZqQkE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.3.exe"
     }
   }
 }
