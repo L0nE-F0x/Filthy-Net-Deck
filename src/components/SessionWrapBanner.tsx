@@ -53,7 +53,7 @@ export function SessionWrapBanner() {
             const dest = id as ShareDestination;
             // Reuse week recap renderer with session stats window.
             const blob = await renderRecapPng(w.stats, {
-              kicker: "Session wrap · local only",
+              kicker: "Session wrap · tracked on this PC",
             });
             const caption = recapCaption({
               wins: w.stats.wins,

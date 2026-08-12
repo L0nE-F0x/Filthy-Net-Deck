@@ -167,19 +167,28 @@ do nothing.
 this document recommended moving it; that recommendation was wrong and is
 withdrawn.
 
-### Still open: the root file's header rules never apply
+### ✅ Resolved: the root file's header rules never applied
 
-Because headers come from the `website/` file, these root-file rules have never
-taken effect: `/meta-web/*` `max-age=300`, `/assets/og-image.png`
-`max-age=86400`, and the UTF-8 `Content-Type` rules. **This is the real
-explanation for `handoff.md` §1** — the meta-web cache fix "never showed up
-live" because it was written into the file that does not control headers, not
-because of a pinned deploy or auto-publish being off.
+Because headers come from the `website/` file, these root-file rules never took
+effect: `/meta-web/*` `max-age=300`, `/assets/og-image.png` `max-age=86400`, and
+the UTF-8 `Content-Type` rules. **This was the real explanation for the old
+`handoff.md` §1** — the meta-web cache fix "never showed up live" because it was
+written into the file that does not control headers, not because of a pinned
+deploy or auto-publish being off.
 
-Fix when convenient: port the wanted header rules from the root file into
-`website/netlify.toml`. Low risk, no dashboard change. One thing to check first
-— doing so would *add* `/meta-web/*` caching that has never been active, so
-confirm the daily cron's freshness expectations still hold.
+**Reviewed and closed 2026-07-30.** Each dead rule was judged on its merits
+rather than ported wholesale, and the reasoning now lives in comments at the top
+of both `netlify.toml` files:
+
+| Rule | Decision |
+|---|---|
+| `/assets/og-image.png` `max-age=86400` | **Ported.** Social scrapers refetch it constantly and it only changes on release |
+| `/meta-web/*` `max-age=300` | **Not ported** — it would make pages *staler* than the current `max-age=0`. The original "fix" was misconceived |
+| `/updater/*` `max-age=60` + CORS | **Not ported, deliberately.** Caching the update manifest is the wrong direction, and the CORS headers are dead weight: the Tauri updater fetches via reqwest, so no preflight is ever involved |
+| `/*.html` UTF-8 | Already present in `website/netlify.toml` |
+
+The root file keeps its rules for provenance. **Do not "fix" them by porting
+wholesale** — that is the trap this table exists to prevent.
 
 ## Reverting
 

@@ -45,8 +45,8 @@ Formats: **Standard** and **Pioneer** only. Design rules:
 ## Winrate tracker (My Stats)
 
 The desktop app tails MTG Arena's own `Player.log` and records your matches —
-result, opponent, deck, queue, play/draw, and rank — **entirely on your PC**.
-Nothing is uploaded anywhere.
+result, opponent, deck, queue, play/draw, and rank. **Local by default: nothing
+leaves your PC unless you turn it on.**
 
 - Requires **Detailed Logs (Plugin Support)** enabled in Arena
   (Options → Account); the app walks you through it if it's off.
@@ -54,6 +54,30 @@ Nothing is uploaded anywhere.
 - The log format is unofficial; if an Arena update changes it, the My Stats
   page says so instead of recording garbage. To debug against a real log:
   `FND_REPLAY_LOG=path/to/Player.log cargo test replay_real_log -- --nocapture --ignored`
+
+## Accounts and cloud features (all optional, all off by default)
+
+The app is fully functional with **no account** — that is not going to change.
+A free account unlocks features that need a server, and each is opt-in:
+
+| Feature | What it does |
+|---|---|
+| Community matchup rates | Your record vs. an archetype, joined to the field's |
+| Public profile `/u/<handle>` | Your season climb, shared on your terms |
+| Cloud deck sync | Backs up the lists Arena registers, which local log rotation destroys |
+| Friend codes | Compare stat lines and race a season with people you play |
+
+Two rules hold regardless of any toggle:
+
+- **Another player's identity never leaves your machine.** `opponentName` and
+  `opponentSeen` are not uploaded — not hashed, not "anonymised". The opponent's
+  archetype is inferred locally and only the *label* is sent.
+- **The upload payload is an explicit allowlist**, not a serialised object, so a
+  field added to the tracker later cannot silently start being uploaded. A test
+  asserts the exact key set.
+
+The full field list is published verbatim at
+[filthy-net-deck.com/privacy](https://filthy-net-deck.com/privacy.html).
 
 ## Netlify
 

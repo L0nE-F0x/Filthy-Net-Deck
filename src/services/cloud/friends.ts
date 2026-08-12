@@ -13,6 +13,7 @@
 
 import { getSupabase, getCurrentUser } from "./auth";
 import { cloudConfigured } from "./config";
+import { parseRank } from "../ranks";
 
 /** One row of the comparison table. */
 export interface FriendLine {
@@ -24,7 +25,11 @@ export interface FriendLine {
   matches: number;
   wins: number;
   losses: number;
-  /** Freshest rank they have shared, e.g. "Diamond 2". Null when unknown. */
+  /**
+   * Highest rank they have reached in the selected span, e.g. "Diamond 2".
+   * Null when they have shared none. This is a race — how far up someone got
+   * is the interesting number, not where they happen to sit today.
+   */
   bestRank: string | null;
   lastMatch: number | null;
 }
@@ -90,8 +95,32 @@ interface RawLine {
   matches: number | string;
   wins: number | string;
   losses: number | string;
-  best_rank: string | null;
+  /** Every distinct rank they have shared, unordered. See `bestRank`. */
+  ranks: string[] | null;
   last_match: string | null;
+}
+
+/**
+ * The highest rank in a set of Arena rank labels.
+ *
+ * The server returns the distinct labels and this picks the best, rather than
+ * the server picking — because ordering them is not a string sort ("Mythic
+ * 82%", "Mythic #874" and "Diamond 1" all compare differently) and
+ * `parseRank`'s 0–22 score already owns that logic. Doing it in SQL would mean
+ * a second copy of the parser, guaranteed to drift from this one.
+ *
+ * (The server used to return `best_rank`, which was actually the most *recent*
+ * rank despite the name and its own comment. Fixed in migration 20260812060000.)
+ */
+export function bestRankOf(ranks: readonly string[] | null | undefined): string | null {
+  if (!ranks?.length) return null;
+  let best: { raw: string; score: number } | null = null;
+  for (const raw of ranks) {
+    const parsed = parseRank(raw);
+    if (!parsed) continue;
+    if (!best || parsed.score > best.score) best = { raw: parsed.raw, score: parsed.score };
+  }
+  return best?.raw ?? null;
 }
 
 /**
@@ -122,7 +151,7 @@ export async function friendLines(season?: number | null): Promise<FriendLine[]>
         matches: Number(r.matches) || 0,
         wins: Number(r.wins) || 0,
         losses: Number(r.losses) || 0,
-        bestRank: r.best_rank,
+        bestRank: bestRankOf(r.ranks),
         lastMatch: Number.isFinite(at) ? at : null,
       } satisfies FriendLine;
     });

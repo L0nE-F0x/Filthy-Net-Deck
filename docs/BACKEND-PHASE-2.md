@@ -2,7 +2,32 @@
 
 **Prepared:** 2026-08-10 · grounded in the real `TrackedMatch` shape, not a sketch
 **Parent plan:** [`PLATFORM-STRATEGY.md`](PLATFORM-STRATEGY.md) §1.1, §1.2, §2.3, §3
-**Status:** design — nothing built, no infrastructure provisioned
+**Status:** ✅ **BUILT — all 8 slices shipped v2.7.5 → v2.8.2.** Reconciled against the code 2026-08-12.
+
+> This started as a design document and is now a **record of what was built**.
+> Where the built thing differs from the design, the difference is called out
+> inline rather than edited away — the reasoning is the useful part.
+>
+> | Slice | Shipped |
+> |---|---|
+> | 0 · parser-health ping | v2.7.5 |
+> | 1 · schema, RLS, archetype seeding | v2.7.6 |
+> | 2 · deep-link scheme + Google/Discord OAuth | v2.7.6 |
+> | 3 · consent screen, one cloud toggle | v2.7.6 |
+> | 4 · public profile pages `/u/<handle>` | v2.7.7 |
+> | 5 · match upload + hourly rollup | v2.7.6 |
+> | 6 · crowd matchup UI, gated on `games >= 30` | v2.7.6 |
+> | 7 · cloud deck sync | v2.8.0 |
+>
+> **Seven migrations are live on the DB**, not the five listed in older notes:
+> `health_pings`, `core_schema`, `public_profiles`, `display_name_privacy`,
+> `decks`, `public_decks`, `friends`.
+>
+> **Email OTP (§6) is built but hidden** behind `EMAIL_SIGN_IN_ENABLED` in
+> `src/services/cloud/config.ts` — Supabase's built-in mailer is rate-limited
+> per project and fails by silently not delivering, which under a launch spike
+> reads as a broken app. It also has **no test coverage**, unlike the OAuth path.
+> Both need fixing before it is switched back on.
 
 Phase 1's gate was waived by the owner on 2026-08-10 (Search Console: 3 clicks /
 32 impressions / avg position 11.2 over 28 days — thin, but Netlify Web
@@ -206,14 +231,14 @@ An opt-in crowd meta is *poisonable*, and the moat is worthless if the numbers
 can be pushed. The client is on the user's machine and the repo is public, so
 assume the payload can be forged.
 
-| Vector | Mitigation |
-|---|---|
-| Mass fake matches | Per-user rate limit: 100 matches/day, 400/week. A real human maxes out well below this |
-| Duplicate submissions | `unique (user_id, client_hash)` — replays are no-ops |
-| A single user skewing a cell | Cap any one user's contribution to **5%** of a given matchup cell in the rollup |
-| Statistical outliers | Exclude users whose overall winrate is >75% or <25% over 200+ matches from aggregates (still show them their own data) |
-| Throwaway accounts | `trust` starts at 0; matches count toward aggregates only after 25 matches and 7 days |
-| Archetype spoofing | `my_archetype` / `opp_archetype` are FKs to the seeded `archetypes` table — unknown slugs are rejected, not created |
+| Vector | Mitigation | As built |
+|---|---|---|
+| Mass fake matches | Per-user rate limit: 100 matches/day, 400/week | ⚠️ **Changed.** Nothing was implemented until the v3.0.0 audit found the gap; now a `before insert` trigger caps **2,000/day** keyed on server-set `created_at`. 100/day was unshippable — a new user backfilling a long local history on first sync would fail and keep failing. The real job of this limit is cost, not integrity (the three rows below already bound influence), so it is set to never touch a real backfill |
+| Duplicate submissions | `unique (user_id, client_hash)` — replays are no-ops | ✅ As designed |
+| A single user skewing a cell | Cap any one user's contribution to **5%** of a given matchup cell | ✅ As designed. Note the consequence: the cap only stops binding at **≥20 contributors** per cell, so cells fill slowly by construction |
+| Statistical outliers | Exclude users whose overall winrate is >75% or <25% over 200+ matches | ⚠️ **Was missing.** Specified here, never implemented, added in migration `20260812060000` as a CTE anti-join (the correlated form is quietly quadratic) |
+| Throwaway accounts | `trust` starts at 0; matches count only after 25 matches and 7 days | ✅ As designed (`refresh_trust()`) |
+| Archetype spoofing | FKs to the seeded `archetypes` table | ⚠️ **Deliberately changed** to a regex shape check. A hard FK would reject a legitimate match whenever the registry lagged the feed — the day a new archetype appears — and silently lose real user data. Unknown slugs are stored and start counting the moment they are registered. Reasoning is in the migration |
 
 None of this stops a determined attacker. It raises the cost above what a niche
 MTG tool attracts, which is the right target — same threat-model logic as
@@ -476,14 +501,20 @@ thread. Ship it off, explain it, and revisit if uptake is too low to be useful.
 
 ## 8. What must change outside the code
 
-- **README**, at the moment the first upload ships — not before. It currently
-  says *"entirely on your PC. Nothing is uploaded anywhere,"* which is **true
-  today** and should stay until slice 0 lands. Then: *"Local by default. Nothing
-  leaves your PC unless you turn it on."* Mention it in the release notes too;
-  existing users installed on the old promise.
-- **A short privacy page on the site** listing the field allowlist verbatim. The
-  list is short enough to publish in full, which makes it self-evidently honest
-  at roughly zero cost.
-- **§2.6 legal items** (WotC Fan Content Policy, Scryfall commercial terms) gate
-  *taking money*, and Phase 4 is deferred indefinitely — so nothing here is
-  blocked. They must be done before Phase 4 is ever revived.
+- ✅ **README** — done **2026-08-12, three releases late.** The rule was "rewrite
+  it the moment the first upload ships"; uploads shipped in v2.7.5 and the README
+  went on promising *"entirely on your PC. Nothing is uploaded anywhere"* until
+  v3.0.0. Two marketing-site claims were wrong for the same span. Nobody was
+  uploaded without consenting — the in-app consent copy was accurate the whole
+  time — but the *published* claim was false and no checklist item owned it.
+  `AGENTS.md` now carries a binding rule tying payload changes to all three
+  surfaces. Full post-mortem in `PLATFORM-STRATEGY.md` §1.2 rule 4.
+- ✅ **A short privacy page on the site** — `website/privacy.html`, shipped
+  v3.0.0. Lists both allowlists field by field, names the five things that are
+  never uploaded, and is linked from the site footer *and* from Settings → Data
+  & privacy, one click from the toggles themselves. Generated into the sitemap
+  by `build-meta-site.mjs` (static pages sit outside the `/meta-web/` corpus and
+  must not inherit its daily `lastmod`).
+- ⬜ **§2.6 legal items** (WotC Fan Content Policy, Scryfall commercial terms)
+  gate *taking money*, and Phase 4 is deferred indefinitely — so nothing here is
+  blocked. They must be done before Phase 4 is ever revived, **not after**.

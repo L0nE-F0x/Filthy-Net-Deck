@@ -76,7 +76,7 @@ export function FriendRace({ seasonOrdinal }: { seasonOrdinal?: number | null })
             <th className="num">Matches</th>
             <th className="num">W–L</th>
             <th className="num">Win rate</th>
-            <th>Rank</th>
+            <th>Best rank</th>
           </tr>
         </thead>
         <tbody>

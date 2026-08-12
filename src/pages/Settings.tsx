@@ -7,7 +7,8 @@ import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { FriendCodes } from "../components/FriendCodes";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
-import { DONATE_URL } from "../services/site";
+import { DONATE_URL, PRIVACY_URL } from "../services/site";
+import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import { exportTrackerDiagnostic } from "../services/tracker";
@@ -58,7 +59,7 @@ function TrackerHealthCard() {
     <section className="panel settings-card settings-card-span2">
       <h3 className="settings-card-title">Tracker health</h3>
       <p className="settings-card-desc mb-2">
-        Local only — nothing leaves this machine. Answers “is it working?” without leaving Settings.
+        This check runs locally and sends nothing. Answers “is it working?” without leaving Settings.
       </p>
       <TrackerOnboarding />
       <div className="flex flex-wrap gap-2 mt-2">
@@ -885,8 +886,9 @@ export const Settings = memo(function Settings() {
               </div>
             )}
 
-            {/* Email route — a 6-digit code, no password to forget. */}
-            {!authName && (
+            {/* Email route — a 6-digit code, no password to forget. Hidden
+                until custom SMTP is live; see EMAIL_SIGN_IN_ENABLED. */}
+            {EMAIL_SIGN_IN_ENABLED && !authName && (
               <div className="settings-note mt-3">
                 {emailStage === "idle" ? (
                   <div className="flex flex-wrap items-end gap-2">
@@ -1111,8 +1113,11 @@ export const Settings = memo(function Settings() {
             <p className="text-xs text-muted m-0 mt-2">
               Google and Discord open your normal browser rather than a window
               inside the app, so you can see the real address bar — and because
-              Google refuses sign-in from embedded windows. The email route never
-              asks for a password: you get a one-time code instead.
+              Google refuses sign-in from embedded windows. There is no password
+              to set or forget either way.
+              {EMAIL_SIGN_IN_ENABLED
+                ? " The email route sends a one-time code instead."
+                : ""}
             </p>
           </section>
         )}
@@ -1121,8 +1126,10 @@ export const Settings = memo(function Settings() {
         <section className="panel settings-card settings-card-span2">
           <h3 className="settings-card-title">Data &amp; privacy</h3>
           <p className="settings-card-desc">
-            Your matches, decks and stats live on this PC and are not uploaded.
-            The one optional exception is below — it is off unless you turn it on.
+            Your matches, decks and stats live on this PC. Exactly two things can
+            send anything out — the sharing toggle under <strong>Account</strong>{" "}
+            above, and the status check below. Both are off until you turn them
+            on, and signing in alone uploads nothing.
           </p>
           <div className="settings-toggle-list">
             <label className="settings-toggle-row">
@@ -1158,6 +1165,20 @@ export const Settings = memo(function Settings() {
               deletes the random ID, so switching it back on starts fresh.
             </p>
           </div>
+          {/*
+            Every field either toggle can upload, published in full. Kept one
+            click from the toggles themselves rather than buried on the site —
+            a list nobody can find is not much of a disclosure.
+          */}
+          <p className="m-0 mt-3 text-xs text-muted">
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => void openExternal(PRIVACY_URL)}
+            >
+              Read the full list of everything the app can send
+            </button>
+          </p>
         </section>
 
         {/* —— Plumbing last: health, shortcuts, updates, about —— */}

@@ -74,7 +74,7 @@ export async function renderClimbSharePng(input: ClimbShareInput): Promise<Blob>
   paintBackdrop(ctx, size, size);
   const logo = await loadBrandLogo();
   let y = drawHeader(ctx, size, {
-    kicker: "Climb story · local only",
+    kicker: "Climb story · tracked on this PC",
     logo,
   });
   y += 28;

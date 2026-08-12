@@ -1,16 +1,31 @@
 # Filthy Net Deck — Platform Strategy
 
 **Prepared:** 2026-07-29 · from the owner's growth/monetization brief + a repo and site read
+**Last reconciled against the code:** 2026-08-12 (v2.8.2)
 **Product at time of writing:** v2.5.3 · Tauri 2 + React 19 + TS + Tailwind 4 + Zustand 5 · ~33.5k lines TS/TSX · ~2.4k Rust · 250+ vitest tests · four webviews
-**Status:** Reviewed and in progress. **Phase 0 done** (one ⬜ tail: the opt-in parser-health ping). **Phase 1 partially done** — items C and B shipped; A (card pages) still the largest available corpus expansion. **Phase 2 started 2026-08-10** after the owner waived its gate on measured data (see §3). Design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md).
 
-> This document answers three questions the owner asked: (1) is the plan viable, honestly; (2) what's the sequence to build it; (3) what's obviously missing. It supersedes nothing — `ROADMAP.md` and `100X-ROADMAP.md` cover the *app*. This covers the *business around the app*.
+> ## ▶ STATUS: every buildable phase is shipped
+>
+> | Phase | State |
+> |---|---|
+> | **0 — Instrument & rails** | ✅ Complete. The last ⬜ (parser-health ping) shipped in v2.7.5 |
+> | **1 — Reach** | ✅ Complete. C + B shipped in `776bfa1`; **A — card pages — shipped in v2.8.2** (269 live) |
+> | **2 — Accounts + profiles** | ✅ Complete. All 8 slices, 7 migrations on the live DB |
+> | **3 — Crowd meta** | ⏸ **Gated on population, not code.** The machinery shipped inside slices 5/6 — upload, hourly rollup, Wilson intervals, ≥30-game suppression. Cells stay empty until enough opted-in users exist. Building more here will not fill them; users will |
+> | **4 — Pro tier** | ⏸ Deferred indefinitely by the owner. Nothing is being built toward it |
+> | **5 — Light social** | ✅ Friend codes + the seasonal race shipped in v2.8.2 |
+>
+> **The sequence in §3 is therefore history, not a plan.** It is kept because the
+> reasoning — and especially the gates that stopped work happening in the wrong
+> order — is worth preserving. The live checklist is `handoff.md`.
+
+> This document answers three questions the owner asked: (1) is the plan viable, honestly; (2) what's the sequence to build it; (3) what's obviously missing. It covers the *business around the app*; `AGENTS.md` holds the binding product rules and non-goals. (It used to point at `ROADMAP.md` / `100X-ROADMAP.md` for the app roadmap — both programs closed and the files were removed 2026-08-12; they are in git history.)
 
 ---
 
 ## 0. Honest snapshot — where this actually is
 
-**The engineering is not the constraint.** CI gates, a self-healing daily pipeline, signed auto-updates, a reverse-engineered log parser, a no-fabrication data promise enforced in code. That is ahead of where most solo projects ever get, and `100X-ROADMAP.md` already closed its active pillars.
+**The engineering is not the constraint.** CI gates, a self-healing daily pipeline, signed auto-updates, a reverse-engineered log parser, a no-fabrication data promise enforced in code. That is ahead of where most solo projects ever get, and the app's own roadmap had already closed its active pillars.
 
 **The audience is the constraint.** Read the numbers without flinching:
 
@@ -43,7 +58,7 @@ That single reordering is the spine of everything below. It is why public profil
 
 "Users upload their decks" is a convenience feature. It is not why this is worth building.
 
-The strategic reason: **the entire meta feed currently depends on regex-scraping MTGGoldfish.** `100X-ROADMAP.md` already flags it — one Goldfish redesign and the meta goes dark. C3 added MTGO/magic.gg fallbacks, which helps, but the dependency on third-party publishers is structural.
+The strategic reason: **the entire meta feed currently depends on regex-scraping MTGGoldfish.** One Goldfish redesign and the meta goes dark. C3 added MTGO/magic.gg fallbacks, which helps, but the dependency on third-party publishers is structural.
 
 If a few thousand users opt in to sharing match results, **FND becomes its own data source.** Real matchup winrates from real ladder play — precisely the thing Goldfish cannot provide and Untapped charges for. That converts the biggest structural fragility in the product into the actual moat. Deck sync falls out of the same infrastructure for free.
 
@@ -74,11 +89,23 @@ problem rather than a lost talking point:
    stay on the machine. This is not positioning: an Arena handle identifies a
    real person who consented to nothing, and UK/EU users bring GDPR with them
    regardless of how the app is marketed. Costs one line in an allowlist.
-4. **Announce the change, don't make it silently.** The README currently promises
-   *"entirely on your PC. Nothing is uploaded anywhere."* That is still true
-   today and stays until the first upload ships — at which point it gets
-   rewritten precisely *and* mentioned in release notes. This is about not
-   surprising people who already installed on that promise.
+4. **Announce the change, don't make it silently.** ⚠️ **This one was missed, and
+   it is worth recording why.** The README promised *"entirely on your PC.
+   Nothing is uploaded anywhere"*; the rule said rewrite it the moment the first
+   upload ships. Uploads shipped in v2.7.5 (health ping) and v2.7.6 (match
+   sharing) and **the README was not touched until 2026-08-12** — three releases
+   of a false public promise, on the page a prospective user reads first. Two
+   marketing-site claims had the same problem.
+
+   The in-app consent copy was accurate throughout, which is the part that
+   actually gates an upload — so no one was uploaded without consenting. But the
+   *published* claim was wrong, and nothing in the release checklist would have
+   caught it. **Fixed in v3.0.0**, along with a `website/privacy.html` publishing
+   the field allowlist verbatim, and `AGENTS.md` now carries a binding rule that
+   a payload change is incomplete until README, site and privacy page all say so.
+
+   Lesson: a promise made in marketing copy needs an owner in the release
+   checklist, or it rots silently while every code-level rule is honoured.
 
 Everything else formerly in this section is now an ordinary design note in
 [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md), not a rule.
@@ -170,7 +197,7 @@ Zero telemetry is principled but at scale it is dangerous: an Arena patch breaks
 1. **Passive, immediate, zero-privacy-cost:** every install hits **`/updater/latest.json`** on launch via the signed Tauri updater. Netlify Web Analytics already records it — filter to that path for install and DAU numbers **today**, with no code change and nothing new leaving the user's machine.
 
    > ⚠️ **Corrected 2026-07-30.** This originally said `version.json`. That was wrong: `useAppStore::checkForUpdates` tries the signed updater first and returns early whenever it answers, so `/version.json` is only a fallback for when that check *fails* — real installs never request it. An attempt to instrument it counted 0 app hits and caused two production incidents. Full write-up in [`INSTALL-COUNTING.md`](INSTALL-COUNTING.md). **Do not put a function in front of `/updater/latest.json`** — it drives the signed auto-update. Reading its count in Analytics is free and safe; code in that path is not.
-2. **Opt-in parser-health ping:** app version, parser version, crash/parse-failure class. No account, no PII, no match data. Ship it *before* scaling, not after.
+2. ✅ **Opt-in parser-health ping** (**shipped v2.7.5**): app version, parser version, crash/parse-failure class. No account, no PII, no match data. Shipped before scaling, as intended.
 
 ### 2.2 The streamer / OBS play
 
@@ -222,7 +249,7 @@ Worst-case craft cost per meta deck, checked against a real wildcard balance, wi
 
 **Possible incremental improvement:** cards appearing in decks the user has actually played are necessarily owned, so ownership can be accumulated as a **lower bound** over time. This must be labelled honestly — *"known owned (seen in your decks)"*, never *"your collection"* — or it violates the no-fabrication promise. Treat as optional, later.
 
-**Revised priority:** this is no longer a candidate to jump the queue. It is a good, cheap, local feature — a normal `ROADMAP.md` item, not a strategic move.
+**Revised priority:** this is no longer a candidate to jump the queue. It is a good, cheap, local feature — an ordinary backlog item, not a strategic move. **Still unbuilt as of v2.8.2.**
 
 **Caveat on the evidence:** absence across two full logs is strong but it is not proof. If Arena only emits collection data on particular flows — a first login after a client update, or opening the collection screen — it could exist and simply be missing from this sample. Worth one more look before permanently writing off the full version. To re-check, open the collection screen in Arena, then:
 
@@ -245,7 +272,16 @@ Also worth confirming: WotC tolerates log-reading trackers but not in-draft assi
 
 ### 2.7 Arena patch risk is existential
 
-The entire moat is an unofficial parser against a format that can change without notice. Needed before scale: a documented fast-response process, a **public status page**, and an in-app "we know, fix incoming" channel (partially exists — My Stats already degrades honestly rather than recording garbage). At 300 users a two-day outage is a support ticket; at 10,000 it is a review-bombing.
+The entire moat is an unofficial parser against a format that can change without notice. At 300 users a two-day outage is a support ticket; at 10,000 it is a review-bombing.
+
+Three things were named as needed before scale. Status as of v2.8.2:
+
+| Item | State |
+|---|---|
+| Early detection | ✅ The health ping (§2.1) gives a population-level spike in `parseErrors` within hours |
+| In-app "we know" channel | ⚠️ **Partial.** My Stats degrades honestly rather than recording garbage, which is the important half — but there is no way to tell users a fix is coming |
+| **Public status page** | ❌ **Not built.** Still the gap |
+| Documented fast-response process | ⚠️ `docs/MAINTENANCE.md` item 4 covers the *repair* (replay harness → fix `tracker.rs`), but not the communication |
 
 ### 2.8 Reality-check on "better in every way than Untapped"
 
@@ -272,7 +308,7 @@ Route effort there rather than at feature parity.
 - ✅ **Ko-fi tip jar** — site + Settings → About (Ko-fi pays through to PayPal; PayPal.Me is not offered to Indonesian personal accounts). Single `DONATE_URL` constant in `src/services/site.ts`; empty string hides it everywhere. Gates nothing.
 - ❌ **Discord server** — *cut by owner 2026-07-30.*
 - ❌ **Email capture** — *cut by owner 2026-07-30.*
-- ⬜ **Opt-in parser-health ping** — now the only way to get true unique-install counts, since no passive endpoint distinguishes machines. **Moved into Phase 2 as slice 0** (owner, 2026-08-10) so it can share the Supabase project rather than needing its own endpoint. Full design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md) §7.1. It has no dependency on the rest of Phase 2 and can ship in the next release.
+- ✅ **Opt-in parser-health ping** — **shipped v2.7.5.** The only way to get true unique-install counts, since no passive endpoint distinguishes machines. Moved into Phase 2 as slice 0 (owner, 2026-08-10) so it could share the Supabase project rather than needing its own endpoint. Design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md) §7.1. Client: `src/services/cloud/healthPing.ts`; server: `supabase/functions/health-ping`. Default off, one row per install per day.
 
 **Revised install estimate:** the measured data puts the base in the **low hundreds**, below the 200–350 guessed in §0 from visitor numbers. That *strengthens* the §0 conclusion rather than changing it — with daily actives in the teens, reach is unambiguously the binding constraint, and Phase 1 matters more than anything on the backend.
 
@@ -286,7 +322,7 @@ Owner selected **C + B** on 2026-07-30 and cut the rest for now.
 
 - ✅ **C — crawlability** (`776bfa1`). The hub linked only the top 5 Bo1 decks per format, leaving **22 of 32 deck pages unreachable from it**; it now links all 32. Deck pages were dead ends with no outbound deck links; each now links 6 siblings plus its format hub — **192 internal links** across the corpus. Homepage gained a CTA block (previously one nav link). Sitemap gained `lastmod` + tiered priorities, replacing a flat 0.7.
 - ✅ **B — page depth** (`776bfa1`). Deck pages 170 → ~257 lines: mana curve from `cmc` weighted by copies, composition by card type, key-card art strip, colors spelled out, richer descriptions, `BreadcrumbList` JSON-LD. Also fixed `og:image` being pinned at `?v=1.5.1` since v1.5.1 — social caches had held a stale card for eight releases.
-- ⬜ **A — 252 card pages** — not selected. Still the largest corpus expansion available.
+- ✅ **A — card pages** — **shipped v2.8.2.** `/meta-web/card/<slug>.html` for every distinct card in the ranked field, plus `/meta-web/cards.html`. The corpus went 32 pages → ~300, and the internal link graph 192 edges → ~7,800. `pipeline/meta-site-links.test.mjs` resolves every internal link and asserts no card page is orphaned — written after one added nav entry silently broke 32 deck pages. The page count tracks the live field, so it moves with the meta rather than being fixed.
 - ❌ **D — monthly archive pages** — cut by owner. Would have needed to live outside `website/meta-web/`, which `build-meta-site.mjs` wipes on every run.
 - ❌ **E / F / G** — per-page OG cards, automated X posts, OBS overlay — all cut for now.
 - ❌ **Weekly meta email** — cut with email capture in Phase 0.
@@ -320,8 +356,13 @@ Owner's call: Netlify Web Analytics shows real and growing app usage, so proceed
 to Phase 2 rather than wait out another SEO cycle. The gate did its job — it
 forced the measurement before the spend.
 
-### Phase 2 — Accounts + public profiles
+### Phase 2 — Accounts + public profiles ✅ COMPLETE (v2.7.5 → v2.8.2)
 *~4–6 weeks · first backend* · **full design: [`BACKEND-PHASE-2.md`](BACKEND-PHASE-2.md)**
+
+All 8 slices shipped, 7 migrations run on the live DB. Google and Discord OAuth
+verified live; **email OTP is built but hidden** behind `EMAIL_SIGN_IN_ENABLED`
+until custom SMTP exists, because Supabase's built-in mailer is rate-limited per
+project and fails by silently not delivering.
 
 - **Supabase** (Postgres + auth + row-level security) — chosen for velocity as a solo dev. Abstract the boundary so a move to Cloudflare Workers/D1 is possible if costs bite.
 - **Google + Discord OAuth** via system browser → deep-link callback into the app. (Firebase was considered 2026-08-10 for Google login and rejected — Supabase does Google natively, and Firestore is the wrong shape for a `GROUP BY`-driven crowd meta. Reasoning in `BACKEND-PHASE-2.md` §6.) Google refuses OAuth from embedded webviews, so the system-browser hop is mandatory.
@@ -333,8 +374,15 @@ forced the measurement before the spend.
 **Goal:** the platform everything else needs, shipped in acquisition-first order.
 **Gate to Phase 3:** enough opted-in users for statistically honest aggregates.
 
-### Phase 3 — Crowd meta
+### Phase 3 — Crowd meta ⏸ BUILT, WAITING ON PEOPLE
 *The moat*
+
+> **The code for this shipped inside Phase 2 slices 5 and 6.** Upload, the hourly
+> rollup cron, Wilson intervals and ≥30-game suppression are all live. The
+> matchup cells are empty because not enough people have opted in yet — which is
+> the honesty discipline working, not a fault. **Writing more code here will not
+> fill them.** The input this phase consumes is users, and that comes from
+> Phase 1's corpus and the owner's creator channel.
 
 - Opt-in match sharing → FND's own aggregate matchup winrates
 - **Must respect the no-fabrication data promise**: show sample sizes, suppress thin cells, never present a 12-match sample as a winrate. This is the same discipline `build-meta.mjs` already enforces — apply it to crowd data or the promise is dead.
@@ -366,10 +414,12 @@ When and if it is revived:
 - Capped Founder's Lifetime tier at launch
 - Price at or slightly under Untapped — verify their current tiers first
 
-### Phase 5 — Light social
+### Phase 5 — Light social ✅ SHIPPED v2.8.2
 
-- Friend codes, stat-line comparison, pod leaderboards, seasonal friend ladder races
-- **Still no chat.** Discord is the chat.
+- ✅ **Friend codes** — a private token you hand out, deliberately *not* a handle. `src/services/cloud/friends.ts`, migration `20260812030000_friends.sql`. The code alphabet omits I/L/O/0/1 so a mistyped code cannot reach the server and come back as "no one is using that code", which would blame the sender for a typo.
+- ✅ **Stat-line comparison + seasonal friend race** on the Climb page. A friend with sharing switched off returns zeroes rather than being hidden.
+- ⬜ Pod leaderboards — not built, and needs density this does not have yet.
+- ✅ **Still no chat.** Discord is the chat. This stays cut (§1.5).
 
 ---
 

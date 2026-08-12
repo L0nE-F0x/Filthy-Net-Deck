@@ -39,3 +39,11 @@ export const SITE_ORIGINS = [SITE_ORIGIN_PRIMARY, SITE_ORIGIN_LEGACY] as const;
  * sync with the link in `website/index.html`.
  */
 export const DONATE_URL = "https://ko-fi.com/filthynetdeck";
+
+/**
+ * Privacy page — publishes the upload field allowlist verbatim
+ * (`docs/BACKEND-PHASE-2.md` §8). Linked from Settings → Data & privacy so the
+ * full list is one click from the toggle that turns uploading on, rather than
+ * something a user has to go looking for on the website.
+ */
+export const PRIVACY_URL = `${SITE_ORIGIN_PRIMARY}/privacy.html`;

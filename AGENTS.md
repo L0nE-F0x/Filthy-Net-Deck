@@ -18,6 +18,7 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 | **Signed in-app updater** | Update `website/updater/latest.json` with new `version`, `notes`, `pub_date`, `platforms.windows-x86_64.url` + **signature** from the build. Prefer **Update & restart** over browser download. |
 | **Soft version channel** | Update `website/version.json` **and** `public/version.json` (`version`, `downloadUrl`, `notes`) so Settings / soft fallback see the new build. |
 | **Marketing site** | `website/index.html` download buttons, version labels, hero/mock version strings, feature copy. |
+| **Upload claims (only when the payload changed)** | If this release adds, removes or changes an uploaded field, update **all three**: `README.md`, `website/index.html`, and `website/privacy.html` (bump `PRIVACY_LASTMOD` in `pipeline/build-meta-site.mjs`). Say it in the release notes — existing users installed on the old promise. This was missed for three releases; see `docs/PLATFORM-STRATEGY.md` §1.2 rule 4. |
 | **Share card / SEO (mandatory every version bump)** | Refresh Open Graph + Twitter meta in `website/index.html` (`title`, `description`, `og:*`, `twitter:*`) to market the **current** release. Regenerate `website/assets/og-image.png` via `website/assets/_gen_og.py` (version badge + feature lines). **Cache-bust** image URLs with `?v=<version>` so X/Discord/Slack pick up the new card (e.g. `og-image.png?v=0.12.4`). |
 | **Netlify** | Push to `main` so the site, `version.json`, `updater/latest.json`, `downloads/*`, and `assets/og-image.png` go live. Confirm live URLs return the new version (not just local files). Spot-check the homepage meta and OG image in a private/incognito share preview if possible. |
 | **macOS (when shipping a tagged release)** | Tag `vX.Y.Z` so `.github/workflows/macos-build.yml` can produce a dmg; roll the dmg into `website/downloads/` and fix macOS download links (same pattern as past “Roll vX out to macOS” commits). |
@@ -35,8 +36,12 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 [ ] OG / Twitter meta titles + descriptions match this release
 [ ] website/assets/_gen_og.py updated + og-image.png regenerated
 [ ] og-image.png?v=<version> cache-bust on og:image + twitter:image
+[ ] If the upload payload changed: README + index.html + privacy.html all updated
 [ ] Pushed main; Netlify live version.json matches
 [ ] Tag vX.Y.Z (macOS CI) when appropriate
+[ ] macOS dmg rolled from the GH Release into website/downloads/ AND index.html
+    links updated — v2.8.2's dmg was built but never rolled, leaving macOS
+    visitors on 2.8.1
 [ ] Verified: in-app Check for updates offers Update & restart (not only Chrome download)
 [ ] Verified: link share preview shows new OG card (not a stale X cache)
 ```
@@ -53,8 +58,25 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 ## Product constraints
 
 - **Formats:** Standard + Pioneer only. Real, verified lists only (no seed/placeholder decks).
-- **Tracker:** Local `Player.log` tail; data stays on the PC.
+- **Tracker:** Local `Player.log` tail. Match data stays on the PC **unless the user opts in** — see the cloud rules below.
 - **Branding:** ApexForge credit (“Built by ApexForge” → https://ame-apexforge.org/) on marketing footer and in-app sidebar/Settings About — keep on every release.
+
+### Cloud rules (since v2.7.5 the app can upload — these are binding)
+
+1. **The app stays fully functional with no account.** Not negotiable. Never put an existing local feature behind sign-in, and never treat sign-in as a monetization step.
+2. **Never upload another player's identity.** `opponentName` and `opponentSeen` do not leave the machine — not hashed, not "anonymised". Infer the archetype locally, upload the *label*.
+3. **Build every payload from an explicit allowlist**, never by serialising a `TrackedMatch`. A test asserts the exact key set; keep it that way.
+4. **Public copy must match reality.** `README.md`, `website/index.html` and `website/privacy.html` describe what is uploaded. A change to the payload is incomplete until all three say so. (The README promised "nothing is uploaded anywhere" for three releases after that stopped being true — do not repeat it.)
+5. **Never paywall anything that runs locally.** The repo is public and a Tauri binary ships to the user's machine, so client-side gates are unenforceable. Server-side value only — this holds even though Phase 4 is deferred.
+6. **Honest aggregates.** Suppress cells under 30 games, show `n` everywhere, Wilson intervals not raw proportions. Ship nothing rather than ship noise.
+
+### Non-goals — do not add
+
+In-draft overlay (WotC ToS) · price tracking · mobile / APK tracking promises · Alchemy & Historic · fabricated matchup or sideboard content · in-app chat relay (cost + moderation liability; Discord is the chat) · client-side paywalls · competing with Untapped on data breadth.
+
+### Deferred (not cancelled — revisit deliberately)
+
+Limited/Draft hub · Events overhaul · free-form LLM coach without grounded local data · **Pro tier and paywalls** (deferred indefinitely, owner 2026-08-10 — monetization is donation-only via Ko-fi). Reviving the paid tier requires the WotC Fan Content Policy and Scryfall commercial-terms checks in `docs/PLATFORM-STRATEGY.md` §2.6 **first**, not after.
 
 ## Dev commands
 
@@ -67,5 +89,11 @@ npm run tauri:build   # installers (set TAURI_SIGNING_* for updater artifacts)
 
 ## Docs
 
+- **Live session state / top-of-todo: `handoff.md` — read it first.**
 - Data sources + updater overview: `docs/DATA-AND-UPDATES.md` (keep in sync when release process changes).
 - Self-maintenance vs. monthly manual checklist: `docs/MAINTENANCE.md` (keep in sync when pipeline automation changes).
+- Growth phases and the reasoning behind them: `docs/PLATFORM-STRATEGY.md` (all buildable phases shipped).
+- The backend as designed *and as built*: `docs/BACKEND-PHASE-2.md`.
+- Install counting post-mortem (right machinery, wrong endpoint): `docs/INSTALL-COUNTING.md`.
+- The optional `.git` history rewrite, and why never to automate it: `docs/GIT-HISTORY-BLOAT.md`.
+- Published upload allowlist: `website/privacy.html` — must match `matchSync.ts` + `healthPing.ts`.

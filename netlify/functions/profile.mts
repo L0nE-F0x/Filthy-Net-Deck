@@ -63,18 +63,24 @@ interface ArchetypeRow {
   losses: number;
 }
 /**
- * A deck the player chose to publish. `main`/`side` are Arena card ids, which
- * nothing here can turn into card names — there is no id→name map on the
- * server and resolving 60 ids per request through Scryfall would be both slow
- * and rude to a public API. So the page publishes what it can state exactly:
- * the deck, its format, its size, and when it was last played.
+ * A deck the player chose to publish. The page shows what it can state exactly:
+ * the deck, its format, its size, and when it was last played — never the list.
+ * Card names are impossible here anyway: the stored list is Arena card ids,
+ * there is no id→name map on the server, and resolving 60 ids per request
+ * through Scryfall would be both slow and rude to a public API.
+ *
+ * The view returns **counts, not the arrays** (migration 20260812060000). It
+ * used to select `main`/`side`, which meant the full card-id list of every
+ * published deck was readable straight off the public REST API — contradicting
+ * what the product and the privacy page both say — while this code only ever
+ * used the lengths.
  */
 interface DeckRow {
   deck_id: string;
   name: string;
   format: string;
-  main: number[] | null;
-  side: number[] | null;
+  main_count: number | null;
+  side_count: number | null;
   played_at: string | null;
 }
 
@@ -285,8 +291,8 @@ export default async (_req: Request, ctx: Context) => {
     // which is the default — the section simply does not appear.
     const deckRows = decks
       .map((d) => {
-        const size = Array.isArray(d.main) ? d.main.length : 0;
-        const side = Array.isArray(d.side) ? d.side.length : 0;
+        const size = typeof d.main_count === "number" ? d.main_count : 0;
+        const side = typeof d.side_count === "number" ? d.side_count : 0;
         const when = d.played_at ? new Date(d.played_at) : null;
         const played =
           when && !Number.isNaN(when.valueOf())

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bestRankOf,
   looksLikeFriendCode,
   normalizeFriendCode,
   rankFriends,
@@ -53,6 +54,36 @@ describe("winrateOf", () => {
     expect(winrateOf(line())).toBeNull();
     expect(winrateOf(line({ matches: 3 }))).toBeNull(); // draws only
     expect(winrateOf(line({ wins: 3, losses: 1 }))).toBeCloseTo(0.75);
+  });
+});
+
+describe("bestRankOf", () => {
+  it("returns the highest rank reached, not the most recent one", () => {
+    // The bug this replaced: the server returned the latest rank while calling
+    // it best_rank. Someone who hit Mythic and slid back to Diamond showed
+    // Diamond on a leaderboard whose whole point is how far up they got.
+    expect(bestRankOf(["Diamond 3", "Mythic", "Diamond 1"])).toBe("Mythic");
+    expect(bestRankOf(["Gold 2", "Platinum 4"])).toBe("Platinum 4");
+  });
+
+  it("orders divisions the right way round — 1 beats 4", () => {
+    expect(bestRankOf(["Diamond 4", "Diamond 1"])).toBe("Diamond 1");
+  });
+
+  it("orders inside Mythic, where a plain string sort gets it wrong", () => {
+    // "Mythic 93.4%" < "Mythic 82%" as strings; by score it is the opposite.
+    expect(bestRankOf(["Mythic 82%", "Mythic 93.4%"])).toBe("Mythic 93.4%");
+    // A leaderboard place beats any percentile.
+    expect(bestRankOf(["Mythic 99%", "Mythic #874"])).toBe("Mythic #874");
+    // And a better place beats a worse one.
+    expect(bestRankOf(["Mythic #874", "Mythic #12"])).toBe("Mythic #12");
+  });
+
+  it("is null when nothing was shared, and ignores unparseable labels", () => {
+    expect(bestRankOf(null)).toBeNull();
+    expect(bestRankOf([])).toBeNull();
+    expect(bestRankOf(["not a rank"])).toBeNull();
+    expect(bestRankOf(["not a rank", "Gold 1"])).toBe("Gold 1");
   });
 });
 

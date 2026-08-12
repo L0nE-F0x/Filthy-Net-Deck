@@ -46,7 +46,7 @@ export function StatusPanel() {
         </p>
         <span className="text-xs text-muted">
           {status?.matchesRecorded ?? 0} match
-          {(status?.matchesRecorded ?? 0) === 1 ? "" : "es"} recorded · local only
+          {(status?.matchesRecorded ?? 0) === 1 ? "" : "es"} recorded · stored on this PC
         </span>
       </div>
       {status && status.parseErrors > 0 && status.parseErrors < 3 && (

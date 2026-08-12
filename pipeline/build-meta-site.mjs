@@ -1237,6 +1237,9 @@ function sitemapPriority(p) {
   return "0.4";
 }
 
+/** Bump when `website/privacy.html` is substantively edited. */
+const PRIVACY_LASTMOD = "2026-08-12";
+
 function writeSitemap(paths, lastmod) {
   const mod = /^\d{4}-\d{2}-\d{2}$/.test(String(lastmod || "")) ? String(lastmod) : null;
   const modTag = mod ? `\n    <lastmod>${mod}</lastmod>` : "";
@@ -1249,12 +1252,22 @@ function writeSitemap(paths, lastmod) {
   </url>`,
     )
     .join("\n");
+  // Hand-written static pages live outside `paths`, which only ever holds the
+  // generated /meta-web/ corpus. They also must not inherit the feed's
+  // `lastmod` + daily `changefreq` — claiming a page changed daily when it did
+  // not is the kind of thing that gets a sitemap discounted.
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${SITE}/</loc>${modTag}
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${SITE}/privacy.html</loc>
+    <lastmod>${PRIVACY_LASTMOD}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 ${urls}
 </urlset>

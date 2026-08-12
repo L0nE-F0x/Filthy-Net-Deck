@@ -1,5 +1,5 @@
 /**
- * Fixture tests for the MTGGoldfish parsers (100X-ROADMAP Phase 0, C2).
+ * Fixture tests for the MTGGoldfish parsers.
  *
  * The fixtures are REAL pages, fetched 2026-07-20 and gzipped verbatim into
  * pipeline/__fixtures__/. They freeze today's HTML shape so any parser

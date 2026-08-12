@@ -339,7 +339,7 @@ export const Stats = memo(function Stats() {
                 setRecapMsg(`${formatRecapHeadline(stats)} — rendering…`);
                 try {
                   const blob = await renderRecapPng(stats, {
-                    kicker: "Weekly recap · local only",
+                    kicker: "Weekly recap · tracked on this PC",
                   });
                   const caption = recapCaption({
                     wins: stats.wins,
