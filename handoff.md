@@ -31,10 +31,10 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | # | Item | Notes |
 |---|------|-------|
-| ⬜ | **Full regression audit v2.7.3 → v2.8.2** | Nothing since the v2.7.3 audit has been adversarially reviewed — that is the entire backend, accounts, profiles, friends, deck sync, public decks, and the inference rewrite. Produce `docs/AUDIT-<date>-v3.0.0.md` |
-| ⬜ | **Performance pass** | Cold start, RAM across the four webviews, fresh-profile / zero-match first run, on a production build |
+| ✅ | **Full regression audit v2.7.3 → v2.8.2** | **9 findings, 2 of them P0** — `docs/AUDIT-2026-08-12-v3.0.0.md`. All fixed. ⚠️ **The SQL fixes need running on the live DB**: `supabase/migrations/20260812060000_rollup_null_fix_and_limits.sql` |
+| ⚠️ | **Performance pass** | Largely done — found the P0 splash re-render loop. Bundle + boot verified on a production build. **Not done:** RAM across the four webviews, which needs a real installed build |
 | ⬜ | **UI/UX polish** | Empty states, first-run with zero matches, consistency across the pages added during the v2.7–2.8 backend push |
-| ⬜ | **Launch readiness** | What a 500-signup day does to Supabase quotas; verify §4 anti-abuse is actually implemented; build the status page (`PLATFORM-STRATEGY.md` §2.7 — still the gap) |
+| ⚠️ | **Launch readiness** | ✅ Status page + in-app incident banner shipped (§2.7 closed). ✅ §4 anti-abuse verified — two of six were missing and are now implemented. **Not done:** what a 500-signup day does to Supabase quotas |
 | ⬜ | **Roll the macOS dmg** | ⚠️ **v2.8.2's dmg is on the GitHub Release but was never copied into `website/downloads/`.** `index.html` lines ~114 and ~529 still link the **2.8.1** dmg, so macOS visitors are being served a version behind *right now* |
 | ⬜ | **v3.0.0 release train** | Full `AGENTS.md` checklist |
 
@@ -57,7 +57,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 |------|--------|
 | App version | **v2.8.2** live on Windows; **macOS site link is stale at 2.8.1** (see above) |
 | Branch | `main`, v3.0.0 work in progress |
-| Gates last green | **547** vitest / 78 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
+| Gates last green | **563** vitest / 80 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |
@@ -95,12 +95,14 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | `src/services/cloud/auth.ts` | OAuth (system browser + `fnd://`), email OTP, session |
 | `src/services/cloud/archetypeSlug.ts` | Canonical slug join key (duplicated in the profile function) |
 | `src/services/opponentArchetype.ts` | Inference. `observedColorsFromSeenCards` is where the basic-land fix landed |
-| `src/services/site.ts` | `SITE_*`, `DONATE_URL`, `PRIVACY_URL` — empty string hides an affordance everywhere |
+| `src/services/site.ts` | `SITE_*`, `DONATE_URL`, `PRIVACY_URL`, `STATUS_URL` — empty string hides an affordance everywhere |
+| `src/services/serviceStatus.ts` | Reads `website/status.json`; drives the in-app incident banner |
+| `website/status.json` | **Flip this during an Arena-break incident** — see `docs/MAINTENANCE.md` item 4 |
 | `src-tauri/src/deeplink.rs` | `fnd://` — handles BOTH cold start and the single-instance argv route |
 | `netlify/functions/profile.mts` | Server-rendered `/u/<handle>` (config.path routing) |
 | `pipeline/build-meta-site.mjs` | The `/meta-web/` corpus + sitemap. Static pages are hardcoded there, not in `paths` |
 | `website/privacy.html` | The published field allowlist |
-| `supabase/migrations/` | 7 migrations, all run on the live DB |
+| `supabase/migrations/` | 8 migrations. **The 8th (`20260812060000`) is NOT yet run on the live DB** — it carries the P0 rollup fix |
 
 ---
 
@@ -291,6 +293,7 @@ updater + version.json + site + OG + Netlify live + tag/macOS).
 | `docs/DATA-AND-UPDATES.md` | Pipeline sources + updater mechanics |
 | `docs/INSTALL-COUNTING.md` | Post-mortem: right machinery, wrong endpoint |
 | `docs/GIT-HISTORY-BLOAT.md` | The optional history rewrite, and why not to automate it |
+| `docs/AUDIT-2026-08-12-v3.0.0.md` | Latest deep audit — 9 findings across the v2.7.3→v2.8.2 backend push |
 
 Removed 2026-08-12 as shipped history (recover from git if ever needed):
 `ROADMAP.md`, `100X-ROADMAP.md`, `docs/AUDIT-2026-08-10-v2.7.3.md`,
