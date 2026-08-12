@@ -63,7 +63,7 @@ export function buildOnboardingSteps(
       done: tagOk,
       hint: tagOk
         ? "Matchups is learning your field"
-        : "Play with Detailed Logs on - archetypes fill in automatically",
+        : "Play with Detailed Logs on — archetypes fill in automatically",
     },
   ];
 }

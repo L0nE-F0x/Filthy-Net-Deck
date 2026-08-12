@@ -23,7 +23,7 @@
   --font-mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
 }
 
-/* Light appearance â€” same tokens, inverted surfaces. Dark remains default. */
+/* Light appearance — same tokens, inverted surfaces. Dark remains default. */
 html[data-theme="light"] {
   --color-ink-950: #f3f4f8;
   --color-ink-900: #e8eaef;
@@ -71,7 +71,7 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--color-ink-600) 55%, transparent);
 }
 
-/* Theme toggle â€” discreet pill in the topbar / Settings */
+/* Theme toggle — discreet pill in the topbar / Settings */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -422,7 +422,7 @@ select,
   border-bottom: 1px solid color-mix(in srgb, var(--color-ink-600) 45%, transparent);
   background: color-mix(in srgb, var(--color-ink-900) 60%, transparent);
   backdrop-filter: blur(10px);
-  /* Fullscreen window buttons live in the topbar â€” keep them from colliding. */
+  /* Fullscreen window buttons live in the topbar — keep them from colliding. */
   flex-wrap: wrap;
   row-gap: 0.45rem;
 }
@@ -748,7 +748,7 @@ select,
   }
 }
 
-/* â€”â€”â€” v0.4 polish â€”â€”â€” */
+/* ——— v0.4 polish ——— */
 .panel {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1015,7 +1015,7 @@ select,
   color: var(--color-muted);
 }
 
-/* Scrolls with deck content â€” do not sticky/fixed (was overlapping mainboard). */
+/* Scrolls with deck content — do not sticky/fixed (was overlapping mainboard). */
 .deck-import-bar {
   position: relative;
   z-index: 1;
@@ -1098,7 +1098,7 @@ select,
 .feed-dot.offline { background: var(--color-fair); }
 .feed-dot.cached { background: var(--color-azure-400); }
 
-/* â€”â€”â€” v0.5 visual suite â€”â€”â€” */
+/* ——— v0.5 visual suite ——— */
 .card-art {
   display: block;
   object-fit: cover;
@@ -1366,7 +1366,7 @@ select,
   letter-spacing: -0.03em;
 }
 
-/* â€”â€”â€” v0.9 winrate tracker â€”â€”â€” */
+/* ——— v0.9 winrate tracker ——— */
 .stat-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1554,7 +1554,7 @@ select,
   border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
 }
 
-/* â€”â€”â€” v0.10 deck drill-down â€”â€”â€” */
+/* ——— v0.10 deck drill-down ——— */
 .deck-row-btn {
   background: none;
   border: none;
@@ -1577,7 +1577,7 @@ select,
   line-height: 1;
 }
 
-/* â€”â€”â€” sortable column headers (My Stats) â€”â€”â€” */
+/* ——— sortable column headers (My Stats) ——— */
 .sort-head-btn {
   appearance: none;
   background: none;
@@ -1715,7 +1715,7 @@ select,
   border: 1px solid color-mix(in srgb, var(--color-poor) 28%, transparent);
 }
 
-/* â€”â€”â€” version history mini card art â€”â€”â€” */
+/* ——— version history mini card art ——— */
 .diff-art-row {
   display: flex;
   flex-wrap: wrap;
@@ -1837,7 +1837,7 @@ select,
   height: 50px;
 }
 
-/* â€”â€”â€” My Stats arsenal + deck row art â€”â€”â€” */
+/* ——— My Stats arsenal + deck row art ——— */
 .stats-arsenal {
   display: flex;
   flex-wrap: wrap;
@@ -1960,7 +1960,7 @@ select,
   height: 62px;
 }
 
-/* â€”â€”â€” Matchup Lab + Climb Tracker â€”â€”â€” */
+/* ——— Matchup Lab + Climb Tracker ——— */
 .lab-intro {
   display: flex;
   flex-wrap: wrap;
@@ -2571,7 +2571,7 @@ select,
   }
   .mu-lab-meta { grid-column: 1 / -1; }
 }
-/* â€”â€”â€” Launch splash â€”â€”â€” */
+/* ——— Launch splash ——— */
 .splash-root {
   position: fixed;
   inset: 0;
@@ -2800,7 +2800,7 @@ select,
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-/* â€”â€”â€” Set radar â€”â€”â€” */
+/* ——— Set radar ——— */
 .set-section-title {
   margin: 0 0 0.85rem;
   font-size: 0.72rem;
@@ -3160,7 +3160,7 @@ html[data-theme="light"] .live-set-icon {
   padding-top: 0.15rem;
 }
 
-/* â€”â€”â€” Set gallery (full set) â€”â€”â€” */
+/* ——— Set gallery (full set) ——— */
 .set-gallery-toolbar {
   display: flex;
   flex-direction: column;
@@ -3371,7 +3371,7 @@ html[data-theme="light"] .live-set-icon {
   color: var(--color-gold-300);
 }
 
-/* B&R pulse â€” red-accented sibling of the spoiler pulse */
+/* B&R pulse — red-accented sibling of the spoiler pulse */
 .ban-pulse {
   border-color: color-mix(in srgb, var(--color-poor) 45%, var(--color-ink-600));
   background: linear-gradient(
@@ -3694,7 +3694,7 @@ html[data-theme="light"] .live-set-icon {
   opacity: 0.85;
 }
 
-/* Decks home â€” art-backed marquee for the #1 deck */
+/* Decks home — art-backed marquee for the #1 deck */
 .daily-hero {
   position: relative;
   overflow: hidden;
@@ -3807,7 +3807,7 @@ html[data-theme="light"] .live-set-icon {
   .daily-hero-stat { flex: 1 1 0; }
 }
 
-/* Format hub â€” legality / rotation / bans on the Sets page */
+/* Format hub — legality / rotation / bans on the Sets page */
 .fmt-hub-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -4089,7 +4089,7 @@ html[data-theme="light"] .live-set-icon {
   opacity: 0.9;
 }
 
-/* Settings â€” two-column grid so prefs fill the page instead of a long single rail */
+/* Settings — two-column grid so prefs fill the page instead of a long single rail */
 .settings-page {
   display: flex;
   flex-direction: column;
@@ -4598,7 +4598,7 @@ html[data-theme="light"] .live-set-icon {
   box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
 }
 
-/* Arsenal fans are buttons now â€” open the deck when clicked */
+/* Arsenal fans are buttons now — open the deck when clicked */
 button.stats-arsenal-fan {
   background: transparent;
   border: 0;
@@ -5088,12 +5088,12 @@ button.stats-arsenal-fan:focus-visible {
   background: color-mix(in srgb, var(--color-ink-700) 40%, transparent);
 }
 
-/* â€”â€” Planeswalker accent skins (data-skin) â€”â€”
+/* —— Planeswalker accent skins (data-skin) ——
    Orthogonal to data-theme light/dark. Classic = no attribute.
    Each skin retints gold (accent), azure (secondary), and warm/cool inks.
 */
 
-/* Chandra â€” fire */
+/* Chandra — fire */
 html[data-skin="chandra"] {
   --color-ink-950: #120605;
   --color-ink-900: #1a0a08;
@@ -5135,7 +5135,7 @@ html[data-theme="light"][data-skin="chandra"] {
   --color-poor: #b91c1c;
 }
 
-/* Teferi â€” time / island */
+/* Teferi — time / island */
 html[data-skin="teferi"] {
   --color-ink-950: #050a12;
   --color-ink-900: #081018;
@@ -5177,7 +5177,7 @@ html[data-theme="light"][data-skin="teferi"] {
   --color-poor: #dc2626;
 }
 
-/* Liliana â€” swamp / void */
+/* Liliana — swamp / void */
 html[data-skin="liliana"] {
   --color-ink-950: #0a0610;
   --color-ink-900: #100818;
@@ -5219,7 +5219,7 @@ html[data-theme="light"][data-skin="liliana"] {
   --color-poor: #be123c;
 }
 
-/* Ajani â€” leonin white / gold */
+/* Ajani — leonin white / gold */
 html[data-skin="ajani"] {
   --color-ink-950: #100e08;
   --color-ink-900: #16140c;
@@ -5261,7 +5261,7 @@ html[data-theme="light"][data-skin="ajani"] {
   --color-poor: #dc2626;
 }
 
-/* Elspeth â€” sun's champion / steel */
+/* Elspeth — sun's champion / steel */
 html[data-skin="elspeth"] {
   --color-ink-950: #0a0c10;
   --color-ink-900: #10141a;
@@ -5395,7 +5395,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
     var(--color-ink-950);
 }
 
-/* Planeswalker Themes â€” inline accordion inside sidebar (never floats over main) */
+/* Planeswalker Themes — inline accordion inside sidebar (never floats over main) */
 .pw-themes {
   display: flex;
   flex-direction: column-reverse; /* button at bottom; panel grows upward in footer */
@@ -5471,7 +5471,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   border-radius: 50%;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-foam) 15%, transparent);
 }
-/* Panel lives in the sidebar column only â€” no absolute positioning into main pane */
+/* Panel lives in the sidebar column only — no absolute positioning into main pane */
 .pw-themes-panel {
   width: 100%;
   max-width: 100%;

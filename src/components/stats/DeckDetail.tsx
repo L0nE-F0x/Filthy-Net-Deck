@@ -512,7 +512,7 @@ export function DeckDetail({
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            title="Tag and note opponents in Matchup Lab"
+            title="See your record against each archetype this deck has faced"
             onClick={() => setPage("matchups")}
           >
             Opponents
