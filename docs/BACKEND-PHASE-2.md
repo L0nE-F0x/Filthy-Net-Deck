@@ -266,6 +266,32 @@ counted.
 Rollups are negligible by comparison: bounded by archetype pairs (~60 × 60 × 2
 formats × 2 Bo) ≈ 15k rows, a few MB, permanent.
 
+### A launch-day spike (added 2026-08-12, before the v3.0.0 promotion)
+
+The table above models *steady-state sharers*. The other question — what a video
+or a launch post does on the day — is different, because a new account backfills
+its whole local history in one go.
+
+Assuming 500 signups in a day, each backfilling a history the size of the
+owner's (371 matches), then playing 12 ranked matches a day:
+
+| | |
+|---|---|
+| MAU consumed | **500 of 100,000** (0.5%) |
+| First-day rows | 185,500 → **65 MB** (0.8% of the 8 GB) |
+| Steady state if all 500 stay active | 6,000 rows/day → **0.25 GB** at 120-day retention (3.1%) |
+| Worst case, one abusive account against the 2,000/day cap | **84 MB** over the retention window |
+
+**Storage is not the launch risk.** It only bites somewhere around **16k
+continuously-active sharers**, which is far beyond the reach discussed in
+`PLATFORM-STRATEGY.md` §0. Two things are worth watching instead:
+
+1. **Auth provider limits, not database limits.** Email OTP is hidden precisely
+   because Supabase's built-in mailer would throttle first (§6); Google and
+   Discord signups are rate-limited by the providers, not by us.
+2. **Edge Function invocations** for the health ping — capped by construction at
+   one row per install per day, so it scales with installs rather than usage.
+
 **Conclusions under Pro:**
 1. Storage is **not** the near-term constraint it would be on free — there is
    headroom to roughly **5–8k active sharers** before it bites. Nothing here

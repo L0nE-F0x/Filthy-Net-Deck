@@ -34,10 +34,10 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | # | Item | Notes |
 |---|------|-------|
-| ✅ | **Full regression audit v2.7.3 → v2.8.2** | **9 findings, 2 of them P0** — `docs/AUDIT-2026-08-12-v3.0.0.md`. All fixed. ⚠️ **The SQL fixes need running on the live DB**: `supabase/migrations/20260812060000_rollup_null_fix_and_limits.sql` |
-| ⚠️ | **Performance pass** | Largely done — found the P0 splash re-render loop. Bundle + boot verified on a production build. **Not done:** RAM across the four webviews, which needs a real installed build |
+| ✅ | **Full regression audit v2.7.3 → v2.8.2** | **9 findings, 2 of them P0** — `docs/AUDIT-2026-08-12-v3.0.0.md`. All fixed, and `20260812060000` was run on the live DB by the owner 2026-08-12 (verified: the deck view no longer exposes `main`) |
+| ✅ | **Performance pass** | Found the P0 splash re-render loop. Bundle + boot verified on a production build; WebView2 RAM measured on the live install (~795 MB attributable, three renderers = main + overlay + presence with Arena running, which is correct) |
 | ✅ | **UI/UX polish** | Empty states verified across all nine pages; ~700 lines of dead Matchup-Lab-era code removed (incl. a share card branded with the retired product name); typography and tooltip fixes; `index.css` comment encoding repaired |
-| ⚠️ | **Launch readiness** | ✅ Status page + in-app incident banner shipped (§2.7 closed). ✅ §4 anti-abuse verified — two of six were missing and are now implemented. **Not done:** what a 500-signup day does to Supabase quotas |
+| ✅ | **Launch readiness** | Status page + in-app incident banner shipped (§2.7 closed). §4 anti-abuse verified — two of six were missing, now implemented. Launch-spike quota modelled in `BACKEND-PHASE-2.md` §5: a 500-signup day is 0.5% of MAU and 0.8% of the database; storage only bites near ~16k active sharers, so the constraint is auth providers, not Supabase |
 | ✅ | **Roll the macOS dmg** | v2.8.2's dmg rolled in and links fixed (macOS visitors had been served 2.8.1). A checklist line in `AGENTS.md` now guards against a repeat |
 | ✅ | **v3.0.0 release train** | Shipped. Signed installer (key id verified), updater manifest, site, OG, tag, macOS dmg rolled |
 | ✅ | **v3.0.1 / v3.0.2 — new-set cards** | The Hobbit shipped on Arena before Scryfall assigned its `arena_id`s, so every card showed as `Card #103529`. New `meta/arena-names.json` gap map + client fallback. **3.0.1** restored names (v3.0.0's installer predated the client half); **3.0.2** added mana value, colours and land-ness from Arena's own table, so the curve and pips are right too |

@@ -53,11 +53,43 @@ jobs:
           git add website/meta public/meta || true
           if git diff --staged --quiet; then
             echo "No set radar changes"
-          else
-            git commit -m "chore: set radar refresh $(date -u +%Y-%m-%dT%H:%M)"
-            git pull --rebase origin main
-            git push
+            exit 0
           fi
+          git commit -m "chore: set radar refresh $(date -u +%Y-%m-%dT%H:%M)"
+
+          # Rebase, and REBUILD rather than merge on conflict.
+          #
+          # Everything under meta/ is minified single-line JSON, so if a human
+          # push touched the same file this run did, git cannot auto-merge it
+          # and the rebase stops dead — the job then exits 1 and emails a
+          # failure while the radar quietly goes stale. That is exactly what
+          # happened on 2026-08-12: CI wrote arena-names.json in one shape while
+          # a release changed its shape, and the two one-line files collided.
+          #
+          # There is never anything to hand-merge here. This output is a pure
+          # function of the pipeline code and today's upstream data, so the
+          # correct resolution is always "throw mine away, take theirs, build
+          # again on top". Retried because the same race can recur.
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Rebase/push failed (attempt $attempt) — rebuilding on top of origin/main"
+            git rebase --abort 2>/dev/null || true
+            git reset --hard origin/main
+            git fetch origin main
+            git reset --hard origin/main
+            npm run sets || { echo "Rebuild failed"; exit 1; }
+            git add website/meta public/meta || true
+            if git diff --staged --quiet; then
+              echo "Nothing left to commit after rebuild — upstream already current"
+              exit 0
+            fi
+            git commit -m "chore: set radar refresh $(date -u +%Y-%m-%dT%H:%M)"
+          done
+          echo "Could not push after 3 attempts"
+          exit 1
 
       - name: Open/update failure issue when the sets build fails
         if: steps.build_sets.outcome == 'failure'
