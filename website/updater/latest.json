@@ -1,11 +1,11 @@
 {
-  "version": "3.0.0",
-  "notes": "v3.0.0: Snappier everywhere — a background loop was re-rendering the whole app every second, and it is gone. New status page and in-app heads-up when an Arena update breaks tracking. Every field the app can send is now published in full at filthy-net-deck.com/privacy.",
-  "pub_date": "2026-08-12T02:35:05Z",
+  "version": "3.0.1",
+  "notes": "v3.0.1: Brand-new set cards get their real names again — no more \"Card #103529\" while Scryfall catches up on a release.",
+  "pub_date": "2026-08-12T05:00:17Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJ6MU9FVHdUZ1FCSjRTK3FGZ21udUZpRmRZWFNjRnJkdVVBR1JQYUJiT3ZySll3UnBaMm1IYkJIakh2Q1dPQWM0RXVNM2RGbEgyaVArV0pMaVpmWGdnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTAyMDQ4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4wX3g2NC1zZXR1cC5leGUKeHpyRWNHOFJuajQzN01EY0hublJTRXN6UHVUaGt1alFBQUFRU1M1Z1ZnUUJzZUpDWVh3ZUU2M1ppSkxqWGpuVG9JclJjb0k1QlB2U2pYcFVoRmtQQVE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFDK2xvTjNKTXhpblJzY3lyMnQ5UUIxMDBaRUJCQkdPdGhmWm5QS210KzUzV1VvbzY3YUNyZyttQWUrK0tqd2cxRUFFZlBUcUxTZmJoUHEycUkzc3dJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTEwNzgwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4xX3g2NC1zZXR1cC5leGUKblUyOTYra0dsdTl5N3R6djVPRUs0R0RtUW9CRFZPWVpSay9ZOTIyNDVnc2h0K281L2Y5bmhCSXczSk9EZG5tTkhBUFRZMndrYjhEbzdJNWp0VVNlQ0E9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.1.exe"
     }
   }
 }
