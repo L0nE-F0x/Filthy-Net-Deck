@@ -23,8 +23,19 @@ import type { ManaColor } from "../types/meta";
 
 const GAP_PATH = "/meta/arena-names.json";
 
-/** Wire shape: n name, c cmc, i colour identity, m mana cost, l land. */
-type GapEntry = { n?: unknown; c?: unknown; i?: unknown; m?: unknown; l?: unknown };
+/**
+ * Wire shape: n name, c cmc, i colour identity, m mana cost, l land,
+ * s Scryfall id, t Scryfall type line.
+ */
+type GapEntry = {
+  n?: unknown;
+  c?: unknown;
+  i?: unknown;
+  m?: unknown;
+  l?: unknown;
+  s?: unknown;
+  t?: unknown;
+};
 
 /**
  * What Arena's own card table says about a card Scryfall cannot resolve: name,
@@ -35,11 +46,18 @@ type GapEntry = { n?: unknown; c?: unknown; i?: unknown; m?: unknown; l?: unknow
  * basic-land bug, where a Swamp in the game object resolved to an Island through
  * the card API.
  *
- * What is absent stays absent: no Scryfall id means no art and no oracle type
- * line, and inventing those would feed archetype inference values it cannot
- * stand behind. An omitted `cmc` stays `null` and an omitted colour identity
- * stays empty, so "Arena did not say" remains distinguishable from "colourless"
- * and cannot be read as evidence.
+ * `scryfallId` and `typeLine` come from Scryfall's own record for the card,
+ * which exists — the only thing Scryfall is missing is the `arena_id` link. The
+ * builder joins the two by name within a single set, so these are looked up,
+ * never invented. v3.0.1–v3.0.3 shipped without them on the reasoning that "no
+ * Scryfall id means no art"; the id was in the same response that proved the
+ * `arena_id` was absent, and discarding it is why the owner saw named cards
+ * with blank art and every one of them filed under "Other".
+ *
+ * What is still absent stays absent. Both fields are `null` when the join
+ * missed, an omitted `cmc` stays `null`, and an omitted colour identity stays
+ * empty — so "Arena did not say" remains distinguishable from "colourless" and
+ * cannot be read as evidence by archetype inference.
  */
 export type GapCard = {
   name: string;
@@ -47,6 +65,10 @@ export type GapCard = {
   colorIdentity: ManaColor[];
   manaCost: string | null;
   isLand: boolean;
+  /** Scryfall card id for art, or null when the name join missed. */
+  scryfallId: string | null;
+  /** Scryfall oracle type line, or null when the name join missed. */
+  typeLine: string | null;
 };
 
 let gapMap: Map<number, GapCard> | null = null;
@@ -56,7 +78,17 @@ export function parseGapEntry(v: unknown): GapCard | null {
   // Tolerates the v3.0.1 shape, which was a bare name string.
   if (typeof v === "string") {
     const name = v.trim();
-    return name ? { name, cmc: null, colorIdentity: [], manaCost: null, isLand: false } : null;
+    return name
+      ? {
+          name,
+          cmc: null,
+          colorIdentity: [],
+          manaCost: null,
+          isLand: false,
+          scryfallId: null,
+          typeLine: null,
+        }
+      : null;
   }
   if (!v || typeof v !== "object") return null;
   const e = v as GapEntry;
@@ -68,7 +100,17 @@ export function parseGapEntry(v: unknown): GapCard | null {
       ? ([...e.i].filter((c): c is ManaColor => /^[WUBRG]$/.test(c)) as ManaColor[])
       : [];
   const manaCost = typeof e.m === "string" && e.m.trim() ? e.m.trim() : null;
-  return { name, cmc, colorIdentity, manaCost, isLand: e.l === 1 || e.l === true };
+  const scryfallId = typeof e.s === "string" && e.s.trim() ? e.s.trim() : null;
+  const typeLine = typeof e.t === "string" && e.t.trim() ? e.t.trim() : null;
+  return {
+    name,
+    cmc,
+    colorIdentity,
+    manaCost,
+    isLand: e.l === 1 || e.l === true,
+    scryfallId,
+    typeLine,
+  };
 }
 
 /** The published gap map, fetched once per session and shared by both resolvers. */

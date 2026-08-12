@@ -41,8 +41,22 @@ function stubGap(map: Record<string, unknown>) {
 }
 
 const HOBBIT = {
-  "103482": { n: "The Misty Mountains Cold", c: 3, i: "R", m: "{2}{R}" },
-  "103489": { n: "Smaug the Magnificent", c: 4, i: "R", m: "{2}{R}{R}" },
+  "103482": {
+    n: "The Misty Mountains Cold",
+    c: 3,
+    i: "R",
+    m: "{2}{R}",
+    s: "3d5f35ff-4146-4844-9da5-031461cc8c05",
+    t: "Enchantment — Saga",
+  },
+  "103489": {
+    n: "Smaug the Magnificent",
+    c: 4,
+    i: "R",
+    m: "{2}{R}{R}",
+    s: "6a5d8fad-2ffd-4645-8c49-907999b6cecf",
+    t: "Legendary Creature — Dragon",
+  },
   "103565": { n: "Elven Passage", l: 1 },
 };
 
@@ -74,14 +88,29 @@ describe("resolveArenaCards — Scryfall cannot resolve the id", () => {
     expect(map[103565]?.cmc).toBeUndefined();
   });
 
-  it("claims nothing it cannot support", async () => {
-    // No Scryfall id means no art, and there is no oracle type line to give.
+  it("carries Scryfall's art id and type line when the map published them", async () => {
+    // The owner's 3.0.3 report: names arrived, art did not, and every card
+    // landed in "Other". Scryfall HAS these cards — only the arena_id link is
+    // missing — so the builder now publishes the id and type line it already
+    // had in hand, and the row renders like any other card.
     stubGap(HOBBIT);
     const m = await freshModule();
     const map = await m.resolveArenaCards([103482], { full: true });
-    expect(map[103482]?.scryfallId).toBeUndefined();
-    expect(map[103482]?.typeLine).toBeUndefined();
+    expect(map[103482]?.scryfallId).toBe("3d5f35ff-4146-4844-9da5-031461cc8c05");
+    expect(map[103482]?.typeLine).toBe("Enchantment — Saga");
     expect(map[103482]?.partial).toBe(true);
+  });
+
+  it("still claims nothing when the map has no Scryfall record", async () => {
+    // Tokens never join (they live in their own set), so absent must stay
+    // absent rather than becoming an empty string that renders a broken image.
+    stubGap(HOBBIT);
+    const m = await freshModule();
+    const map = await m.resolveArenaCards([103565], { full: true });
+    expect(map[103565]?.name).toBe("Elven Passage");
+    expect(map[103565]?.scryfallId).toBeUndefined();
+    expect(map[103565]?.typeLine).toBeUndefined();
+    expect(map[103565]?.partial).toBe(true);
   });
 
   it("never writes a gap entry to the disk cache", async () => {

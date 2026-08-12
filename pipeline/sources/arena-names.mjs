@@ -167,13 +167,37 @@ export function recentSetCodes(scryfallSets, now = Date.now()) {
 }
 
 /**
- * grpIds Scryfall already knows, for one set. Returns null when the set could
- * not be read at all, so the caller can tell "no arena ids" from "no answer" —
- * treating a failed fetch as "Scryfall knows nothing" would publish the whole
- * set as a gap.
+ * Join key for matching an Arena card name to a Scryfall one.
+ *
+ * Arena's localisation table names a double-faced card by its front face
+ * ("Bilbo, Retired Burglar"); Scryfall names it with both ("Bilbo, Retired
+ * Burglar // Bilbo, Birthday Celebrant"). Keying on the front face makes those
+ * two agree, and both sides are indexed so a lookup succeeds either way.
+ */
+export function nameKey(name) {
+  return String(name || "")
+    .split("//")[0]
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * What Scryfall knows about one set: the grpIds it has already claimed, and an
+ * index from card name to its Scryfall identity.
+ *
+ * Returns null when the set could not be read at all, so the caller can tell
+ * "no arena ids" from "no answer" — treating a failed fetch as "Scryfall knows
+ * nothing" would publish the whole set as a gap.
+ *
+ * The `byName` index is the whole reason a gap card can have art. Scryfall HAS
+ * these cards — it just has not linked them to an `arena_id` yet — so the very
+ * search that proves an id is missing also carries that card's `id` and
+ * `type_line`. v3.0.1–v3.0.3 threw both away and concluded "no Scryfall id
+ * means no art"; the id was in the response all along.
  */
 export async function scryfallArenaIdsForSet(code, tries) {
   const ids = new Set();
+  const byName = new Map();
   let url = `${SCRYFALL}/cards/search?q=${encodeURIComponent(`set:${code} game:arena`)}&unique=prints`;
   let pages = 0;
   while (url && pages++ < 10) {
@@ -181,19 +205,45 @@ export async function scryfallArenaIdsForSet(code, tries) {
     if (!res.ok) return null; // no answer — caller must skip this set
     // A 404 means the search matched nothing: Scryfall genuinely has no
     // Arena-legal cards in this set. That is an empty answer, not a failure.
-    if (res.data === null) return ids;
+    if (res.data === null) return { ids, byName };
     for (const c of res.data.data || []) {
       if (typeof c?.arena_id === "number") ids.add(c.arena_id);
+      if (typeof c?.id !== "string" || !c.id) continue;
+      // First printing wins. `unique=prints` returns showcase / borderless /
+      // promo variants of the same card too, and any of them would render, but
+      // pinning the first keeps the published id stable from run to run instead
+      // of flipping art whenever Scryfall reorders a page.
+      const whole = c.type_line || c.card_faces?.[0]?.type_line || "";
+      // Index the whole card under its own name, then each face under its own —
+      // Arena gives an Adventure or a DFC back face its own grpId, and that
+      // grpId's type line is the FACE's, not the combined one. Sharing the
+      // combined string would file "Burglar's Plot" (a Sorcery — Adventure) as
+      // a Creature, because the combined line names both.
+      // Faces first, whole card last. First-wins, and the whole card's name
+      // keys on its front face too ("A // B" → "a"), so indexing it first would
+      // let the combined type line beat the front face's own.
+      const faces = [
+        ...(c.card_faces || []).map((f) => ({
+          name: f?.name,
+          typeLine: f?.type_line || whole,
+        })),
+        { name: c.name, typeLine: whole },
+      ];
+      for (const f of faces) {
+        const key = nameKey(f.name);
+        if (key && !byName.has(key)) byName.set(key, { id: c.id, typeLine: f.typeLine });
+      }
     }
     url = res.data.has_more ? res.data.next_page : null;
     if (url) await new Promise((r) => setTimeout(r, 120));
   }
-  return ids;
+  return { ids, byName };
 }
 
 /**
- * Build `{ [grpId]: { n, c?, i?, l? } }` for Arena cards Scryfall cannot
- * resolve — name, converted mana cost, colour identity, and land-ness.
+ * Build `{ [grpId]: { n, c?, i?, m?, l?, s?, t? } }` for Arena cards Scryfall
+ * cannot resolve — name, converted mana cost, colour identity, land-ness, and
+ * (when the name joins) Scryfall's own card id and type line for art.
  *
  * Self-contained: fetches its own `/sets` list rather than taking one, because
  * the sets bundle does not carry the raw Scryfall payload. Costs one list
@@ -259,13 +309,15 @@ export async function buildArenaNameGap(opts = {}) {
   // positively resolves that grpId. A skipped set is a no-op.
   const gap = { ...(opts.previous ?? {}) };
   let skipped = 0;
+  let arted = 0;
   for (const [code, rows] of bySet) {
-    const known = await scryfallArenaIdsForSet(code, tries);
-    if (known === null) {
+    const found = await scryfallArenaIdsForSet(code, tries);
+    if (found === null) {
       skipped++;
       log(`  arena-names: ${code} unreadable on Scryfall — keeping existing entries`);
       continue;
     }
+    const { ids: known, byName } = found;
     // This set was read, so entries for it can be pruned once Scryfall knows
     // them. That is what makes the map self-healing rather than ever-growing.
     for (const c of rows) {
@@ -281,6 +333,7 @@ export async function buildArenaNameGap(opts = {}) {
       // Compact on purpose — this is fetched by every client that meets an
       // unresolvable card, and it is one entry per card in a whole set.
       //   n = name, c = cmc, i = colour identity, m = mana cost, l = is a land
+      //   s = Scryfall id, t = Scryfall type line
       // `c` and `i` are omitted when Arena does not state them, so the client
       // can tell "colourless" from "unknown" — the distinction that keeps an
       // unresolved card from pushing an archetype guess.
@@ -291,6 +344,17 @@ export async function buildArenaNameGap(opts = {}) {
       const mc = manaCostFromArena(c.castingcost);
       if (mc) entry.m = mc;
       if (Array.isArray(c.types) && c.types.includes(TYPE_LAND)) entry.l = 1;
+      // Scryfall's own record for this card, matched by name within this one
+      // set. Missing `arena_id` is the only thing Scryfall lacks — it has the
+      // art and the oracle type line, which is what turns a named-but-blank row
+      // into a real card. Only set when the join actually hit; a miss leaves
+      // both absent exactly as before.
+      const sf = byName.get(nameKey(name));
+      if (sf) {
+        entry.s = sf.id;
+        if (sf.typeLine) entry.t = sf.typeLine;
+        arted++;
+      }
       gap[String(grp)] = entry;
       added++;
     }
@@ -299,6 +363,7 @@ export async function buildArenaNameGap(opts = {}) {
     // sets back to back is what tripped Scryfall's limiter on 2026-08-12.
     await new Promise((r) => setTimeout(r, 400));
   }
+  if (arted) log(`  arena-names: ${arted} entries carry Scryfall art + type line`);
   if (skipped) {
     log(
       `  arena-names: ${skipped} set(s) unreadable this run — their existing ` +

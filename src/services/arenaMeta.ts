@@ -134,18 +134,26 @@ function fromScryfall(data: ScryfallArenaCard): ArenaCardMeta | null {
  * What Arena itself says about a card Scryfall cannot resolve (see
  * `arenaNameGap`), shaped as an `ArenaCardMeta`.
  *
- * What is absent stays absent: no `scryfallId` means no art, and `typeLine` is
- * left empty rather than reconstructed.
+ * The gap map now carries Scryfall's own id and type line for these cards when
+ * the builder could join them by name — Scryfall has the card, it is only the
+ * `arena_id` link that is missing — so art and the oracle type line come
+ * through. What the join could not supply stays absent: `typeLine` falls back
+ * to empty and `artUrl` to null rather than being reconstructed.
+ *
+ * `isLand` still prefers Arena's own flag. Arena's card table is authoritative
+ * about the id the log actually emitted, and it is populated even when the name
+ * join misses.
  */
 async function nameOnlyFallback(grpId: number): Promise<ArenaCardMeta | null> {
   const card = await gapCard(grpId);
   if (!card) return null;
+  const scryfallId = card.scryfallId ?? "";
   return {
     name: card.name,
-    typeLine: "",
-    isLand: card.isLand,
-    scryfallId: "",
-    artUrl: null,
+    typeLine: card.typeLine ?? "",
+    isLand: card.isLand || (card.typeLine ? isLandType(card.typeLine) : false),
+    scryfallId,
+    artUrl: scryfallId ? scryfallCdnUrl(scryfallId, "art_crop") : null,
     cmc: card.cmc,
     manaCost: card.manaCost,
     colorIdentity: card.colorIdentity,

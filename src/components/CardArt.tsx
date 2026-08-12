@@ -110,7 +110,12 @@ export const CardArtStrip = memo(function CardArtStrip({
     <div className="card-art-strip">
       {shown.map((c, i) => (
         <div
-          key={c.scryfallId ?? `${c.name}-${i}`}
+          // Index-qualified: a Scryfall id is NOT unique within a strip. The two
+          // halves of an Adventure or a DFC are separate Arena grpIds that
+          // resolve to one Scryfall record, so keying on the id alone made React
+          // drop one of them ("two children with the same key"). Positional keys
+          // are safe here — the strip is a fixed slice that is never reordered.
+          key={`${c.scryfallId ?? c.name}-${i}`}
           className="card-art-strip-item"
           style={{ zIndex: max - i }}
         >

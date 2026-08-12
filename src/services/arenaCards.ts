@@ -210,6 +210,10 @@ export async function resolveArenaCards(
       manaCost: card.manaCost ?? undefined,
       cmc: card.cmc ?? undefined,
       isLand: card.isLand,
+      // Present whenever the builder's name join hit, which is what gives the
+      // row its art and puts it in the right type group instead of "Other".
+      scryfallId: card.scryfallId ?? undefined,
+      typeLine: card.typeLine ?? undefined,
       partial: true,
     };
   }

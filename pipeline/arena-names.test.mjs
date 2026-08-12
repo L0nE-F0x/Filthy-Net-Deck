@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildArenaNameGap, colorsFromIds, manaCostFromArena, recentSetCodes } from "./sources/arena-names.mjs";
+import {
+  buildArenaNameGap,
+  colorsFromIds,
+  manaCostFromArena,
+  nameKey,
+  recentSetCodes,
+  scryfallArenaIdsForSet,
+} from "./sources/arena-names.mjs";
 
 describe("colorsFromIds", () => {
   it("maps Arena's colour enum, verified against the five basics", () => {
@@ -91,6 +98,129 @@ describe("manaCostFromArena", () => {
     expect(manaCostFromArena("")).toBeNull();
     expect(manaCostFromArena(undefined)).toBeNull();
     expect(manaCostFromArena(42)).toBeNull();
+  });
+});
+
+describe("nameKey — joining Arena's names to Scryfall's", () => {
+  it("keys a double-faced card on its front face", () => {
+    // Arena's loc table names only the front face; Scryfall names both. Without
+    // this the join misses every DFC in a new set and they lose their art.
+    expect(nameKey("Bilbo, Retired Burglar // Bilbo, Birthday Celebrant")).toBe(
+      "bilbo, retired burglar",
+    );
+    expect(nameKey("Bilbo, Retired Burglar")).toBe("bilbo, retired burglar");
+  });
+
+  it("is case- and whitespace-insensitive", () => {
+    expect(nameKey("  SMAUG the Magnificent ")).toBe("smaug the magnificent");
+  });
+
+  it("returns empty for junk rather than throwing", () => {
+    expect(nameKey(null)).toBe("");
+    expect(nameKey(undefined)).toBe("");
+    expect(nameKey("")).toBe("");
+  });
+});
+
+describe("scryfallArenaIdsForSet — the id index that gives a gap card its art", () => {
+  function mockSearch(cards) {
+    return vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: cards, has_more: false }),
+      }),
+    );
+  }
+
+  it("indexes Scryfall's id and type line for cards with no arena_id", async () => {
+    // The whole point: the response that PROVES the arena_id is missing also
+    // carries the id and type line. v3.0.1–v3.0.3 discarded both.
+    const spy = mockSearch([
+      {
+        id: "ed87b471-79f9-45ec-9188-69e970f6121e",
+        name: "The Sackville-Bagginses",
+        type_line: "Legendary Creature — Halfling Citizen",
+        arena_id: null,
+      },
+    ]);
+    const { ids, byName } = await scryfallArenaIdsForSet("hob", 1);
+    expect(ids.size).toBe(0);
+    expect(byName.get("the sackville-bagginses")).toEqual({
+      id: "ed87b471-79f9-45ec-9188-69e970f6121e",
+      typeLine: "Legendary Creature — Halfling Citizen",
+    });
+    spy.mockRestore();
+  });
+
+  it("still collects arena_ids, so a resolved card is still pruned", async () => {
+    const spy = mockSearch([{ id: "abc", name: "Known Card", arena_id: 12345 }]);
+    const { ids } = await scryfallArenaIdsForSet("hob", 1);
+    expect(ids.has(12345)).toBe(true);
+    spy.mockRestore();
+  });
+
+  it("indexes both faces of a DFC so either name joins", async () => {
+    const spy = mockSearch([
+      {
+        id: "dfc-1",
+        name: "Front Face // Back Face",
+        card_faces: [
+          { name: "Front Face", type_line: "Creature — Halfling" },
+          { name: "Back Face", type_line: "Creature — Halfling" },
+        ],
+      },
+    ]);
+    const { byName } = await scryfallArenaIdsForSet("hob", 1);
+    expect(byName.get("front face").id).toBe("dfc-1");
+    expect(byName.get("back face").id).toBe("dfc-1");
+    // The combined name keys on its front face, same as Arena's.
+    expect(byName.get("front face").typeLine).toBe("Creature — Halfling");
+    spy.mockRestore();
+  });
+
+  it("gives an Adventure half its own type line, not the combined one", async () => {
+    // Arena gives the Adventure its own grpId. The combined line names both
+    // halves, so sharing it would file a Sorcery — Adventure under Creatures.
+    const spy = mockSearch([
+      {
+        id: "adv-1",
+        name: "Bilbo, Luckwearer // Burglar's Plot",
+        type_line: "Legendary Creature — Halfling Rogue // Sorcery — Adventure",
+        card_faces: [
+          { name: "Bilbo, Luckwearer", type_line: "Legendary Creature — Halfling Rogue" },
+          { name: "Burglar's Plot", type_line: "Sorcery — Adventure" },
+        ],
+      },
+    ]);
+    const { byName } = await scryfallArenaIdsForSet("hob", 1);
+    expect(byName.get("burglar's plot")).toEqual({
+      id: "adv-1",
+      typeLine: "Sorcery — Adventure",
+    });
+    // Both halves still point at the one Scryfall record, so both get art.
+    expect(byName.get("bilbo, luckwearer").id).toBe("adv-1");
+    expect(byName.get("bilbo, luckwearer").typeLine).toBe(
+      "Legendary Creature — Halfling Rogue",
+    );
+    spy.mockRestore();
+  });
+
+  it("pins the first printing so published art does not flip between runs", async () => {
+    const spy = mockSearch([
+      { id: "base", name: "Smaug the Magnificent", type_line: "Legendary Creature — Dragon" },
+      { id: "showcase", name: "Smaug the Magnificent", type_line: "Legendary Creature — Dragon" },
+    ]);
+    const { byName } = await scryfallArenaIdsForSet("hob", 1);
+    expect(byName.get("smaug the magnificent").id).toBe("base");
+    spy.mockRestore();
+  });
+
+  it("still returns null when the set could not be read at all", async () => {
+    // Load-bearing: a network failure must not read as "Scryfall knows nothing
+    // here", which would publish the whole set as a gap.
+    const spy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
+    expect(await scryfallArenaIdsForSet("hob", 1)).toBeNull();
+    spy.mockRestore();
   });
 });
 
