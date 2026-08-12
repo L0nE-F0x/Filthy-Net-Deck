@@ -5,6 +5,7 @@ import {
   cmcFromManaCost,
   colorGroupName,
   colorsFromManaCost,
+  buildCardDocumentFrequency,
   confidenceFromHits,
   formatGuessLabel,
   inferOpponentArchetype,
@@ -563,5 +564,60 @@ describe("macro fallback (off-meta opponents)", () => {
       { ...opts, macroFallback: false },
     );
     expect(guess).toBeNull();
+  });
+});
+
+describe("field-invariant work is computed once, not once per match", () => {
+  // A CPU profile of the real v3.0.3 build, attached over CDP with 503 real
+  // matches loaded, found `deckCardPool` burning 4.19s of main thread across
+  // six panel switches — because `personalRecords` walks every match, every
+  // match calls `inferOpponentArchetype`, and that rebuilt the pools for the
+  // whole candidate field each time. These assert the caches that fixed it.
+  const field = [
+    deck("d1", "Mono Red", [
+      { name: "Monastery Swiftspear" },
+      { name: "Lightning Strike" },
+      { name: "Mountain", land: true },
+    ]),
+    deck("d2", "Azorius Control", [
+      { name: "Wrath of the Skies" },
+      { name: "Island", land: true },
+      { name: "Plains", land: true },
+    ]),
+  ];
+
+  it("returns the identical document-frequency map for the same field", () => {
+    const a = buildCardDocumentFrequency(field);
+    const b = buildCardDocumentFrequency(field);
+    expect(b).toBe(a);
+  });
+
+  it("computes a fresh map for a different field", () => {
+    // The cache is keyed on identity, so a new candidate array must not reuse
+    // another field's answer — that would silently freeze the metagame.
+    const other = [deck("d3", "Golgari Midrange", [{ name: "Llanowar Elves" }])];
+    const a = buildCardDocumentFrequency(field);
+    const c = buildCardDocumentFrequency(other);
+    expect(c).not.toBe(a);
+    expect(c.has(normalizeCardName("Llanowar Elves"))).toBe(true);
+    expect(c.has(normalizeCardName("Monastery Swiftspear"))).toBe(false);
+  });
+
+  it("counts each deck once, and excludes lands", () => {
+    // Correctness of the cached value itself, not just its identity.
+    const df = buildCardDocumentFrequency(field);
+    expect(df.get(normalizeCardName("Monastery Swiftspear"))).toBe(1);
+    expect(df.get(normalizeCardName("Mountain"))).toBeUndefined();
+    expect(df.get(normalizeCardName("Island"))).toBeUndefined();
+  });
+
+  it("gives a repeated inference the same answer as a first one", () => {
+    // The caches must not change what the app concludes — only how long it
+    // takes. Same call twice, same guess.
+    const seen = { 1: "Monastery Swiftspear", 2: "Lightning Strike" } as Record<number, string>;
+    const opts = { minHits: 1, minConfidence: 0, minMargin: 0 };
+    const first = inferOpponentArchetype([1, 2], (id) => seen[id] ?? null, field, opts);
+    const second = inferOpponentArchetype([1, 2], (id) => seen[id] ?? null, field, opts);
+    expect(second).toEqual(first);
   });
 });
