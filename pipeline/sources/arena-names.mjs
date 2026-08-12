@@ -39,16 +39,26 @@
  * `cmc`, `colorIdentity` and `types` are omitted rather than guessed when Arena
  * does not state them, so "unknown" stays distinguishable from "colourless".
  *
- * ## Why this is self-healing
+ * ## Self-healing, but only ever additively
  *
- * Only grpIds Scryfall **cannot** resolve are emitted, checked per set against
- * live Scryfall data on every run. The moment Scryfall assigns arena_ids the
- * entries disappear, and the file shrinks back to `{}` on its own. Nobody has
- * to remember to remove anything — the same discipline as `freshSpoilers`.
+ * The previously published map is merged, never replaced. An entry is dropped
+ * only when a set was **read successfully** and Scryfall positively resolves
+ * that grpId — so the file still shrinks to `{}` on its own once Scryfall
+ * catches up, the same discipline as `freshSpoilers`, without a bad run being
+ * able to take names away.
  *
- * Fail-soft: any network problem yields an empty map and the caller keeps the
- * previously published file. This is a fallback for a fallback; it must never
- * be able to fail a build.
+ * That distinction was learned the hard way. The first cut rebuilt the map from
+ * scratch each run, and on 2026-08-12 Scryfall rate-limited the job after six
+ * of ten sets: the other four came back unreadable, were skipped, and the
+ * shrunken result was written over the good file — **deleting 573 working card
+ * names, including every Hobbit card the feature existed for.** A guard against
+ * writing a *totally* empty map did not help, because the map was not empty,
+ * just wrong. Partial failure is the common case with a rate limiter, so it is
+ * the case that has to be safe.
+ *
+ * Fail-soft throughout: any network problem returns the previous map unchanged.
+ * This is a fallback for a fallback; it must never fail a build, and it must
+ * never regress one either.
  */
 
 const MTGAJSON = "https://mtgajson.untapped.gg/v1/latest";
@@ -114,7 +124,7 @@ const RECENT_DAYS = 180;
  * make an outage look like "Scryfall knows no arena ids for this set" and
  * publish the entire set as a gap.
  */
-async function getJson(url, { tries = 3 } = {}) {
+async function getJson(url, { tries = 4 } = {}) {
   for (let i = 0; i < tries; i++) {
     try {
       const res = await fetch(url, {
@@ -122,10 +132,21 @@ async function getJson(url, { tries = 3 } = {}) {
       });
       if (res.ok) return { ok: true, data: await res.json() };
       if (res.status === 404) return { ok: true, data: null };
+      // 429/503: back off properly and honour Retry-After. The first cut
+      // retried after 250ms, which is no wait at all to a rate limiter, so a
+      // throttled run burned all its attempts in under a second and reported
+      // the set as unreadable.
+      if (res.status === 429 || res.status >= 500) {
+        const ra = Number(res.headers.get("retry-after"));
+        const wait = Number.isFinite(ra) && ra > 0 ? ra * 1000 : 2000 * 2 ** i;
+        await new Promise((r) => setTimeout(r, Math.min(wait, 30_000)));
+        continue;
+      }
+      return { ok: false };
     } catch {
-      /* retry */
+      /* network — retry below */
     }
-    await new Promise((r) => setTimeout(r, 250 * (i + 1)));
+    await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
   }
   return { ok: false };
 }
@@ -151,12 +172,12 @@ export function recentSetCodes(scryfallSets, now = Date.now()) {
  * treating a failed fetch as "Scryfall knows nothing" would publish the whole
  * set as a gap.
  */
-export async function scryfallArenaIdsForSet(code) {
+export async function scryfallArenaIdsForSet(code, tries) {
   const ids = new Set();
   let url = `${SCRYFALL}/cards/search?q=${encodeURIComponent(`set:${code} game:arena`)}&unique=prints`;
   let pages = 0;
   while (url && pages++ < 10) {
-    const res = await getJson(url);
+    const res = await getJson(url, tries ? { tries } : undefined);
     if (!res.ok) return null; // no answer — caller must skip this set
     // A 404 means the search matched nothing: Scryfall genuinely has no
     // Arena-legal cards in this set. That is an empty answer, not a failure.
@@ -182,24 +203,30 @@ export async function scryfallArenaIdsForSet(code) {
  */
 export async function buildArenaNameGap(opts = {}) {
   const log = opts.log ?? (() => {});
+  // Every bail-out returns what was already published, never `{}`. Losing an
+  // upstream source is not evidence that a card became resolvable.
+  const previous = opts.previous ?? {};
+  // Tests set this to 1 so the real backoff (up to ~10s) is not waited out.
+  const tries = opts.tries;
+  const fetchOpts = tries ? { tries } : undefined;
   let scryfallSets = opts.sets;
   if (!scryfallSets) {
-    const res = await getJson(`${SCRYFALL}/sets`);
+    const res = await getJson(`${SCRYFALL}/sets`, fetchOpts);
     scryfallSets = res.ok && res.data ? res.data.data : null;
     if (!Array.isArray(scryfallSets)) {
-      log("  arena-names: Scryfall set list unavailable — publishing nothing");
-      return {};
+      log("  arena-names: Scryfall set list unavailable — keeping existing map");
+      return { ...previous };
     }
   }
   const [cardsRes, locRes] = await Promise.all([
-    getJson(`${MTGAJSON}/cards.json`),
-    getJson(`${MTGAJSON}/loc_en.json`),
+    getJson(`${MTGAJSON}/cards.json`, fetchOpts),
+    getJson(`${MTGAJSON}/loc_en.json`, fetchOpts),
   ]);
   const cards = cardsRes.ok ? cardsRes.data : null;
   const loc = locRes.ok ? locRes.data : null;
   if (!Array.isArray(cards) || !Array.isArray(loc)) {
-    log("  arena-names: mtgajson unavailable — publishing nothing");
-    return {};
+    log("  arena-names: mtgajson unavailable — keeping existing map");
+    return { ...previous };
   }
 
   const nameByTitle = new Map();
@@ -218,12 +245,32 @@ export async function buildArenaNameGap(opts = {}) {
     bySet.get(code).push(c);
   }
 
-  const gap = {};
+  // Start from what is already published and ADD to it.
+  //
+  // Replacing wholesale was actively harmful. On 2026-08-12 Scryfall
+  // rate-limited the run after six sets; the remaining four came back
+  // unreadable, were skipped, and the shrunken map was written over the good
+  // one — deleting 573 working card names, including every Hobbit card the
+  // feature had been built for. A partial upstream failure must never be able
+  // to take names away from users, and "empty result, keep the old file" only
+  // guarded the total-failure case.
+  //
+  // An entry is now removed only when a set was read successfully AND Scryfall
+  // positively resolves that grpId. A skipped set is a no-op.
+  const gap = { ...(opts.previous ?? {}) };
+  let skipped = 0;
   for (const [code, rows] of bySet) {
-    const known = await scryfallArenaIdsForSet(code);
+    const known = await scryfallArenaIdsForSet(code, tries);
     if (known === null) {
-      log(`  arena-names: ${code} unreadable on Scryfall — skipped`);
+      skipped++;
+      log(`  arena-names: ${code} unreadable on Scryfall — keeping existing entries`);
       continue;
+    }
+    // This set was read, so entries for it can be pruned once Scryfall knows
+    // them. That is what makes the map self-healing rather than ever-growing.
+    for (const c of rows) {
+      const grp = Number(c?.grpid);
+      if (Number.isFinite(grp) && known.has(grp)) delete gap[String(grp)];
     }
     let added = 0;
     for (const c of rows) {
@@ -248,6 +295,15 @@ export async function buildArenaNameGap(opts = {}) {
       added++;
     }
     if (added) log(`  arena-names: +${added} from ${code} (Scryfall has no arena_id yet)`);
+    // Breathe between sets. Each set is several paginated searches, and ten
+    // sets back to back is what tripped Scryfall's limiter on 2026-08-12.
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  if (skipped) {
+    log(
+      `  arena-names: ${skipped} set(s) unreadable this run — their existing ` +
+        `entries were kept rather than dropped`,
+    );
   }
   return gap;
 }

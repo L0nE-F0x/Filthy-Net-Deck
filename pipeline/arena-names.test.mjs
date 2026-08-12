@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { colorsFromIds, manaCostFromArena, recentSetCodes } from "./sources/arena-names.mjs";
+import { describe, expect, it, vi } from "vitest";
+import { buildArenaNameGap, colorsFromIds, manaCostFromArena, recentSetCodes } from "./sources/arena-names.mjs";
 
 describe("colorsFromIds", () => {
   it("maps Arena's colour enum, verified against the five basics", () => {
@@ -91,5 +91,41 @@ describe("manaCostFromArena", () => {
     expect(manaCostFromArena("")).toBeNull();
     expect(manaCostFromArena(undefined)).toBeNull();
     expect(manaCostFromArena(42)).toBeNull();
+  });
+});
+
+describe("buildArenaNameGap — a partial upstream failure must not delete entries", () => {
+  const previous = {
+    "103529": { n: "Bolg's Company", c: 2, i: "BR" },
+    "103538": { n: "The Great Goblin", c: 3, i: "BR" },
+  };
+
+  it("keeps the existing map when the Scryfall set list is unavailable", async () => {
+    // The regression: on 2026-08-12 a rate-limited run wrote a shrunken map
+    // over the good one and deleted 573 working card names.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("429"));
+    const out = await buildArenaNameGap({ previous, tries: 1 });
+    expect(out).toEqual(previous);
+    fetchSpy.mockRestore();
+  });
+
+  it("keeps the existing map when mtgajson is unreachable", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      if (url.endsWith("/sets")) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) });
+      }
+      return Promise.reject(new Error("down"));
+    });
+    const out = await buildArenaNameGap({ previous, sets: [], tries: 1 });
+    expect(out).toEqual(previous);
+    fetchSpy.mockRestore();
+  });
+
+  it("never returns fewer entries than it was given when nothing could be read", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
+    const out = await buildArenaNameGap({ previous, sets: [{ code: "hob" }], tries: 1 });
+    expect(Object.keys(out).length).toBeGreaterThanOrEqual(Object.keys(previous).length);
+    fetchSpy.mockRestore();
   });
 });

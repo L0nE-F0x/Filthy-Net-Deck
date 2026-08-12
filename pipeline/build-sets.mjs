@@ -8,7 +8,7 @@
  * Safe to run independently of the deck meta pipeline.
  */
 
-import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync, existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSetsBundle } from "./sources/sets.mjs";
@@ -56,14 +56,29 @@ async function main() {
   );
 
   // Names for Arena cards Scryfall cannot resolve yet (see arena-names.mjs).
-  // Written only when non-empty: an empty result is far more likely to mean
-  // "mtgajson was unreachable" than "Scryfall caught up on every set at once",
-  // and overwriting a good map with {} would silently reopen the very gap this
-  // closes. A genuinely-caught-up map is pruned by the next successful run that
-  // *does* return entries, or by hand.
+  //
+  // The previously published map is passed in and merged, NOT replaced. A run
+  // that cannot read some sets — Scryfall rate-limited this job on 2026-08-12
+  // after six of ten — must keep the entries it could not re-verify. Without
+  // that, a throttled run silently deleted 573 working card names.
+  //
+  // Still only written when non-empty, so a total upstream failure leaves the
+  // file alone as well.
   try {
-    const gap = await buildArenaNameGap({ log: (m) => console.log(m) });
+    let previous = {};
+    try {
+      previous = JSON.parse(
+        readFileSync(join(root, "website", "meta", "arena-names.json"), "utf8"),
+      );
+    } catch {
+      /* first run, or unreadable — start from nothing */
+    }
+    const before = Object.keys(previous).length;
+    const gap = await buildArenaNameGap({ previous, log: (m) => console.log(m) });
     const n = Object.keys(gap).length;
+    if (n < before) {
+      console.log(`  arena-names: ${before - n} entries pruned (Scryfall resolves them now)`);
+    }
     if (n) {
       const json = JSON.stringify(gap);
       for (const dir of [join(root, "website", "meta"), join(root, "public", "meta")]) {
