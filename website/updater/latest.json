@@ -1,11 +1,11 @@
 {
-  "version": "3.0.3",
-  "notes": "v3.0.3: Brand-new set cards are named on every screen now. My Stats and Brew Lab were still showing them as card numbers while the overlay had their names all along.",
-  "pub_date": "2026-08-12T08:39:14Z",
+  "version": "3.1.0",
+  "notes": "v3.1.0: Switching pages is fast again — the app was rebuilding the entire metagame on every single click. Brand-new set cards also get their art and land in the right type group now, instead of a blank box under \"Other\".",
+  "pub_date": "2026-08-12T10:41:27Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFnUUhNK25zSTJFbjhQcktHUkNMVlE3d240ZGhyUW03cE54azJZMXljYXFJOGJRQ1llaFdrQTNhRm5neUpUTHdTNU9pQ0YxNFVnY3hqY0ZaMFdjNUE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTIzOTE4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4zX3g2NC1zZXR1cC5leGUKaktJS0tkSEl1ME43UG5oVDFCTHZzL3JYZGpHb2RzZkR3cWVWRDd0WTlwdWZTL0dsc01EeDB0SURYMCtMUDNPTi9oeFY2aVY4UWRZWktCbHdYbmZqQkE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9BNFlHYTI1MzdoNlZTaWlLdFRPcU4ybzIzRDJ2OWpTNmQ2Z0hSaytiS0FzYUNNMHM3OGtIZ1hCSkdqWWZBQ3lBSnNVZnhubjdXeDlJb1VBTXNlVXdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTMxMjUxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4wX3g2NC1zZXR1cC5leGUKRUIzNGcrR0VxT3ZnYzZRNDh6QWJaNEpHRUtTVkdFdVlwRDF0Vzk0T2NRRmIzYmFqSGF3WTRTcGl4QWVZV29lL2ZMeEpPVHBtQ0NwcnBveEFBbFM2RHc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.0.exe"
     }
   }
 }
