@@ -37,6 +37,22 @@ pub fn find_deep_link(args: &[String]) -> Option<String> {
 ///
 /// The payload is passed through untouched: parsing OAuth params is the
 /// frontend's job, and Rust has no business handling a token it does not need.
+///
+/// This broadcasts rather than targeting `main`, and that is a **deliberate
+/// non-change** (v3.0.0 audit). The URL carries a live OAuth authorization
+/// code, and `app.emit` hands it to all four webviews when only `App.tsx` in
+/// `main` listens — so `emit_to("main", …)` looks strictly tighter.
+///
+/// It was tried and reverted. All four webviews are the same origin in the
+/// same process, so no privilege boundary is being crossed and the "leak" is
+/// to first-party code that ignores it — the benefit is close to zero. Against
+/// that, `emit_to`'s `EventTarget` matching could not be verified here without
+/// a real OAuth round trip (the URI scheme is registered by NSIS, so
+/// `tauri:dev` cannot exercise the cold-start route at all — see the module
+/// docs). Trading an unverifiable risk to the sign-in path for a cosmetic
+/// tightening is a bad deal, particularly right before a launch.
+///
+/// Worth doing later, behind a real end-to-end test in an installed build.
 pub fn handle_url(app: &AppHandle, url: &str) {
     if !url.to_ascii_lowercase().starts_with(SCHEME) {
         return;

@@ -4,7 +4,9 @@ import { APP_VERSION } from "../version";
 const TIPS = [
   "Pulling today’s ranked lists…",
   "Double-checking every card…",
-  "Warming up Matchup Lab…",
+  // "Warming up Matchup Lab…" until v3.0.0 — Matchup Lab was replaced by
+  // Matchups in v2.7.6 and the splash went on advertising it for four releases.
+  "Reading your matchups…",
   "Tailing Arena for your winrate…",
   "Netdeck dirty. Climb clean.",
 ];
@@ -40,12 +42,39 @@ export function SplashScreen({
     return () => window.clearInterval(t);
   }, [gone]);
 
+  // Start the fade once boot is done and the minimum has elapsed.
   useEffect(() => {
-    if (!ready || !minElapsed || fadeOut || gone) return;
+    if (!ready || !minElapsed) return;
     setFadeOut(true);
+  }, [ready, minElapsed]);
+
+  // Unmount one fade later.
+  //
+  // This MUST be its own effect. Both halves used to live together with
+  // `fadeOut` in the dependency array and in the guard:
+  //
+  //     if (!ready || !minElapsed || fadeOut || gone) return;
+  //     setFadeOut(true);
+  //     const t = setTimeout(() => setGone(true), FADE_MS);
+  //     return () => clearTimeout(t);
+  //
+  // which cancels its own unmount. Setting `fadeOut` re-runs the effect, the
+  // cleanup clears the pending timeout, and the `|| fadeOut` guard then returns
+  // before scheduling a new one. `gone` therefore never became true.
+  //
+  // Nothing looked wrong — the CSS still faded the splash to opacity 0 — but it
+  // stayed mounted forever, which defeated BOTH mitigations below: the tips
+  // interval kept ticking every 900 ms, and each tick re-rendered this wrapper
+  // and with it the entire app tree, for the whole life of the process.
+  // Measured on a production build 2026-08-12: five tips still cycling and ten
+  // DOM mutations in a four-second window, two minutes after boot.
+  //
+  // Keyed on `fadeOut` alone, so setting it cannot cancel the timer it starts.
+  useEffect(() => {
+    if (!fadeOut) return;
     const t = window.setTimeout(() => setGone(true), FADE_MS);
     return () => window.clearTimeout(t);
-  }, [ready, minElapsed, fadeOut, gone]);
+  }, [fadeOut]);
 
   const tip = useMemo(() => TIPS[tipIndex], [tipIndex]);
 

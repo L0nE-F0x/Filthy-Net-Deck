@@ -2385,8 +2385,20 @@ fn load_matches(file: &Path) -> Vec<TrackedMatch> {
         .collect()
 }
 
-/// Rewrite the whole matches file (used after deletions). Writes to a temp
-/// file first so a crash mid-write can't lose the surviving history.
+/// Rewrite the whole matches file (used after deletions, and by the repair
+/// pass). Writes to a temp file first so a crash mid-write can't lose the
+/// surviving history.
+///
+/// The `sync_all()` is load-bearing and was missing. `fs::write` opens, writes
+/// and closes — it never fsyncs — so the rename could reach the disk while the
+/// temp file's data blocks had not, replacing good history with a truncated or
+/// empty file. "Temp file + rename" is only atomic if the data is durable
+/// *before* the rename.
+///
+/// That is a small window, but this is the one function whose entire reason for
+/// existing is that 348 matches were lost once already. Paying an fsync on a
+/// path that runs at most once per match end is not a trade worth thinking
+/// about.
 fn rewrite_matches(file: &Path, matches: &[TrackedMatch]) -> std::io::Result<()> {
     if let Some(dir) = file.parent() {
         fs::create_dir_all(dir)?;
@@ -2399,7 +2411,11 @@ fn rewrite_matches(file: &Path, matches: &[TrackedMatch]) -> std::io::Result<()>
         }
     }
     let tmp = file.with_extension("jsonl.tmp");
-    fs::write(&tmp, out)?;
+    {
+        let mut f = fs::File::create(&tmp)?;
+        f.write_all(out.as_bytes())?;
+        f.sync_all()?;
+    }
     fs::rename(&tmp, file)
 }
 
