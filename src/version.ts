@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.8.2";
+export const APP_VERSION = "3.0.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Opponent colours stay honest — dual lands no longer invent a fourth colour on the overlay",
-  "Friend codes and a seasonal race on Climb — compare win rates with people you actually play",
-  "Publish a deck to your public profile page — format, size, and last played, on your terms",
+  "Snappier everywhere — a background loop was quietly re-rendering the whole app every second, and it is gone",
+  "A status page and an in-app heads-up, so an Arena update that breaks tracking says so instead of looking like your install",
+  "Every field the app can send is now published in full at filthy-net-deck.com/privacy",
+  "The friends race shows the best rank each of you actually reached, not just where you sit today",
 ];

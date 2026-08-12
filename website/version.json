@@ -1,5 +1,5 @@
 {
-  "version": "2.8.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.2.exe",
-  "notes": "v2.8.2: Opponent colours stay honest — dual lands no longer invent a fourth colour. Friend codes and a seasonal race on Climb. Publish a deck to your public profile."
+  "version": "3.0.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.0.exe",
+  "notes": "v3.0.0: Snappier everywhere — a background loop was re-rendering the whole app every second, and it is gone. New status page and in-app heads-up when an Arena update breaks tracking. Every field the app can send is now published in full at filthy-net-deck.com/privacy."
 }

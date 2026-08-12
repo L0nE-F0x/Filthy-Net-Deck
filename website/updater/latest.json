@@ -1,11 +1,11 @@
 {
-  "version": "2.8.2",
-  "notes": "v2.8.2: Opponent colours stay honest — dual lands no longer invent a fourth colour. Friend codes and a seasonal race on Climb. Publish a deck to your public profile.",
-  "pub_date": "2026-08-11T18:28:05Z",
+  "version": "3.0.0",
+  "notes": "v3.0.0: Snappier everywhere — a background loop was re-rendering the whole app every second, and it is gone. New status page and in-app heads-up when an Arena update breaks tracking. Every field the app can send is now published in full at filthy-net-deck.com/privacy.",
+  "pub_date": "2026-08-12T02:35:05Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnl6YnRIdlMwT0l3SzBVL2FoWG9LZ1dVMjc4UDdDeHdsZ0p0VVVURzJhMFZqWmdWOGhXVnFtVVhtSmlpTnZkTjlSRkhsem5HV0RhZ0RTUDViZUNxVkEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NDcyODcxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzIuOC4yX3g2NC1zZXR1cC5leGUKYmNXVlppL0pxdG9pTkNQZ1RkR3l0eGdobjRKa29Ic0pPOWpnWHpyTHZNbHRlQzROT0h6RXN4b1hKd1JLczFlMWR4Q3lXN0liVCs0V3JnZmphVWJXQmc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-2.8.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJ6MU9FVHdUZ1FCSjRTK3FGZ21udUZpRmRZWFNjRnJkdVVBR1JQYUJiT3ZySll3UnBaMm1IYkJIakh2Q1dPQWM0RXVNM2RGbEgyaVArV0pMaVpmWGdnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTAyMDQ4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMC4wX3g2NC1zZXR1cC5leGUKeHpyRWNHOFJuajQzN01EY0hublJTRXN6UHVUaGt1alFBQUFRU1M1Z1ZnUUJzZUpDWVh3ZUU2M1ppSkxqWGpuVG9JclJjb0k1QlB2U2pYcFVoRmtQQVE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.0.0.exe"
     }
   }
 }

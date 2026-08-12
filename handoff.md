@@ -3,9 +3,12 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v2.8.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-**In progress: v3.0.0** — the polish release, aimed at a public push to the
-owner's YouTube + X audience.
+**Live product version: v3.0.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+
+v3.0.0 is the polish release, cut for a public push to the owner's YouTube + X
+audience. It is a **quality** release, not a feature one: an audit of everything
+the v2.7–2.8 backend push landed, the fixes it turned up, and correcting what
+the project publicly claimed about itself.
 
 ---
 
@@ -33,9 +36,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 |---|------|-------|
 | ✅ | **Full regression audit v2.7.3 → v2.8.2** | **9 findings, 2 of them P0** — `docs/AUDIT-2026-08-12-v3.0.0.md`. All fixed. ⚠️ **The SQL fixes need running on the live DB**: `supabase/migrations/20260812060000_rollup_null_fix_and_limits.sql` |
 | ⚠️ | **Performance pass** | Largely done — found the P0 splash re-render loop. Bundle + boot verified on a production build. **Not done:** RAM across the four webviews, which needs a real installed build |
-| ⬜ | **UI/UX polish** | Empty states, first-run with zero matches, consistency across the pages added during the v2.7–2.8 backend push |
+| ✅ | **UI/UX polish** | Empty states verified across all nine pages; ~700 lines of dead Matchup-Lab-era code removed (incl. a share card branded with the retired product name); typography and tooltip fixes; `index.css` comment encoding repaired |
 | ⚠️ | **Launch readiness** | ✅ Status page + in-app incident banner shipped (§2.7 closed). ✅ §4 anti-abuse verified — two of six were missing and are now implemented. **Not done:** what a 500-signup day does to Supabase quotas |
-| ⬜ | **Roll the macOS dmg** | ⚠️ **v2.8.2's dmg is on the GitHub Release but was never copied into `website/downloads/`.** `index.html` lines ~114 and ~529 still link the **2.8.1** dmg, so macOS visitors are being served a version behind *right now* |
+| ✅ | **Roll the macOS dmg** | v2.8.2's dmg rolled in and links fixed (macOS visitors had been served 2.8.1). A checklist line in `AGENTS.md` now guards against a repeat |
 | ⬜ | **v3.0.0 release train** | Full `AGENTS.md` checklist |
 
 ## Known-open, not blocking v3.0.0
