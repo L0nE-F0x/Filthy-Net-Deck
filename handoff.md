@@ -3,16 +3,52 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.0.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+**Live product version: v3.1.1** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· commit `be44a48` · tag `v3.1.1`
 
-v3.0.0 is the polish release, cut for a public push to the owner's YouTube + X
-audience. It is a **quality** release, not a feature one: an audit of everything
-the v2.7–2.8 backend push landed, the fixes it turned up, and correcting what
-the project publicly claimed about itself.
+Windows signed updater is live. macOS **dmg is built on the GH Release and has
+not been rolled** into `website/downloads/` or the homepage buttons — same
+failure mode `AGENTS.md` now guards against.
 
 ---
 
-# ▶ START HERE — the v3.0.0 program
+# ▶ START HERE — next session
+
+1. **Roll the v3.1.1 macOS dmg.** CI succeeded. Asset:
+   `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.1.1/Filthy-Net-Deck-3.1.1-universal.dmg`
+   Curl it into `website/downloads/`, point both homepage macOS buttons at it
+   (hero still says 3.1.0 on purpose), commit, push, confirm Netlify serves it.
+   Do not leave macOS visitors on 3.1.0.
+2. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
+   Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
+   bump. Do it on the next `npm run meta:site`, not as a drive-by.
+
+Working tree should be clean. Owner wrapped 2026-08-13 after the Windows
+release; do not invent more product work.
+
+## This session (2026-08-13)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Fullscreen + Close-to-tray** | Hide drops the OS fullscreen bit so Windows will actually hide. `WANT_FULLSCREEN` remembers the pref; every show path (`show_main_window` — tray, second instance, presence, deep link) restores it, with retries. `window_state` no longer persists the dropped bit. |
+| ✅ | **Brew Lab shrunk into My Stats** | Nav page gone (keys 1–8). Clinic is card-by-card vs the **closest ranked 75 by list overlap**, not the field average and not the deck name. “N cards off” = L1/2. Paste-a-list is a collapsed row on the My Stats home. |
+| ✅ | **v3.1.1 Windows release** | Signed with key id `67FCA9900F523D49`. Installer + `.sig` + `updater/latest.json` + `version.json` + OG `?v=3.1.1` live. 3.0.3 pruned. |
+
+### Hard-won this session
+
+- After the repo moved off `Desktop\Coding with Grok\…`, **release** `tauri`
+  artifacts still pointed `OUT_DIR` at the old path. `cargo clean -p tauri -p
+  tauri-build` is not always enough for release — delete
+  `src-tauri/target/release/build/tauri-*` (not plugins/runtime) and the
+  matching fingerprints/deps, then rebuild.
+- Do not restore fullscreen on generic `focus`. A focus flicker during hide
+  re-enters exclusive fullscreen and Close-to-tray looks dead again.
+- `document.visibilityState` often does **not** change after WebView2
+  `hide()`. Restore belongs in Rust `show_main_window` + the `main:shown` event.
+
+---
+
+# v3.0.0 program (closed)
 
 Owner's brief (2026-08-12): *"refining, debugging, perfecting performance and
 polishing — a PERFECT v3.0.0 I can confidently share around."*
@@ -60,8 +96,8 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.0.2** on Windows. macOS button held at the 3.0.0 dmg until tag CI rolls 3.0.2 — never link a dmg before it exists |
-| Branch | `main`, v3.0.0 work in progress |
+| App version | **v3.1.1** on Windows (signed updater live). macOS dmg **built** on the v3.1.1 GH Release, **not rolled** — homepage still links 3.1.0 |
+| Branch | `main`, clean after wrap |
 | Gates last green | **567** vitest / 79 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
