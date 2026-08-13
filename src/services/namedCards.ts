@@ -1,7 +1,7 @@
 /**
  * Card name → Scryfall identity (type line, mana value) for pasted decklists.
  *
- * Brew Lab's paste-a-list mode has names but no Arena ids, so we resolve via
+ * The My Stats paste clinic has names but no Arena ids, so we resolve via
  * Scryfall's POST /cards/collection with exact-name identifiers (75 per batch,
  * the API cap). Results are cached in localStorage so a re-clinic of the same
  * brew is instant and works offline. Unknown names resolve to null — they are

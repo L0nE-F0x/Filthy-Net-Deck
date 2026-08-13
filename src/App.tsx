@@ -12,7 +12,6 @@ import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { Sets } from "./pages/Sets";
 import { FormatHubPage } from "./pages/FormatHub";
-import { BrewLab } from "./pages/BrewLab";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -28,13 +27,12 @@ import {
   IconClimb,
   IconSets,
   IconFormatHub,
-  IconBrewLab,
   IconHelp,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
-import { applyFullscreen, closeToTray } from "./services/windowMode";
+import { applyFullscreen, closeToTray, restoreFullscreenIfPreferred } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
 import { syncOverlayPrefFromStore } from "./services/overlay";
 import { HelpGuide } from "./components/HelpGuide";
@@ -59,7 +57,7 @@ function navigateTo(page: Page) {
   useAppStore.getState().setPage(page);
 }
 
-/** Nav order: Decks → personal loop → Brew Lab → world → Settings. Keys 1–9. */
+/** Nav order: Decks → personal loop → world → Settings. Keys 1–8. */
 const NAV: {
   id: Page;
   label: string;
@@ -69,7 +67,6 @@ const NAV: {
   { id: "stats", label: "My Stats", icon: IconStats },
   { id: "climb", label: "Climb", icon: IconClimb },
   { id: "matchups", label: "Matchups", icon: IconMatchups },
-  { id: "brewlab", label: "Brew Lab", icon: IconBrewLab },
   { id: "sets", label: "Sets", icon: IconSets },
   { id: "formats", label: "Format Hub", icon: IconFormatHub },
   { id: "meta", label: "Events", icon: IconMeta },
@@ -82,7 +79,6 @@ const LOCAL_PAGES: Page[] = [
   "stats",
   "matchups",
   "climb",
-  "brewlab",
   "sets",
   "formats",
 ];
@@ -105,8 +101,6 @@ function pageTitle(page: Page): string {
       return "Matchups";
     case "climb":
       return "Climb Tracker";
-    case "brewlab":
-      return "Brew Lab";
     case "formats":
       return "Format Hub";
     case "settings":
@@ -287,12 +281,17 @@ export default function App() {
       if (!cancelled) void useAppStore.getState().refreshTracker();
     };
 
+    const restoreFs = () => {
+      // hide_to_tray drops OS fullscreen so Windows will actually hide; put it
+      // back when the user reopens from the tray if they still prefer fullscreen.
+      // Do not hook this to generic focus — a focus flicker during hide would
+      // re-enter fullscreen and make Close-to-tray look dead again.
+      void restoreFullscreenIfPreferred(useAppStore.getState().prefs.fullscreen);
+    };
     const onVis = () => {
       if (document.visibilityState !== "visible") return;
       pull();
-      // hide_to_tray drops OS fullscreen so Windows will actually hide; put it
-      // back when the user reopens from the tray if they still prefer fullscreen.
-      if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
+      restoreFs();
     };
     const onFocus = () => pull();
     document.addEventListener("visibilitychange", onVis);
@@ -305,6 +304,7 @@ export default function App() {
     }, 12_000);
 
     let unFocus: (() => void) | undefined;
+    let unShown: (() => void) | undefined;
     void (async () => {
       try {
         const { getCurrentWindow } = await import("@tauri-apps/api/window");
@@ -315,6 +315,15 @@ export default function App() {
         /* browser / API unavailable */
       }
     })();
+    // Rust emits this from every show_main_window path (tray, second instance,
+    // presence badge, deep link). visibilitychange often does not fire after
+    // a WebView2 hide(), which is why tray-restore used to stay windowed.
+    void listen("main:shown", () => {
+      pull();
+      restoreFs();
+    }).then((f) => {
+      unShown = f;
+    });
 
     return () => {
       cancelled = true;
@@ -322,6 +331,7 @@ export default function App() {
       window.removeEventListener("focus", onFocus);
       window.clearInterval(poll);
       unFocus?.();
+      unShown?.();
     };
   }, []);
 
@@ -353,7 +363,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Keyboard shortcuts 1–9 jump to main nav pages (order matches NAV).
+  // Keyboard shortcuts 1–8 jump to main nav pages (order matches NAV).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -596,7 +606,6 @@ export default function App() {
               {page === "stats" && <Stats />}
               {page === "matchups" && <Matchups />}
               {page === "climb" && <Climb />}
-              {page === "brewlab" && <BrewLab />}
               {page === "formats" && <FormatHubPage />}
               {page === "settings" && <Settings />}
             </>

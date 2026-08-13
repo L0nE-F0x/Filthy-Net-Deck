@@ -7,10 +7,11 @@ mod toast;
 mod tracker;
 
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager, WindowEvent,
+    Emitter, Manager, WindowEvent,
 };
 
 /// Set by tray → Quit. `app.exit(0)` asks every window to close, and the
@@ -21,6 +22,30 @@ static QUITTING: AtomicBool = AtomicBool::new(false);
 
 /// Thread that owns the event loop, captured in `setup()`.
 static MAIN_THREAD: std::sync::OnceLock<std::thread::ThreadId> = std::sync::OnceLock::new();
+
+/// Prefs-owned fullscreen bit, independent of the OS flag.
+///
+/// Hide-to-tray has to drop exclusive fullscreen or Windows ignores hide()
+/// (the window stays up and Close-to-tray looks dead). The OS bit then says
+/// "windowed" while Settings still says fullscreen — reopen-from-tray used
+/// to come back decorated and stay that way. This flag is the source of
+/// truth for "put them back in fullscreen" on every show path.
+static WANT_FULLSCREEN: AtomicBool = AtomicBool::new(false);
+
+fn remember_fullscreen_pref(on: bool) {
+    WANT_FULLSCREEN.store(on, Ordering::SeqCst);
+}
+
+fn wants_fullscreen() -> bool {
+    WANT_FULLSCREEN.load(Ordering::SeqCst)
+}
+
+/// Hide may already have dropped the OS bit; don't clear the pref if so.
+fn note_os_fullscreen_on_hide(is_fullscreen: bool) {
+    if is_fullscreen {
+        WANT_FULLSCREEN.store(true, Ordering::SeqCst);
+    }
+}
 
 /// Guard against this crate's most expensive recurring bug.
 ///
@@ -53,18 +78,69 @@ pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
     true
 }
 
-fn show_main_window(app: &tauri::AppHandle) {
+/// Surface the main window. Every reopen path (tray click, tray menu,
+/// second-instance, presence badge, deep link) must go through here so a
+/// hide that dropped exclusive fullscreen is undone.
+pub(crate) fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
+        let restore = wants_fullscreen();
         let _ = window.unminimize();
+        // Try before show() so a hidden window that still accepts the call
+        // comes up already exclusive, instead of flashing windowed first.
+        if restore {
+            let _ = window.set_fullscreen(true);
+        }
         let _ = window.show();
         let _ = window.set_focus();
+        if restore {
+            restore_fullscreen(&window);
+        }
+        let _ = window.emit("main:shown", ());
     }
 }
 
-fn hide_to_tray(window: &tauri::Window) {
+/// Windows often ignores the first set_fullscreen after hide-from-exclusive.
+/// Retry a few times on a worker; the window call hops back to the event loop.
+fn restore_fullscreen(window: &tauri::WebviewWindow) {
+    if !wants_fullscreen() {
+        return;
+    }
+    let _ = window.set_fullscreen(true);
+    if window.is_fullscreen().unwrap_or(false) {
+        return;
+    }
+    let win = window.clone();
+    std::thread::spawn(move || {
+        for delay_ms in [32_u64, 120, 400] {
+            std::thread::sleep(Duration::from_millis(delay_ms));
+            if !wants_fullscreen() {
+                return;
+            }
+            let _ = win.set_fullscreen(true);
+            if win.is_fullscreen().unwrap_or(false) {
+                return;
+            }
+        }
+    });
+}
+
+fn hide_webview_to_tray(window: &tauri::WebviewWindow) {
     // Windows frequently ignores hide()/close while the window is still in
     // exclusive fullscreen — Exit / Close-to-tray then look dead. Drop
-    // fullscreen first so the hide sticks.
+    // the OS bit so the hide sticks, but keep WANT_FULLSCREEN so show()
+    // can put it back. Do not go through main_window_set_fullscreen —
+    // that would clear the pref.
+    note_os_fullscreen_on_hide(window.is_fullscreen().unwrap_or(false));
+    let _ = window.set_fullscreen(false);
+    let _ = window.hide();
+}
+
+fn hide_to_tray(window: &tauri::Window) {
+    if let Some(win) = window.app_handle().get_webview_window(window.label()) {
+        hide_webview_to_tray(&win);
+        return;
+    }
+    note_os_fullscreen_on_hide(window.is_fullscreen().unwrap_or(false));
     let _ = window.set_fullscreen(false);
     let _ = window.hide();
 }
@@ -73,6 +149,7 @@ fn hide_to_tray(window: &tauri::Window) {
 /// plugin from JS so we always target the `main` label (not overlay/toast).
 #[tauri::command]
 fn main_window_set_fullscreen(app: tauri::AppHandle, on: bool) -> Result<(), String> {
+    remember_fullscreen_pref(on);
     let win = app
         .get_webview_window("main")
         .ok_or_else(|| "main window missing".to_string())?;
@@ -86,9 +163,7 @@ fn main_window_hide_to_tray(app: tauri::AppHandle) -> Result<(), String> {
     let win = app
         .get_webview_window("main")
         .ok_or_else(|| "main window missing".to_string())?;
-    // WebviewWindow and Window share set_fullscreen / hide on the handle.
-    let _ = win.set_fullscreen(false);
-    let _ = win.hide();
+    hide_webview_to_tray(&win);
     notify_tray_hint_once(&app);
     Ok(())
 }
@@ -190,13 +265,17 @@ pub fn run() {
                     Some(vec!["--hidden"]),
                 ))?;
                 // Remember window size/position between launches. Visibility
-                // is excluded: --hidden / tray logic owns that. Overlay is
-                // denylisted so its position is not restored over the main UI.
+                // is excluded: --hidden / tray logic owns that. Fullscreen
+                // is excluded too — hide-to-tray has to drop the OS bit, and
+                // persisting that would reopen windowed against the pref.
+                // Overlay is denylisted so its position is not restored over
+                // the main UI.
                 app.handle().plugin(
                     tauri_plugin_window_state::Builder::new()
                         .with_state_flags(
                             tauri_plugin_window_state::StateFlags::all()
-                                - tauri_plugin_window_state::StateFlags::VISIBLE,
+                                - tauri_plugin_window_state::StateFlags::VISIBLE
+                                - tauri_plugin_window_state::StateFlags::FULLSCREEN,
                         )
                         .with_denylist(&["overlay"])
                         .build(),
@@ -327,4 +406,35 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running Filthy Net Deck");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{note_os_fullscreen_on_hide, remember_fullscreen_pref, wants_fullscreen};
+
+    // One test so the process-wide flag cannot race with itself under
+    // cargo's default parallel runner.
+    #[test]
+    fn fullscreen_pref_survives_hide_but_not_an_explicit_exit() {
+        remember_fullscreen_pref(false);
+        note_os_fullscreen_on_hide(true);
+        assert!(
+            wants_fullscreen(),
+            "dropping the OS bit to hide must not forget the user wanted fullscreen"
+        );
+
+        remember_fullscreen_pref(true);
+        note_os_fullscreen_on_hide(false);
+        assert!(
+            wants_fullscreen(),
+            "a later windowed hide (OS bit already dropped) must still restore"
+        );
+
+        remember_fullscreen_pref(false);
+        note_os_fullscreen_on_hide(false);
+        assert!(
+            !wants_fullscreen(),
+            "F11 / Exit fullscreen must not come back on the next tray show"
+        );
+    }
 }

@@ -17,7 +17,7 @@
 //! Both funnel into [`handle_url`], which forwards to the webview as a
 //! `deep-link` event.
 
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter};
 
 pub const EVENT: &str = "deep-link";
 const SCHEME: &str = "fnd://";
@@ -57,11 +57,7 @@ pub fn handle_url(app: &AppHandle, url: &str) {
     if !url.to_ascii_lowercase().starts_with(SCHEME) {
         return;
     }
-    if let Some(win) = app.get_webview_window("main") {
-        let _ = win.unminimize();
-        let _ = win.show();
-        let _ = win.set_focus();
-    }
+    crate::show_main_window(app);
     if let Err(e) = app.emit(EVENT, url.to_string()) {
         eprintln!("[deeplink] emit failed: {e}");
     }

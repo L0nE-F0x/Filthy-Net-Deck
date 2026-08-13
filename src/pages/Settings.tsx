@@ -29,7 +29,6 @@ const PAGE_LABELS: Partial<Record<Page, string>> = {
   stats: "My Stats",
   climb: "Climb",
   matchups: "Matchups",
-  brewlab: "Brew Lab",
   sets: "Sets",
   formats: "Format Hub",
   meta: "Events",
@@ -101,10 +100,10 @@ function TrackerHealthCard() {
   );
 }
 
-/** X2 — discoverability for 1–9 / Ctrl+K / F11. */
+/** X2 — discoverability for 1–8 / Ctrl+K / F11. */
 function KeyboardCheatSheet() {
   const rows: { keys: string; action: string }[] = [
-    { keys: "1–9", action: "Jump nav: Decks · Stats · Climb · Matchups · Brew Lab · Sets · Format Hub · Events · Settings" },
+    { keys: "1–8", action: "Jump nav: Decks · Stats · Climb · Matchups · Sets · Format Hub · Events · Settings" },
     { keys: "Ctrl+K", action: "Command palette — search cards, decks, pages" },
     { keys: "F11", action: "Toggle fullscreen (also in Display above)" },
   ];

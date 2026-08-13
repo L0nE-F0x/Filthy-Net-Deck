@@ -1,5 +1,5 @@
 {
-  "version": "3.1.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.0.exe",
-  "notes": "v3.1.0: Switching pages is fast again — the app was rebuilding the entire metagame on every single click. Brand-new set cards also get their art and land in the right type group now, instead of a blank box under \"Other\"."
+  "version": "3.1.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.1.exe",
+  "notes": "v3.1.1: Close-to-tray from fullscreen comes back fullscreen. My Stats now shows how many cards you are off today's closest ranked list."
 }

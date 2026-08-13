@@ -99,8 +99,10 @@ const TOPICS: Topic[] = [
         <p>
           Your private tracker. Win rates by season, queue, and deck; play/draw and mulligan
           splits; opponent archetypes inferred from cards actually seen. Click any deck for its
-          full story: decklist (switch <em>Stacked / List / Text</em> views), version history with
-          card-by-card diffs, and match history.
+          full story: decklist (switch <em>Stacked / List / Text</em> views), how many cards you
+          are off today&apos;s closest ranked list, version history with card-by-card diffs, and
+          match history. Paste any Arena/MTGO export on the My Stats home to compare a brew
+          before you play it.
         </p>
         <p>
           <strong>Fresh runs</strong> hide a deck’s older matches without deleting anything —
@@ -141,26 +143,6 @@ const TOPICS: Topic[] = [
           tagging required. When community data is available, each row shows how you compare
           to the field. The overlay still uses this mid-match against the deck it thinks you
           are facing.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: "brewlab",
-    label: "Brew Lab",
-    page: "brewlab",
-    body: (
-      <>
-        <p>
-          The list clinic. Pick any tracked deck — or <strong>paste any list</strong> (Arena
-          export, MTGO text) — and it’s graded against today’s ranked peer field: mana base,
-          curve, interaction density, staple alignment, sideboard readiness, rolled into an
-          honest letter grade.
-        </p>
-        <p>
-          Everything is arithmetic on real ranked lists already in the feed — no AI, no invented
-          cards. Clinic a brew <em>before</em> you spend wildcards, then copy the report as plain
-          text.
         </p>
       </>
     ),
@@ -233,7 +215,7 @@ const TOPICS: Topic[] = [
         </p>
         <ul className="help-kbd-list">
           <li>
-            <K>1–9</K> jump straight to each nav page (in sidebar order)
+            <K>1–8</K> jump straight to each nav page (in sidebar order)
           </li>
           <li>
             <K>Ctrl+K</K> command palette — search cards, decks, pages

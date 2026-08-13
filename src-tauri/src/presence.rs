@@ -184,9 +184,5 @@ pub fn presence_set_size(app: AppHandle, width: f64, height: f64) {
 /// Badge click — surface the main window (same as the tray "Open" item).
 #[tauri::command]
 pub fn presence_open_main(app: AppHandle) {
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.unminimize();
-        let _ = window.show();
-        let _ = window.set_focus();
-    }
+    crate::show_main_window(&app);
 }

@@ -1,87 +1,53 @@
 /**
- * Brew Lab — pure, non-LLM list clinic.
+ * List clinic — your 75 vs the closest ranked list on today's board.
  *
- * Compares *your* main (and side) to live ranked meta peers for a format+mode.
- * Never invents cards: staples and copy targets only come from peer lists already
- * in the meta feed. No oracle text, no external AI, no BYOK.
+ * Distance is the multiset L1 / 2 ("cards off"): one swap is 1 card off.
+ * Never invents cards. Closest list is chosen by the list itself, not the
+ * deck's display name — a pile named "jank" that is 2 off Golgari is Golgari.
  */
 
 import type { CardEntry, Deck, FormatId, MetaBundle, PlayMode } from "../types/meta";
 import { decksForMode } from "./deckHelpers";
-import { resolveMetaDeck } from "./deepLinks";
 import { isLandName } from "./landNames";
-
-export type ClinicSeverity = "info" | "nudge" | "gap";
 
 export interface CountedName {
   name: string;
   count: number;
   cmc?: number;
   land?: boolean;
-  /** Pipeline / Scryfall type bucket when known. */
   type?: CardEntry["type"];
   typeLine?: string;
 }
 
-export interface ListShape {
-  total: number;
-  lands: number;
-  creatures: number;
-  /** Instants + sorceries — proxy for interaction / draw / counters without oracle. */
-  instantSorcery: number;
-  otherNonlands: number;
-  nonlands: number;
-  avgCmc: number | null;
-  /** Non-land counts for MV 0..5 and 6+. */
-  curve: [number, number, number, number, number, number, number];
-}
-
-export interface PeerStaple {
+export interface ClinicSwap {
   name: string;
-  /** Mean copies among peers (including zeros). */
-  peerAvg: number;
-  /** Fraction of peers that play ≥1 copy. */
-  presence: number;
-  yourCount: number;
-  /** yourCount − peerAvg (negative = you're light). */
-  delta: number;
+  yours: number;
+  ranked: number;
 }
 
-export interface ClinicFinding {
-  id: string;
-  severity: ClinicSeverity;
-  title: string;
-  detail: string;
+export interface BoardDiff {
+  cardsOff: number;
+  yoursTotal: number;
+  rankedTotal: number;
+  /** You play it; the ranked list does not. */
+  extras: ClinicSwap[];
+  /** Ranked list plays it; you do not. */
+  missing: ClinicSwap[];
+  /** Both play it, different counts. */
+  counts: ClinicSwap[];
+  identical: boolean;
 }
 
-export interface BrewClinicInput {
-  deckName: string;
-  main: CountedName[];
-  side?: CountedName[];
-  meta: MetaBundle | null | undefined;
-  mode: PlayMode;
-  /** Prefer this format when resolving peers; else fuzzy across formats. */
-  formatId?: FormatId;
-}
-
-export interface BrewClinicReport {
+export interface ListClinicReport {
   mode: PlayMode;
   formatId: FormatId | null;
-  peerCount: number;
-  peerNames: string[];
-  matchedPeerName: string | null;
-  matchedPeerId: string | null;
-  yourMain: ListShape;
-  peerMainAvg: ListShape;
-  yourSide: ListShape | null;
-  peerSideAvg: ListShape | null;
-  findings: ClinicFinding[];
-  /** You're under peer average on high-presence staples. */
-  lightStaples: PeerStaple[];
-  /** High-presence peer cards for reference (not necessarily light). */
-  fieldStaples: PeerStaple[];
-  /** Sideboard staples you're light on (Bo3). */
-  lightSideStaples: PeerStaple[];
+  rankedName: string | null;
+  rankedId: string | null;
+  /** True when a name match existed but a different list was closer. */
+  nameWasOverridden: boolean;
+  namedMatch: string | null;
+  main: BoardDiff;
+  side: BoardDiff | null;
   emptyReason?: string;
 }
 
@@ -89,137 +55,71 @@ function norm(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-function isLandCard(c: CountedName): boolean {
-  if (c.land === true) return true;
-  if (c.land === false) return false;
-  if (c.type === "creature") return false;
-  if (c.typeLine) return /\bLand\b/i.test(c.typeLine.split("//")[0] ?? "");
-  return isLandName(c.name);
-}
-
-function isCreatureCard(c: CountedName): boolean {
-  if (isLandCard(c)) return false;
-  if (c.type === "creature") return true;
-  if (c.typeLine) return /\bCreature\b/i.test(c.typeLine.split("//")[0] ?? "");
-  return false;
-}
-
-function isInstantOrSorcery(c: CountedName): boolean {
-  if (isLandCard(c)) return false;
-  if (c.type === "instant" || c.type === "sorcery") return true;
-  if (c.typeLine) {
-    const face = c.typeLine.split("//")[0] ?? "";
-    return /\bInstant\b/i.test(face) || /\bSorcery\b/i.test(face);
-  }
-  return false;
-}
-
-function cmcBucket(cmc: number | undefined): number {
-  if (cmc == null || !Number.isFinite(cmc)) return 2; // unknown → mid bias
-  const n = Math.max(0, Math.floor(cmc));
-  return n >= 6 ? 6 : n;
-}
-
-/** Quantify a 60/15 board into shape stats. */
-export function shapeOf(cards: CountedName[]): ListShape {
-  let lands = 0;
-  let creatures = 0;
-  let instantSorcery = 0;
-  let otherNonlands = 0;
-  let cmcSum = 0;
-  let cmcN = 0;
-  const curve: ListShape["curve"] = [0, 0, 0, 0, 0, 0, 0];
-  let total = 0;
-
+function countMap(cards: CountedName[]): Map<string, number> {
+  const m = new Map<string, number>();
   for (const c of cards) {
-    const n = Math.max(0, c.count | 0);
-    if (n === 0) continue;
-    total += n;
-    if (isLandCard(c)) {
-      lands += n;
-      continue;
-    }
-    const bucket = cmcBucket(c.cmc);
-    curve[bucket] += n;
-    if (c.cmc != null && Number.isFinite(c.cmc)) {
-      cmcSum += c.cmc * n;
-      cmcN += n;
-    }
-    if (isCreatureCard(c)) creatures += n;
-    else if (isInstantOrSorcery(c)) instantSorcery += n;
-    else otherNonlands += n;
+    const k = norm(c.name);
+    if (!k) continue;
+    m.set(k, (m.get(k) ?? 0) + c.count);
   }
-
-  return {
-    total,
-    lands,
-    creatures,
-    instantSorcery,
-    otherNonlands,
-    nonlands: total - lands,
-    avgCmc: cmcN > 0 ? cmcSum / cmcN : null,
-    curve,
-  };
+  return m;
 }
 
-export function averageShapes(shapes: ListShape[]): ListShape {
-  if (shapes.length === 0) {
-    return {
-      total: 0,
-      lands: 0,
-      creatures: 0,
-      instantSorcery: 0,
-      otherNonlands: 0,
-      nonlands: 0,
-      avgCmc: null,
-      curve: [0, 0, 0, 0, 0, 0, 0],
+function displayNameFor(key: string, lists: CountedName[][]): string {
+  for (const list of lists) {
+    for (const c of list) {
+      if (norm(c.name) === key) return c.name;
+    }
+  }
+  return key;
+}
+
+/** Sum of |your − theirs| across every card name. */
+export function l1Distance(a: CountedName[], b: CountedName[]): number {
+  const A = countMap(a);
+  const B = countMap(b);
+  const keys = new Set([...A.keys(), ...B.keys()]);
+  let n = 0;
+  for (const k of keys) n += Math.abs((A.get(k) ?? 0) - (B.get(k) ?? 0));
+  return n;
+}
+
+/** Substitutions vs the other list. One swap = 1. */
+export function cardsOff(a: CountedName[], b: CountedName[]): number {
+  return l1Distance(a, b) / 2;
+}
+
+export function boardDiff(yours: CountedName[], ranked: CountedName[]): BoardDiff {
+  const Y = countMap(yours);
+  const R = countMap(ranked);
+  const extras: ClinicSwap[] = [];
+  const missing: ClinicSwap[] = [];
+  const counts: ClinicSwap[] = [];
+  const names = new Set([...Y.keys(), ...R.keys()]);
+  for (const k of [...names].sort()) {
+    const y = Y.get(k) ?? 0;
+    const r = R.get(k) ?? 0;
+    if (y === r) continue;
+    const row: ClinicSwap = {
+      name: displayNameFor(k, [yours, ranked]),
+      yours: y,
+      ranked: r,
     };
+    if (r === 0) extras.push(row);
+    else if (y === 0) missing.push(row);
+    else counts.push(row);
   }
-  const n = shapes.length;
-  const curve: ListShape["curve"] = [0, 0, 0, 0, 0, 0, 0];
-  let lands = 0;
-  let creatures = 0;
-  let instantSorcery = 0;
-  let otherNonlands = 0;
-  let total = 0;
-  let nonlands = 0;
-  let cmcSum = 0;
-  let cmcN = 0;
-  for (const s of shapes) {
-    lands += s.lands;
-    creatures += s.creatures;
-    instantSorcery += s.instantSorcery;
-    otherNonlands += s.otherNonlands;
-    total += s.total;
-    nonlands += s.nonlands;
-    for (let i = 0; i < 7; i++) curve[i] += s.curve[i];
-    if (s.avgCmc != null) {
-      cmcSum += s.avgCmc;
-      cmcN++;
-    }
-  }
-  for (let i = 0; i < 7; i++) curve[i] = curve[i] / n;
+  const yoursTotal = yours.reduce((n, c) => n + Math.max(0, c.count | 0), 0);
+  const rankedTotal = ranked.reduce((n, c) => n + Math.max(0, c.count | 0), 0);
   return {
-    total: total / n,
-    lands: lands / n,
-    creatures: creatures / n,
-    instantSorcery: instantSorcery / n,
-    otherNonlands: otherNonlands / n,
-    nonlands: nonlands / n,
-    avgCmc: cmcN > 0 ? cmcSum / cmcN : null,
-    curve,
+    cardsOff: l1Distance(yours, ranked) / 2,
+    yoursTotal,
+    rankedTotal,
+    extras,
+    missing,
+    counts,
+    identical: extras.length === 0 && missing.length === 0 && counts.length === 0,
   };
-}
-
-/** CardEntry[] (meta pipeline) → counted names. */
-export function fromCardEntries(entries: CardEntry[]): CountedName[] {
-  return entries.map((c) => ({
-    name: c.name,
-    count: c.count,
-    cmc: c.cmc,
-    land: c.land,
-    type: c.type,
-  }));
 }
 
 function typeFromFace(face: string): CardEntry["type"] | undefined {
@@ -231,6 +131,17 @@ function typeFromFace(face: string): CardEntry["type"] | undefined {
   if (/\bPlaneswalker\b/i.test(face)) return "planeswalker";
   if (/\bBattle\b/i.test(face)) return "battle";
   return undefined;
+}
+
+/** CardEntry[] (meta pipeline) → counted names. */
+export function fromCardEntries(entries: CardEntry[]): CountedName[] {
+  return entries.map((c) => ({
+    name: c.name,
+    count: c.count,
+    cmc: c.cmc,
+    land: c.land,
+    type: c.type,
+  }));
 }
 
 /** Arena id multiset + resolved meta → counted names. Unknown ids dropped. */
@@ -259,16 +170,12 @@ export function fromArenaIds(
 }
 
 /**
- * Pasted deck lines + Scryfall name resolution → counted names (v2.0 Brew
- * Lab paste mode). Unresolved names come back in `unknown` so the UI can say
- * so honestly — they are skipped by the clinic, never guessed at.
+ * Pasted deck lines + name resolution → counted names. Unresolved names
+ * come back in `unknown` so the UI can say so — they are skipped, never guessed.
  */
 export function fromNamedLines(
   lines: { name: string; count: number }[],
-  info: Record<
-    string,
-    { name?: string; typeLine?: string; cmc?: number } | null | undefined
-  >,
+  info: Record<string, { name?: string; typeLine?: string; cmc?: number } | null | undefined>,
   normalize: (s: string) => string,
 ): { cards: CountedName[]; unknown: string[] } {
   const cards: CountedName[] = [];
@@ -302,231 +209,81 @@ export function fromNamedLines(
   return { cards, unknown };
 }
 
-function countMap(cards: CountedName[]): Map<string, number> {
-  const m = new Map<string, number>();
-  for (const c of cards) {
-    const k = norm(c.name);
-    if (!k) continue;
-    m.set(k, (m.get(k) ?? 0) + c.count);
-  }
-  return m;
+function nameAffinity(query: string, deck: Deck): number {
+  const q = norm(query);
+  if (!q) return 0;
+  const labels = [deck.name, deck.archetype].filter(Boolean).map((s) => norm(String(s)));
+  if (labels.includes(q)) return 2;
+  if (labels.some((l) => l.includes(q) || q.includes(l))) return 1;
+  return 0;
 }
 
-/** Display name for a norm key from first peer that has it. */
-function displayNameFor(
-  key: string,
-  peers: CountedName[][],
-): string {
-  for (const list of peers) {
-    for (const c of list) {
-      if (norm(c.name) === key) return c.name;
-    }
-  }
-  return key;
+export interface ClosestHit {
+  deck: Deck;
+  formatId: FormatId;
+  mode: PlayMode;
+  l1: number;
 }
 
-/**
- * Staples across peer lists: mean copies + presence.
- * yourMap optional — when omitted, yourCount is 0.
- */
-export function peerStaples(
-  peerLists: CountedName[][],
-  yourList: CountedName[],
-  opts?: { minPresence?: number; minPeerAvg?: number },
-): PeerStaple[] {
-  const minPresence = opts?.minPresence ?? 0.35;
-  const minPeerAvg = opts?.minPeerAvg ?? 1.25;
-  const n = peerLists.length;
-  if (n === 0) return [];
-  const yours = countMap(yourList);
-  const totals = new Map<string, number>();
-  const present = new Map<string, number>();
-  for (const list of peerLists) {
-    const seen = new Set<string>();
-    for (const c of list) {
-      const k = norm(c.name);
-      if (!k) continue;
-      totals.set(k, (totals.get(k) ?? 0) + c.count);
-      if (!seen.has(k)) {
-        seen.add(k);
-        present.set(k, (present.get(k) ?? 0) + 1);
+/** Ranked board only (the 8), both formats, requested mode. */
+export function closestRankedDeck(
+  yours: CountedName[],
+  meta: MetaBundle,
+  opts: { mode: PlayMode; preferFormat?: FormatId | null; preferName?: string },
+): ClosestHit | null {
+  if (!yours.length) return null;
+  let best: ClosestHit | null = null;
+  let bestAffinity = -1;
+  for (const fmt of meta.formats) {
+    for (const deck of decksForMode(fmt, opts.mode, meta.decks)) {
+      if (!deck.mainboard?.length) continue;
+      const l1 = l1Distance(yours, fromCardEntries(deck.mainboard));
+      const affinity = nameAffinity(opts.preferName ?? "", deck);
+      const preferFmt = opts.preferFormat && fmt.id === opts.preferFormat ? 1 : 0;
+      if (
+        !best ||
+        l1 < best.l1 ||
+        (l1 === best.l1 && affinity > bestAffinity) ||
+        (l1 === best.l1 && affinity === bestAffinity && preferFmt && best.formatId !== opts.preferFormat)
+      ) {
+        best = { deck, formatId: fmt.id, mode: opts.mode, l1 };
+        bestAffinity = affinity;
       }
     }
   }
-  const out: PeerStaple[] = [];
-  for (const [k, sum] of totals) {
-    const presence = (present.get(k) ?? 0) / n;
-    const peerAvg = sum / n;
-    if (presence < minPresence || peerAvg < minPeerAvg) continue;
-    const yourCount = yours.get(k) ?? 0;
-    out.push({
-      name: displayNameFor(k, peerLists),
-      peerAvg,
-      presence,
-      yourCount,
-      delta: yourCount - peerAvg,
-    });
-  }
-  return out.sort(
-    (a, b) => b.presence - a.presence || b.peerAvg - a.peerAvg || a.name.localeCompare(b.name),
-  );
+  return best;
 }
 
-function round1(n: number): string {
-  return (Math.round(n * 10) / 10).toFixed(n % 1 ? 1 : 0);
-}
-
-/** Build clinic findings from shape deltas + staple gaps. */
-export function buildFindings(
-  yours: ListShape,
-  peer: ListShape,
-  light: PeerStaple[],
-  opts?: { board?: "main" | "side" },
-): ClinicFinding[] {
-  const board = opts?.board ?? "main";
-  const label = board === "main" ? "main" : "sideboard";
-  const findings: ClinicFinding[] = [];
-
-  if (board === "main" && yours.total > 0 && (yours.total < 58 || yours.total > 60)) {
-    findings.push({
-      id: "main-size",
-      severity: yours.total < 55 || yours.total > 62 ? "gap" : "nudge",
-      title: `Main is ${yours.total} cards`,
-      detail:
-        yours.total < 60
-          ? "Standard/Pioneer constructed mains are usually 60. Short lists often mean missing interaction or lands."
-          : "Over 60 dilutes draws — cut flex slots unless you have a hard reason.",
-    });
-  }
-
-  const landDelta = yours.lands - peer.lands;
-  if (Math.abs(landDelta) >= 2.5) {
-    findings.push({
-      id: `${board}-lands`,
-      severity: Math.abs(landDelta) >= 4 ? "gap" : "nudge",
-      title:
-        landDelta < 0
-          ? `Light on lands (~${round1(yours.lands)} vs peer ~${round1(peer.lands)})`
-          : `Heavy on lands (~${round1(yours.lands)} vs peer ~${round1(peer.lands)})`,
-      detail:
-        landDelta < 0
-          ? `Ranked ${label}s in this mode average more lands. Flood/screw swings often fix here first.`
-          : `Peers run fewer lands. Extra taps can stall your curve if the package is already greedy.`,
-    });
-  }
-
-  const crDelta = yours.creatures - peer.creatures;
-  if (crDelta <= -4) {
-    findings.push({
-      id: `${board}-creatures`,
-      severity: crDelta <= -7 ? "gap" : "nudge",
-      title: `Creature density low (~${round1(yours.creatures)} vs ~${round1(peer.creatures)})`,
-      detail:
-        "Versus peer mains in this mode, you’re short on bodies. Midrange/aggro shells usually need more pressure slots.",
-    });
-  } else if (crDelta >= 5) {
-    findings.push({
-      id: `${board}-creatures-high`,
-      severity: "info",
-      title: `Creature-heavy vs peers (~${round1(yours.creatures)} vs ~${round1(peer.creatures)})`,
-      detail:
-        "Fine if the plan is go-wide or stompy — just confirm you still have enough clean-up spells for the field.",
-    });
-  }
-
-  const isDelta = yours.instantSorcery - peer.instantSorcery;
-  if (isDelta <= -3) {
-    findings.push({
-      id: `${board}-is`,
-      severity: isDelta <= -5 ? "gap" : "nudge",
-      title: `Few instants/sorceries (~${round1(yours.instantSorcery)} vs ~${round1(peer.instantSorcery)})`,
-      detail:
-        "Peers pack more noncreature spells (removal, draw, counters, pumps). Interaction density is the usual “field demands X” fix.",
-    });
-  }
-
-  // Early curve pressure: MV 1–2 nonlands
-  const yourEarly = yours.curve[1] + yours.curve[2];
-  const peerEarly = peer.curve[1] + peer.curve[2];
-  if (peerEarly - yourEarly >= 4 && board === "main") {
-    findings.push({
-      id: "curve-early",
-      severity: "nudge",
-      title: `Top-heavy curve (1–2 drops ~${round1(yourEarly)} vs peer ~${round1(peerEarly)})`,
-      detail:
-        "Peers deploy more early nonlands. If you’re dying before your plan, buy cheap interaction or threats before adding 5-drops.",
-    });
-  }
-
-  const yourLate = yours.curve[5] + yours.curve[6];
-  const peerLate = peer.curve[5] + peer.curve[6];
-  if (yourLate - peerLate >= 3 && board === "main") {
-    findings.push({
-      id: "curve-late",
-      severity: "info",
-      title: `More expensive spells than peers (~${round1(yourLate)} MV5+ vs ~${round1(peerLate)})`,
-      detail: "High curve is fine for control/ramp — deadly if your land count or early interaction is already light.",
-    });
-  }
-
-  if (yours.avgCmc != null && peer.avgCmc != null && yours.avgCmc - peer.avgCmc >= 0.45) {
-    findings.push({
-      id: `${board}-mv`,
-      severity: "nudge",
-      title: `Higher average MV (${yours.avgCmc.toFixed(2)} vs peer ${peer.avgCmc.toFixed(2)})`,
-      detail: "You cast more expensive spells on average than ranked peers in this mode.",
-    });
-  }
-
-  // Staple copy counts — only real peer cards
-  for (const s of light.slice(0, 6)) {
-    const need = Math.max(1, Math.round(s.peerAvg));
-    findings.push({
-      id: `staple-${norm(s.name)}`,
-      severity: s.yourCount === 0 && s.presence >= 0.5 ? "gap" : "nudge",
-      title:
-        s.yourCount === 0
-          ? `Missing peer staple: ${s.name}`
-          : `Light on ${s.name} (${s.yourCount} vs ~${round1(s.peerAvg)})`,
-      detail: `${Math.round(s.presence * 100)}% of ranked peers play it (avg ${round1(s.peerAvg)}). Field shape suggests ~${need} cop${need === 1 ? "y" : "ies"} — never invented; only cards already on today’s board.`,
-    });
-  }
-
-  if (findings.length === 0) {
-    findings.push({
-      id: "aligned",
-      severity: "info",
-      title: "Shape tracks the peer field",
-      detail:
-        "Lands, threats, and spell density are close to ranked lists in this mode. Next edge is matchup tagging and your own WR, not big package rewrites.",
-    });
-  }
-
-  return findings;
-}
-
-function peerDecksFor(
+function namedHit(
   meta: MetaBundle,
+  name: string | undefined,
   mode: PlayMode,
-  formatId: FormatId | null,
-): Deck[] {
-  const formats = formatId
-    ? meta.formats.filter((f) => f.id === formatId)
-    : meta.formats;
-  const out: Deck[] = [];
-  for (const fmt of formats) {
-    for (const d of decksForMode(fmt, mode, meta.decks)) {
-      if (d.mainboard?.length) out.push(d);
+): { name: string; formatId: FormatId } | null {
+  if (!name?.trim()) return null;
+  let best: { name: string; formatId: FormatId; score: number } | null = null;
+  for (const fmt of meta.formats) {
+    for (const deck of decksForMode(fmt, mode, meta.decks)) {
+      const score = nameAffinity(name, deck);
+      if (score === 0) continue;
+      if (!best || score > best.score) {
+        best = { name: deck.name, formatId: fmt.id, score };
+      }
     }
   }
-  return out;
+  return best ? { name: best.name, formatId: best.formatId } : null;
 }
 
-/**
- * Run Brew Lab clinic. Pure — feed must already be loaded; no network.
- */
-export function runBrewClinic(input: BrewClinicInput): BrewClinicReport {
-  const { deckName, main, side, meta, mode } = input;
+export interface ListClinicInput {
+  deckName?: string;
+  main: CountedName[];
+  side?: CountedName[];
+  meta: MetaBundle | null | undefined;
+  mode: PlayMode;
+  preferFormat?: FormatId;
+}
+
+export function runListClinic(input: ListClinicInput): ListClinicReport {
+  const { main, side, meta, mode } = input;
   if (!meta) {
     return emptyReport(mode, "Meta feed not loaded yet — open Decks once so today’s board is available.");
   }
@@ -537,263 +294,91 @@ export function runBrewClinic(input: BrewClinicInput): BrewClinicReport {
     );
   }
 
-  const hit = resolveMetaDeck(meta, deckName, {
-    formatId: input.formatId,
+  const hit = closestRankedDeck(main, meta, {
     mode,
+    preferFormat: input.preferFormat,
+    preferName: input.deckName,
   });
-  const formatId = input.formatId ?? hit?.formatId ?? null;
-  const peers = peerDecksFor(meta, mode, formatId);
-  if (peers.length === 0) {
-    return emptyReport(
-      mode,
-      "No ranked peer lists for this format/mode in today’s feed.",
-      formatId,
-    );
+  if (!hit) {
+    return emptyReport(mode, "No ranked lists for this mode in today’s feed.");
   }
 
-  const peerMains = peers.map((d) => fromCardEntries(d.mainboard));
-  const peerSides = peers
-    .map((d) => fromCardEntries(d.sideboard ?? []))
-    .filter((s) => s.length > 0);
-
-  const yourMain = shapeOf(main);
-  const peerMainAvg = averageShapes(peerMains.map(shapeOf));
-  const yourSide = side && side.length ? shapeOf(side) : null;
-  const peerSideAvg =
-    peerSides.length > 0 ? averageShapes(peerSides.map(shapeOf)) : null;
-
-  const allStaples = peerStaples(peerMains, main, {
-    minPresence: 0.35,
-    minPeerAvg: 1.2,
-  });
-  const lightStaples = allStaples
-    .filter((s) => s.delta <= -0.75)
-    .sort((a, b) => a.delta - b.delta || b.presence - a.presence)
-    .slice(0, 8);
-  const fieldStaples = allStaples.slice(0, 12);
-
-  const findings = buildFindings(yourMain, peerMainAvg, lightStaples, {
-    board: "main",
-  });
-
-  let lightSideStaples: PeerStaple[] = [];
-  if (mode === "bo3" && yourSide && peerSideAvg && peerSides.length > 0) {
-    const sideAll = peerStaples(peerSides, side ?? [], {
-      minPresence: 0.3,
-      minPeerAvg: 0.8,
-    });
-    lightSideStaples = sideAll
-      .filter((s) => s.delta <= -0.6)
-      .sort((a, b) => a.delta - b.delta)
-      .slice(0, 6);
-    findings.push(
-      ...buildFindings(yourSide, peerSideAvg, lightSideStaples, { board: "side" }).filter(
-        (f) => f.id !== "aligned",
-      ),
-    );
-  }
+  const named = namedHit(meta, input.deckName, mode);
+  const mainDiff = boardDiff(main, fromCardEntries(hit.deck.mainboard));
+  const rankedSide = hit.deck.sideboard ?? [];
+  const sideDiff =
+    side && side.length && rankedSide.length
+      ? boardDiff(side, fromCardEntries(rankedSide))
+      : null;
 
   return {
     mode,
-    formatId,
-    peerCount: peers.length,
-    peerNames: peers.map((d) => d.name),
-    matchedPeerName: hit?.deck.name ?? null,
-    matchedPeerId: hit?.deckId ?? null,
-    yourMain,
-    peerMainAvg,
-    yourSide,
-    peerSideAvg,
-    findings,
-    lightStaples,
-    fieldStaples,
-    lightSideStaples,
+    formatId: hit.formatId,
+    rankedName: hit.deck.name,
+    rankedId: hit.deck.id,
+    nameWasOverridden: Boolean(named && named.name !== hit.deck.name),
+    namedMatch: named?.name ?? null,
+    main: mainDiff,
+    side: sideDiff,
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* v2.0 — Clinic Grade: one honest number from the shape/staple math   */
-/* ------------------------------------------------------------------ */
-
-export interface ClinicAxis {
-  id: string;
-  label: string;
-  /** 0–100, higher = closer to the ranked peer field. */
-  score: number;
-  detail: string;
+function formatOff(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
 }
 
-export interface ClinicGrade {
-  /** 0–100 weighted alignment with the ranked peer field. */
-  score: number;
-  /** A+ … D letter for the scorecard. */
-  letter: string;
-  verdict: string;
-  axes: ClinicAxis[];
-}
-
-function clamp100(n: number): number {
-  return Math.max(0, Math.min(100, Math.round(n)));
-}
-
-function letterFor(score: number): { letter: string; verdict: string } {
-  if (score >= 95) return { letter: "A+", verdict: "Tuned to the field — play it." };
-  if (score >= 88) return { letter: "A", verdict: "Field-ready. Sweat the sideboard, not the shell." };
-  if (score >= 80) return { letter: "B+", verdict: "Close. One or two slots off the ranked shape." };
-  if (score >= 72) return { letter: "B", verdict: "Solid core with clear tightening room." };
-  if (score >= 64) return { letter: "C+", verdict: "Playable, but the field punishes these gaps." };
-  if (score >= 55) return { letter: "C", verdict: "Brew territory — expect variance vs ranked lists." };
-  return { letter: "D", verdict: "Far off the ranked shape. Fix the flagged gaps first." };
-}
-
-/**
- * Grade a clinic report. Pure arithmetic on the same peer-field numbers the
- * findings already use — no oracle text, no invented cards, no AI.
- * Returns null when the report is empty (no list / no peers).
- */
-export function clinicGrade(report: BrewClinicReport): ClinicGrade | null {
-  if (report.emptyReason || report.peerCount === 0 || report.yourMain.total === 0) {
-    return null;
-  }
-  const yours = report.yourMain;
-  const peer = report.peerMainAvg;
-  const axes: ClinicAxis[] = [];
-
-  // Mana base — land count distance from the peer average.
-  const landDelta = yours.lands - peer.lands;
-  axes.push({
-    id: "mana",
-    label: "Mana base",
-    score: clamp100(100 - Math.abs(landDelta) * 16),
-    detail: `${Math.round(yours.lands)} lands vs peer ~${Math.round(peer.lands * 10) / 10}`,
-  });
-
-  // Curve — total per-MV distance from the peer curve (nonlands).
-  let curveDiff = 0;
-  for (let i = 0; i < 7; i++) curveDiff += Math.abs(yours.curve[i] - peer.curve[i]);
-  axes.push({
-    id: "curve",
-    label: "Curve",
-    score: clamp100(100 - curveDiff * 3.5),
-    detail:
-      yours.avgCmc != null && peer.avgCmc != null
-        ? `avg MV ${yours.avgCmc.toFixed(2)} vs peer ${peer.avgCmc.toFixed(2)}`
-        : "mana-value spread vs the peer curve",
-  });
-
-  // Interaction — only being LIGHT on instants/sorceries is penalized.
-  const isShort = Math.max(0, peer.instantSorcery - yours.instantSorcery);
-  axes.push({
-    id: "interaction",
-    label: "Interaction density",
-    score: clamp100(100 - isShort * 9),
-    detail: `${Math.round(yours.instantSorcery)} instants/sorceries vs peer ~${Math.round(peer.instantSorcery * 10) / 10}`,
-  });
-
-  // Staples — missing copies of high-presence peer cards, capped per card.
-  let stapleGap = 0;
-  for (const s of report.lightStaples) {
-    stapleGap += Math.min(2.5, Math.max(0, -s.delta)) * (0.5 + s.presence / 2);
-  }
-  axes.push({
-    id: "staples",
-    label: "Staple alignment",
-    score: clamp100(100 - stapleGap * 8),
-    detail: report.lightStaples.length
-      ? `light on ${report.lightStaples.length} peer staple${report.lightStaples.length === 1 ? "" : "s"}`
-      : "no staple gaps vs the peer field",
-  });
-
-  // Sideboard readiness — Bo3 only, when peers have sideboards on file.
-  if (report.mode === "bo3" && report.yourSide && report.peerSideAvg) {
-    let sideGap = 0;
-    for (const s of report.lightSideStaples) {
-      sideGap += Math.min(2, Math.max(0, -s.delta)) * (0.5 + s.presence / 2);
-    }
-    const sizeGap = Math.max(0, 15 - report.yourSide.total);
-    axes.push({
-      id: "side",
-      label: "Sideboard readiness",
-      score: clamp100(100 - sideGap * 9 - sizeGap * 4),
-      detail: `${report.yourSide.total}/15 slots · ${report.lightSideStaples.length} light SB staple${report.lightSideStaples.length === 1 ? "" : "s"}`,
-    });
-  }
-
-  // Weighted overall: staples matter most, then shell shape.
-  const weights: Record<string, number> = {
-    mana: 22,
-    curve: 22,
-    interaction: 16,
-    staples: 28,
-    side: 12,
-  };
-  let wSum = 0;
-  let acc = 0;
-  for (const a of axes) {
-    const w = weights[a.id] ?? 10;
-    wSum += w;
-    acc += a.score * w;
-  }
-  const score = clamp100(acc / Math.max(1, wSum));
-  const { letter, verdict } = letterFor(score);
-  return { score, letter, verdict, axes };
-}
-
-/** Plain-text clinic report for the copy/share button. */
-export function clinicReportText(
-  deckName: string,
-  report: BrewClinicReport,
-  grade: ClinicGrade | null,
-): string {
+/** Plain-text clinic for the copy button. */
+export function clinicReportText(deckName: string, report: ListClinicReport): string {
   const lines: string[] = [];
-  lines.push(`Brew Lab clinic — ${deckName}`);
-  lines.push(
-    `Field: ${report.peerCount} ranked ${report.formatId ?? "?"} ${report.mode.toUpperCase()} lists` +
-      (report.matchedPeerName ? ` · closest: ${report.matchedPeerName}` : ""),
-  );
-  if (grade) {
-    lines.push(`Grade: ${grade.letter} (${grade.score}/100) — ${grade.verdict}`);
-    for (const a of grade.axes) {
-      lines.push(`  · ${a.label}: ${a.score}/100 (${a.detail})`);
+  const field = report.rankedName
+    ? `${report.rankedName} (${report.formatId ?? "?"} ${report.mode.toUpperCase()})`
+    : "today’s ranked board";
+  lines.push(`${deckName} vs ${field}`);
+  if (report.emptyReason) {
+    lines.push(report.emptyReason);
+    return lines.join("\n");
+  }
+  const pushBoard = (label: string, b: BoardDiff) => {
+    if (b.identical) {
+      lines.push(`${label}: same ${b.rankedTotal}`);
+      return;
     }
-  }
-  if (report.findings.length) {
-    lines.push("Notes:");
-    for (const f of report.findings) lines.push(`  · ${f.title}`);
-  }
-  if (report.lightStaples.length) {
-    lines.push("Light vs peer staples:");
-    for (const s of report.lightStaples) {
-      lines.push(
-        `  · ${s.name} — you ${s.yourCount}, peer ~${(Math.round(s.peerAvg * 10) / 10).toFixed(1)}`,
-      );
+    lines.push(`${label}: ${formatOff(b.cardsOff)} card${b.cardsOff === 1 ? "" : "s"} off the ranked ${b.rankedTotal}`);
+    for (const s of b.extras) lines.push(`  + you ${s.yours} ${s.name} (ranked 0)`);
+    for (const s of b.counts) {
+      const sign = s.yours > s.ranked ? "+" : "−";
+      lines.push(`  ${sign} ${s.name} — you ${s.yours}, ranked ${s.ranked}`);
     }
-  }
+    for (const s of b.missing) lines.push(`  − ranked ${s.ranked} ${s.name} (you 0)`);
+  };
+  pushBoard("Main", report.main);
+  if (report.side) pushBoard("Side", report.side);
   lines.push("— Filthy Net Deck · real ranked lists only, no invented cards");
   return lines.join("\n");
 }
 
-function emptyReport(
-  mode: PlayMode,
-  emptyReason: string,
-  formatId: FormatId | null = null,
-): BrewClinicReport {
-  const z = shapeOf([]);
+function emptyBoard(): BoardDiff {
+  return {
+    cardsOff: 0,
+    yoursTotal: 0,
+    rankedTotal: 0,
+    extras: [],
+    missing: [],
+    counts: [],
+    identical: true,
+  };
+}
+
+function emptyReport(mode: PlayMode, emptyReason: string): ListClinicReport {
   return {
     mode,
-    formatId,
-    peerCount: 0,
-    peerNames: [],
-    matchedPeerName: null,
-    matchedPeerId: null,
-    yourMain: z,
-    peerMainAvg: z,
-    yourSide: null,
-    peerSideAvg: null,
-    findings: [],
-    lightStaples: [],
-    fieldStaples: [],
-    lightSideStaples: [],
+    formatId: null,
+    rankedName: null,
+    rankedId: null,
+    nameWasOverridden: false,
+    namedMatch: null,
+    main: emptyBoard(),
+    side: null,
     emptyReason,
   };
 }

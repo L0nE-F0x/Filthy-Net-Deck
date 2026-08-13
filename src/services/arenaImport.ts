@@ -57,7 +57,7 @@ export function sanitizeArenaImportText(text: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* v2.0 Brew Lab — parse a pasted decklist (Arena / MTGO / Goldfish)  */
+/* Parse a pasted decklist (Arena / MTGO / Goldfish) for the My Stats clinic. */
 /* ------------------------------------------------------------------ */
 
 export interface ParsedDeckLine {

@@ -19,6 +19,8 @@ import {
   type ArenaCardInfo,
 } from "../../services/arenaCards";
 import { resolveMetaDeck } from "../../services/deepLinks";
+import { formatIdForEvent } from "../../services/deckHelpers";
+import { TrackedListClinic } from "../ListClinic";
 import { CardArt, CardArtStrip } from "../CardArt";
 import { TrackedDecklist } from "../TrackedDecklist";
 import { GameAnalyticsPanel } from "../GameAnalyticsPanel";
@@ -374,7 +376,6 @@ export function DeckDetail({
   const openDeck = useAppStore((s) => s.openDeck);
   const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const openClimbDeck = useAppStore((s) => s.openClimbDeck);
-  const openBrewLabDeck = useAppStore((s) => s.openBrewLabDeck);
   const openStatsCompare = useAppStore((s) => s.openStatsCompare);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
   const setPage = useAppStore((s) => s.setPage);
@@ -409,6 +410,10 @@ export function DeckDetail({
   const cardMap = useArenaCardMap(mainIds);
   const headerArts = pickArenaPreview(latestMainboard(deck.matches), cardMap, 6);
   const deckList = useMemo(() => latestDecklist(deck.matches), [deck.matches]);
+  const preferFormat = useMemo(() => {
+    const last = [...deck.matches].sort((a, b) => b.endedAt - a.endedAt)[0];
+    return formatIdForEvent(last?.eventId) ?? undefined;
+  }, [deck.matches]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -504,14 +509,6 @@ export function DeckDetail({
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            title="Grade this list against today's ranked peer field in Brew Lab"
-            onClick={() => openBrewLabDeck(deck.key)}
-          >
-            Brew Lab clinic
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
             title="See your record against each archetype this deck has faced"
             onClick={() => setPage("matchups")}
           >
@@ -574,11 +571,19 @@ export function DeckDetail({
         <>
           <SummaryTiles matches={visibleMatches} />
           {deckList && (
-            <TrackedDecklist
-              deckName={deck.name}
-              main={deckList.main}
-              side={deckList.side}
-            />
+            <>
+              <TrackedListClinic
+                deckName={deck.name}
+                mainIds={deckList.main}
+                sideIds={deckList.side}
+                preferFormat={preferFormat}
+              />
+              <TrackedDecklist
+                deckName={deck.name}
+                main={deckList.main}
+                side={deckList.side}
+              />
+            </>
           )}
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <QueueAnalyticsPanel matches={visibleMatches} />

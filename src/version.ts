@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.1.0";
+export const APP_VERSION = "3.1.1";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,6 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Switching pages is fast again — the app was rebuilding the whole metagame on every click",
-  "Brand-new set cards now show their art and sit in the right type group, instead of a blank box under \"Other\"",
+  "Close-to-tray from fullscreen comes back fullscreen — the window matches Settings again",
+  "My Stats shows how many cards you are off today's closest ranked list. Brew Lab is no longer its own page",
 ];

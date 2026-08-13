@@ -10,7 +10,7 @@
  *
  * This lives in its own module because the app has **two** Arena id resolvers —
  * `arenaMeta` (overlay, archetype inference) and `arenaCards` (My Stats deck
- * list, Brew Lab, deck share). v3.0.1/v3.0.2 taught only the first one about the
+ * list, My Stats clinic, deck share). v3.0.1/v3.0.2 taught only the first one about the
  * gap map, so My Stats kept showing `Card #103482` after the fix shipped. Both
  * now read the map from here, and neither owns it.
  *

@@ -13,8 +13,6 @@ export type Page =
   | "stats"
   | "matchups"
   | "climb"
-  /** Standalone Brew Lab list clinic (v2.0). */
-  | "brewlab"
   /** Standalone Format Hub (legality / rotation / bans). Not FormatView. */
   | "formats"
   | "settings";

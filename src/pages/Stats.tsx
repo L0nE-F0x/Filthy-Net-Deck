@@ -37,6 +37,7 @@ import {
   StatusPanel,
   SummaryTiles,
 } from "../components/stats";
+import { PasteListClinic } from "../components/ListClinic";
 
 // ---------------------------------------------------------------------------
 // Page
@@ -229,6 +230,7 @@ export const Stats = memo(function Stats() {
   return (
     <div className="flex flex-col gap-3">
       <StatusPanel />
+      <PasteListClinic />
 
       {matches.length === 0 ? (
         status?.logFound && status.detailedLogs !== false ? (

@@ -5,7 +5,7 @@
  * The gap-map fallback on the *other* resolver.
  *
  * v3.0.1/v3.0.2 fixed "every Hobbit card shows as `Card #103529`" in
- * `arenaMeta` — the overlay's resolver. My Stats' deck list, Brew Lab and deck
+ * `arenaMeta` — the overlay's resolver. My Stats' deck list, the list clinic and deck
  * share go through `arenaCards` instead, which knew nothing about the gap map,
  * so those screens still showed `Card #103482` with the fix shipped, the map
  * published, and both names sitting in it. Every test here fails against that.

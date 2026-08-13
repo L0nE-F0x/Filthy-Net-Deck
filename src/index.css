@@ -6728,240 +6728,86 @@ html.overlay-macos .overlay-shell {
   opacity: 0.6;
 }
 
-/* �� Brew Lab (pure meta list clinic) �� */
-.brew-lab-head {
+/* vs today's ranked list (My Stats clinic) */
+.clinic-head {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
 }
-.brew-lab-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  align-items: flex-end;
-}
-.brew-lab-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
-}
-.brew-shape {
-  padding: 0.65rem 0.75rem;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
-  background: color-mix(in srgb, var(--color-ink-900) 70%, transparent);
-}
-.brew-shape-title {
-  margin: 0 0 0.45rem;
+.clinic-board { margin-top: 0.85rem; }
+.clinic-board-title {
+  margin: 0 0 0.4rem;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-.brew-shape-list {
+.clinic-rows {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.28rem;
 }
-.brew-shape-list li {
+.clinic-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 0.4rem;
+  grid-template-columns: 2.4rem 1fr auto;
+  gap: 0.5rem;
   align-items: baseline;
-  font-size: 0.78rem;
-}
-.brew-shape-list strong {
-  color: var(--color-foam);
-  font-variant-numeric: tabular-nums;
-}
-.brew-shape-list em {
-  font-style: normal;
-  font-size: 0.68rem;
-  color: var(--color-muted);
-  font-variant-numeric: tabular-nums;
-}
-.brew-curve-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
-  height: 88px;
-  align-items: end;
-}
-.brew-curve-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  height: 100%;
-  justify-content: flex-end;
-}
-.brew-curve-bars {
-  display: flex;
-  gap: 2px;
-  align-items: flex-end;
-  height: 64px;
-  width: 100%;
-  justify-content: center;
-}
-.brew-curve-you,
-.brew-curve-peer {
-  width: 6px;
-  min-height: 2px;
-  border-radius: 2px 2px 0 0;
-}
-.brew-curve-you {
-  background: var(--color-gold-400);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--color-gold-500) 40%, transparent);
-}
-.brew-curve-peer {
-  background: color-mix(in srgb, var(--color-azure-400) 70%, transparent);
-}
-.brew-curve-col em {
-  font-style: normal;
-  font-size: 0.62rem;
-  color: var(--color-muted);
-}
-.brew-curve-legend {
-  display: flex;
-  gap: 0.85rem;
-  margin-top: 0.4rem;
-}
-.brew-leg-you::before,
-.brew-leg-peer::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  margin-right: 0.3rem;
-  vertical-align: middle;
-}
-.brew-leg-you::before { background: var(--color-gold-400); }
-.brew-leg-peer::before {
-  background: color-mix(in srgb, var(--color-azure-400) 70%, transparent);
-}
-.brew-findings-list,
-.brew-staple-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.brew-finding {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--color-ink-600) 50%, transparent);
-  background: color-mix(in srgb, var(--color-ink-900) 65%, transparent);
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-.brew-finding strong {
-  color: var(--color-foam);
-  font-size: 0.82rem;
-}
-.brew-finding span { color: var(--color-muted); }
-.brew-finding.is-gap {
-  border-color: color-mix(in srgb, var(--color-poor) 45%, transparent);
-  background: color-mix(in srgb, var(--color-poor) 10%, transparent);
-}
-.brew-finding.is-nudge {
-  border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
-  background: color-mix(in srgb, var(--color-gold-500) 8%, transparent);
-}
-.brew-finding.is-info {
-  border-color: color-mix(in srgb, var(--color-azure-500) 35%, transparent);
-}
-.brew-staple-list li {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.35rem 0.75rem;
-  padding: 0.4rem 0.55rem;
+  padding: 0.38rem 0.55rem;
   border-radius: 8px;
   font-size: 0.78rem;
   background: color-mix(in srgb, var(--color-ink-900) 55%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-ink-600) 40%, transparent);
 }
-.brew-staple-list strong { color: var(--color-foam); }
-.brew-staple-list span { color: var(--color-muted); font-size: 0.72rem; }
-.brew-field summary {
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 650;
-  color: var(--color-gold-300);
-}
-
-/* —— v2.0 Brew Lab page: grade scorecard + paste mode —— */
-.brew-grade {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 0.9rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-gold-500) 28%, transparent);
-  background: color-mix(in srgb, var(--color-ink-900) 60%, transparent);
-}
-.brew-grade-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 74px;
-  height: 74px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  flex-shrink: 0;
-}
-.brew-grade.is-good .brew-grade-badge { color: var(--color-good, #4ade80); }
-.brew-grade.is-mid .brew-grade-badge { color: var(--color-fair, #facc15); }
-.brew-grade.is-low .brew-grade-badge { color: var(--color-poor, #f87171); }
-.brew-grade-badge strong { font-size: 1.5rem; line-height: 1; letter-spacing: -0.02em; }
-.brew-grade-badge span { font-size: 0.62rem; opacity: 0.8; margin-top: 0.15rem; }
-.brew-grade-axes { min-width: 0; display: flex; flex-direction: column; gap: 0.28rem; }
-.brew-grade-verdict {
-  margin: 0 0 0.2rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-foam);
-}
-.brew-grade-axis {
-  display: grid;
-  grid-template-columns: 118px 1fr auto;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 0.72rem;
-}
-.brew-grade-axis-label { color: var(--color-muted); white-space: nowrap; }
-.brew-grade-track { min-width: 60px; }
-.brew-grade-axis-num {
+.clinic-row strong { color: var(--color-foam); font-weight: 600; }
+.clinic-delta {
   font-variant-numeric: tabular-nums;
-  color: var(--color-foam);
-  font-weight: 600;
-  width: 2ch;
-  text-align: right;
+  font-weight: 700;
+  font-size: 0.78rem;
 }
-.brew-grade-copy { align-self: start; }
-@media (max-width: 700px) {
-  .brew-grade { grid-template-columns: auto 1fr; }
-  .brew-grade-copy { grid-column: 1 / -1; justify-self: start; }
+.clinic-counts {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
 }
-.brew-paste-input {
+.clinic-row.is-extra {
+  border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
+}
+.clinic-row.is-extra .clinic-delta { color: var(--color-gold-300); }
+.clinic-row.is-missing {
+  border-color: color-mix(in srgb, var(--color-poor) 40%, transparent);
+}
+.clinic-row.is-missing .clinic-delta { color: var(--color-poor); }
+.clinic-row.is-count .clinic-delta { color: var(--color-foam); }
+.clinic-paste-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.clinic-paste-toggle:hover .clinic-paste-hint { color: var(--color-foam); }
+.clinic-paste-hint {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.clinic-paste-input {
   width: 100%;
   resize: vertical;
-  min-height: 130px;
+  min-height: 110px;
   padding: 0.6rem 0.7rem;
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, var(--color-ink-600) 80%, transparent);
@@ -6971,7 +6817,7 @@ html.overlay-macos .overlay-shell {
   font-size: 0.78rem;
   line-height: 1.45;
 }
-.brew-paste-input:focus {
+.clinic-paste-input:focus {
   outline: none;
   border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
 }

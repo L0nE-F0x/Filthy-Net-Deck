@@ -1,6 +1,6 @@
 /**
  * Deterministic "coach" chips — no LLM. Every claim ties to real match
- * aggregates or today's ranked meta lists (Brew Lab peer staples only).
+ * aggregates or today's ranked meta lists.
  */
 
 import type { Deck, MetaBundle } from "../types/meta";

@@ -4,7 +4,9 @@
  *
  * Prefer Rust-side commands when available: Windows often ignores hide/close
  * while the window is exclusive-fullscreen, and the OS fullscreen bit can
- * desync from our prefs (Exit then appears to do nothing).
+ * desync from our prefs (Exit then appears to do nothing). Hide-to-tray
+ * drops the OS bit on purpose; `show_main_window` (and `restoreFullscreenIfPreferred`
+ * on the `main:shown` event) puts it back from the pref.
  */
 
 import { invoke } from "@tauri-apps/api/core";
@@ -28,6 +30,16 @@ export async function applyFullscreen(on: boolean): Promise<void> {
   } catch (e) {
     console.warn("[windowMode] setFullscreen fallback failed", e);
   }
+}
+
+/**
+ * Re-apply the persisted fullscreen pref after a tray show. Hide-to-tray
+ * drops the OS bit so Windows will actually hide; the pref is unchanged, so
+ * a no-op when the user is windowed on purpose.
+ */
+export async function restoreFullscreenIfPreferred(preferred: boolean): Promise<void> {
+  if (!preferred) return;
+  await applyFullscreen(true);
 }
 
 /**

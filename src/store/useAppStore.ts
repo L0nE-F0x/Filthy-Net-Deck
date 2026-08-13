@@ -82,7 +82,6 @@ export const LANDING_PAGES: Page[] = [
   "stats",
   "climb",
   "matchups",
-  "brewlab",
   "sets",
   "formats",
   "meta",
@@ -217,9 +216,12 @@ function loadPrefs(): Prefs {
             ? parsed.decklistView
             : "stacked",
         climbNewestFirst: parsed.climbNewestFirst !== false,
-        defaultPage: LANDING_PAGES.includes(parsed.defaultPage as Page)
-          ? (parsed.defaultPage as Page)
-          : "daily",
+        defaultPage:
+          parsed.defaultPage === "brewlab"
+            ? "stats"
+            : LANDING_PAGES.includes(parsed.defaultPage as Page)
+              ? (parsed.defaultPage as Page)
+              : "daily",
         reduceMotion: parsed.reduceMotion === true,
         // Sound is opt-in — OFF by default (owner: bad sound ruins an app).
         soundEnabled: parsed.soundEnabled === true,
@@ -373,14 +375,6 @@ interface AppState {
   climbFocusDeckKey: string | null;
   openClimbDeck: (trackerDeckKey: string) => void;
   clearClimbFocus: () => void;
-  /** Brew Lab focus: open the clinic with a tracked deck pre-selected. */
-  brewLabFocusDeckKey: string | null;
-  openBrewLabDeck: (trackerDeckKey: string) => void;
-  clearBrewLabFocus: () => void;
-  /** Brew Lab seed: open the paste clinic pre-filled with an Arena list. */
-  brewLabSeedText: string | null;
-  openBrewLabText: (arenaImport: string) => void;
-  clearBrewLabSeed: () => void;
   /** Help center modal (v2.0) — openable from anywhere. */
   helpOpen: boolean;
   setHelpOpen: (v: boolean) => void;
@@ -542,8 +536,6 @@ export const useAppStore = create<AppState>((set, get) => {
     formatsFocusTab: null,
     rankUpMoment: null,
     climbFocusDeckKey: null,
-    brewLabFocusDeckKey: null,
-    brewLabSeedText: null,
     helpOpen: false,
     meta: null,
     metaSource: null,
@@ -636,16 +628,6 @@ export const useAppStore = create<AppState>((set, get) => {
         page: "climb",
       }),
     clearClimbFocus: () => set({ climbFocusDeckKey: null }),
-    openBrewLabDeck: (trackerDeckKey) =>
-      set({ brewLabFocusDeckKey: trackerDeckKey, page: "brewlab" }),
-    clearBrewLabFocus: () => set({ brewLabFocusDeckKey: null }),
-    openBrewLabText: (arenaImport) =>
-      set({
-        brewLabSeedText: arenaImport,
-        brewLabFocusDeckKey: null,
-        page: "brewlab",
-      }),
-    clearBrewLabSeed: () => set({ brewLabSeedText: null }),
     setHelpOpen: (helpOpen) => set({ helpOpen }),
     setDefaultMode: (m) => {
       const next = { ...get().prefs, defaultMode: m };
