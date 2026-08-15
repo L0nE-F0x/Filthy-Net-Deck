@@ -3,30 +3,31 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.1** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· commit `be44a48` · tag `v3.1.1`
-
-Windows signed updater is live. macOS **dmg is built on the GH Release and has
-not been rolled** into `website/downloads/` or the homepage buttons — same
-failure mode `AGENTS.md` now guards against.
+**Live product version: v3.1.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· Windows signed updater for 3.1.2. macOS homepage currently serves the
+**v3.1.1** dmg (rolled this session so visitors left 3.1.0). Tag `v3.1.2`
+kicks macOS CI; roll that dmg when it lands.
 
 ---
 
 # ▶ START HERE — next session
 
-1. **Roll the v3.1.1 macOS dmg.** CI succeeded. Asset:
-   `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.1.1/Filthy-Net-Deck-3.1.1-universal.dmg`
-   Curl it into `website/downloads/`, point both homepage macOS buttons at it
-   (hero still says 3.1.0 on purpose), commit, push, confirm Netlify serves it.
-   Do not leave macOS visitors on 3.1.0.
+1. **Roll the v3.1.2 macOS dmg** once CI attaches it to the GitHub Release.
+   Same pattern as 3.1.1: curl into `website/downloads/`, point both homepage
+   macOS buttons at it, commit, push, confirm Netlify serves it.
 2. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
    Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
    bump. Do it on the next `npm run meta:site`, not as a drive-by.
 
-Working tree should be clean. Owner wrapped 2026-08-13 after the Windows
-release; do not invent more product work.
+## This session (2026-08-15)
 
-## This session (2026-08-13)
+| Item | Notes |
+|------|--------|
+| ✅ | **Opponent revealed cards** | Cut with Matchup Lab (`OpponentDeckRead`). Restored on Match History (click a match) and Matchups (open a game). Raw cards only — no archetype guess, copy as Arena import of what was seen. `opponentSeen` still never uploaded. |
+| ✅ | **v3.1.2 Windows release** | Signed with key id `67FCA9900F523D49`. Installer + `.sig` + `updater/latest.json` + `version.json` + OG `?v=3.1.2`. |
+| ✅ | **v3.1.1 macOS dmg rolled** | Homepage was still linking 3.1.0. 3.1.1 dmg is now in `website/downloads/` and both buttons. 3.1.2 dmg waits on CI. |
+
+## Previous session (2026-08-13)
 
 | Item | Notes |
 |------|--------|
@@ -96,7 +97,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.1** on Windows (signed updater live). macOS dmg **built** on the v3.1.1 GH Release, **not rolled** — homepage still links 3.1.0 |
+| App version | **v3.1.2** on Windows (signed updater). macOS homepage serves **v3.1.1** dmg; 3.1.2 dmg waits on the version tag |
 | Branch | `main`, clean after wrap |
 | Gates last green | **567** vitest / 79 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |

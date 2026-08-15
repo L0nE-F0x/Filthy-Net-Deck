@@ -45,7 +45,8 @@ Formats: **Standard** and **Pioneer** only. Design rules:
 ## Winrate tracker (My Stats)
 
 The desktop app tails MTG Arena's own `Player.log` and records your matches —
-result, opponent, deck, queue, play/draw, and rank. **Local by default: nothing
+result, opponent, deck, queue, play/draw, rank, and the cards the opponent
+revealed. Click a match in My Stats to see that list. **Local by default: nothing
 leaves your PC unless you turn it on.**
 
 - Requires **Detailed Logs (Plugin Support)** enabled in Arena

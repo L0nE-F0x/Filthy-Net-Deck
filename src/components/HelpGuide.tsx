@@ -98,11 +98,12 @@ const TOPICS: Topic[] = [
       <>
         <p>
           Your private tracker. Win rates by season, queue, and deck; play/draw and mulligan
-          splits; opponent archetypes inferred from cards actually seen. Click any deck for its
-          full story: decklist (switch <em>Stacked / List / Text</em> views), how many cards you
-          are off today&apos;s closest ranked list, version history with card-by-card diffs, and
-          match history. Paste any Arena/MTGO export on the My Stats home to compare a brew
-          before you play it.
+          splits; opponent archetypes inferred from cards actually seen. Click any match in
+          history to see every card the opponent revealed (copy the list if you want to
+          reconstruct their deck). Click any deck for its full story: decklist (switch{" "}
+          <em>Stacked / List / Text</em> views), how many cards you are off today&apos;s closest
+          ranked list, version history with card-by-card diffs, and match history. Paste any
+          Arena/MTGO export on the My Stats home to compare a brew before you play it.
         </p>
         <p>
           <strong>Fresh runs</strong> hide a deck’s older matches without deleting anything —
@@ -139,10 +140,10 @@ const TOPICS: Topic[] = [
     body: (
       <>
         <p>
-          Your win rate against each archetype, inferred automatically from cards seen - no
-          tagging required. When community data is available, each row shows how you compare
-          to the field. The overlay still uses this mid-match against the deck it thinks you
-          are facing.
+          Your win rate against each archetype, inferred automatically from cards seen — no
+          tagging required. Open a match to see the cards they actually revealed. When
+          community data is available, each row shows how you compare to the field. The
+          overlay still uses this mid-match against the deck it thinks you are facing.
         </p>
       </>
     ),

@@ -5,6 +5,8 @@ import type { TrackedMatch } from "../../types/tracker";
 import { inferOpponentArchetype } from "../../services/opponentArchetype";
 import { peekSeenCard, resolveArenaMetaBatch } from "../../services/arenaMeta";
 import { inferenceCandidates } from "../../services/deckHelpers";
+import { seenCardCount } from "../../services/opponentSeen";
+import { OpponentRevealedCards } from "../OpponentRevealedCards";
 import {
   MATCH_SORT_DEFAULTS,
   sortMatches,
@@ -17,6 +19,13 @@ import {
   type SortDir,
 } from "./statsUi";
 
+function isInteractiveTarget(t: EventTarget | null): boolean {
+  return (
+    t instanceof Element &&
+    Boolean(t.closest("button, a, input, textarea, select"))
+  );
+}
+
 function MatchRow({
   m,
   onArchetype,
@@ -28,49 +37,90 @@ function MatchRow({
   onDeck: (key: string) => void;
   oppArch?: string | null;
 }) {
+  const [open, setOpen] = useState(false);
   const onPlay = m.games.length === 1 ? m.games[0]?.onPlay : undefined;
+  const seen = seenCardCount(m.opponentSeen);
+  const panelId = `match-seen-${m.matchId}`;
+
+  const toggle = () => setOpen((v) => !v);
+
   return (
-    <div className="match-row">
-      <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
-      {/*
-        Links to the *archetype*, not the player. A record against one ladder
-        opponent never accumulates — you rarely meet them twice — whereas the
-        record against what they were playing is the useful question. Plain
-        text when the deck could not be identified, rather than a dead click.
-      */}
-      {oppArch ? (
-        <button
-          type="button"
-          className="match-opponent link-btn text-left"
-          title={`Your record vs ${oppArch}`}
-          onClick={() => onArchetype(oppArch)}
-        >
-          vs {m.opponentName ?? "Unknown"}
-          <span className="text-muted font-normal"> · {oppArch}</span>
-        </button>
-      ) : (
-        <span className="match-opponent text-left" title={m.opponentPlatform ?? undefined}>
-          vs {m.opponentName ?? "Unknown"}
-        </span>
-      )}
-      <span className="match-detail">
-        <button
-          type="button"
-          className="link-btn"
-          onClick={() => onDeck(deckKey(m))}
-        >
-          {m.deckName ?? "Unknown deck"}
-        </button>
-        <span className="text-muted"> · {queueLabel(m.eventId)}</span>
-        {m.games.length > 1 && <span className="text-muted"> · {gameScore(m)}</span>}
-        {onPlay !== undefined && (
-          <span className="text-muted"> · {onPlay ? "on the play" : "on the draw"}</span>
+    <div className={`match-item${open ? " is-open" : ""}`}>
+      <div
+        className="match-row is-toggle"
+        onClick={(e) => {
+          if (isInteractiveTarget(e.target)) return;
+          toggle();
+        }}
+      >
+        <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
+        {/*
+          Links to the *archetype*, not the player. A record against one ladder
+          opponent never accumulates — you rarely meet them twice — whereas the
+          record against what they were playing is the useful question. Plain
+          text when the deck could not be identified, rather than a dead click.
+        */}
+        {oppArch ? (
+          <button
+            type="button"
+            className="match-opponent link-btn text-left"
+            title={`Your record vs ${oppArch}`}
+            onClick={() => onArchetype(oppArch)}
+          >
+            vs {m.opponentName ?? "Unknown"}
+            <span className="text-muted font-normal"> · {oppArch}</span>
+          </button>
+        ) : (
+          <span className="match-opponent text-left" title={m.opponentPlatform ?? undefined}>
+            vs {m.opponentName ?? "Unknown"}
+          </span>
         )}
-      </span>
-      <span className="match-when" title={new Date(m.endedAt).toLocaleString()}>
-        {m.myRank && <span className="text-muted">{m.myRank} · </span>}
-        {timeAgo(m.endedAt)}
-      </span>
+        <span className="match-detail">
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => onDeck(deckKey(m))}
+          >
+            {m.deckName ?? "Unknown deck"}
+          </button>
+          <span className="text-muted"> · {queueLabel(m.eventId)}</span>
+          {m.games.length > 1 && <span className="text-muted"> · {gameScore(m)}</span>}
+          {onPlay !== undefined && (
+            <span className="text-muted"> · {onPlay ? "on the play" : "on the draw"}</span>
+          )}
+        </span>
+        <span className="match-when" title={new Date(m.endedAt).toLocaleString()}>
+          {m.myRank && <span className="text-muted">{m.myRank} · </span>}
+          {timeAgo(m.endedAt)}
+        </span>
+        <button
+          type="button"
+          className="match-expand"
+          aria-expanded={open}
+          aria-controls={panelId}
+          title={
+            seen > 0
+              ? `Show the ${seen} card${seen === 1 ? "" : "s"} the opponent revealed`
+              : "No opponent cards recorded for this match"
+          }
+          onClick={toggle}
+        >
+          <span className="match-expand-count">
+            {seen > 0 ? `${seen}` : "—"}
+          </span>
+          <span className="match-expand-chevron" aria-hidden>
+            {open ? "▴" : "▾"}
+          </span>
+        </button>
+      </div>
+      {open && (
+        <div id={panelId}>
+          <OpponentRevealedCards
+            grpIds={m.opponentSeen}
+            opponentName={m.opponentName}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -174,6 +224,9 @@ export function MatchHistory({
             align="right"
             onClick={() => setCol("when")}
           />
+          <span className="match-cards-head" title="Cards the opponent revealed">
+            Cards
+          </span>
         </div>
         {sorted.slice(0, visible).map((m) => (
           <MatchRow
@@ -194,6 +247,10 @@ export function MatchHistory({
           Show more ({sorted.length - visible} older)
         </button>
       )}
+      <p className="text-xs text-muted m-0 mt-2">
+        Click a match to see the cards the opponent revealed · click a column
+        header to sort · click a deck for its full breakdown.
+      </p>
     </div>
   );
 }

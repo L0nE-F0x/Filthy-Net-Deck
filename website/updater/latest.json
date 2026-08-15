@@ -1,11 +1,11 @@
 {
-  "version": "3.1.1",
-  "notes": "v3.1.1: Close-to-tray from fullscreen comes back fullscreen. My Stats now shows how many cards you are off today's closest ranked list.",
-  "pub_date": "2026-08-13T04:42:10.823Z",
+  "version": "3.1.2",
+  "notes": "v3.1.2: Click a match in My Stats to see the cards the opponent revealed. Copy the list and rebuild their deck — it stays on this PC.",
+  "pub_date": "2026-08-15T07:16:23Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi81UWE5RXR1Z2lBcW52eUJvakpnbVA0WVU1RzBKaENyRElsUTB0WEh0eFJtdTdqVmt2ZVBYTEtBOUkvbkZ6MFBaOWUwMUtaZkVTTDJYSnMyci9DVGdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2NTk2MDg5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4xX3g2NC1zZXR1cC5leGUKVW1pZ3JlUFUwYlBiR24yM3A0NS9yenJCMlJDYUVHU3B4MTBwVzVnd3B2ajhtbWhCTFZUdEd5UEc4QXdhZHNpekpmTlhVZHdZaFBlN3M1MHNQS1p5REE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjI3ZFNsbXAvMWdobnZCeUJudURpRU5GNXlmYUhlQ0xyQXFVQ3BtN0s1SCs0ZGw0Qzl2MHdrRCtGdWFVd3hSQ2N1Rm5ZUFpEZGtGVlN6VnJITkhWWWdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2Nzc4MTgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4yX3g2NC1zZXR1cC5leGUKT05GMXdWOGFCb1hpbEUxL3VQNkdPWHA3Sm43RmprTUszR2VJSGQxNXlsbXh6eGRkMmN0MUl5YmwyeVdoUG56Q01FY0QzTmdaWFY1aWFsRUlRbzR4QkE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.2.exe"
     }
   }
 }

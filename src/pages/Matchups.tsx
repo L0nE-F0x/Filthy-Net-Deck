@@ -38,6 +38,8 @@ import {
 import { myArchetypeName } from "../services/cloud/matchSync";
 import { fetchRollup } from "../services/cloud/sync";
 import { labelFromSlug } from "../services/cloud/archetypeSlug";
+import { seenCardCount } from "../services/opponentSeen";
+import { OpponentRevealedCards } from "../components/OpponentRevealedCards";
 
 const RESULT_LABEL: Record<MatchResult, string> = {
   win: "Win",
@@ -84,6 +86,70 @@ function RateChip({
 function favorFromPct(ratePct: number | null): "favored" | "even" | "unfavored" {
   if (ratePct == null) return "even";
   return winrateFavor(ratePct / 100);
+}
+
+function MatchupsMatchRow({
+  m,
+  onDeck,
+}: {
+  m: TrackedMatch;
+  onDeck: (key: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const seen = seenCardCount(m.opponentSeen);
+  const panelId = `mu-seen-${m.matchId}`;
+  return (
+    <div className={`mu-lab-match-wrap${open ? " is-open" : ""}`}>
+      <div className="mu-lab-match">
+        <span className={`result-chip ${m.result}`}>{RESULT_LABEL[m.result]}</span>
+        <button
+          type="button"
+          className="truncate link-btn text-left"
+          onClick={() => onDeck(deckKey(m))}
+          title="Open in My Stats"
+        >
+          {m.deckName ?? "Unknown deck"}
+          {m.games.length > 1 && (
+            <span className="text-muted"> · {gameScore(m)}</span>
+          )}
+          {m.opponentName ? (
+            <span className="text-muted font-normal">
+              {" "}
+              · vs {m.opponentName}
+            </span>
+          ) : null}
+        </button>
+        <span className="text-xs text-muted whitespace-nowrap">
+          {timeAgo(m.endedAt)}
+        </span>
+        <button
+          type="button"
+          className="match-expand"
+          aria-expanded={open}
+          aria-controls={panelId}
+          title={
+            seen > 0
+              ? `Show the ${seen} card${seen === 1 ? "" : "s"} the opponent revealed`
+              : "No opponent cards recorded for this match"
+          }
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className="match-expand-count">{seen > 0 ? `${seen}` : "—"}</span>
+          <span className="match-expand-chevron" aria-hidden>
+            {open ? "▴" : "▾"}
+          </span>
+        </button>
+      </div>
+      {open && (
+        <div id={panelId}>
+          <OpponentRevealedCards
+            grpIds={m.opponentSeen}
+            opponentName={m.opponentName}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function focusMatchesTag(row: MergedMatchup, tag: string): boolean {
@@ -600,31 +666,11 @@ export const Matchups = memo(function Matchups() {
               ) : (
                 <div className="mu-lab-matches">
                   {selectedMatches.map((m) => (
-                    <div key={m.matchId} className="mu-lab-match">
-                      <span className={`result-chip ${m.result}`}>
-                        {RESULT_LABEL[m.result]}
-                      </span>
-                      <button
-                        type="button"
-                        className="truncate link-btn text-left"
-                        onClick={() => openStatsDeck(deckKey(m))}
-                        title="Open in My Stats"
-                      >
-                        {m.deckName ?? "Unknown deck"}
-                        {m.games.length > 1 && (
-                          <span className="text-muted"> · {gameScore(m)}</span>
-                        )}
-                        {m.opponentName ? (
-                          <span className="text-muted font-normal">
-                            {" "}
-                            · vs {m.opponentName}
-                          </span>
-                        ) : null}
-                      </button>
-                      <span className="text-xs text-muted whitespace-nowrap">
-                        {timeAgo(m.endedAt)}
-                      </span>
-                    </div>
+                    <MatchupsMatchRow
+                      key={m.matchId}
+                      m={m}
+                      onDeck={openStatsDeck}
+                    />
                   ))}
                 </div>
               )}

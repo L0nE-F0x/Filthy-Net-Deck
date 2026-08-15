@@ -1495,9 +1495,17 @@ select,
   display: flex;
   flex-direction: column;
 }
+.match-item {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 55%, transparent);
+}
+.match-item:last-child { border-bottom: none; }
+.match-item.is-open {
+  background: color-mix(in srgb, var(--color-gold-500) 5%, transparent);
+  border-radius: 8px;
+}
 .match-row {
   display: grid;
-  grid-template-columns: 52px minmax(120px, 0.9fr) 1.6fr auto;
+  grid-template-columns: 52px minmax(120px, 0.9fr) 1.6fr auto 4.6rem;
   gap: 0.6rem;
   align-items: center;
   padding: 0.45rem 0.15rem;
@@ -1505,6 +1513,54 @@ select,
   border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 55%, transparent);
 }
 .match-row:last-child { border-bottom: none; }
+.match-item .match-row { border-bottom: none; }
+.match-item .opp-read {
+  margin: 0 0.2rem 0.55rem;
+  padding-top: 0.45rem;
+}
+.match-row.is-toggle { cursor: pointer; }
+.match-row.is-toggle:hover {
+  background: color-mix(in srgb, var(--color-gold-500) 6%, transparent);
+}
+.match-cards-head {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  text-align: right;
+  padding-right: 0.15rem;
+}
+.match-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0.12rem 0.28rem;
+  border: 1px solid color-mix(in srgb, var(--color-ink-600) 55%, transparent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.match-expand:hover,
+.match-item.is-open .match-expand,
+.mu-lab-match-wrap.is-open .match-expand {
+  color: var(--color-foam);
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+  background: color-mix(in srgb, var(--color-gold-500) 10%, transparent);
+}
+.match-expand-chevron {
+  font-size: 0.62rem;
+  line-height: 1;
+  opacity: 0.8;
+}
 .match-opponent {
   font-weight: 600;
   overflow: hidden;
@@ -2129,19 +2185,24 @@ select,
 .mu-lab-matches {
   display: flex;
   flex-direction: column;
-  max-height: 240px;
+  max-height: 360px;
   overflow: auto;
 }
+.mu-lab-match-wrap {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 50%, transparent);
+}
+.mu-lab-match-wrap:last-child { border-bottom: none; }
 .mu-lab-match {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto;
+  grid-template-columns: 52px minmax(0, 1fr) auto 4.4rem;
   gap: 0.5rem;
   align-items: center;
   padding: 0.35rem 0;
   font-size: 0.78rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-ink-700) 50%, transparent);
 }
-.mu-lab-match:last-child { border-bottom: none; }
+.mu-lab-match-wrap .opp-read {
+  margin-bottom: 0.45rem;
+}
 
 /* --- Opponent deck read ("What they were playing") --- */
 .opp-read {
@@ -2552,7 +2613,7 @@ select,
 
 @media (max-width: 960px) {
   .stat-tiles { grid-template-columns: repeat(2, 1fr); }
-  .match-row { grid-template-columns: 52px 1fr auto; }
+  .match-row { grid-template-columns: 52px minmax(0, 1fr) auto 4.4rem; }
   .match-detail { grid-column: 1 / -1; }
   .deck-row-btn { grid-template-columns: minmax(90px, 1fr) 1fr 100px 14px; }
   .deck-row-with-art {
