@@ -4,16 +4,24 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· Windows signed updater for 3.1.3. macOS homepage now serves the **v3.1.2**
-dmg. Tag `v3.1.3` kicks macOS CI; roll that dmg when it lands.
+· commit `3445759` · tag `v3.1.3`
+
+Windows signed updater is live. macOS homepage serves the **v3.1.2** dmg
+(rolled this session). Tag `v3.1.3` kicked macOS CI — roll that dmg when it
+lands. Do not leave macOS visitors on 3.1.2 once 3.1.3 is on the GH Release.
+
+Working tree should be clean. Owner wrapped 2026-08-15; do not invent more
+product work.
 
 ---
 
 # ▶ START HERE — next session
 
 1. **Roll the v3.1.3 macOS dmg** once CI attaches it to the GitHub Release.
-   Same pattern: curl into `website/downloads/`, point both homepage macOS
-   buttons at it, commit, push, confirm Netlify serves it.
+   Asset pattern:
+   `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.1.3/Filthy-Net-Deck-3.1.3-universal.dmg`
+   Curl into `website/downloads/`, point both homepage macOS buttons at it,
+   commit, push, confirm Netlify serves it.
 2. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
    Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
    bump. Do it on the next `npm run meta:site`, not as a drive-by.
@@ -22,10 +30,28 @@ dmg. Tag `v3.1.3` kicks macOS CI; roll that dmg when it lands.
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Opponent revealed cards** | Restored on Match History / Matchups. v3.1.2. |
-| ✅ | **Clinic collapsed + moved** | “Vs today’s ranked list” starts closed, **Show cards off** expands it, and it now sits under Match history on the deck page. v3.1.3. |
-| ✅ | **v3.1.3 Windows release** | Signed with key id `67FCA9900F523D49`. |
-| ✅ | **v3.1.2 macOS dmg rolled** | Homepage buttons point at 3.1.2. 3.1.3 dmg waits on CI. |
+| ✅ | **Opponent revealed cards** | Cut with Matchup Lab (`OpponentDeckRead`, deleted in `2d0aaea` as “dead code”). Restored on Match History (click a match / Cards column) and Matchups (open a game). Raw cards only — no archetype guess. **Copy list** = Arena import of what was seen (1 of each). `opponentSeen` still never uploaded. v3.1.2. |
+| ✅ | **Clinic collapsed + moved** | “Vs today’s ranked list” on a deck page starts closed, **Show cards off** / **Hide**, and now sits **under Match history**. v3.1.3. |
+| ✅ | **v3.1.2 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.2` live. |
+| ✅ | **v3.1.3 Windows** | Same. Live `version.json` / `updater/latest.json` / `Setup-3.1.3.exe` confirmed on filthy-net-deck.com. |
+| ✅ | **v3.1.2 macOS dmg rolled** | Homepage was on 3.1.0, then 3.1.1 mid-session, now 3.1.2. 3.1.3 dmg waits on CI. |
+
+### Hard-won this session
+
+- **Do not delete the revealed-cards UI again.** `2d0aaea` retired Matchup Lab and
+  took `OpponentDeckRead.tsx` with it because nothing imported it. The data
+  (`TrackedMatch.opponentSeen`) never left. New home is Match History + Matchups,
+  helpers in `src/services/opponentSeen.ts`, UI in
+  `src/components/OpponentRevealedCards.tsx`. CSS `.opp-read*` was already there.
+- Netlify takes ~2–3 minutes after a push that includes the installer + dmg.
+  `version.json` staying on the previous version for that window is normal, not
+  a missed deploy.
+- First `tauri:build` failed because a vitest mock in
+  `OpponentRevealedCards.test.tsx` was included by `tsc` (`vi.fn()` typed as
+  zero-arg). Type the mocks (`vi.fn<(id: number) => unknown>()`) before the
+  signed build.
+- Rebase onto `origin/main` before every release push — set-radar / daily-meta
+  moved main 16 commits during the 3.1.2 build.
 
 ## Previous session (2026-08-13)
 
@@ -136,6 +162,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | `src/services/cloud/deckSync.ts` | Slice 7 — `deck_hash` upsert, fingerprint instead of a high-water mark |
 | `src/services/cloud/auth.ts` | OAuth (system browser + `fnd://`), email OTP, session |
 | `src/services/cloud/archetypeSlug.ts` | Canonical slug join key (duplicated in the profile function) |
+| `src/services/opponentSeen.ts` | Distinct revealed grpIds, display list, Arena import of what was seen |
+| `src/components/OpponentRevealedCards.tsx` | Match History / Matchups expand panel. Local only |
+| `src/components/ListClinic.tsx` | `collapsible` starts the deck-page clinic closed (`Show cards off`) |
 | `src/services/opponentArchetype.ts` | Inference. `observedColorsFromSeenCards` is where the basic-land fix landed |
 | `src/services/site.ts` | `SITE_*`, `DONATE_URL`, `PRIVACY_URL`, `STATUS_URL` — empty string hides an affordance everywhere |
 | `src/services/serviceStatus.ts` | Reads `website/status.json`; drives the in-app incident banner |
