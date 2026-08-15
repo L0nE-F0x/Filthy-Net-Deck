@@ -4,24 +4,17 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· commit `39937d2` · tag **v3.1.4**
+· tag **v3.1.4** · Windows **and** macOS both serve 3.1.4
 
-Windows signed updater is the ship path. macOS homepage still serves the
-**v3.1.2** dmg until a newer GH Release dmg is rolled. Tag `v3.1.4` kicks
-macOS CI — roll that dmg when it lands. Do not leave macOS visitors on 3.1.2
-once 3.1.4 is on the GH Release.
+Windows signed updater is the ship path. macOS is a homepage dmg roll from
+the GitHub Release — do not leave visitors on the previous dmg after CI
+attaches the new one.
 
 ---
 
 # ▶ START HERE — next session
 
-1. **Roll the v3.1.4 macOS dmg** once CI attaches it to the GitHub Release.
-   Asset pattern:
-   `https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.1.4/Filthy-Net-Deck-3.1.4-universal.dmg`
-   Curl into `website/downloads/`, point both homepage macOS buttons at it,
-   commit, push, confirm Netlify serves it. If 3.1.3's dmg landed first and
-   was never rolled, skip it — 3.1.4 supersedes.
-2. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
+1. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
    Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
    bump. Do it on the next `npm run meta:site`, not as a drive-by.
 
@@ -31,6 +24,7 @@ once 3.1.4 is on the GH Release.
 |------|--------|
 | ✅ | **Revealed-card quantities** | Match History / Matchups chips show `×N` when the opponent revealed more than one copy. Copy list is an Arena import with those counts. Overlay Opponent tab shows the same qty. Tracker stores repeats = max simultaneous copies in any one game (Bo3 does not triple-count). `opponentSeen` still never uploaded. v3.1.4. |
 | ✅ | **v3.1.4 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.4`. |
+| ✅ | **v3.1.4 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.4-universal.dmg` from the GH Release (sha256 `f47b0361…e675`, 21 097 809 bytes). Both homepage Mac buttons pointed at it. 3.1.3 skipped (never on the homepage). 3.1.0 + 3.1.1 dmgs pruned — downloads stays at current + 1 (3.1.4 + 3.1.2). |
 
 ### Hard-won this session
 
@@ -142,7 +136,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.4** on Windows (signed updater). macOS homepage serves **v3.1.2** dmg; 3.1.4 dmg waits on CI |
+| App version | **v3.1.4** on Windows (signed updater) and macOS (universal dmg on the homepage) |
 | Branch | `main`, clean after wrap |
 | Gates last green | **617** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-16) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
