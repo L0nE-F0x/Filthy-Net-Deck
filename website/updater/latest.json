@@ -1,11 +1,11 @@
 {
-  "version": "3.1.2",
-  "notes": "v3.1.2: Click a match in My Stats to see the cards the opponent revealed. Copy the list and rebuild their deck — it stays on this PC.",
-  "pub_date": "2026-08-15T07:16:23Z",
+  "version": "3.1.3",
+  "notes": "v3.1.3: Vs today's ranked list on a deck page starts collapsed and sits under Match history. Tap Show cards off to expand it.",
+  "pub_date": "2026-08-15T07:38:11Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjI3ZFNsbXAvMWdobnZCeUJudURpRU5GNXlmYUhlQ0xyQXFVQ3BtN0s1SCs0ZGw0Qzl2MHdrRCtGdWFVd3hSQ2N1Rm5ZUFpEZGtGVlN6VnJITkhWWWdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2Nzc4MTgzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4yX3g2NC1zZXR1cC5leGUKT05GMXdWOGFCb1hpbEUxL3VQNkdPWHA3Sm43RmprTUszR2VJSGQxNXlsbXh6eGRkMmN0MUl5YmwyeVdoUG56Q01FY0QzTmdaWFY1aWFsRUlRbzR4QkE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.2.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjkxNFR1SlVIRGUraUUwNDZzTHVCNTJnZXFSeG51TVpySWtEQkpZbkd1bEdWam5VV3BFMGtqSXpHZ3phMnExNUpMbFZsRDA3RXY5SjUxc0tab3NsNUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2Nzc5NDkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4zX3g2NC1zZXR1cC5leGUKMU9POUlvL3h2VFVRL0s1YTJRMncwc1QrWlBYMlRBVVU2V29yM1d2RkFodzBMRlJWc2NQTllmdjNFTkdpZUp3K0lBUnJPdmVlc1pTZ1FoVmNKN3hvQkE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.3.exe"
     }
   }
 }

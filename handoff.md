@@ -3,20 +3,17 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· commit `509ba84` · tag `v3.1.2`
-
-Windows signed updater is live. macOS homepage serves the **v3.1.1** dmg
-(rolled this session so visitors left 3.1.0). Tag `v3.1.2` kicked macOS CI;
-roll that dmg when it lands.
+**Live product version: v3.1.3** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· Windows signed updater for 3.1.3. macOS homepage now serves the **v3.1.2**
+dmg. Tag `v3.1.3` kicks macOS CI; roll that dmg when it lands.
 
 ---
 
 # ▶ START HERE — next session
 
-1. **Roll the v3.1.2 macOS dmg** once CI attaches it to the GitHub Release.
-   Same pattern as 3.1.1: curl into `website/downloads/`, point both homepage
-   macOS buttons at it, commit, push, confirm Netlify serves it.
+1. **Roll the v3.1.3 macOS dmg** once CI attaches it to the GitHub Release.
+   Same pattern: curl into `website/downloads/`, point both homepage macOS
+   buttons at it, commit, push, confirm Netlify serves it.
 2. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
    Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
    bump. Do it on the next `npm run meta:site`, not as a drive-by.
@@ -25,9 +22,10 @@ roll that dmg when it lands.
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Opponent revealed cards** | Cut with Matchup Lab (`OpponentDeckRead`). Restored on Match History (click a match) and Matchups (open a game). Raw cards only — no archetype guess, copy as Arena import of what was seen. `opponentSeen` still never uploaded. |
-| ✅ | **v3.1.2 Windows release** | Signed with key id `67FCA9900F523D49`. Installer + `.sig` + `updater/latest.json` + `version.json` + OG `?v=3.1.2`. |
-| ✅ | **v3.1.1 macOS dmg rolled** | Homepage was still linking 3.1.0. 3.1.1 dmg is now in `website/downloads/` and both buttons. 3.1.2 dmg waits on CI. |
+| ✅ | **Opponent revealed cards** | Restored on Match History / Matchups. v3.1.2. |
+| ✅ | **Clinic collapsed + moved** | “Vs today’s ranked list” starts closed, **Show cards off** expands it, and it now sits under Match history on the deck page. v3.1.3. |
+| ✅ | **v3.1.3 Windows release** | Signed with key id `67FCA9900F523D49`. |
+| ✅ | **v3.1.2 macOS dmg rolled** | Homepage buttons point at 3.1.2. 3.1.3 dmg waits on CI. |
 
 ## Previous session (2026-08-13)
 
@@ -99,7 +97,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.2** on Windows (signed updater live). macOS homepage serves **v3.1.1** dmg; 3.1.2 dmg waits on CI |
+| App version | **v3.1.3** on Windows (signed updater). macOS homepage serves **v3.1.2** dmg; 3.1.3 dmg waits on CI |
 | Branch | `main`, clean after wrap |
 | Gates last green | **613** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-15) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |

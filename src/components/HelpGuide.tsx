@@ -101,8 +101,9 @@ const TOPICS: Topic[] = [
           splits; opponent archetypes inferred from cards actually seen. Click any match in
           history to see every card the opponent revealed (copy the list if you want to
           reconstruct their deck). Click any deck for its full story: decklist (switch{" "}
-          <em>Stacked / List / Text</em> views), how many cards you are off today&apos;s closest
-          ranked list, version history with card-by-card diffs, and match history. Paste any
+          <em>Stacked / List / Text</em> views), version history with card-by-card diffs, and
+          match history. How many cards you are off today&apos;s closest ranked list sits
+          collapsed under history — tap Show cards off to expand it. Paste any
           Arena/MTGO export on the My Stats home to compare a brew before you play it.
         </p>
         <p>

@@ -76,6 +76,8 @@ type ClinicProps = {
   resolving?: boolean;
   /** Skip the outer panel when already inside one (paste box). */
   embedded?: boolean;
+  /** Start closed; a Show / Hide button reveals the card-by-card diff. */
+  collapsible?: boolean;
 };
 
 /** Card-by-card vs the closest ranked list on today's board. */
@@ -86,12 +88,14 @@ export function ListClinic({
   preferFormat,
   resolving,
   embedded,
+  collapsible,
 }: ClinicProps) {
   const meta = useAppStore((s) => s.meta);
   const appMode = useAppStore((s) => s.mode);
   const openDeck = useAppStore((s) => s.openDeck);
   const [mode, setMode] = useState<PlayMode>(appMode);
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(!collapsible);
 
   const report: ListClinicReport = useMemo(
     () =>
@@ -107,22 +111,19 @@ export function ListClinic({
   );
 
   const far = !report.emptyReason && report.main.cardsOff > 15;
+  const summary = report.emptyReason
+    ? deckName
+    : report.main.identical
+      ? `Same ${report.main.rankedTotal} as ${report.rankedName}`
+      : `${offLabel(report.main.cardsOff)} ${report.rankedName}`;
 
   return (
     <div className={embedded ? "clinic" : "panel clinic"}>
       <div className="clinic-head">
         <div>
           <p className="eyebrow m-0">vs today’s ranked list</p>
-          {report.emptyReason ? (
-            <h3 className="dash-title m-0 mt-1">{deckName}</h3>
-          ) : (
-            <h3 className="dash-title m-0 mt-1">
-              {report.main.identical
-                ? `Same ${report.main.rankedTotal} as ${report.rankedName}`
-                : `${offLabel(report.main.cardsOff)} ${report.rankedName}`}
-            </h3>
-          )}
-          {!report.emptyReason && (
+          <h3 className="dash-title m-0 mt-1">{summary}</h3>
+          {open && !report.emptyReason && (
             <p className="text-xs text-muted m-0 mt-1 leading-relaxed">
               Closest {report.formatId} {report.mode.toUpperCase()} list on today’s board
               {report.nameWasOverridden && report.namedMatch
@@ -131,64 +132,84 @@ export function ListClinic({
               . Real ranked cards only.
             </p>
           )}
-        </div>
-        <div className="filter-bar mb-0" role="group" aria-label="Clinic mode">
-          {(["bo1", "bo3"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              className={`filter-chip${mode === m ? " active" : ""}`}
-              onClick={() => setMode(m)}
-            >
-              {m.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {resolving && (
-        <p className="text-xs text-muted m-0 mt-2 loading-pulse">Resolving card names…</p>
-      )}
-
-      {report.emptyReason ? (
-        <p className="text-sm text-muted m-0 mt-3 leading-relaxed" role="status">
-          {report.emptyReason}
-        </p>
-      ) : (
-        <>
-          {far && (
-            <p className="qa-flag mt-2 mb-0">
-              Not a close netdeck — this is just the nearest list on the board.
+          {collapsible && !open && (
+            <p className="text-xs text-muted m-0 mt-1">
+              Card-by-card vs the closest ranked 75 — expand to see the swaps.
             </p>
           )}
-          <BoardBlock label="Main" board={report.main} />
-          {report.side && <BoardBlock label="Sideboard" board={report.side} />}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            {report.rankedId && (
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => openDeck(report.rankedId!)}
-              >
-                Open ranked list
-              </button>
-            )}
+        </div>
+        <div className="clinic-head-actions">
+          {open && (
+            <div className="filter-bar mb-0" role="group" aria-label="Clinic mode">
+              {(["bo1", "bo3"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`filter-chip${mode === m ? " active" : ""}`}
+                  onClick={() => setMode(m)}
+                >
+                  {m.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          )}
+          {collapsible && (
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              title="Copy the card-by-card diff as plain text"
-              onClick={() => {
-                void copyToClipboard(clinicReportText(deckName, report)).then((ok) => {
-                  setCopied(ok);
-                  setTimeout(() => setCopied(false), 2400);
-                });
-              }}
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
             >
-              <IconCopy className="w-4 h-4" /> {copied ? "Copied!" : "Copy diff"}
+              {open ? "Hide" : "Show cards off"}
             </button>
-          </div>
-        </>
+          )}
+        </div>
+      </div>
+
+      {open && resolving && (
+        <p className="text-xs text-muted m-0 mt-2 loading-pulse">Resolving card names…</p>
       )}
+
+      {open &&
+        (report.emptyReason ? (
+          <p className="text-sm text-muted m-0 mt-3 leading-relaxed" role="status">
+            {report.emptyReason}
+          </p>
+        ) : (
+          <>
+            {far && (
+              <p className="qa-flag mt-2 mb-0">
+                Not a close netdeck — this is just the nearest list on the board.
+              </p>
+            )}
+            <BoardBlock label="Main" board={report.main} />
+            {report.side && <BoardBlock label="Sideboard" board={report.side} />}
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {report.rankedId && (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => openDeck(report.rankedId!)}
+                >
+                  Open ranked list
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                title="Copy the card-by-card diff as plain text"
+                onClick={() => {
+                  void copyToClipboard(clinicReportText(deckName, report)).then((ok) => {
+                    setCopied(ok);
+                    setTimeout(() => setCopied(false), 2400);
+                  });
+                }}
+              >
+                <IconCopy className="w-4 h-4" /> {copied ? "Copied!" : "Copy diff"}
+              </button>
+            </div>
+          </>
+        ))}
     </div>
   );
 }
@@ -252,6 +273,7 @@ export function TrackedListClinic({
       side={side}
       preferFormat={preferFormat}
       resolving={resolving}
+      collapsible
     />
   );
 }

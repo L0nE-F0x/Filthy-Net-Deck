@@ -571,19 +571,11 @@ export function DeckDetail({
         <>
           <SummaryTiles matches={visibleMatches} />
           {deckList && (
-            <>
-              <TrackedListClinic
-                deckName={deck.name}
-                mainIds={deckList.main}
-                sideIds={deckList.side}
-                preferFormat={preferFormat}
-              />
-              <TrackedDecklist
-                deckName={deck.name}
-                main={deckList.main}
-                side={deckList.side}
-              />
-            </>
+            <TrackedDecklist
+              deckName={deck.name}
+              main={deckList.main}
+              side={deckList.side}
+            />
           )}
           <SplitsPanel matches={visibleMatches} showQueues showSeasons />
           <QueueAnalyticsPanel matches={visibleMatches} />
@@ -596,6 +588,14 @@ export function DeckDetail({
               if (key !== deck.key) openStatsDeck(key);
             }}
           />
+          {deckList && (
+            <TrackedListClinic
+              deckName={deck.name}
+              mainIds={deckList.main}
+              sideIds={deckList.side}
+              preferFormat={preferFormat}
+            />
+          )}
         </>
       )}
     </div>

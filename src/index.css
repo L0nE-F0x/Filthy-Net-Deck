@@ -6797,6 +6797,13 @@ html.overlay-macos .overlay-shell {
   justify-content: space-between;
   gap: 0.75rem;
 }
+.clinic-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
 .clinic-board { margin-top: 0.85rem; }
 .clinic-board-title {
   margin: 0 0 0.4rem;

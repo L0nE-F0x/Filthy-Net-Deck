@@ -1,5 +1,5 @@
 {
-  "version": "3.1.2",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.2.exe",
-  "notes": "v3.1.2: Click a match in My Stats to see the cards the opponent revealed. Copy the list and rebuild their deck — it stays on this PC."
+  "version": "3.1.3",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.3.exe",
+  "notes": "v3.1.3: Vs today's ranked list on a deck page starts collapsed and sits under Match history. Tap Show cards off to expand it."
 }
