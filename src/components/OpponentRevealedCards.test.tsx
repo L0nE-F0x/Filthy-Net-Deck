@@ -56,4 +56,26 @@ describe("OpponentRevealedCards", () => {
     );
     expect(await screen.findByText("Copied ✓")).toBeTruthy();
   });
+
+  it("shows how many of each card and copies those counts", async () => {
+    peek.mockImplementation((id: number) => {
+      if (id === 20)
+        return { name: "Slickshot Show-Off", isLand: false, artUrl: null };
+      if (id === 10) return { name: "Mountain", isLand: true, artUrl: null };
+      return undefined;
+    });
+    render(
+      <OpponentRevealedCards
+        grpIds={[20, 20, 20, 10, 10]}
+        opponentName="ruthless"
+      />,
+    );
+    expect(screen.getByText(/2 cards revealed · 5 copies/)).toBeTruthy();
+    expect(screen.getByLabelText("3 copies")).toBeTruthy();
+    expect(screen.getByLabelText("2 copies")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /copy list/i }));
+    expect(copy).toHaveBeenCalledWith(
+      ["Deck", "3 Slickshot Show-Off", "2 Mountain"].join("\n"),
+    );
+  });
 });

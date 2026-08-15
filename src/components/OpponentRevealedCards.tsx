@@ -38,11 +38,13 @@ export function OpponentRevealedCards({
 
   const cards = useMemo(() => {
     void tick;
-    return revealedCardsOf(ids, peekArenaMeta);
-  }, [ids, tick]);
+    // Raw list — repeats are quantities. Distinct `ids` is only for resolve.
+    return revealedCardsOf(grpIds, peekArenaMeta);
+  }, [grpIds, tick]);
 
   const pending = cards.filter((c) => c.pending).length;
   const named = cards.length - pending;
+  const copies = cards.reduce((n, c) => n + Math.max(1, c.qty), 0);
   const who = opponentName?.trim() || "the opponent";
 
   if (ids.length === 0) {
@@ -71,6 +73,7 @@ export function OpponentRevealedCards({
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h4 className="dash-title m-0">
           {named} card{named === 1 ? "" : "s"} revealed
+          {copies > named ? ` · ${copies} copies` : ""}
           {pending > 0 ? ` · ${pending} resolving` : ""}
         </h4>
         {named > 0 && (
@@ -78,25 +81,37 @@ export function OpponentRevealedCards({
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => void onCopy()}
-            title="Copy the revealed cards as Arena import text (1 of each)"
+            title="Copy the revealed cards as Arena import text, with how many of each"
           >
             {copied ? "Copied ✓" : "Copy list"}
           </button>
         )}
       </div>
       <p className="text-xs text-muted m-0 mt-1 leading-relaxed">
-        Distinct cards {who} showed this match — not their full 75. Stays on
-        this PC.
+        Cards {who} showed this match
+        {copies > named ? ", with how many of each" : ""} — not their full 75.
+        Stays on this PC.
       </p>
       <div className="opp-read-cards">
         {cards.map((c) => (
           <span
             key={c.id}
-            className={`opp-read-chip${c.isLand ? " is-land" : ""}${c.pending ? " is-pending" : ""}`}
-            title={c.pending ? "Resolving card name…" : c.name}
+            className={`opp-read-chip${c.isLand ? " is-land" : ""}${c.pending ? " is-pending" : ""}${c.qty > 1 ? " has-qty" : ""}`}
+            title={
+              c.pending
+                ? "Resolving card name…"
+                : c.qty > 1
+                  ? `${c.qty}× ${c.name}`
+                  : c.name
+            }
           >
             {c.art ? <img src={c.art} alt="" loading="lazy" /> : null}
             <span className="opp-read-chip-name">{c.name}</span>
+            {c.qty > 1 ? (
+              <span className="opp-read-chip-qty" aria-label={`${c.qty} copies`}>
+                ×{c.qty}
+              </span>
+            ) : null}
           </span>
         ))}
       </div>

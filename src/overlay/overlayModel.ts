@@ -86,17 +86,26 @@ export function groupLibrary(
 }
 
 /**
- * Group the opponent's seen cards (distinct grpIds) with the same
- * Lands / Creatures / Spells sections as the library list.
+ * Group the opponent's seen cards with the same Lands / Creatures / Spells
+ * sections as the library list. Repeats in `seen` become the row quantity.
  */
 export function groupSeenCards(
   seen: number[] | null | undefined,
   metaOf: (grpId: number) => ArenaCardMeta | null | undefined,
 ): OverlayGroup[] {
   if (!seen?.length) return [];
-  const distinct = [...new Set(seen.filter((id) => Number.isFinite(id)))];
+  const qty = new Map<number, number>();
+  const order: number[] = [];
+  for (const id of seen) {
+    if (!Number.isFinite(id)) continue;
+    if (!qty.has(id)) order.push(id);
+    qty.set(id, (qty.get(id) ?? 0) + 1);
+  }
   return groupLibrary(
-    distinct.map((grpId) => ({ grpId, remaining: 1, total: 1 })),
+    order.map((grpId) => {
+      const n = qty.get(grpId) ?? 1;
+      return { grpId, remaining: n, total: n };
+    }),
     metaOf,
   );
 }

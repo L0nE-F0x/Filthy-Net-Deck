@@ -41,8 +41,9 @@ export interface TrackedMatch {
   /** Arena ranked season ordinal (seasons reset monthly). */
   seasonOrdinal?: number;
   /**
-   * Distinct Arena grpIds observed on the opponent seat this match
-   * (battlefield / gy / exile / stack / hand). Used to infer meta archetype.
+   * Arena grpIds observed on the opponent seat this match (battlefield / gy /
+   * exile / stack / hand). Repeats = the most copies seen simultaneously in
+   * any one game. Used to infer meta archetype and to show quantities.
    */
   opponentSeen?: number[];
   /**
@@ -109,7 +110,7 @@ export interface LiveMatch {
    */
   sideboard?: LiveCardCount[];
   sideboardTotal?: number;
-  /** Opponent grpIds seen so far this match. */
+  /** Opponent grpIds seen so far this match (repeats = quantity). */
   opponentSeen?: number[];
   /** Basic land types Arena reported for the opponent (see TrackedMatch). */
   opponentBasics?: string[];

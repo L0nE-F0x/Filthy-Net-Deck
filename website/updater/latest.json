@@ -1,11 +1,11 @@
 {
-  "version": "3.1.3",
-  "notes": "v3.1.3: Vs today's ranked list on a deck page starts collapsed and sits under Match history. Tap Show cards off to expand it.",
-  "pub_date": "2026-08-15T07:38:11Z",
+  "version": "3.1.4",
+  "notes": "v3.1.4: Revealed opponent cards now show how many of each, not just which ones. Copy list includes the counts.",
+  "pub_date": "2026-08-15T16:22:40Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjkxNFR1SlVIRGUraUUwNDZzTHVCNTJnZXFSeG51TVpySWtEQkpZbkd1bEdWam5VV3BFMGtqSXpHZ3phMnExNUpMbFZsRDA3RXY5SjUxc0tab3NsNUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2Nzc5NDkxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS4zX3g2NC1zZXR1cC5leGUKMU9POUlvL3h2VFVRL0s1YTJRMncwc1QrWlBYMlRBVVU2V29yM1d2RkFodzBMRlJWc2NQTllmdjNFTkdpZUp3K0lBUnJPdmVlc1pTZ1FoVmNKN3hvQkE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.3.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjE5MmU1RS83WXMwVHQvZEVsRE5xb2U3YmFGZXVHdGtYUjUzQTI4WU45VFhkRnVIUXBNZlYvMWJhVElGS3NzdHFmZnpFQ0J0NzIremNxYitPT253N0FFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2ODEwOTQwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS40X3g2NC1zZXR1cC5leGUKK3RRU2lLS0ZBTmR6NGNQcmNlaURabVJMYVlTQXhIbDRGenBrSmlsSVpGSldON1lBcWJHdGo2M2czaDhubUtray93Q1hsOXExV3pUSGhlM0JOUjNtREE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.4.exe"
     }
   }
 }

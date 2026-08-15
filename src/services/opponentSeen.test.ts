@@ -4,6 +4,8 @@ import {
   revealedCardsOf,
   revealedListText,
   seenCardCount,
+  seenCopyCount,
+  seenQtyByGrpId,
   type RevealedPeek,
 } from "./opponentSeen";
 
@@ -35,6 +37,15 @@ describe("distinctSeenGrpIds / seenCardCount", () => {
     expect(seenCardCount(undefined)).toBe(0);
     expect(seenCardCount([])).toBe(0);
   });
+
+  it("counts copies separately from distinct names", () => {
+    expect(seenCopyCount([20, 10, 20, 30])).toBe(4);
+    expect(seenCopyCount(undefined)).toBe(0);
+    expect([...seenQtyByGrpId([20, 10, 20])]).toEqual([
+      [20, 2],
+      [10, 1],
+    ]);
+  });
 });
 
 describe("revealedCardsOf", () => {
@@ -47,8 +58,17 @@ describe("revealedCardsOf", () => {
     ]);
     expect(cards[0].pending).toBe(false);
     expect(cards[0].art).toBe("https://example/slick.jpg");
+    expect(cards[0].qty).toBe(1);
     expect(cards[1].isLand).toBe(true);
     expect(cards[2].pending).toBe(true);
+  });
+
+  it("attaches quantity and sorts higher counts first", () => {
+    const cards = revealedCardsOf([10, 20, 20, 20, 10], peek);
+    expect(cards.map((c) => [c.name, c.qty])).toEqual([
+      ["Slickshot Show-Off", 3],
+      ["Mountain", 2],
+    ]);
   });
 
   it("returns empty when nothing was seen", () => {
@@ -62,6 +82,13 @@ describe("revealedListText", () => {
     const cards = revealedCardsOf([30, 20, 99], peek);
     expect(revealedListText(cards)).toBe(
       ["Deck", "1 Slickshot Show-Off", "1 Unholy Annex"].join("\n"),
+    );
+  });
+
+  it("writes recorded quantities into the Arena import", () => {
+    const cards = revealedCardsOf([20, 20, 10, 10, 10], peek);
+    expect(revealedListText(cards)).toBe(
+      ["Deck", "2 Slickshot Show-Off", "3 Mountain"].join("\n"),
     );
   });
 

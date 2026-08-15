@@ -104,9 +104,11 @@ pub struct TrackedMatch {
     /// Arena ranked season ordinal (from rank payloads; seasons reset monthly).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub season_ordinal: Option<u32>,
-    /// Distinct Arena grpIds observed on the *opponent* seat this match
-    /// (battlefield / gy / exile / stack / hand). Used client-side to infer
-    /// meta archetype. Empty when detailed logs never revealed opponent cards.
+    /// Arena grpIds observed on the *opponent* seat this match (battlefield /
+    /// gy / exile / stack / hand). Repeats = the most copies of that card
+    /// seen simultaneously in any one game (so a Bo3 does not triple-count
+    /// the same 75). Used client-side to infer meta archetype and to show
+    /// "how many of each". Empty when detailed logs never revealed cards.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub opponent_seen: Option<Vec<u32>>,
     /// Basic land types Arena itself reported for opponent permanents this
@@ -196,7 +198,7 @@ pub struct LiveMatch {
     /// Sum of sideboard card copies (quick badge).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sideboard_total: Option<u32>,
-    /// Opponent grpIds seen so far this match (sorted).
+    /// Opponent grpIds seen so far this match (sorted; repeats = quantity).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub opponent_seen: Vec<u32>,
     /// Basic land types Arena reported for opponent permanents (sorted).
@@ -308,7 +310,13 @@ pub fn tracker_export_csv(
         // Calendar season key YYYY-MM for spreadsheet pivots (from iso_date).
         let day = iso_date(m.ended_at);
         let season = if day.len() >= 7 { &day[..7] } else { "" };
-        let cards_seen = m.opponent_seen.as_ref().map(|v| v.len()).unwrap_or(0);
+        // Distinct cards — quantity lives in repeated grpIds on the match
+        // itself; this column predates counts and stays a unique tally.
+        let cards_seen = m
+            .opponent_seen
+            .as_ref()
+            .map(|v| v.iter().copied().collect::<HashSet<_>>().len())
+            .unwrap_or(0);
         csv.push_str(&format!(
             "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
             iso_date(m.ended_at),
@@ -571,8 +579,12 @@ struct PendingMatch {
     mulligans_open: bool,
     /// Live turn number from GRE turnInfo (current game).
     cur_turn: Option<u32>,
-    /// Opponent cards (grpId) revealed via GRE this match.
-    opponent_seen: HashSet<u32>,
+    /// Opponent-owned instanceId → grpId for the *current* game. GRE remints
+    /// instance ids on every zone hop, so this map is wiped at each new
+    /// `deckMessage` and identity is collapsed via `DeckTracker::root`.
+    opp_inst_grp: HashMap<u32, u32>,
+    /// grpId → most copies seen simultaneously in any one game this match.
+    opp_seen_max: HashMap<u32, u32>,
     /// Basic land types ("Swamp", …) Arena reported on opponent permanents.
     opponent_basics: HashSet<String>,
 }
@@ -963,7 +975,7 @@ impl LogParser {
             library_total,
             sideboard,
             sideboard_total,
-            opponent_seen: sorted_grp_ids(&pending.opponent_seen),
+            opponent_seen: expanded_grp_ids(&pending.opp_seen_max),
             opponent_basics: sorted_strings(&pending.opponent_basics),
             turn: pending.cur_turn,
             on_play: pending.game_on_play.last().copied().flatten(),
@@ -1161,6 +1173,9 @@ impl LogParser {
                         pending.awaiting_first_turn = true;
                         pending.mulligans_open = true;
                         pending.cur_turn = None;
+                        // Instance ids are reminted per game; keep match-level
+                        // max counts so G2 does not forget G1's two-ofs.
+                        pending.opp_inst_grp.clear();
                         // Only game 1 identifies the registered deck; later games
                         // are post-sideboard lists.
                         if pending.deck_hash.is_none() {
@@ -1204,9 +1219,8 @@ impl LogParser {
                                 if let Some(pending) = self.pending.get_mut(&match_id) {
                                     changed |= note_turn_number(pending, gsm);
                                     changed |= note_opponent_cards(
-                                        &mut self.deck_tracker.zone_types,
-                                        &mut pending.opponent_seen,
-                                        &mut pending.opponent_basics,
+                                        &self.deck_tracker,
+                                        pending,
                                         gsm,
                                         my_seat,
                                     );
@@ -1224,9 +1238,8 @@ impl LogParser {
                         if let Some(pending) = self.pending.get_mut(&match_id) {
                             changed |= note_turn_number(pending, gsm);
                             changed |= note_opponent_cards(
-                                &mut self.deck_tracker.zone_types,
-                                &mut pending.opponent_seen,
-                                &mut pending.opponent_basics,
+                                &self.deck_tracker,
+                                pending,
                                 gsm,
                                 my_seat,
                             );
@@ -1407,10 +1420,57 @@ impl LogParser {
     }
 }
 
-fn sorted_grp_ids(set: &HashSet<u32>) -> Vec<u32> {
-    let mut v: Vec<u32> = set.iter().copied().collect();
-    v.sort_unstable();
-    v
+/// Persist / emit `opponent_seen` as a sorted list with repeats = quantity
+/// (same convention as `deck_main`).
+fn expanded_grp_ids(counts: &HashMap<u32, u32>) -> Vec<u32> {
+    let mut keys: Vec<u32> = counts.keys().copied().collect();
+    keys.sort_unstable();
+    let mut out = Vec::new();
+    for id in keys {
+        let n = counts.get(&id).copied().unwrap_or(0).max(1);
+        for _ in 0..n {
+            out.push(id);
+        }
+    }
+    out
+}
+
+fn count_grp_ids(ids: &[u32]) -> HashMap<u32, u32> {
+    let mut m = HashMap::new();
+    for &id in ids {
+        *m.entry(id).or_default() += 1;
+    }
+    m
+}
+
+/// Raise per-id counts on an already-recorded match when a later parse (log
+/// backfill after this feature shipped) saw more copies. Never drops an id
+/// the stored row already had. Returns true when the row changed.
+fn enrich_opponent_seen(existing: &mut TrackedMatch, incoming: &TrackedMatch) -> bool {
+    let new = incoming.opponent_seen.as_deref().unwrap_or(&[]);
+    if new.is_empty() {
+        return false;
+    }
+    let old = existing.opponent_seen.clone().unwrap_or_default();
+    let mut counts = count_grp_ids(&old);
+    let mut changed = false;
+    for (id, n) in count_grp_ids(new) {
+        let slot = counts.entry(id).or_insert(0);
+        if n > *slot {
+            *slot = n;
+            changed = true;
+        }
+    }
+    if !changed {
+        return false;
+    }
+    let expanded = expanded_grp_ids(&counts);
+    existing.opponent_seen = if expanded.is_empty() {
+        None
+    } else {
+        Some(expanded)
+    };
+    true
 }
 
 fn sorted_strings(set: &HashSet<String>) -> Vec<String> {
@@ -1567,26 +1627,25 @@ fn basic_land_types(go: &serde_json::Value) -> Vec<String> {
         .collect()
 }
 
-/// Record opponent-owned cards that appear in revealed zones. Returns true if set grew.
+/// Record opponent-owned cards that appear in revealed zones.
+///
+/// Quantity is the **most copies of a grpId sitting in revealed zones at
+/// once** this game (then the match keeps the max across games). Counting
+/// unique instance ids would over-count: GRE remints `instanceId` on every
+/// zone hop, which is why the library tracker re-derives from zone
+/// membership instead of accumulating events.
+///
+/// Returns true if the live snapshot should refresh.
 fn note_opponent_cards(
-    zone_types: &mut HashMap<u32, String>,
-    seen: &mut HashSet<u32>,
-    basics: &mut HashSet<String>,
+    tracker: &DeckTracker,
+    pending: &mut PendingMatch,
     gsm: &serde_json::Value,
     my_seat: u32,
 ) -> bool {
-    if let Some(zones) = gsm.get("zones").and_then(|z| z.as_array()) {
-        for z in zones {
-            let Some(zid) = z.get("zoneId").and_then(|x| x.as_u64()).map(|x| x as u32) else {
-                continue;
-            };
-            if let Some(ty) = z.get("type").and_then(|t| t.as_str()) {
-                zone_types.insert(zid, ty.to_string());
-            }
-        }
-    }
     let Some(gos) = gsm.get("gameObjects").and_then(|g| g.as_array()) else {
-        return false;
+        // Zone-only diffs can still move known instances between revealed
+        // seats (e.g. a card already identified hops to the graveyard).
+        return recount_opponent_seen(tracker, pending);
     };
     let mut changed = false;
     for go in gos {
@@ -1603,15 +1662,14 @@ fn note_opponent_cards(
         }
         let zone_id = go.get("zoneId").and_then(|z| z.as_u64()).map(|z| z as u32);
         let zone_ty = zone_id
-            .and_then(|z| zone_types.get(&z))
+            .and_then(|z| tracker.zone_types.get(&z))
             .map(|s| s.as_str())
             .unwrap_or("");
-        if !zone_reveals_card(zone_ty) {
-            continue;
-        }
-        for ty in basic_land_types(go) {
-            if basics.insert(ty) {
-                changed = true;
+        if zone_reveals_card(zone_ty) {
+            for land in basic_land_types(go) {
+                if pending.opponent_basics.insert(land) {
+                    changed = true;
+                }
             }
         }
         let Some(grp) = go.get("grpId").and_then(|g| g.as_u64()).map(|g| g as u32) else {
@@ -1620,7 +1678,61 @@ fn note_opponent_cards(
         if grp == 0 {
             continue;
         }
-        if seen.insert(grp) {
+        let Some(instance) = go
+            .get("instanceId")
+            .and_then(|i| i.as_u64())
+            .map(|i| i as u32)
+        else {
+            continue;
+        };
+        let root = tracker.root(instance);
+        if pending.opp_inst_grp.insert(instance, grp).is_none() {
+            changed = true;
+        }
+        if root != instance {
+            pending.opp_inst_grp.entry(root).or_insert(grp);
+        }
+    }
+    changed |= recount_opponent_seen(tracker, pending);
+    changed
+}
+
+/// Count opponent instances currently in revealed zones and raise match maxes.
+fn recount_opponent_seen(tracker: &DeckTracker, pending: &mut PendingMatch) -> bool {
+    if pending.opp_inst_grp.is_empty() {
+        return false;
+    }
+    let mut used: HashSet<u32> = HashSet::new();
+    let mut now: HashMap<u32, u32> = HashMap::new();
+    for (zid, members) in &tracker.zone_members {
+        let ty = tracker
+            .zone_types
+            .get(zid)
+            .map(|s| s.as_str())
+            .unwrap_or("");
+        if !zone_reveals_card(ty) {
+            continue;
+        }
+        for &iid in members {
+            let root = tracker.root(iid);
+            if !used.insert(root) {
+                continue;
+            }
+            let grp = pending
+                .opp_inst_grp
+                .get(&iid)
+                .copied()
+                .or_else(|| pending.opp_inst_grp.get(&root).copied());
+            if let Some(grp) = grp {
+                *now.entry(grp).or_default() += 1;
+            }
+        }
+    }
+    let mut changed = false;
+    for (grp, n) in now {
+        let slot = pending.opp_seen_max.entry(grp).or_insert(0);
+        if n > *slot {
+            *slot = n;
             changed = true;
         }
     }
@@ -1733,8 +1845,7 @@ fn finalize_match(
         my_rank: pending.my_rank,
         season_ordinal: pending.season_ordinal,
         opponent_seen: {
-            let mut v: Vec<u32> = pending.opponent_seen.into_iter().collect();
-            v.sort_unstable();
+            let v = expanded_grp_ids(&pending.opp_seen_max);
             if v.is_empty() {
                 None
             } else {
@@ -2187,10 +2298,22 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
     }
     let shared = app.state::<TrackerShared>();
     let mut fresh = Vec::new();
+    let mut upgraded = false;
     {
         let mut data = shared.0.lock().expect("tracker lock");
         for m in completed {
             if !data.recorded_ids.insert(m.match_id.clone()) {
+                // Already stored — still fold in better per-card counts from
+                // a re-parse (first launch after quantity tracking shipped).
+                if let Some(existing) = data
+                    .matches
+                    .iter_mut()
+                    .find(|x| x.match_id == m.match_id)
+                {
+                    if enrich_opponent_seen(existing, &m) {
+                        upgraded = true;
+                    }
+                }
                 continue;
             }
             if let Some(file) = data.data_file.clone() {
@@ -2206,6 +2329,13 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
             fresh.push((m, toast));
         }
         data.status.matches_recorded = data.matches.len();
+        if upgraded {
+            if let Some(file) = data.data_file.clone() {
+                if let Err(e) = rewrite_matches(&file, &data.matches) {
+                    note_write_error("enrich rewrite", &e);
+                }
+            }
+        }
     }
     // The append above is best-effort; this is what actually guarantees the
     // match survives the next log rotation.
@@ -3299,6 +3429,190 @@ mod tests {
         assert_eq!(done.len(), 1);
         let seen = done[0].opponent_seen.as_ref().expect("persisted");
         assert_eq!(seen, &vec![777, 888]);
+    }
+
+    #[test]
+    fn opponent_seen_counts_simultaneous_copies() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-qty", "Ladder"));
+        // Two Mountains (777) on the battlefield at once, plus a unique spell.
+        let gsm = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50, 51] },
+                { "zoneId": 11, "type": "ZoneType_Graveyard", "ownerSeatId": 1, "objectInstanceIds": [52] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 50, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 },
+                { "type": "GameObjectType_Card", "instanceId": 51, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 },
+                { "type": "GameObjectType_Card", "instanceId": 52, "grpId": 888, "zoneId": 11, "ownerSeatId": 1 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(gsm);
+        let live = p.live_match().expect("playing");
+        assert_eq!(
+            live.opponent_seen.iter().filter(|&&id| id == 777).count(),
+            2,
+            "two copies in play at once"
+        );
+        assert_eq!(live.opponent_seen.iter().filter(|&&id| id == 888).count(), 1);
+        let done = p.feed_line(&room_completed(
+            "m-qty",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        let seen = done[0].opponent_seen.as_ref().expect("persisted");
+        assert_eq!(seen, &vec![777, 777, 888]);
+    }
+
+    #[test]
+    fn opponent_seen_zone_hop_is_still_one_copy() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-hop", "Ladder"));
+        let play = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 50, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(play);
+        // GRE remints the instance as it dies. Stale battlefield membership
+        // would over-count without ObjectIdChanged → root collapsing.
+        let dies = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "annotations": [
+                { "type": ["AnnotationType_ObjectIdChanged"],
+                  "details": [
+                    { "key": "orig_id", "valueInt32": [50] },
+                    { "key": "new_id", "valueInt32": [60] }
+                  ]
+                }
+              ],
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50] },
+                { "zoneId": 11, "type": "ZoneType_Graveyard", "ownerSeatId": 1, "objectInstanceIds": [60] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 60, "grpId": 777, "zoneId": 11, "ownerSeatId": 1 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(dies);
+        let live = p.live_match().expect("playing");
+        assert_eq!(
+            live.opponent_seen.iter().filter(|&&id| id == 777).count(),
+            1,
+            "one physical card after a zone hop"
+        );
+        let done = p.feed_line(&room_completed(
+            "m-hop",
+            "Ladder",
+            &[(2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done[0].opponent_seen.as_ref().unwrap(), &vec![777]);
+    }
+
+    #[test]
+    fn opponent_seen_keeps_max_across_bo3_games() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-bo3-qty", "Traditional_Ladder"));
+        p.feed_line(GRE_CONNECT);
+        let g1 = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [50, 51] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 50, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 },
+                { "type": "GameObjectType_Card", "instanceId": 51, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(g1);
+        // New GRE connection = new game; instance ids remint.
+        p.feed_line(GRE_CONNECT);
+        let g2 = r#"{ "greToClientEvent": { "greToClientMessages": [ {
+            "type": "GREMessageType_GameStateMessage",
+            "gameStateMessage": {
+              "type": "GameStateType_Diff",
+              "zones": [
+                { "zoneId": 10, "type": "ZoneType_Battlefield", "ownerSeatId": 1, "objectInstanceIds": [80] }
+              ],
+              "gameObjects": [
+                { "type": "GameObjectType_Card", "instanceId": 80, "grpId": 777, "zoneId": 10, "ownerSeatId": 1 }
+              ]
+            }
+        } ] } }"#;
+        p.feed_line(g2);
+        let live = p.live_match().expect("playing");
+        assert_eq!(
+            live.opponent_seen.iter().filter(|&&id| id == 777).count(),
+            2,
+            "G2 showing one copy must not forget G1's two"
+        );
+        let done = p.feed_line(&room_completed(
+            "m-bo3-qty",
+            "Traditional_Ladder",
+            &[
+                (2, "ResultReason_Game"),
+                (1, "ResultReason_Game"),
+                (2, "ResultReason_Game"),
+            ],
+            2,
+        ));
+        assert_eq!(done[0].opponent_seen.as_ref().unwrap(), &vec![777, 777]);
+    }
+
+    #[test]
+    fn enrich_opponent_seen_raises_counts_without_dropping_ids() {
+        let mut existing = TrackedMatch {
+            match_id: "m".into(),
+            started_at: 1,
+            ended_at: 2,
+            event_id: "Ladder".into(),
+            best_of: 1,
+            opponent_name: None,
+            opponent_platform: None,
+            my_team_id: 2,
+            my_player_name: None,
+            games: vec![],
+            result: "win".into(),
+            result_reason: None,
+            deck_name: None,
+            deck_id: None,
+            deck_hash: None,
+            deck_main: None,
+            deck_side: None,
+            my_rank: None,
+            season_ordinal: None,
+            opponent_seen: Some(vec![10, 20]),
+            opponent_basics: None,
+        };
+        let incoming = TrackedMatch {
+            opponent_seen: Some(vec![10, 10, 10]),
+            ..existing.clone()
+        };
+        assert!(enrich_opponent_seen(&mut existing, &incoming));
+        assert_eq!(existing.opponent_seen.as_ref().unwrap(), &vec![10, 10, 10, 20]);
+        assert!(!enrich_opponent_seen(&mut existing, &incoming));
     }
 
     /// Basic lands carry their colour in Arena's own `subtypes`, not in a

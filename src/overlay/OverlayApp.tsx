@@ -382,12 +382,16 @@ const GroupSection = memo(function GroupSection({
   );
 });
 
-/** Opponent-seen row: art · name · pips. No qty/draw% — we only know "shown". */
+/** Opponent-seen row: qty · art · name · pips. */
 const SeenRow = memo(function SeenRow({ row }: { row: OverlayRow }) {
   const label = row.meta?.name ?? `Card ${row.card.grpId}`;
   const art = row.meta?.artUrl;
+  const qty = Math.max(1, row.card.remaining);
   return (
     <li className={`overlay-card-row is-seen${row.meta?.isLand ? " is-land" : ""}`}>
+      <span className="overlay-card-qty" title={`${qty} shown`}>
+        {qty}
+      </span>
       {art ? (
         <img
           className="overlay-card-art"
@@ -402,7 +406,7 @@ const SeenRow = memo(function SeenRow({ row }: { row: OverlayRow }) {
       ) : (
         <span className="overlay-card-art overlay-card-art--empty" />
       )}
-      <span className="overlay-card-name" title={label}>
+      <span className="overlay-card-name" title={qty > 1 ? `${qty}× ${label}` : label}>
         {label}
       </span>
       <ManaPips cost={row.meta?.manaCost} />
@@ -415,7 +419,7 @@ const SeenSection = memo(function SeenSection({ group }: { group: OverlayGroup }
     <section className={`overlay-group overlay-group--${group.id}`}>
       <header className="overlay-group-head" data-tauri-drag-region>
         <span className="overlay-group-label">{group.label}</span>
-        <span className="overlay-group-count">{group.rows.length}</span>
+        <span className="overlay-group-count">{group.remaining}</span>
       </header>
       <ul className="overlay-group-list">
         {group.rows.map((row) => (

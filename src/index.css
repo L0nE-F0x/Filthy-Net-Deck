@@ -2256,6 +2256,18 @@ select,
   white-space: nowrap;
   padding-left: 0.15rem;
 }
+.opp-read-chip-qty {
+  flex-shrink: 0;
+  margin-left: 0.05rem;
+  padding: 0.02rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--color-gold-300) 92%, var(--color-foam));
+  background: color-mix(in srgb, var(--color-gold-500) 18%, transparent);
+}
 .opp-read-chip.is-hit {
   border-color: color-mix(in srgb, var(--color-gold-500) 55%, transparent);
   background: color-mix(in srgb, var(--color-gold-500) 14%, var(--color-ink-900));
@@ -6571,7 +6583,7 @@ html.overlay-macos .overlay-shell {
   color: var(--color-good);
 }
 .overlay-card-row.is-seen {
-  grid-template-columns: 30px minmax(0, 1fr) auto;
+  grid-template-columns: 12px 30px minmax(0, 1fr) auto;
   background: none;
 }
 
@@ -6606,7 +6618,7 @@ html.overlay-macos .overlay-shell {
   padding: 1px 5px 1px 6px;
 }
 .overlay-shell.density-compact .overlay-card-row.is-seen {
-  grid-template-columns: 22px minmax(0, 1fr) auto;
+  grid-template-columns: 12px 22px minmax(0, 1fr) auto;
 }
 .overlay-shell.density-compact .overlay-group-head { padding: 5px 6px 1px; }
 
@@ -6623,7 +6635,7 @@ html.overlay-macos .overlay-shell {
   padding: 1px 5px 1px 6px;
 }
 .overlay-shell.density-minimal .overlay-card-row.is-seen {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
 }
 .overlay-shell.density-minimal .overlay-group-head { padding: 4px 6px 1px; }
 

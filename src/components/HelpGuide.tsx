@@ -99,8 +99,8 @@ const TOPICS: Topic[] = [
         <p>
           Your private tracker. Win rates by season, queue, and deck; play/draw and mulligan
           splits; opponent archetypes inferred from cards actually seen. Click any match in
-          history to see every card the opponent revealed (copy the list if you want to
-          reconstruct their deck). Click any deck for its full story: decklist (switch{" "}
+          history to see every card the opponent revealed and how many of each
+          (copy the list if you want to reconstruct their deck). Click any deck for its full story: decklist (switch{" "}
           <em>Stacked / List / Text</em> views), version history with card-by-card diffs, and
           match history. How many cards you are off today&apos;s closest ranked list sits
           collapsed under history — tap Show cards off to expand it. Paste any

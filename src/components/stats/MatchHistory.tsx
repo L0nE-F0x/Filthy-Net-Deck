@@ -248,8 +248,9 @@ export function MatchHistory({
         </button>
       )}
       <p className="text-xs text-muted m-0 mt-2">
-        Click a match to see the cards the opponent revealed · click a column
-        header to sort · click a deck for its full breakdown.
+        Click a match to see the cards the opponent revealed and how many of
+        each · click a column header to sort · click a deck for its full
+        breakdown.
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.1.3";
+export const APP_VERSION = "3.1.4";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,6 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Vs today's ranked list on a deck page starts collapsed and sits under Match history — tap Show cards off",
-  "Click a match to see every card the opponent revealed. Copy the list and rebuild their deck",
+  "Revealed opponent cards now show how many of each, not just which ones",
+  "Copy list includes those counts so you can rebuild their deck from what they showed",
 ];

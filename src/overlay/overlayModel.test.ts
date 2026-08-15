@@ -205,11 +205,15 @@ describe("groupSeenCards", () => {
   ]);
   const metaOf = (id: number) => metas.get(id);
 
-  it("groups distinct seen ids like the library list", () => {
+  it("groups seen ids like the library list and keeps quantities", () => {
     const groups = groupSeenCards([20, 10, 30, 20, 10], metaOf);
     expect(groups.map((g) => g.id)).toEqual(["land", "creature", "spell"]);
-    // Distinct — the duplicate reveals collapse to one row each.
-    expect(groups.flatMap((g) => g.rows).length).toBe(3);
+    const rows = groups.flatMap((g) => g.rows);
+    expect(rows.length).toBe(3);
+    expect(rows.find((r) => r.card.grpId === 20)?.card.remaining).toBe(2);
+    expect(rows.find((r) => r.card.grpId === 10)?.card.remaining).toBe(2);
+    expect(rows.find((r) => r.card.grpId === 30)?.card.remaining).toBe(1);
+    expect(groups.find((g) => g.id === "land")?.remaining).toBe(2);
   });
 
   it("returns empty for nothing seen", () => {
