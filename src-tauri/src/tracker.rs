@@ -1237,12 +1237,8 @@ impl LogParser {
                         changed |= self.deck_tracker.apply_game_state(gsm, my_seat);
                         if let Some(pending) = self.pending.get_mut(&match_id) {
                             changed |= note_turn_number(pending, gsm);
-                            changed |= note_opponent_cards(
-                                &self.deck_tracker,
-                                pending,
-                                gsm,
-                                my_seat,
-                            );
+                            changed |=
+                                note_opponent_cards(&self.deck_tracker, pending, gsm, my_seat);
                             changed |= note_first_land(
                                 &mut self.deck_tracker.zone_types,
                                 pending,
@@ -2305,11 +2301,7 @@ fn record_matches(app: &AppHandle, completed: Vec<TrackedMatch>, rank_now: Optio
             if !data.recorded_ids.insert(m.match_id.clone()) {
                 // Already stored — still fold in better per-card counts from
                 // a re-parse (first launch after quantity tracking shipped).
-                if let Some(existing) = data
-                    .matches
-                    .iter_mut()
-                    .find(|x| x.match_id == m.match_id)
-                {
+                if let Some(existing) = data.matches.iter_mut().find(|x| x.match_id == m.match_id) {
                     if enrich_opponent_seen(existing, &m) {
                         upgraded = true;
                     }
@@ -3459,7 +3451,10 @@ mod tests {
             2,
             "two copies in play at once"
         );
-        assert_eq!(live.opponent_seen.iter().filter(|&&id| id == 888).count(), 1);
+        assert_eq!(
+            live.opponent_seen.iter().filter(|&&id| id == 888).count(),
+            1
+        );
         let done = p.feed_line(&room_completed(
             "m-qty",
             "Ladder",
@@ -3611,7 +3606,10 @@ mod tests {
             ..existing.clone()
         };
         assert!(enrich_opponent_seen(&mut existing, &incoming));
-        assert_eq!(existing.opponent_seen.as_ref().unwrap(), &vec![10, 10, 10, 20]);
+        assert_eq!(
+            existing.opponent_seen.as_ref().unwrap(),
+            &vec![10, 10, 10, 20]
+        );
         assert!(!enrich_opponent_seen(&mut existing, &incoming));
     }
 

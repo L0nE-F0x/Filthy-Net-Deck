@@ -4,7 +4,7 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· (this session) · tag **v3.1.4**
+· commit `39937d2` · tag **v3.1.4**
 
 Windows signed updater is the ship path. macOS homepage still serves the
 **v3.1.2** dmg until a newer GH Release dmg is rolled. Tag `v3.1.4` kicks
