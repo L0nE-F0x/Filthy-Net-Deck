@@ -4,9 +4,11 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.2** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· Windows signed updater for 3.1.2. macOS homepage currently serves the
-**v3.1.1** dmg (rolled this session so visitors left 3.1.0). Tag `v3.1.2`
-kicks macOS CI; roll that dmg when it lands.
+· commit `509ba84` · tag `v3.1.2`
+
+Windows signed updater is live. macOS homepage serves the **v3.1.1** dmg
+(rolled this session so visitors left 3.1.0). Tag `v3.1.2` kicked macOS CI;
+roll that dmg when it lands.
 
 ---
 
@@ -97,9 +99,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.2** on Windows (signed updater). macOS homepage serves **v3.1.1** dmg; 3.1.2 dmg waits on the version tag |
+| App version | **v3.1.2** on Windows (signed updater live). macOS homepage serves **v3.1.1** dmg; 3.1.2 dmg waits on CI |
 | Branch | `main`, clean after wrap |
-| Gates last green | **567** vitest / 79 files · tsc · eslint · `cargo fmt`/`clippy` · **48** cargo tests (2026-08-12) |
+| Gates last green | **613** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-15) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |
