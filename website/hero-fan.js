@@ -1,4 +1,14 @@
-/* Hero fan — live Standard + Pioneer Bo1 from /meta/latest.json */
+/* Hero fan — live Standard/Pioneer × Bo1/Bo3 from /meta/latest.json */
+
+const FORMATS = ["standard", "pioneer"];
+const MODES = ["bo1", "bo3"];
+
+function emptyBoards() {
+  return {
+    standard: { bo1: [], bo3: [] },
+    pioneer: { bo1: [], bo3: [] },
+  };
+}
 
 function scryfallCard(id) {
   if (!id || id.length < 3) return "";
@@ -10,10 +20,14 @@ function isLand(c) {
   return !t || t.includes("land");
 }
 
-function signatureCard(deck) {
-  const pool = [...(deck.mainboard || [])].filter((c) => c.scryfallId && !isLand(c));
+function signatureFrom(cards) {
+  const pool = [...(cards || [])].filter((c) => c.scryfallId && !isLand(c));
   pool.sort((a, b) => (b.count || 0) - (a.count || 0));
-  return pool[0] || (deck.mainboard || []).find((c) => c.scryfallId) || null;
+  return pool[0] || (cards || []).find((c) => c.scryfallId) || null;
+}
+
+function signatureCard(deck) {
+  return signatureFrom(deck.mainboard);
 }
 
 function escapeHtml(s) {
@@ -23,10 +37,11 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-function packFormat(meta, fmtId) {
+function packFormat(meta, fmtId, mode) {
   const fmt = meta.formats?.find((f) => f.id === fmtId);
   if (!fmt) return [];
-  const ids = fmt.bo1DeckIds?.length ? fmt.bo1DeckIds : fmt.bo3DeckIds || [];
+  const key = mode === "bo3" ? "bo3DeckIds" : "bo1DeckIds";
+  const ids = fmt[key] || [];
   return ids
     .map((id) => meta.decks?.[id])
     .filter(Boolean)
@@ -37,24 +52,43 @@ function packFormat(meta, fmtId) {
       rank: d.rank,
       share: d.metaShare,
       format: fmtId,
+      mode,
+      sbCount: (d.sideboard || []).reduce((n, c) => n + (c.count || 0), 0),
       card: signatureCard(d),
     }))
     .filter((d) => d.card?.scryfallId);
 }
 
+function sameFaces(a, b) {
+  if (!a?.length || a.length !== b?.length) return false;
+  return a.every((d, i) => d.card?.scryfallId && d.card.scryfallId === b[i]?.card?.scryfallId);
+}
+
 async function loadBoards() {
-  const empty = { standard: [], pioneer: [] };
+  const empty = emptyBoards();
   try {
     const res = await fetch("/meta/latest.json", { cache: "no-cache" });
     if (!res.ok) return empty;
     const meta = await res.json();
-    return {
-      standard: packFormat(meta, "standard"),
-      pioneer: packFormat(meta, "pioneer"),
-    };
+    const boards = emptyBoards();
+    for (const fmt of FORMATS) {
+      for (const mode of MODES) {
+        boards[fmt][mode] = packFormat(meta, fmt, mode);
+      }
+    }
+    return boards;
   } catch {
     return empty;
   }
+}
+
+function pickInitial(boards) {
+  for (const mode of MODES) {
+    for (const fmt of FORMATS) {
+      if (boards[fmt]?.[mode]?.length) return { format: fmt, mode };
+    }
+  }
+  return { format: "standard", mode: "bo1" };
 }
 
 function layout(i, active) {
@@ -73,15 +107,26 @@ function setupFan(boards) {
   const stage = document.getElementById("hero-stage");
   const hand = document.getElementById("fan-hand");
   const dots = document.getElementById("fan-dots");
+  const dockEl = document.getElementById("fan-dock");
   if (!stage || !hand) return;
 
-  let format = boards.standard.length ? "standard" : "pioneer";
-  let decks = boards[format] || [];
+  const start = pickInitial(boards);
+  let format = start.format;
+  let mode = start.mode;
+  let decks = boards[format]?.[mode] || [];
   let cards = [];
   let active = 0;
   let timer = 0;
   let paused = false;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function currentBoard() {
+    return boards[format]?.[mode] || [];
+  }
+
+  function hasBoard(fmt, m) {
+    return (boards[fmt]?.[m] || []).length > 0;
+  }
 
   function dock(d) {
     if (!d) return;
@@ -90,13 +135,41 @@ function setupFan(boards) {
     const metaEl = document.getElementById("fan-meta");
     const go = document.getElementById("fan-go");
     const fmtLabel = d.format === "pioneer" ? "Pioneer" : "Standard";
+    const modeLabel = d.mode === "bo3" ? "Bo3" : "Bo1";
     if (rank) rank.textContent = `#${d.rank ?? ""}`;
     if (name) name.textContent = d.name;
     if (metaEl) {
       const share = d.share != null ? `${d.share}%` : "verified";
-      metaEl.textContent = `${fmtLabel} Bo1 · ${share}`;
+      const sb =
+        d.mode === "bo3" && d.sbCount
+          ? ` · ${d.sbCount}-card SB`
+          : "";
+      metaEl.textContent = `${fmtLabel} ${modeLabel} · ${share}${sb}`;
     }
     if (go) go.href = d.id ? `meta-web/deck/${d.id}.html` : "meta-web/";
+  }
+
+  function flashDock() {
+    if (!dockEl) return;
+    dockEl.classList.remove("is-flash");
+    void dockEl.offsetWidth;
+    dockEl.classList.add("is-flash");
+    window.setTimeout(() => dockEl.classList.remove("is-flash"), 450);
+  }
+
+  function syncToggles() {
+    document.querySelectorAll("[data-fan-fmt]").forEach((b) => {
+      const on = b.dataset.fanFmt === format;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.disabled = !hasBoard(b.dataset.fanFmt, mode);
+    });
+    document.querySelectorAll("[data-fan-mode]").forEach((b) => {
+      const on = b.dataset.fanMode === mode;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.disabled = !hasBoard(format, b.dataset.fanMode);
+    });
   }
 
   function render() {
@@ -140,14 +213,13 @@ function setupFan(boards) {
     });
   }
 
-  function paint() {
-    decks = boards[format] || [];
+  function paint({ flash = false } = {}) {
+    decks = currentBoard();
     if (!decks.length) {
-      const other = format === "standard" ? "pioneer" : "standard";
-      if (boards[other]?.length) {
-        format = other;
-        decks = boards[format];
-      }
+      const next = pickInitial(boards);
+      format = next.format;
+      mode = next.mode;
+      decks = currentBoard();
     }
     hand.innerHTML = decks
       .map((d, i) => {
@@ -165,20 +237,27 @@ function setupFan(boards) {
     cards = [...hand.querySelectorAll(".fan-card")];
     active = 0;
     bindCards();
-    document.querySelectorAll("[data-fan-fmt]").forEach((b) => {
-      b.classList.toggle("on", b.dataset.fanFmt === format);
-    });
+    syncToggles();
     render();
     restart();
+    if (flash) flashDock();
+  }
+
+  function switchBoard(nextFmt, nextMode) {
+    if (!hasBoard(nextFmt, nextMode)) return;
+    if (nextFmt === format && nextMode === mode) return;
+    const prev = currentBoard();
+    format = nextFmt;
+    mode = nextMode;
+    const next = currentBoard();
+    paint({ flash: sameFaces(prev, next) });
   }
 
   document.querySelectorAll("[data-fan-fmt]").forEach((b) => {
-    b.addEventListener("click", () => {
-      const next = b.dataset.fanFmt;
-      if (!boards[next]?.length || next === format) return;
-      format = next;
-      paint();
-    });
+    b.addEventListener("click", () => switchBoard(b.dataset.fanFmt, mode));
+  });
+  document.querySelectorAll("[data-fan-mode]").forEach((b) => {
+    b.addEventListener("click", () => switchBoard(format, b.dataset.fanMode));
   });
 
   dots?.addEventListener("click", (e) => {

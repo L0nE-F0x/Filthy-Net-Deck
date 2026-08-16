@@ -47,7 +47,15 @@
   background: rgba(184, 240, 0, 0.18);
   color: var(--acid);
 }
-.fan-kicker-mode { color: var(--muted); letter-spacing: 0.06em; }
+.fan-fmt button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.fan-dock.is-flash {
+  border-color: rgba(184, 240, 0, 0.5);
+  box-shadow: 0 0 18px rgba(184, 240, 0, 0.12);
+}
 
 .fan-hand {
   position: absolute;
@@ -121,12 +129,13 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-width: min(380px, 92%);
+  min-width: min(400px, 92%);
   padding: 0.55rem 0.75rem;
   border-radius: 12px;
   background: rgba(10, 11, 8, 0.88);
   border: 1px solid rgba(184, 240, 0, 0.22);
   backdrop-filter: blur(10px);
+  transition: border-color 0.35s, box-shadow 0.35s;
 }
 .fan-dock-rank {
   margin: 0;
@@ -174,5 +183,12 @@
   .hero-stage { height: 500px; }
   .fan-card { width: 128px; }
   .fan-dock { min-width: 0; width: 92%; }
-  .fan-kicker { flex-wrap: wrap; justify-content: center; white-space: normal; }
+  .fan-kicker {
+    flex-wrap: wrap;
+    justify-content: center;
+    white-space: normal;
+    gap: 0.4rem;
+    width: 92%;
+  }
+  .fan-fmt button { padding: 0.26rem 0.5rem; }
 }

@@ -24,7 +24,8 @@ attaches the new one.
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Homepage hero = live fan** | Hand of 5 real Scryfall cards from today’s Bo1 top 5. Standard / Pioneer toggle. Click side card to lift; click the lifted card or **Open list →** to `/meta-web/deck/<id>.html`. Driven by `/meta/latest.json`. Brand tokens + Segoe UI untouched. |
+| ✅ | **Homepage hero = live fan** | Hand of 5 real Scryfall cards from today’s top 5. **Standard / Pioneer × Bo1 / Bo3** sibling pills (replaces the static “Bo1 · live” label). Click side card to lift; click the lifted card or **Open list →** to `/meta-web/deck/<id>.html`. Driven by `/meta/latest.json`. Brand tokens + Segoe UI untouched. Pioneer Bo1/Bo3 share the same mainboard faces — dock flashes and shows `N-card SB` so the mode switch is visible. |
+| ✅ | **Stacked decklist = Arena overlap** | Public `/meta-web/deck/*` stacked view was a wrapping tile grid (`auto-fit` + 78px art + name under the crop). Lands wrapped into a lone skinny column with a void. Now matches the in-app stack: 128px columns, cards overlap (`height: 64px; margin-bottom: -38px`), name on the art, Lands/SB stay 128px and sit together when they wrap. CSS in `pipeline/build-meta-site.mjs` + `website/meta-web/site.css`. No page regen needed. |
 | ✅ | **Public meta pages** | Deck heroes get a 4-card art stack; hub/format tiles get art strips; Stacked / List / Text toggles (same as the app, remembered in `localStorage`). Format pages (Std + Pio) have hero art. |
 | ✅ | **Copy** | Hero no longer says “MTGO only”. Pipeline is MTGO → magic.gg → Goldfish, plus Untapped ladder when that’s the list (today’s #1 Auras is). Matchup Lab line removed. |
 | ✅ | **Web platform plan** | `docs/WEB-PLATFORM.md` — site as public face of FND data, not a second desktop app. Pointer in `PLATFORM-STRATEGY.md` §1.6. |

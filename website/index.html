@@ -137,12 +137,15 @@
 
         <div class="hero-stage reveal-child delay-1" id="hero-stage">
           <p class="fan-kicker">
-            <span class="dot-live"></span>
+            <span class="dot-live" title="Live metagame"></span>
             <span class="fan-fmt" role="group" aria-label="Format">
-              <button type="button" data-fan-fmt="standard" class="on">Standard</button>
-              <button type="button" data-fan-fmt="pioneer">Pioneer</button>
+              <button type="button" data-fan-fmt="standard" class="on" aria-pressed="true">Standard</button>
+              <button type="button" data-fan-fmt="pioneer" aria-pressed="false">Pioneer</button>
             </span>
-            <span class="fan-kicker-mode">Bo1 · live</span>
+            <span class="fan-fmt" role="group" aria-label="Best of">
+              <button type="button" data-fan-mode="bo1" class="on" aria-pressed="true">Bo1</button>
+              <button type="button" data-fan-mode="bo3" aria-pressed="false">Bo3</button>
+            </span>
           </p>
           <div class="fan-hand" id="fan-hand" aria-label="Today’s top decks"></div>
           <div class="fan-dock" id="fan-dock">
