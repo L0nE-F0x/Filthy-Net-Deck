@@ -148,13 +148,7 @@ function composition(mainboard) {
  * grid auto-fits, so 1, 2 or 3 all lay out correctly.
  */
 function keyCardStrip(deck) {
-  const byName = new Map(
-    [...(deck.mainboard || []), ...(deck.sideboard || [])].map((c) => [c.name, c]),
-  );
-  const found = (deck.keyCards || [])
-    .slice(0, 3)
-    .map((n) => byName.get(n))
-    .filter((c) => c && scryfallImg(c));
+  const found = artCards(deck, 4);
   if (!found.length) return "";
 
   const items = found
@@ -212,7 +206,58 @@ function scryfallImg(card) {
   return `https://cards.scryfall.io/art_crop/front/${id[0]}/${id[1]}/${id}.jpg`;
 }
 
-function layout({ title, description, canonicalPath, body, active, jsonLd }) {
+function isLandCard(c) {
+  const t = String(c?.type || "").toLowerCase();
+  return !t || t.includes("land");
+}
+
+/** Prefer Goldfish key cards that are actually in the list; else top non-lands. */
+function artCards(deck, n = 4) {
+  const pool = [...(deck.mainboard || [])];
+  const byName = new Map(pool.map((c) => [c.name, c]));
+  const fromKeys = (deck.keyCards || [])
+    .map((name) => byName.get(name))
+    .filter((c) => c && scryfallImg(c) && !isLandCard(c));
+  const rest = pool
+    .filter((c) => scryfallImg(c) && !isLandCard(c))
+    .sort((a, b) => (b.count || 0) - (a.count || 0));
+  const seen = new Set();
+  const out = [];
+  for (const c of [...fromKeys, ...rest]) {
+    if (seen.has(c.name)) continue;
+    seen.add(c.name);
+    out.push(c);
+    if (out.length >= n) break;
+  }
+  return out;
+}
+
+function typeBucket(c) {
+  if (isLandCard(c)) return "land";
+  const t = String(c.type || "").toLowerCase();
+  if (t.includes("creature")) return "creature";
+  if (t.includes("planeswalker")) return "planeswalker";
+  if (t.includes("battle")) return "battle";
+  if (t.includes("instant")) return "instant";
+  if (t.includes("sorcery")) return "sorcery";
+  if (t.includes("enchantment")) return "enchantment";
+  if (t.includes("artifact")) return "artifact";
+  return "other";
+}
+
+const TYPE_LABELS = {
+  creature: "Creatures",
+  planeswalker: "Planeswalkers",
+  instant: "Instants",
+  sorcery: "Sorceries",
+  enchantment: "Enchantments",
+  artifact: "Artifacts",
+  battle: "Battles",
+  other: "Other",
+  land: "Lands",
+};
+
+function layout({ title, description, canonicalPath, body, active, jsonLd, extraScripts = "" }) {
   const canon = `${SITE}${canonicalPath}`;
   // Was pinned at ?v=1.5.1 and never updated, so social caches kept a stale card.
   const ogv = resolveDownloads().ver;
@@ -271,6 +316,7 @@ ${body}
       <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck">GitHub</a>
     </p>
   </footer>
+  ${extraScripts}
 </body>
 </html>
 `;
@@ -284,7 +330,7 @@ function downloadBanner(date, nest = 0) {
     <aside class="download-banner">
       <div>
         <strong>Track these decks in the free desktop app</strong>
-        <p>Daily meta, Brew Lab, overlay, and a local-only winrate tracker for Arena. Updated ${esc(date)}.</p>
+        <p>Daily meta, overlay, and a local winrate tracker for Arena. Updated ${esc(date)}.</p>
       </div>
       <div class="dl-row">
         <a class="btn" href="${win}">Windows</a>
@@ -295,8 +341,11 @@ function downloadBanner(date, nest = 0) {
 
 function deckCard(d) {
   const href = `deck/${esc(d.id)}.html`;
-  const keys = (d.keyCards || []).slice(0, 3).map(esc).join(" · ");
+  const keys = artCards(d, 3).map((c) => c.name);
   const share = d.metaShare != null ? `${Number(d.metaShare).toFixed(1)}%` : "-";
+  const arts = artCards(d, 4)
+    .map((c) => `<img src="${esc(scryfallImg(c))}" alt="" loading="lazy" />`)
+    .join("");
   return `
     <a class="deck-card" href="${href}">
       <div class="deck-rank">#${esc(d.rank)}</div>
@@ -308,7 +357,8 @@ function deckCard(d) {
           <span class="pct">${esc(share)}</span>
           <span class="colors">${esc(colorsText(d.colors))}</span>
         </p>
-        ${keys ? `<p class="keys">${keys}</p>` : ""}
+        ${arts ? `<div class="deck-arts">${arts}</div>` : ""}
+        ${keys.length ? `<p class="keys">${keys.map(esc).join(" · ")}</p>` : ""}
       </div>
     </a>`;
 }
@@ -337,6 +387,123 @@ function listCards(cards, title) {
       <h2>${esc(title)} <span class="count">(${cards.reduce((n, c) => n + (c.count || 0), 0)})</span></h2>
       <ul class="card-list">${rows}</ul>
     </section>`;
+}
+
+function cardThumb(c) {
+  const img = scryfallImg(c);
+  return img
+    ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy" width="40" height="56" />`
+    : `<span class="thumb empty"></span>`;
+}
+
+function stackedView(main, side) {
+  const cols = new Map();
+  const lands = [];
+  for (const c of main || []) {
+    if (typeBucket(c) === "land") {
+      lands.push(c);
+      continue;
+    }
+    const mv = Math.min(7, Math.max(0, Math.floor(c.cmc ?? 0)));
+    const list = cols.get(mv) ?? [];
+    list.push(c);
+    cols.set(mv, list);
+  }
+  const blocks = [];
+  for (const mv of [...cols.keys()].sort((a, b) => a - b)) {
+    const rows = cols.get(mv);
+    const count = rows.reduce((n, c) => n + (c.count || 0), 0);
+    blocks.push({ key: `mv${mv}`, label: mv >= 7 ? "7+" : String(mv), rows, count });
+  }
+  if (lands.length) {
+    blocks.push({
+      key: "lands",
+      label: "Lands",
+      rows: lands,
+      count: lands.reduce((n, c) => n + (c.count || 0), 0),
+    });
+  }
+  if (side?.length) {
+    blocks.push({
+      key: "side",
+      label: "SB",
+      rows: side,
+      count: side.reduce((n, c) => n + (c.count || 0), 0),
+    });
+  }
+  if (!blocks.length) return "";
+  return `<div class="view-stacked">
+    ${blocks
+      .map(
+        (b) => `<div class="stack-col${b.key === "side" ? " is-side" : ""}">
+        <p class="stack-head">${esc(b.label)} <span>${esc(b.count)}</span></p>
+        ${b.rows
+          .map((c) => {
+            const img = scryfallImg(c);
+            return `<div class="stack-card-row" title="${esc(c.name)}">
+              ${img ? `<img src="${esc(img)}" alt="" loading="lazy" />` : `<span class="stack-empty"></span>`}
+              <span class="stack-name">${esc(cardDisplayName(c.name))}</span>
+              <span class="stack-qty">${esc(c.count)}</span>
+            </div>`;
+          })
+          .join("")}
+      </div>`,
+      )
+      .join("")}
+  </div>`;
+}
+
+function compactView(main, side) {
+  const byKey = new Map();
+  for (const c of main || []) {
+    const k = typeBucket(c);
+    const list = byKey.get(k) ?? [];
+    list.push(c);
+    byKey.set(k, list);
+  }
+  const order = ["creature", "planeswalker", "instant", "sorcery", "enchantment", "artifact", "battle", "other", "land"];
+  const groups = order
+    .filter((k) => byKey.has(k))
+    .map((k) => {
+      const rows = byKey.get(k);
+      return { label: TYPE_LABELS[k], rows, count: rows.reduce((n, c) => n + (c.count || 0), 0) };
+    });
+  if (side?.length) {
+    groups.push({
+      label: "Sideboard",
+      rows: side,
+      count: side.reduce((n, c) => n + (c.count || 0), 0),
+    });
+  }
+  return `<div class="view-compact">
+    ${groups
+      .map(
+        (g) => `<div class="compact-group">
+        <p class="compact-head">${esc(g.label)} <span>(${esc(g.count)})</span></p>
+        ${g.rows.map((c) => `<p class="compact-row"><span>${esc(c.count)}</span>${esc(cardDisplayName(c.name))}</p>`).join("")}
+      </div>`,
+      )
+      .join("")}
+  </div>`;
+}
+
+function deckLists(deck) {
+  return `<div class="lists" data-deck-views data-view="stacked">
+    <div class="view-toolbar">
+      <strong>Decklist</strong>
+      <div class="view-toggle" role="group" aria-label="Decklist view">
+        <button type="button" data-view="stacked" class="on" title="Arena-style mana columns">Stacked</button>
+        <button type="button" data-view="list" title="Type groups with art rows">List</button>
+        <button type="button" data-view="compact" title="Plain text">Text</button>
+      </div>
+    </div>
+    ${stackedView(deck.mainboard, deck.sideboard)}
+    <div class="view-list">
+      ${listCards(deck.mainboard, "Mainboard")}
+      ${listCards(deck.sideboard, "Sideboard")}
+    </div>
+    ${compactView(deck.mainboard, deck.sideboard)}
+  </div>`;
 }
 
 function historySpark(points, archetype, format, mode) {
@@ -427,7 +594,7 @@ function buildHub(bundle) {
     <section class="why">
       <h2>Why this page exists</h2>
       <p>
-        Search engines can index today&rsquo;s meta. The free app adds Arena import, Brew Lab,
+        Search engines can index today&rsquo;s meta. The free app adds Arena import, a list clinic,
         overlay, and a private winrate tracker that never leaves your PC.
       </p>
     </section>`;
@@ -464,11 +631,29 @@ function buildFormat(bundle, history, fmtId) {
     .map((s) => `<li><strong>${esc(s.name)}</strong> <span>${esc(s.pct)}%</span></li>`)
     .join("");
 
+  const heroCards = [];
+  const seenArt = new Set();
+  for (const id of [...(fmt.bo1DeckIds || []), ...(fmt.bo3DeckIds || [])]) {
+    const card = artCards(bundle.decks?.[id], 1)[0];
+    if (!card || seenArt.has(card.name)) continue;
+    seenArt.add(card.name);
+    heroCards.push(card);
+    if (heroCards.length >= 5) break;
+  }
+  const formatArt = heroCards.length
+    ? `<div class="deck-hero-art format-hero-art" aria-hidden="true">${heroCards
+        .map((c, i) => `<img class="dha dha-${i + 1}" src="${esc(scryfallImg(c))}" alt="" />`)
+        .join("")}</div>`
+    : "";
+
   const body = `
-    <section class="hero slim">
-      <p class="eyebrow"><a href="index.html">Meta</a> / ${esc(name)} · ${esc(date)}</p>
-      <h1>${esc(name)} metagame</h1>
-      <p class="lede">${esc(fmt.metaNotes || `Ranked ${name} archetypes for ${date}.`)}</p>
+    <section class="hero slim deck-hero">
+      <div class="deck-hero-copy">
+        <p class="eyebrow"><a href="index.html">Meta</a> / ${esc(name)} · ${esc(date)}</p>
+        <h1>${esc(name)} metagame</h1>
+        <p class="lede">${esc(fmt.metaNotes || `Ranked ${name} archetypes for ${date}.`)}</p>
+      </div>
+      ${formatArt}
     </section>
     ${downloadBanner(date)}
     ${shareTop ? `<section class="share-top"><h2>Meta share leaders</h2><ol>${shareTop}</ol></section>` : ""}
@@ -834,26 +1019,33 @@ function buildDeck(bundle, history, deck) {
       </section>`
     : "";
 
+  const heroArts = artCards(deck, 4)
+    .map((c, i) => `<img class="dha dha-${i + 1}" src="${esc(scryfallImg(c))}" alt="${esc(c.name)}" />`)
+    .join("");
+
   const body = `
-    <section class="hero slim">
-      <p class="eyebrow">
-        <a href="index.html">Meta</a> /
-        <a href="${esc(deck.format)}.html">${esc(fmtName)}</a> /
-        ${esc(modeLabel(deck.mode))} &middot; ${esc(date)}
-      </p>
-      <h1>${esc(deck.name)}</h1>
-      <p class="meta-line big">
-        <span class="pill">#${esc(deck.rank)}</span>
-        <span class="pill soft">Tier ${esc(deck.tier ?? "-")}</span>
-        <span class="pct">${esc(share)} meta</span>
-        <span class="colors">${esc(colorsText(deck.colors))}</span>
-        <span class="pill soft">${esc(modeLabel(deck.mode))}</span>
-      </p>
-      <p class="lede">${esc(deck.description || deck.listNote || "")}</p>
-      <p class="hint">
-        ${esc(colorsLong(deck.colors))} · ${esc(fmtName)} ${esc(modeLabel(deck.mode))} ·
-        ranked #${esc(deck.rank)} of the ${esc(fmtName)} ladder on ${esc(date)}
-      </p>
+    <section class="hero slim deck-hero">
+      <div class="deck-hero-copy">
+        <p class="eyebrow">
+          <a href="index.html">Meta</a> /
+          <a href="${esc(deck.format)}.html">${esc(fmtName)}</a> /
+          ${esc(modeLabel(deck.mode))} &middot; ${esc(date)}
+        </p>
+        <h1>${esc(deck.name)}</h1>
+        <p class="meta-line big">
+          <span class="pill">#${esc(deck.rank)}</span>
+          <span class="pill soft">Tier ${esc(deck.tier ?? "-")}</span>
+          <span class="pct">${esc(share)} meta</span>
+          <span class="colors">${esc(colorsText(deck.colors))}</span>
+          <span class="pill soft">${esc(modeLabel(deck.mode))}</span>
+        </p>
+        <p class="lede">${esc(deck.description || deck.listNote || "")}</p>
+        <p class="hint">
+          ${esc(colorsLong(deck.colors))} · ${esc(fmtName)} ${esc(modeLabel(deck.mode))} ·
+          ranked #${esc(deck.rank)} of the ${esc(fmtName)} ladder on ${esc(date)}
+        </p>
+      </div>
+      ${heroArts ? `<div class="deck-hero-art" aria-hidden="true">${heroArts}</div>` : ""}
     </section>
     ${downloadBanner(date, 1)}
     ${keyCardStrip(deck)}
@@ -862,10 +1054,7 @@ function buildDeck(bundle, history, deck) {
       ${manaCurve(deck.mainboard)}
       ${composition(deck.mainboard)}
     </div>
-    <div class="lists">
-      ${listCards(deck.mainboard, "Mainboard")}
-      ${listCards(deck.sideboard, "Sideboard")}
-    </div>
+    ${deckLists(deck)}
     ${arena}
     ${relatedDecks(bundle, deck)}
     ${sources ? `<section class="sources"><h2>Sources</h2><ul>${sources}</ul><p class="hint">listQuality: ${esc(deck.listQuality || "unknown")}</p></section>` : ""}
@@ -897,6 +1086,7 @@ function buildDeck(bundle, history, deck) {
     body,
     active: deck.format,
     jsonLd,
+    extraScripts: `<script src="view.js" defer></script>`,
   });
 
   // Rewrite relative roots for nested deck pages
@@ -906,6 +1096,7 @@ function buildDeck(bundle, history, deck) {
     .replaceAll('href="../assets/', 'href="../../assets/')
     .replaceAll('src="../assets/', 'src="../../assets/')
     .replaceAll('href="site.css"', 'href="../site.css"')
+    .replaceAll('src="view.js"', 'src="../view.js"')
     .replaceAll('href="index.html"', 'href="../index.html"')
     .replaceAll('href="standard.html"', 'href="../standard.html"')
     .replaceAll('href="pioneer.html"', 'href="../pioneer.html"')
@@ -1061,7 +1252,8 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
 .share-top ol { margin: 0; padding-left: 1.2rem; color: var(--muted); }
 .share-top li { margin: 0.25rem 0; }
 .share-top span { color: var(--gold); font-weight: 700; margin-left: 0.35rem; }
-.lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+.lists { display: flex; flex-direction: column; gap: 1rem; }
+.view-list { display: none; }
 .list-block h2 .count { color: var(--muted); font-weight: 500; font-size: 0.9rem; }
 .card-list { list-style: none; margin: 0; padding: 0; }
 .card-list li {
@@ -1217,6 +1409,174 @@ a.cname:hover { color: #b8f000; text-decoration: underline; }
 @media (max-width: 720px) {
   .stat-row { grid-template-columns: 1fr; }
   .key-row { grid-template-columns: 1fr; }
+  .deck-hero { grid-template-columns: 1fr; }
+}
+
+/* Deck hero art + hub tiles */
+.deck-hero {
+  display: grid;
+  grid-template-columns: 1fr minmax(220px, 280px);
+  gap: 1.5rem;
+  align-items: center;
+}
+.deck-hero-art {
+  position: relative;
+  height: 220px;
+}
+.dha {
+  position: absolute;
+  width: 92px;
+  height: 128px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(184, 240, 0, 0.28);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+  background: #151822;
+}
+.dha-1 { left: 0; top: 28px; transform: rotate(-10deg); z-index: 4; }
+.dha-2 { left: 48px; top: 8px; transform: rotate(-2deg); z-index: 3; }
+.dha-3 { left: 100px; top: 18px; transform: rotate(8deg); z-index: 2; }
+.dha-4 { left: 154px; top: 36px; transform: rotate(16deg); z-index: 1; }
+.dha-5 { left: 200px; top: 14px; transform: rotate(22deg); z-index: 0; }
+.format-hero-art { height: 240px; }
+.deck-arts {
+  display: flex;
+  gap: 0.28rem;
+  margin: 0.45rem 0 0.2rem;
+}
+.deck-arts img {
+  width: 36px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--ink-800);
+}
+.deck-card { flex-wrap: wrap; }
+
+/* View toggles — same three modes as the app */
+.view-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0 0.85rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid rgba(184, 240, 0, 0.14);
+}
+.view-toolbar strong {
+  font-size: 1.15rem;
+}
+.view-toggle {
+  display: flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--ink-800);
+  border: 1px solid rgba(184, 240, 0, 0.18);
+}
+.view-toggle button {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.view-toggle button.on {
+  background: rgba(184, 240, 0, 0.18);
+  color: var(--acid);
+}
+.lists[data-view="stacked"] .view-list,
+.lists[data-view="stacked"] .view-compact,
+.lists[data-view="list"] .view-stacked,
+.lists[data-view="list"] .view-compact,
+.lists[data-view="compact"] .view-stacked,
+.lists[data-view="compact"] .view-list { display: none; }
+.lists[data-view="stacked"] .view-stacked {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 0.75rem;
+}
+.lists[data-view="list"] .view-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.lists[data-view="compact"] .view-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.view-stacked {
+  display: none;
+}
+.stack-col {
+  min-width: 0;
+}
+.stack-col.is-side { opacity: 0.92; }
+.stack-head {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
+.stack-card-row {
+  position: relative;
+  margin-bottom: 0.35rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(184, 240, 0, 0.16);
+  background: var(--ink-800);
+}
+.stack-card-row img, .stack-empty {
+  display: block;
+  width: 100%;
+  height: 78px;
+  object-fit: cover;
+}
+.stack-empty { background: var(--ink-700); }
+.stack-name {
+  display: block;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.35rem 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stack-qty {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: rgba(5, 6, 4, 0.75);
+  color: var(--acid);
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+}
+.view-compact { display: none; }
+.compact-head {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.compact-row {
+  margin: 0.12rem 0;
+  font-size: 0.86rem;
+}
+.compact-row span {
+  display: inline-block;
+  min-width: 1.4rem;
+  color: var(--gold);
+  font-weight: 700;
 }
 `;
 
@@ -1312,6 +1672,25 @@ export function buildMetaSite(latestPath = join(META_DIR, "latest.json")) {
   mkdirSync(join(OUT, "deck"), { recursive: true });
   mkdirSync(join(OUT, "card"), { recursive: true });
   writeFileSync(join(OUT, "site.css"), CSS);
+  writeFileSync(
+    join(OUT, "view.js"),
+    `document.addEventListener("DOMContentLoaded", () => {
+  const root = document.querySelector("[data-deck-views]");
+  if (!root) return;
+  const buttons = [...root.querySelectorAll(".view-toggle [data-view]")];
+  const apply = (v) => {
+    if (!["stacked", "list", "compact"].includes(v)) v = "stacked";
+    root.dataset.view = v;
+    try { localStorage.setItem("fnd-decklist-view", v); } catch {}
+    buttons.forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+  };
+  let start = "stacked";
+  try { start = localStorage.getItem("fnd-decklist-view") || "stacked"; } catch {}
+  apply(start);
+  buttons.forEach((b) => b.addEventListener("click", () => apply(b.dataset.view)));
+});
+`,
+  );
   writeFileSync(join(OUT, "index.html"), buildHub(bundle));
 
   const paths = ["/meta-web/", "/meta-web/index.html"];

@@ -14,11 +14,27 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. Optional: `pipeline/build-meta-site.mjs` footer still says “Daily meta, Brew
-   Lab, overlay…”. Regenerating the corpus is a meta-pipeline job, not an app
-   bump. Do it on the next `npm run meta:site`, not as a drive-by.
+1. Marketing site overhaul is on `main` (no app bump). Netlify should serve
+   the live hero fan + regenerated `/meta-web/` after this push.
+2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+   the site until gate G2 trips (a real `n ≥ 30` crowd cell).
 
 ## This session (2026-08-16)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Homepage hero overhaul** | 3D product-surface carousel (daily boards, overlay, Player.log ingest, My Stats, Climb). Brand tokens + Segoe UI untouched. Copy tightened; Matchup Lab line fixed; stale Selesnya/Jeskai fallbacks replaced with current Std Bo1. Marketing-only — **no app version bump**. |
+| ✅ | **Web platform plan** | `docs/WEB-PLATFORM.md` — Goldfish × AetherHub × Untapped as a *public data destination*, gated on population. Pointer added in `PLATFORM-STRATEGY.md` §1.6. |
+
+### Hard-won this session
+
+- Marketing-only HTML is not a release. Do not bump `package.json` / installer
+  for a homepage layout change. Netlify still needs a `main` push before
+  anyone sees it.
+- Carousel cards are product surfaces, not ApexForge service tiles. The
+  ingest log is FND-coloured (acid on ink), not the orange mac terminal.
+
+## Previous session (2026-08-16)
 
 | Item | Notes |
 |------|--------|
@@ -380,6 +396,7 @@ updater + version.json + site + OG + Netlify live + tag/macOS).
 | `docs/INSTALL-COUNTING.md` | Post-mortem: right machinery, wrong endpoint |
 | `docs/GIT-HISTORY-BLOAT.md` | The optional history rewrite, and why not to automate it |
 | `docs/AUDIT-2026-08-12-v3.0.0.md` | Latest deep audit — 9 findings across the v2.7.3→v2.8.2 backend push |
+| `docs/WEB-PLATFORM.md` | Site-as-destination plan (Goldfish × AetherHub × Untapped). Gates, not a build list |
 
 Removed 2026-08-12 as shipped history (recover from git if ever needed):
 `ROADMAP.md`, `100X-ROADMAP.md`, `docs/AUDIT-2026-08-10-v2.7.3.md`,

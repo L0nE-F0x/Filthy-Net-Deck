@@ -186,6 +186,14 @@ The right expansion is **programmatic SEO**, not a web app clone:
 
 **Do not rebuild Untapped's web app.** Their web product is their acquisition channel because they are web-first. FND is desktop-first; the website's job is **discovery that funnels to installs**, not a second product to maintain.
 
+> **2026-08-16 addendum.** Once opted-in ladder data is dense enough to be
+> honest, the site *also* becomes the public face of FND's own meta — the
+> Goldfish job (already shipping as `/meta-web/`) plus the Untapped job on
+> FND-native matchups plus the AetherHub job on published decks. That plan
+> lives in [`WEB-PLATFORM.md`](WEB-PLATFORM.md). It does not cancel this
+> paragraph: tracking stays desktop-only, and no public number ships before
+> the Phase 3 population gate.
+
 ---
 
 ## 2. What the brief missed

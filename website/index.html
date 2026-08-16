@@ -51,6 +51,7 @@
     <link rel="apple-touch-icon" href="/assets/app-icon.png" />
     <link rel="preconnect" href="https://cards.scryfall.io" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="hero-fan.css" />
   </head>
   <body>
     <div class="fx-root" aria-hidden="true">
@@ -91,16 +92,11 @@
             <span class="grad">Climb clean.</span>
           </h1>
           <p class="lede">
-            Daily <strong>Standard</strong> &amp; <strong>Pioneer</strong> boards —
-            <strong>real ranked lists only</strong> from live
-            <strong>MTGO challenge decklists</strong>, every card Scryfall-verified.
-            <strong>My Stats</strong> shows how many cards you are off today's
-            closest ranked list and every card the opponent revealed — including
-            how many of each — the
-            <strong>overlay</strong> reads your opponent mid-match — naming 40+
-            off-meta decks per format, not just the top 8 — and
-            <strong>Set Radar</strong> catches spoilers before Scryfall lists them.
-            Free, native, no account.
+            Daily <strong>Standard</strong> &amp; <strong>Pioneer</strong> boards
+            from live tournament and ladder lists —
+            <strong>magic.gg</strong>, <strong>MTGO</strong>, and the ranked
+            metagame — every card Scryfall-verified. The overlay reads the
+            opponent mid-match. History stays on this PC unless you opt in.
           </p>
           <div class="hero-actions">
             <a
@@ -119,133 +115,71 @@
               Download for macOS
               <span class="btn-meta">v3.1.4 · universal .dmg</span>
             </a>
+          </div>
+          <p class="hero-more">
             <a
-              class="btn btn-ghost"
               href="https://github.com/L0nE-F0x/Filthy-Net-Deck"
               target="_blank"
               rel="noopener noreferrer"
+              >Source on GitHub</a
             >
-              View on GitHub
-              <span class="btn-meta">Open source · L0nE-F0x</span>
-            </a>
-          </div>
+            · L0nE-F0x
+          </p>
           <ul class="trust-row">
-            <li>Format hub</li>
-            <li>Set Radar</li>
             <li>Daily meta boards</li>
-            <li>Matchup intel</li>
+            <li>Mid-match overlay</li>
+            <li>Revealed-card reads</li>
             <li>Local win rates</li>
-            <li>Tray + autostart</li>
+            <li>Set Radar</li>
+            <li>No account required</li>
           </ul>
         </div>
 
-        <!-- Accurate app chrome mock -->
-        <div class="hero-stage reveal-child delay-1" aria-hidden="true">
-          <div class="mock-glow"></div>
-          <div class="mock-window">
-            <div class="mock-titlebar">
-              <div class="mock-dots"><i></i><i></i><i></i></div>
-              <span>Filthy Net Deck — MTG Arena Companion</span>
+        <div class="hero-stage reveal-child delay-1" id="hero-stage">
+          <p class="fan-kicker">
+            <span class="dot-live"></span>
+            <span class="fan-fmt" role="group" aria-label="Format">
+              <button type="button" data-fan-fmt="standard" class="on">Standard</button>
+              <button type="button" data-fan-fmt="pioneer">Pioneer</button>
+            </span>
+            <span class="fan-kicker-mode">Bo1 · live</span>
+          </p>
+          <div class="fan-hand" id="fan-hand" aria-label="Today’s top decks"></div>
+          <div class="fan-dock" id="fan-dock">
+            <p class="fan-dock-rank" id="fan-rank">#1</p>
+            <div>
+              <strong id="fan-name">Mono-White Auras</strong>
+              <span id="fan-meta">18.1% of the board</span>
             </div>
-            <div class="mock-body">
-              <aside class="mock-side">
-                <div class="mock-brand">
-                  <img src="assets/app-icon.png" alt="" />
-                  <div>
-                    <strong>Filthy Net Deck</strong>
-                    <small>Standard &amp; Pioneer · v3.1.4</small>
-                  </div>
-                </div>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">▣</span> Decks
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">↗</span> Events
-                </button>
-                <button class="mock-nav on" type="button">
-                  <span class="mock-ico">◈</span> Sets
-                  <span class="mock-nav-badge">3d</span>
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">📊</span> My Stats
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">⚔</span> Matchups
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">↗</span> Climb
-                </button>
-                <button class="mock-nav" type="button">
-                  <span class="mock-ico">⚙</span> Settings
-                </button>
-                <p class="mock-legal">Not affiliated with Wizards of the Coast.</p>
-              </aside>
-              <div class="mock-main">
-                <header class="mock-top">
-                  <div>
-                    <h2>Set Radar</h2>
-                    <p><span class="live-dot"></span> Arena-first · no Alchemy · ← → browse</p>
-                  </div>
-                </header>
-                <div class="mock-hero-panel">
-                  <div class="mock-hero-text">
-                    <div class="mock-tags">
-                      <em>SPOILING</em>
-                      <b>ARENA IN 3D</b>
-                    </div>
-                    <strong>Edge of Eternities</strong>
-                    <span>Full gallery · Std/Pio legality at release · mana pips · new-card badges</span>
-                    <div class="mock-btns">
-                      <span class="mb primary">Open gallery</span>
-                      <span class="mb">Arena-eve notify</span>
-                    </div>
-                  </div>
-                  <div class="mock-cards">
-                    <img class="mc mc-1" src="" alt="" data-card="Slickshot Show-Off" />
-                    <img class="mc mc-2" src="" alt="" data-card="Badgermole Cub" />
-                    <img class="mc mc-3" src="" alt="" data-card="Inevitable Defeat" />
-                  </div>
-                </div>
-                <div class="mock-charts">
-                  <div class="mock-chart">
-                    <h4>Today’s Standard · Bo1</h4>
-                    <div class="bar"><i style="--w: 100%"></i><span>Selesnya Ouroboroid <em class="mock-move">↑</em></span><b>12.9%</b></div>
-                    <div class="bar"><i style="--w: 100%"></i><span>Jeskai Lessons</span><b>12.9%</b></div>
-                    <div class="bar"><i style="--w: 95%"></i><span>Izzet Prowess <em class="mock-move down">↓</em></span><b>12.3%</b></div>
-                    <div class="bar"><i style="--w: 89%"></i><span>4c Control</span><b>11.5%</b></div>
-                  </div>
-                  <div class="mock-chart slim">
-                    <h4>You vs tags</h4>
-                    <ul>
-                      <li><i class="t1"></i> you 4–0 vs Izzet</li>
-                      <li><i class="t2"></i> Streak W3 · 62% wk</li>
-                      <li><i class="t3"></i> CSV + recap PNG</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a class="fan-dock-go" id="fan-go" href="meta-web/">Open list →</a>
+          </div>
+          <div class="fan-controls">
+            <button type="button" class="orbit-nav" data-fan-prev aria-label="Previous deck">‹</button>
+            <div class="hero-dots" id="fan-dots"></div>
+            <button type="button" class="orbit-nav" data-fan-next aria-label="Next deck">›</button>
           </div>
         </div>
       </section>
 
       <!-- STATS STRIP -->
-      <section class="stats reveal">
-        <div class="stat reveal-child">
-          <strong>2</strong>
-          <span>formats · Standard &amp; Pioneer</span>
-        </div>
-        <div class="stat reveal-child delay-1">
-          <strong>8</strong>
-          <span>ranked decks each, daily</span>
-        </div>
-        <div class="stat reveal-child delay-2">
-          <strong>100%</strong>
-          <span>real lists · every card verified</span>
-        </div>
-        <div class="stat reveal-child delay-3">
-          <strong>100%</strong>
-          <span>local by default · no account needed</span>
+      <section class="stats reveal" aria-label="Product facts">
+        <div class="stats-bar">
+          <div class="stat reveal-child">
+            <strong>2</strong>
+            <span>formats · Standard &amp; Pioneer</span>
+          </div>
+          <div class="stat reveal-child delay-1">
+            <strong>8</strong>
+            <span>ranked decks each, daily</span>
+          </div>
+          <div class="stat reveal-child delay-2">
+            <strong>100%</strong>
+            <span>real lists · every card verified</span>
+          </div>
+          <div class="stat reveal-child delay-3">
+            <strong>0</strong>
+            <span>account required to track</span>
+          </div>
         </div>
       </section>
 
@@ -255,15 +189,13 @@
           <p class="eyebrow">Features</p>
           <h2>Everything you need to stay filthy-current</h2>
           <p class="section-lede">
-            Fullscreen-safe chrome, clear Search, full Standard Recently live on Sets,
-            denser Settings, light mode, Arena-safe double-faced import, official set
-            trailers, Future Standard, card watch, Format hub, daily meta, matchup intel,
-            Climb Tracker, and a private winrate tracker — one native app. Only real data.
-            Your history stays on this PC unless you opt in to the cloud features.
+            One native app for the two constructed formats that actually have a
+            public paper metagame. Daily boards, a mid-match overlay, and a
+            winrate tracker that stays on this PC unless you opt in.
           </p>
         </div>
         <div class="feature-bento">
-          <article class="fb fb-wide fb-stats reveal">
+          <article class="fb fb-wide fb-stats reveal" id="overlay">
             <div class="fb-copy">
               <p class="fb-kicker">Presence badge</p>
               <h3>Always know it's running.</h3>
@@ -332,10 +264,10 @@
               <p class="fb-kicker">Matchup intel</p>
               <h3>Your winrate vs every tagged archetype</h3>
               <p>
-                Matchup Lab tags opponents and stores prep notes (now saved as you type) — and
-                aggregates <em>your</em> record vs each tag, surfaces “you 4–0 vs Izzet” chips on
-                the Decks board, and exports history to CSV. Streaks and today tiles keep form
-                visible.
+                Matchups tags the opponent from what you saw and keeps prep notes
+                as you type — then aggregates <em>your</em> record vs each tag,
+                surfaces “you 4–0 vs Izzet” chips on the Decks board, and
+                exports history to CSV. Streaks and today tiles keep form visible.
               </p>
             </div>
             <div class="fb-visual fb-stats-visual" aria-hidden="true">
@@ -361,29 +293,30 @@
               <p class="fb-kicker">Daily boards</p>
               <h3>Standard &amp; Pioneer — movement included</h3>
               <p>
-                Eight full lists per format from live metagame share. Rising/falling chips from the
-                daily diff, multi-select color filters, deck view grouped by type with avg mana value and hover-art rows, plus a 30-day meta-share timeline and "you vs the meta" table.
+                Eight full lists per format from live metagame share — lists assigned
+                from magic.gg, MTGO challenges, then Goldfish, never invented.
+                Rising/falling chips, color filters, and a 30-day share timeline.
               </p>
             </div>
             <div class="fb-visual fb-decks">
               <div class="mini-deck">
                 <span>#1 ↑</span>
-                <strong>Selesnya Ouroboroid</strong>
-                <em>12.9%</em>
+                <strong>Mono-White Auras</strong>
+                <em>18.1%</em>
               </div>
               <div class="mini-deck">
                 <span>#2</span>
-                <strong>Jeskai Lessons</strong>
-                <em>12.9%</em>
+                <strong>Mono-Black Demons</strong>
+                <em>6.6%</em>
               </div>
               <div class="mini-deck">
-                <span>#3 ↓</span>
-                <strong>Izzet Prowess</strong>
-                <em>12.3%</em>
+                <span>#3</span>
+                <strong>4c Reanimator</strong>
+                <em>6.2%</em>
               </div>
             </div>
           </article>
-          <article class="fb reveal delay-1">
+          <article class="fb reveal delay-1" id="clinic">
             <div class="fb-icon">📋</div>
             <h3>How many cards off</h3>
             <p>NEW: My Stats diffs your 75 against today&rsquo;s closest ranked list. One swap is one card off.</p>
@@ -403,7 +336,7 @@
             <h3>Public decks</h3>
             <p>NEW: publish a deck to your profile page — format, size, and last played, on your terms.</p>
           </article>
-          <article class="fb reveal delay-1">
+          <article class="fb reveal delay-1" id="climb-feature">
             <div class="fb-icon">↗</div>
             <h3>Climb Tracker</h3>
             <p>Season rank curve with peak marker &amp; hover detail, win/loss streak chips, season-vs-season, games-to-next-rank.</p>
@@ -435,10 +368,10 @@
           <p class="eyebrow">Live meta</p>
           <h2>Built around today’s Standard &amp; Pioneer</h2>
           <p class="section-lede">
-            Rankings come straight from the live tournament metagame, every card name is verified
-            on Scryfall, and the result ships as a daily JSON feed the app pulls on launch. If
-            live data can’t be verified on a given day, yesterday’s real data stays up — the feed
-            never falls back to invented lists.
+            Rankings come from the live metagame. Lists are assigned in order from
+            <strong>MTGO</strong> challenges, <strong>magic.gg</strong> decklists,
+            then Goldfish — every card name Scryfall-verified. If a day cannot be
+            verified, yesterday’s real data stays up. Nothing is invented.
           </p>
         </div>
         <div class="meta-showcase reveal">
@@ -450,26 +383,27 @@
             <div class="meta-list" id="meta-list">
               <!-- filled by script from /meta/latest.json when available -->
               <div class="meta-row">
-                <b>#1</b><span>Selesnya Ouroboroid</span><i style="--p: 100%"></i><em>12.9%</em>
+                <b>#1</b><span>Mono-White Auras</span><i style="--p: 100%"></i><em>18.1%</em>
               </div>
               <div class="meta-row">
-                <b>#2</b><span>Jeskai Lessons</span><i style="--p: 100%"></i><em>12.9%</em>
+                <b>#2</b><span>Mono-Black Demons</span><i style="--p: 36%"></i><em>6.6%</em>
               </div>
               <div class="meta-row">
-                <b>#3</b><span>Izzet Prowess</span><i style="--p: 95%"></i><em>12.3%</em>
+                <b>#3</b><span>4c Reanimator</span><i style="--p: 34%"></i><em>6.2%</em>
               </div>
               <div class="meta-row">
-                <b>#4</b><span>4c Control</span><i style="--p: 89%"></i><em>11.5%</em>
+                <b>#4</b><span>4c Control</span><i style="--p: 25%"></i><em>4.5%</em>
               </div>
               <div class="meta-row">
-                <b>#5</b><span>Izzet Spellementals</span><i style="--p: 67%"></i><em>8.7%</em>
+                <b>#5</b><span>Mono-Green Landfall</span><i style="--p: 23%"></i><em>4.2%</em>
               </div>
             </div>
           </div>
-          <div class="meta-art-stack">
-            <img data-card="Badgermole Cub" alt="Badgermole Cub" class="stack-card s1" />
-            <img data-card="Slickshot Show-Off" alt="Slickshot Show-Off" class="stack-card s2" />
-            <img data-card="Inevitable Defeat" alt="Inevitable Defeat" class="stack-card s3" />
+          <div class="meta-art-stack" id="meta-art-stack">
+            <img data-card="Sheltered by Ghosts" alt="Sheltered by Ghosts" class="stack-card s1" />
+            <img data-card="Bloodletter of Aclazotz" alt="Bloodletter of Aclazotz" class="stack-card s2" />
+            <img data-card="Ardyn, the Usurper" alt="Ardyn, the Usurper" class="stack-card s3" />
+            <img data-card="Ethereal Armor" alt="Ethereal Armor" class="stack-card s4" />
           </div>
         </div>
         <!-- Surfaces /meta-web/ properly. It was reachable only from one nav
@@ -595,5 +529,6 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="hero-fan.js"></script>
   </body>
 </html>

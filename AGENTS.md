@@ -97,3 +97,4 @@ npm run tauri:build   # installers (set TAURI_SIGNING_* for updater artifacts)
 - Install counting post-mortem (right machinery, wrong endpoint): `docs/INSTALL-COUNTING.md`.
 - The optional `.git` history rewrite, and why never to automate it: `docs/GIT-HISTORY-BLOAT.md`.
 - Published upload allowlist: `website/privacy.html` — must match `matchSync.ts` + `healthPing.ts`.
+- Site-as-destination (not a second app): `docs/WEB-PLATFORM.md`. Public matchup pages wait on crowd `n ≥ 30`.
