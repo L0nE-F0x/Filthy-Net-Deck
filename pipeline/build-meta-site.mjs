@@ -363,14 +363,18 @@ function deckCard(d) {
     </a>`;
 }
 
+function cardThumb(c) {
+  const img = scryfallImg(c);
+  return img
+    ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy" width="40" height="56" />`
+    : `<span class="thumb empty"></span>`;
+}
+
 function listCards(cards, title) {
   if (!cards?.length) return "";
   const rows = cards
     .map((c) => {
-      const img = scryfallImg(c);
-      const thumb = img
-        ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy" width="40" height="56" />`
-        : `<span class="thumb empty"></span>`;
+      const thumb = cardThumb(c);
       // Every card name is a link to its own page. This is the other half of
       // the corpus expansion: the deck pages that already rank now feed ~320
       // card pages, and each card page links back.
@@ -387,13 +391,6 @@ function listCards(cards, title) {
       <h2>${esc(title)} <span class="count">(${cards.reduce((n, c) => n + (c.count || 0), 0)})</span></h2>
       <ul class="card-list">${rows}</ul>
     </section>`;
-}
-
-function cardThumb(c) {
-  const img = scryfallImg(c);
-  return img
-    ? `<img class="thumb" src="${esc(img)}" alt="" loading="lazy" width="40" height="56" />`
-    : `<span class="thumb empty"></span>`;
 }
 
 function stackedView(main, side) {
