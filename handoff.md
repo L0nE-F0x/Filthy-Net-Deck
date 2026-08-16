@@ -14,8 +14,9 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. Marketing site overhaul is on `main` (no app bump). Netlify should serve
-   the live hero fan + regenerated `/meta-web/` after this push.
+1. **Beta-tester feedback on the marketing site.** Owner will collect
+   reports and pick this up later. Do not redesign the hero unless they
+   ask — the live fan is the chosen treatment.
 2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
 
@@ -23,16 +24,29 @@ attaches the new one.
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Homepage hero overhaul** | 3D product-surface carousel (daily boards, overlay, Player.log ingest, My Stats, Climb). Brand tokens + Segoe UI untouched. Copy tightened; Matchup Lab line fixed; stale Selesnya/Jeskai fallbacks replaced with current Std Bo1. Marketing-only — **no app version bump**. |
-| ✅ | **Web platform plan** | `docs/WEB-PLATFORM.md` — Goldfish × AetherHub × Untapped as a *public data destination*, gated on population. Pointer added in `PLATFORM-STRATEGY.md` §1.6. |
+| ✅ | **Homepage hero = live fan** | Hand of 5 real Scryfall cards from today’s Bo1 top 5. Standard / Pioneer toggle. Click side card to lift; click the lifted card or **Open list →** to `/meta-web/deck/<id>.html`. Driven by `/meta/latest.json`. Brand tokens + Segoe UI untouched. |
+| ✅ | **Public meta pages** | Deck heroes get a 4-card art stack; hub/format tiles get art strips; Stacked / List / Text toggles (same as the app, remembered in `localStorage`). Format pages (Std + Pio) have hero art. |
+| ✅ | **Copy** | Hero no longer says “MTGO only”. Pipeline is MTGO → magic.gg → Goldfish, plus Untapped ladder when that’s the list (today’s #1 Auras is). Matchup Lab line removed. |
+| ✅ | **Web platform plan** | `docs/WEB-PLATFORM.md` — site as public face of FND data, not a second desktop app. Pointer in `PLATFORM-STRATEGY.md` §1.6. |
+| ✅ | **Pushed** | `7b52fe7` `site: live hero fan + public meta deck views` on `origin/main`. **No app bump.** Netlify = site only. |
 
 ### Hard-won this session
 
-- Marketing-only HTML is not a release. Do not bump `package.json` / installer
-  for a homepage layout change. Netlify still needs a `main` push before
-  anyone sees it.
-- Carousel cards are product surfaces, not ApexForge service tiles. The
-  ingest log is FND-coloured (acid on ink), not the orange mac terminal.
+- Marketing-only HTML is not an app release. Do not bump `package.json` /
+  installer for a homepage layout change.
+- **Do not put `rotateX` / `translateZ` / `preserve-3d` on the fan hand.**
+  Chromium then draws the cards in one place and hit-tests another — they
+  look clickable and are not. Production fan is flat 2D (`translate` +
+  `rotate` + `scale`).
+- Hero fan files: `website/hero-fan.js` + `website/hero-fan.css`. Lab
+  geometries (coverflow / helix / tesseract / etc.) were prototypes and
+  were **not** shipped.
+- `pipeline/build-meta-site.mjs` owns `/meta-web/` HTML + `site.css` +
+  `view.js`. Edit the generator, then `npm run meta:site`. Do not hand-edit
+  the 380 generated pages.
+- `.lists` in meta-web must be a **column** (`display: flex; flex-direction:
+  column`). A 2-col grid puts the Stacked/List/Text toolbar in the left
+  cell and the cards in the right.
 
 ## Previous session (2026-08-16)
 
