@@ -16,22 +16,40 @@ attaches the new one.
 
 1. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
-   ask — the live fan is the chosen treatment.
+   ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
 2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
+3. Owner may still post the site on X from `@MBrewlab` — wait until Netlify
+   is serving `37bdba3` (Bo1/Bo3 pills + stacked lists) before they hit send.
 
-## This session (2026-08-16)
+## This session (2026-08-16, later)
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Homepage hero = live fan** | Hand of 5 real Scryfall cards from today’s top 5. **Standard / Pioneer × Bo1 / Bo3** sibling pills (replaces the static “Bo1 · live” label). Click side card to lift; click the lifted card or **Open list →** to `/meta-web/deck/<id>.html`. Driven by `/meta/latest.json`. Brand tokens + Segoe UI untouched. Pioneer Bo1/Bo3 share the same mainboard faces — dock flashes and shows `N-card SB` so the mode switch is visible. |
-| ✅ | **Stacked decklist = Arena overlap** | Public `/meta-web/deck/*` stacked view was a wrapping tile grid (`auto-fit` + 78px art + name under the crop). Lands wrapped into a lone skinny column with a void. Now matches the in-app stack: 128px columns, cards overlap (`height: 64px; margin-bottom: -38px`), name on the art, Lands/SB stay 128px and sit together when they wrap. CSS in `pipeline/build-meta-site.mjs` + `website/meta-web/site.css`. No page regen needed. |
+| ✅ | **Bo1/Bo3 hero pills** | Static “Bo1 · live” replaced with a sibling pill group. Four boards from `/meta/latest.json`. Pioneer Bo1/Bo3 share mainboard faces — dock flashes and shows `N-card SB`. `37bdba3`. |
+| ✅ | **Stacked public lists** | Arena overlap (same as in-app): 128px columns, `height: 64px; margin-bottom: -38px`. Lands no longer a lonely void column. CSS in generator + `site.css`. Same commit. |
+| ✅ | **CI lint** | Site commits that also touch `pipeline/` run the full CI. Unused `cardThumb` failed ESLint and mailed the owner on every such push. Wired into `listCards`. `4496c1f`. |
+| ✅ | **Pushed** | `37bdba3` + `4496c1f` on `origin/main`. **No app bump.** Netlify = site only. |
+
+### Hard-won this session
+
+- `pipeline/` is **not** in CI `paths-ignore`. Editing `build-meta-site.mjs`
+  for a CSS-only site fix still runs `eslint src pipeline --max-warnings 0`
+  and emails on failure. Keep the generator lint-clean.
+- Pioneer Bo1 and Bo3 are the same five mainboard faces. Do not put
+  sideboard art on the fan — dock + SB count is the mode signal.
+
+## Previous session (2026-08-16)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Homepage hero = live fan** | Hand of 5 real Scryfall cards from today’s top 5. Standard / Pioneer toggle (Bo1/Bo3 pills came later the same day). Click side card to lift; click the lifted card or **Open list →** to `/meta-web/deck/<id>.html`. Driven by `/meta/latest.json`. Brand tokens + Segoe UI untouched. |
 | ✅ | **Public meta pages** | Deck heroes get a 4-card art stack; hub/format tiles get art strips; Stacked / List / Text toggles (same as the app, remembered in `localStorage`). Format pages (Std + Pio) have hero art. |
 | ✅ | **Copy** | Hero no longer says “MTGO only”. Pipeline is MTGO → magic.gg → Goldfish, plus Untapped ladder when that’s the list (today’s #1 Auras is). Matchup Lab line removed. |
 | ✅ | **Web platform plan** | `docs/WEB-PLATFORM.md` — site as public face of FND data, not a second desktop app. Pointer in `PLATFORM-STRATEGY.md` §1.6. |
 | ✅ | **Pushed** | `7b52fe7` `site: live hero fan + public meta deck views` on `origin/main`. **No app bump.** Netlify = site only. |
 
-### Hard-won this session
+### Hard-won that session
 
 - Marketing-only HTML is not an app release. Do not bump `package.json` /
   installer for a homepage layout change.
@@ -49,7 +67,7 @@ attaches the new one.
   column`). A 2-col grid puts the Stacked/List/Text toolbar in the left
   cell and the cards in the right.
 
-## Previous session (2026-08-16)
+## Previous session (2026-08-16, app)
 
 | Item | Notes |
 |------|--------|
