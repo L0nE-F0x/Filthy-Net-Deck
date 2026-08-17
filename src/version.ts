@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.1.4";
+export const APP_VERSION = "3.1.5";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,5 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Revealed opponent cards now show how many of each, not just which ones",
-  "Copy list includes those counts so you can rebuild their deck from what they showed",
+  "Suggest / Report in the top bar — feature ideas and bugs email the maintainer, no GitHub account",
 ];

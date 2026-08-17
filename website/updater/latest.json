@@ -1,11 +1,11 @@
 {
-  "version": "3.1.4",
-  "notes": "v3.1.4: Revealed opponent cards now show how many of each, not just which ones. Copy list includes the counts.",
-  "pub_date": "2026-08-15T16:22:40Z",
+  "version": "3.1.5",
+  "notes": "v3.1.5: Suggest / Report in the top bar — feature ideas and bugs email the maintainer, no GitHub account needed.",
+  "pub_date": "2026-08-17T07:16:40Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjE5MmU1RS83WXMwVHQvZEVsRE5xb2U3YmFGZXVHdGtYUjUzQTI4WU45VFhkRnVIUXBNZlYvMWJhVElGS3NzdHFmZnpFQ0J0NzIremNxYitPT253N0FFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2ODEwOTQwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS40X3g2NC1zZXR1cC5leGUKK3RRU2lLS0ZBTmR6NGNQcmNlaURabVJMYVlTQXhIbDRGenBrSmlsSVpGSldON1lBcWJHdGo2M2czaDhubUtray93Q1hsOXExV3pUSGhlM0JOUjNtREE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.4.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9LajgzYklUbHNUaGxaTGowZ0svcE5XWlVId0hzUEUxMndKeG0rUlNEV0tFTG1PSCtYWkpXYUxHMTUvRnFyeEVaV3lUa3hoZGk0aHdSajlzUXVlOGcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTUwOTY4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS41X3g2NC1zZXR1cC5leGUKS1c0WVJWdFNqMUp3RkJEczJvQTI3MkhBR2RudFpPRXFMWXE2bDdJU2kxUHJNQ0JFc2IzamZ4bUlSTXdFSDNTSEV5Sk9OZXk4clQxNVN1UGticytGQmc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.5.exe"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "3.1.4",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.4.exe",
-  "notes": "v3.1.4: Revealed opponent cards now show how many of each, not just which ones. Copy list includes the counts."
+  "version": "3.1.5",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.5.exe",
+  "notes": "v3.1.5: Suggest / Report in the top bar — feature ideas and bugs email the maintainer, no GitHub account needed."
 }

@@ -3,8 +3,9 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.4** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.4** · Windows **and** macOS both serve 3.1.4
+**Live product version: v3.1.5** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· tag **v3.1.5** · Windows **3.1.5** (signed updater) · macOS homepage still **3.1.4**
+until the tagged CI dmg is rolled
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -28,7 +29,8 @@ attaches the new one.
 |------|--------|
 | ✅ | **Suggest / Report** | Website + app button → `website/feedback.html`. FormSubmit emails `ston3d4pe@gmail.com`. First live submit needs the FormSubmit activation click. GitHub issue templates remain as the fallback. |
 | ✅ | **Surfaces** | Homepage nav pill + hero + footer + download note; privacy + status; in-app topbar next to Help; Settings → Interface and About. `FEEDBACK_URL` / `appFeedbackUrl()` in `src/services/site.ts`. |
-| ⏳ | **Not an app release** | Site can ship on `main` with no version bump. The in-app button needs a signed v3.1.5 for installed users. |
+| ✅ | **v3.1.5 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.5`. In-app Suggest / Report is now in the binary. |
+| ⏳ | **v3.1.5 macOS dmg** | Tag `v3.1.5` so `macos-build.yml` attaches the dmg. Homepage Mac buttons stay on 3.1.4 until that roll. |
 
 ### Hard-won this session
 
@@ -199,7 +201,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.4** on Windows (signed updater) and macOS (universal dmg on the homepage) |
+| App version | **v3.1.5** on Windows (signed updater). macOS homepage still **3.1.4** until the tagged dmg is rolled |
 | Branch | `main`, clean after wrap |
 | Gates last green | **617** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-16) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |

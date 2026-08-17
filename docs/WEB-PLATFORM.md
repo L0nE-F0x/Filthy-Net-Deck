@@ -6,7 +6,7 @@ combination of what people currently go to **MTGGoldfish**, **AetherHub**, and
 **Untapped.gg** for.
 **Parent:** [`PLATFORM-STRATEGY.md`](PLATFORM-STRATEGY.md) §1.1, §1.6, §3
 **Status:** plan only. Nothing here is being built until the gates below trip.
-The live product is still the desktop app (v3.1.4). The live site is still a
+The live product is still the desktop app (v3.1.5). The live site is still a
 funnel plus a thin `/meta-web/` corpus.
 
 > **This does not replace §1.6.** That section said: do not rebuild Untapped's
