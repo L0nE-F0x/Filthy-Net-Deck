@@ -213,7 +213,9 @@ const TOPICS: Topic[] = [
         <p>
           Settings has grown a full <strong>Interface</strong> card: launch page, decklist view
           default, climb order, overlay bar widgets, reduced motion, themes, sounds,
-          notifications — nearly everything is a toggle now.
+          notifications — nearly everything is a toggle now. The{" "}
+          <strong>Suggest / Report</strong> button in the top bar opens a short form on the
+          site — feature ideas and bugs both land there, no GitHub account needed.
         </p>
         <ul className="help-kbd-list">
           <li>

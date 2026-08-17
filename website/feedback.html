@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suggest a feature or report a bug — Filthy Net Deck</title>
+    <meta
+      name="description"
+      content="Suggest a feature or report a bug for Filthy Net Deck. Short form, no account required."
+    />
+    <meta name="theme-color" content="#070806" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://filthy-net-deck.com/feedback.html" />
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/app-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .doc {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 120px 24px 80px;
+      }
+      .doc h1 {
+        font-size: clamp(1.9rem, 5vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 12px;
+      }
+      .doc p,
+      .doc li {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .doc strong {
+        color: var(--foam);
+      }
+      .doc .lede-big {
+        font-size: 1.08rem;
+        color: var(--foam);
+        margin-bottom: 28px;
+      }
+      .feedback-sent {
+        display: none;
+        border: 1px solid color-mix(in srgb, var(--good) 40%, var(--ink-700));
+        border-radius: var(--radius);
+        background: var(--ink-900);
+        padding: 22px 24px;
+        margin: 8px 0 28px;
+      }
+      .feedback-sent.is-on {
+        display: block;
+      }
+      .feedback-sent h2 {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+        color: var(--acid-bright);
+      }
+      .feedback-form.is-hidden {
+        display: none;
+      }
+      .kind {
+        border: 0;
+        padding: 0;
+        margin: 0 0 22px;
+      }
+      .kind legend {
+        font-weight: 700;
+        color: var(--foam);
+        margin-bottom: 10px;
+      }
+      .kind-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .kind-card {
+        display: block;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid var(--ink-600);
+        background: var(--ink-900);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      .kind-card:hover {
+        border-color: rgba(184, 240, 0, 0.4);
+      }
+      .kind-card:has(input:checked) {
+        border-color: var(--acid);
+        background: color-mix(in srgb, var(--acid) 8%, var(--ink-900));
+      }
+      .kind-card input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .kind-card strong {
+        display: block;
+        margin-bottom: 2px;
+      }
+      .kind-card span {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+      .field label {
+        font-weight: 600;
+        color: var(--foam);
+      }
+      .field .hint {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .field textarea,
+      .field input[type="text"],
+      .field input[type="email"] {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--ink-600);
+        background: var(--ink-900);
+        color: var(--foam);
+        font: inherit;
+        resize: vertical;
+      }
+      .field textarea {
+        min-height: 160px;
+      }
+      .field textarea:focus,
+      .field input:focus {
+        outline: none;
+        border-color: var(--acid);
+      }
+      .feedback-hp {
+        position: absolute;
+        left: -9999px;
+        height: 0;
+        overflow: hidden;
+      }
+      .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px 18px;
+        margin-top: 8px;
+      }
+      .alt-link {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+      .alt-link a {
+        color: var(--acid);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .alt-link a:hover {
+        text-decoration: underline;
+      }
+      .doc-back {
+        display: inline-block;
+        margin-top: 48px;
+        color: var(--acid);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .doc-back:hover {
+        text-decoration: underline;
+      }
+      @media (max-width: 560px) {
+        .kind-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fx-root" aria-hidden="true">
+      <div class="fx-orb fx-orb-a"></div>
+      <div class="fx-orb fx-orb-b"></div>
+      <div class="fx-grid"></div>
+    </div>
+
+    <header class="nav">
+      <a class="brand" href="/">
+        <img src="assets/app-icon.png" alt="" width="40" height="40" />
+        <span>
+          <strong>Filthy Net Deck</strong>
+          <small>MTG Arena companion</small>
+        </span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="meta-web/">Public meta</a>
+        <a href="/#download" class="nav-cta">Download</a>
+      </nav>
+    </header>
+
+    <main class="doc">
+      <p class="eyebrow">Feedback</p>
+      <h1>Suggest a feature or report a bug</h1>
+      <p class="lede-big">
+        Short form, no account. I read every one. Feature ideas and bugs both
+        land here.
+      </p>
+
+      <div class="feedback-sent" id="sent" hidden>
+        <h2>Got it.</h2>
+        <p>
+          Thanks — that is in the pile. If you left a contact, I can write back
+          if I need more detail.
+        </p>
+      </div>
+
+      <form
+        class="feedback-form"
+        id="form"
+        name="feedback"
+        method="POST"
+        action="https://formsubmit.co/ston3d4pe@gmail.com"
+      >
+        <input type="hidden" name="_next" value="https://filthy-net-deck.com/feedback.html?sent=1" />
+        <input type="hidden" name="_subject" id="mail_subject" value="Filthy Net Deck feedback" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_replyto" id="replyto" value="" />
+        <input type="hidden" name="source" id="source" value="website" />
+        <input type="hidden" name="app_version" id="app_version" value="" />
+
+        <p class="feedback-hp">
+          <label>Don’t fill this out <input name="_honey" tabindex="-1" autocomplete="off" /></label>
+        </p>
+
+        <fieldset class="kind">
+          <legend>What is this?</legend>
+          <div class="kind-grid">
+            <label class="kind-card">
+              <input type="radio" name="kind" value="feature" required />
+              <strong>Feature idea</strong>
+              <span>Something you want the app or site to do</span>
+            </label>
+            <label class="kind-card">
+              <input type="radio" name="kind" value="bug" />
+              <strong>Bug</strong>
+              <span>Something broken, wrong, or confusing</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="message">The details</label>
+          <span class="hint">
+            For bugs: what you did, what you expected, what happened. Please do
+            <strong>not</strong> include another player’s Arena name or the
+            cards they showed you.
+          </span>
+          <textarea id="message" name="message" required maxlength="4000"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="contact">Contact <span class="hint">(optional)</span></label>
+          <span class="hint">Email or a handle if you want a reply. Fine to leave blank.</span>
+          <input
+            id="contact"
+            name="contact"
+            type="text"
+            maxlength="200"
+            autocomplete="email"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Send</button>
+          <p class="alt-link">
+            Prefer GitHub?
+            <a
+              href="https://github.com/L0nE-F0x/Filthy-Net-Deck/issues/new/choose"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Open an issue</a
+            >.
+          </p>
+        </div>
+      </form>
+
+      <a class="doc-back" href="/">← Back to Filthy Net Deck</a>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="brand footer-brand">
+          <img src="assets/app-icon.png" alt="" width="32" height="32" />
+          <strong>Filthy Net Deck</strong>
+        </div>
+        <p>
+          Fan-made companion — <strong>not affiliated with Wizards of the Coast</strong>.
+        </p>
+        <p class="footer-credit">
+          <a href="privacy.html">Privacy</a> · <a href="status.html">Status</a> ·
+          <a href="feedback.html">Suggest / Report</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var sent = params.get("sent") === "1";
+        var form = document.getElementById("form");
+        var banner = document.getElementById("sent");
+        if (sent) {
+          form.classList.add("is-hidden");
+          banner.hidden = false;
+          banner.classList.add("is-on");
+        }
+        var source = document.getElementById("source");
+        var version = document.getElementById("app_version");
+        if (params.get("from") === "app") source.value = "app";
+        if (params.get("v")) version.value = params.get("v");
+        var kind = params.get("kind");
+        if (kind === "feature" || kind === "bug") {
+          var radio = form.querySelector('input[name="kind"][value="' + kind + '"]');
+          if (radio) radio.checked = true;
+        }
+        form.addEventListener("submit", function () {
+          var picked = form.querySelector('input[name="kind"]:checked');
+          var label = picked && picked.value === "bug" ? "Bug" : "Feature idea";
+          document.getElementById("mail_subject").value =
+            "Filthy Net Deck — " + label;
+          var contact = (document.getElementById("contact").value || "").trim();
+          document.getElementById("replyto").value = contact.indexOf("@") > 0 ? contact : "";
+        });
+      })();
+    </script>
+  </body>
+</html>

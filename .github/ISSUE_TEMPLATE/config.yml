@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Suggest a feature or report a bug
+    url: https://filthy-net-deck.com/feedback.html
+    about: Short form on the site — no GitHub account needed.

@@ -7,7 +7,8 @@ Desktop meta companion for **Magic: The Gathering** — the daily **Standard** a
 **Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.
 
 **Download:** https://filthy-net-deck.com/  
-**Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck
+**Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
+**Suggest a feature / report a bug:** https://filthy-net-deck.com/feedback.html
 
 Built with **Tauri 2 + React + TypeScript + Tailwind**.
 

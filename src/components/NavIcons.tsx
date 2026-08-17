@@ -122,6 +122,15 @@ export function IconHelp({ className }: IconProps): ReactNode {
   );
 }
 
+/** Suggest / Report — speech bubble */
+export function IconFeedback({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M6 6.5A2.5 2.5 0 018.5 4h7A2.5 2.5 0 0118 6.5v6A2.5 2.5 0 0115.5 15H12l-3.8 2.9c-.5.4-1.2 0-1.2-.6V15H8.5A2.5 2.5 0 016 12.5v-6z" />
+    </svg>
+  );
+}
+
 /** Format Hub — legality / rotation / bans */
 export function IconFormatHub({ className }: IconProps): ReactNode {
   return (

@@ -1,0 +1,16 @@
+name: Feature idea
+description: Something you want the app or site to do
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prefer the [site form](https://filthy-net-deck.com/feedback.html) if you do not want a GitHub account.
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What you want, and why it would help.
+    validations:
+      required: true

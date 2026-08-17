@@ -31,6 +31,11 @@ never silently stale-as-fresh).
    linked run, fix the source module in `pipeline/sources/`, close the issue.
    (Turn on GitHub email notifications for the repo so you hear about these the
    day they happen, not at month-end.)
+1b. **Feedback form** — submissions from the site and the in-app **Suggest /
+   Report** button are emailed to `ston3d4pe@gmail.com` via FormSubmit
+   (`website/feedback.html`). The first live submit sends an activation mail
+   from FormSubmit — click it or nothing arrives after that. Check spam.
+   GitHub Issues is the fallback for people who prefer the repo.
 2. **Arena dates** — `pipeline/sources/set-calendar-overrides.json`: for each
    upcoming set on the Sets page showing an *estimated* Arena date, check WotC /
    magic.gg announcements and add the official date + source URL. This is the

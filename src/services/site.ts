@@ -55,3 +55,19 @@ export const PRIVACY_URL = `${SITE_ORIGIN_PRIMARY}/privacy.html`;
  * app can never disagree about whether there is an incident.
  */
 export const STATUS_URL = `${SITE_ORIGIN_PRIMARY}/status.html`;
+
+/**
+ * Suggest a feature / report a bug. Lands on the public form at
+ * `/feedback.html` (Netlify Forms) so people do not need a GitHub account.
+ * An empty string hides every feedback affordance in the app.
+ */
+export const FEEDBACK_URL = `${SITE_ORIGIN_PRIMARY}/feedback.html`;
+
+/** App-originated feedback URL — stamps version so the form can include it. */
+export function appFeedbackUrl(version: string): string {
+  if (!FEEDBACK_URL) return "";
+  const u = new URL(FEEDBACK_URL);
+  u.searchParams.set("from", "app");
+  if (version) u.searchParams.set("v", version);
+  return u.toString();
+}

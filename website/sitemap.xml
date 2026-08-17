@@ -18,6 +18,12 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://filthy-net-deck.com/feedback.html</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://filthy-net-deck.com/meta-web/</loc>
     <lastmod>2026-08-16</lastmod>
     <changefreq>daily</changefreq>

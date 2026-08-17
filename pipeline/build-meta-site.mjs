@@ -313,6 +313,7 @@ ${body}
     <p class="foot-links">
       <a href="../">Home</a> ·
       <a href="../#download">Windows &amp; macOS app</a> &middot;
+      <a href="../feedback.html">Suggest / Report</a> &middot;
       <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck">GitHub</a>
     </p>
   </footer>
@@ -925,6 +926,7 @@ function buildCard(bundle, card, cardsBySlug) {
   html = html
     .replaceAll('href="../"', 'href="../../"')
     .replaceAll('href="../#download"', 'href="../../#download"')
+    .replaceAll('href="../feedback.html"', 'href="../../feedback.html"')
     .replaceAll('href="../assets/', 'href="../../assets/')
     .replaceAll('src="../assets/', 'src="../../assets/')
     .replaceAll('href="site.css"', 'href="../site.css"')
@@ -1090,6 +1092,7 @@ function buildDeck(bundle, history, deck) {
   html = html
     .replaceAll('href="../"', 'href="../../"')
     .replaceAll('href="../#download"', 'href="../../#download"')
+    .replaceAll('href="../feedback.html"', 'href="../../feedback.html"')
     .replaceAll('href="../assets/', 'href="../../assets/')
     .replaceAll('src="../assets/', 'src="../../assets/')
     .replaceAll('href="site.css"', 'href="../site.css"')
@@ -1628,7 +1631,8 @@ function sitemapPriority(p) {
 }
 
 /** Bump when `website/privacy.html` is substantively edited. */
-const PRIVACY_LASTMOD = "2026-08-12";
+const PRIVACY_LASTMOD = "2026-08-17";
+const FEEDBACK_LASTMOD = "2026-08-17";
 
 function writeSitemap(paths, lastmod) {
   const mod = /^\d{4}-\d{2}-\d{2}$/.test(String(lastmod || "")) ? String(lastmod) : null;
@@ -1662,6 +1666,12 @@ function writeSitemap(paths, lastmod) {
   <url>
     <loc>${SITE}/status.html</loc>
     <changefreq>daily</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>${SITE}/feedback.html</loc>
+    <lastmod>${FEEDBACK_LASTMOD}</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
 ${urls}

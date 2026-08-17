@@ -1,0 +1,31 @@
+name: Bug report
+description: Something is broken, wrong, or confusing
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prefer the [site form](https://filthy-net-deck.com/feedback.html) if you do not want a GitHub account.
+        Do **not** include another player's Arena name or the cards they showed you.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Settings → About, or the small line under the sidebar logo.
+      placeholder: "3.1.4"
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Windows
+        - macOS
+        - Not sure

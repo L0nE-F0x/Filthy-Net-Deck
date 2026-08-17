@@ -7,7 +7,7 @@ import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { FriendCodes } from "../components/FriendCodes";
 import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
-import { DONATE_URL, PRIVACY_URL } from "../services/site";
+import { DONATE_URL, FEEDBACK_URL, PRIVACY_URL, appFeedbackUrl } from "../services/site";
 import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
@@ -519,6 +519,16 @@ export const Settings = memo(function Settings() {
             >
               Open help &amp; tour
             </button>
+            {FEEDBACK_URL && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                title="Suggest a feature or report a bug"
+                onClick={() => void openExternal(appFeedbackUrl(APP_VERSION))}
+              >
+                Suggest a feature / Report a bug
+              </button>
+            )}
           </div>
         </section>
 
@@ -1310,6 +1320,19 @@ export const Settings = memo(function Settings() {
                 onClick={() => void openExternal(DONATE_URL)}
               >
                 buy me a coffee
+              </button>
+              .
+            </p>
+          )}
+          {FEEDBACK_URL && (
+            <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
+              Something missing, or something broken?{" "}
+              <button
+                type="button"
+                className="text-gold-300 hover:text-gold-200 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-xs"
+                onClick={() => void openExternal(appFeedbackUrl(APP_VERSION))}
+              >
+                Suggest a feature / report a bug
               </button>
               .
             </p>

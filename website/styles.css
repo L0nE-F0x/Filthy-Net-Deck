@@ -199,6 +199,17 @@ main,
 .nav-cta:hover {
   background: rgba(184, 240, 0, 0.2) !important;
 }
+.nav-feedback {
+  padding: 0.42rem 0.85rem !important;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 61, 40, 0.95);
+  color: var(--foam) !important;
+  font-weight: 600 !important;
+}
+.nav-feedback:hover {
+  border-color: rgba(184, 240, 0, 0.45);
+  color: var(--acid) !important;
+}
 
 /* ——— hero ——— */
 .visually-hidden {
@@ -304,8 +315,10 @@ main,
   padding: 0.85rem 1.25rem;
   border-radius: 14px;
   text-decoration: none;
+  font-family: inherit;
   font-weight: 700;
   font-size: 0.95rem;
+  cursor: pointer;
   border: 1px solid transparent;
   transition: transform 0.15s var(--ease), filter 0.15s, box-shadow 0.2s, border-color 0.15s;
 }
@@ -1828,7 +1841,7 @@ main,
 }
 
 @media (max-width: 700px) {
-  .nav-links a:not(.nav-cta) {
+  .nav-links a:not(.nav-cta):not(.nav-feedback) {
     display: none;
   }
   .mock-body {

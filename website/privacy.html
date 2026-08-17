@@ -151,6 +151,7 @@
         <a href="/#features">Features</a>
         <a href="meta-web/">Public meta</a>
         <a href="/#formats">Formats</a>
+        <a href="feedback.html" class="nav-feedback">Suggest / Report</a>
         <a href="/#download" class="nav-cta">Download</a>
       </nav>
     </header>
@@ -158,7 +159,7 @@
     <main class="doc">
       <p class="eyebrow">Privacy</p>
       <h1>What the app sends, field by field</h1>
-      <p class="doc-updated">Last updated 2026-08-12 · applies to v2.8.2 and later</p>
+      <p class="doc-updated">Last updated 2026-08-17 · applies to v2.8.2 and later</p>
 
       <p class="lede-big">
         Filthy Net Deck works completely with <strong>no account</strong>, and in that state it
@@ -307,7 +308,9 @@
         you browse cards. Deck data comes from MTGGoldfish, MTGO, magic.gg, Melee and Untapped, and
         is fetched by a build pipeline on a server — <em>not</em> by your PC. Accounts, storage and
         the community aggregates run on <strong>Supabase</strong>. The site and downloads are hosted
-        on <strong>Netlify</strong>, whose analytics count page requests without cookies. There is
+        on <strong>Netlify</strong>, whose analytics count page requests without cookies. The
+        optional <a href="feedback.html">feedback form</a> is posted to
+        <strong>FormSubmit</strong>, which emails it to the maintainer. There is
         no advertising, no third-party tracker, and nothing is sold or shared with anyone.
       </p>
 
@@ -321,7 +324,20 @@
 
       <p>
         Questions, or want your data removed?
-        <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck/issues">Open an issue</a>.
+        <a href="feedback.html">Use the feedback form</a>
+        or
+        <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck/issues">open a GitHub issue</a>.
+      </p>
+
+      <h2>7 · Feedback form (this website)</h2>
+      <p>
+        Separate from anything the app can upload. The
+        <a href="feedback.html">Suggest / Report</a> form on this site is
+        optional and sends only what you type: whether it is a feature idea or a
+        bug, the message, an optional contact, and (if you opened it from the
+        app) the app version. FormSubmit receives that POST and emails it to
+        the maintainer. It is never mixed into match uploads, and you do not
+        need an account.
       </p>
 
       <a class="doc-back" href="/">← Back to Filthy Net Deck</a>
@@ -339,7 +355,8 @@
           Scryfall.
         </p>
         <p class="footer-credit">
-          <a href="status.html">Status</a> · Built by
+          <a href="status.html">Status</a> ·
+          <a href="feedback.html">Suggest / Report</a> · Built by
           <a href="https://ame-apexforge.org/" target="_blank" rel="noopener noreferrer"
             >ApexForge</a
           >

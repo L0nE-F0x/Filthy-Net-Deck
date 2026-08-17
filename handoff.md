@@ -22,6 +22,20 @@ attaches the new one.
 3. Owner may still post the site on X from `@MBrewlab` — wait until Netlify
    is serving `37bdba3` (Bo1/Bo3 pills + stacked lists) before they hit send.
 
+## This session (2026-08-17)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Suggest / Report** | Website + app button → `website/feedback.html`. FormSubmit emails `ston3d4pe@gmail.com`. First live submit needs the FormSubmit activation click. GitHub issue templates remain as the fallback. |
+| ✅ | **Surfaces** | Homepage nav pill + hero + footer + download note; privacy + status; in-app topbar next to Help; Settings → Interface and About. `FEEDBACK_URL` / `appFeedbackUrl()` in `src/services/site.ts`. |
+| ⏳ | **Not an app release** | Site can ship on `main` with no version bump. The in-app button needs a signed v3.1.5 for installed users. |
+
+### Hard-won this session
+
+- The form is website-only. It is **not** an app upload-payload change, but privacy.html §7 still lists the fields (kind, message, optional contact, optional app version).
+- After the first live submit, open `ston3d4pe@gmail.com` and click FormSubmit’s activation mail (`docs/MAINTENANCE.md` item 1b). Nothing is delivered until that click.
+- Local `serve` pretty-URLs `/feedback.html?x=1` → `/feedback` and **drops the query**. Production Netlify serves `/privacy.html` as 200, so `?sent=1` / `?from=app&v=` will keep working on the live domain.
+
 ## This session (2026-08-16, later)
 
 | Item | Notes |

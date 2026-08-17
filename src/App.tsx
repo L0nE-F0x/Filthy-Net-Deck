@@ -28,10 +28,12 @@ import {
   IconSets,
   IconFormatHub,
   IconHelp,
+  IconFeedback,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
 import { openExternal } from "./services/openExternal";
+import { FEEDBACK_URL, appFeedbackUrl } from "./services/site";
 import { applyFullscreen, closeToTray, restoreFullscreenIfPreferred } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
 import { syncOverlayPrefFromStore } from "./services/overlay";
@@ -543,6 +545,18 @@ export default function App() {
               <IconHelp className="w-3.5 h-3.5" />
               Help
             </button>
+            {FEEDBACK_URL && (
+              <button
+                type="button"
+                className="fs-btn help-btn"
+                title="Suggest a feature or report a bug"
+                aria-label="Suggest a feature or report a bug"
+                onClick={() => void openExternal(appFeedbackUrl(APP_VERSION))}
+              >
+                <IconFeedback className="w-3.5 h-3.5" />
+                Suggest / Report
+              </button>
+            )}
             <button
               type="button"
               className="palette-hint"
