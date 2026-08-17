@@ -19,25 +19,28 @@ attaches the new one.
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
 2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-3. Owner may still post the site on X from `@MBrewlab` — wait until Netlify
-   is serving `37bdba3` (Bo1/Bo3 pills + stacked lists) before they hit send.
+3. Suggest / Report is live (site + v3.1.5 app). FormSubmit is already
+   activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
-## This session (2026-08-17)
+## Previous session (2026-08-17)
 
 | Item | Notes |
 |------|--------|
-| ✅ | **Suggest / Report** | Website + app button → `website/feedback.html`. FormSubmit emails `ston3d4pe@gmail.com`. First live submit needs the FormSubmit activation click. GitHub issue templates remain as the fallback. |
+| ✅ | **Suggest / Report** | Website + app button → `website/feedback.html`. FormSubmit emails `ston3d4pe@gmail.com`. Owner confirmed delivery after the one-time activation click. GitHub issue templates are the fallback. |
 | ✅ | **Surfaces** | Homepage nav pill + hero + footer + download note; privacy + status; in-app topbar next to Help; Settings → Interface and About. `FEEDBACK_URL` / `appFeedbackUrl()` in `src/services/site.ts`. |
-| ✅ | **v3.1.5 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.5`. In-app Suggest / Report is now in the binary. |
-| ✅ | **v3.1.5 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.5-universal.dmg` from the GH Release (sha256 `a0faa4e2…db785`, 21 285 350 bytes). Both homepage Mac buttons pointed at it. downloads stays at current + 1 (3.1.5 + 3.1.4); 3.1.2 pruned. |
+| ✅ | **v3.1.5 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.5`. In-app button is in the binary. `4eb7be3`. |
+| ✅ | **v3.1.5 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.5-universal.dmg` from the GH Release (sha256 `a0faa4e2…db785`, 21 285 350 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.5 + 3.1.4). `2d6f546`. |
+| ✅ | **Live** | `version.json` / `updater/latest.json` / Setup-3.1.5.exe / 3.1.5 dmg all 200 on filthy-net-deck.com. |
 
-### Hard-won this session
+### Hard-won that session
 
 - The form is website-only. It is **not** an app upload-payload change, but privacy.html §7 still lists the fields (kind, message, optional contact, optional app version).
-- After the first live submit, open `ston3d4pe@gmail.com` and click FormSubmit’s activation mail (`docs/MAINTENANCE.md` item 1b). Nothing is delivered until that click.
-- Local `serve` pretty-URLs `/feedback.html?x=1` → `/feedback` and **drops the query**. Production Netlify serves `/privacy.html` as 200, so `?sent=1` / `?from=app&v=` will keep working on the live domain.
+- FormSubmit’s first live submit only sends an activation mail. Owner already clicked it; later submits land in Gmail.
+- Local `serve` pretty-URLs `/feedback.html?x=1` → `/feedback` and **drops the query**. Production Netlify serves `/privacy.html` as 200, so `?sent=1` / `?from=app&v=` keep working on the live domain.
+- App UI is not live until a signed version bump. Shipping the site form first, then v3.1.5, is the right split.
+- `git add a b missing` fails the whole add. Stage the new dmg and HTML in their own add, never reuse a path that `git rm` already consumed.
 
-## This session (2026-08-16, later)
+## Previous session (2026-08-16, later)
 
 | Item | Notes |
 |------|--------|
