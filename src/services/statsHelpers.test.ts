@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   formExtremes,
   isSameLocalDay,
+  isWithinLast24Hours,
+  matchesForStatsWindow,
   rollingWinrate,
+  STATS_WINDOW_TODAY,
   tallyMatches,
 } from "./statsHelpers";
 import type { TrackedMatch } from "../types/tracker";
@@ -37,6 +40,48 @@ describe("isSameLocalDay", () => {
     const noon = Date.parse("2026-07-20T12:00:00");
     expect(isSameLocalDay(noon, noon + 3600_000)).toBe(true);
     expect(isSameLocalDay(noon, noon + 86400000)).toBe(false);
+  });
+});
+
+describe("isWithinLast24Hours", () => {
+  const now = Date.parse("2026-08-18T18:00:00");
+  it("includes matches inside the rolling window", () => {
+    expect(isWithinLast24Hours(now - 3_600_000, now)).toBe(true);
+    expect(isWithinLast24Hours(now, now)).toBe(true);
+    expect(isWithinLast24Hours(now - 24 * 60 * 60 * 1000, now)).toBe(true);
+  });
+  it("excludes matches older than 24h or in the future", () => {
+    expect(isWithinLast24Hours(now - 24 * 60 * 60 * 1000 - 1, now)).toBe(false);
+    expect(isWithinLast24Hours(now + 1, now)).toBe(false);
+  });
+});
+
+describe("matchesForStatsWindow", () => {
+  const now = Date.parse("2026-08-18T18:00:00");
+  const recent = match({ matchId: "r", endedAt: now - 2 * 60 * 60 * 1000, result: "win" });
+  const yesterday = match({
+    matchId: "y",
+    endedAt: now - 30 * 60 * 60 * 1000,
+    result: "loss",
+  });
+  const july = match({
+    matchId: "j",
+    endedAt: Date.parse("2026-07-04T12:00:00"),
+    result: "win",
+  });
+  const pool = [recent, yesterday, july];
+
+  it("returns every match for all / empty", () => {
+    expect(matchesForStatsWindow(pool, "all", now)).toEqual(pool);
+    expect(matchesForStatsWindow(pool, null, now)).toEqual(pool);
+  });
+
+  it("keeps only the last 24 hours for today", () => {
+    expect(matchesForStatsWindow(pool, STATS_WINDOW_TODAY, now)).toEqual([recent]);
+  });
+
+  it("filters by YYYY-MM season key", () => {
+    expect(matchesForStatsWindow(pool, "2026-07", now)).toEqual([july]);
   });
 });
 

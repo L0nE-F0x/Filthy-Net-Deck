@@ -13,7 +13,7 @@ export function SummaryTiles({ matches }: { matches: TrackedMatch[] }) {
     <div className="stat-tiles">
       <div
         className="panel stat-tile"
-        title={`${matches.length} matches in the current season / queue filter`}
+        title={`${matches.length} matches in the current time / queue filter`}
       >
         <CountUp className="stat-num" value={matches.length} />
         <span className="stat-label">Matches</span>

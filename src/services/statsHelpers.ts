@@ -4,6 +4,11 @@
  */
 
 import type { TrackedMatch } from "../types/tracker";
+import { seasonKeyOf } from "./tracker";
+
+/** Sentinel for the My Stats "Today" chip — rolling last 24 hours. */
+export const STATS_WINDOW_TODAY = "today";
+export const LAST_24H_MS = 24 * 60 * 60 * 1000;
 
 export interface MatchTally {
   wins: number;
@@ -28,6 +33,28 @@ export function isSameLocalDay(ms: number, nowMs = Date.now()): boolean {
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
   );
+}
+
+/** Rolling last-24-hours window used by the My Stats Today chip. */
+export function isWithinLast24Hours(ms: number, nowMs = Date.now()): boolean {
+  return ms <= nowMs && ms >= nowMs - LAST_24H_MS;
+}
+
+/**
+ * Filter tracker matches for a My Stats time chip.
+ * `"today"` is the last 24 hours; `"all"` / empty is everything; otherwise a
+ * `YYYY-MM` season key.
+ */
+export function matchesForStatsWindow(
+  matches: readonly TrackedMatch[],
+  window: string | null | undefined,
+  nowMs = Date.now(),
+): TrackedMatch[] {
+  if (!window || window === "all") return matches as TrackedMatch[];
+  if (window === STATS_WINDOW_TODAY) {
+    return matches.filter((m) => isWithinLast24Hours(m.endedAt, nowMs));
+  }
+  return matches.filter((m) => seasonKeyOf(m.endedAt) === window);
 }
 
 /**

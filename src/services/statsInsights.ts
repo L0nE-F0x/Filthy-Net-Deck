@@ -3,9 +3,9 @@
  */
 
 import type { TrackedMatch } from "../types/tracker";
-import { deckKey, seasonKeyOf } from "./tracker";
+import { deckKey } from "./tracker";
 import { parseRank, type ParsedRank } from "./ranks";
-import { formExtremes, tallyMatches } from "./statsHelpers";
+import { formExtremes, matchesForStatsWindow, tallyMatches } from "./statsHelpers";
 import { gamePlayDrawSplit } from "./gameAnalytics";
 
 export interface InsightChip {
@@ -25,13 +25,9 @@ function tally(matches: TrackedMatch[]) {
 /** Insight chips for Stats home (clickable when deckKey set). */
 export function buildInsightChips(
   matches: TrackedMatch[],
-  opts?: { seasonKey?: string | null },
+  opts?: { seasonKey?: string | null; nowMs?: number },
 ): InsightChip[] {
-  const season = opts?.seasonKey;
-  const pool =
-    season && season !== "all"
-      ? matches.filter((m) => seasonKeyOf(m.endedAt) === season)
-      : matches;
+  const pool = matchesForStatsWindow(matches, opts?.seasonKey, opts?.nowMs);
   const decided = pool.filter((m) => m.result === "win" || m.result === "loss");
   if (!decided.length) return [];
 
@@ -142,11 +138,9 @@ export interface SeasonStory {
 export function buildSeasonStory(
   matches: TrackedMatch[],
   seasonKey: string,
+  nowMs = Date.now(),
 ): SeasonStory {
-  const pool =
-    seasonKey === "all"
-      ? matches
-      : matches.filter((m) => seasonKeyOf(m.endedAt) === seasonKey);
+  const pool = matchesForStatsWindow(matches, seasonKey, nowMs);
   const t = tally(pool);
   let peak: ParsedRank | null = null;
   for (const m of pool) {

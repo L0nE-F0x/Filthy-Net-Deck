@@ -60,6 +60,34 @@ describe("buildInsightChips", () => {
     expect(chips.some((c) => c.id === "hot-deck")).toBe(true);
   });
 
+  it("scopes today chips to the last 24 hours", () => {
+    const now = Date.parse("2026-08-18T18:00:00");
+    const matches: TrackedMatch[] = [];
+    for (let i = 0; i < 6; i++) {
+      matches.push(
+        m({
+          result: "loss",
+          endedAt: now - 48 * 60 * 60 * 1000,
+          deckName: "Old Cold",
+          deckId: "old",
+        }),
+      );
+    }
+    for (let i = 0; i < 6; i++) {
+      matches.push(
+        m({
+          result: "win",
+          endedAt: now - 30 * 60 * 1000,
+          deckName: "Today Hot",
+          deckId: "hot",
+        }),
+      );
+    }
+    const chips = buildInsightChips(matches, { seasonKey: "today", nowMs: now });
+    expect(chips.some((c) => c.deckKey === "old")).toBe(false);
+    expect(chips.some((c) => c.id === "hot-deck" && c.deckKey === "hot")).toBe(true);
+  });
+
   it("flags hot/cold 10-match stretches when form extremes are extreme", () => {
     const matches: TrackedMatch[] = [];
     // 10 wins then 10 losses → best form 100%, worst 0%
@@ -102,6 +130,19 @@ describe("buildSeasonStory", () => {
     expect(story.losses).toBe(1);
     expect(story.peakRank?.score).toBeGreaterThan(0);
     expect(story.bestDeckName).toBe("A");
+  });
+
+  it("summarizes only the last 24 hours for today", () => {
+    const now = Date.parse("2026-08-18T18:00:00");
+    const matches = [
+      m({ result: "win", endedAt: now - 2 * 60 * 60 * 1000, deckName: "A", deckId: "a" }),
+      m({ result: "loss", endedAt: now - 3 * 60 * 60 * 1000, deckName: "A", deckId: "a" }),
+      m({ result: "win", endedAt: now - 48 * 60 * 60 * 1000, deckName: "A", deckId: "a" }),
+    ];
+    const story = buildSeasonStory(matches, "today", now);
+    expect(story.wins).toBe(1);
+    expect(story.losses).toBe(1);
+    expect(story.games).toBe(2);
   });
 });
 

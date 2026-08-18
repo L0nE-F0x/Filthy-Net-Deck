@@ -8,6 +8,10 @@ import {
   seasonKeyOf,
   seasonLabel,
 } from "../services/tracker";
+import {
+  matchesForStatsWindow,
+  STATS_WINDOW_TODAY,
+} from "../services/statsHelpers";
 import { recapFromMatches, renderRecapPng } from "../services/recapCard";
 import { formatRecapHeadline } from "../services/recapStats";
 import {
@@ -54,7 +58,7 @@ export const Stats = memo(function Stats() {
   const clearStatsCompareDeck = useAppStore((s) => s.clearStatsCompareDeck);
   const openMatchupTag = useAppStore((s) => s.openMatchupTag);
   const [queue, setQueue] = useState<string | null>(null);
-  const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto
+  const [seasonSel, setSeasonSel] = useState<string | null>(null); // null = auto season
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
   const [compareWith, setCompareWith] = useState<string | null>(null);
   const [runs, setRuns] = useState<DeckRuns>(() => loadDeckRuns());
@@ -107,10 +111,7 @@ export const Stats = memo(function Stats() {
     seasonSel ?? (seasons.includes(currentSeasonKey()) ? currentSeasonKey() : "all");
 
   const seasonFiltered = useMemo(
-    () =>
-      season === "all"
-        ? runFiltered
-        : runFiltered.filter((m) => seasonKeyOf(m.endedAt) === season),
+    () => matchesForStatsWindow(runFiltered, season),
     [runFiltered, season],
   );
 
@@ -245,27 +246,34 @@ export const Stats = memo(function Stats() {
         ) : null
       ) : (
         <>
-          {seasons.length > 1 && (
-            <div className="filter-bar mb-0">
-              {seasons.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`filter-chip${season === s ? " active" : ""}`}
-                  onClick={() => setSeasonSel(s)}
-                >
-                  {seasonLabel(s)}
-                </button>
-              ))}
+          <div className="filter-bar mb-0">
+            <button
+              type="button"
+              className={`filter-chip${season === STATS_WINDOW_TODAY ? " active" : ""}`}
+              title="Matches from the last 24 hours"
+              onClick={() => setSeasonSel(STATS_WINDOW_TODAY)}
+            >
+              Today
+            </button>
+            {seasons.map((s) => (
               <button
+                key={s}
                 type="button"
-                className={`filter-chip${season === "all" ? " active" : ""}`}
-                onClick={() => setSeasonSel("all")}
+                className={`filter-chip${season === s ? " active" : ""}`}
+                onClick={() => setSeasonSel(s)}
               >
-                All time
+                {seasonLabel(s)}
               </button>
-            </div>
-          )}
+            ))}
+            <button
+              type="button"
+              className={`filter-chip${season === "all" ? " active" : ""}`}
+              title="Every tracked match"
+              onClick={() => setSeasonSel("all")}
+            >
+              All time
+            </button>
+          </div>
 
           {queues.length > 1 && (
             <div className="filter-bar mb-0">
@@ -292,7 +300,9 @@ export const Stats = memo(function Stats() {
           <div className="panel season-story">
             <div className="flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0">
-            <p className="eyebrow m-0 mb-1">Season story</p>
+            <p className="eyebrow m-0 mb-1">
+              {season === STATS_WINDOW_TODAY ? "Last 24 hours" : "Season story"}
+            </p>
             <p className="text-sm m-0">
               {seasonStory.wins}W {seasonStory.losses}L
               {seasonStory.rate != null && (
@@ -329,6 +339,11 @@ export const Stats = memo(function Stats() {
                 </>
               )}
             </p>
+            {season === STATS_WINDOW_TODAY && seasonStory.games === 0 && (
+              <p className="text-xs text-muted m-0 mt-1">
+                No matches in the last 24 hours.
+              </p>
+            )}
             {recapMsg && <p className="text-xs m-0 mt-1 text-foam">{recapMsg}</p>}
             </div>
             <ShareMenu

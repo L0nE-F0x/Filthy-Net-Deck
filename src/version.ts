@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.1.5";
+export const APP_VERSION = "3.1.6";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,5 +7,5 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Suggest / Report in the top bar — feature ideas and bugs email the maintainer, no GitHub account",
+  "Today chip on My Stats — tap it to scope WR, decks, and match history to the last 24 hours",
 ];
