@@ -4,7 +4,7 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.7** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.7** (pending push) · Windows **3.1.7** · macOS still **3.1.6** until the dmg roll
+· tag **v3.1.7** · Windows **and** macOS both serve 3.1.7
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -27,8 +27,8 @@ attaches the new one.
 | Item | Notes |
 |------|--------|
 | ✅ | **Jace / Kaito / Tezzeret themes** | Sidebar Themes picker now has ten walkers. Jace = indigo mind-magic (deeper than Teferi's sky-ivory). Kaito = neon cyan + magenta. Tezzeret = etherium brass + gunmetal. Dark and Light palettes for each. |
-| ✅ | **v3.1.7 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.7`. macOS homepage still 3.1.6 until CI dmg. |
-| ⏳ | **v3.1.7 macOS dmg** | Tag `v3.1.7` kicks `macos-build.yml`. Roll `Filthy-Net-Deck-3.1.7-universal.dmg` into `website/downloads/` and point both homepage Mac buttons at it. Keep current + 1 (3.1.7 + 3.1.6). |
+| ✅ | **v3.1.7 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.7`. `711a91c`. |
+| ✅ | **v3.1.7 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.7-universal.dmg` from the GH Release (sha256 `0448241f…c6fe9`, 21 382 310 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.7 + 3.1.6). |
 
 ### Hard-won this session
 
@@ -231,7 +231,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.7** Windows (signed updater). macOS homepage still **v3.1.6** until the dmg roll |
+| App version | **v3.1.7** on Windows (signed updater) and macOS (universal dmg on the homepage) |
 | Branch | `main`, clean after wrap |
 | Gates last green | **626** vitest / 84 files · tsc · signed Windows build (2026-08-18) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
