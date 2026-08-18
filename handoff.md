@@ -4,8 +4,7 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.6** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.6** · Windows 3.1.6 (signed updater) · macOS homepage still 3.1.5
-until the CI dmg is rolled
+· tag **v3.1.6** · Windows **and** macOS both serve 3.1.6
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -15,15 +14,12 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. **Roll the v3.1.6 macOS dmg** once `macos-build.yml` attaches
-   `Filthy-Net-Deck-3.1.6-universal.dmg` to the `v3.1.6` GitHub Release.
-   Homepage Mac buttons still point at 3.1.5 until that roll.
-2. **Beta-tester feedback on the marketing site.** Owner will collect
+1. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
-3. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-4. Suggest / Report is live (site + app). FormSubmit is already
+3. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
 ## Previous session (2026-08-18)
@@ -32,8 +28,9 @@ attaches the new one.
 |------|--------|
 | ✅ | **Today chip on My Stats** | New first filter chip. Scopes every home tile, queue, insight, season story, arsenal, splits, and match history to the **last 24 hours** (rolling, not calendar day). The existing TODAY tile stays local-calendar-day. |
 | ✅ | **Always-visible time chips** | Filter bar no longer hides when only one season is present — Today / this season / All time are always there. |
-| ✅ | **v3.1.6 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.6`. |
-| ⏳ | **v3.1.6 macOS dmg** | Tag `v3.1.6` starts CI. Do not leave homepage Mac buttons on 3.1.5 after the dmg lands. |
+| ✅ | **v3.1.6 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.6`. `e0d1ddb`. |
+| ✅ | **v3.1.6 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.6-universal.dmg` from the GH Release (sha256 `71f27e60…6328e`, 21 380 156 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.6 + 3.1.5). |
+| ✅ | **Live** | `version.json` / `updater/latest.json` / Setup-3.1.6.exe confirmed 200 on filthy-net-deck.com. |
 
 ### Hard-won this session
 
@@ -221,7 +218,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.6** on Windows (signed updater). macOS homepage still **3.1.5** until the CI dmg is rolled |
+| App version | **v3.1.6** on Windows (signed updater) and macOS (universal dmg on the homepage) |
 | Branch | `main`, clean after wrap |
 | Gates last green | **617** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-16) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
