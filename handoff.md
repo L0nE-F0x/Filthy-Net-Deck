@@ -28,7 +28,8 @@ attaches the new one.
 |------|--------|
 | ✅ | **Jace / Kaito / Tezzeret themes** | Sidebar Themes picker now has ten walkers. Jace = indigo mind-magic (deeper than Teferi's sky-ivory). Kaito = neon cyan + magenta. Tezzeret = etherium brass + gunmetal. Dark and Light palettes for each. |
 | ✅ | **v3.1.7 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.7`. `711a91c`. |
-| ✅ | **v3.1.7 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.7-universal.dmg` from the GH Release (sha256 `0448241f…c6fe9`, 21 382 310 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.7 + 3.1.6). |
+| ✅ | **v3.1.7 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.7-universal.dmg` from the GH Release (sha256 `0448241f…c6fe9`, 21 382 310 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.7 + 3.1.6). `f956918`. |
+| ✅ | **Live** | `version.json` / `updater/latest.json` / Setup-3.1.7.exe / 3.1.7 dmg all 200 on filthy-net-deck.com. |
 
 ### Hard-won this session
 
