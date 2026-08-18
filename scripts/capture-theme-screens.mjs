@@ -18,6 +18,11 @@ const SKINS = [
   { id: "liliana", name: "Liliana" },
   { id: "ajani", name: "Ajani" },
   { id: "elspeth", name: "Elspeth" },
+  { id: "ugin", name: "Ugin" },
+  { id: "garruk", name: "Garruk" },
+  { id: "jace", name: "Jace" },
+  { id: "kaito", name: "Kaito" },
+  { id: "tezzeret", name: "Tezzeret" },
 ];
 
 function prefs(skin) {

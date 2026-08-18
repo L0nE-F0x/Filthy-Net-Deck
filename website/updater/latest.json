@@ -1,11 +1,11 @@
 {
-  "version": "3.1.6",
-  "notes": "v3.1.6: Today chip on My Stats — filter every stat to the last 24 hours.",
-  "pub_date": "2026-08-18T08:48:11Z",
+  "version": "3.1.7",
+  "notes": "v3.1.7: Jace, Kaito and Tezzeret join the sidebar Themes picker.",
+  "pub_date": "2026-08-18T12:51:27Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9WS1dWT2prMndQMFZkaENvN0pvQTEvRDVldm00M3JmWjN0T2hRdC9iWEFiWEM3VThQRmdEMHE1RlFmSlNGdHhRSHNZVFExQm84aWlHSWx2YzRXM2c0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MDQyODYwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS42X3g2NC1zZXR1cC5leGUKdFgzSGlVTjQwQlQ1Q1A3b3o5S3h4NmFkZHJQSm5vdHZsOWtna3hzWHU4VmlyRmQveEZhc25pbEluRmR5a3FvekF2THJhanFyVkNEN1p1enN4MkFHQUE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.6.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFmazRUNDcvMkRrT080dXRsS2F2UE5EMlcyYlhEVmdkTTNDMWZKaVdoZHo5dVk1dWNnMDJGNFZUM1ZNVGZOck9RQ0RENWZiL1prVzFQZ3JaOVExSVFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MDU3NDg3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS43X3g2NC1zZXR1cC5leGUKQjUyNzhGRHg4KzNDRzRnelhDMFNqY2h2aE5KZ3QzZDRQd3RnZnpJVXBUMmJESUJJejBpdEJ3b2gvaUdFdVlQWGJFTUpQRWRabi9GOTJ6UnZyelFhQlE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.7.exe"
     }
   }
 }

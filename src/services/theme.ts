@@ -13,7 +13,10 @@ export type SkinId =
   | "ajani"
   | "elspeth"
   | "ugin"
-  | "garruk";
+  | "garruk"
+  | "jace"
+  | "kaito"
+  | "tezzeret";
 
 export interface SkinMeta {
   id: SkinId;
@@ -80,6 +83,27 @@ export const SKINS: SkinMeta[] = [
     walker: "Garruk Wildspeaker",
     blurb: "Deep forest greens & moss",
     swatches: ["#061208", "#3d8b4f", "#a3e635"],
+  },
+  {
+    id: "jace",
+    name: "Jace",
+    walker: "Jace, the Mind Sculptor",
+    blurb: "Indigo mind-magic & psychic cyan",
+    swatches: ["#080c1c", "#4f8cff", "#67e8f9"],
+  },
+  {
+    id: "kaito",
+    name: "Kaito",
+    walker: "Kaito Shizuki",
+    blurb: "Neon night, cyan steel & magenta signs",
+    swatches: ["#080a12", "#22d3ee", "#e879f9"],
+  },
+  {
+    id: "tezzeret",
+    name: "Tezzeret",
+    walker: "Tezzeret the Seeker",
+    blurb: "Etherium brass & cold alloy",
+    swatches: ["#0b0d12", "#d4a574", "#7a9eae"],
   },
 ];
 

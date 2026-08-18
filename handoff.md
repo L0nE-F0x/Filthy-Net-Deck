@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.6** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.6** · Windows **and** macOS both serve 3.1.6
+**Live product version: v3.1.7** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· tag **v3.1.7** (pending push) · Windows **3.1.7** · macOS still **3.1.6** until the dmg roll
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -21,6 +21,19 @@ attaches the new one.
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
 3. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
+
+## Previous session (2026-08-18, later)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Jace / Kaito / Tezzeret themes** | Sidebar Themes picker now has ten walkers. Jace = indigo mind-magic (deeper than Teferi's sky-ivory). Kaito = neon cyan + magenta. Tezzeret = etherium brass + gunmetal. Dark and Light palettes for each. |
+| ✅ | **v3.1.7 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.7`. macOS homepage still 3.1.6 until CI dmg. |
+| ⏳ | **v3.1.7 macOS dmg** | Tag `v3.1.7` kicks `macos-build.yml`. Roll `Filthy-Net-Deck-3.1.7-universal.dmg` into `website/downloads/` and point both homepage Mac buttons at it. Keep current + 1 (3.1.7 + 3.1.6). |
+
+### Hard-won this session
+
+- New skins append after Garruk. Teferi stays the sky/ivory blue; do not make Jace another ice-blue.
+- Picker list already scrolls (`max-height: min(18rem, 40vh)`). Do not float the panel over the main pane.
 
 ## Previous session (2026-08-18)
 
@@ -218,9 +231,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.6** on Windows (signed updater) and macOS (universal dmg on the homepage) |
+| App version | **v3.1.7** Windows (signed updater). macOS homepage still **v3.1.6** until the dmg roll |
 | Branch | `main`, clean after wrap |
-| Gates last green | **625** vitest / 84 files · tsc · eslint · signed Windows build (2026-08-18) |
+| Gates last green | **626** vitest / 84 files · tsc · signed Windows build (2026-08-18) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |

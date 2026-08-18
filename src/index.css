@@ -5460,6 +5460,132 @@ html[data-theme="light"][data-skin="garruk"] {
   --color-poor: #dc2626;
 }
 
+/* Jace — mind sculptor / indigo (deeper than Teferi's sky-ivory) */
+html[data-skin="jace"] {
+  --color-ink-950: #050713;
+  --color-ink-900: #080c1c;
+  --color-ink-850: #0d1228;
+  --color-ink-800: #141a34;
+  --color-ink-700: #1e2850;
+  --color-ink-600: #2c3c72;
+  --color-gold-500: #2563eb;
+  --color-gold-400: #4f8cff;
+  --color-gold-300: #93c5fd;
+  --color-gold-200: #dbeafe;
+  --color-azure-500: #0284c7;
+  --color-azure-400: #22d3ee;
+  --color-azure-300: #67e8f9;
+  --color-foam: #e8f4ff;
+  --color-muted: #7a96c4;
+  --color-good: #34d399;
+  --color-fair: #fbbf24;
+  --color-poor: #f87171;
+}
+html[data-theme="light"][data-skin="jace"] {
+  --color-ink-950: #eef2fb;
+  --color-ink-900: #e0e8f7;
+  --color-ink-850: #f6f8fd;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #cdd8f0;
+  --color-ink-600: #a4b6dc;
+  --color-gold-500: #1d4ed8;
+  --color-gold-400: #2563eb;
+  --color-gold-300: #1e3a8a;
+  --color-gold-200: #172554;
+  --color-azure-500: #0369a1;
+  --color-azure-400: #0284c7;
+  --color-azure-300: #0e7490;
+  --color-foam: #0b1224;
+  --color-muted: #3f5280;
+  --color-good: #047857;
+  --color-fair: #b45309;
+  --color-poor: #dc2626;
+}
+
+/* Kaito — Kamigawa neon night (cyan primary, magenta signs) */
+html[data-skin="kaito"] {
+  --color-ink-950: #05060c;
+  --color-ink-900: #080a12;
+  --color-ink-850: #0e121c;
+  --color-ink-800: #141a28;
+  --color-ink-700: #1e2840;
+  --color-ink-600: #2a3858;
+  --color-gold-500: #0891b2;
+  --color-gold-400: #22d3ee;
+  --color-gold-300: #67e8f9;
+  --color-gold-200: #cffafe;
+  --color-azure-500: #c026d3;
+  --color-azure-400: #e879f9;
+  --color-azure-300: #f0abfc;
+  --color-foam: #eefcff;
+  --color-muted: #8aa0b8;
+  --color-good: #4ade80;
+  --color-fair: #e879f9;
+  --color-poor: #fb7185;
+}
+html[data-theme="light"][data-skin="kaito"] {
+  --color-ink-950: #eef8fb;
+  --color-ink-900: #dff2f7;
+  --color-ink-850: #f6fcfd;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #c5e4ec;
+  --color-ink-600: #97c8d4;
+  --color-gold-500: #0e7490;
+  --color-gold-400: #0891b2;
+  --color-gold-300: #155e75;
+  --color-gold-200: #164e63;
+  --color-azure-500: #a21caf;
+  --color-azure-400: #c026d3;
+  --color-azure-300: #86198f;
+  --color-foam: #0a1220;
+  --color-muted: #3f5a68;
+  --color-good: #047857;
+  --color-fair: #a21caf;
+  --color-poor: #be123c;
+}
+
+/* Tezzeret — etherium artisan / gunmetal + brass */
+html[data-skin="tezzeret"] {
+  --color-ink-950: #07080b;
+  --color-ink-900: #0b0d12;
+  --color-ink-850: #12151c;
+  --color-ink-800: #1a1e28;
+  --color-ink-700: #282e3c;
+  --color-ink-600: #3c4458;
+  --color-gold-500: #b8864a;
+  --color-gold-400: #d4a574;
+  --color-gold-300: #e8c9a0;
+  --color-gold-200: #f5e6d0;
+  --color-azure-500: #4a6a80;
+  --color-azure-400: #7a9eae;
+  --color-azure-300: #a8c4d0;
+  --color-foam: #f2f0ea;
+  --color-muted: #9aa4b0;
+  --color-good: #86efac;
+  --color-fair: #d4a574;
+  --color-poor: #f87171;
+}
+html[data-theme="light"][data-skin="tezzeret"] {
+  --color-ink-950: #f3f1ec;
+  --color-ink-900: #e8e4dc;
+  --color-ink-850: #faf8f4;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #d8d2c6;
+  --color-ink-600: #b8b0a0;
+  --color-gold-500: #9a6b2e;
+  --color-gold-400: #b8864a;
+  --color-gold-300: #6b4a1c;
+  --color-gold-200: #4a3414;
+  --color-azure-500: #3d5868;
+  --color-azure-400: #4a6a80;
+  --color-azure-300: #334854;
+  --color-foam: #12151a;
+  --color-muted: #5c5648;
+  --color-good: #047857;
+  --color-fair: #b45309;
+  --color-poor: #dc2626;
+}
+
 /* Soft ambient glow follows active gold/azure */
 html[data-skin]:not([data-skin="classic"]) .app-shell {
   background:
@@ -5572,7 +5698,7 @@ html[data-skin]:not([data-skin="classic"]) .app-shell {
   flex-direction: column;
   gap: 0.2rem;
   /* Stay within the sidebar footer; scroll if the window is short */
-  max-height: min(14.5rem, 32vh);
+  max-height: min(18rem, 40vh);
   overflow-x: hidden;
   overflow-y: auto;
 }
