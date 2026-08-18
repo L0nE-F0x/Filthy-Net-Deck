@@ -29,8 +29,8 @@ attaches the new one.
 | ✅ | **Today chip on My Stats** | New first filter chip. Scopes every home tile, queue, insight, season story, arsenal, splits, and match history to the **last 24 hours** (rolling, not calendar day). The existing TODAY tile stays local-calendar-day. |
 | ✅ | **Always-visible time chips** | Filter bar no longer hides when only one season is present — Today / this season / All time are always there. |
 | ✅ | **v3.1.6 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.6`. `e0d1ddb`. |
-| ✅ | **v3.1.6 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.6-universal.dmg` from the GH Release (sha256 `71f27e60…6328e`, 21 380 156 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.6 + 3.1.5). |
-| ✅ | **Live** | `version.json` / `updater/latest.json` / Setup-3.1.6.exe confirmed 200 on filthy-net-deck.com. |
+| ✅ | **v3.1.6 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.6-universal.dmg` from the GH Release (sha256 `71f27e60…6328e`, 21 380 156 bytes). Both homepage Mac buttons pointed at it. downloads = current + 1 (3.1.6 + 3.1.5). `4cef8bd`. |
+| ✅ | **Live** | `version.json` / `updater/latest.json` / Setup-3.1.6.exe / 3.1.6 dmg all 200 on filthy-net-deck.com. |
 
 ### Hard-won this session
 
@@ -220,7 +220,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 |------|--------|
 | App version | **v3.1.6** on Windows (signed updater) and macOS (universal dmg on the homepage) |
 | Branch | `main`, clean after wrap |
-| Gates last green | **617** vitest / 83 files · tsc · eslint · signed Windows build (2026-08-16) |
+| Gates last green | **625** vitest / 84 files · tsc · eslint · signed Windows build (2026-08-18) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |
@@ -437,7 +437,7 @@ FND_REPLAY_LOG=<Player.log> FND_REPLAY_OPP='*' cargo test replay_real_log -- --n
 ```bash
 npm install
 npm run tauri:dev
-npm test              # 547 vitest across 78 files
+npm test              # 625 vitest across 84 files
 npm run sets          # rebuild slim sets index + galleries
 npm run meta          # daily meta (no app bump required)
 npm run meta:site     # regenerate /meta-web/ + sitemap
