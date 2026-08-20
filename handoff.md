@@ -4,7 +4,7 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.1.8** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.8** · Windows serves 3.1.8; **macOS dmg not yet rolled**
+· tag **v3.1.8** · Windows **and** macOS both serve 3.1.8
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -14,24 +14,12 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. **⚠️ RUN MIGRATION 9 ON THE LIVE DB.**
-   `supabase/migrations/20260820120000_public_decklists.sql` is written and
-   committed but **not applied** — paste it into the Supabase SQL editor for
-   project `bzcryoocsapqtyhiwzbe`. Until it runs, v3.1.8's **Publish decklist**
-   button fails (`set_deck_public` has no `list_in` argument) and
-   `/u/<handle>/<slug>` 404s. The whole release is inert without it.
-2. **macOS: tag v3.1.8, roll the dmg, then repoint the Mac buttons.** The two
-   homepage Mac links are **deliberately still on the 3.1.7 dmg** — pointing
-   them at a 3.1.8 dmg that CI has not built yet would serve Mac visitors a
-   404, which is worse than an older working build. Order: tag → CI attaches
-   the dmg → copy it into `website/downloads/` → flip both links and their
-   `btn-meta` labels to 3.1.8.
-3. **Beta-tester feedback on the marketing site.** Owner will collect
+1. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
-4. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-5. Suggest / Report is live (site + app). FormSubmit is already
+3. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
 ## Previous session (2026-08-20)
@@ -41,8 +29,8 @@ attaches the new one.
 | ✅ | **Copyable published decklists** | The ask: replace an AetherHub link in a YouTube description with an own-site link viewers can copy. Publishing a deck now uploads the list as **Arena import text**, and `/u/<handle>/<slug>` renders it with a one-click Copy button. `/d/<id>` 301s to the same page. |
 | ✅ | **Profile rows are links** | Both tables on `/u/<handle>` now link a deck to its page when a published deck's name matches — with a `list` badge when there is one to copy. |
 | ✅ | **v3.1.8 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.8`. |
-| ⚠️ | **Migration 9 NOT applied** | `20260820120000_public_decklists.sql`. See START HERE #1. |
-| ⚠️ | **macOS dmg not rolled** | See START HERE #2. |
+| ✅ | **Migration 9 applied** | `20260820120000_public_decklists.sql`, run by the owner. Verified via REST: `has_list`/`list` select 200 while a bogus column 400s, and both the 3-arg and legacy 2-arg `set_deck_public` shapes resolve. |
+| ✅ | **v3.1.8 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.8-universal.dmg` from the GH Release (sha256 `e06c66db…a345b`, 21 470 155 bytes). Both homepage Mac buttons repointed. downloads = current + 1 (3.1.8 + 3.1.7). |
 
 ### Hard-won this session
 
@@ -274,12 +262,12 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.8** on Windows (signed updater). macOS still serves the 3.1.7 dmg until v3.1.8 is tagged and rolled |
+| App version | **v3.1.8** on Windows (signed updater) and macOS (universal dmg on the homepage) |
 | Branch | `main`, clean after wrap |
 | Gates last green | **647** vitest / 86 files · tsc · eslint · signed Windows build (2026-08-20) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
-| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Eight** migrations run; the ninth (`20260820120000_public_decklists`) is written and **pending** — see START HERE #1 |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Nine** migrations run; the ninth (`20260820120000_public_decklists`) applied by the owner 2026-08-20 |
 | Auth | Google **and** Discord enabled + verified live. **Email OTP built but hidden** behind `EMAIL_SIGN_IN_ENABLED` |
 | Cron | `fnd-rollup` scheduled hourly (job id 1) — without it `matchup_rollup` never fills |
 | Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |
@@ -328,7 +316,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | `src/services/arenaExport.ts` | Arena ids + resolved names → Arena import text. The publish path's only source of a decklist |
 | `pipeline/build-meta-site.mjs` | The `/meta-web/` corpus + sitemap. Static pages are hardcoded there, not in `paths` |
 | `website/privacy.html` | The published field allowlist |
-| `supabase/migrations/` | 9 migrations. The first 8 are live; **`20260820120000` is not yet applied** (see START HERE #1) |
+| `supabase/migrations/` | 9 migrations, **all run on the live DB** (the 9th, `20260820120000`, published decklists — run by the owner 2026-08-20) |
 
 ---
 

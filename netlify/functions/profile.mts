@@ -183,6 +183,8 @@ ${opts.noindex ? '<meta name="robots" content="noindex" />' : ""}
 <meta name="twitter:title" content="${esc(opts.title)}" />
 <meta name="twitter:description" content="${esc(opts.desc)}" />
 <meta name="twitter:image" content="${SITE}/assets/og-image.png?v=${OG_VERSION}" />
+<link rel="icon" type="image/png" href="${SITE}/assets/favicon.png" />
+<link rel="apple-touch-icon" href="${SITE}/assets/app-icon.png" />
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }

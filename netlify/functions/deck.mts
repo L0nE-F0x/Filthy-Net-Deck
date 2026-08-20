@@ -117,6 +117,10 @@ ${opts.noindex ? '<meta name="robots" content="noindex" />' : ""}
 <meta name="twitter:title" content="${esc(opts.title)}" />
 <meta name="twitter:description" content="${esc(opts.desc)}" />
 <meta name="twitter:image" content="${SITE}/assets/og-image.png?v=${OG_VERSION}" />
+<!-- Absolute, not "/assets/…": these pages live at a nested path
+     (/u/<handle>/<slug>), where a relative href would resolve wrong. -->
+<link rel="icon" type="image/png" href="${SITE}/assets/favicon.png" />
+<link rel="apple-touch-icon" href="${SITE}/assets/app-icon.png" />
 <style>${STYLE}</style>
 </head>
 <body><div class="wrap">${body}
