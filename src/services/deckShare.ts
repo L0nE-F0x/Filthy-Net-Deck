@@ -108,8 +108,8 @@ const GROUP_ORDER: { id: DeckGroupId; label: string }[] = [
  * resolveArenaCards(); unknown ids fall back to "Card {id}".
  */
 export function aggregateDeck(
-  mainIds: number[] | undefined,
-  sideIds: number[] | undefined,
+  mainIds: readonly number[] | undefined,
+  sideIds: readonly number[] | undefined,
   cards: Record<number, ArenaCardInfo>,
 ): DeckShareList {
   const qty = new Map<number, number>();

@@ -282,7 +282,7 @@ export default async (_req: Request, ctx: Context) => {
     const rate = s ? pct(s.wins, decided) : "—";
 
     const head = `<header>
-        <img src="${SITE}/assets/app-icon.png" alt="" />
+        <img src="${SITE}/assets/app-icon-128.png" alt="" width="52" height="52" />
         <div>
           <h1>${esc(name)}</h1>
           <p class="sub">/u/${esc(profile.handle)} · Filthy Net Deck</p>

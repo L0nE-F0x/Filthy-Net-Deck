@@ -1,5 +1,5 @@
 {
-  "version": "3.1.8",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.8.exe",
-  "notes": "v3.1.8: publish a deck to your profile page and share a link anyone can copy into Arena."
+  "version": "3.1.9",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.9.exe",
+  "notes": "v3.1.9: published decklists read creatures, spells, then lands."
 }

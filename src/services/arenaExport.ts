@@ -26,6 +26,7 @@
 import type { CardEntry } from "../types/meta";
 import type { ArenaCardInfo } from "./arenaCards";
 import { buildArenaImport } from "./arenaImport";
+import { aggregateDeck } from "./deckShare";
 
 export interface ArenaExportResult {
   /** Arena-importable text, or "" when the list could not be rendered. */
@@ -51,9 +52,21 @@ function tally(ids: readonly number[] | undefined): [number, number][] {
 /**
  * Render `main`/`side` arena ids as Arena import text.
  *
- * Rows sort by mana value then name — the order a player expects to read a
- * list in, and stable across two publishes of the same deck so re-publishing
- * does not churn the stored text.
+ * ORDER
+ * The mainboard is grouped **creatures, then other spells, then lands**, each
+ * group by mana value then name. That is `aggregateDeck`'s ordering, reused
+ * rather than reimplemented so a published list reads in the same order as the
+ * deck's share card and the in-app deck screen — three surfaces showing one
+ * deck should not disagree about what order it is in.
+ *
+ * Sorting the whole list by mana value alone put the lands *first* (they are
+ * MV 0), which is the opposite of how every decklist is written.
+ *
+ * The order is deterministic, so re-publishing an unchanged deck rewrites
+ * byte-identical text rather than churning the stored list.
+ *
+ * The sideboard is tallied here instead: `aggregateDeck` returns it as a count,
+ * not rows, and a sideboard is conventionally a flat list anyway.
  *
  * `unresolved` is reported rather than papered over: a line reading
  * `4 Card 103529` is useless to whoever copies it, so the caller refuses to
@@ -64,38 +77,44 @@ export function toArenaDecklist(
   sideIds: readonly number[] | undefined,
   cards: Record<number, ArenaCardInfo>,
 ): ArenaExportResult {
-  let unresolved = 0;
-  let main = 0;
-  let side = 0;
+  const agg = aggregateDeck(mainIds, sideIds, cards);
 
-  const render = (ids: readonly number[] | undefined, into: "main" | "side"): CardEntry[] => {
-    const rows = tally(ids).map(([id, count]) => {
+  const mainboard: CardEntry[] = [];
+  for (const group of agg.groups) {
+    for (const row of group.rows) {
+      // A row with no resolved name renders as "Card 103529"; count it and drop
+      // it, so the caller can refuse rather than publish an unimportable line.
+      if (row.unresolved) continue;
+      mainboard.push({ name: row.name, count: row.qty });
+    }
+  }
+
+  let side = 0;
+  let sideUnresolved = 0;
+  const sideboard = tally(sideIds)
+    .map(([id, count]) => {
       const info = cards[id];
       const name = info?.name?.trim();
-      if (!name) unresolved++;
-      if (into === "main") main += count;
-      else side += count;
+      if (!name) sideUnresolved++;
+      side += count;
       return {
         name: name ?? "",
         count,
         cmc: typeof info?.cmc === "number" ? info.cmc : Number.POSITIVE_INFINITY,
       };
-    });
-    rows.sort((a, b) => (a.cmc !== b.cmc ? a.cmc - b.cmc : a.name.localeCompare(b.name)));
-    return rows.filter((r) => r.name);
-  };
+    })
+    .sort((a, b) => (a.cmc !== b.cmc ? a.cmc - b.cmc : a.name.localeCompare(b.name)))
+    .filter((r) => r.name);
 
-  const mainboard = render(mainIds, "main");
-  const sideboard = render(sideIds, "side");
-
-  if (!mainboard.length) return { text: "", unresolved, main, side };
+  const unresolved = agg.unresolved + sideUnresolved;
+  if (!mainboard.length) return { text: "", unresolved, main: agg.total, side };
 
   // `buildArenaImport` owns the header layout and the front-face name strip, so
   // a published list and an in-app "copy deck" produce byte-identical text.
   return {
     text: buildArenaImport({ mainboard, sideboard, commander: undefined }),
     unresolved,
-    main,
+    main: agg.total,
     side,
   };
 }

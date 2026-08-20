@@ -1,11 +1,11 @@
 {
-  "version": "3.1.8",
-  "notes": "v3.1.8: publish a deck to your profile page and share a link anyone can copy into Arena.",
-  "pub_date": "2026-08-20T06:40:05Z",
+  "version": "3.1.9",
+  "notes": "v3.1.9: published decklists read creatures, spells, then lands.",
+  "pub_date": "2026-08-20T07:53:19Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlMQnVjNkJEMkNrUjFaaVdabW16M3BvbExLZXNhM3BYWEJadVorWmEwaDBNZG5zZE5uZWh6Lzh6T0tNeHZVUmpCd1BnQ0RQSHI3Y1M0NDBieXJwRmdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MjA3OTQ2CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS44X3g2NC1zZXR1cC5leGUKcGVzajRXRFVidUFSNXlGUXVrMXhmeGpVY1k3cGhrdUt5U0RmN1N2cWtxQlM5NmRpcFVTMktBYmtiZGlBK2FKaVBLQklRczViS2V3Y0E5WGdJVTFMQUE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.8.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlVMkt3SlkyZEVhOGF2d2pKL3lxSWpFSEIyOGVLTlhvRzJQN3dNeVVHT1JPbjdVVmVXaW51Q3FpdFhVMzZYNXJLcHhQQVJHamxJNnlxY05tTldwTkFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MjEyMTUyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS45X3g2NC1zZXR1cC5leGUKS0N6QjY2Qlp1djQzZzZrY1FtT0RFczc4cTkyOE10TzBLQWh6V1VIaysvMXh4NzR2UnRDNmg4ajgxMm1ObG5jRm5qNTNtRjllbXFYU1hxcWcvUTEzQWc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.9.exe"
     }
   }
 }

@@ -293,7 +293,7 @@ export default async (_req: Request, ctx: Context) => {
          <p><a href="${SITE}/u/${esc(deck.handle)}">See ${esc(deck.handle)}'s profile</a></p>`;
 
     const body = `<header>
-        <img src="${SITE}/assets/app-icon.png" alt="" />
+        <img src="${SITE}/assets/app-icon-128.png" alt="" width="52" height="52" />
         <div>
           <h1>${esc(deck.name)}</h1>
           <p class="sub">

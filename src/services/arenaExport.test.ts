@@ -4,26 +4,48 @@ import { deckSlug, toArenaDecklist } from "./arenaExport";
 import { parseDeckText } from "./arenaImport";
 
 const CARDS: Record<number, ArenaCardInfo> = {
-  1: { name: "Mountain", cmc: 0, isLand: true },
-  2: { name: "Monastery Swiftspear", cmc: 1 },
-  3: { name: "Abrade", cmc: 2 },
-  4: { name: "Urabrask's Forge", cmc: 4 },
-  5: { name: "Unholy Annex // Ritual Chamber", cmc: 4 },
+  1: { name: "Mountain", cmc: 0, isLand: true, typeLine: "Basic Land — Mountain" },
+  2: { name: "Monastery Swiftspear", cmc: 1, typeLine: "Creature — Human Monk" },
+  3: { name: "Abrade", cmc: 2, typeLine: "Instant" },
+  4: { name: "Urabrask's Forge", cmc: 4, typeLine: "Enchantment" },
+  5: { name: "Unholy Annex // Ritual Chamber", cmc: 4, typeLine: "Enchantment // Room" },
+  6: { name: "Screaming Nemesis", cmc: 3, typeLine: "Creature — Elemental" },
 };
 
 describe("toArenaDecklist", () => {
-  it("renders quantities under a Deck header, sorted by mana value", () => {
+  it("groups creatures, then spells, then lands — never lands first", () => {
+    // Sorting the whole list by mana value alone floated the lands to the top
+    // (they are MV 0), which is the opposite of how a decklist is written.
     const { text, main, side, unresolved } = toArenaDecklist(
-      [3, 3, 1, 1, 1, 2, 2, 2, 2],
+      [3, 3, 1, 1, 1, 2, 2, 2, 2, 6],
       [],
       CARDS,
     );
     expect(text).toBe(
-      ["Deck", "3 Mountain", "4 Monastery Swiftspear", "2 Abrade"].join("\n"),
+      [
+        "Deck",
+        "4 Monastery Swiftspear",
+        "1 Screaming Nemesis",
+        "2 Abrade",
+        "3 Mountain",
+      ].join("\n"),
     );
-    expect(main).toBe(9);
+    expect(main).toBe(10);
     expect(side).toBe(0);
     expect(unresolved).toBe(0);
+  });
+
+  it("orders within a group by mana value, then name", () => {
+    const { text } = toArenaDecklist([6, 2, 4, 3], [], CARDS);
+    expect(text).toBe(
+      [
+        "Deck",
+        "1 Monastery Swiftspear", // creature, MV 1
+        "1 Screaming Nemesis", // creature, MV 3
+        "1 Abrade", // spell, MV 2
+        "1 Urabrask's Forge", // spell, MV 4
+      ].join("\n"),
+    );
   });
 
   it("appends a Sideboard section only when there is one", () => {
@@ -67,8 +89,8 @@ describe("toArenaDecklist", () => {
     const { text } = toArenaDecklist([2, 2, 2, 2, 1, 1], [3, 3], CARDS);
     const parsed = parseDeckText(text);
     expect(parsed.main).toEqual([
-      { name: "Mountain", count: 2 },
       { name: "Monastery Swiftspear", count: 4 },
+      { name: "Mountain", count: 2 },
     ]);
     expect(parsed.side).toEqual([{ name: "Abrade", count: 2 }]);
     expect(parsed.skipped).toEqual([]);

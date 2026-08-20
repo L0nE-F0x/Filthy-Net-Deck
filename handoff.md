@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.8** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.8** · Windows **and** macOS both serve 3.1.8
+**Live product version: v3.1.9** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· tag **v3.1.9** · Windows serves 3.1.9; **macOS dmg roll pending CI**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -14,12 +14,18 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. **Beta-tester feedback on the marketing site.** Owner will collect
+1. **macOS: roll the v3.1.9 dmg.** The tag is pushed and CI builds it; the two
+   homepage Mac buttons are **deliberately still on the 3.1.8 dmg** — pointing
+   them at a dmg CI has not attached yet serves a 404, which is worse than an
+   older working build. Order: CI finishes → `gh release download v3.1.9
+   --pattern "*.dmg" --dir website/downloads` → flip both links and their
+   `btn-meta` labels → prune the oldest dmg (downloads = current + 1).
+2. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
-2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+3. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-3. Suggest / Report is live (site + app). FormSubmit is already
+4. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
 ## Previous session (2026-08-20)
@@ -31,6 +37,8 @@ attaches the new one.
 | ✅ | **v3.1.8 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.8`. |
 | ✅ | **Migration 9 applied** | `20260820120000_public_decklists.sql`, run by the owner. Verified via REST: `has_list`/`list` select 200 while a bogus column 400s, and both the 3-arg and legacy 2-arg `set_deck_public` shapes resolve. |
 | ✅ | **v3.1.8 macOS dmg rolled** | Pulled `Filthy-Net-Deck-3.1.8-universal.dmg` from the GH Release (sha256 `e06c66db…a345b`, 21 470 155 bytes). Both homepage Mac buttons repointed. downloads = current + 1 (3.1.8 + 3.1.7). |
+| ✅ | **Favicon on the server-rendered pages** | `profile.mts` / `deck.mts` never had the icon links the static pages carry, so those tabs showed the browser's generic globe. Absolute URLs — the deck page is at a nested path where a relative href resolves wrong. |
+| ✅ | **v3.1.9 — decklist order + right-sized icons** | Published lists now read creatures → spells → lands (`aggregateDeck`'s order, reused). `favicon.png` was a byte-identical copy of the 1024px `app-icon.png` at **804 KB**, served on every page; now 64px / 5.7 KB, with a 128px `app-icon-128.png` for the 52px page-header avatar. |
 
 ### Hard-won this session
 
@@ -51,6 +59,19 @@ attaches the new one.
   `data === true`. Changing either would break every installed older build.
 - Consent is not retroactive: `public_list` is null for everything published
   before 3.1.8 and only an explicit publish from a 3.1.8+ client fills it.
+- **Sorting a decklist by mana value alone puts the lands first** — they are
+  MV 0. `aggregateDeck` in `deckShare.ts` already owns the right order
+  (creatures → spells → lands, each by MV then name); `arenaExport` reuses it
+  rather than reimplementing, so the published list, the share card and the
+  deck screen cannot disagree.
+- **A published list is frozen at publish time.** Changing the export order
+  does not rewrite lists already on profile pages — the owner has to publish
+  the deck again. That is inherent to storing the rendered text, and is the
+  same reason the server cannot re-render one.
+- `favicon.png` and `app-icon.png` were the same 1024px 804 KB file. Do not
+  point a tab icon or a 52px avatar at the master again — `favicon.png` (64px)
+  and `app-icon-128.png` exist for that. `apple-touch-icon` still wants the
+  large one.
 
 ## Previous session (2026-08-18, later)
 
@@ -262,9 +283,9 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.8** on Windows (signed updater) and macOS (universal dmg on the homepage) |
+| App version | **v3.1.9** on Windows (signed updater). macOS serves the 3.1.8 dmg until v3.1.9 is rolled |
 | Branch | `main`, clean after wrap |
-| Gates last green | **647** vitest / 86 files · tsc · eslint · signed Windows build (2026-08-20) |
+| Gates last green | **648** vitest / 86 files · tsc (app + netlify) · eslint · signed Windows build (2026-08-20) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
 | Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Nine** migrations run; the ninth (`20260820120000_public_decklists`) applied by the owner 2026-08-20 |

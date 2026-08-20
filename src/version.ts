@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.1.8";
+export const APP_VERSION = "3.1.9";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,5 +7,5 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Publish a deck to your profile and share one link — anyone can copy the list straight into Arena",
+  "Published decklists now read creatures, then spells, then lands — the way a decklist is written",
 ];
