@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.7** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.7** · Windows **and** macOS both serve 3.1.7
+**Live product version: v3.1.8** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· tag **v3.1.8** · Windows serves 3.1.8; **macOS dmg not yet rolled**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -14,13 +14,55 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-1. **Beta-tester feedback on the marketing site.** Owner will collect
+1. **⚠️ RUN MIGRATION 9 ON THE LIVE DB.**
+   `supabase/migrations/20260820120000_public_decklists.sql` is written and
+   committed but **not applied** — paste it into the Supabase SQL editor for
+   project `bzcryoocsapqtyhiwzbe`. Until it runs, v3.1.8's **Publish decklist**
+   button fails (`set_deck_public` has no `list_in` argument) and
+   `/u/<handle>/<slug>` 404s. The whole release is inert without it.
+2. **macOS: tag v3.1.8, roll the dmg, then repoint the Mac buttons.** The two
+   homepage Mac links are **deliberately still on the 3.1.7 dmg** — pointing
+   them at a 3.1.8 dmg that CI has not built yet would serve Mac visitors a
+   404, which is worse than an older working build. Order: tag → CI attaches
+   the dmg → copy it into `website/downloads/` → flip both links and their
+   `btn-meta` labels to 3.1.8.
+3. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
-2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+4. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-3. Suggest / Report is live (site + app). FormSubmit is already
+5. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
+
+## Previous session (2026-08-20)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Copyable published decklists** | The ask: replace an AetherHub link in a YouTube description with an own-site link viewers can copy. Publishing a deck now uploads the list as **Arena import text**, and `/u/<handle>/<slug>` renders it with a one-click Copy button. `/d/<id>` 301s to the same page. |
+| ✅ | **Profile rows are links** | Both tables on `/u/<handle>` now link a deck to its page when a published deck's name matches — with a `list` badge when there is one to copy. |
+| ✅ | **v3.1.8 Windows** | Signed key id `67FCA9900F523D49`. Installer + `.sig` + updater + `version.json` + OG `?v=3.1.8`. |
+| ⚠️ | **Migration 9 NOT applied** | `20260820120000_public_decklists.sql`. See START HERE #1. |
+| ⚠️ | **macOS dmg not rolled** | See START HERE #2. |
+
+### Hard-won this session
+
+- **The server cannot name a card.** `meta/arena-names.json` is only the *gap*
+  map for sets Scryfall has not indexed; `meta/sets/*.json` carries no arena
+  ids at all. That is why the list is rendered client-side at publish time and
+  uploaded as text — do not "improve" this by resolving ids in the function.
+- **Names must go through `arenaCardName`.** Scryfall returns
+  "Unholy Annex // Ritual Chamber"; Arena's importer rejects it. Without the
+  front-face strip every Standard deck with an MDFC publishes an unimportable
+  list.
+- `public_profile_decks` exposes `has_list` (a boolean) *and* `list`. The
+  profile page selects named columns and must never `select=*` — that would pull
+  twelve decklists to evaluate twelve booleans, the same waste 20260812060000
+  found.
+- `set_deck_public` gained a **defaulted** third argument and kept `returns
+  boolean` on purpose: a v3.1.7 client calls it with two named args and checks
+  `data === true`. Changing either would break every installed older build.
+- Consent is not retroactive: `public_list` is null for everything published
+  before 3.1.8 and only an explicit publish from a 3.1.8+ client fills it.
 
 ## Previous session (2026-08-18, later)
 
@@ -232,12 +274,12 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.7** on Windows (signed updater) and macOS (universal dmg on the homepage) |
+| App version | **v3.1.8** on Windows (signed updater). macOS still serves the 3.1.7 dmg until v3.1.8 is tagged and rolled |
 | Branch | `main`, clean after wrap |
-| Gates last green | **626** vitest / 84 files · tsc · signed Windows build (2026-08-18) |
+| Gates last green | **647** vitest / 86 files · tsc · eslint · signed Windows build (2026-08-20) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
-| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Seven** migrations run: health_pings, core schema, public profiles, display-name privacy, decks, public decks, friends |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Eight** migrations run; the ninth (`20260820120000_public_decklists`) is written and **pending** — see START HERE #1 |
 | Auth | Google **and** Discord enabled + verified live. **Email OTP built but hidden** behind `EMAIL_SIGN_IN_ENABLED` |
 | Cron | `fnd-rollup` scheduled hourly (job id 1) — without it `matchup_rollup` never fills |
 | Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |
@@ -282,9 +324,11 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 | `src/services/arenaMeta.ts` | grpId → card meta. Scryfall first, gap map only on 404, `partial` entries never persisted |
 | `src-tauri/src/deeplink.rs` | `fnd://` — handles BOTH cold start and the single-instance argv route |
 | `netlify/functions/profile.mts` | Server-rendered `/u/<handle>` (config.path routing) |
+| `netlify/functions/deck.mts` | Server-rendered `/u/<handle>/<slug>` + `/d/<id>` — one published deck, with the copy button |
+| `src/services/arenaExport.ts` | Arena ids + resolved names → Arena import text. The publish path's only source of a decklist |
 | `pipeline/build-meta-site.mjs` | The `/meta-web/` corpus + sitemap. Static pages are hardcoded there, not in `paths` |
 | `website/privacy.html` | The published field allowlist |
-| `supabase/migrations/` | 8 migrations, **all run on the live DB** (the 8th, `20260812060000`, carries the P0 rollup fix — run by the owner 2026-08-12) |
+| `supabase/migrations/` | 9 migrations. The first 8 are live; **`20260820120000` is not yet applied** (see START HERE #1) |
 
 ---
 

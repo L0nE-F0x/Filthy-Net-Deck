@@ -1631,7 +1631,7 @@ function sitemapPriority(p) {
 }
 
 /** Bump when `website/privacy.html` is substantively edited. */
-const PRIVACY_LASTMOD = "2026-08-17";
+const PRIVACY_LASTMOD = "2026-08-20";
 const FEEDBACK_LASTMOD = "2026-08-17";
 
 function writeSitemap(paths, lastmod) {

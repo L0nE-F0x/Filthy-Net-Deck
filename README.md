@@ -66,6 +66,7 @@ A free account unlocks features that need a server, and each is opt-in:
 |---|---|
 | Community matchup rates | Your record vs. an archetype, joined to the field's |
 | Public profile `/u/<handle>` | Your season climb, shared on your terms |
+| Published decklists `/u/<handle>/<deck>` | Publish one deck and anyone with the link can copy it into Arena |
 | Cloud deck sync | Backs up the lists Arena registers, which local log rotation destroys |
 | Friend codes | Compare stat lines and race a season with people you play |
 

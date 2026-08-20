@@ -304,7 +304,7 @@ export async function fetchCloudDecks(): Promise<CloudDeck[]> {
     const supabase = await getSupabase();
     const { data, error } = await supabase
       .from("decks")
-      .select("deck_hash,name,format,main,side,played_at,is_public")
+      .select("deck_hash,name,format,main,side,played_at,is_public,public_slug,public_id,public_list")
       .eq("user_id", user.id)
       .order("played_at", { ascending: false });
     if (error || !data) return [];
@@ -323,14 +323,28 @@ export async function fetchCloudDecks(): Promise<CloudDeck[]> {
  * so "you need a public profile first" comes back as something the UI can say
  * instead of a silently ignored write. Returns false when the deck has not
  * been backed up yet — a list only exists in the cloud once a sync has run.
+ *
+ * `list` is the Arena-importable text from `arenaExport.toArenaDecklist()`,
+ * and it is what makes a published deck copyable. The server cannot build it:
+ * it stores arena card ids and has no id→name map, so the names have to come
+ * from the client that already resolved them. Omit it and the deck publishes
+ * the way it did before v3.1.8 — name, format and size, no list.
  */
-export async function setDeckPublic(deckHash: string, on: boolean): Promise<boolean> {
+export async function setDeckPublic(
+  deckHash: string,
+  on: boolean,
+  list?: string | null,
+): Promise<boolean> {
   const user = await getCurrentUser();
   if (!user) throw new Error("Sign in first.");
   const supabase = await getSupabase();
   const { data, error } = await supabase.rpc("set_deck_public", {
     deck_hash_in: deckHash,
     make_public: on,
+    // Always sent on publish so re-publishing refreshes a list that went
+    // stale after a sideboard tweak; null on take-down, where the server
+    // clears it anyway.
+    list_in: on ? list?.trim() || null : null,
   });
   if (error) {
     throw new Error(

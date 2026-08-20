@@ -159,7 +159,7 @@
     <main class="doc">
       <p class="eyebrow">Privacy</p>
       <h1>What the app sends, field by field</h1>
-      <p class="doc-updated">Last updated 2026-08-17 · applies to v2.8.2 and later</p>
+      <p class="doc-updated">Last updated 2026-08-20 · applies to v2.8.2 and later</p>
 
       <p class="lede-big">
         Filthy Net Deck works completely with <strong>no account</strong>, and in that state it
@@ -271,10 +271,20 @@
       <h3>Public profile and friends</h3>
       <p>
         A profile page at <code>/u/&lt;handle&gt;</code> is published only when you choose to publish
-        it, and it carries your handle, display name, and season record. Publishing a deck to it
-        shows the deck name, format, size and last-played date — <em>not</em> the card list. Friend
-        codes are private tokens you hand out yourself; a friendship is two account ids and a
-        timestamp. All of it can be switched back off.
+        it, and it carries your handle, display name, and season record. Friend codes are private
+        tokens you hand out yourself; a friendship is two account ids and a timestamp. All of it
+        can be switched back off.
+      </p>
+      <p>
+        <strong>Changed in v3.1.8:</strong> publishing a deck to that page now also publishes
+        <em>the decklist</em>, as Arena import text, at
+        <code>/u/&lt;handle&gt;/&lt;deck&gt;</code> — so anyone with the link can copy it into
+        Arena. That is the point of the feature, and it is a per-deck decision you make with the
+        <strong>Publish decklist</strong> button on that deck. Before v3.1.8 a published deck showed
+        only its name, format, size and last-played date; decks you published back then keep showing
+        exactly that until you publish them again. Taking a deck down deletes the published list,
+        and so does making your profile private. What is never published either way is the
+        <em>match history</em> behind the deck, or anything about the opponents you played it into.
       </p>
 
       <h2>3 · Never uploaded, under any setting</h2>

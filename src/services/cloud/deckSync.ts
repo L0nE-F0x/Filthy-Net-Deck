@@ -41,6 +41,19 @@ export interface CloudDeck {
   playedAt: number | null;
   /** Shown on the owner's public profile page. Off unless they said so. */
   isPublic: boolean;
+  /**
+   * URL slug the server assigned on first publish (`/u/<handle>/<slug>`), and
+   * the stable short id behind `/d/<id>`. Both survive a rename and a take-down
+   * so a link already pasted into a video description keeps resolving.
+   */
+  slug: string | null;
+  publicId: string | null;
+  /**
+   * The Arena-importable text this deck is published with, or null when the
+   * deck carries no list. Null is the honest answer for anything published
+   * before v3.1.8 — the server has never been able to render one itself.
+   */
+  publicList: string | null;
 }
 
 function isSyncableFormat(id: FormatId | string | null | undefined): id is
@@ -122,6 +135,8 @@ export function toCloudDeck(row: unknown): CloudDeck | null {
   const main = nums(r.main);
   if (!main.length) return null;
   const playedAt = typeof r.played_at === "string" ? Date.parse(r.played_at) : NaN;
+  const str = (v: unknown): string | null =>
+    typeof v === "string" && v.trim() ? v : null;
   return {
     deckHash,
     name: typeof r.name === "string" ? r.name : "",
@@ -132,6 +147,9 @@ export function toCloudDeck(row: unknown): CloudDeck | null {
     // Absent or malformed reads as private. Publishing is a decision the user
     // makes; it is never something a parsing default should do for them.
     isPublic: r.is_public === true,
+    slug: str(r.public_slug),
+    publicId: str(r.public_id),
+    publicList: str(r.public_list),
   };
 }
 

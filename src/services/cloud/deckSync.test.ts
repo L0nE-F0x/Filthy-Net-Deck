@@ -157,6 +157,9 @@ describe("toCloudDeck", () => {
       side: [3],
       playedAt: Date.UTC(2026, 7, 10, 12, 0, 0),
       isPublic: false,
+      slug: null,
+      publicId: null,
+      publicList: null,
     });
   });
 
@@ -175,6 +178,27 @@ describe("toCloudDeck", () => {
     expect(toCloudDeck({ deck_hash: "a", main: [1], is_public: true })!.isPublic).toBe(true);
   });
 
+  it("reads the published slug, id and list, and nulls anything blank", () => {
+    const d = toCloudDeck({
+      deck_hash: "a",
+      main: [1],
+      is_public: true,
+      public_slug: "dwarven-weapons",
+      public_id: "7f3a9c2e10",
+      public_list: "Deck\n4 Mountain",
+    })!;
+    expect(d.slug).toBe("dwarven-weapons");
+    expect(d.publicId).toBe("7f3a9c2e10");
+    expect(d.publicList).toBe("Deck\n4 Mountain");
+
+    // Decks published before v3.1.8 carry no list, and the column is absent on
+    // an older row entirely. Both must read as "no list", never as "".
+    const bare = toCloudDeck({ deck_hash: "a", main: [1], public_list: "   " })!;
+    expect(bare.publicList).toBeNull();
+    expect(bare.slug).toBeNull();
+    expect(bare.publicId).toBeNull();
+  });
+
   it("tolerates a missing side and an unparseable date", () => {
     const d = toCloudDeck({ deck_hash: "a", main: [1], played_at: "nope" })!;
     expect(d.side).toEqual([]);
@@ -185,7 +209,18 @@ describe("toCloudDeck", () => {
 describe("indexByHash", () => {
   it("keys restored lists for local lookup", () => {
     const map = indexByHash([
-      { deckHash: "a", name: "A", format: "standard", main: [1], side: [], playedAt: null, isPublic: false },
+      {
+        deckHash: "a",
+        name: "A",
+        format: "standard",
+        main: [1],
+        side: [],
+        playedAt: null,
+        isPublic: false,
+        slug: null,
+        publicId: null,
+        publicList: null,
+      },
     ]);
     expect(map.get("a")?.main).toEqual([1]);
     expect(map.has("b")).toBe(false);

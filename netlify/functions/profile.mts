@@ -40,7 +40,7 @@ const SITE = "https://filthy-net-deck.com";
  * `?v=1.5.1` for eight releases because the value was inline in several places,
  * and social caches served a stale card the whole time. One name, one edit.
  */
-const OG_VERSION = "2.7.7";
+const OG_VERSION = "3.1.8";
 
 interface ProfileRow {
   handle: string;
@@ -63,24 +63,34 @@ interface ArchetypeRow {
   losses: number;
 }
 /**
- * A deck the player chose to publish. The page shows what it can state exactly:
- * the deck, its format, its size, and when it was last played — never the list.
- * Card names are impossible here anyway: the stored list is Arena card ids,
- * there is no id→name map on the server, and resolving 60 ids per request
- * through Scryfall would be both slow and rude to a public API.
+ * A deck the player chose to publish.
  *
- * The view returns **counts, not the arrays** (migration 20260812060000). It
- * used to select `main`/`side`, which meant the full card-id list of every
- * published deck was readable straight off the public REST API — contradicting
- * what the product and the privacy page both say — while this code only ever
- * used the lengths.
+ * The view still returns **counts, not the id arrays** (migration
+ * 20260812060000): the arena card ids of a published deck are nobody's
+ * business, and this page only ever used the lengths.
+ *
+ * `has_list` is new in v3.1.8. The list itself — Arena import text the owner's
+ * app rendered and uploaded at publish time — is deliberately NOT selected
+ * here: this page only needs to know *whether* there is one, and pulling twelve
+ * decklists across the wire to evaluate twelve booleans is the exact waste
+ * 20260812060000 found. The view computes the flag; deck.mts fetches the text.
+ *
+ * False for every deck published before v3.1.8, and for anyone who publishes
+ * without a list — in which case the row renders as it always did: name,
+ * format, size, last played.
+ *
+ * The full list lives on `/u/<handle>/<slug>` (deck.mts); this page links to it
+ * rather than inlining 75 lines per deck.
  */
 interface DeckRow {
   deck_id: string;
+  public_id: string | null;
+  slug: string | null;
   name: string;
   format: string;
   main_count: number | null;
   side_count: number | null;
+  has_list: boolean | null;
   played_at: string | null;
 }
 
@@ -125,6 +135,25 @@ function label(slug: string): string {
 function pct(wins: number, decided: number): string {
   if (!decided) return "—";
   return `${Math.round((wins / decided) * 100)}%`;
+}
+
+/**
+ * Kept in sync with `public.deck_slugify()` (migration 20260820120000) and
+ * `deckSlug()` in src/services/arenaExport.ts.
+ *
+ * Used here only to *match* an archetype row against a published deck, never to
+ * build a URL — the slug the site serves is the one the database assigned, and
+ * that is the one carried on the row. Guessing a URL from a name would 404 the
+ * moment two decks collided and the second took a `-2` suffix.
+ */
+export function slugify(raw: string): string {
+  const s = String(raw ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48)
+    .replace(/^-+|-+$/g, "");
+  return s || "deck";
 }
 
 async function sb<T>(path: string): Promise<T[]> {
@@ -173,6 +202,8 @@ ${opts.noindex ? '<meta name="robots" content="noindex" />' : ""}
   th,td { text-align:left; padding:.5rem .4rem; border-bottom:1px solid #1b1e15; }
   th { color:#9aa38a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
   td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .tag { display:inline-block; background:#1b2410; border:1px solid #35461f; color:#b8f000;
+    border-radius:999px; padding:.05rem .5rem; font-size:.68rem; letter-spacing:.02em; }
   .cta { margin-top:2rem; padding:1rem; background:#0e100b; border:1px solid #23261c; border-radius:.6rem; }
   .btn { display:inline-block; margin-top:.6rem; padding:.55rem 1rem; border-radius:.5rem;
     background:#b8f000; color:#050604; font-weight:650; text-decoration:none; font-size:.9rem; }
@@ -219,7 +250,9 @@ export default async (_req: Request, ctx: Context) => {
         `public_profile_archetypes?handle=eq.${encodeURIComponent(handle)}&select=*&order=matches.desc&limit=25`,
       ),
       sb<DeckRow>(
-        `public_profile_decks?handle=eq.${encodeURIComponent(handle)}&select=*&order=played_at.desc&limit=12`,
+        `public_profile_decks?handle=eq.${encodeURIComponent(handle)}` +
+          `&select=deck_id,public_id,slug,name,format,main_count,side_count,has_list,played_at` +
+          `&order=played_at.desc&limit=12`,
       ),
     ]);
 
@@ -274,11 +307,32 @@ export default async (_req: Request, ctx: Context) => {
       );
     }
 
+    // A published deck, keyed by the slug its *name* would produce. An
+    // archetype row and a deck row are different records — one is an aggregate
+    // over matches, the other a list the player published — and the only thing
+    // tying them together is that both are named after the same archetype. So
+    // the link appears when the names agree and is silently absent when they do
+    // not, which is the honest outcome: a wrong link here would send a viewer
+    // to somebody's other deck.
+    const published = new Map<string, DeckRow>();
+    for (const d of decks) {
+      if (!d.slug) continue;
+      const key = slugify(d.name);
+      if (!published.has(key)) published.set(key, d);
+    }
+
     const rows = archetypes
       .map((a) => {
         const d = a.wins + a.losses;
+        const name = label(a.archetype);
+        const deck = published.get(slugify(name));
+        const cell =
+          deck && deck.slug
+            ? `<a href="${SITE}/u/${esc(profile.handle)}/${esc(deck.slug)}">${esc(name)}</a>` +
+              (deck.has_list ? ` <span class="tag">list</span>` : "")
+            : esc(name);
         return `<tr>
-          <td>${esc(label(a.archetype))}</td>
+          <td>${cell}</td>
           <td>${esc(a.format)}</td>
           <td class="num">${a.matches}</td>
           <td class="num">${a.wins}–${a.losses}</td>
@@ -298,21 +352,35 @@ export default async (_req: Request, ctx: Context) => {
           when && !Number.isNaN(when.valueOf())
             ? when.toISOString().slice(0, 10)
             : "—";
+        // Linked on the slug the database assigned, never on one guessed from
+        // the name. A row published before slugs existed has none and stays
+        // plain text rather than pointing at a 404.
+        const name = d.slug
+          ? `<a href="${SITE}/u/${esc(profile.handle)}/${esc(d.slug)}">${esc(d.name)}</a>`
+          : esc(d.name);
         return `<tr>
-          <td>${esc(d.name)}</td>
+          <td>${name}</td>
           <td>${esc(d.format)}</td>
           <td class="num">${size}${side ? ` <span class="sub">+${side}</span>` : ""}</td>
+          <td>${d.has_list ? '<span class="tag">Copy list</span>' : '<span class="sub">—</span>'}</td>
           <td class="num">${esc(played)}</td>
         </tr>`;
       })
       .join("");
 
+    const anyList = decks.some((d) => d.has_list);
+
     const deckSection = deckRows
       ? `<h2 style="font-size:1rem;margin:1.5rem 0 0">Published decks</h2>
+         ${
+           anyList
+             ? '<p class="sub">Open one to copy the decklist straight into MTG Arena.</p>'
+             : ""
+         }
          <table>
            <thead><tr>
              <th>Deck</th><th>Format</th>
-             <th class="num">Cards</th><th class="num">Last played</th>
+             <th class="num">Cards</th><th>Decklist</th><th class="num">Last played</th>
            </tr></thead>
            <tbody>${deckRows}</tbody>
          </table>`
