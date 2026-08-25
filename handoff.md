@@ -22,6 +22,20 @@ attaches the new one.
 3. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
+## Previous session (2026-08-25)
+
+| Item | Notes |
+|------|--------|
+| ✅ | **First in-app bug report — Green Game Jam basic lands, no art** | Shane (`shane@coinz.org`) on v3.1.9: decklist / stacked view blank for Arena store basics from June. Scryfall `/cards/arena/107494` 404s. The five lands are ANA grpIds **107492–107496** (`DigitalReleaseSet: ANA-GGJ-2026`); he listed 107494–107498 in WUBRG order, off by two — 107497/107498 are MSC tokens. |
+| ✅ | **Gap map now covers evergreen ANA** | `ana` never ages out of the 180-day window. Builder also searches Scryfall `pana` and joins on **name + artist**, so the Daren Bader Plains is not the 2018 Donato Giancola Plains. |
+| ✅ | **No app bump** | 3.1.9 already reads `s`/`t` from `arena-names.json` after a Scryfall 404. Publishing the map is the ship. |
+
+### Hard-won this session
+
+- Arena dumps store cosmetics into **ANA**. Scryfall's `ana` is the 2018 New Player Experience; the paintings live in **pana** with `arena_id: null`. The 180-day window skipped both because `released_at` is 2018.
+- Name-only join on "Plains" is how you show the wrong basic-land art. Evergreen dumps require artist. Same artist on Plains and Swamp (Daren Bader) is fine — the key is name+artist, not artist alone.
+- mtgajson is the name authority, not the reporter's labels. 107494 is a Swamp, not a Plains.
+
 ## Previous session (2026-08-20)
 
 | Item | Notes |

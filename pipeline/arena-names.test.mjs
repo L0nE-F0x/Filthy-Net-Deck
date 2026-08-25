@@ -1,11 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  EVERGREEN_ARENA_SETS,
+  artistKey,
   buildArenaNameGap,
   colorsFromIds,
+  joinScryfall,
   manaCostFromArena,
   nameKey,
   recentSetCodes,
   scryfallArenaIdsForSet,
+  setCodesToSearch,
 } from "./sources/arena-names.mjs";
 
 describe("colorsFromIds", () => {
@@ -51,7 +55,8 @@ describe("recentSetCodes", () => {
       NOW,
     );
     // Codes are lowercased so they join with mtgajson's, which are uppercase.
-    expect([...codes].sort()).toEqual(["fin", "hob"]);
+    expect(codes.has("fin")).toBe(true);
+    expect(codes.has("hob")).toBe(true);
   });
 
   it("excludes sets older than the window", () => {
@@ -59,19 +64,35 @@ describe("recentSetCodes", () => {
       [{ code: "old", released_at: new Date(NOW - 400 * day).toISOString().slice(0, 10) }],
       NOW,
     );
-    expect(codes.size).toBe(0);
+    expect(codes.has("old")).toBe(false);
   });
 
   it("includes announced sets with no date at all", () => {
     // A set Scryfall has created but not dated is the earliest part of exactly
     // the window this exists for — dropping it would miss the first spoilers.
     const codes = recentSetCodes([{ code: "future" }, { code: "bad", released_at: "nonsense" }], NOW);
-    expect([...codes].sort()).toEqual(["bad", "future"]);
+    expect(codes.has("future")).toBe(true);
+    expect(codes.has("bad")).toBe(true);
+  });
+
+  it("always includes evergreen Arena promo dumps even when they date to 2018", () => {
+    // ANA's Scryfall released_at is 2018-07-14. The Green Game Jam basics
+    // landed there in June 2026; dropping ANA as "too old" left them as
+    // Card #107494 with a blank art tile.
+    const codes = recentSetCodes(
+      [{ code: "ANA", released_at: "2018-07-14" }, { code: "pana", released_at: "2018-07-14" }],
+      NOW,
+    );
+    for (const c of EVERGREEN_ARENA_SETS) expect(codes.has(c)).toBe(true);
+    // And they stay in even if the set list we were handed omitted the row.
+    const empty = recentSetCodes([], NOW);
+    for (const c of EVERGREEN_ARENA_SETS) expect(empty.has(c)).toBe(true);
   });
 
   it("ignores junk rows rather than throwing", () => {
-    expect(recentSetCodes([null, {}, { code: "" }, undefined], NOW).size).toBe(0);
-    expect(recentSetCodes(null, NOW).size).toBe(0);
+    const codes = recentSetCodes([null, {}, { code: "" }, undefined], NOW);
+    expect(codes.has("")).toBe(false);
+    expect(recentSetCodes(null, NOW).has("ana")).toBe(true);
   });
 });
 
@@ -98,6 +119,50 @@ describe("manaCostFromArena", () => {
     expect(manaCostFromArena("")).toBeNull();
     expect(manaCostFromArena(undefined)).toBeNull();
     expect(manaCostFromArena(42)).toBeNull();
+  });
+});
+
+describe("artistKey / set aliases / joinScryfall", () => {
+  it("normalises artist names the same way on both sides of the join", () => {
+    expect(artistKey("  Daren Bader ")).toBe("daren bader");
+    expect(artistKey(null)).toBe("");
+  });
+
+  it("searches pana when the Arena set is ANA", () => {
+    // Arena dumps store cosmetics as ANA; Scryfall files the prints as pana.
+    expect(setCodesToSearch("ANA")).toEqual(["ana", "pana"]);
+    expect(setCodesToSearch("hob")).toEqual(["hob"]);
+    expect(setCodesToSearch("")).toEqual([]);
+  });
+
+  it("joins a basic land on name+artist, not on the first Plains in the set", () => {
+    // The Green Game Jam report: five ANA basics, five pana paintings, one
+    // name each. First-wins on "plains" would show the 2018 NPE/pana Plains
+    // on a 2026 Daren Bader Game Jam Plains.
+    const found = {
+      byName: new Map([
+        ["plains", { id: "old-plains", typeLine: "Basic Land — Plains" }],
+        ["swamp", { id: "old-swamp", typeLine: "Basic Land — Swamp" }],
+      ]),
+      byArtist: new Map([
+        ["plains\0daren bader", { id: "ggj-plains", typeLine: "Basic Land — Plains" }],
+        ["swamp\0daren bader", { id: "ggj-swamp", typeLine: "Basic Land — Swamp" }],
+      ]),
+    };
+    expect(joinScryfall(found, "Plains", "Daren Bader").id).toBe("ggj-plains");
+    expect(joinScryfall(found, "Swamp", "Daren Bader").id).toBe("ggj-swamp");
+    // Same artist, different land — must not cross-wire a Swamp onto Plains.
+    expect(joinScryfall(found, "Plains", "Daren Bader").id).not.toBe("ggj-swamp");
+  });
+
+  it("refuses a name-only join when the caller says artist is required", () => {
+    // Evergreen ANA: a miss must stay a miss, not become the first Plains.
+    const found = {
+      byName: new Map([["plains", { id: "old-plains", typeLine: "Basic Land — Plains" }]]),
+      byArtist: new Map(),
+    };
+    expect(joinScryfall(found, "Plains", "Daren Bader", { artistRequired: true })).toBeNull();
+    expect(joinScryfall(found, "Plains", "Daren Bader").id).toBe("old-plains");
   });
 });
 
@@ -145,7 +210,7 @@ describe("scryfallArenaIdsForSet — the id index that gives a gap card its art"
     ]);
     const { ids, byName } = await scryfallArenaIdsForSet("hob", 1);
     expect(ids.size).toBe(0);
-    expect(byName.get("the sackville-bagginses")).toEqual({
+    expect(byName.get("the sackville-bagginses")).toMatchObject({
       id: "ed87b471-79f9-45ec-9188-69e970f6121e",
       typeLine: "Legendary Creature — Halfling Citizen",
     });
@@ -193,7 +258,7 @@ describe("scryfallArenaIdsForSet — the id index that gives a gap card its art"
       },
     ]);
     const { byName } = await scryfallArenaIdsForSet("hob", 1);
-    expect(byName.get("burglar's plot")).toEqual({
+    expect(byName.get("burglar's plot")).toMatchObject({
       id: "adv-1",
       typeLine: "Sorcery — Adventure",
     });
@@ -220,6 +285,58 @@ describe("scryfallArenaIdsForSet — the id index that gives a gap card its art"
     // here", which would publish the whole set as a gap.
     const spy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
     expect(await scryfallArenaIdsForSet("hob", 1)).toBeNull();
+    spy.mockRestore();
+  });
+
+  it("indexes by artist so two Plains paintings stay distinct", async () => {
+    const spy = mockSearch([
+      {
+        id: "old-plains",
+        name: "Plains",
+        type_line: "Basic Land — Plains",
+        artist: "Donato Giancola",
+        released_at: "2018-07-14",
+        arena_id: null,
+      },
+      {
+        id: "ggj-plains",
+        name: "Plains",
+        type_line: "Basic Land — Plains",
+        artist: "Daren Bader",
+        released_at: "2026-06-06",
+        arena_id: null,
+      },
+    ]);
+    const { byName, byArtist } = await scryfallArenaIdsForSet("pana", 1);
+    expect(byArtist.get("plains\0daren bader").id).toBe("ggj-plains");
+    expect(byArtist.get("plains\0donato giancola").id).toBe("old-plains");
+    // Name-only prefers the unlinked newer print (Game Jam), not first-wins.
+    expect(byName.get("plains").id).toBe("ggj-plains");
+    spy.mockRestore();
+  });
+
+  it("prefers an unlinked print over one Scryfall already tied to an arena_id", async () => {
+    const spy = mockSearch([
+      {
+        id: "linked",
+        name: "Plains",
+        type_line: "Basic Land — Plains",
+        artist: "Someone",
+        arena_id: 7193,
+        released_at: "2026-07-01",
+      },
+      {
+        id: "gap",
+        name: "Plains",
+        type_line: "Basic Land — Plains",
+        artist: "Someone",
+        arena_id: null,
+        released_at: "2026-06-06",
+      },
+    ]);
+    const { ids, byName } = await scryfallArenaIdsForSet("pana", 1);
+    expect(ids.has(7193)).toBe(true);
+    expect(byName.get("plains").id).toBe("gap");
     spy.mockRestore();
   });
 });
@@ -256,6 +373,119 @@ describe("buildArenaNameGap — a partial upstream failure must not delete entri
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
     const out = await buildArenaNameGap({ previous, sets: [{ code: "hob" }], tries: 1 });
     expect(Object.keys(out).length).toBeGreaterThanOrEqual(Object.keys(previous).length);
+    fetchSpy.mockRestore();
+  });
+
+  it("publishes Green Game Jam basics from ANA with their pana art", async () => {
+    // The 2026-08-25 bug report: Card #107494 (and the four siblings) showed
+    // no art. Arena stores them as ANA / DigitalReleaseSet ANA-GGJ-2026;
+    // Scryfall has the paintings in pana with arena_id null. ANA's Scryfall
+    // released_at is 2018, so the 180-day window used to skip the whole set.
+    const sets = [{ code: "ana", released_at: "2018-07-14" }];
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      if (url.includes("/cards.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                grpid: 107492,
+                titleId: 1,
+                set: "ANA",
+                artistCredit: "Daren Bader",
+                types: [5],
+                colorIdentity: [1],
+                collectorNumber: "1",
+              },
+              {
+                grpid: 107494,
+                titleId: 3,
+                set: "ANA",
+                artistCredit: "Daren Bader",
+                types: [5],
+                colorIdentity: [3],
+                collectorNumber: "3",
+              },
+            ]),
+        });
+      }
+      if (url.includes("/loc_en.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { id: 1, text: "Plains" },
+              { id: 3, text: "Swamp" },
+            ]),
+        });
+      }
+      const q = decodeURIComponent((url.match(/q=([^&]+)/) || [])[1] || "");
+      const set = (q.match(/set:(\w+)/) || [])[1];
+      const bySet = {
+        ana: [
+          {
+            id: "npe-plains",
+            name: "Plains",
+            type_line: "Basic Land — Plains",
+            artist: "Eytan Zana",
+            arena_id: 7193,
+            released_at: "2018-07-14",
+          },
+        ],
+        pana: [
+          {
+            id: "old-plains",
+            name: "Plains",
+            type_line: "Basic Land — Plains",
+            artist: "Donato Giancola",
+            arena_id: null,
+            released_at: "2018-07-14",
+          },
+          {
+            id: "ggj-plains",
+            name: "Plains",
+            type_line: "Basic Land — Plains",
+            artist: "Daren Bader",
+            arena_id: null,
+            released_at: "2026-06-06",
+          },
+          {
+            id: "ggj-swamp",
+            name: "Swamp",
+            type_line: "Basic Land — Swamp",
+            artist: "Daren Bader",
+            arena_id: null,
+            released_at: "2026-06-06",
+          },
+        ],
+      };
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: bySet[set] || [], has_more: false }),
+      });
+    });
+
+    const out = await buildArenaNameGap({ previous: {}, sets, tries: 1 });
+    expect(out["107492"]).toMatchObject({
+      n: "Plains",
+      i: "W",
+      l: 1,
+      s: "ggj-plains",
+      t: "Basic Land — Plains",
+    });
+    expect(out["107494"]).toMatchObject({
+      n: "Swamp",
+      i: "B",
+      l: 1,
+      s: "ggj-swamp",
+      t: "Basic Land — Swamp",
+    });
+    // Must not collapse both lands onto one painting just because the artist
+    // is the same, and must not pick the 2018 pana Plains either.
+    expect(out["107492"].s).not.toBe(out["107494"].s);
+    expect(out["107492"].s).not.toBe("old-plains");
+    expect(out["107492"].s).not.toBe("npe-plains");
     fetchSpy.mockRestore();
   });
 });

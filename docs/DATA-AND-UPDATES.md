@@ -210,19 +210,31 @@ Titanbreach etc. The Sets page plays them in an in-app player
 
 The app turns an Arena `grpId` into a card name with
 `https://api.scryfall.com/cards/arena/<grpId>`. That covers almost everything,
-almost always — but **not a set in the window between "playable on Arena" and
-"Scryfall has assigned its `arena_id`s".**
+almost always — but not in two windows where Scryfall has the card and has
+not linked it:
 
-Hit for real on **2026-08-12** with **The Hobbit** (`hob`, paper release 08-14):
-all 193 Scryfall entries said `games: ["paper","mtgo","arena"]` and
-`arena_id: null`, so every Hobbit card a player cast rendered in the deck list
-*and the overlay* as `Card #103529` — no name, no cost, no colour, and so no
-archetype signal either. That window lands exactly when a new set matters most.
+1. **A new set**, between "playable on Arena" and "Scryfall has assigned its
+   `arena_id`s". Hit for real on **2026-08-12** with **The Hobbit** (`hob`,
+   paper release 08-14): all 193 Scryfall entries said
+   `games: ["paper","mtgo","arena"]` and `arena_id: null`, so every Hobbit
+   card a player cast rendered in the deck list *and the overlay* as
+   `Card #103529` — no name, no cost, no colour, and so no archetype signal
+   either. That window lands exactly when a new set matters most.
+
+2. **Arena store cosmetics** dumped into the evergreen `ANA` set. Scryfall's
+   `ana` row is the 2018 New Player Experience (`released_at` never moves),
+   and the actual paintings live in `pana` (MTG Arena Promos) **without** an
+   `arena_id`. The 180-day window therefore skips both sets, and a name-only
+   join would paint every "Plains" with the first pana Plains. Hit for real
+   on **2026-08-25** with the Green Game Jam basics (grpIds 107492–107496,
+   `DigitalReleaseSet: ANA-GGJ-2026`). The builder always includes `ana`,
+   also searches `pana`, and joins those cards on **name + artist** so the
+   Daren Bader Plains is not the Donato Giancola Plains.
 
 | Piece | Role |
 |-------|------|
 | `pipeline/sources/arena-names.mjs` | Builds the gap map |
-| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?} }`, ~49 KB |
+| `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?,s?,t?} }`, fetched after a Scryfall 404 |
 | `src/services/arenaNameGap.ts` | Owns the client-side map — fetched once per session, **only after** a Scryfall 404 |
 | `src/services/arenaMeta.ts` | Resolver for the overlay, archetype inference, Matchups, DeckView |
 | `src/services/arenaCards.ts` | Resolver for the My Stats decklist, Brew Lab, deck share |
