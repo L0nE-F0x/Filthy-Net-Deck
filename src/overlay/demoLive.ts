@@ -6,7 +6,9 @@
  *
  * Knobs: `&phase=ended` shows the post-match card instead of the live tracker,
  * `&fresh` cuts history to a single game so the card's day-one state (no
- * progression graph yet) is reachable.
+ * progression graph yet) is reachable, `&bo3` adds a sideboard, and
+ * `&untracked` puts the match in a Historic queue so the "archetype read off"
+ * state on the opponent tab can be seen without owning a Historic deck.
  */
 import type { LiveCardCount, LiveMatch, TrackedMatch } from "../types/tracker";
 
@@ -24,9 +26,16 @@ const row = (grpId: number, remaining: number, total: number): LiveCardCount => 
 export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
   // `?demo&bo3` — Traditional queue with a sideboard so the Sideboard tab
   // can be styled without a real Bo3 match.
-  const bo3 =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).has("bo3");
+  const params =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+  const bo3 = params.has("bo3");
+  // `?demo&untracked` — a Historic queue, so the "archetype read off" state can
+  // be styled without owning a Historic deck. The opponent-tab note only
+  // appears for a format the app ships no deck field for, which is otherwise
+  // unreachable in the browser.
+  const untracked = params.has("untracked");
   const library: LiveCardCount[] = [
     row(105180, 12, 18), // Mountain
     row(91674, 2, 4), // Heartfire Hero
@@ -55,7 +64,13 @@ export function demoLiveMatch(opts: { ended?: boolean } = {}): LiveMatch {
     matchId: "demo-match",
     phase: opts.ended ? "ended" : "playing",
     startedAt: Date.now() - 6 * 60_000 - 12_000,
-    eventId: bo3 ? "Traditional_Ladder" : "Ladder",
+    eventId: untracked
+      ? bo3
+        ? "Historic_Traditional_Ladder"
+        : "Historic_Ladder"
+      : bo3
+        ? "Traditional_Ladder"
+        : "Ladder",
     bestOf: bo3 ? 3 : 1,
     opponentName: "wraith",
     myPlayerName: "You",

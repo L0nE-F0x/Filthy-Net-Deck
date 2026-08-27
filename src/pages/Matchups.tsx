@@ -14,10 +14,8 @@ import type { MatchResult, TrackedMatch } from "../types/tracker";
 import type { FormatId } from "../types/meta";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
 import { peekSeenCard, resolveArenaMetaBatch } from "../services/arenaMeta";
-import {
-  formatIdForEvent,
-  inferenceCandidatesFromBundle,
-} from "../services/deckHelpers";
+import { inferenceCandidatesFromBundle } from "../services/deckHelpers";
+import { isUncoveredFormat, localFormatOf } from "../services/arenaFormat";
 import { getOpponentNote } from "../services/matchupNotes";
 import { archetypeSlug } from "../services/cloud/archetypeSlug";
 import {
@@ -48,8 +46,16 @@ const RESULT_LABEL: Record<MatchResult, string> = {
   unknown: "?",
 };
 
-function formatForMatch(m: TrackedMatch): FormatId {
-  return formatIdForEvent(m.eventId) ?? "standard";
+/**
+ * Which format a match counts under here.
+ *
+ * Returns null for Historic, Alchemy, Timeless, Brawl and draft, which
+ * `archetypeForMatch` treats as "counts nowhere" — those games have no honest
+ * cell on a page whose rows are `standard-*` / `pioneer-*` slugs joined against
+ * Standard and Pioneer crowd data. They used to be counted as Standard.
+ */
+function formatForMatch(m: TrackedMatch, fallback: FormatId | null): FormatId | null {
+  return localFormatOf(m.eventId, fallback);
 }
 
 function RateChip({
@@ -237,15 +243,32 @@ export const Matchups = memo(function Matchups() {
     [meta, mode],
   );
 
+  // What an unnamed queue falls back to. The featured format is the app's
+  // default everywhere else; hardcoding "standard" here would be the same
+  // assumption by a less honest route.
+  const fallbackFormat = useMemo<FormatId | null>(() => {
+    const f =
+      meta?.formats?.find((x) => x.featured) ?? meta?.formats?.[0] ?? null;
+    return (f?.id as FormatId | undefined) ?? null;
+  }, [meta]);
+
   const resolveOpts: ResolveOpts = useMemo(() => {
     void namesTick;
     return {
       resolveName: (id) => peekSeenCard(id),
       candidates,
       tagFor: (m) => getOpponentNote(m.opponentName)?.tag?.trim() || null,
-      formatFor: formatForMatch,
+      formatFor: (m) => formatForMatch(m, fallbackFormat),
     };
-  }, [candidates, namesTick]);
+  }, [candidates, namesTick, fallbackFormat]);
+
+  // Games this page cannot honestly place. Said out loud rather than dropped in
+  // silence — a record that quietly shrinks is how the Standard-vs-Historic
+  // mixing went unnoticed for as long as it did.
+  const uncoveredCount = useMemo(
+    () => filtered.filter((m) => isUncoveredFormat(m.eventId)).length,
+    [filtered],
+  );
 
   const personal = useMemo(
     () => personalRecords(filtered, resolveOpts),
@@ -259,10 +282,10 @@ export const Matchups = memo(function Matchups() {
   const subject = useMemo(
     () =>
       subjectArchetype(filtered, {
-        formatFor: formatForMatch,
+        formatFor: (m) => formatForMatch(m, fallbackFormat),
         myArchetypeFor: (m) => myArchetypeName(m, candidates),
       }),
-    [filtered, candidates],
+    [filtered, candidates, fallbackFormat],
   );
 
   const subjectFormat = useMemo<"standard" | "pioneer" | null>(() => {
@@ -518,6 +541,19 @@ export const Matchups = memo(function Matchups() {
                 );
               })}
             </div>
+          )}
+          {uncoveredCount > 0 && (
+            <p
+              className="text-xs text-muted m-0 mt-3 leading-relaxed"
+              title="Matchup records are keyed to Standard and Pioneer archetypes. A Historic or Brawl game has no matching row, and counting it as Standard — which this page used to do — would quietly corrupt the record it sits in."
+            >
+              {uncoveredCount} match{uncoveredCount === 1 ? "" : "es"} in this
+              filter {uncoveredCount === 1 ? "is" : "are"} from a format Filthy
+              Net Deck doesn&apos;t cover — Historic, Alchemy, Timeless, Brawl or
+              draft — so {uncoveredCount === 1 ? "it isn't" : "they aren't"}{" "}
+              counted here. The decks are still kept in{" "}
+              <strong className="text-foam">My Stats</strong>.
+            </p>
           )}
           {/*
             Four honest states, because a community number is only comparable to

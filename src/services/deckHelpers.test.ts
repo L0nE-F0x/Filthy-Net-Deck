@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   allDecksForFormat,
   deckIdsForMode,
-  formatIdForEvent,
   inferenceCandidates,
   normalizeMetaBundle,
 } from "./deckHelpers";
@@ -153,22 +152,11 @@ describe("allDecksForFormat", () => {
   });
 });
 
-describe("formatIdForEvent", () => {
-  it("maps Pioneer and Explorer queues to pioneer", () => {
-    expect(formatIdForEvent("Pioneer_Ladder")).toBe("pioneer");
-    expect(formatIdForEvent("Pioneer_Traditional_Ladder")).toBe("pioneer");
-    expect(formatIdForEvent("Explorer_Play")).toBe("pioneer");
-  });
-
-  it("returns null for Standard/unknown queues so callers fall back", () => {
-    expect(formatIdForEvent("Ladder")).toBeNull();
-    expect(formatIdForEvent("Traditional_Ladder")).toBeNull();
-    expect(formatIdForEvent("Play")).toBeNull();
-    expect(formatIdForEvent("")).toBeNull();
-    expect(formatIdForEvent(null)).toBeNull();
-    expect(formatIdForEvent(undefined)).toBeNull();
-  });
-});
+// `formatIdForEvent`'s tests lived here. They passed the whole time — the
+// function did exactly what it said. What they could not catch was that its
+// null-for-Standard shape made `?? "standard"` the obvious call site, and that
+// callers therefore filed Historic games as Standard. The replacement is
+// `services/arenaFormat`, whose tests pin the three-way distinction instead.
 
 describe("normalizeMetaBundle", () => {
   it("fills deck id arrays from legacy single slots", () => {

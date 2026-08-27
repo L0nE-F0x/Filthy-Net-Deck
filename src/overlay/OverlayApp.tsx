@@ -41,7 +41,8 @@ import {
 } from "./overlayModel";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
-import { formatIdForEvent, inferenceCandidates } from "../services/deckHelpers";
+import { inferenceCandidates } from "../services/deckHelpers";
+import { isUncoveredFormat, localFormatOf } from "../services/arenaFormat";
 import type { MetaBundle, PlayMode } from "../types/meta";
 import { queueRankedKind, rankedChipLabel } from "../services/ranks";
 import { PostMatchSummary } from "./PostMatchSummary";
@@ -1048,11 +1049,16 @@ export function OverlayApp() {
   const oppHud = useMemo(() => {
     // metaMap identity changes as card names resolve — recompute the guess.
     void metaMap;
+    // Computed before the early return: the format is knowable from the queue
+    // alone, and the note explaining a missing read has to show from the first
+    // second of the match, not only once the opponent has revealed something.
+    const uncovered = isUncoveredFormat(live?.eventId);
     if (!live?.opponentSeen?.length) {
       return {
         guess: null as string | null,
         matchup: null as ReturnType<typeof matchupHudLine>,
         seen: opponentCardsSeenCount(live?.opponentSeen),
+        uncovered,
       };
     }
     const bundle = loadMetaCache();
@@ -1061,10 +1067,18 @@ export function OverlayApp() {
 
     let guess: string | null = null;
     let candidates: ReturnType<typeof inferenceCandidates> = [];
-    if (bundle) {
+    // A queue the app ships no deck field for gets no guess at all.
+    //
+    // This used to fall through to the featured format, so a Historic or Brawl
+    // game had its opponent inferred against the *Standard* board — and a
+    // Historic Izzet list clears the 0.35 confidence floor against Standard's
+    // Izzet deck easily. The overlay would then name a deck the opponent
+    // demonstrably was not on, live, mid-match. No line beats a wrong line.
+    if (bundle && !uncovered) {
       // Pioneer/Explorer queues infer against the Pioneer field, not blindly
-      // against the featured format (Standard).
-      const eventFmt = formatIdForEvent(live.eventId);
+      // against the featured format (Standard). An unnamed queue still falls
+      // back to featured — unknown is not the same as known-uncovered.
+      const eventFmt = localFormatOf(live.eventId, null);
       const fmt =
         bundle.formats.find((f) => f.id === eventFmt) ??
         bundle.formats.find((f) => f.featured) ??
@@ -1101,12 +1115,15 @@ export function OverlayApp() {
       guess,
       matchup,
       seen: opponentCardsSeenCount(live.opponentSeen),
+      uncovered,
     };
   }, [live, matches, metaMap]);
 
   const oppGuessLabel = oppHud.guess;
   const matchupLine = oppHud.matchup;
   const cardsSeen = oppHud.seen;
+  /** Queue FND ships no deck field for — the archetype read is off on purpose. */
+  const uncoveredFormat = oppHud.uncovered;
 
   if (!live || live.phase === "idle") {
     return <div className="overlay-empty" />;
@@ -1389,7 +1406,20 @@ export function OverlayApp() {
             />
           ) : view === "opp" ? (
             <div className="overlay-decklist overlay-decklist--opp">
-              {oppGuessLabel ? (
+              {/*
+                Three states, not two. A missing archetype read means either
+                "not enough cards yet" (keep watching) or "this queue has no
+                deck field to read against" (it is never coming) — and leaving
+                the second one silent reads as the overlay being broken.
+              */}
+              {uncoveredFormat ? (
+                <p
+                  className="overlay-opp-note overlay-opp-note--off"
+                  title={`${queueLabel(live.eventId)} — Filthy Net Deck tracks the Standard and Pioneer metagames, so there is no deck list to match this opponent against. Guessing from the Standard field would name a deck they are not playing. Revealed cards below are tracked as normal.`}
+                >
+                  Archetype read off — <strong>untracked format</strong>
+                </p>
+              ) : oppGuessLabel ? (
                 <p className="overlay-opp-note">
                   Reads like <strong>{oppGuessLabel}</strong>
                   {matchupLine ? <em> · you {matchupLine.detail}</em> : null}

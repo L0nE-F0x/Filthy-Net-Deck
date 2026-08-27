@@ -10,7 +10,7 @@
  */
 
 import { useAppStore } from "../../store/useAppStore";
-import { inferenceCandidatesFromBundle, formatIdForEvent } from "../deckHelpers";
+import { inferenceCandidatesFromBundle } from "../deckHelpers";
 import { inferOpponentArchetype } from "../opponentArchetype";
 import { peekSeenCard, resolveArenaMetaBatch } from "../arenaMeta";
 import { getOpponentNote } from "../matchupNotes";
@@ -104,7 +104,9 @@ export async function cloudDecksNow(): Promise<CloudDeck[]> {
   }
 }
 
-/** Format for a match, shared with the Matchups page's view of the same data. */
-export function formatForMatch(m: TrackedMatch) {
-  return formatIdForEvent(m.eventId) ?? "standard";
-}
+// `formatForMatch` used to live here — `formatIdForEvent(m.eventId) ?? "standard"`,
+// the same line that put Historic games in Standard's matchup cells. It had no
+// importers left, so it is deleted rather than repaired: a dead export that
+// still encodes the wrong rule is a trap for whoever reaches for it next.
+// Live callers use `services/arenaFormat`: `metaFormatOf` for anything that
+// joins crowd data, `localFormatOf` for a local page scoped to one format.

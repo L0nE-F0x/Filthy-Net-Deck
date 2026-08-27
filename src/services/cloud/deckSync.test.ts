@@ -97,14 +97,25 @@ describe("collectDeckRows", () => {
     expect(collectDeckRows(USER, [match({ deckHash: undefined })], ctx)).toEqual([]);
   });
 
-  it("only syncs the two formats the table accepts", () => {
-    expect(
-      collectDeckRows(USER, [match()], { formatFor: () => "alchemy" }),
-    ).toEqual([]);
+  it("archives every constructed format, under its own name", () => {
+    // A deck built in Historic is a Historic deck whether or not the app ships
+    // a Historic metagame. Filing it as `standard` — which is what the old
+    // queue resolver did to every `*_Ladder` — put the wrong word on the
+    // user's own public deck page.
+    for (const fmt of ["standard", "pioneer", "historic", "alchemy", "timeless", "brawl"]) {
+      const rows = collectDeckRows(USER, [match()], { formatFor: () => fmt });
+      expect(rows).toHaveLength(1);
+      expect(rows[0].format).toBe(fmt);
+    }
+  });
+
+  it("skips limited and unnamed queues rather than inventing a format", () => {
+    // A draft deck is a sealed pool that no longer exists, so an archived
+    // import of it would list cards the user does not own. An unknown queue
+    // has no honest label at all.
+    expect(collectDeckRows(USER, [match()], { formatFor: () => "limited" })).toEqual([]);
+    expect(collectDeckRows(USER, [match()], { formatFor: () => "unknown" })).toEqual([]);
     expect(collectDeckRows(USER, [match()], { formatFor: () => null })).toEqual([]);
-    expect(
-      collectDeckRows(USER, [match()], { formatFor: () => "pioneer" })[0].format,
-    ).toBe("pioneer");
   });
 
   it("prefers a recognised archetype over the user's own deck name", () => {

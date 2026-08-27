@@ -1,4 +1,4 @@
-import type { Deck, FormatId, FormatMeta, MetaBundle, PlayMode } from "../types/meta";
+import type { Deck, FormatMeta, MetaBundle, PlayMode } from "../types/meta";
 import { sanitizeDeckDescription } from "./sanitizeSources";
 
 /** Resolve the ranked board deck ids for a format + mode (supports legacy single-deck feeds). */
@@ -48,20 +48,23 @@ export function allDecksForFormat(
   return out;
 }
 
-/**
- * Arena queue eventId → bundle format. Pioneer queues (`Pioneer_Ladder`,
- * `Pioneer_Traditional_Ladder`, …) and Explorer (≈ Pioneer's card pool, the
- * convention the Untapped source already uses) map to pioneer. Everything
- * else returns null so callers fall back to the featured format (Standard).
+/*
+ * `formatIdForEvent` was here. It answered "which of the two formats this app
+ * covers should I show for this queue?" and returned null for everything else —
+ * correct for picking a tier list, and its doc comment said so.
+ *
+ * The trouble was the shape. Returning null for Standard *and* for Historic
+ * made `formatIdForEvent(id) ?? "standard"` the obvious way to call it, and
+ * every caller wrote exactly that. Which is how a Historic game came to be
+ * counted in the Standard matchup table, and how the overlay came to name a
+ * Standard archetype during a Historic match.
+ *
+ * Every caller now uses `services/arenaFormat`, which distinguishes the three
+ * cases the old signature could not: `metaFormatOf` for anything joining crowd
+ * data, `localFormatOf` for a local page scoped to one format. That left this
+ * with no callers, and a dead export whose natural call site is a bug is worth
+ * deleting rather than keeping for symmetry.
  */
-export function formatIdForEvent(
-  eventId: string | undefined | null,
-): FormatId | null {
-  const id = eventId?.trim();
-  if (!id) return null;
-  if (/pioneer|explorer/i.test(id)) return "pioneer";
-  return null;
-}
 
 /**
  * Candidate pool for opponent-archetype inference.

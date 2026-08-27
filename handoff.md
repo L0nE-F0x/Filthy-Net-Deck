@@ -6,6 +6,11 @@
 **Live product version: v3.1.9** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
 · tag **v3.1.9** · Windows **and** macOS both serve 3.1.9
 
+> ⚠️ **v3.2.0 Windows is in this commit; live still reads 3.1.9 until Netlify
+> finishes.** Do not "fix" the line above until
+> `https://filthy-net-deck.com/version.json` returns 3.2.0. macOS dmg is still
+> a follow-up (tag `v3.2.0` → GH Release → roll into `website/downloads/`).
+
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
 attaches the new one.
@@ -14,6 +19,52 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
+0. **▶ v3.2.0 Windows is built and in this commit. Remaining: live confirm + macOS dmg.**
+
+   Grok picked this up from Claude session `d46b6234` on 2026-08-27. Rebased
+   onto `origin/main` (10 radar/meta commits) before the signed build.
+
+   ### Done in this commit
+   - Signed Windows NSIS, key id `67FCA9900F523D49`. Trusted comment verified:
+     `file:Filthy Net Deck_3.2.0_x64-setup.exe`.
+   - `website/downloads/Filthy-Net-Deck-Setup-3.2.0.exe` (+ `.sig`).
+   - `website/updater/latest.json` rewritten with that signature.
+   - Downloads pruned to **current + 1** (3.2.0 + 3.1.9 Windows; 3.1.9 dmg
+     until the 3.2.0 dmg rolls). Convention from every recent release; the
+     owner question in the previous handoff is treated as yes.
+   - Migration 10 already applied on Supabase 2026-08-27. **Do not re-run it.**
+   - Gates re-run this session: 693 vitest / 89 files, tsc, eslint,
+     `cargo fmt --check`, clippy `-D warnings`, 57 cargo tests.
+
+   ⚠️ The signing passphrase was pasted into a chat transcript on 2026-08-27.
+   **Rotate the signing key** when convenient, and re-publish `pubkey` in
+   `src-tauri/tauri.conf.json` if you do (current key id `67FCA9900F523D49`).
+
+   ### Still to do after this push
+   1. Confirm **live** `https://filthy-net-deck.com/version.json` reads `3.2.0`
+      (Netlify is ~2–3 minutes; previous version for that window is normal).
+   2. Tag `v3.2.0` if this commit did not already (macOS CI).
+   3. Roll `Filthy-Net-Deck-3.2.0-universal.dmg` from the GH Release into
+      `website/downloads/` and confirm both Mac buttons in `index.html` (they
+      already say 3.2.0, so they 404 until the dmg lands).
+   4. In-app **Check for updates** offers *Update & restart*, not a browser
+      download. Link-share preview shows the new OG card.
+   5. Reply to Shane — draft below. Do not send until the Windows build is
+      actually downloadable.
+
+   ### Deliberately NOT part of this release
+   - `supabase/maintenance/20260827_shared_matches_format_cleanup.sql` — run it
+     **weeks later**, after users have updated and their decks have re-synced
+     under true formats. Read-only diagnostic first. Not urgent: the rollup
+     reads a 30-day window and fully rewrites itself, so the published numbers
+     clean themselves once updated clients stop sending bad rows.
+   - **Brawl commanders** — unresolved, needs a real log. See the open-question
+     section below. Do not guess at a field name.
+
+   ### Open question still unanswered
+   - Add the signed-build command as `npm run release:build` in `package.json`
+     so it is one memorable command per release? Not added in v3.2.0.
+
 1. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
@@ -21,6 +72,183 @@ attaches the new one.
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
 3. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
+
+## Reply to Shane — send after v3.2.0 is live
+
+`shane@coinz.org`, the reporter of both this ticket and the v3.1.9 basic-lands
+one. Kept here because the only other copy was in a session scratchpad that does
+not survive the handover. Owner should edit the sign-off. **Do not send before
+the build is downloadable** — it says the feature has shipped.
+
+> **Subject:** Re: Deck library across formats — yes, and you found a bug
+>
+> Shane,
+>
+> Second good ticket in a row. Short answer: most of this already exists, one
+> part of it was quietly broken, and the missing piece is now built.
+>
+> **What's already there.** FND doesn't just read match results out of
+> `Player.log` — it pulls the *decklist Arena registers* at the start of every
+> match. That's already format-agnostic: your Historic, Timeless and Brawl games
+> have been recorded the whole time, same as Standard. They're in **My Stats →
+> Your decks**, each with version history (every time you swap cards, that's a
+> new build, with a card-by-card diff and the win rate of each) and a **Copy
+> decklist** button that gives you Arena import text.
+>
+> So the library exists. What it lacked was the two things that make it useful
+> to you specifically.
+>
+> **The bug you surfaced.** FND worked out a match's format by looking for
+> `"ladder"` in Arena's queue id. `Historic_Ladder` contains `"ladder"`. So did
+> `Alchemy_Ladder` and `Timeless_Ladder`, and `Brawl` fell through to the
+> default. Every one of them was being filed as **Standard**. Your Historic
+> decks were being backed up with a "standard" label, and Historic games were
+> being counted in the community Standard matchup data. Both fixed: decks now
+> carry the format they were actually played in, and matches from formats FND
+> doesn't cover are no longer uploaded to the community numbers at all.
+>
+> **What's new.** A single **Export decklists** button in My Stats. It writes
+> your entire deck library to a folder in Downloads — one `.txt` per deck, named
+> `Deck Name (Format).txt`, each one straight Arena import text. Every
+> constructed format you play, no account needed, no sign-in, nothing uploaded.
+> That's your "keep them in local files" workflow, minus the manual part. Run it
+> before you cull down to 100 and nothing is lost.
+>
+> If you *do* make an account, deck backup rides the existing cloud toggle and
+> covers all those formats too — that one matters because Arena's logs rotate,
+> and once they do, a deck you haven't played recently is gone from your PC and
+> Arena won't hand it back. Publishing a deck to `/u/<you>/<deck>` is a separate,
+> per-deck choice — that's for sharing a link, not for backup. You don't have to
+> publish anything to have it backed up.
+>
+> **One real limitation, worth knowing before you delete anything.** FND only
+> sees a deck when you *play* it — it reads the list Arena hands over at match
+> start. A deck sitting untouched in your collection isn't in the library. So if
+> you're about to clear space: play one game with anything you want to keep (the
+> Play queue counts), then export.
+>
+> **What isn't changing:** the metagame side stays Standard and Pioneer. No
+> Historic tier list, no Brawl matchup rates. Keeping your decks and covering a
+> format's metagame are different jobs, and I'd rather do the second one properly
+> for two formats than badly for six.
+>
+> **One ask, if you're up for it.** Brawl is the one format I can't fully vouch
+> for. FND reads the maindeck and sideboard out of the log, but I've never
+> confirmed where Arena puts the *commander* — and I don't have a Brawl log to
+> check against. Your decks will export, but the commander may not be tagged. If
+> you play a Brawl game and send me the `Player.log` afterwards, I'll wire it up
+> properly rather than guess. (Same place you found the log for the land report.)
+>
+> Thanks for the report. The format bug had been live for a while and nobody had
+> hit it from an angle that made it obvious.
+>
+> — [owner]
+
+## Previous session (2026-08-27)
+
+Second in-app ticket from Shane (`shane@coinz.org`), v3.1.9: Arena's 100-deck
+cap makes him archive decks to Goldfish/AetherHub or local text files; could FND
+pull them out of `Player.log` into a deck library across Standard, Historic,
+Explorer, Brawl? Owner's call: **do not add Historic/Brawl as covered formats**,
+but back the *decks* up honestly.
+
+| Item | Notes |
+|------|--------|
+| ✅ | **Root-cause bug — every prefixed queue was "Standard"** | `sync.ts formatFor` tested `id.includes("ladder")`. `Historic_Ladder`, `Alchemy_Ladder` and `Timeless_Ladder` all contain it; `Brawl` fell through to `meta.formats[0].id`. So non-covered formats were uploading into the **crowd matchup rollup as Standard**, and their decks were backed up + publishable with a `standard` chip. |
+| ✅ | **`services/arenaFormat.ts`** | One honest queue→format resolver. Order is load-bearing: brawl before historic (`Historic_Brawl`), limited before the rest, Standard is the *leftover* not a guess. `metaFormatOf` (standard\|pioneer\|null) gates crowd data; `arenaFormatOf` labels decks. 12 tests. |
+| ✅ | **Crowd data now rejects, never relabels** | Non-Standard/Pioneer matches return null → `buildSharedMatch` drops them. Unknown queues are dropped too — they used to become the featured format. Fewer uploads, all of them real. |
+| ✅ | **Deck library covers every constructed format** | `decks.format` widened by migration 10 to standard/pioneer/historic/alchemy/timeless/brawl. Limited and unknown are skipped rather than given an invented label. Mislabelled rows self-heal: `format` is in `deckSyncFingerprint`, so the next sync re-upserts on `(user_id, deck_hash)`. |
+| ✅ | **Format chip in My Stats** | `DeckGroup.format` from the *newest* match that named a queue (a post-rotation deck is Historic now); an unnamed match cannot blank a format the rest agree on. Covered formats get the gold chip, library-only formats a quiet one, `unknown` renders nothing. |
+| ✅ | **Export decklists** | New: `tracker_export_decklists` writes one Arena-import `.txt` per deck to a dated folder in Downloads and reveals it. Runs over the **unfiltered** library, no account, all formats. Text is built client-side (`arenaExport`) — the Rust side still has no id→name map. Decks whose cards have not resolved are **held back, not trimmed**, because `toArenaDecklist` silently drops unnamed rows. |
+| ⏳ | **macOS dmg not rolled** | Windows is in this commit. See item 0 for the remaining ship steps. |
+
+### Hard-won this session
+
+- **"Which format is this queue" and "which tier list do I show" are different
+  questions.** `deckHelpers.formatIdForEvent` answers the second and returns
+  null for everything uncovered — correct there, catastrophic when reused as the
+  first. That reuse is what put Historic games in Standard's matchup cells.
+- **A metagame is not a deck library.** The Standard+Pioneer non-goal is about
+  *coverage* — tier lists, archetype data, matchup rates. It was never a reason
+  to lie about what format the user's own deck is.
+- **`toArenaDecklist` drops rows it cannot name.** Fine when publishing (the
+  caller refuses on `unresolved > 0`); a trap anywhere else, because the output
+  still looks like a valid decklist. Every new caller has to check the count.
+- **Windows deck names.** Arena allows `Dimir? / "Midrange"`; NTFS does not, and
+  `CON` cannot be a filename at all. `safe_file_stem` handles both, truncates by
+  chars not bytes, and dedupes collisions rather than overwriting.
+
+### Open question — needs a real log, not a guess
+
+- **Brawl commanders are unverified.** Nothing in the chain reads one:
+  `tracker.rs find_deck_message` takes `deckCards` + `sideboardCards` off the
+  GRE `connectResp.deckMessage` and nothing else, and `toArenaDecklist` passes
+  `commander: undefined` unconditionally — so a Brawl deck exports with no
+  `Commander` header, though `buildArenaImport` can write one. Whether that
+  *loses* the card or merely untags it depends on where Arena puts it, and there
+  is **no Brawl fixture** in `src-tauri/tests/fixtures/logs/`. Deliberately not
+  guessed at. Next step: get a Brawl `Player.log` (Shane is the obvious ask —
+  his last report came with grpIds), add a fixture, then wire it through.
+
+### Second pass — the local display half (same session)
+
+The first pass fixed what was *uploaded*; every local page was still doing
+`formatIdForEvent(...) ?? "standard"`. Owner asked for it in the same session.
+
+| Item | Notes |
+|------|--------|
+| ✅ | **`localFormatOf(eventId, fallback)`** | The local policy, three-way: covered → itself; **known**-uncovered → null; **unnamed** → the page's own format. The old `?? "standard"` collapsed the last two, which is the entire bug. Deliberately weaker than `metaFormatOf` (which rejects unnamed queues too): a wrong row in the crowd rollup is everyone's problem, a wrong row in your own local record is only yours and is visible in the match list. |
+| ✅ | **Matchups** | Historic/Alchemy/Timeless/Brawl/draft games no longer reach `archetypeForMatch`, so they cannot land in a `standard-*` row. Unnamed queues fall back to the **featured** format rather than a hardcoded "standard". A footnote counts what was left out — a record that silently shrinks is how this went unnoticed. |
+| ✅ | **Overlay** | Was the worst one: an uncovered queue fell through to the featured format, so a Historic game had its opponent inferred against the **Standard** board — and a Historic Izzet list clears the 0.35 floor against Standard's Izzet deck easily. It now skips inference entirely. No line beats a wrong line. |
+| ✅ | **Overlay says why (owner call, 2026-08-27)** | The overlay **has always shown in every format** — `tracker.rs` shows it on any `playing`/`ended` phase, with no format check, and the owner had assumed otherwise. Kept that way deliberately: library count, draw odds, lands left and revealed cards are all format-agnostic and hiding the HUD would take a working tracker off Historic players. The opponent tab now carries *"Archetype read off — untracked format"* where the read would be, muted rather than gold (gold reads as a live result on that HUD). Three states, not two: "not enough cards yet" vs "no deck field exists for this queue" — the second was silent and read as a bug. Style it with `?demo&untracked#/overlay`. |
+| ✅ | **Daily + DeckView** | Same three-way policy; a Historic game no longer inflates a Standard archetype's "you vs this deck" chip. |
+| ✅ | **List Clinic gated** | `closestRankedDeck` scans every format and takes the nearest by L1 — `preferFormat` is only a tie-breaker — so a Historic deck got "58 cards off Izzet Cauldron" rather than no result. DeckDetail now renders an honest "nothing to compare this to" panel instead. |
+| ✅ | **Dead `syncRunner.formatForMatch` deleted** | Exported, zero importers, still carrying `?? "standard"`. Deleted rather than repaired — a dead export encoding the wrong rule is a trap for whoever reaches for it next. |
+| ✅ | **CI flake fixed** | `pipeline/meta-site-links.test.mjs` is a synchronous crawl of the whole corpus; it passes in ~1 s alone but timed out against vitest's 5 s default under full parallel load. Given an explicit 30 s timeout — the default is sized for async hangs, not honest I/O. |
+
+| ✅ | **`deckHelpers.formatIdForEvent` deleted too** | Migrating the five call sites left it with zero production callers. Its own tests always passed — the function did exactly what it documented. The defect was the *signature*: returning null for Standard **and** for Historic made `?? "standard"` the obvious call, and all five callers wrote it. A dead export whose natural call site is a bug does not survive on symmetry. |
+
+### File inventory — the whole uncommitted v3.2.0 change
+
+Curated so the release commit can be reviewed without re-deriving intent.
+`git status` is the source of truth if these drift.
+
+**New**
+| File | Why |
+|---|---|
+| `src/services/arenaFormat.ts` (+ `.test.ts`) | The honest queue→format resolver. `arenaFormatOf` names the queue, `metaFormatOf` gates crowd data, `localFormatOf` gates local pages, `isUncoveredFormat` drives the UI notes. 19 tests. |
+| `src/services/deckLibraryExport.ts` (+ `.test.ts`) | Builds the whole library as Arena import text. Carries the ⚠️ Brawl-commander note. 10 tests. |
+| `src/components/stats/FormatChip.test.tsx` | jsdom render test for the format chip, incl. "unknown renders nothing". |
+| `supabase/migrations/20260827120000_deck_library_formats.sql` | **Already applied.** Widens `decks.format`. Commit it for the record. |
+| `supabase/maintenance/20260827_shared_matches_format_cleanup.sql` | Operator runbook, run later. Not a migration. |
+
+**Modified — app behaviour**
+| File | Why |
+|---|---|
+| `src/services/cloud/sync.ts` | The origin bug. `formatFor` → `metaFormatOf` (crowd), `deckFormatFor` → `arenaFormatOf` (decks). |
+| `src/services/cloud/deckSync.ts` (+ test) | `DeckRow.format` widened to every constructed format; limited/unknown skipped. |
+| `src/services/cloud/syncRunner.ts` | Dead `formatForMatch` deleted. |
+| `src/services/deckHelpers.ts` (+ test) | Dead `formatIdForEvent` deleted — its null-for-Standard shape *was* the footgun. |
+| `src/services/deckStats.ts` (+ test) | `DeckGroup.format`, from the newest match that named a queue. |
+| `src/pages/Matchups.tsx` | Uncovered formats excluded + a footnote counting them. |
+| `src/pages/Daily.tsx`, `src/pages/DeckView.tsx` | Same three-way policy on the "you vs this deck" chips. |
+| `src/overlay/OverlayApp.tsx` | No archetype guess in uncovered formats + the "read off" note. |
+| `src/overlay/demoLive.ts` | `?demo&untracked` knob to style that note in a browser. |
+| `src/pages/Stats.tsx` | **Export decklists** button; runs over the *unfiltered* library. |
+| `src/components/stats/{DeckBreakdown,DeckDetail,statsUi}.tsx` | Format chip, and the List Clinic replaced by an honest empty state for uncovered formats. |
+| `src/index.css` | `.fmt-chip`, `.deck-row-label`, `.overlay-opp-note--off`. Verified in both themes. |
+| `src-tauri/src/tracker.rs`, `src-tauri/src/lib.rs` | `tracker_export_decklists` + `safe_file_stem` (4 tests). |
+
+**Modified — release + docs**
+`package.json` · `src/version.ts` · `src-tauri/{Cargo.toml,Cargo.lock,tauri.conf.json}` ·
+`website/version.json` · `public/version.json` · `website/index.html` ·
+`website/privacy.html` · `website/assets/_gen_og.py` + `og-image.png` ·
+`pipeline/build-meta-site.mjs` (PRIVACY_LASTMOD) ·
+`pipeline/meta-site-links.test.mjs` (CI flake) · `README.md` · `handoff.md`
+
+### Known, not fixed (deliberate)
+
+- Nothing outstanding from the format work.
 
 ## Previous session (2026-08-25)
 
@@ -292,12 +520,12 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.1.9** on Windows (signed updater) and macOS (universal dmg on the homepage) |
-| Branch | `main`, clean after wrap |
-| Gates last green | **648** vitest / 86 files · tsc (app + netlify) · eslint · signed Windows build (2026-08-20) |
+| App version | **v3.2.0 Windows in this commit** (live still 3.1.9 until Netlify). macOS still 3.1.9 until the dmg rolls |
+| Branch | `main` |
+| Gates last green | **693** vitest / 89 files · tsc · eslint · cargo fmt/clippy/57 tests · signed Windows build (2026-08-27) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
 | Monetization | Ko-fi only; Phase 4 paid tier deferred indefinitely |
-| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Nine** migrations run; the ninth (`20260820120000_public_decklists`) applied by the owner 2026-08-20 |
+| Supabase | Project `bzcryoocsapqtyhiwzbe`, **Pro**. **Ten** migrations run; the tenth (`20260827120000_deck_library_formats`) applied by the owner 2026-08-27. Do not re-run it. |
 | Auth | Google **and** Discord enabled + verified live. **Email OTP built but hidden** behind `EMAIL_SIGN_IN_ENABLED` |
 | Cron | `fnd-rollup` scheduled hourly (job id 1) — without it `matchup_rollup` never fills |
 | Owner's profile | `filthy-net-deck.com/u/l0ne-f0x` — public, 371+ matches uploaded and aggregating |

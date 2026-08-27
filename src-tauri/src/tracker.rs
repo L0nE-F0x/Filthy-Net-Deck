@@ -352,6 +352,119 @@ pub fn tracker_export_csv(
     Ok(file.display().to_string())
 }
 
+/// One deck on its way to disk. The Arena import **text** is built on the
+/// frontend and handed over finished, for the same reason publishing a deck
+/// does it there: names come from Scryfall and this side has no id→name map.
+/// See `services/arenaExport.ts` and migration 20260820120000.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeckExport {
+    pub name: String,
+    /// Arena queue format, already resolved (`services/arenaFormat.ts`).
+    pub format: String,
+    pub text: String,
+}
+
+/// Windows-safe file stem for a deck name.
+///
+/// Arena lets a player call a deck almost anything — `Dimir? / "Midrange"` is a
+/// legal deck name and an illegal filename. Reserved device names matter too:
+/// a deck honestly named `CON` cannot be a file on Windows at all, so it gets
+/// a suffix rather than silently failing to write.
+fn safe_file_stem(name: &str) -> String {
+    let mut out: String = name
+        .chars()
+        .map(|c| match c {
+            '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*' => '-',
+            c if (c as u32) < 0x20 => '-',
+            c => c,
+        })
+        .collect();
+    // Windows silently strips trailing dots and spaces, which would turn two
+    // distinct names into one file.
+    out = out
+        .trim_matches(|c: char| c == '.' || c.is_whitespace())
+        .to_string();
+    // Long deck names plus a format suffix can outrun MAX_PATH on Windows.
+    if out.chars().count() > 80 {
+        out = out
+            .chars()
+            .take(80)
+            .collect::<String>()
+            .trim_end()
+            .to_string();
+    }
+    const RESERVED: [&str; 22] = [
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+        "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+    ];
+    if RESERVED.contains(&out.to_uppercase().as_str()) {
+        out.push_str("-deck");
+    }
+    if out.is_empty() {
+        out.push_str("deck");
+    }
+    out
+}
+
+/// Write the whole deck library to Downloads as one Arena-importable `.txt`
+/// per deck, then reveal the folder.
+///
+/// This is the no-account path, and deliberately so: the lists come out of the
+/// user's own Player.log, so archiving them must not require signing in. It
+/// also covers **every** constructed format the tracker sees, not just the two
+/// the app ships a metagame for — a deck the player built in Historic is still
+/// theirs to keep, and Arena's 100-deck cap is what makes keeping it useful.
+#[tauri::command]
+pub fn tracker_export_decklists(app: AppHandle, decks: Vec<DeckExport>) -> Result<String, String> {
+    if decks.is_empty() {
+        return Err(
+            "No decklists to export yet — play a match and Arena will register one.".into(),
+        );
+    }
+
+    let root = app
+        .path()
+        .download_dir()
+        .or_else(|_| app.path().app_data_dir())
+        .map_err(|e| format!("No folder to write to: {e}"))?;
+    let dir = root.join(format!("filthy-net-deck-decks-{}", iso_date(now_ms())));
+    fs::create_dir_all(&dir).map_err(|e| format!("Could not create the export folder: {e}"))?;
+
+    // Two decks can legitimately share a name — a Standard and a Historic build
+    // of the same brew, or two versions the player never renamed. Suffix the
+    // duplicates instead of letting the second silently overwrite the first.
+    let mut used: HashSet<String> = HashSet::new();
+    let mut written = 0usize;
+    for deck in &decks {
+        if deck.text.trim().is_empty() {
+            continue;
+        }
+        let base = if deck.format.is_empty() {
+            safe_file_stem(&deck.name)
+        } else {
+            safe_file_stem(&format!("{} ({})", deck.name, deck.format))
+        };
+        let mut stem = base.clone();
+        let mut n = 2;
+        while !used.insert(stem.to_lowercase()) {
+            stem = format!("{base} ({n})");
+            n += 1;
+        }
+        let file = dir.join(format!("{stem}.txt"));
+        fs::write(&file, deck.text.as_bytes())
+            .map_err(|e| format!("Could not write {}: {e}", file.display()))?;
+        written += 1;
+    }
+
+    if written == 0 {
+        return Err("None of those decks had a list to write.".into());
+    }
+
+    let _ = tauri_plugin_opener::reveal_item_in_dir(&dir);
+    Ok(dir.display().to_string())
+}
+
 /// C6 — write an anonymized parser-health file to Downloads and reveal it.
 /// Contains ONLY counters and flags: no player names, no opponents, no match
 /// contents, no file paths (the log path embeds the OS username). Safe to
@@ -3996,5 +4109,49 @@ mod tests {
             mismatches.is_empty(),
             "library count drifted (worst {worst:+}); first cases (arena, overlay): {mismatches:?}"
         );
+    }
+
+    // ---------------------------------------------------------------------
+    // Deck library export
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn safe_file_stem_survives_arena_deck_names() {
+        // Arena accepts all of these as deck names; Windows accepts none of
+        // them as file names, and a failed write would lose the deck silently.
+        assert_eq!(
+            safe_file_stem("Dimir? / \"Midrange\""),
+            "Dimir- - -Midrange-"
+        );
+        assert_eq!(safe_file_stem("Boros<Aggro>"), "Boros-Aggro-");
+        assert_eq!(safe_file_stem("Jund|Sacrifice"), "Jund-Sacrifice");
+    }
+
+    #[test]
+    fn safe_file_stem_handles_names_windows_would_mangle() {
+        // Windows strips trailing dots and spaces itself, which would collapse
+        // two distinct deck names onto one file.
+        assert_eq!(safe_file_stem("Mono Red. "), "Mono Red");
+        assert_eq!(safe_file_stem("   "), "deck");
+        assert_eq!(safe_file_stem(""), "deck");
+        // Reserved device names cannot be files at all...
+        assert_eq!(safe_file_stem("CON"), "CON-deck");
+        assert_eq!(safe_file_stem("com4"), "com4-deck");
+        // ...but only when the whole name is one.
+        assert_eq!(safe_file_stem("Control"), "Control");
+    }
+
+    #[test]
+    fn safe_file_stem_caps_length_for_max_path() {
+        assert_eq!(safe_file_stem(&"a".repeat(300)).chars().count(), 80);
+    }
+
+    #[test]
+    fn safe_file_stem_keeps_names_that_are_already_legal() {
+        // Nothing here needs stripping, and mangling a legal name would only
+        // make the file harder to find. Truncation counts *chars*, not bytes,
+        // so a multi-byte name cannot be cut mid-codepoint.
+        assert_eq!(safe_file_stem("Izzet Phoenix - v3"), "Izzet Phoenix - v3");
+        assert_eq!(safe_file_stem(&"é".repeat(300)).chars().count(), 80);
     }
 }

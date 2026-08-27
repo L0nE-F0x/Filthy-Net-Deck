@@ -1,11 +1,11 @@
 {
-  "version": "3.1.9",
-  "notes": "v3.1.9: published decklists read creatures, spells, then lands.",
-  "pub_date": "2026-08-20T07:53:19Z",
+  "version": "3.2.0",
+  "notes": "v3.2.0: deck library across every format, one-click decklist export, and matchups no longer mix Historic games into Standard.",
+  "pub_date": "2026-08-27T07:22:02Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjlVMkt3SlkyZEVhOGF2d2pKL3lxSWpFSEIyOGVLTlhvRzJQN3dNeVVHT1JPbjdVVmVXaW51Q3FpdFhVMzZYNXJLcHhQQVJHamxJNnlxY05tTldwTkFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MjEyMTUyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMS45X3g2NC1zZXR1cC5leGUKS0N6QjY2Qlp1djQzZzZrY1FtT0RFczc4cTkyOE10TzBLQWh6V1VIaysvMXh4NzR2UnRDNmg4ajgxMm1ObG5jRm5qNTNtRjllbXFYU1hxcWcvUTEzQWc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.9.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnl3aCtTQWJkRDdqb3VzTWJ1SldRaitnaTZkV3hvdXVvMXBFazQxN096aDVQdEt5ckIyazRub05LdUk4Q1lETjZ6d2RVY05FTS9DOGwyMFp3NmtPRkFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3ODE1MjMxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMi4wX3g2NC1zZXR1cC5leGUKb0IzM244VjlYNEpRalBkQnd1and6bXVEbk5ZQm03VHZGRWlhWnZndEJ4L1diVndETkljMTZBczFaT09KZGlWRFpWM0dRZG9Vb0ZscHBmcHg4MVJpQ3c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.2.0.exe"
     }
   }
 }

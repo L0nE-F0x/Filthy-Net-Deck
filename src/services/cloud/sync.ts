@@ -19,6 +19,7 @@ import {
 } from "./deckSync";
 import type { RollupRow } from "./crowdMeta";
 import { cloudConfigured } from "./config";
+import { arenaFormatOf, metaFormatOf, type ArenaFormat } from "../arenaFormat";
 
 const UPLOADED_KEY = "bbi.cloud.uploadedThrough";
 
@@ -118,13 +119,31 @@ export async function setCloudEnabled(on: boolean): Promise<void> {
   }
 }
 
-/** Resolve a match's format from the meta bundle, falling back to its queue. */
-function formatFor(match: TrackedMatch, meta: MetaBundle | null): FormatId | null {
-  const id = String(match.eventId ?? "").toLowerCase();
-  if (id.includes("pioneer") || id.includes("explorer")) return "pioneer" as FormatId;
-  if (id.includes("standard") || id.includes("ladder")) return "standard" as FormatId;
-  return (meta?.formats?.[0]?.id as FormatId) ?? null;
-}
+/**
+ * The format a match counts as for **crowd data** — Standard or Pioneer, or
+ * null for anything else.
+ *
+ * Null is a rejection, not a fallback. This used to end
+ * `return meta?.formats?.[0]?.id ?? null`, which meant a Brawl game, a draft,
+ * or a match whose queue Arena never named all landed in the featured format's
+ * matchup rollup. `Historic_Ladder` did too — the old test was
+ * `id.includes("ladder")`. Aggregates built on that are noise, and the rule is
+ * to ship nothing rather than ship noise.
+ *
+ * `meta` is no longer consulted: what format a queue is does not depend on
+ * which tier list happens to be loaded.
+ */
+const formatFor = (match: TrackedMatch): FormatId | null =>
+  metaFormatOf(match.eventId);
+
+/**
+ * The format a **decklist** is filed under — every constructed queue, because
+ * a deck the user built in Historic is theirs to keep whether or not the app
+ * covers the Historic metagame. Limited and unnamed queues return null and are
+ * skipped by `collectDeckRows`.
+ */
+const deckFormatFor = (match: TrackedMatch): ArenaFormat =>
+  arenaFormatOf(match.eventId);
 
 export interface UploadOutcome {
   attempted: number;
@@ -196,7 +215,7 @@ async function runUpload(
       user.id,
       m,
       {
-        formatId: formatFor(m, args.meta),
+        formatId: formatFor(m),
         myArchetypeName: myArchetypeName(m, args.decks),
         oppArchetypeName: opp.name,
         oppConfidence: opp.confidence,
@@ -263,7 +282,7 @@ export async function uploadDecks(args: {
   decksInFlight = true;
   try {
     const rows = collectDeckRows(user.id, args.matches, {
-      formatFor: (m) => formatFor(m, args.meta),
+      formatFor: deckFormatFor,
       decks: args.decks,
     });
     if (!rows.length) return empty;

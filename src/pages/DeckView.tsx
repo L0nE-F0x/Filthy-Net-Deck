@@ -14,10 +14,8 @@ import { ArchetypeDiffPanel } from "../components/ArchetypeDiffPanel";
 import { deckRotationImpact, rotationWhen } from "../services/rotationImpact";
 import { getOpponentNote } from "../services/matchupNotes";
 import { peekSeenCard } from "../services/arenaMeta";
-import {
-  formatIdForEvent,
-  inferenceCandidatesFromBundle,
-} from "../services/deckHelpers";
+import { inferenceCandidatesFromBundle } from "../services/deckHelpers";
+import { localFormatOf } from "../services/arenaFormat";
 import {
   personalRecords,
   recordForArchetypeName,
@@ -164,8 +162,10 @@ export function DeckView() {
       resolveName: (id) => peekSeenCard(id),
       candidates: inferenceCandidatesFromBundle(meta, mode),
       tagFor: (m) => getOpponentNote(m.opponentName)?.tag?.trim() || null,
+      // A Historic game against this archetype is not a data point about the
+      // Standard version of it, so it counts nowhere rather than here.
       formatFor: (m) =>
-        formatIdForEvent(m.eventId) ?? (deck.format as typeof deck.format) ?? "standard",
+        localFormatOf(m.eventId, (deck.format as typeof deck.format) ?? "standard"),
     };
     const rows = personalRecords(trackerMatches, opts);
     const hit = recordForArchetypeName(

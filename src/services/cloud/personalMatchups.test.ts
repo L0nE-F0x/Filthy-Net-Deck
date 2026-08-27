@@ -12,6 +12,7 @@ import {
 import type { Matchup } from "./crowdMeta";
 import type { TrackedMatch } from "../../types/tracker";
 import type { Deck, FormatId } from "../../types/meta";
+import { localFormatOf } from "../arenaFormat";
 
 const STANDARD = "standard" as FormatId;
 
@@ -81,6 +82,25 @@ describe("archetypeForMatch", () => {
     expect(archetypeForMatch(match(), opts)).toBeNull();
   });
 
+  it("keeps a Historic game out of the Standard record, tag and all", () => {
+    // End-to-end guard on the bug this page shipped with: the queue resolver
+    // matched `"ladder"` inside `Historic_Ladder` and called it Standard, so a
+    // Historic win against Mono-Red inflated the *Standard* Mono-Red row. The
+    // manual-tag path is used here because it is the strongest input there is —
+    // even an explicit user label must not create a row in the wrong format.
+    const opts: ResolveOpts = {
+      ...noInfer,
+      tagFor: () => "Mono-Red Aggro",
+      formatFor: (m) => localFormatOf(m.eventId, STANDARD),
+    };
+    expect(archetypeForMatch(match({ eventId: "Ladder" }), opts)).toBe(
+      "standard-mono-red-aggro",
+    );
+    for (const eventId of ["Historic_Ladder", "Alchemy_Ladder", "Historic_Brawl"]) {
+      expect(archetypeForMatch(match({ eventId }), opts)).toBeNull();
+    }
+  });
+
   it("falls back to inference when no tag is set", () => {
     const names: Record<number, string> = {
       1: "Monastery Swiftspear",
@@ -99,6 +119,29 @@ describe("archetypeForMatch", () => {
 
 describe("personalRecords", () => {
   const tagged = (tag: string): ResolveOpts => ({ ...noInfer, tagFor: () => tag });
+
+  it("counts only the covered-format games, and leaves the rest out entirely", () => {
+    // Six wins tagged the same archetype; two of them are Historic. The row
+    // must read 4 games, not 6 — an inflated personal winrate is the thing the
+    // user actually acts on when they pick a deck for the ladder.
+    const rows = personalRecords(
+      [
+        match({ eventId: "Ladder", result: "win" }),
+        match({ eventId: "Ladder", result: "win" }),
+        match({ eventId: "Traditional_Ladder", result: "loss" }),
+        match({ eventId: "Unknown", result: "win" }),
+        match({ eventId: "Historic_Ladder", result: "win" }),
+        match({ eventId: "Historic_Brawl", result: "win" }),
+      ],
+      {
+        ...tagged("Mono-Red Aggro"),
+        formatFor: (m) => localFormatOf(m.eventId, STANDARD),
+      },
+    );
+    expect(rows).toHaveLength(1);
+    // The unnamed queue still counts — unknown is not known-wrong.
+    expect(rows[0]).toMatchObject({ wins: 3, losses: 1, games: 4 });
+  });
 
   it("tallies wins and losses per archetype", () => {
     const rows = personalRecords(

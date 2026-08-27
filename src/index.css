@@ -1711,6 +1711,42 @@ select,
   margin-left: 0.4rem;
   flex-shrink: 0;
 }
+/* Format chip — the queue a deck was last played in.
+   Stacked under the name rather than beside it: the name column is
+   minmax(90px, …) and an inline chip would eat an archetype name that already
+   has to ellipsis. */
+.deck-row-label {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.12rem;
+}
+.deck-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.deck-row-meta .run-badge { margin-left: 0; }
+.fmt-chip {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  border: 1px solid color-mix(in srgb, var(--color-foam) 22%, transparent);
+  border-radius: 5px;
+  padding: 0.05rem 0.3rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+/* The two formats the app ships a metagame for read as "you can look this up
+   here"; the rest are library-only labels and stay quiet. */
+.fmt-chip.is-covered {
+  color: var(--color-gold-300);
+  border-color: color-mix(in srgb, var(--color-gold-500) 45%, transparent);
+}
+
 .run-banner {
   margin: 0.6rem 0 0;
   font-size: 0.78rem;
@@ -6707,6 +6743,14 @@ html.overlay-macos .overlay-shell {
 .overlay-opp-note em {
   font-style: normal;
   color: var(--color-good);
+}
+/* "Archetype read off — untracked format". Deliberately NOT gold: gold reads as
+   a live result on this HUD, and this is the absence of one. Muted so it states
+   the situation without competing with the cards below it. */
+.overlay-opp-note--off strong {
+  color: var(--color-muted);
+  font-weight: 700;
+  border-bottom: 1px dotted color-mix(in srgb, var(--color-muted) 55%, transparent);
 }
 .overlay-card-row.is-seen {
   grid-template-columns: 12px 30px minmax(0, 1fr) auto;

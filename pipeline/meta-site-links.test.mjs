@@ -52,7 +52,12 @@ describe("generated meta site", () => {
     }
     expect(checked).toBeGreaterThan(500);
     expect(broken).toEqual([]);
-  });
+    // Synchronous crawl of the whole corpus — hundreds of files read and
+    // regexed. It finishes in ~1s alone but competes with 88 other test
+    // files for CPU, and vitest's 5s default is sized for async hangs, not
+    // for honest I/O. It timed out in full-suite runs while passing in
+    // isolation, which reads as a broken build rather than a slow test.
+  }, 30_000);
 
   it.skipIf(!built)("keeps every card page reachable from the card index", () => {
     // 300+ pages nothing links to would be an orphan corpus — worse than no
@@ -70,5 +75,5 @@ describe("generated meta site", () => {
     expect(onDisk.length).toBeGreaterThan(50);
     const orphans = onDisk.filter((slug) => !linked.has(slug));
     expect(orphans).toEqual([]);
-  });
+  }, 30_000);
 });

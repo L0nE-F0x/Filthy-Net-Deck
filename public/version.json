@@ -1,5 +1,5 @@
 {
-  "version": "3.1.9",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.1.9.exe",
-  "notes": "v3.1.9: published decklists read creatures, spells, then lands."
+  "version": "3.2.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.2.0.exe",
+  "notes": "v3.2.0: deck library across every format, one-click decklist export, and matchups no longer mix Historic games into Standard."
 }

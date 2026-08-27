@@ -19,7 +19,7 @@ import {
   type ArenaCardInfo,
 } from "../../services/arenaCards";
 import { resolveMetaDeck } from "../../services/deepLinks";
-import { formatIdForEvent } from "../../services/deckHelpers";
+import { arenaFormatLabel, metaFormatOf } from "../../services/arenaFormat";
 import { TrackedListClinic } from "../ListClinic";
 import { CardArt, CardArtStrip } from "../CardArt";
 import { TrackedDecklist } from "../TrackedDecklist";
@@ -40,7 +40,7 @@ import { PublishDeck } from "./PublishDeck";
 import { SummaryTiles } from "./SummaryTiles";
 import { SplitsPanel } from "./SplitsPanel";
 import { MatchHistory } from "./MatchHistory";
-import { pickArenaPreview, useArenaCardMap } from "./statsUi";
+import { FormatChip, pickArenaPreview, useArenaCardMap } from "./statsUi";
 
 /* -- Deck share card (decklist + record + FND logo, for posting) -- */
 type DeckShareScope = "all" | "season" | "run" | "session" | "day" | "week";
@@ -412,8 +412,15 @@ export function DeckDetail({
   const deckList = useMemo(() => latestDecklist(deck.matches), [deck.matches]);
   const preferFormat = useMemo(() => {
     const last = [...deck.matches].sort((a, b) => b.endedAt - a.endedAt)[0];
-    return formatIdForEvent(last?.eventId) ?? undefined;
+    return metaFormatOf(last?.eventId) ?? undefined;
   }, [deck.matches]);
+
+  // The clinic measures a list against today's Standard and Pioneer ranked
+  // boards. `closestRankedDeck` scans every format and takes the nearest by L1
+  // distance — `preferFormat` is only a tie-breaker — so a Historic deck does
+  // not get "no result", it gets "58 cards off Izzet Cauldron". A number with
+  // no meaning is worse than no number, so the panel says so instead.
+  const clinicCovered = deck.format === "standard" || deck.format === "pioneer";
 
   return (
     <div className="flex flex-col gap-3">
@@ -424,6 +431,7 @@ export function DeckDetail({
               ‹ All decks
             </button>
             <h3 className="dash-title m-0 truncate">{deck.name}</h3>
+            <FormatChip format={deck.format} />
           </span>
           <span className="flex items-center gap-2 flex-wrap">
             <PublishDeck deckHash={deck.matches.find((m) => m.deckHash)?.deckHash} />
@@ -588,14 +596,33 @@ export function DeckDetail({
               if (key !== deck.key) openStatsDeck(key);
             }}
           />
-          {deckList && (
-            <TrackedListClinic
-              deckName={deck.name}
-              mainIds={deckList.main}
-              sideIds={deckList.side}
-              preferFormat={preferFormat}
-            />
-          )}
+          {deckList &&
+            (clinicCovered ? (
+              <TrackedListClinic
+                deckName={deck.name}
+                mainIds={deckList.main}
+                sideIds={deckList.side}
+                preferFormat={preferFormat}
+              />
+            ) : (
+              <div className="panel">
+                <p className="eyebrow m-0">vs today’s ranked list</p>
+                <h3 className="dash-title m-0 mt-1">Nothing honest to compare this to</h3>
+                <p className="text-sm text-muted m-0 mt-2 leading-relaxed max-w-2xl">
+                  The clinic measures a list against today’s{" "}
+                  <strong className="text-foam">Standard</strong> and{" "}
+                  <strong className="text-foam">Pioneer</strong> ranked boards, and this is a{" "}
+                  {arenaFormatLabel(deck.format)} deck. Filthy Net Deck doesn’t track that
+                  metagame, so a card-for-card diff against a Standard list would be a number
+                  with nothing behind it.
+                </p>
+                <p className="text-sm text-muted m-0 mt-2 leading-relaxed max-w-2xl">
+                  Everything else on this page is format-agnostic — the decklist, the version
+                  history, the record, and <strong className="text-foam">Export decklists</strong>{" "}
+                  in My Stats all work the same here as anywhere.
+                </p>
+              </div>
+            ))}
         </>
       )}
     </div>

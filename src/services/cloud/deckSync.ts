@@ -17,7 +17,12 @@
  */
 
 import type { TrackedMatch } from "../../types/tracker";
-import type { Deck, FormatId } from "../../types/meta";
+import type { Deck } from "../../types/meta";
+import {
+  isArchivableFormat,
+  type ArchivableFormat,
+  type ArenaFormat,
+} from "../arenaFormat";
 import { myArchetypeName } from "./matchSync";
 
 /** Rows accepted by `public.decks`. */
@@ -25,7 +30,17 @@ export interface DeckRow {
   user_id: string;
   deck_hash: string;
   name: string;
-  format: "standard" | "pioneer";
+  /**
+   * The format the deck was actually played in — every constructed queue the
+   * tracker can see, not just the two the app ships a metagame for.
+   *
+   * These are two different questions and conflating them was a bug: a deck
+   * built in Historic is a Historic deck whether or not FND has a Historic
+   * tier list, and labelling it `standard` put the wrong word on the user's
+   * own public deck page. Widened by migration 20260827120000; crowd matchup
+   * data stays Standard/Pioneer-only regardless (`matchSync.buildSharedMatch`).
+   */
+  format: ArchivableFormat;
   main: number[];
   side: number[];
   played_at: string;
@@ -56,12 +71,15 @@ export interface CloudDeck {
   publicList: string | null;
 }
 
-function isSyncableFormat(id: FormatId | string | null | undefined): id is
-  | "standard"
-  | "pioneer" {
-  const f = String(id ?? "").toLowerCase();
-  return f === "standard" || f === "pioneer";
-}
+/**
+ * Which formats get a row.
+ *
+ * Constructed only. A Limited deck is a sealed pool that no longer exists, so
+ * an archived import of it would list cards the user does not own; an unknown
+ * queue has no honest label to file the deck under, and the whole point of
+ * this change was to stop inventing one.
+ */
+const isSyncableFormat = isArchivableFormat;
 
 /**
  * Collapse match history into one row per distinct list.
@@ -75,7 +93,7 @@ export function collectDeckRows(
   userId: string,
   matches: readonly TrackedMatch[],
   ctx: {
-    formatFor: (m: TrackedMatch) => FormatId | string | null;
+    formatFor: (m: TrackedMatch) => ArenaFormat | string | null;
     decks?: readonly Deck[];
   },
 ): DeckRow[] {

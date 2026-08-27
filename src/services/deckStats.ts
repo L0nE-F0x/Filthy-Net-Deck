@@ -7,6 +7,7 @@ import type { TrackedMatch } from "../types/tracker";
 import { deckKey } from "./tracker";
 import { tallyMatches } from "./statsHelpers";
 import type { DeckRuns } from "./deckRuns";
+import { arenaFormatOf, type ArenaFormat } from "./arenaFormat";
 
 export interface DeckGroup {
   key: string;
@@ -17,11 +18,24 @@ export interface DeckGroup {
   lastPlayedAt: number;
   /** Oldest match end time (ms) on this deck. */
   firstPlayedAt: number;
+  /**
+   * The format this deck was last played in.
+   *
+   * Taken from the newest match rather than the first: a list carried from
+   * Standard into Historic after rotation is a Historic deck now, and the
+   * library should say where it is legal today. `unknown` when Arena never
+   * named the queue — shown as nothing rather than guessed at.
+   */
+  format: ArenaFormat;
 }
 
 /** Group matches by deck (newest deckName wins as the display name). Unsorted. */
 export function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[] {
   const byKey = new Map<string, DeckGroup>();
+  // Newest match that actually named a queue, per deck. Tracked apart from
+  // `lastPlayedAt` so one match Arena never labelled cannot blank out a format
+  // every other match on the deck agrees on.
+  const formatAt = new Map<string, number>();
   for (const m of matches) {
     const key = deckKey(m);
     let g = byKey.get(key);
@@ -33,12 +47,18 @@ export function groupDecks(matches: TrackedMatch[], runs: DeckRuns): DeckGroup[]
         runActive: runs[key] !== undefined,
         lastPlayedAt: m.endedAt,
         firstPlayedAt: m.endedAt,
+        format: "unknown",
       };
       byKey.set(key, g);
     }
     g.matches.push(m);
     if (m.endedAt > g.lastPlayedAt) g.lastPlayedAt = m.endedAt;
     if (m.endedAt < g.firstPlayedAt) g.firstPlayedAt = m.endedAt;
+    const f = arenaFormatOf(m.eventId);
+    if (f !== "unknown" && m.endedAt >= (formatAt.get(key) ?? -Infinity)) {
+      formatAt.set(key, m.endedAt);
+      g.format = f;
+    }
     // trackerMatches is newest-first, so keep the first name we see.
     if (!g.name && m.deckName) g.name = m.deckName;
   }

@@ -267,6 +267,35 @@
         once they do, the 75 cards a deck was are gone from your PC and Arena will not hand them
         back.
       </p>
+      <p>
+        <strong>Changed in v3.2.0 — two corrections worth stating plainly.</strong>
+        Until now the app worked out a match's format by looking for
+        <code>"ladder"</code> in Arena's queue id. <code>Historic_Ladder</code> contains
+        <code>"ladder"</code>, and so do the Alchemy and Timeless queues, so games from formats
+        this app does not cover were being uploaded to the community matchup data
+        <em>labelled Standard</em>, and decks from those queues were backed up and published with
+        a "standard" chip. Both are fixed:
+      </p>
+      <ul>
+        <li>
+          <strong>Fewer matches are uploaded.</strong> Only genuine Standard and Explorer/Pioneer
+          matches reach <code>shared_matches</code>. Historic, Alchemy, Timeless, Brawl, draft and
+          any queue Arena did not name are now skipped outright rather than relabelled. Rows
+          uploaded under the old behaviour are already there; ask and they will be removed.
+        </li>
+        <li>
+          <strong>Decks are backed up under their real format.</strong> <code>format</code> can now
+          say <code>historic</code>, <code>alchemy</code>, <code>timeless</code> or
+          <code>brawl</code> as well as <code>standard</code> and <code>pioneer</code>, so a deck
+          you built in Historic is filed as a Historic deck. Draft pools are not backed up at all.
+          No new field is sent — the row is the same four things it always was.
+        </li>
+      </ul>
+      <p>
+        Exporting your decklists to a folder on your own PC — <strong>Export decklists</strong> in
+        My Stats — uploads nothing and needs no account. It reads the same local history the app
+        already has and writes files.
+      </p>
 
       <h3>Public profile and friends</h3>
       <p>

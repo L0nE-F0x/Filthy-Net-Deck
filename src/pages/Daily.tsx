@@ -14,9 +14,9 @@ import { LocalCoachStrip } from "../components/LocalCoachStrip";
 import {
   decksForMode,
   topDeckForMode,
-  formatIdForEvent,
   inferenceCandidatesFromBundle,
 } from "../services/deckHelpers";
+import { localFormatOf } from "../services/arenaFormat";
 import { getOpponentNote, listTaggedOpponentCount } from "../services/matchupNotes";
 import { peekSeenCard } from "../services/arenaMeta";
 import {
@@ -211,7 +211,9 @@ export const Daily = memo(function Daily() {
       resolveName: (id) => peekSeenCard(id),
       candidates: inferenceCandidatesFromBundle(meta, mode),
       tagFor: (m) => getOpponentNote(m.opponentName)?.tag?.trim() || null,
-      formatFor: (m) => formatIdForEvent(m.eventId) ?? dailyFormatId ?? "standard",
+      // Historic/Brawl/draft games count nowhere rather than toward whichever
+      // format is on screen; an unnamed queue still falls back to it.
+      formatFor: (m) => localFormatOf(m.eventId, dailyFormatId ?? "standard"),
     };
     return personalRecords(trackerMatches, opts);
   }, [trackerMatches, meta, mode, dailyFormatId]);

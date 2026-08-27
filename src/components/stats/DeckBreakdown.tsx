@@ -9,7 +9,9 @@ import {
   type DeckSortKey,
 } from "../../services/deckStats";
 import { latestMainboard } from "../../services/deckVersions";
+import { arenaFormatLabel } from "../../services/arenaFormat";
 import {
+  FormatChip,
   nextSort,
   pickArenaPreview,
   RateBar,
@@ -109,6 +111,7 @@ export function DeckBreakdown({
           const firstAbs = new Date(d.firstPlayedAt).toLocaleString();
           const rowTip = [
             d.name,
+            d.format !== "unknown" ? arenaFormatLabel(d.format) : null,
             t.decided > 0
               ? `${t.wins}W–${t.losses}L · ${Math.round((t.rate ?? 0) * 100)}%`
               : "No decided games",
@@ -135,16 +138,19 @@ export function DeckBreakdown({
                   <span className="deck-row-art-empty" />
                 )}
               </span>
-              <span className="meta-bar-label">
+              <span className="meta-bar-label deck-row-label">
                 <span className="meta-bar-name">{d.name}</span>
-                {d.runActive && (
-                  <span
-                    className="run-badge"
-                    title="Fresh run is on — older matches for this deck are hidden from stats"
-                  >
-                    run
-                  </span>
-                )}
+                <span className="deck-row-meta">
+                  <FormatChip format={d.format} />
+                  {d.runActive && (
+                    <span
+                      className="run-badge"
+                      title="Fresh run is on — older matches for this deck are hidden from stats"
+                    >
+                      run
+                    </span>
+                  )}
+                </span>
               </span>
               <span className="deck-row-record">
                 <RateBar

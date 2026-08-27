@@ -5,6 +5,7 @@ import {
   type ArenaCardInfo,
 } from "../../services/arenaCards";
 import { winrateFavor } from "../../services/ranks";
+import { arenaFormatLabel, type ArenaFormat } from "../../services/arenaFormat";
 import type { ArtRef } from "../CardArt";
 import type { MatchResult } from "../../types/tracker";
 
@@ -141,5 +142,31 @@ export function RateBar({
         </strong>
       </span>
     </>
+  );
+}
+
+/**
+ * The format a deck was last played in.
+ *
+ * Renders nothing for `unknown` — Arena does not always name the queue, and a
+ * blank is honest where a guess would not be. Standard and Explorer are picked
+ * out because those are the two the app can show a metagame for; the rest are
+ * library labels, present so a multi-format player can tell their decks apart.
+ */
+export function FormatChip({ format }: { format: ArenaFormat }) {
+  if (format === "unknown") return null;
+  const covered = format === "standard" || format === "pioneer";
+  const label = arenaFormatLabel(format);
+  return (
+    <span
+      className={`fmt-chip${covered ? " is-covered" : ""}`}
+      title={
+        covered
+          ? `Last played in ${label} — the daily meta covers this format`
+          : `Last played in ${label} — tracked and archived, but FND ships no ${label} metagame`
+      }
+    >
+      {label}
+    </span>
   );
 }

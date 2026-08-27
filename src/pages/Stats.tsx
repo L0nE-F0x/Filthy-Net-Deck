@@ -95,6 +95,44 @@ export const Stats = memo(function Stats() {
       );
   };
 
+  /**
+   * Archive the whole library as Arena import text, one file per deck.
+   *
+   * Runs over `allDecks`, not the filtered table: the season/queue chips are a
+   * lens on the stats, and someone exporting before Arena's 100-deck cap forces
+   * a cull wants every deck, not this month's.
+   */
+  const onExportDecks = () => {
+    setExportMsg("Building decklists…");
+    void (async () => {
+      try {
+        const [{ buildDeckLibraryExport, deckExportSummary, writeDeckLibrary }, restored] =
+          await Promise.all([
+            import("../services/deckLibraryExport"),
+            // Fills in builds whose Arena log has rotated away. Resolves empty
+            // for anyone signed out or opted out, which is the normal case.
+            import("../services/cloud/syncRunner")
+              .then((r) => r.cloudDecksNow())
+              .then((d) => new Map(d.map((x) => [x.deckHash, { main: x.main, side: x.side }])))
+              .catch(() => new Map()),
+          ]);
+        const built = await buildDeckLibraryExport(allDecks, restored);
+        if (!built.entries.length) {
+          setExportMsg(
+            built.unresolved > 0
+              ? "Still loading card names — try again in a minute."
+              : "No stored decklists yet. Play a match and Arena will register one.",
+          );
+          return;
+        }
+        const path = await writeDeckLibrary(built.entries);
+        setExportMsg(deckExportSummary(built, path));
+      } catch (e) {
+        setExportMsg(e instanceof Error ? e.message : "Export failed.");
+      }
+    })();
+  };
+
   // Fresh runs hide a deck's older matches from every stat (never deleted).
   const runFiltered = useMemo(
     () => matches.filter((m) => m.endedAt >= (runs[deckKey(m)] ?? 0)),
@@ -126,6 +164,11 @@ export const Stats = memo(function Stats() {
   );
 
   const decks = useMemo(() => groupDecks(filtered, runs), [filtered, runs]);
+
+  // The unfiltered library, for the decklist export. Season and queue chips
+  // narrow what the stats are *about*; they must not decide what an archive of
+  // your own decks contains.
+  const allDecks = useMemo(() => groupDecks(matches, runs), [matches, runs]);
 
   // Deck detail is season/queue-agnostic: it's the deck's whole story.
   const selected = useMemo(() => {
@@ -456,6 +499,18 @@ export const Stats = memo(function Stats() {
                   onClick={onExportCsv}
                 >
                   Export CSV
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  title={
+                    "Save every deck Arena has registered — all formats — as Arena import text, " +
+                    "one file per deck, in your Downloads folder. Paste one back into Arena's " +
+                    "Import button any time. No account needed."
+                  }
+                  onClick={onExportDecks}
+                >
+                  Export decklists
                 </button>
                 <button
                   type="button"

@@ -53,6 +53,11 @@ leaves your PC unless you turn it on.**
 - Requires **Detailed Logs (Plugin Support)** enabled in Arena
   (Options → Account); the app walks you through it if it's off.
 - Matches are stored as JSONL in the app data dir (`tracker-matches.jsonl`).
+- Every list Arena registers is kept as a **deck library** in My Stats — name,
+  format, version history, and one-click Arena import text. **Export decklists**
+  writes the whole library to a folder in Downloads, one `.txt` per deck, so a
+  list you delete to get under Arena's 100-deck cap is not gone. Works signed
+  out, in every constructed format you play.
 - The log format is unofficial; if an Arena update changes it, the My Stats
   page says so instead of recording garbage. To debug against a real log:
   `FND_REPLAY_LOG=path/to/Player.log cargo test replay_real_log -- --nocapture --ignored`
@@ -68,6 +73,17 @@ A free account unlocks features that need a server, and each is opt-in:
 | Public profile `/u/<handle>` | Your season climb, shared on your terms |
 | Published decklists `/u/<handle>/<deck>` | Publish one deck and anyone with the link can copy it into Arena |
 | Cloud deck sync | Backs up the lists Arena registers, which local log rotation destroys |
+
+Two rules about formats, because they are easy to conflate:
+
+- **The metagame is Standard + Pioneer.** Tier lists, matchup rates and every
+  crowd aggregate cover those two and nothing else. A Historic or Brawl match is
+  not uploaded to the community data at all — it has no honest cell to land in.
+- **The deck library is every constructed format you play.** Standard, Explorer,
+  Historic, Alchemy, Timeless, Brawl — if Arena registered the list, it is in
+  My Stats with its own format label, and **Export decklists** writes the lot to
+  a folder as Arena import text with no account required. Limited is excluded:
+  a draft pool is not a deck you can rebuild.
 | Friend codes | Compare stat lines and race a season with people you play |
 
 Two rules hold regardless of any toggle:
