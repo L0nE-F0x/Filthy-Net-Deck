@@ -3,13 +3,11 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.1.9** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.1.9** · Windows **and** macOS both serve 3.1.9
+**Live product version: v3.2.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
+· tag **v3.2.0** · Windows **and** macOS both serve 3.2.0 after this dmg-roll commit lands
 
-> ⚠️ **v3.2.0 Windows is in this commit; live still reads 3.1.9 until Netlify
-> finishes.** Do not "fix" the line above until
-> `https://filthy-net-deck.com/version.json` returns 3.2.0. macOS dmg is still
-> a follow-up (tag `v3.2.0` → GH Release → roll into `website/downloads/`).
+> Windows `version.json` / updater / Setup-3.2.0.exe already live. This commit
+> rolls the universal dmg. Remaining for the owner: in-app update check + Shane.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -19,38 +17,36 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-0. **▶ v3.2.0 Windows is built and in this commit. Remaining: live confirm + macOS dmg.**
+0. **▶ v3.2.0 Windows is live. This commit rolls the macOS dmg.**
 
    Grok picked this up from Claude session `d46b6234` on 2026-08-27. Rebased
-   onto `origin/main` (10 radar/meta commits) before the signed build.
+   onto `origin/main`, signed-built, pushed `e695e79` + tag `v3.2.0`.
 
-   ### Done in this commit
-   - Signed Windows NSIS, key id `67FCA9900F523D49`. Trusted comment verified:
-     `file:Filthy Net Deck_3.2.0_x64-setup.exe`.
-   - `website/downloads/Filthy-Net-Deck-Setup-3.2.0.exe` (+ `.sig`).
-   - `website/updater/latest.json` rewritten with that signature.
-   - Downloads pruned to **current + 1** (3.2.0 + 3.1.9 Windows; 3.1.9 dmg
-     until the 3.2.0 dmg rolls). Convention from every recent release; the
-     owner question in the previous handoff is treated as yes.
-   - Migration 10 already applied on Supabase 2026-08-27. **Do not re-run it.**
-   - Gates re-run this session: 693 vitest / 89 files, tsc, eslint,
-     `cargo fmt --check`, clippy `-D warnings`, 57 cargo tests.
+   ### Verified live (not just local files)
+   - `https://filthy-net-deck.com/version.json` → `3.2.0`
+   - `https://filthy-net-deck.com/updater/latest.json` → `3.2.0`, signature
+     matches the local `.sig`
+   - `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-Setup-3.2.0.exe`
+     → 200, 7 574 959 bytes
+   - Trusted comment: `file:Filthy Net Deck_3.2.0_x64-setup.exe`
+   - Key id `67FCA9900F523D49`. Migration 10 already applied — do not re-run.
+   - macOS CI `33049552980` green. Dmg from the GH Release:
+     `Filthy-Net-Deck-3.2.0-universal.dmg` sha256
+     `5afe08f7…30da9b`, 22 125 807 bytes. Both homepage Mac buttons already
+     pointed at it. downloads = current + 1 (3.2.0 + 3.1.9, Windows and dmg).
 
    ⚠️ The signing passphrase was pasted into a chat transcript on 2026-08-27.
    **Rotate the signing key** when convenient, and re-publish `pubkey` in
-   `src-tauri/tauri.conf.json` if you do (current key id `67FCA9900F523D49`).
+   `src-tauri/tauri.conf.json` if you do.
 
-   ### Still to do after this push
-   1. Confirm **live** `https://filthy-net-deck.com/version.json` reads `3.2.0`
-      (Netlify is ~2–3 minutes; previous version for that window is normal).
-   2. Tag `v3.2.0` if this commit did not already (macOS CI).
-   3. Roll `Filthy-Net-Deck-3.2.0-universal.dmg` from the GH Release into
-      `website/downloads/` and confirm both Mac buttons in `index.html` (they
-      already say 3.2.0, so they 404 until the dmg lands).
-   4. In-app **Check for updates** offers *Update & restart*, not a browser
-      download. Link-share preview shows the new OG card.
-   5. Reply to Shane — draft below. Do not send until the Windows build is
-      actually downloadable.
+   ### Still to do (owner)
+   1. After Netlify: `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-3.2.0-universal.dmg` is 200.
+   2. In-app **Check for updates** on an installed 3.1.9: should offer
+      *Update & restart*, not a browser download. Not verified from this
+      session — needs the running desktop app.
+   3. Link-share preview shows the new OG card (`?v=3.2.0`).
+   4. Reply to Shane — draft below. Edit the sign-off, then send. Both
+      platforms are downloadable once the dmg URL is 200.
 
    ### Deliberately NOT part of this release
    - `supabase/maintenance/20260827_shared_matches_format_cleanup.sql` — run it
@@ -160,7 +156,7 @@ but back the *decks* up honestly.
 | ✅ | **Deck library covers every constructed format** | `decks.format` widened by migration 10 to standard/pioneer/historic/alchemy/timeless/brawl. Limited and unknown are skipped rather than given an invented label. Mislabelled rows self-heal: `format` is in `deckSyncFingerprint`, so the next sync re-upserts on `(user_id, deck_hash)`. |
 | ✅ | **Format chip in My Stats** | `DeckGroup.format` from the *newest* match that named a queue (a post-rotation deck is Historic now); an unnamed match cannot blank a format the rest agree on. Covered formats get the gold chip, library-only formats a quiet one, `unknown` renders nothing. |
 | ✅ | **Export decklists** | New: `tracker_export_decklists` writes one Arena-import `.txt` per deck to a dated folder in Downloads and reveals it. Runs over the **unfiltered** library, no account, all formats. Text is built client-side (`arenaExport`) — the Rust side still has no id→name map. Decks whose cards have not resolved are **held back, not trimmed**, because `toArenaDecklist` silently drops unnamed rows. |
-| ⏳ | **macOS dmg not rolled** | Windows is in this commit. See item 0 for the remaining ship steps. |
+| ✅ | **Shipped v3.2.0** | Windows signed updater live; macOS dmg rolled in this follow-up. |
 
 ### Hard-won this session
 
@@ -520,7 +516,7 @@ workstream**, email sign-in hidden, historical docs deleted outright.
 
 | Item | Status |
 |------|--------|
-| App version | **v3.2.0 Windows in this commit** (live still 3.1.9 until Netlify). macOS still 3.1.9 until the dmg rolls |
+| App version | **v3.2.0** on Windows (signed updater) and macOS (universal dmg on the homepage, this commit) |
 | Branch | `main` |
 | Gates last green | **693** vitest / 89 files · tsc · eslint · cargo fmt/clippy/57 tests · signed Windows build (2026-08-27) |
 | Licence | MIT (`LICENSE`); README carves out brand, third-party meta data, Scryfall/WotC content |
