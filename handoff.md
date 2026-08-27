@@ -4,10 +4,11 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.2.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.2.0** · Windows **and** macOS both serve 3.2.0 after this dmg-roll commit lands
+· tag **v3.2.0** · Windows **and** macOS both serve 3.2.0
 
-> Windows `version.json` / updater / Setup-3.2.0.exe already live. This commit
-> rolls the universal dmg. Remaining for the owner: in-app update check + Shane.
+> v3.2.0 is shipped. Grok session closed 2026-08-27. Do not rebuild or
+> re-roll. Remaining is owner-only: in-app update check, Shane reply, key
+> rotate.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -17,36 +18,30 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-0. **▶ v3.2.0 Windows is live. This commit rolls the macOS dmg.**
+0. **v3.2.0 is shipped. Session closed. Do not rebuild.**
 
-   Grok picked this up from Claude session `d46b6234` on 2026-08-27. Rebased
-   onto `origin/main`, signed-built, pushed `e695e79` + tag `v3.2.0`.
+   Grok wrapped Claude session `d46b6234` on 2026-08-27: rebased onto
+   `origin/main`, signed Windows build, pushed `e695e79` + tag `v3.2.0`,
+   then rolled the dmg in `b4a9b95`.
 
-   ### Verified live (not just local files)
+   ### Verified live
    - `https://filthy-net-deck.com/version.json` → `3.2.0`
-   - `https://filthy-net-deck.com/updater/latest.json` → `3.2.0`, signature
-     matches the local `.sig`
-   - `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-Setup-3.2.0.exe`
-     → 200, 7 574 959 bytes
-   - Trusted comment: `file:Filthy Net Deck_3.2.0_x64-setup.exe`
-   - Key id `67FCA9900F523D49`. Migration 10 already applied — do not re-run.
-   - macOS CI `33049552980` green. Dmg from the GH Release:
-     `Filthy-Net-Deck-3.2.0-universal.dmg` sha256
-     `5afe08f7…30da9b`, 22 125 807 bytes. Both homepage Mac buttons already
-     pointed at it. downloads = current + 1 (3.2.0 + 3.1.9, Windows and dmg).
+   - `https://filthy-net-deck.com/updater/latest.json` → `3.2.0`
+   - Setup-3.2.0.exe → 200, 7 574 959 bytes
+   - Filthy-Net-Deck-3.2.0-universal.dmg → 200, 22 125 807 bytes
+     (sha256 `5afe08f7…30da9b`, GH Release + Netlify)
+   - downloads = current + 1 (3.2.0 + 3.1.9, Windows and dmg)
+   - Migration 10 already applied — do not re-run.
 
-   ⚠️ The signing passphrase was pasted into a chat transcript on 2026-08-27.
-   **Rotate the signing key** when convenient, and re-publish `pubkey` in
-   `src-tauri/tauri.conf.json` if you do.
+   ⚠️ Signing passphrase was pasted into a chat transcript on 2026-08-27.
+   **Rotate the signing key** when convenient (key id `67FCA9900F523D49`).
 
-   ### Still to do (owner)
-   1. After Netlify: `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-3.2.0-universal.dmg` is 200.
-   2. In-app **Check for updates** on an installed 3.1.9: should offer
-      *Update & restart*, not a browser download. Not verified from this
-      session — needs the running desktop app.
-   3. Link-share preview shows the new OG card (`?v=3.2.0`).
-   4. Reply to Shane — draft below. Edit the sign-off, then send. Both
-      platforms are downloadable once the dmg URL is 200.
+   ### Owner leftovers (not blockers, not for an agent to invent)
+   1. In-app **Check for updates** on an installed 3.1.9 — *Update & restart*,
+      not a browser download. Needs the running desktop app.
+   2. Link-share preview of the OG card (`?v=3.2.0`).
+   3. Reply to Shane — draft below. Edit the sign-off, then send. Both
+      platforms are downloadable.
 
    ### Deliberately NOT part of this release
    - `supabase/maintenance/20260827_shared_matches_format_cleanup.sql` — run it
