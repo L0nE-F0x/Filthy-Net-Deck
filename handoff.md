@@ -3,113 +3,84 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.2.0** (Windows + macOS) · source on **main is v3.3.0**
+**Live product version: v3.3.0** (Windows signed updater + macOS dmg)
 · repo `L0nE-F0x/Filthy-Net-Deck`
-
-> v3.3.0 source is cut. The signed Windows installer is **not** on this
-> Linux box (no `TAURI_SIGNING_PRIVATE_KEY`). Do not point version.json /
-> updater/latest.json / homepage download buttons at 3.3.0 until the
-> NSIS exe + `.sig` exist. Tag `v3.3.0` starts macOS CI; roll the dmg
-> after Windows is signed, same commit as the site.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
 attaches the new one.
 
+This Omarchy box **can** produce the signed NSIS + updater `.sig` (key in
+`~/.tauri`, cargo-xwin, local NSIS). Authenticode is skipped on Linux;
+that is expected and does not block auto-update.
+
 ---
 
 # ▶ START HERE — next session
 
-0. **v3.3.0 source cut — Windows signed build is the remaining ship path.**
+0. **v3.3.0 installer + site are in this commit. Confirm Netlify, then stop.**
 
    Overlay companion + quiet HUD + autostart ask + Arena-language i18n
-   are in source at **3.3.0**. Live site/updater still **3.2.0** until
-   the signed NSIS setup exists. Key id `67FCA9900F523D49` lives on the
-   Windows machine (`%USERPROFILE%\.tauri\filthy-net-deck.key`). This
-   Omarchy box cannot produce updater artifacts.
+   shipped as **3.3.0**. Tag `v3.3.0` already exists (source cut). Do not
+   bump. Do not rebuild the Windows NSIS unless the updater signature is
+   wrong on the live `latest.json`.
 
-   Ticket + original analysis + **implementation log for this code**:
-   **`docs/FRIEND-FEEDBACK-OVERLAY-IA.md`** (read the “Implemented this
-   session” section before touching overlay files).
+   Ticket + implementation log:
+   **`docs/FRIEND-FEEDBACK-OVERLAY-IA.md`**.
 
-   ### What landed (source only)
+   ### What shipped
    - Overlay vs **companion window** — same webview, not a fourth renderer.
      Companion: not always-on-top, on the taskbar, opaque, close button,
      survives match end and Arena quit until the user closes it.
    - Quiet collapsed HUD: clock · turn · **session** W–L · **Land n%**
      (next-draw) · archetype + **confidence**. Lists stay behind ▾.
-     Ranked/Unrk/Bo3/library-count chips left the collapsed bar.
-   - First overlay appearance: “HUD over Arena” vs “Normal window”
-     (`overlayWindowModeChosen` false). Default stays overlay.
-   - Set Radar pulse: persist-dismiss + “Open Set Radar in Sets →”.
-   - Update **Later** persists across restarts (`bbi.dismissedUpdateVersion`).
-   - Deck-to-beat kicker: `{format} meta · BO1`. Pulses quieter than the board.
-   - **P2 autostart ask** (2026-08-31, later): one-shot Decks prompt after
-     the Help tour. Not silent-on. Settings toggle is the same switch.
-   - **i18n (2026-08-31, later):** Arena client languages in-app —
-     en, es, fr, de, it, pt-BR, ja, ko. Settings → Appearance → Language.
-     Chrome, overlay, pulses, Daily, Settings cards, Help chrome, page
-     eyebrows wired. Remaining English: long Help bodies, some Settings
-     paragraphs, Climb/Stats inner copy. Marketing site not translated.
+   - First overlay appearance: “HUD over Arena” vs “Normal window”.
+     Default stays overlay.
+   - Set Radar pulse persist-dismiss; Update **Later** persists;
+     deck-to-beat `{format} meta · BO1`.
+   - P2 autostart ask (one-shot after Help tour — not silent-on).
+   - i18n: en, es, fr, de, it, pt-BR, ja, ko. Remaining English: long
+     Help bodies, some Settings paragraphs, Climb/Stats inner copy.
+     Marketing site not translated.
 
-   ### Next agent’s job
-   Owner reviews the live `tauri:dev` app (running on this box) then
-   commit or iterate. **Still do not commit unless asked. Do not bump.**
+   ### Signed Windows build on this Linux box (keep)
+   Key id `67FCA9900F523D49` — `~/.tauri/filthy-net-deck.key` (copied from
+   Temple 1TB `Users/Temple Lodge/.tauri/`, mode 600). Never commit it.
+   Password file is `~/.tauri/filthy-net-deck-key-password.txt`.
 
-   Verified 2026-08-31 (this session): chooser, companion ×, quiet HUD
-   (session / land% / Izzet Aggro 44%), Set Radar CTA + persist-dismiss,
-   Update Later persist, Settings Window mode (AT-SPI in the Tauri
-   window), deck-to-beat `{format} meta · BO1`. Demo HUD
-   `/?demo#/overlay`. Density follow-up below.
+   ```bash
+   export PATH="$HOME/bin:/home/lonefox/tools/llvm-mingw/bin:$HOME/.cargo/bin:$PATH"
+   export NSISDIR=/home/lonefox/tools/nsis/usr/share/nsis
+   export XWIN_CACHE_DIR=$HOME/.xwin
+   export TAURI_SIGNING_PRIVATE_KEY=$HOME/.tauri/filthy-net-deck.key
+   export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(cat $HOME/.tauri/filthy-net-deck-key-password.txt)"
+   npm run tauri:build -- --bundles nsis --runner cargo-xwin --target x86_64-pc-windows-msvc
+   ```
 
-   **Not live-tested (no Arena on this machine):** overlay auto-hide
-   after match end; companion staying up after match / Arena quit;
-   first-match chooser inside the real overlay webview (demo used
-   Vite). Rust `hide()` / `on_arena_quit` / `user_close` are the
-   contract — click through once Arena is up.
+   Output: `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/Filthy Net Deck_<ver>_x64-setup.exe` + `.sig`.
+   Tauri will warn that **Authenticode** signing is Windows-only — ignore
+   that; the updater minisign `.sig` is what `latest.json` needs.
+   `~/bin/makensis` wraps the extracted NSIS 3.08 and sets `NSISDIR`.
+
+   ### Not live-tested (no Arena on this machine)
+   Overlay auto-hide after match end; companion staying up after match /
+   Arena quit; first-match chooser inside the real overlay webview.
 
    ### Do not sneak in
-   Spanish i18n · silent autostart-on · extra nav items · ripping out the
-   library tracker · flipping overlay default for existing users ·
-   notification centre · P2 autostart installer checkbox.
+   Silent autostart-on · extra nav items · ripping out the library
+   tracker · flipping overlay default for existing users · notification
+   centre · P2 autostart installer checkbox · translating the marketing
+   site · rotating the signing key in the same commit as a release.
 
-   ### Working tree (uncommitted on `main`)
-   Rust: `src-tauri/src/{overlay,tracker,arena,lib}.rs`
-   Overlay HUD: `src/overlay/OverlayApp.tsx`, `overlayModel.ts`,
-     `overlayPrefs.ts` + `overlayModel.test.ts`
-   Settings / store / prefs bridge: `src/pages/Settings.tsx`,
-     `src/store/useAppStore.ts`, `src/services/overlay.ts`, `src/App.tsx`,
-     `src/presence/PresenceApp.tsx`
-   Pulses: `src/components/{SpoilerPulse,StatusBanners}.tsx`,
-     `src/services/setPulse.ts`, `src/pages/Daily.tsx`, `src/index.css`
-   Incidental: `package-lock.json` root version `2.8.2` → `3.2.0` (npm
-   install on this machine; lockfile was stale vs package.json). Keep it
-   if you commit this work; it is not a feature change.
+   ### Owner leftovers (not blockers)
+   1. In-app **Check for updates** on an installed 3.2.0 — *Update & restart*.
+   2. Link-share preview of the OG card (`?v=3.3.0`).
+   3. Reply to Shane — draft below still refers to 3.2.0 deck-library;
+      edit if sending now (3.3.0 is overlay/companion + i18n).
+   4. **Rotate the signing key** when convenient (passphrase was pasted
+      into a chat transcript on 2026-08-27). Key id `67FCA9900F523D49`.
 
-   ### Verified here / not verified
-   - Yes: `tsc --noEmit`, eslint on touched TS, vitest overlayModel +
-     setPulse. Playwright against Vite overlay demo + Decks/Settings.
-     Live Tauri Daily (Set Radar + deck-to-beat) and Settings Window
-     mode combo (Overlay / Companion).
-   - Density fix this session: default overlay width 228 → **360**
-     (saved geometry untouched). Collapsed bar at ≤320 drops name +
-     clock; at ≤250 also shortens land and, in companion, drops turn
-     so the × and the guess both fit. Do not put archetype inside the
-     ellipsizing opponent-name span.
-   - Not live: hide-on-match-end / companion-after-Arena (no Arena).
-   - Full vitest: unrelated arenaMeta/arenaCards failures
-     (`localStorage.clear` under Node 26 without `--localstorage-file`)
-     — pre-existing, not this diff.
-
-   ### Linux vibecoding setup (this machine, 2026-08-31)
-   - `mise use --global rust@stable` → rustc/cargo 1.98.0, clippy,
-     rustfmt, rust-analyzer. Lives in `~/.config/mise/config.toml`.
-   - Tauri 2 deps already had webkit2gtk-4.1; added
-     `libappindicator`, `xdotool`, `appmenu-gtk-module`, `wget`.
-   - First crate compile cached under `src-tauri/target/` (~10 min
-     cold). Later `cargo test` / `tauri:dev` should be incremental.
-
-1. **v3.2.0 is shipped. Session closed. Do not rebuild.**
+1. **v3.2.0 was shipped 2026-08-27. Historical. Do not rebuild.**
 
    Grok wrapped Claude session `d46b6234` on 2026-08-27: rebased onto
    `origin/main`, signed Windows build, pushed `e695e79` + tag `v3.2.0`,
@@ -780,11 +751,12 @@ FND_REPLAY_LOG=<Player.log> FND_REPLAY_OPP='*' cargo test replay_real_log -- --n
 - `main` can move under you via scheduled set-radar commits. Rebase release onto
   `origin/main` before push; retarget the version tag if it was created
   pre-rebase.
-- Signing: `TAURI_SIGNING_PRIVATE_KEY` (file contents) +
+- Signing: `TAURI_SIGNING_PRIVATE_KEY` (file path or contents) +
   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`; clear from the shell after. Key id
   **67FCA9900F523D49** — check it against the pubkey in `tauri.conf.json` before
   publishing, because a sig from the abandoned repo-root key looks fine and
-  breaks auto-update.
+  breaks auto-update. On this Linux box the key lives in `~/.tauri/` and the
+  NSIS build is `tauri build --bundles nsis --runner cargo-xwin --target x86_64-pc-windows-msvc`.
 - PowerShell mangles HEREDOC / JSON argv — use temp files or node scripts for
   multi-line commits and version bumps on Windows.
 - Install counting: the signal is **`/updater/latest.json`**, not

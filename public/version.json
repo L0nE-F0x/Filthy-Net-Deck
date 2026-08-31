@@ -1,5 +1,5 @@
 {
-  "version": "3.2.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.2.0.exe",
-  "notes": "v3.2.0: deck library across every format, one-click decklist export, and matchups no longer mix Historic games into Standard."
+  "version": "3.3.0",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.0.exe",
+  "notes": "v3.3.0: overlay or companion window, a quieter in-match bar, and the app in Arena's languages."
 }
