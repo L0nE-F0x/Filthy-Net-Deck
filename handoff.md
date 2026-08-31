@@ -71,9 +71,24 @@ that is expected and does not block auto-update.
    that; the updater minisign `.sig` is what `latest.json` needs.
    `~/bin/makensis` wraps the extracted NSIS 3.08 and sets `NSISDIR`.
 
-   ### Not live-tested (no Arena on this machine)
+   ### Linux local install (this Omarchy box — not marketed)
+
+   Arena is on Steam Proton (app 2141910). The tracker now finds
+   `Player.log` under the Proton prefix. Installed for the owner only:
+
+   - binary: `~/.local/bin/filthy-net-deck` (rebuild: `npm run tauri:build -- --no-bundle` then `install` over that path)
+   - launcher: `~/.local/share/applications/filthy-net-deck.desktop`
+   - HUD Hyprland rule: overlay title float+pin in `~/.config/hypr/looknfeel.lua`
+
+   Do **not** add Linux to the marketing site. Exclusive-fullscreen Arena
+   will cover the HUD — use borderless windowed. Detailed Logs were
+   **disabled** in the Proton `Player.log` last we looked; same Arena
+   account toggle as Windows.
+
+   ### Not live-tested with a real match on Linux
    Overlay auto-hide after match end; companion staying up after match /
-   Arena quit; first-match chooser inside the real overlay webview.
+   Arena quit; first-match chooser inside the real overlay webview;
+   Proton process-name vs `MTGA.exe` path (badge / HUD show).
 
    ### Do not sneak in
    Silent autostart-on · extra nav items · ripping out the library

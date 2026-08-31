@@ -593,6 +593,36 @@ pub fn tracker_delete_matches(
 // Log locations
 // ---------------------------------------------------------------------------
 
+/// Steam Proton prefix for MTG Arena. Walks every `compatdata` id so a
+/// Steam appid change does not break the tail. Prefers a dir that already
+/// has `Player.log`. Used on Linux; tests feed a fake `$HOME`.
+fn steam_proton_mtga_log_dir(home: &Path) -> Option<PathBuf> {
+    const STEAM_ROOTS: &[&str] = &[
+        ".local/share/Steam",
+        ".steam/steam",
+        ".var/app/com.valvesoftware.Steam/.local/share/Steam",
+    ];
+    const LOG_SUFFIX: &str =
+        "pfx/drive_c/users/steamuser/AppData/LocalLow/Wizards Of The Coast/MTGA";
+    let mut empty_dir = None;
+    for rel in STEAM_ROOTS {
+        let compat = home.join(rel).join("steamapps").join("compatdata");
+        let Ok(entries) = fs::read_dir(&compat) else {
+            continue;
+        };
+        for ent in entries.flatten() {
+            let dir = ent.path().join(LOG_SUFFIX);
+            if dir.join("Player.log").is_file() {
+                return Some(dir);
+            }
+            if empty_dir.is_none() && dir.is_dir() {
+                empty_dir = Some(dir);
+            }
+        }
+    }
+    empty_dir
+}
+
 fn arena_log_dir() -> Option<PathBuf> {
     #[cfg(target_os = "windows")]
     {
@@ -616,7 +646,12 @@ fn arena_log_dir() -> Option<PathBuf> {
                 .join("MTGA"),
         )
     }
-    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    #[cfg(target_os = "linux")]
+    {
+        let home = std::env::var_os("HOME")?;
+        steam_proton_mtga_log_dir(&PathBuf::from(home))
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
     {
         None
     }
@@ -2168,7 +2203,16 @@ fn run_loop(app: AppHandle) {
         data.status.log_path = log_path
             .as_ref()
             .map(|p| p.display().to_string())
-            .unwrap_or_else(|| "unsupported platform".to_string());
+            .unwrap_or_else(|| {
+                #[cfg(target_os = "linux")]
+                {
+                    "not found (Steam Proton MTGA prefix)".to_string()
+                }
+                #[cfg(not(target_os = "linux"))]
+                {
+                    "unsupported platform".to_string()
+                }
+            });
         // Tombstoned ids go in first so neither the JSONL load below nor the
         // log backfill can bring a deleted match back.
         if let Some(file) = &deleted_file {
@@ -2794,6 +2838,35 @@ fn append_match(file: &Path, m: &TrackedMatch) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn steam_proton_prefers_a_player_log() {
+        let root = std::env::temp_dir().join(format!(
+            "fnd-steam-probe-{}-{}",
+            std::process::id(),
+            now_ms()
+        ));
+        let log_dir = root.join(
+            ".local/share/Steam/steamapps/compatdata/2141910/pfx/drive_c/users/steamuser/AppData/LocalLow/Wizards Of The Coast/MTGA",
+        );
+        fs::create_dir_all(&log_dir).unwrap();
+        fs::write(log_dir.join("Player.log"), b"DETAILED LOGS: DISABLED\n").unwrap();
+        let found = steam_proton_mtga_log_dir(&root).expect("proton prefix");
+        assert_eq!(found, log_dir);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn steam_proton_skips_unrelated_prefixes() {
+        let root = std::env::temp_dir().join(format!(
+            "fnd-steam-empty-{}-{}",
+            std::process::id(),
+            now_ms()
+        ));
+        fs::create_dir_all(root.join(".local/share/Steam/steamapps/compatdata/1493710")).unwrap();
+        assert!(steam_proton_mtga_log_dir(&root).is_none());
+        let _ = fs::remove_dir_all(&root);
+    }
 
     const AUTH: &str = r#"{ "transactionId": "t1", "requestId": 1, "timestamp": "639195495199502959", "authenticateResponse": { "clientId": "LOCALUSERID111111111111111", "sessionId": "s" } }"#;
 

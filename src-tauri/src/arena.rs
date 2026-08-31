@@ -7,9 +7,10 @@
 //! Privacy: this only ever asks "is a process named MTGA running" — no other
 //! process is inspected, recorded or sent anywhere.
 
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
-use sysinfo::{ProcessRefreshKind, RefreshKind, System};
+use sysinfo::{ProcessRefreshKind, RefreshKind, System, UpdateKind};
 use tauri::{AppHandle, Emitter};
 
 /// Arena's executable stem on both shipping platforms (`MTGA.exe` on Windows,
@@ -32,6 +33,20 @@ fn is_arena_process(name: &str) -> bool {
     stem.eq_ignore_ascii_case(ARENA_STEM)
 }
 
+/// Proton/Wine on Linux often reports `wine64-preloader` as `comm` while the
+/// executable path still ends in `MTGA.exe`.
+fn is_arena_exe_path(path: &Path) -> bool {
+    path.file_name()
+        .is_some_and(|f| is_arena_process(&f.to_string_lossy()))
+}
+
+fn is_arena_proc(p: &sysinfo::Process) -> bool {
+    if is_arena_process(&p.name().to_string_lossy()) {
+        return true;
+    }
+    p.exe().is_some_and(is_arena_exe_path)
+}
+
 /// Pure transition helper for the poll loop: emit only when running-ness flips.
 /// `previous` is the value *before* this scan; `current` is the fresh scan.
 /// Returns `Some(current)` on an edge (start or stop), else `None`.
@@ -45,10 +60,10 @@ fn running_transition(previous: bool, current: bool) -> Option<bool> {
 
 /// True when any live process' executable name is Arena's.
 fn scan(sys: &mut System) -> bool {
-    sys.refresh_specifics(RefreshKind::nothing().with_processes(ProcessRefreshKind::nothing()));
-    sys.processes()
-        .values()
-        .any(|p| is_arena_process(&p.name().to_string_lossy()))
+    sys.refresh_specifics(RefreshKind::nothing().with_processes(
+        ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet),
+    ));
+    sys.processes().values().any(is_arena_proc)
 }
 
 /// Poll in the background, publishing every transition to the whole app.
@@ -123,6 +138,17 @@ mod tests {
         // Whitespace-only and unrelated games.
         assert!(!is_arena_process("   "));
         assert!(!is_arena_process("LeagueClient.exe"));
+    }
+
+    #[test]
+    fn proton_exe_path_counts_as_arena() {
+        assert!(is_arena_exe_path(Path::new(
+            "/home/user/.local/share/Steam/steamapps/common/MTGA/MTGA.exe"
+        )));
+        assert!(!is_arena_exe_path(Path::new(
+            "/home/user/.local/share/Steam/steamapps/common/MTGA/UnityCrashHandler64.exe"
+        )));
+        assert!(!is_arena_exe_path(Path::new("wine64-preloader")));
     }
 
     #[test]
