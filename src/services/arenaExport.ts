@@ -12,10 +12,9 @@
  * number (see `arenaCards.ts`), and Arena resolves a bare name to a legal
  * printing on its own. A wrong set suffix would be worse than none.
  *
- * Names go through `arenaCardName`, so an MDFC/adventure/room arrives as its
- * front face. Scryfall hands back "Unholy Annex // Ritual Chamber" and Arena's
- * importer rejects that outright — without the strip, publishing any Standard
- * deck with a modal land would produce a list nobody could import.
+ * Names go through `arenaCardName`: rooms and classic splits keep
+ * "Front // Back" (Arena rejects "Unholy Annex" alone), while adventures,
+ * transform and MDFCs strip to the front face.
  *
  * WHY THE TEXT IS BUILT HERE AND UPLOADED
  * The server has no arena-id → name map, so it cannot render a list from the
@@ -85,7 +84,11 @@ export function toArenaDecklist(
       // A row with no resolved name renders as "Card 103529"; count it and drop
       // it, so the caller can refuse rather than publish an unimportable line.
       if (row.unresolved) continue;
-      mainboard.push({ name: row.name, count: row.qty });
+      mainboard.push({
+        name: row.name,
+        count: row.qty,
+        typeLine: cards[row.id]?.typeLine,
+      });
     }
   }
 
@@ -101,6 +104,7 @@ export function toArenaDecklist(
         name: name ?? "",
         count,
         cmc: typeof info?.cmc === "number" ? info.cmc : Number.POSITIVE_INFINITY,
+        typeLine: info?.typeLine,
       };
     })
     .sort((a, b) => (a.cmc !== b.cmc ? a.cmc - b.cmc : a.name.localeCompare(b.name)))
@@ -109,7 +113,7 @@ export function toArenaDecklist(
   const unresolved = agg.unresolved + sideUnresolved;
   if (!mainboard.length) return { text: "", unresolved, main: agg.total, side };
 
-  // `buildArenaImport` owns the header layout and the front-face name strip, so
+  // `buildArenaImport` owns the header layout and the per-layout name form, so
   // a published list and an in-app "copy deck" produce byte-identical text.
   return {
     text: buildArenaImport({ mainboard, sideboard, commander: undefined }),

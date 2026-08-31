@@ -1,11 +1,11 @@
 {
-  "version": "3.3.0",
-  "notes": "v3.3.0: overlay or companion window, a quieter in-match bar, and the app in Arena's languages.",
-  "pub_date": "2026-08-31T11:19:20Z",
+  "version": "3.3.1",
+  "notes": "v3.3.1: rooms copy into Arena as Front // Back; Unfinity basics named instead of Card 81181.",
+  "pub_date": "2026-08-31T16:40:44Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi90QkMwUkVpZm9uM1FxMHc3V2kvYkN3OTYwZzhBVUc5QkZVMG9TWXB6KzVzKzRNRnlsWDM1MVBYVUJ5U3V4a2FPbm01eEEzTUd2S3NCTmdVbDNXSmc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MTc1MDI3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMy4wX3g2NC1zZXR1cC5leGUKU0JWYk9IaDVHTHBZTWZWb3c5OStESjlMV1IyeENxR1hUTXNBQ1RUT3RPcHdWek1oMU9xa0lVK3JPRXdReFNjODlra05yWnVjalhqMEo1SVB2R3RtQmc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZCemU3OVlyZ2xLNmo5WXcrY01HZ2MxOGpqRWgxbVJzTEV3K2VJVVNydzRIMklYZDY0K1hGZ3NNbWtQMDBoYmlMYk8vMzBiSm1aMVNFUStydU1OUFF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MTk0NDMxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMy4xX3g2NC1zZXR1cC5leGUKUjV1M09RMlhaMnBOSTJYMUFHaWhWR0lwekZkTXF0QjdKSDQxOW0vY2dCV3VicnU5ODJUb3lEVU5weGhZVXlzTHRWMS9wNStWcmhyZzdEYkpYMUdzQXc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.1.exe"
     }
   }
 }

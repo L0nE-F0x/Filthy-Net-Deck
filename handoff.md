@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.3.0** (Windows signed updater + macOS dmg)
+**Live product version: v3.3.1** (Windows signed updater; macOS still 3.3.0 dmg until rolled)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
@@ -18,7 +18,35 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.0 is live. 2026-09-01 session wrapped. Do not rebuild.**
+0. **v3.3.1 Windows is the cut. Roll the macOS dmg when CI attaches it.**
+
+   Friend (Lobo Blanco, same overlay-ticket reporter) came back with two
+   regressions that looked fixed years ago:
+
+   1. **Arena import of rooms.** Copy of Mono-Black Demons failed because
+      the list said `4 Unholy Annex`. Arena wants
+      `4 Unholy Annex // Ritual Chamber`. v0.23.0 stripped every ` // `
+      name; that was right for MDFCs/adventures and **wrong for rooms**
+      (Scryfall `layout: split`, same as Fire // Ice). Keep both faces
+      for split/rooms; still strip adventure / transform / modal_dfc.
+   2. **`Card 81181` in the overlay.** Unfinity Swamp (Adam Paquette).
+      `/cards/arena/81181` 404s; UNF is 2022 so the 180-day gap window
+      never saw it. Evergreen `unf` + a sweep of every unlinked basic
+      land. 81181 now publishes as Swamp with art. Existing 3.3.0
+      clients pick this up from `meta/arena-names.json` without an
+      app bump; in-app copy of rooms needs 3.3.1.
+
+   Windows NSIS signed on this box. Homepage Mac buttons stay on the
+   **3.3.0** dmg until `.github/workflows/macos-build.yml` attaches
+   `Filthy-Net-Deck-3.3.1-universal.dmg` — then roll it the same way
+   as past “Roll vX out to macOS” commits. Do not leave Mac visitors
+   on 3.3.0 after the dmg exists.
+
+   Owner leftovers unchanged (not blockers): Check for updates on an
+   installed 3.2.0; OG share preview `?v=3.3.1`; Shane reply; rotate
+   signing key `67FCA9900F523D49`.
+
+1. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
 
    Owner confirmed the Linux white-`<select>` fix looks perfect and will
    keep testing. Next session: wait for the owner. Do not invent work.
@@ -36,7 +64,7 @@ that is expected and does not block auto-update.
    installed 3.2.0; OG share preview `?v=3.3.0`; Shane reply; rotate
    signing key `67FCA9900F523D49`.
 
-1. **v3.3.0 was shipped 2026-08-31. Do not rebuild.**
+2. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
 
    Shipped this session: overlay companion + quiet HUD + autostart ask +
    Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed

@@ -78,12 +78,14 @@ describe("recentSetCodes", () => {
   it("always includes evergreen Arena promo dumps even when they date to 2018", () => {
     // ANA's Scryfall released_at is 2018-07-14. The Green Game Jam basics
     // landed there in June 2026; dropping ANA as "too old" left them as
-    // Card #107494 with a blank art tile.
+    // Card #107494 with a blank art tile. UNF (2022) is the same shape:
+    // players sleeve those lands onto live constructed decks.
     const codes = recentSetCodes(
       [{ code: "ANA", released_at: "2018-07-14" }, { code: "pana", released_at: "2018-07-14" }],
       NOW,
     );
     for (const c of EVERGREEN_ARENA_SETS) expect(codes.has(c)).toBe(true);
+    expect(codes.has("unf")).toBe(true);
     // And they stay in even if the set list we were handed omitted the row.
     const empty = recentSetCodes([], NOW);
     for (const c of EVERGREEN_ARENA_SETS) expect(empty.has(c)).toBe(true);
@@ -288,6 +290,38 @@ describe("scryfallArenaIdsForSet — the id index that gives a gap card its art"
     spy.mockRestore();
   });
 
+  it("indexes paper prints when game:arena 404s, so Unfinity lands still get art", async () => {
+    // `set:unf game:arena` 404s; the lands are tagged paper/mtgo only.
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      const q = decodeURIComponent((url.match(/q=([^&]+)/) || [])[1] || "");
+      if (q.includes("game:arena")) {
+        return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: [
+              {
+                id: "unf-swamp",
+                name: "Swamp",
+                type_line: "Basic Land — Swamp",
+                artist: "Adam Paquette",
+                arena_id: null,
+              },
+            ],
+            has_more: false,
+          }),
+      });
+    });
+    const { ids, byName, byArtist } = await scryfallArenaIdsForSet("unf", 1);
+    expect(ids.size).toBe(0);
+    expect(byName.get("swamp").id).toBe("unf-swamp");
+    expect(byArtist.get("swamp\0adam paquette").id).toBe("unf-swamp");
+    spy.mockRestore();
+  });
+
   it("indexes by artist so two Plains paintings stay distinct", async () => {
     const spy = mockSearch([
       {
@@ -486,6 +520,107 @@ describe("buildArenaNameGap — a partial upstream failure must not delete entri
     expect(out["107492"].s).not.toBe(out["107494"].s);
     expect(out["107492"].s).not.toBe("old-plains");
     expect(out["107492"].s).not.toBe("npe-plains");
+    fetchSpy.mockRestore();
+  });
+
+  it("names Unfinity cosmetic basics that Scryfall has no arena_id for", async () => {
+    // Live 2026-09-01: overlay showed `Card 81181` for an Unfinity Swamp.
+    // `/cards/arena/81181` 404s and `set:unf game:arena` 404s; the paper
+    // set still has Adam Paquette's painting.
+    const sets = [{ code: "unf", released_at: "2022-10-07" }];
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      if (url.includes("/cards.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                grpid: 81181,
+                titleId: 3,
+                set: "UNF",
+                artistCredit: "Adam Paquette",
+                types: [5],
+                colorIdentity: [3],
+              },
+            ]),
+        });
+      }
+      if (url.includes("/loc_en.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([{ id: 3, text: "Swamp" }]),
+        });
+      }
+      const q = decodeURIComponent((url.match(/q=([^&]+)/) || [])[1] || "");
+      if (q.includes("game:arena")) {
+        return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: [
+              {
+                id: "unf-swamp-art",
+                name: "Swamp",
+                type_line: "Basic Land — Swamp",
+                artist: "Adam Paquette",
+                arena_id: null,
+                released_at: "2022-10-07",
+              },
+            ],
+            has_more: false,
+          }),
+      });
+    });
+
+    const out = await buildArenaNameGap({ previous: {}, sets, tries: 1 });
+    expect(out["81181"]).toMatchObject({
+      n: "Swamp",
+      i: "B",
+      l: 1,
+      s: "unf-swamp-art",
+      t: "Basic Land — Swamp",
+    });
+    fetchSpy.mockRestore();
+  });
+
+  it("still names a basic from an old set the 180-day window skipped", async () => {
+    // Jumpstart 2020 (or any other old cosmetic pile). Not evergreen, not
+    // recent. Name + land flag only — no name-only art join.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      if (url.includes("/cards.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                grpid: 99991,
+                titleId: 3,
+                set: "JMP",
+                types: [5],
+                colorIdentity: [3],
+              },
+            ]),
+        });
+      }
+      if (url.includes("/loc_en.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([{ id: 3, text: "Swamp" }]),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: [], has_more: false }),
+      });
+    });
+
+    const out = await buildArenaNameGap({ previous: {}, sets: [], tries: 1 });
+    expect(out["99991"]).toMatchObject({ n: "Swamp", i: "B", l: 1 });
+    expect(out["99991"].s).toBeUndefined();
     fetchSpy.mockRestore();
   });
 });

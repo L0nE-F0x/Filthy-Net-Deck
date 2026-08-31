@@ -35,6 +35,14 @@ export interface CardEntry {
     | "artifact"
     | "battle"
     | "other";
+  /**
+   * Scryfall layout when it is not `normal`. `split` (rooms + Fire // Ice)
+   * must keep "Front // Back" on Arena import; adventure / transform /
+   * modal_dfc strip to the front face. Older feeds omit this.
+   */
+  layout?: string;
+  /** Oracle type line. Used to keep rooms as "Front // Back" when `layout` is absent. */
+  typeLine?: string;
 }
 
 export interface Matchup {

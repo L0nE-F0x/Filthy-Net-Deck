@@ -19,12 +19,19 @@
  * shape of problem `freshSpoilers` solves on the Sets page: Scryfall is the
  * canonical source and also, briefly, an incomplete one.
  *
- * A second, quieter gap: Arena dumps store cosmetics into the evergreen
- * **ANA** set (Scryfall's "Arena New Player Experience", released_at 2018),
- * while Scryfall files the prints under **pana** ("MTG Arena Promos", also
- * 2018) **without** an `arena_id`. The 180-day window never sees either set,
- * so a June 2026 Green Game Jam basic land (grpId 107492–107496) 404s forever
- * as `Card #107494` with a blank art tile. Hit for real on 2026-08-25.
+ * A second, quieter gap: Arena dumps store cosmetics into old sets Scryfall
+ * never tags with `arena_id`, and the 180-day window never sees them:
+ *
+ *  - **ANA** (Scryfall's "Arena New Player Experience", released_at 2018),
+ *    while the paintings live in **pana** without an `arena_id`. A June 2026
+ *    Green Game Jam basic (grpId 107492–107496) 404s as `Card #107494`.
+ *    Hit for real on 2026-08-25.
+ *  - **UNF** (Unfinity, 2022). Players use those lands as styles on any
+ *    constructed deck. grpId **81181** is an Adam Paquette Swamp;
+ *    `/cards/arena/81181` 404s and the overlay shows `Card 81181`. Hit for
+ *    real on 2026-09-01. Scryfall's `set:unf game:arena` search 404s too —
+ *    the prints are tagged paper/mtgo only — so the builder also indexes
+ *    the paper set for art.
  *
  * ## Why mtgajson
  *
@@ -81,6 +88,21 @@ const COLOR_BY_ID = { 1: "W", 2: "U", 3: "B", 4: "R", 5: "G" };
 /** Arena's card-type enum: 5 is Land (every basic is `types: [5]`). */
 const TYPE_LAND = 5;
 
+/** Oracle names of basic lands. Used to sweep old cosmetic printings. */
+export const BASIC_LAND_NAMES = new Set([
+  "Plains",
+  "Island",
+  "Swamp",
+  "Mountain",
+  "Forest",
+  "Wastes",
+  "Snow-Covered Plains",
+  "Snow-Covered Island",
+  "Snow-Covered Swamp",
+  "Snow-Covered Mountain",
+  "Snow-Covered Forest",
+]);
+
 /**
  * Arena's casting-cost notation → Scryfall's.
  *
@@ -130,7 +152,7 @@ const RECENT_DAYS = 180;
  * New Player Experience) — that is a different pile of cards. The prints
  * we actually want live in `pana`; see SET_ALIASES.
  */
-export const EVERGREEN_ARENA_SETS = new Set(["ana"]);
+export const EVERGREEN_ARENA_SETS = new Set(["ana", "unf"]);
 
 /**
  * Extra Scryfall set codes to search when indexing one Arena set.
@@ -190,9 +212,10 @@ export function recentSetCodes(scryfallSets, now = Date.now()) {
     // very window this exists for.
     if (!Number.isFinite(t) || t >= cutoff) out.add(code);
   }
-  // Evergreen Arena promo dumps (ANA) never age out of Scryfall's set list —
-  // `released_at` stays 2018 — but new grpIds keep landing there. Always
-  // include them, even when the set list we were handed omitted the row.
+  // Evergreen Arena cosmetic dumps never age out of Scryfall's set list —
+  // ANA's `released_at` stays 2018, UNF's is 2022 — but players still sleeve
+  // those lands onto live constructed decks. Always include them, even when
+  // the set list we were handed omitted the row.
   for (const code of EVERGREEN_ARENA_SETS) out.add(code);
   return out;
 }
@@ -291,57 +314,88 @@ export function joinScryfall(found, name, artist, { artistRequired = false } = {
  * Daren Bader, the 2018 pana Plains is Donato Giancola, and joining on
  * name alone would show the wrong one.
  */
+function indexScryfallCards(rows, { ids, byName, byArtist }) {
+  for (const c of rows || []) {
+    if (typeof c?.arena_id === "number") ids.add(c.arena_id);
+    if (typeof c?.id !== "string" || !c.id) continue;
+    const releasedAt = c.released_at ? Date.parse(c.released_at) : NaN;
+    const base = {
+      id: c.id,
+      hasArenaId: typeof c.arena_id === "number",
+      releasedAt: Number.isFinite(releasedAt) ? releasedAt : 0,
+    };
+    const artist = artistKey(c.artist);
+    const whole = c.type_line || c.card_faces?.[0]?.type_line || "";
+    // Index the whole card under its own name, then each face under its own —
+    // Arena gives an Adventure or a DFC back face its own grpId, and that
+    // grpId's type line is the FACE's, not the combined one. Sharing the
+    // combined string would file "Burglar's Plot" (a Sorcery — Adventure) as
+    // a Creature, because the combined line names both.
+    // Faces first, whole card last. First-wins (via remember's tie), and the
+    // whole card's name keys on its front face too ("A // B" → "a"), so
+    // indexing it first would let the combined type line beat the front
+    // face's own.
+    const faces = [
+      ...(c.card_faces || []).map((f) => ({
+        name: f?.name,
+        typeLine: f?.type_line || whole,
+      })),
+      { name: c.name, typeLine: whole },
+    ];
+    for (const f of faces) {
+      const key = nameKey(f.name);
+      if (!key) continue;
+      const entry = { ...base, typeLine: f.typeLine };
+      remember(byName, key, entry);
+      if (artist) remember(byArtist, `${key}\0${artist}`, entry);
+    }
+  }
+}
+
+/**
+ * Paginate one Scryfall search into `index`.
+ * Returns `"ok"` | `"empty"` | `null` (unreadable).
+ */
+async function searchScryfallIndex(query, tries, index) {
+  let url = `${SCRYFALL}/cards/search?q=${encodeURIComponent(query)}&unique=prints`;
+  let pages = 0;
+  let sawPage = false;
+  while (url && pages++ < 10) {
+    const res = await getJson(url, tries ? { tries } : undefined);
+    if (!res.ok) return null;
+    // A 404 means the search matched nothing. That is an empty answer, not a
+    // failure — unless we already indexed a previous page of the same query.
+    if (res.data === null) return sawPage ? "ok" : "empty";
+    sawPage = true;
+    indexScryfallCards(res.data.data || [], index);
+    url = res.data.has_more ? res.data.next_page : null;
+    if (url) await new Promise((r) => setTimeout(r, 120));
+  }
+  return sawPage ? "ok" : "empty";
+}
+
 export async function scryfallArenaIdsForSet(code, tries) {
   const ids = new Set();
   const byName = new Map();
   const byArtist = new Map();
-  let url = `${SCRYFALL}/cards/search?q=${encodeURIComponent(`set:${code} game:arena`)}&unique=prints`;
-  let pages = 0;
-  while (url && pages++ < 10) {
-    const res = await getJson(url, tries ? { tries } : undefined);
-    if (!res.ok) return null; // no answer — caller must skip this set
-    // A 404 means the search matched nothing: Scryfall genuinely has no
-    // Arena-legal cards in this set. That is an empty answer, not a failure.
-    if (res.data === null) return { ids, byName, byArtist };
-    for (const c of res.data.data || []) {
-      if (typeof c?.arena_id === "number") ids.add(c.arena_id);
-      if (typeof c?.id !== "string" || !c.id) continue;
-      const releasedAt = c.released_at ? Date.parse(c.released_at) : NaN;
-      const base = {
-        id: c.id,
-        hasArenaId: typeof c.arena_id === "number",
-        releasedAt: Number.isFinite(releasedAt) ? releasedAt : 0,
-      };
-      const artist = artistKey(c.artist);
-      const whole = c.type_line || c.card_faces?.[0]?.type_line || "";
-      // Index the whole card under its own name, then each face under its own —
-      // Arena gives an Adventure or a DFC back face its own grpId, and that
-      // grpId's type line is the FACE's, not the combined one. Sharing the
-      // combined string would file "Burglar's Plot" (a Sorcery — Adventure) as
-      // a Creature, because the combined line names both.
-      // Faces first, whole card last. First-wins (via remember's tie), and the
-      // whole card's name keys on its front face too ("A // B" → "a"), so
-      // indexing it first would let the combined type line beat the front
-      // face's own.
-      const faces = [
-        ...(c.card_faces || []).map((f) => ({
-          name: f?.name,
-          typeLine: f?.type_line || whole,
-        })),
-        { name: c.name, typeLine: whole },
-      ];
-      for (const f of faces) {
-        const key = nameKey(f.name);
-        if (!key) continue;
-        const entry = { ...base, typeLine: f.typeLine };
-        remember(byName, key, entry);
-        if (artist) remember(byArtist, `${key}\0${artist}`, entry);
-      }
-    }
-    url = res.data.has_more ? res.data.next_page : null;
-    if (url) await new Promise((r) => setTimeout(r, 120));
+  const index = { ids, byName, byArtist };
+
+  const arena = await searchScryfallIndex(`set:${code} game:arena`, tries, index);
+  if (arena === null) return null; // no answer — caller must skip this set
+
+  // Cosmetic sets (Unfinity lands, some Secret Lair) are on Arena but
+  // Scryfall's `game:arena` search 404s because the prints are tagged
+  // paper/mtgo only. Retry without the filter so art still joins; ids stay
+  // empty, which is what makes them a gap.
+  if (ids.size === 0 && byName.size === 0) {
+    const paper = await searchScryfallIndex(`set:${code}`, tries, index);
+    // A paper-search outage after a clean Arena 404 is not "the set is
+    // unreadable": we already know Scryfall has no arena_ids here. Returning
+    // empty indexes lets the caller publish names (no art) rather than skip
+    // the set and leave "Card 81181" in the overlay.
+    if (paper === null) return index;
   }
-  return { ids, byName, byArtist };
+  return index;
 }
 
 /**
@@ -427,6 +481,9 @@ export async function buildArenaNameGap(opts = {}) {
     if (!bySet.has(code)) bySet.set(code, []);
     bySet.get(code).push(c);
   }
+  // Arena ids Scryfall already claims, across every set we successfully
+  // read. The basic-land sweep below must not re-insert those.
+  const resolvedIds = new Set();
 
   // Start from what is already published and ADD to it.
   //
@@ -451,7 +508,11 @@ export async function buildArenaNameGap(opts = {}) {
       continue;
     }
     const { ids: known } = found;
-    const artistRequired = EVERGREEN_ARENA_SETS.has(code);
+    for (const id of known) resolvedIds.add(id);
+    // Name-only join is how a Swamp became an Island. Require artist on the
+    // evergreen promo dump (ANA) where five "Plains" share a set. UNF has
+    // one painting per land type, so a name fallback is safe there.
+    const artistRequired = code === "ana";
     // This set was read, so entries for it can be pruned once Scryfall knows
     // them. That is what makes the map self-healing rather than ever-growing.
     for (const c of rows) {
@@ -497,6 +558,28 @@ export async function buildArenaNameGap(opts = {}) {
     // sets back to back is what tripped Scryfall's limiter on 2026-08-12.
     await new Promise((r) => setTimeout(r, 400));
   }
+
+  // Basic lands from sets the 180-day window never sees. Players sleeve any
+  // printing they own (Unfinity, Jumpstart, Secret Lair, Ixalan, …) onto a
+  // Standard list; `/cards/arena/<grpId>` 404s and the overlay shows
+  // `Card 81181`. Name + land flag, no name-only art join — that is how a
+  // Swamp became an Island. Art still arrives for evergreen sets above.
+  let basicsAdded = 0;
+  for (const c of cards) {
+    const grp = Number(c?.grpid);
+    if (!Number.isFinite(grp) || resolvedIds.has(grp)) continue;
+    if (gap[String(grp)]) continue;
+    const name = nameByTitle.get(c?.titleId);
+    if (!name || !BASIC_LAND_NAMES.has(name)) continue;
+    if (!Array.isArray(c.types) || !c.types.includes(TYPE_LAND)) continue;
+    const entry = { n: name, l: 1 };
+    const ci = colorsFromIds(c.colorIdentity);
+    if (ci) entry.i = ci;
+    gap[String(grp)] = entry;
+    basicsAdded++;
+  }
+  if (basicsAdded) log(`  arena-names: +${basicsAdded} unlinked basic-land printings`);
+
   if (arted) log(`  arena-names: ${arted} entries carry Scryfall art + type line`);
   if (skipped) {
     log(

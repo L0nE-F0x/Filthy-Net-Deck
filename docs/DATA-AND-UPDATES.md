@@ -221,15 +221,21 @@ not linked it:
    `Card #103529` — no name, no cost, no colour, and so no archetype signal
    either. That window lands exactly when a new set matters most.
 
-2. **Arena store cosmetics** dumped into the evergreen `ANA` set. Scryfall's
-   `ana` row is the 2018 New Player Experience (`released_at` never moves),
-   and the actual paintings live in `pana` (MTG Arena Promos) **without** an
-   `arena_id`. The 180-day window therefore skips both sets, and a name-only
-   join would paint every "Plains" with the first pana Plains. Hit for real
-   on **2026-08-25** with the Green Game Jam basics (grpIds 107492–107496,
-   `DigitalReleaseSet: ANA-GGJ-2026`). The builder always includes `ana`,
-   also searches `pana`, and joins those cards on **name + artist** so the
-   Daren Bader Plains is not the Donato Giancola Plains.
+2. **Arena store cosmetics** dumped into old sets Scryfall never tags with
+   `arena_id`. Two evergreen piles plus a basic-land sweep:
+
+   - **ANA** — Scryfall's 2018 New Player Experience (`released_at` never
+     moves); the paintings live in `pana` without an `arena_id`. Hit for
+     real on **2026-08-25** with the Green Game Jam basics (grpIds
+     107492–107496). Joined on **name + artist**.
+   - **UNF** — Unfinity (2022). Players sleeve those lands onto live
+     constructed decks. Hit for real on **2026-09-01**: grpId **81181**
+     (Adam Paquette Swamp) rendered as `Card 81181` because
+     `/cards/arena/81181` 404s and `set:unf game:arena` 404s (the prints
+     are tagged paper/mtgo only). The builder indexes the paper set for art.
+   - **Any other basic land** whose grpId Scryfall does not claim, from
+     Jumpstart / Secret Lair / old Standard frames / etc. Name + land flag
+     only — no name-only art join (that is how a Swamp became an Island).
 
 | Piece | Role |
 |-------|------|

@@ -104,15 +104,15 @@ export function revealedCardsOf(
 
 /**
  * Arena import of the revealed cards with recorded quantities.
- * Front faces only — the importer rejects "Front // Back". Empty when
- * nothing has resolved yet.
+ * Rooms/splits keep "Front // Back"; other DFCs strip to the front face.
+ * Empty when nothing has resolved yet.
  */
 export function revealedListText(
-  cards: Pick<RevealedCard, "name" | "pending" | "qty">[],
+  cards: Pick<RevealedCard, "name" | "pending" | "qty" | "typeLine">[],
 ): string {
   const lines = cards
     .filter((c) => !c.pending)
-    .map((c) => `${Math.max(1, c.qty)} ${arenaCardName(c.name)}`);
+    .map((c) => `${Math.max(1, c.qty)} ${arenaCardName(c.name, c)}`);
   if (lines.length === 0) return "";
   return ["Deck", ...lines].join("\n");
 }

@@ -325,6 +325,7 @@ export function TrackedDecklist({
     const entry = (r: ListRow) => ({
       count: r.count,
       name: r.info?.name ?? `Card #${r.id}`,
+      typeLine: r.info?.typeLine,
     });
     const text = buildArenaImport({
       mainboard: sortRows(mainRows).map(entry),

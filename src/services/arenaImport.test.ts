@@ -8,8 +8,19 @@ import {
 } from "./arenaImport";
 
 describe("arenaCardName", () => {
-  it("strips double-faced / room / adventure back faces", () => {
-    expect(arenaCardName("Unholy Annex // Ritual Chamber")).toBe("Unholy Annex");
+  it("keeps rooms and classic splits as Front // Back", () => {
+    // Live 2026-09-01: Arena rejects "Unholy Annex" and accepts the full name.
+    expect(arenaCardName("Unholy Annex // Ritual Chamber")).toBe(
+      "Unholy Annex // Ritual Chamber",
+    );
+    expect(arenaCardName("Bedeck // Bedazzle")).toBe("Bedeck // Bedazzle");
+    expect(arenaCardName("Wear // Tear")).toBe("Wear // Tear");
+    expect(
+      arenaCardName("Unholy Annex // Ritual Chamber", { layout: "split" }),
+    ).toBe("Unholy Annex // Ritual Chamber");
+  });
+
+  it("strips adventure / transform / MDFC back faces", () => {
     expect(arenaCardName("Jennifer Walters // The Sensational She-Hulk")).toBe(
       "Jennifer Walters",
     );
@@ -17,6 +28,18 @@ describe("arenaCardName", () => {
     expect(arenaCardName("Fable of the Mirror-Breaker // Reflection of Kiki-Jiki")).toBe(
       "Fable of the Mirror-Breaker",
     );
+    expect(arenaCardName("Blightstep Pathway // Searstep Pathway")).toBe(
+      "Blightstep Pathway",
+    );
+    expect(
+      arenaCardName("Brazen Borrower // Petty Theft", { layout: "adventure" }),
+    ).toBe("Brazen Borrower");
+  });
+
+  it("layout split beats a name that would otherwise strip", () => {
+    expect(
+      arenaCardName("Alive // Well", { layout: "split" }),
+    ).toBe("Alive // Well");
   });
 
   it("leaves single-faced names alone", () => {
@@ -30,12 +53,15 @@ describe("arenaCardName", () => {
 });
 
 describe("cardsToArenaLines / buildArenaImport", () => {
-  it("emits Arena-safe front-face lines", () => {
+  it("emits rooms with both faces and MDFCs as the front face", () => {
     const lines = cardsToArenaLines([
       { count: 4, name: "Lightning Bolt" },
       { count: 2, name: "Unholy Annex // Ritual Chamber" },
+      { count: 4, name: "Blightstep Pathway // Searstep Pathway" },
     ]);
-    expect(lines).toBe("4 Lightning Bolt\n2 Unholy Annex");
+    expect(lines).toBe(
+      "4 Lightning Bolt\n2 Unholy Annex // Ritual Chamber\n4 Blightstep Pathway",
+    );
   });
 
   it("builds a full Arena import block", () => {
@@ -43,6 +69,7 @@ describe("cardsToArenaLines / buildArenaImport", () => {
       mainboard: [
         { count: 4, name: "Badgermole Cub" },
         { count: 2, name: "Jennifer Walters // The Sensational She-Hulk" },
+        { count: 4, name: "Unholy Annex // Ritual Chamber", layout: "split" },
       ],
       sideboard: [{ count: 1, name: "Brazen Borrower // Petty Theft" }],
     });
@@ -51,6 +78,7 @@ describe("cardsToArenaLines / buildArenaImport", () => {
         "Deck",
         "4 Badgermole Cub",
         "2 Jennifer Walters",
+        "4 Unholy Annex // Ritual Chamber",
         "",
         "Sideboard",
         "1 Brazen Borrower",
@@ -60,7 +88,7 @@ describe("cardsToArenaLines / buildArenaImport", () => {
 });
 
 describe("sanitizeArenaImportText", () => {
-  it("fixes pre-baked feeds that still include // back faces", () => {
+  it("strips MDFC/transform back faces and keeps rooms", () => {
     const raw = [
       "Deck",
       "4 Badgermole Cub",
@@ -76,7 +104,7 @@ describe("sanitizeArenaImportText", () => {
         "2 Jennifer Walters",
         "",
         "Sideboard",
-        "1 Unholy Annex",
+        "1 Unholy Annex // Ritual Chamber",
       ].join("\n"),
     );
   });

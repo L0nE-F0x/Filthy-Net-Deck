@@ -1,5 +1,5 @@
 {
-  "version": "3.3.0",
-  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.0.exe",
-  "notes": "v3.3.0: overlay or companion window, a quieter in-match bar, and the app in Arena's languages."
+  "version": "3.3.1",
+  "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.1.exe",
+  "notes": "v3.3.1: rooms copy into Arena as Front // Back; Unfinity basics named instead of Card 81181."
 }

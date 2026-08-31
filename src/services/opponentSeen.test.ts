@@ -78,10 +78,10 @@ describe("revealedCardsOf", () => {
 });
 
 describe("revealedListText", () => {
-  it("emits an Arena Deck block of front faces, skipping pending", () => {
+  it("emits an Arena Deck block, keeping rooms as Front // Back", () => {
     const cards = revealedCardsOf([30, 20, 99], peek);
     expect(revealedListText(cards)).toBe(
-      ["Deck", "1 Slickshot Show-Off", "1 Unholy Annex"].join("\n"),
+      ["Deck", "1 Slickshot Show-Off", "1 Unholy Annex // Ritual Chamber"].join("\n"),
     );
   });
 

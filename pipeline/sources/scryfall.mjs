@@ -57,6 +57,9 @@ function keep(card) {
       card.mana_cost ||
       card.card_faces?.map((f) => f.mana_cost || "").filter(Boolean).join(" // ") ||
       "",
+    // Non-normal layouts ride along so Arena import can keep "Front // Back"
+    // for rooms/splits and still strip adventures / MDFCs / transform.
+    layout: card.layout && card.layout !== "normal" ? card.layout : undefined,
   };
 }
 
@@ -236,6 +239,7 @@ export async function validateDeck(deck, formatId, { dropIllegal = false } = {})
         ...(card.cmc != null ? { cmc: card.cmc } : {}),
         ...(card.isLand ? { land: true } : {}),
         ...(card.type && !card.isLand ? { type: card.type } : {}),
+        ...(card.layout ? { layout: card.layout } : {}),
       });
     }
     return out;

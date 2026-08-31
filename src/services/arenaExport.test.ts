@@ -81,8 +81,30 @@ describe("toArenaDecklist", () => {
     expect(a).toBe(b);
   });
 
-  it("writes the front face only, because Arena rejects '//' names", () => {
-    expect(toArenaDecklist([5, 5], [], CARDS).text).toBe("Deck\n2 Unholy Annex");
+  it("keeps room names as Front // Back — Arena rejects the front face alone", () => {
+    expect(toArenaDecklist([5, 5], [], CARDS).text).toBe(
+      "Deck\n2 Unholy Annex // Ritual Chamber",
+    );
+  });
+
+  it("still strips adventure / MDFC names to the front face", () => {
+    const cards: Record<number, ArenaCardInfo> = {
+      ...CARDS,
+      7: {
+        name: "Brazen Borrower // Petty Theft",
+        cmc: 3,
+        typeLine: "Creature — Faerie Rogue // Instant — Adventure",
+      },
+      8: {
+        name: "Blightstep Pathway // Searstep Pathway",
+        cmc: 0,
+        isLand: true,
+        typeLine: "Land // Land",
+      },
+    };
+    expect(toArenaDecklist([7, 8], [], cards).text).toBe(
+      ["Deck", "1 Brazen Borrower", "1 Blightstep Pathway"].join("\n"),
+    );
   });
 
   it("round-trips through the importer", () => {

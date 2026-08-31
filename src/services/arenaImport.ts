@@ -1,22 +1,87 @@
 import type { CardEntry, Deck } from "../types/meta";
 
 /**
- * MTG Arena's deck importer rejects full double-faced / adventure / room
- * names with " // " (e.g. "Unholy Annex // Ritual Chamber"). It expects the
- * **front face only**, which is also how Arena exports lists.
- *
- * Split cards, MDFCs, transform, adventures, and rooms all use the Scryfall
- * "Front // Back" form — strip from the first " // " onward.
+ * Hints that decide whether Arena's importer wants "Front // Back" or
+ * the front face alone. `layout` from Scryfall is authoritative; `typeLine`
+ * covers overlay/My Stats rows that never stored layout; the name itself
+ * is the fallback for pre-baked strings.
  */
-export function arenaCardName(name: string): string {
+export type ArenaNameHints = {
+  layout?: string | null;
+  typeLine?: string | null;
+};
+
+/**
+ * Arena's importer is layout-specific, not "anything with //":
+ *
+ *  - **split** (classic Fire // Ice *and* Duskmourn rooms) — the full
+ *    "Front // Back" name. "Unholy Annex" is rejected; "Unholy Annex //
+ *    Ritual Chamber" imports. Scryfall files rooms as `layout: split`.
+ *  - **adventure / transform / modal_dfc / flip** — front face only.
+ *    "Brazen Borrower // Petty Theft" is rejected; "Brazen Borrower" works.
+ *
+ * v0.23.0 stripped every " // " name. That was right for MDFCs and
+ * adventures, and wrong for rooms — live report 2026-09-01, same Demons
+ * list Goldfish already exports with both faces.
+ *
+ * Keep in sync with `pipeline/sources/common.mjs`.
+ */
+export function arenaWantsBothFaces(
+  name: string,
+  hints?: ArenaNameHints,
+): boolean {
+  const layout = String(hints?.layout || "")
+    .trim()
+    .toLowerCase();
+  if (layout === "split") return true;
+  if (layout) return false;
+  const tl = hints?.typeLine || "";
+  if (/\bRoom\b/i.test(tl)) return true;
+  if (tl.includes(" // ") && !/\bAdventure\b/i.test(tl)) {
+    const faces = tl.split(" // ").map((s) => s.trim());
+    if (
+      faces.length >= 2 &&
+      faces.every((f) => /^(Instant|Sorcery)\b/i.test(f))
+    ) {
+      return true;
+    }
+  }
+  return splitNameLooksLikeArenaSplit(name);
+}
+
+/** Name-only guess used when a pre-baked line has no layout/typeLine. */
+function splitNameLooksLikeArenaSplit(name: string): boolean {
+  const parts = String(name || "")
+    .split(" // ")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return false;
+  // Rooms: a face usually names the room. Closed set from Duskmourn; the
+  // words are distinctive enough not to collide with Pathway/Adventure DFCs.
+  if (
+    /\b(Room|Chamber|Hall|Gallery|Kitchen|Sauna|Parlor|Cellar|Corridor|Stairs|Yard|Maze|Lab|Diner|Aquarium|Closet|Attic|Gazebo|Oubliette|Salon|Study|Pit|Arcade|Booth|Cistern|Vents|Abattoir|Theater|Crypt|Foyer|Elevator|Pool|Gym|Studio|Office|Lounge|Tunnel|Rotunda)\b/i.test(
+      name,
+    )
+  ) {
+    return true;
+  }
+  // Classic splits: both faces are a single word (Fire // Ice, Bedeck //
+  // Bedazzle). Pathways, adventures and transform cards have longer names.
+  return parts.every((p) => /^[A-Za-z][A-Za-z'-]*$/.test(p));
+}
+
+export function arenaCardName(name: string, hints?: ArenaNameHints): string {
   if (!name) return name;
   const idx = name.indexOf(" // ");
   if (idx === -1) return name;
+  if (arenaWantsBothFaces(name, hints)) return name;
   return name.slice(0, idx).trimEnd();
 }
 
 export function cardsToArenaLines(cards: CardEntry[]): string {
-  return cards.map((c) => `${c.count} ${arenaCardName(c.name)}`).join("\n");
+  return cards
+    .map((c) => `${c.count} ${arenaCardName(c.name, c)}`)
+    .join("\n");
 }
 
 export function buildArenaImport(
@@ -39,9 +104,9 @@ export function buildArenaImport(
 }
 
 /**
- * Re-normalize a pre-baked `arenaImport` string (from older feeds that still
- * include " // " back faces) so copy always works even before the meta
- * pipeline republishes.
+ * Re-normalize a pre-baked `arenaImport` string so copy always works even
+ * before the meta pipeline republishes. Rooms/splits keep " // "; MDFC /
+ * adventure / transform lines still lose the back face.
  */
 export function sanitizeArenaImportText(text: string): string {
   return text
