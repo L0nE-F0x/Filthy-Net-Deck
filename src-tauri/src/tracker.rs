@@ -596,6 +596,13 @@ pub fn tracker_delete_matches(
 /// Steam Proton prefix for MTG Arena. Walks every `compatdata` id so a
 /// Steam appid change does not break the tail. Prefers a dir that already
 /// has `Player.log`. Used on Linux; tests feed a fake `$HOME`.
+///
+/// Compiled on Linux always, and in `cfg(test)` on every OS so the unit
+/// tests still run on Windows CI. Without that gate, Windows clippy sees
+/// an unused fn (`arena_log_dir` only calls it under `target_os = "linux"`)
+/// and `-D warnings` fails the job — which is why every main push after
+/// the Proton tail landed emailed a CI failure.
+#[cfg(any(target_os = "linux", test))]
 fn steam_proton_mtga_log_dir(home: &Path) -> Option<PathBuf> {
     const STEAM_ROOTS: &[&str] = &[
         ".local/share/Steam",
