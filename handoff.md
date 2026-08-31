@@ -18,19 +18,23 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **Linux Settings dropdowns (owner box, 2026-08-31 night).** White
-   `<select>` fields on WebKitGTK — the page never declared
-   `color-scheme: dark`, so GTK painted Adwaita-light combos under our
-   foam text. Source fix is in (no version bump, Linux not marketed):
+0. **v3.3.0 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
-   - `html { color-scheme: dark }` + meta tag + `root.style.colorScheme`
-   - `appearance: none` + token background + chevron on every `<select>`
-   - Rebuilt and installed over `~/.local/bin/filthy-net-deck`
+   Owner confirmed the Linux white-`<select>` fix looks perfect and will
+   keep testing. Next session: wait for the owner. Do not invent work.
+   Do not bump.
 
-   Owner: reopen **Settings** (key `8`) to see Language / Launch page /
-   Decklist view. Windows/macOS unchanged until the next version cut.
+   This session (`21f10a42`): WebKitGTK was painting Adwaita-light native
+   combos under foam text because the dark page never declared
+   `color-scheme: dark`. Opted the page into dark/light, stripped native
+   appearance, painted every `<select>` with tokens + chevron. Rebuilt
+   and installed over `~/.local/bin/filthy-net-deck`. No version bump —
+   Linux is not marketed. Windows/macOS still 3.3.0 until the next cut
+   (the CSS will ride along then).
 
-   **v3.3.0 is live. Do not bump. Do not rebuild Windows.**
+   Owner leftovers unchanged (not blockers): Check for updates on an
+   installed 3.2.0; OG share preview `?v=3.3.0`; Shane reply; rotate
+   signing key `67FCA9900F523D49`.
 
 1. **v3.3.0 was shipped 2026-08-31. Do not rebuild.**
 
@@ -100,6 +104,8 @@ that is expected and does not block auto-update.
    - binary: `~/.local/bin/filthy-net-deck` (rebuild: `npm run tauri:build -- --no-bundle` then `install` over that path)
    - launcher: `~/.local/share/applications/filthy-net-deck.desktop`
    - HUD Hyprland rule: overlay title float+pin in `~/.config/hypr/looknfeel.lua`
+   - WebKitGTK native-select theming (`21f10a42`) is in this local binary.
+     Owner confirmed Settings dropdowns 2026-09-01.
 
    Do **not** add Linux to the marketing site. Exclusive-fullscreen Arena
    will cover the HUD — use borderless windowed. Detailed Logs were
