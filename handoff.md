@@ -40,6 +40,18 @@ that is expected and does not block auto-update.
    (`Filthy-Net-Deck-3.3.1-universal.dmg`, sha256 `8250f59f…934a0`,
    22 666 785 bytes). Homepage Mac buttons point at 3.3.1.
 
+   Verified live 2026-08-31 after Netlify caught up:
+   - `https://filthy-net-deck.com/version.json` → `3.3.1`
+   - `https://filthy-net-deck.com/updater/latest.json` → `3.3.1` (sig 428 bytes)
+   - Setup-3.3.1.exe → 200, 7 850 500 bytes
+   - Filthy-Net-Deck-3.3.1-universal.dmg → 200, 22 666 785 bytes
+   - `meta/arena-names.json` 1602 grpIds; `81181` is Swamp
+   - Mono-Black Demons import is `4 Unholy Annex // Ritual Chamber`
+   - downloads = current + 1 (3.3.1 + 3.3.0, Windows and dmg)
+
+   Windows CI rustfmt/clippy is still red (pre-existing Proton `arena.rs`
+   drift, not this cut). Web job is green. Does not block auto-update.
+
    Owner leftovers unchanged (not blockers): Check for updates on an
    installed 3.2.0; OG share preview `?v=3.3.1`; Shane reply; rotate
    signing key `67FCA9900F523D49`.
