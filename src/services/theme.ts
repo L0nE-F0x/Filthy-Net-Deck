@@ -125,6 +125,9 @@ export function applyTheme(theme: ThemeMode): void {
   } else {
     root.removeAttribute(THEME_ATTR);
   }
+  // WebKitGTK (Linux) keys native form controls off the inline color-scheme,
+  // not only the CSS property. Skip this and <select> paints Adwaita-light.
+  root.style.colorScheme = theme;
 }
 
 /** Apply planeswalker accent skin. Classic removes the attribute. */

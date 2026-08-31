@@ -25,6 +25,7 @@
 
 /* Light appearance — same tokens, inverted surfaces. Dark remains default. */
 html[data-theme="light"] {
+  --fnd-select-chevron: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%235c6578' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' d='M1.2 1.6 6 6.4 10.8 1.6'/%3E%3C/svg%3E");
   --color-ink-950: #f3f4f8;
   --color-ink-900: #e8eaef;
   --color-ink-850: #f7f8fb;
@@ -255,6 +256,12 @@ html[data-theme="light"] .trailer-panel {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+  /* Chevron for appearance:none <select> — muted, works on ink or foam. */
+  --fnd-select-chevron: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%238b93a7' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' d='M1.2 1.6 6 6.4 10.8 1.6'/%3E%3C/svg%3E");
+}
+
 html,
 body,
 #root {
@@ -278,6 +285,30 @@ input,
 select,
 .selectable {
   user-select: text;
+}
+
+/*
+ * Native <select> on WebKitGTK (Linux Tauri) is a GTK combo. `appearance: auto`
+ * ignores `background-color` but still honors `color`, so dark-theme foam text
+ * lands on a white Adwaita field. Strip native appearance; paint with tokens.
+ * The dropdown *popup* is still a GTK menu — `color-scheme` on <html> is what
+ * makes that menu follow dark/light.
+ */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: inherit;
+  background-color: var(--color-ink-900);
+  background-image: var(--fnd-select-chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.72rem 0.48rem;
+  color: var(--color-foam);
+  padding-right: 1.65rem;
+}
+select option {
+  background-color: var(--color-ink-900);
+  color: var(--color-foam);
 }
 
 ::-webkit-scrollbar {
@@ -957,6 +988,15 @@ select,
   background: color-mix(in srgb, var(--color-gold-500) 18%, var(--color-ink-800));
   color: var(--color-gold-300);
   border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
+}
+/* Restore the chevron after `.filter-chip`'s `background` shorthand. */
+select.filter-chip {
+  background-color: var(--color-ink-800);
+  background-image: var(--fnd-select-chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.72rem 0.48rem;
+  padding-right: 1.5rem;
 }
 
 .mana-curve-bars {
@@ -3638,10 +3678,10 @@ html[data-theme="light"] .live-set-icon {
   font-weight: 600;
 }
 .set-sort-select {
-  padding: 0.35rem 0.5rem;
+  padding: 0.35rem 1.65rem 0.35rem 0.5rem;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
-  background: var(--color-ink-900);
+  background-color: var(--color-ink-900);
   color: var(--color-foam);
   font: inherit;
   font-size: 0.78rem;
@@ -4386,7 +4426,10 @@ html[data-theme="light"] .live-set-icon {
   color: var(--color-muted);
   margin-top: 0.1rem;
 }
-.settings-select-row .fnd-select { min-width: 190px; }
+.settings-select-row .fnd-select {
+  min-width: 190px;
+  max-width: 18rem;
+}
 .settings-toggle-row:hover {
   background: color-mix(in srgb, var(--color-ink-700) 55%, transparent);
 }
@@ -4633,14 +4676,19 @@ html[data-theme="light"] .live-set-icon {
   color: var(--color-muted);
 }
 
-/* Native selects that must stay readable in dark mode */
+/* Native selects — painted by us, not GTK/WebView2, so dark mode stays readable. */
 .fnd-select {
-  appearance: auto;
+  appearance: none;
+  -webkit-appearance: none;
   max-width: 11rem;
-  padding: 0.35rem 0.55rem;
+  padding: 0.35rem 1.65rem 0.35rem 0.55rem;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
   background-color: var(--color-ink-900);
+  background-image: var(--fnd-select-chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.72rem 0.48rem;
   color: var(--color-foam);
   font-size: 0.78rem;
   font-weight: 550;

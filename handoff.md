@@ -18,7 +18,21 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.0 is live. 2026-08-31 session wrapped. Do not rebuild.**
+0. **Linux Settings dropdowns (owner box, 2026-08-31 night).** White
+   `<select>` fields on WebKitGTK — the page never declared
+   `color-scheme: dark`, so GTK painted Adwaita-light combos under our
+   foam text. Source fix is in (no version bump, Linux not marketed):
+
+   - `html { color-scheme: dark }` + meta tag + `root.style.colorScheme`
+   - `appearance: none` + token background + chevron on every `<select>`
+   - Rebuilt and installed over `~/.local/bin/filthy-net-deck`
+
+   Owner: reopen **Settings** (key `8`) to see Language / Launch page /
+   Decklist view. Windows/macOS unchanged until the next version cut.
+
+   **v3.3.0 is live. Do not bump. Do not rebuild Windows.**
+
+1. **v3.3.0 was shipped 2026-08-31. Do not rebuild.**
 
    Shipped this session: overlay companion + quiet HUD + autostart ask +
    Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed

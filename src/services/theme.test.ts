@@ -4,7 +4,15 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { isSkinId, SKINS } from "./theme";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const css = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../index.css"), "utf8");
+const themeSrc = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "theme.ts"),
+  "utf8",
+);
+const indexHtml = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "../../index.html"),
+  "utf8",
+);
 
 describe("planeswalker skins", () => {
   it("lists Classic plus ten walkers", () => {
@@ -44,11 +52,25 @@ describe("planeswalker skins", () => {
   });
 
   it("every non-classic skin has dark and light CSS palettes", () => {
-    const css = readFileSync(join(__dirname, "../index.css"), "utf8");
     for (const s of SKINS) {
       if (s.id === "classic") continue;
       expect(css).toContain(`html[data-skin="${s.id}"]`);
       expect(css).toContain(`html[data-theme="light"][data-skin="${s.id}"]`);
     }
+  });
+});
+
+describe("native form controls follow the app theme", () => {
+  it("declares dark color-scheme by default and light when themed", () => {
+    expect(css).toMatch(/html\s*\{[^}]*color-scheme:\s*dark/s);
+    expect(css).toMatch(/html\[data-theme="light"\][\s\S]*?color-scheme:\s*light/);
+    expect(indexHtml).toMatch(/name="color-scheme"/);
+  });
+
+  it("strips native <select> appearance so WebKitGTK cannot paint a white combo", () => {
+    expect(css).toMatch(/select\s*\{[^}]*appearance:\s*none/s);
+    expect(css).toMatch(/\.fnd-select\s*\{[^}]*appearance:\s*none/s);
+    expect(css).not.toMatch(/\.fnd-select\s*\{[^}]*appearance:\s*auto/s);
+    expect(themeSrc).toMatch(/root\.style\.colorScheme\s*=/);
   });
 });
