@@ -60,9 +60,10 @@ fn running_transition(previous: bool, current: bool) -> Option<bool> {
 
 /// True when any live process' executable name is Arena's.
 fn scan(sys: &mut System) -> bool {
-    sys.refresh_specifics(RefreshKind::nothing().with_processes(
-        ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet),
-    ));
+    sys.refresh_specifics(
+        RefreshKind::nothing()
+            .with_processes(ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet)),
+    );
     sys.processes().values().any(is_arena_proc)
 }
 
