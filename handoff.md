@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.3.1** (Windows signed updater; macOS still 3.3.0 dmg until rolled)
+**Live product version: v3.3.1** (Windows signed updater + macOS dmg)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
@@ -18,7 +18,7 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.1 Windows is the cut. Roll the macOS dmg when CI attaches it.**
+0. **v3.3.1 is the cut (Windows + macOS). Do not rebuild.**
 
    Friend (Lobo Blanco, same overlay-ticket reporter) came back with two
    regressions that looked fixed years ago:
@@ -36,11 +36,9 @@ that is expected and does not block auto-update.
       clients pick this up from `meta/arena-names.json` without an
       app bump; in-app copy of rooms needs 3.3.1.
 
-   Windows NSIS signed on this box. Homepage Mac buttons stay on the
-   **3.3.0** dmg until `.github/workflows/macos-build.yml` attaches
-   `Filthy-Net-Deck-3.3.1-universal.dmg` — then roll it the same way
-   as past “Roll vX out to macOS” commits. Do not leave Mac visitors
-   on 3.3.0 after the dmg exists.
+   Windows NSIS signed on this box. macOS dmg rolled from the GH Release
+   (`Filthy-Net-Deck-3.3.1-universal.dmg`, sha256 `8250f59f…934a0`,
+   22 666 785 bytes). Homepage Mac buttons point at 3.3.1.
 
    Owner leftovers unchanged (not blockers): Check for updates on an
    installed 3.2.0; OG share preview `?v=3.3.1`; Shane reply; rotate
