@@ -18,7 +18,14 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.0 is live. Session closed. Do not rebuild.**
+0. **v3.3.0 is live. 2026-08-31 session wrapped. Do not rebuild.**
+
+   Shipped this session: overlay companion + quiet HUD + autostart ask +
+   Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed
+   NSIS from this Linux box; macOS dmg rolled from the GH Release. Linux
+   local install for owner testing (`9148c48f`) — not marketed.
+
+   Next session: wait for the owner. Do not invent work. Do not bump.
 
    Verified 2026-08-31 after `aa26eefc` Netlify deploy:
    - `https://filthy-net-deck.com/version.json` → `3.3.0`
