@@ -18,7 +18,16 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.0 installer + site are in this commit. Confirm Netlify, then stop.**
+0. **v3.3.0 is live. Session closed. Do not rebuild.**
+
+   Verified 2026-08-31 after `aa26eefc` Netlify deploy:
+   - `https://filthy-net-deck.com/version.json` → `3.3.0`
+   - `https://filthy-net-deck.com/updater/latest.json` → `3.3.0` (sig 428 bytes matches the `.sig`)
+   - Setup-3.3.0.exe → 200, 7 804 141 bytes
+   - Filthy-Net-Deck-3.3.0-universal.dmg → 200, 22 583 281 bytes
+     (sha256 `5b36f7c9…70f0`, GH Release + Netlify)
+   - homepage buttons + `og-image.png?v=3.3.0` (no leftover 3.2.0 installer links)
+   - downloads = current + 1 (3.3.0 + 3.2.0)
 
    Overlay companion + quiet HUD + autostart ask + Arena-language i18n
    shipped as **3.3.0**. Tag `v3.3.0` already exists (source cut). Do not
