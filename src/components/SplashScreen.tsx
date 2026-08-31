@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { APP_VERSION } from "../version";
+import { t, type MessageKey } from "../i18n";
 
-const TIPS = [
-  "Pulling today’s ranked lists…",
-  "Double-checking every card…",
-  // "Warming up Matchup Lab…" until v3.0.0 — Matchup Lab was replaced by
-  // Matchups in v2.7.6 and the splash went on advertising it for four releases.
-  "Reading your matchups…",
-  "Tailing Arena for your winrate…",
-  "Netdeck dirty. Climb clean.",
+const TIP_KEYS: MessageKey[] = [
+  "splash.tip1",
+  "splash.tip2",
+  "splash.tip3",
+  "splash.tip4",
+  "splash.tip5",
 ];
 
 const MIN_MS = 1600;
@@ -37,7 +36,7 @@ export function SplashScreen({
   useEffect(() => {
     if (gone) return;
     const t = window.setInterval(() => {
-      setTipIndex((i) => (i + 1) % TIPS.length);
+      setTipIndex((i) => (i + 1) % TIP_KEYS.length);
     }, 900);
     return () => window.clearInterval(t);
   }, [gone]);
@@ -76,8 +75,6 @@ export function SplashScreen({
     return () => window.clearTimeout(t);
   }, [fadeOut]);
 
-  const tip = useMemo(() => TIPS[tipIndex], [tipIndex]);
-
   // Once the splash is dismissed, stop wrapping the tree so tip/fade state
   // can never force a full-app re-render again.
   if (gone) return <>{children}</>;
@@ -111,14 +108,12 @@ export function SplashScreen({
           <div className="splash-copy">
             <p className="splash-eyebrow">
               <span className="splash-live-dot" />
-              MTG Arena companion
+              {t("splash.eyebrow")}
             </p>
-            <h1 className="splash-title">Filthy Net Deck</h1>
-            <p className="splash-tagline">
-              Netdeck dirty. <span>Climb clean.</span>
-            </p>
+            <h1 className="splash-title">{t("brand.name")}</h1>
+            <p className="splash-tagline">{t("brand.tagline")}</p>
             <p className="splash-tip" key={tipIndex}>
-              {tip}
+              {t(TIP_KEYS[tipIndex])}
             </p>
           </div>
 

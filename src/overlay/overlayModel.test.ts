@@ -5,16 +5,20 @@ import {
   cardGroupId,
   drawPct,
   formatClock,
+  formatConfidencePct,
   groupLibrary,
   groupSeenCards,
+  landDrawHeadline,
   matchupHudLine,
   normalizeDensity,
   normalizeOpacity,
+  normalizeWindowMode,
   opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
   playDrawLabel,
+  sessionWl,
   showSideboardTab,
 } from "./overlayModel";
 
@@ -229,6 +233,57 @@ describe("normalizeDensity", () => {
     expect(normalizeDensity("compact")).toBe("compact");
     expect(normalizeDensity(undefined)).toBe("compact");
     expect(normalizeDensity("huge")).toBe("compact");
+  });
+});
+
+describe("normalizeWindowMode", () => {
+  it("only companion is opt-in; everything else is overlay", () => {
+    expect(normalizeWindowMode("companion")).toBe("companion");
+    expect(normalizeWindowMode("overlay")).toBe("overlay");
+    expect(normalizeWindowMode(undefined)).toBe("overlay");
+    expect(normalizeWindowMode("hud")).toBe("overlay");
+  });
+});
+
+describe("formatConfidencePct", () => {
+  it("rounds a 0–1 confidence to a percent chip", () => {
+    expect(formatConfidencePct(0.72)).toBe("72%");
+    expect(formatConfidencePct(0.355)).toBe("36%");
+    expect(formatConfidencePct(1)).toBe("100%");
+  });
+});
+
+describe("sessionWl", () => {
+  const matches = [
+    { result: "win", endedAt: 100 },
+    { result: "loss", endedAt: 200 },
+    { result: "win", endedAt: 300 },
+    { result: "draw", endedAt: 400 },
+    { result: "loss", endedAt: 50 },
+  ];
+
+  it("counts decided games inside the window", () => {
+    const rec = sessionWl(matches, 100);
+    expect(rec).toEqual({ wins: 2, losses: 1, wr: 67 });
+  });
+
+  it("returns null wr when nothing decided", () => {
+    expect(sessionWl([], 0)).toEqual({ wins: 0, losses: 0, wr: null });
+  });
+});
+
+describe("landDrawHeadline", () => {
+  it("is remaining lands over remaining library", () => {
+    const h = landDrawHeadline(12, 34);
+    expect(h).not.toBeNull();
+    expect(h!.pct).toBeCloseTo(35.3, 1);
+    expect(h!.label).toBe("Land 35.3%");
+    expect(h!.title).toContain("12 lands left");
+  });
+
+  it("hides when the library is empty", () => {
+    expect(landDrawHeadline(0, 10)).toBeNull();
+    expect(landDrawHeadline(4, 0)).toBeNull();
   });
 });
 

@@ -27,18 +27,23 @@ import { isTauri } from "../services/appUpdater";
 import {
   drawPct,
   formatClock,
+  formatConfidencePct,
   groupLibrary,
   groupSeenCards,
+  landDrawHeadline,
   matchupHudLine,
   opponentCardsSeenCount,
   parseManaCost,
   pipText,
   pipTone,
   playDrawLabel,
+  sessionWl,
   showSideboardTab,
   type OverlayGroup,
   type OverlayRow,
+  type OverlayWindowMode,
 } from "./overlayModel";
+import { sessionWindow } from "../services/recapStats";
 import { inferOpponentArchetype } from "../services/opponentArchetype";
 import { deckMatchupMatrix } from "../services/gameAnalytics";
 import { inferenceCandidates } from "../services/deckHelpers";
@@ -52,6 +57,8 @@ import {
   writeOverlayPrefs,
   type OverlayPrefs,
 } from "./overlayPrefs";
+import { overlayUserClose, setOverlayWindowMode } from "../services/overlay";
+import { applyLocalePref, readLocalePref, t, useLocale } from "../i18n";
 
 
 const SNAP_PX = 24;
@@ -61,6 +68,8 @@ const COLLAPSED_H = 34;
 const MIN_EXPANDED_H = 120;
 /** Grow the panel to at least this tall while the post-match summary is up. */
 const SUMMARY_MIN_H = 252;
+/** First-run overlay vs companion chooser. */
+const CHOOSER_MIN_H = 220;
 
 /** Disk shape for overlay_save_geometry / overlay_get_geometry (Rust camelCase). */
 interface OverlayGeometry {
@@ -130,6 +139,11 @@ async function applyPostMatch(enabled: boolean) {
   } catch {
     /* older builds without the command */
   }
+}
+
+/** Overlay HUD vs companion chrome — Rust owns always-on-top / taskbar / hide. */
+async function applyWindowMode(mode: OverlayWindowMode) {
+  await setOverlayWindowMode(mode === "companion");
 }
 
 /**
@@ -362,7 +376,15 @@ const GroupSection = memo(function GroupSection({
   return (
     <section className={`overlay-group overlay-group--${group.id}`}>
       <header className="overlay-group-head" data-tauri-drag-region>
-        <span className="overlay-group-label">{group.label}</span>
+        <span className="overlay-group-label">
+          {t(
+            group.id === "land"
+              ? "common.lands"
+              : group.id === "creature"
+                ? "common.creatures"
+                : "common.spells",
+          )}
+        </span>
         <span className="overlay-group-count">{group.remaining}</span>
       </header>
       <ul className="overlay-group-list">
@@ -419,7 +441,15 @@ const SeenSection = memo(function SeenSection({ group }: { group: OverlayGroup }
   return (
     <section className={`overlay-group overlay-group--${group.id}`}>
       <header className="overlay-group-head" data-tauri-drag-region>
-        <span className="overlay-group-label">{group.label}</span>
+        <span className="overlay-group-label">
+          {t(
+            group.id === "land"
+              ? "common.lands"
+              : group.id === "creature"
+                ? "common.creatures"
+                : "common.spells",
+          )}
+        </span>
         <span className="overlay-group-count">{group.remaining}</span>
       </header>
       <ul className="overlay-group-list">
@@ -435,6 +465,37 @@ const SeenSection = memo(function SeenSection({ group }: { group: OverlayGroup }
  * 1 Hz match clock in its own memoized child, so the per-second tick only
  * repaints this span — groups/rows stay untouched (Grok P1-1).
  */
+function OverlayModeChooser({
+  onPick,
+}: {
+  onPick: (mode: OverlayWindowMode) => void;
+}) {
+  const { t } = useLocale();
+  return (
+    <div className="overlay-chooser" role="dialog" aria-label={t("overlay.chooserAria")}>
+      <p className="overlay-chooser-title">{t("overlay.chooserTitle")}</p>
+      <button
+        type="button"
+        className="overlay-chooser-opt"
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={() => onPick("overlay")}
+      >
+        <strong>{t("overlay.hudTitle")}</strong>
+        <em>{t("overlay.hudBlurb")}</em>
+      </button>
+      <button
+        type="button"
+        className="overlay-chooser-opt"
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={() => onPick("companion")}
+      >
+        <strong>{t("overlay.windowTitle")}</strong>
+        <em>{t("overlay.windowBlurb")}</em>
+      </button>
+    </div>
+  );
+}
+
 const MatchClock = memo(function MatchClock({
   startedAt,
 }: {
@@ -454,6 +515,7 @@ const MatchClock = memo(function MatchClock({
 });
 
 export function OverlayApp() {
+  const { t } = useLocale();
   const [live, setLive] = useState<LiveMatch | null>(null);
   const [matches, setMatches] = useState<TrackedMatch[]>([]);
   /**
@@ -462,6 +524,11 @@ export function OverlayApp() {
    */
   const [compact, setCompact] = useState(() => !readOverlayPrefs().startExpanded);
   const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
+  /**
+   * Last non-idle live frame. Companion mode keeps rendering this after the
+   * tracker clears the match so the window does not go blank.
+   */
+  const [held, setHeld] = useState<LiveMatch | null>(null);
   /** Quick-settings pill menu (footer of the expanded overlay). */
   const [menuOpen, setMenuOpen] = useState(false);
   /** Expanded list panel: library, sideboard (Bo3), or opponent's seen cards. */
@@ -484,6 +551,7 @@ export function OverlayApp() {
    * of truth across matches and restarts.
    */
   const startExpandedRef = useRef(readOverlayPrefs().startExpanded);
+  const windowModeRef = useRef(readOverlayPrefs().windowMode);
   /** matchId geometry was last re-applied for (once per match). */
   const appliedMatchRef = useRef<string | null>(null);
   /** matchId the post-match summary was last auto-shown for (once per match). */
@@ -506,7 +574,11 @@ export function OverlayApp() {
 
   useEffect(() => {
     bootThemeFromStorage();
-    void applyClickThrough(readOverlayPrefs().clickThrough);
+    const initial = readOverlayPrefs();
+    void applyWindowMode(initial.windowMode);
+    if (initial.windowMode !== "companion") {
+      void applyClickThrough(initial.clickThrough);
+    }
     document.documentElement.classList.add("overlay-root");
     document.body.classList.add("overlay-body");
     // macOS overlay windows can't be transparent (see overlay.rs) — paint the
@@ -531,8 +603,15 @@ export function OverlayApp() {
       if (e.key !== PREFS_KEY) return;
       const p = readOverlayPrefs();
       setPrefs(p);
+      applyLocalePref(readLocalePref());
       startExpandedRef.current = p.startExpanded;
-      void applyClickThrough(p.clickThrough);
+      if (p.windowMode !== windowModeRef.current) {
+        windowModeRef.current = p.windowMode;
+        void applyWindowMode(p.windowMode);
+      }
+      if (p.windowMode !== "companion") {
+        void applyClickThrough(p.clickThrough);
+      }
       bootThemeFromStorage(); // re-apply data-theme + data-skin
     };
     window.addEventListener("storage", onStorage);
@@ -602,8 +681,15 @@ export function OverlayApp() {
           if (cancelled) return;
           const p = readOverlayPrefs();
           setPrefs(p);
+          applyLocalePref(readLocalePref());
           startExpandedRef.current = p.startExpanded;
-          void applyClickThrough(p.clickThrough);
+          if (p.windowMode !== windowModeRef.current) {
+            windowModeRef.current = p.windowMode;
+            void applyWindowMode(p.windowMode);
+          }
+          if (p.windowMode !== "companion") {
+            void applyClickThrough(p.clickThrough);
+          }
           bootThemeFromStorage();
         });
       } catch {
@@ -723,48 +809,67 @@ export function OverlayApp() {
     };
   }, []);
 
-  const playing = live?.phase === "playing";
+  useEffect(() => {
+    if (live && (live.phase === "playing" || live.phase === "ended")) {
+      setHeld(live);
+    }
+  }, [live]);
 
-  const record = useMemo(() => seasonRecord(matches, live), [matches, live]);
+  const companion = prefs.windowMode === "companion";
+  const hud =
+    live && (live.phase === "playing" || live.phase === "ended")
+      ? live
+      : companion && held
+        ? held
+        : live;
+  const showChooser = !prefs.windowModeChosen && !!hud && hud.phase === "playing";
+
+  const playing = hud?.phase === "playing";
+
+  const record = useMemo(() => seasonRecord(matches, hud), [matches, hud]);
+  const session = useMemo(() => {
+    const { fromMs } = sessionWindow(matches);
+    return sessionWl(matches, fromMs);
+  }, [matches]);
   // One meta map for library, sideboard, and the opponent's seen cards.
   const allIds = useMemo(() => {
-    const ids = (live?.library ?? []).map((c) => c.grpId);
-    for (const c of live?.sideboard ?? []) ids.push(c.grpId);
-    for (const id of live?.opponentSeen ?? []) ids.push(id);
+    const ids = (hud?.library ?? []).map((c) => c.grpId);
+    for (const c of hud?.sideboard ?? []) ids.push(c.grpId);
+    for (const id of hud?.opponentSeen ?? []) ids.push(id);
     return ids;
-  }, [live?.library, live?.sideboard, live?.opponentSeen]);
+  }, [hud?.library, hud?.sideboard, hud?.opponentSeen]);
   const metaMap = useArenaMetaMap(allIds);
 
   const groups = useMemo(
-    () => groupLibrary(live?.library ?? [], (id) => metaMap.get(id)),
-    [live?.library, metaMap],
+    () => groupLibrary(hud?.library ?? [], (id) => metaMap.get(id)),
+    [hud?.library, metaMap],
   );
 
   const sideGroups = useMemo(
-    () => groupLibrary(live?.sideboard ?? [], (id) => metaMap.get(id)),
-    [live?.sideboard, metaMap],
+    () => groupLibrary(hud?.sideboard ?? [], (id) => metaMap.get(id)),
+    [hud?.sideboard, metaMap],
   );
 
   const oppGroups = useMemo(
-    () => groupSeenCards(live?.opponentSeen, (id) => metaMap.get(id)),
-    [live?.opponentSeen, metaMap],
+    () => groupSeenCards(hud?.opponentSeen, (id) => metaMap.get(id)),
+    [hud?.opponentSeen, metaMap],
   );
 
-  const libTotal = live?.libraryTotal ?? 0;
-  const sideTotal = live?.sideboardTotal ?? 0;
-  const sideboardTab = live ? showSideboardTab(live) : false;
+  const libTotal = hud?.libraryTotal ?? 0;
+  const sideTotal = hud?.sideboardTotal ?? 0;
+  const sideboardTab = hud ? showSideboardTab(hud) : false;
 
   const maxPct = useMemo(() => {
     let m = 0;
-    for (const c of live?.library ?? []) {
+    for (const c of hud?.library ?? []) {
       const p = drawPct(c.remaining, libTotal) ?? 0;
       if (p > m) m = p;
     }
     return m;
-  }, [live?.library, libTotal]);
+  }, [hud?.library, libTotal]);
 
   const landStats = useMemo(() => {
-    const library = live?.library ?? [];
+    const library = hud?.library ?? [];
     let rem = 0;
     let known = false;
     for (const c of library) {
@@ -776,7 +881,7 @@ export function OverlayApp() {
     }
     // We only see remaining>0 rows — land count is best-effort.
     return known ? { rem } : null;
-  }, [live?.library, metaMap]);
+  }, [hud?.library, metaMap]);
 
   const onDragHandleDown = useCallback(() => {
     dragArmed.current = true;
@@ -1052,12 +1157,13 @@ export function OverlayApp() {
     // Computed before the early return: the format is knowable from the queue
     // alone, and the note explaining a missing read has to show from the first
     // second of the match, not only once the opponent has revealed something.
-    const uncovered = isUncoveredFormat(live?.eventId);
-    if (!live?.opponentSeen?.length) {
+    const uncovered = isUncoveredFormat(hud?.eventId);
+    if (!hud?.opponentSeen?.length) {
       return {
         guess: null as string | null,
+        confidence: null as number | null,
         matchup: null as ReturnType<typeof matchupHudLine>,
-        seen: opponentCardsSeenCount(live?.opponentSeen),
+        seen: opponentCardsSeenCount(hud?.opponentSeen),
         uncovered,
       };
     }
@@ -1074,38 +1180,40 @@ export function OverlayApp() {
     // Historic Izzet list clears the 0.35 confidence floor against Standard's
     // Izzet deck easily. The overlay would then name a deck the opponent
     // demonstrably was not on, live, mid-match. No line beats a wrong line.
+    let confidence: number | null = null;
     if (bundle && !uncovered) {
       // Pioneer/Explorer queues infer against the Pioneer field, not blindly
       // against the featured format (Standard). An unnamed queue still falls
       // back to featured — unknown is not the same as known-uncovered.
-      const eventFmt = localFormatOf(live.eventId, null);
+      const eventFmt = localFormatOf(hud.eventId, null);
       const fmt =
         bundle.formats.find((f) => f.id === eventFmt) ??
         bundle.formats.find((f) => f.featured) ??
         bundle.formats[0];
       if (fmt) {
-        const mode: PlayMode = /Traditional/i.test(live.eventId) ? "bo3" : "bo1";
+        const mode: PlayMode = /Traditional/i.test(hud.eventId) ? "bo3" : "bo1";
         // Both modes + full format field so Lessons twins don't collapse.
         candidates = inferenceCandidates(bundle.decks, { format: fmt, mode });
         const g = inferOpponentArchetype(
-          live.opponentSeen,
+          hud.opponentSeen,
           resolveName,
           candidates,
           // Arena's own basic-land types for this match only — the historical
           // matrix below reads each past match's own basics.
-          { ...inferOpts, basicLandTypes: live.opponentBasics },
+          { ...inferOpts, basicLandTypes: hud.opponentBasics },
         );
         guess = g ? g.archetype : null;
+        confidence = g ? g.confidence : null;
       }
     }
 
     let matchup = null as ReturnType<typeof matchupHudLine>;
     if (guess && candidates.length) {
-      const key = live.deckId ?? live.deckName ?? live.deckHash ?? null;
+      const key = hud.deckId ?? hud.deckName ?? hud.deckHash ?? null;
       const sameDeck = matches.filter((m) => {
         if (m.result !== "win" && m.result !== "loss") return false;
         if (!key) return false;
-        return deckKey(m) === key || (!!live.deckHash && m.deckHash === live.deckHash);
+        return deckKey(m) === key || (!!hud.deckHash && m.deckHash === hud.deckHash);
       });
       const rows = deckMatchupMatrix(sameDeck, resolveName, candidates, inferOpts);
       matchup = matchupHudLine(rows, guess, 2);
@@ -1113,57 +1221,119 @@ export function OverlayApp() {
 
     return {
       guess,
+      confidence,
       matchup,
-      seen: opponentCardsSeenCount(live.opponentSeen),
+      seen: opponentCardsSeenCount(hud.opponentSeen),
       uncovered,
     };
-  }, [live, matches, metaMap]);
+  }, [hud, matches, metaMap]);
 
   const oppGuessLabel = oppHud.guess;
+  const oppConfidence = oppHud.confidence;
   const matchupLine = oppHud.matchup;
   const cardsSeen = oppHud.seen;
   /** Queue FND ships no deck field for — the archetype read is off on purpose. */
   const uncoveredFormat = oppHud.uncovered;
+  const confLabel =
+    oppConfidence != null ? formatConfidencePct(oppConfidence) : null;
+  const landHeadline = landStats
+    ? landDrawHeadline(landStats.rem, libTotal)
+    : null;
 
-  if (!live || live.phase === "idle") {
+  const pickWindowMode = useCallback(
+    (mode: OverlayWindowMode) => {
+      writeOverlayPrefs({
+        overlayWindowMode: mode,
+        overlayWindowModeChosen: true,
+      });
+      windowModeRef.current = mode;
+      const p = readOverlayPrefs();
+      setPrefs(p);
+      void applyWindowMode(mode);
+    },
+    [],
+  );
+
+  const closeCompanion = useCallback(() => {
+    void overlayUserClose();
+  }, []);
+
+  // Grow the window while the first-run chooser is up, same as post-match.
+  useEffect(() => {
+    if (!showChooser || !isTauri()) return;
+    void (async () => {
+      try {
+        const { getCurrentWindow, LogicalSize } = await import(
+          "@tauri-apps/api/window"
+        );
+        const win = getCurrentWindow();
+        const factor = await win.scaleFactor();
+        const size = await win.outerSize();
+        const w = size.width / factor;
+        const curH = size.height / factor;
+        if (curH >= CHOOSER_MIN_H) return;
+        if (compactRef.current) {
+          compactRef.current = false;
+          setCompact(false);
+        }
+        programmaticResize.current = true;
+        try {
+          await win.setSize(
+            new LogicalSize(w, Math.max(curH, CHOOSER_MIN_H)),
+          );
+        } finally {
+          window.setTimeout(() => {
+            programmaticResize.current = false;
+          }, 400);
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, [showChooser]);
+
+  if (!hud || hud.phase === "idle") {
     return <div className="overlay-empty" />;
   }
 
-  const ended = live.phase === "ended";
-  const opp = live.opponentName?.trim() || "Opponent";
-  const deck = live.deckName?.trim() || "…";
+  const ended = hud.phase === "ended";
+  const opp = hud.opponentName?.trim() || "Opponent";
+  const deck = hud.deckName?.trim() || "…";
   const resultLabel =
-    ended && live.result
-      ? live.result === "win"
-        ? "Victory"
-        : live.result === "loss"
-          ? "Defeat"
-          : live.result === "draw"
-            ? "Draw"
-            : "Ended"
+    ended && hud.result
+      ? hud.result === "win"
+        ? t("common.victory")
+        : hud.result === "loss"
+          ? t("common.defeat")
+          : hud.result === "draw"
+            ? t("common.draw")
+            : t("common.ended")
       : null;
 
-  const landPct =
-    landStats && libTotal > 0
-      ? Math.round((landStats.rem / libTotal) * 1000) / 10
-      : null;
-
-  const playLabel = playDrawLabel(live.onPlay);
-  const rankedLabel = rankedChipLabel(live.eventId);
-  const rankedKind = queueRankedKind(live.eventId);
+  const playLabel = playDrawLabel(hud.onPlay);
+  const rankedLabel = rankedChipLabel(hud.eventId);
+  const rankedKind = queueRankedKind(hud.eventId);
 
   // Quiet down while the mouse is elsewhere. Never while ended (result should
   // pop) and never with click-through (no hover events would ever wake it).
+  // Companion is a normal window — never translucent-dim.
   const dimmed =
-    prefs.idleDim && !hot && !prefs.clickThrough && !menuOpen && !ended;
+    !companion &&
+    prefs.idleDim &&
+    !hot &&
+    !prefs.clickThrough &&
+    !menuOpen &&
+    !ended &&
+    !showChooser;
 
   const shellClass = [
     "overlay-shell",
     `density-${prefs.density}`,
     ended ? "is-ended" : "",
-    ended && live.result ? `is-${live.result}` : "",
-    compact ? "is-compact" : "",
+    ended && hud.result ? `is-${hud.result}` : "",
+    compact && !showChooser ? "is-compact" : "",
     dimmed ? "is-dim" : "",
+    companion ? "is-companion" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -1171,7 +1341,7 @@ export function OverlayApp() {
   return (
     <div
       className={shellClass}
-      style={{ "--ov-alpha": prefs.opacity } as CSSProperties}
+      style={{ "--ov-alpha": companion ? 1 : prefs.opacity } as CSSProperties}
       onMouseEnter={() => setHot(true)}
       onMouseLeave={() => setHot(false)}
     >
@@ -1198,28 +1368,44 @@ export function OverlayApp() {
       >
         <div className="overlay-bar-main" data-tauri-drag-region>
           {resultLabel ? (
-            <span className={`overlay-pill overlay-pill--${live.result}`}>
+            <span className={`overlay-pill overlay-pill--${hud.result}`}>
               {resultLabel}
             </span>
           ) : (
             <span className="overlay-vs" aria-hidden="true">
-              vs
+              {t("common.vs")}
             </span>
           )}
-          <span className="overlay-opp-line" data-tauri-drag-region>
-            {opp}
+          <span className="overlay-opp-cluster" data-tauri-drag-region>
+            <span className="overlay-opp-line" data-tauri-drag-region>
+              {opp}
+            </span>
             {oppGuessLabel ? (
               <span
                 className="overlay-opp-arch"
                 title={
-                  matchupLine
-                    ? `Inferred from cards seen · your record vs ${matchupLine.archetype}: ${matchupLine.detail}`
-                    : "Inferred from cards seen"
+                  confLabel && matchupLine
+                    ? t("overlay.inferredBoth", {
+                        pct: confLabel,
+                        arch: matchupLine.archetype,
+                        detail: matchupLine.detail,
+                      })
+                    : confLabel
+                      ? t("overlay.inferredConf", { pct: confLabel })
+                      : matchupLine
+                        ? t("overlay.inferredMu", {
+                            arch: matchupLine.archetype,
+                            detail: matchupLine.detail,
+                          })
+                        : t("overlay.inferred")
                 }
               >
-                {" "}
-                · {oppGuessLabel}
-                {matchupLine ? (
+                <span className="overlay-opp-arch-sep"> · </span>
+                {oppGuessLabel}
+                {confLabel ? (
+                  <span className="overlay-opp-conf"> {confLabel}</span>
+                ) : null}
+                {!compact && matchupLine ? (
                   <span className="overlay-opp-mu"> · {matchupLine.short}</span>
                 ) : null}
               </span>
@@ -1227,61 +1413,67 @@ export function OverlayApp() {
           </span>
         </div>
         <div className="overlay-bar-stats" data-tauri-drag-region>
-          {compact && prefs.barRecord && record.wr != null ? (
+          {compact && prefs.barRecord && session.wr != null ? (
             <span
               className="overlay-stat overlay-stat--rec"
-              title={`This season on this deck: ${record.wins}–${record.losses} · ${record.wr}%`}
+              title={
+                record.wr != null
+                  ? t("overlay.sessionTitleSeason", {
+                      wins: session.wins,
+                      losses: session.losses,
+                      sw: record.wins,
+                      sl: record.losses,
+                      wr: record.wr,
+                    })
+                  : t("overlay.sessionTitle", {
+                      wins: session.wins,
+                      losses: session.losses,
+                    })
+              }
             >
-              {record.wins}–{record.losses}
-              <em>{record.wr}%</em>
+              {session.wins}–{session.losses}
             </span>
           ) : null}
-          {libTotal > 0 ? (
-            <span
-              className="overlay-stat overlay-stat--lib"
-              title="Cards left in library"
-            >
-              {libTotal}
-            </span>
-          ) : null}
-          {landStats ? (
+          {compact && landHeadline ? (
             <span
               className="overlay-stat overlay-stat--land"
-              title={`${landStats.rem} lands left in library${landPct != null ? ` · ${landPct}% of it` : ""}`}
+              title={
+                landStats && landStats.rem === 1
+                  ? t("overlay.landTitleOne", { pct: landHeadline.pct })
+                  : t("overlay.landTitle", {
+                      pct: landHeadline.pct,
+                      n: landStats?.rem ?? 0,
+                    })
+              }
             >
-              {landStats.rem}L
-              {landPct != null ? <em>{landPct}%</em> : null}
+              <span className="overlay-land-full">
+                {t("overlay.landLabel", { pct: landHeadline.pct })}
+              </span>
+              <span className="overlay-land-short">{landHeadline.pct}%</span>
             </span>
           ) : null}
-          {compact && playing && live.turn != null ? (
+          {compact && playing && hud.turn != null ? (
             <span
               className="overlay-mode-chip overlay-chip--turn"
-              title={`Turn ${live.turn}${playLabel ? ` — on the ${playLabel.toLowerCase()}` : ""}`}
+              title={
+                playLabel === "Play"
+                  ? t("overlay.turnPlay", { n: hud.turn })
+                  : playLabel === "Draw"
+                    ? t("overlay.turnDraw", { n: hud.turn })
+                    : t("overlay.turn", { n: hud.turn })
+              }
             >
-              T{live.turn}
-            </span>
-          ) : null}
-          {compact && live.bestOf > 1 ? (
-            <span className="overlay-mode-chip" title="Best of three">
-              Bo3
-            </span>
-          ) : null}
-          {compact && rankedLabel ? (
-            <span
-              className={`overlay-mode-chip overlay-chip--queue is-${rankedKind}`}
-              title={queueLabel(live.eventId)}
-            >
-              {rankedLabel === "Ranked" ? "Ranked" : "Unrk"}
+              T{hud.turn}
             </span>
           ) : null}
           {compact && prefs.barClock && playing ? (
-            <MatchClock startedAt={live.startedAt} />
+            <MatchClock startedAt={hud.startedAt} />
           ) : null}
         </div>
         <button
           type="button"
           className="overlay-icon-btn"
-          title={compact ? "Expand deck tracker" : "Collapse to bar"}
+          title={compact ? t("overlay.expand") : t("overlay.collapse")}
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
@@ -1290,9 +1482,25 @@ export function OverlayApp() {
         >
           {compact ? "▾" : "▴"}
         </button>
+        {companion ? (
+          <button
+            type="button"
+            className="overlay-icon-btn overlay-icon-btn--close"
+            title={t("overlay.closeWindow")}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              closeCompanion();
+            }}
+          >
+            ×
+          </button>
+        ) : null}
       </header>
 
-      {!compact && (
+      {showChooser ? <OverlayModeChooser onPick={pickWindowMode} /> : null}
+
+      {!compact && !showChooser && (
         <>
           <div className="overlay-sub" data-tauri-drag-region>
             <span className="overlay-deck-line" title={deck}>
@@ -1322,9 +1530,9 @@ export function OverlayApp() {
                   {record.wins}–{record.losses}
                 </span>
               ) : null}
-              {playing && live.turn != null ? (
+              {playing && hud.turn != null ? (
                 <span className="overlay-mode-chip overlay-chip--turn" title="Current turn">
-                  T{live.turn}
+                  T{hud.turn}
                 </span>
               ) : null}
               {playing && playLabel ? (
@@ -1335,26 +1543,26 @@ export function OverlayApp() {
                   {playLabel}
                 </span>
               ) : null}
-              {playing && (live.mulligans ?? 0) > 0 ? (
+              {playing && (hud.mulligans ?? 0) > 0 ? (
                 <span
                   className="overlay-mode-chip overlay-chip--mull"
                   title={`Mulligans taken this game`}
                 >
-                  M{live.mulligans}
+                  M{hud.mulligans}
                 </span>
               ) : null}
               <span className="overlay-mode-chip">
-                {live.bestOf > 1 ? `Bo${live.bestOf}` : "Bo1"}
+                {hud.bestOf > 1 ? `Bo${hud.bestOf}` : "Bo1"}
               </span>
               {rankedLabel ? (
                 <span
                   className={`overlay-mode-chip overlay-chip--queue is-${rankedKind}`}
-                  title={queueLabel(live.eventId)}
+                  title={queueLabel(hud.eventId)}
                 >
                   {rankedLabel}
                 </span>
               ) : null}
-              {playing ? <MatchClock startedAt={live.startedAt} /> : null}
+              {playing ? <MatchClock startedAt={hud.startedAt} /> : null}
             </span>
           </div>
 
@@ -1368,7 +1576,7 @@ export function OverlayApp() {
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={() => setView("deck")}
               >
-                My deck
+                {t("overlay.myDeck")}
               </button>
               {sideboardTab ? (
                 <button
@@ -1376,11 +1584,11 @@ export function OverlayApp() {
                   role="tab"
                   aria-selected={view === "side"}
                   className={`overlay-tab${view === "side" ? " is-active" : ""}`}
-                  title="Your sideboard for this game (Bo3)"
+                  title={t("overlay.sideTab")}
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => setView("side")}
                 >
-                  Sideboard{sideTotal > 0 ? ` · ${sideTotal}` : ""}
+                  {t("overlay.sideboard")}{sideTotal > 0 ? ` · ${sideTotal}` : ""}
                 </button>
               ) : null}
               <button
@@ -1388,18 +1596,18 @@ export function OverlayApp() {
                 role="tab"
                 aria-selected={view === "opp"}
                 className={`overlay-tab${view === "opp" ? " is-active" : ""}`}
-                title="Cards your opponent has shown this match"
+                title={t("overlay.seenCards")}
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={() => setView("opp")}
               >
-                Opponent{cardsSeen > 0 ? ` · ${cardsSeen}` : ""}
+                {t("overlay.opponent")}{cardsSeen > 0 ? ` · ${cardsSeen}` : ""}
               </button>
             </div>
           )}
 
           {ended && prefs.postMatch ? (
             <PostMatchSummary
-              live={live}
+              live={hud}
               matches={matches}
               record={record}
               oppGuess={oppGuessLabel}
@@ -1415,13 +1623,13 @@ export function OverlayApp() {
               {uncoveredFormat ? (
                 <p
                   className="overlay-opp-note overlay-opp-note--off"
-                  title={`${queueLabel(live.eventId)} — Filthy Net Deck tracks the Standard and Pioneer metagames, so there is no deck list to match this opponent against. Guessing from the Standard field would name a deck they are not playing. Revealed cards below are tracked as normal.`}
+                  title={`${queueLabel(hud.eventId)} — Filthy Net Deck tracks the Standard and Pioneer metagames, so there is no deck list to match this opponent against. Guessing from the Standard field would name a deck they are not playing. Revealed cards below are tracked as normal.`}
                 >
-                  Archetype read off — <strong>untracked format</strong>
+                  {t("overlay.untracked")}
                 </p>
               ) : oppGuessLabel ? (
                 <p className="overlay-opp-note">
-                  Reads like <strong>{oppGuessLabel}</strong>
+                  {t("overlay.readsLike")} <strong>{oppGuessLabel}</strong>
                   {matchupLine ? <em> · you {matchupLine.detail}</em> : null}
                 </p>
               ) : null}
@@ -1429,8 +1637,8 @@ export function OverlayApp() {
                 oppGroups.map((g) => <SeenSection key={g.id} group={g} />)
               ) : (
                 <p className="overlay-hint">
-                  Nothing revealed yet…
-                  <span>Opponent cards land here as they get played or shown</span>
+                  {t("overlay.nothingRevealed")}
+                  <span>{t("overlay.nothingRevealedHint")}</span>
                 </p>
               )}
             </div>
@@ -1448,10 +1656,8 @@ export function OverlayApp() {
                 ))
               ) : (
                 <p className="overlay-hint">
-                  Waiting for the sideboard list…
-                  <span>
-                    Arena sends it at game start — it refreshes after each board
-                  </span>
+                  {t("overlay.waitingSide")}
+                  <span>{t("overlay.waitingSideHint")}</span>
                 </p>
               )}
             </div>
@@ -1468,18 +1674,16 @@ export function OverlayApp() {
             </div>
           ) : (
             <p className="overlay-hint">
-              Listening for the deck list…
-              <span>
-                Arena → Options → Account → Detailed Logs (Plugin Support)
-              </span>
+              {t("overlay.listeningDeck")}
+              <span>{t("overlay.listeningDeckHint")}</span>
             </p>
           )}
 
           <div className="overlay-foot">
             {menuOpen && (
-              <div className="overlay-menu" role="menu" aria-label="Overlay quick settings">
+              <div className="overlay-menu" role="menu" aria-label={t("overlay.menuAria")}>
                 <label className="overlay-menu-slider">
-                  <span>Opacity</span>
+                  <span>{t("overlay.opacity")}</span>
                   <input
                     type="range"
                     min={55}
@@ -1489,12 +1693,33 @@ export function OverlayApp() {
                     onChange={(e) =>
                       patchPrefs({ overlayOpacity: Number(e.target.value) / 100 })
                     }
-                    aria-label="Overlay opacity"
+                    aria-label={t("overlay.opacityAria")}
                   />
                   <em>{Math.round(prefs.opacity * 100)}%</em>
                 </label>
-                <div className="overlay-menu-seg" role="radiogroup" aria-label="List density">
-                  <span>Density</span>
+                <div className="overlay-menu-seg" role="radiogroup" aria-label={t("overlay.windowModeAria")}>
+                  <span>{t("overlay.window")}</span>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={!companion}
+                    className={`overlay-seg-btn${!companion ? " is-active" : ""}`}
+                    onClick={() => pickWindowMode("overlay")}
+                  >
+                    {t("overlay.overlay")}
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={companion}
+                    className={`overlay-seg-btn${companion ? " is-active" : ""}`}
+                    onClick={() => pickWindowMode("companion")}
+                  >
+                    {t("overlay.window")}
+                  </button>
+                </div>
+                <div className="overlay-menu-seg" role="radiogroup" aria-label={t("overlay.densityAria")}>
+                  <span>{t("overlay.density")}</span>
                   {(["cozy", "compact", "minimal"] as const).map((d) => (
                     <button
                       key={d}
@@ -1504,7 +1729,11 @@ export function OverlayApp() {
                       className={`overlay-seg-btn${prefs.density === d ? " is-active" : ""}`}
                       onClick={() => patchPrefs({ overlayDensity: d })}
                     >
-                      {d === "cozy" ? "Cozy" : d === "compact" ? "Compact" : "Minimal"}
+                      {d === "cozy"
+                        ? t("overlay.cozy")
+                        : d === "compact"
+                          ? t("overlay.compact")
+                          : t("overlay.minimal")}
                     </button>
                   ))}
                 </div>
@@ -1514,7 +1743,7 @@ export function OverlayApp() {
                     checked={prefs.idleDim}
                     onChange={(e) => patchPrefs({ overlayIdleDim: e.target.checked })}
                   />
-                  <span>Dim while the mouse is away</span>
+                  <span>{t("overlay.idleDim")}</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input
@@ -1522,7 +1751,7 @@ export function OverlayApp() {
                     checked={!compact}
                     onChange={(e) => setCompactMode(!e.target.checked)}
                   />
-                  <span>Expanded (saved across matches &amp; restarts)</span>
+                  <span>{t("overlay.expandedSave")}</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input
@@ -1530,7 +1759,7 @@ export function OverlayApp() {
                     checked={prefs.barClock}
                     onChange={(e) => patchPrefs({ overlayBarClock: e.target.checked })}
                   />
-                  <span>Clock on the minimized bar</span>
+                  <span>{t("overlay.barClock")}</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input
@@ -1538,7 +1767,7 @@ export function OverlayApp() {
                     checked={prefs.barRecord}
                     onChange={(e) => patchPrefs({ overlayBarRecord: e.target.checked })}
                   />
-                  <span>Record on the minimized bar</span>
+                  <span>{t("overlay.barRecord")}</span>
                 </label>
                 <label className="overlay-menu-row">
                   <input
@@ -1549,27 +1778,29 @@ export function OverlayApp() {
                       void applyPostMatch(e.target.checked);
                     }}
                   />
-                  <span>Post-match summary</span>
+                  <span>{t("overlay.postMatch")}</span>
                 </label>
+                {companion ? null : (
                 <button
                   type="button"
                   className="overlay-menu-danger"
-                  title="Overlay ignores the mouse from now on — turn it back off in the main app (Settings → In-game overlay)"
+                  title={t("overlay.clickThroughTitle")}
                   onClick={() => {
                     patchPrefs({ overlayClickThrough: true });
                     setMenuOpen(false);
                     void applyClickThrough(true);
                   }}
                 >
-                  Enable click-through
-                  <em>undo from the main app</em>
+                  {t("overlay.clickThrough")}
+                  <em>{t("overlay.clickThroughUndo")}</em>
                 </button>
+                )}
               </div>
             )}
             <button
               type="button"
               className={`overlay-foot-pill${menuOpen ? " is-open" : ""}`}
-              title="Overlay quick settings — no alt-tab needed"
+              title={t("overlay.gearTitle")}
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();

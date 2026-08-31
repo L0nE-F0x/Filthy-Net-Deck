@@ -55,9 +55,11 @@ import {
 import {
   normalizeDensity,
   normalizeOpacity,
+  normalizeWindowMode,
   type OverlayDensity,
+  type OverlayWindowMode,
 } from "../overlay/overlayModel";
-import { pushOverlayPrefs, setPresenceEnabled as setPresenceEnabledRust, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setNotifyMatchEndRust } from "../services/overlay";
+import { pushOverlayPrefs, setPresenceEnabled as setPresenceEnabledRust, setOverlayEnabled as setOverlayEnabledRust, setOverlayPostMatch as setOverlayPostMatchRust, setOverlayWindowMode as setOverlayWindowModeRust, setNotifyMatchEndRust } from "../services/overlay";
 import { applyFullscreen } from "../services/windowMode";
 import {
   applyAppearance,
@@ -69,9 +71,28 @@ import {
 } from "../services/theme";
 import { detectRankUp, type RankUpMoment } from "../services/rankMoments";
 import { isSoundCueSet, playSfx, type SoundCueSet } from "../services/sfx";
+import { applyLocalePref, isLocalePref, type LocalePref } from "../i18n";
 
 const PREFS_KEY = "bbi.prefs";
 const FAV_KEY = "bbi.favorites";
+const DISMISSED_UPDATE_KEY = "bbi.dismissedUpdateVersion";
+
+function loadDismissedUpdateVersion(): string | null {
+  try {
+    return localStorage.getItem(DISMISSED_UPDATE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function persistDismissedUpdateVersion(version: string | null): void {
+  try {
+    if (version) localStorage.setItem(DISMISSED_UPDATE_KEY, version);
+    else localStorage.removeItem(DISMISSED_UPDATE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 /** Tracked-decklist display style on My Stats (v2.0). */
 export type DecklistView = "stacked" | "list" | "compact";
@@ -140,6 +161,17 @@ interface Prefs {
   overlayDensity: OverlayDensity;
   /** Overlay fades quieter while the mouse is elsewhere (default on). */
   overlayIdleDim: boolean;
+  /**
+   * Overlay = HUD over Arena (default). Companion = persistent window the
+   * user closes. Same webview.
+   */
+  overlayWindowMode: OverlayWindowMode;
+  /** True after the user has picked overlay vs companion. */
+  overlayWindowModeChosen: boolean;
+  /** True after the one-shot "Start with your PC?" prompt (or Settings toggle). */
+  autostartAsked: boolean;
+  /** In-app UI language. `system` follows the OS (Arena client set). */
+  locale: LocalePref;
   /** Tracked-decklist display style on My Stats (default stacked — compact). */
   decklistView: DecklistView;
   /** Climb path list order — newest stretch on top (default on). */
@@ -180,6 +212,10 @@ function loadPrefs(): Prefs {
         overlayPostMatch?: boolean;
         overlayDensity?: string;
         overlayIdleDim?: boolean;
+        overlayWindowMode?: string;
+        overlayWindowModeChosen?: boolean;
+        autostartAsked?: boolean;
+        locale?: string;
         decklistView?: string;
         climbNewestFirst?: boolean;
         defaultPage?: string;
@@ -211,6 +247,10 @@ function loadPrefs(): Prefs {
         overlayPostMatch: parsed.overlayPostMatch !== false,
         overlayDensity: normalizeDensity(parsed.overlayDensity),
         overlayIdleDim: parsed.overlayIdleDim !== false,
+        overlayWindowMode: normalizeWindowMode(parsed.overlayWindowMode),
+        overlayWindowModeChosen: parsed.overlayWindowModeChosen === true,
+        autostartAsked: parsed.autostartAsked === true,
+        locale: isLocalePref(parsed.locale) ? parsed.locale : "system",
         decklistView:
           parsed.decklistView === "list" || parsed.decklistView === "compact"
             ? parsed.decklistView
@@ -256,6 +296,10 @@ function loadPrefs(): Prefs {
     overlayPostMatch: true,
     overlayDensity: "compact",
     overlayIdleDim: true,
+    overlayWindowMode: "overlay",
+    overlayWindowModeChosen: false,
+    autostartAsked: false,
+    locale: "system",
     decklistView: "stacked",
     climbNewestFirst: true,
     defaultPage: "daily",
@@ -328,7 +372,7 @@ interface AppState {
   /** In-app update install state */
   updating: boolean;
   updateProgress: number | null;
-  /** Version the user dismissed with "Later" — banner stays hidden for it this session. */
+  /** Version the user dismissed with "Later" — persisted so it stays gone after restart. */
   dismissedUpdateVersion: string | null;
   /** Winrate tracker (null status = not running / browser build) */
   trackerStatus: TrackerStatus | null;
@@ -417,6 +461,10 @@ interface AppState {
   setOverlayPostMatch: (v: boolean) => void;
   setOverlayDensity: (v: OverlayDensity) => void;
   setOverlayIdleDim: (v: boolean) => void;
+  setOverlayWindowMode: (v: OverlayWindowMode) => void;
+  /** Dismiss the Decks-home autostart ask (Yes or Not now). */
+  markAutostartAsked: () => void;
+  setLocalePref: (v: LocalePref) => void;
   /** Tracked-decklist display style (My Stats deck detail). */
   setDecklistView: (v: DecklistView) => void;
   /** Climb path order — newest stretch on top. */
@@ -517,6 +565,7 @@ declare global {
 export const useAppStore = create<AppState>((set, get) => {
   const prefs = loadPrefs();
   applyAppearance(prefs.theme, prefs.skin);
+  applyLocalePref(prefs.locale);
   applyReduceMotion(prefs.reduceMotion);
   // The test-only meta URL override was removed in 0.8.3 — clear any leftover.
   try {
@@ -553,7 +602,7 @@ export const useAppStore = create<AppState>((set, get) => {
     updateAvailable: null,
     updating: false,
     updateProgress: null,
-    dismissedUpdateVersion: null,
+    dismissedUpdateVersion: loadDismissedUpdateVersion(),
     trackerStatus: null,
     trackerMatches: [],
     trackerReady: false,
@@ -795,6 +844,29 @@ export const useAppStore = create<AppState>((set, get) => {
       set({ prefs: next });
       void pushOverlayPrefs();
     },
+    setOverlayWindowMode: (overlayWindowMode) => {
+      const next = {
+        ...get().prefs,
+        overlayWindowMode: normalizeWindowMode(overlayWindowMode),
+        overlayWindowModeChosen: true,
+      };
+      savePrefs(next);
+      set({ prefs: next });
+      void pushOverlayPrefs();
+      void setOverlayWindowModeRust(next.overlayWindowMode === "companion");
+    },
+    markAutostartAsked: () => {
+      const next = { ...get().prefs, autostartAsked: true };
+      savePrefs(next);
+      set({ prefs: next });
+    },
+    setLocalePref: (locale) => {
+      const next = { ...get().prefs, locale: isLocalePref(locale) ? locale : "system" };
+      savePrefs(next);
+      set({ prefs: next });
+      applyLocalePref(next.locale);
+      void pushOverlayPrefs();
+    },
     setDecklistView: (decklistView) => {
       const next = { ...get().prefs, decklistView };
       savePrefs(next);
@@ -820,6 +892,7 @@ export const useAppStore = create<AppState>((set, get) => {
       const next = loadPrefs();
       set({ prefs: next });
       applyReduceMotion(next.reduceMotion);
+      applyLocalePref(next.locale);
     },
     setSoundEnabled: (soundEnabled) => {
       const next = { ...get().prefs, soundEnabled };
@@ -935,8 +1008,11 @@ export const useAppStore = create<AppState>((set, get) => {
       }
     },
 
-    dismissUpdate: () =>
-      set({ dismissedUpdateVersion: get().updateAvailable?.version ?? null }),
+    dismissUpdate: () => {
+      const version = get().updateAvailable?.version ?? null;
+      persistDismissedUpdateVersion(version);
+      set({ dismissedUpdateVersion: version });
+    },
 
     refreshTracker: async () => {
       if (!isTauri()) return;

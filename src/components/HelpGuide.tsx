@@ -1,24 +1,15 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import type { Page } from "../types/meta";
-
-/** One-shot first-run flag — the tour auto-opens once per PC, then never again. */
-const SEEN_KEY = "bbi.helpSeen.v1";
+import { helpTourWasSeen, markHelpTourSeen } from "../services/helpTour";
+import { useLocale } from "../i18n";
 
 function markSeen() {
-  try {
-    localStorage.setItem(SEEN_KEY, "1");
-  } catch {
-    /* ignore */
-  }
+  markHelpTourSeen();
 }
 
 function wasSeen(): boolean {
-  try {
-    return localStorage.getItem(SEEN_KEY) === "1";
-  } catch {
-    return true;
-  }
+  return helpTourWasSeen();
 }
 
 interface Topic {
@@ -256,6 +247,7 @@ const TOPICS: Topic[] = [
  * install, afterwards from the top-bar Help button or Settings.
  */
 export function HelpGuide() {
+  const { t } = useLocale();
   const open = useAppStore((s) => s.helpOpen);
   const setOpen = useAppStore((s) => s.setHelpOpen);
   const setPage = useAppStore((s) => s.setPage);
@@ -296,14 +288,14 @@ export function HelpGuide() {
     >
       <div className="help-modal" role="dialog" aria-modal="true" aria-label="Help and tour">
         <header className="help-head">
-          <h2 className="m-0">Help &amp; tour</h2>
+          <h2 className="m-0">{t("help.title")}</h2>
           <button
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => setOpen(false)}
-            aria-label="Close help"
+            aria-label={t("help.close")}
           >
-            ✕ Close
+            ✕ {t("common.close")}
           </button>
         </header>
         <div className="help-body">
@@ -345,7 +337,7 @@ export function HelpGuide() {
             disabled={idx === 0}
             onClick={() => setTopicId(TOPICS[Math.max(0, idx - 1)].id)}
           >
-            ‹ Back
+            ‹ {t("help.back")}
           </button>
           <span className="help-foot-dots" aria-hidden="true">
             {TOPICS.map((t, i) => (
@@ -358,7 +350,7 @@ export function HelpGuide() {
               className="btn btn-primary btn-sm"
               onClick={() => setTopicId(TOPICS[idx + 1].id)}
             >
-              Next ›
+              {t("help.next")} ›
             </button>
           ) : (
             <button

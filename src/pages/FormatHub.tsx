@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
+import { t, useLocale } from "../i18n";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { openExternal } from "../services/openExternal";
 import { decksForMode } from "../services/deckHelpers";
@@ -210,7 +211,7 @@ function HubBody({
     <div className="panel flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="eyebrow m-0 mb-1">Legality · rotation · bans</p>
+          <p className="eyebrow m-0 mb-1">{t("formats.legality")}</p>
           <p className="text-sm text-muted m-0 leading-relaxed max-w-2xl">
             {fmt === "standard" ? (
               <>
@@ -316,7 +317,7 @@ function HubBody({
 
       {fmt === "standard" && nearHero.active && (
         <div className="rotation-hero">
-          <p className="eyebrow m-0 mb-1">Rotation approaching</p>
+          <p className="eyebrow m-0 mb-1">{t("formats.rotation")}</p>
           <h3 className="text-base font-semibold m-0">
             {nearHero.nextDate
               ? formatDate(nearHero.nextDate)
@@ -395,6 +396,7 @@ function HubBody({
  * Data rides the sets feed (`formats`); older feeds hide content gracefully.
  */
 export function FormatHubPage() {
+  const { t } = useLocale();
   const sets = useAppStore((s) => s.sets);
   const setsLoading = useAppStore((s) => s.setsLoading);
   const setsError = useAppStore((s) => s.setsError);
@@ -464,7 +466,7 @@ export function FormatHubPage() {
   return (
     <div className="flex flex-col gap-4 max-w-5xl">
       <div>
-        <p className="eyebrow">Format Hub</p>
+        <p className="eyebrow">{t("formats.eyebrow")}</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Legality &amp; bans</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
           Real Standard and Pioneer set pools, rotation windows, and ban lists — from official

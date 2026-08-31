@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { headlineCards, summarizeBanChanges } from "../services/banPulse";
+import { useLocale } from "../i18n";
 
 /**
  * Decks-home banner for a real-world B&R announcement. Shows until the user
  * opens Format Hub or dismisses it — both acknowledge the new ban lists as seen.
  */
 export function BanPulse() {
+  const { t } = useLocale();
   const banChanges = useAppStore((s) => s.banChanges);
   const setPage = useAppStore((s) => s.setPage);
   const markBansSeen = useAppStore((s) => s.markBansSeen);
@@ -24,7 +26,7 @@ export function BanPulse() {
 
   return (
     <div className="spoiler-pulse ban-pulse" role="status">
-      <span className="spoiler-pulse-badge ban-pulse-badge">B&amp;R</span>
+      <span className="spoiler-pulse-badge ban-pulse-badge">{t("pulses.banBadge")}</span>
       <button
         type="button"
         className="ban-pulse-open"
@@ -34,19 +36,19 @@ export function BanPulse() {
         }}
       >
         <span className="spoiler-pulse-copy">
-          <strong>Banned &amp; Restricted update</strong>
+          <strong>{t("pulses.banTitle")}</strong>
           <span className="spoiler-pulse-detail">
             {" "}
             {summary}
             {cardBit}
           </span>
         </span>
-        <span className="spoiler-pulse-cta">Format Hub →</span>
+        <span className="spoiler-pulse-cta">{t("pulses.formatHub")}</span>
       </button>
       <button
         type="button"
         className="ban-pulse-dismiss"
-        aria-label="Dismiss ban list update"
+        aria-label={t("pulses.dismissBan")}
         title="Dismiss"
         onClick={markBansSeen}
       >

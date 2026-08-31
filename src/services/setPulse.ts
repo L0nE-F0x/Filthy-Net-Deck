@@ -6,6 +6,7 @@ import { setGalleryCards } from "../types/sets";
 
 const SNAP_KEY = "bbi.sets.cardSnap";
 const NOTIFY_DAY_KEY = "bbi.sets.arenaNotifyDay";
+const PULSE_DISMISS_KEY = "bbi.spoilerPulse.dismissed";
 
 export type CardSnap = Record<string, string[]>; // setCode -> scryfallIds
 
@@ -142,6 +143,33 @@ export function shouldFireArenaNotify(): boolean {
 export function markArenaNotifyFired(): void {
   try {
     localStorage.setItem(NOTIFY_DAY_KEY, todayIso());
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Identity of a Decks-home Set Radar pulse — changes when the event does. */
+export function spoilerPulseDismissKey(
+  item: Pick<SpoilerPulseItem, "code" | "kind" | "arenaDate">,
+): string {
+  return `${item.code}:${item.kind}:${item.arenaDate ?? ""}`;
+}
+
+export function isSpoilerPulseDismissed(
+  item: Pick<SpoilerPulseItem, "code" | "kind" | "arenaDate">,
+): boolean {
+  try {
+    return localStorage.getItem(PULSE_DISMISS_KEY) === spoilerPulseDismissKey(item);
+  } catch {
+    return false;
+  }
+}
+
+export function dismissSpoilerPulse(
+  item: Pick<SpoilerPulseItem, "code" | "kind" | "arenaDate">,
+): void {
+  try {
+    localStorage.setItem(PULSE_DISMISS_KEY, spoilerPulseDismissKey(item));
   } catch {
     /* ignore */
   }

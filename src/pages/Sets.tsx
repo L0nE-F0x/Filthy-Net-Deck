@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { useAppStore } from "../store/useAppStore";
+import { t, useLocale } from "../i18n";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { ScryfallImg } from "../components/ScryfallImg";
 import { openExternal } from "../services/openExternal";
@@ -215,7 +216,7 @@ function FreshSpoilers({ cards }: { cards: FreshSpoilerCard[] }): ReactNode {
     <section className="fresh-spoilers panel !p-3" aria-label="Just spoiled — unconfirmed">
       <div className="fresh-spoilers-head">
         <div>
-          <p className="eyebrow m-0 mb-0.5">Just spoiled · unconfirmed</p>
+          <p className="eyebrow m-0 mb-0.5">{t("sets.justSpoiled")}</p>
           <p className="text-xs text-muted m-0 leading-relaxed max-w-2xl">
             {cards.length} card{cards.length === 1 ? "" : "s"} not in the official gallery yet.
             These are unverified previews — they drop from here automatically once the card is
@@ -372,7 +373,7 @@ function SetGallery({
             <IconBack className="w-4 h-4 inline-block mr-1 align-text-bottom" />
             All sets
           </button>
-          <p className="eyebrow m-0">Gallery</p>
+          <p className="eyebrow m-0">{t("sets.gallery")}</p>
           <h2 className="text-2xl font-semibold m-0 tracking-tight flex items-center gap-2">
             {set.iconSvg ? (
               <img src={set.iconSvg} alt="" className="set-icon" width={28} height={28} />
@@ -595,7 +596,7 @@ function FutureStandardSection({
       <h3 className="set-section-title">Future Standard</h3>
       <div className="panel flex flex-col gap-3">
         <div>
-          <p className="eyebrow m-0 mb-1">On the roadmap · no cards spoiled yet</p>
+          <p className="eyebrow m-0 mb-1">{t("sets.roadmap")}</p>
           <p className="text-sm text-muted m-0 leading-relaxed max-w-2xl">
             Announced sets beyond the radar, each linked to its announcement source. They
             graduate to the radar above — dates, galleries, countdowns — the moment Scryfall
@@ -751,7 +752,7 @@ function SetCard({
       <div className="set-card-body">
         <div className="set-countdown-strip">
           <div className="set-countdown-main">
-            <span className="set-countdown-eyebrow">Arena</span>
+            <span className="set-countdown-eyebrow">{t("sets.arena")}</span>
             <strong>{countdownLabel(set.dates.arena)}</strong>
             <span className="set-countdown-sub">
               {!set.dates.arena
@@ -762,7 +763,7 @@ function SetCard({
             </span>
           </div>
           <div className="set-countdown-side">
-            <span className="set-countdown-eyebrow">Paper</span>
+            <span className="set-countdown-eyebrow">{t("sets.paper")}</span>
             <strong>{countdownLabel(set.dates.tabletop)}</strong>
             <span className="set-countdown-sub">{formatDate(set.dates.tabletop)}</span>
           </div>
@@ -957,6 +958,7 @@ function LiveSetRow({
 }
 
 export function Sets() {
+  const { t } = useLocale();
   const sets = useAppStore((s) => s.sets);
   const setsLoading = useAppStore((s) => s.setsLoading);
   const setsError = useAppStore((s) => s.setsError);
@@ -1076,7 +1078,7 @@ export function Sets() {
   return (
     <div className="flex flex-col gap-4 max-w-5xl">
       <div>
-        <p className="eyebrow">Sets</p>
+        <p className="eyebrow">{t("sets.eyebrow")}</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Set radar</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
           Arena-first spoilers and full galleries. Legality, rotation, and ban lists live on{" "}
@@ -1100,7 +1102,7 @@ export function Sets() {
 
       {dropDaySets.length > 0 ? (
         <div className="panel set-drop-day-hero">
-          <p className="eyebrow m-0 mb-1">Arena drop window</p>
+          <p className="eyebrow m-0 mb-1">{t("sets.dropWindow")}</p>
           <p className="text-sm m-0">
             {dropDaySets.map((s) => s.name).join(" · ")}
             {" — "}

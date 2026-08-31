@@ -6,15 +6,18 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 const OVERLAY_LABEL: &str = "overlay";
 const ENABLED_FILE: &str = "overlay-enabled";
 const POST_MATCH_FILE: &str = "overlay-post-match";
+const MODE_FILE: &str = "overlay-window-mode";
 const GEOMETRY_FILE: &str = "overlay-geometry.json";
 
-/// Slim column default width (expanded height lives in geometry.height).
-const DEFAULT_W: f64 = 228.0;
+/// Quiet collapsed HUD (name + archetype + confidence + session + land% +
+/// turn + clock) needs ~360. Saved geometry is left alone — first-open only.
+const DEFAULT_W: f64 = 360.0;
 /// Minimal density (no card art) stays readable down to ~164 logical px.
 const MIN_W: f64 = 164.0;
 /// Collapsed bar = 2px accent + 30px bar + border — allow the JS shrink.
@@ -24,6 +27,11 @@ const MAX_H: f64 = 900.0;
 
 static ENABLED: AtomicBool = AtomicBool::new(true);
 static POST_MATCH: AtomicBool = AtomicBool::new(true);
+/// Companion window: opaque-ish, not always-on-top, user-closed, survives match end.
+static COMPANION: AtomicBool = AtomicBool::new(false);
+/// User closed the companion this match — stay hidden until the next match id.
+static USER_CLOSED: AtomicBool = AtomicBool::new(false);
+static LAST_MATCH: Mutex<String> = Mutex::new(String::new());
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -98,6 +106,68 @@ pub fn load_post_match(app: &AppHandle) {
 
 pub fn is_post_match_enabled() -> bool {
     POST_MATCH.load(Ordering::SeqCst)
+}
+
+pub fn is_companion() -> bool {
+    COMPANION.load(Ordering::SeqCst)
+}
+
+fn mode_path(app: &AppHandle) -> Option<PathBuf> {
+    app.path().app_data_dir().ok().map(|d| d.join(MODE_FILE))
+}
+
+pub fn parse_companion_mode(s: &str) -> bool {
+    let t = s.trim();
+    t.eq_ignore_ascii_case("companion") || t == "1" || t.eq_ignore_ascii_case("true")
+}
+
+pub fn load_window_mode(app: &AppHandle) {
+    let companion = mode_path(app)
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| parse_companion_mode(&s))
+        .unwrap_or(false);
+    COMPANION.store(companion, Ordering::SeqCst);
+}
+
+fn persist_window_mode(app: &AppHandle, companion: bool) {
+    if let Some(path) = mode_path(app) {
+        if let Some(dir) = path.parent() {
+            let _ = fs::create_dir_all(dir);
+        }
+        let _ = fs::write(
+            path,
+            if companion {
+                b"companion" as &[u8]
+            } else {
+                b"overlay" as &[u8]
+            },
+        );
+    }
+}
+
+fn apply_chrome(app: &AppHandle) {
+    let companion = is_companion();
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        let _ = win.set_always_on_top(!companion);
+        let _ = win.set_skip_taskbar(!companion);
+        let _ = win.set_title(if companion {
+            "Filthy Net Deck — Match"
+        } else {
+            "Filthy Net Deck — Overlay"
+        });
+        if companion {
+            let _ = win.set_ignore_cursor_events(false);
+        }
+    }
+}
+
+pub fn set_window_mode(app: &AppHandle, companion: bool) {
+    let prev = COMPANION.swap(companion, Ordering::SeqCst);
+    persist_window_mode(app, companion);
+    if prev != companion {
+        USER_CLOSED.store(false, Ordering::SeqCst);
+    }
+    apply_chrome(app);
 }
 
 pub fn set_post_match(app: &AppHandle, enabled: bool) {
@@ -206,24 +276,31 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
         .unwrap_or((DEFAULT_W, COLLAPSED_H, false));
     let _ = expanded; // JS re-syncs compact state from geometry on mount
 
+    let companion = is_companion();
     let url = WebviewUrl::App("index.html#/overlay".into());
     let builder = WebviewWindowBuilder::new(app, OVERLAY_LABEL, url)
-        .title("Filthy Net Deck — Overlay")
+        .title(if companion {
+            "Filthy Net Deck — Match"
+        } else {
+            "Filthy Net Deck — Overlay"
+        })
         .inner_size(w, h)
         .min_inner_size(MIN_W, MIN_H)
         .max_inner_size(MAX_W, MAX_H)
         .resizable(true)
         .decorations(false)
-        .always_on_top(true)
-        .skip_taskbar(true)
+        .always_on_top(!companion)
+        .skip_taskbar(!companion)
         .visible(false)
         .focused(false);
 
     // `transparent` is Windows/Linux-only in Tauri 2 — macOS has no such
     // builder method (this exact call broke the v1.3.x dmg CI builds).
     // macOS gets a square, opaque panel via the .overlay-macos CSS instead.
+    // Companion stays opaque so it reads as a normal window on the other
+    // monitor, not a HUD over Arena.
     #[cfg(not(target_os = "macos"))]
-    let builder = builder.transparent(true);
+    let builder = builder.transparent(!companion);
 
     let builder = match &geo {
         Some(g) if pos_ok => builder.position(g.x, g.y),
@@ -242,16 +319,59 @@ pub fn show(app: &AppHandle) {
         eprintln!("[overlay] ensure_window: {e}");
         return;
     }
+    apply_chrome(app);
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
         let _ = win.show();
-        // Do not set_focus — never steal Arena input.
+        // Overlay never steals Arena input. Companion may, so the user can
+        // alt-tab to it — but still don't yank focus on auto-show.
+        if is_companion() {
+            let _ = win.unminimize();
+        }
     }
 }
 
+/// Show for this match. Companion: if the user closed the window, stay hidden
+/// until `match_id` changes (next game). Overlay: always show.
+pub fn show_for_match(app: &AppHandle, match_id: &str) {
+    if is_companion() {
+        let mut last = LAST_MATCH.lock().unwrap_or_else(|e| e.into_inner());
+        if last.as_str() != match_id {
+            last.clear();
+            last.push_str(match_id);
+            USER_CLOSED.store(false, Ordering::SeqCst);
+        }
+        if USER_CLOSED.load(Ordering::SeqCst) {
+            return;
+        }
+    }
+    show(app);
+}
+
 pub fn hide(app: &AppHandle) {
+    // Companion stays up after the match unless the user closed it.
+    if is_companion() && !USER_CLOSED.load(Ordering::SeqCst) {
+        return;
+    }
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
         let _ = win.hide();
     }
+}
+
+/// User hit the companion close button. Hidden until the next match.
+pub fn user_close(app: &AppHandle) {
+    USER_CLOSED.store(true, Ordering::SeqCst);
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        let _ = win.hide();
+    }
+}
+
+/// Arena quit: drop the HUD renderer to free RAM. Companion stays if the
+/// user left it open — that's the "I close it myself" contract.
+pub fn on_arena_quit(app: &AppHandle) {
+    if is_companion() && !USER_CLOSED.load(Ordering::SeqCst) {
+        return;
+    }
+    destroy(app);
 }
 
 /// Fully tear down the overlay webview (frees its WebView2 renderer).
@@ -326,9 +446,31 @@ pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
 /// mount and on every prefs push, so the window always exists here.
 #[tauri::command]
 pub fn overlay_set_click_through(app: AppHandle, ignore: bool) {
+    if is_companion() {
+        // Companion is a real window — clicks have to land on it.
+        if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+            let _ = win.set_ignore_cursor_events(false);
+        }
+        return;
+    }
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
         let _ = win.set_ignore_cursor_events(ignore);
     }
+}
+
+#[tauri::command]
+pub fn overlay_set_window_mode(app: AppHandle, companion: bool) {
+    set_window_mode(&app, companion);
+}
+
+#[tauri::command]
+pub fn overlay_user_close(app: AppHandle) {
+    user_close(&app);
+}
+
+#[tauri::command]
+pub fn overlay_is_companion() -> bool {
+    is_companion()
 }
 
 #[cfg(test)]
@@ -358,5 +500,16 @@ mod tests {
         // A second monitor with negative coords rescues the same position.
         let two = [(0.0, 0.0, 1920.0, 1080.0), (-2560.0, 0.0, 2560.0, 1440.0)];
         assert!(geometry_reachable(&geo(-2400.0, 50.0), &two));
+    }
+
+    #[test]
+    fn parse_companion_mode_accepts_named_and_truthy() {
+        assert!(parse_companion_mode("companion"));
+        assert!(parse_companion_mode("Companion"));
+        assert!(parse_companion_mode("1"));
+        assert!(!parse_companion_mode("overlay"));
+        assert!(!parse_companion_mode(""));
+        assert!(!parse_companion_mode("0"));
+        assert!(!parse_companion_mode("false"));
     }
 }

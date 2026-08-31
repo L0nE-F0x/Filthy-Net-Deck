@@ -3428,6 +3428,19 @@ html[data-theme="light"] .live-set-icon {
   right: 1rem;
 }
 
+/* Decks-home pulses sit under the board, not as peers of it. */
+.home-pulses {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.home-pulses .spoiler-pulse {
+  padding: 0;
+}
+.home-pulses .spoiler-pulse-badge {
+  margin-left: 0.9rem;
+}
+
 /* Spoiler pulse (Decks home) */
 .spoiler-pulse {
   display: flex;
@@ -3436,21 +3449,30 @@ html[data-theme="light"] .live-set-icon {
   width: 100%;
   padding: 0.7rem 0.9rem;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-gold-500) 35%, var(--color-ink-600));
-  background: linear-gradient(
-    105deg,
-    color-mix(in srgb, var(--color-gold-500) 14%, var(--color-ink-900)),
-    var(--color-ink-900) 55%
-  );
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 22%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-ink-800) 88%, var(--color-gold-500));
   color: var(--color-foam);
   font: inherit;
   text-align: left;
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  cursor: default;
+  transition: border-color 0.15s;
 }
 .spoiler-pulse:hover {
-  border-color: color-mix(in srgb, var(--color-gold-400) 55%, transparent);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--color-gold-400) 40%, transparent);
+}
+.spoiler-pulse-open {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.75rem 0.55rem 0.9rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .spoiler-pulse-badge {
   flex-shrink: 0;
@@ -3531,6 +3553,56 @@ html[data-theme="light"] .live-set-icon {
 .ban-pulse-dismiss:hover {
   background: color-mix(in srgb, var(--color-poor) 20%, transparent);
   color: var(--color-foam);
+}
+
+/* One-shot autostart ask on Decks — quieter than the 8-deck board. */
+.autostart-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 22%, var(--color-ink-600));
+  background: color-mix(in srgb, var(--color-ink-800) 90%, var(--color-gold-500));
+  color: var(--color-foam);
+}
+.autostart-prompt-badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-gold-500) 22%, transparent);
+  color: var(--color-gold-300);
+}
+.autostart-prompt-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+.autostart-prompt-copy strong {
+  font-size: 0.92rem;
+}
+.autostart-prompt-copy span {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  line-height: 1.35;
+}
+.autostart-prompt-err {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--color-poor);
+}
+.autostart-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 /* Gallery extras */
@@ -6237,6 +6309,13 @@ html.overlay-macos .overlay-shell {
   color: var(--color-gold-400);
   opacity: 0.85;
 }
+.overlay-opp-cluster {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
 .overlay-opp-line {
   font-weight: 650;
   font-size: 12px;
@@ -6244,10 +6323,20 @@ html.overlay-macos .overlay-shell {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .overlay-opp-arch {
+  flex-shrink: 0;
   font-weight: 600;
   color: color-mix(in srgb, var(--color-gold-300) 85%, var(--color-foam));
+  white-space: nowrap;
+}
+.overlay-opp-conf {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--color-gold-300) 70%, var(--color-muted));
+  opacity: 0.9;
 }
 .overlay-opp-mu {
   font-weight: 700;
@@ -6259,6 +6348,34 @@ html.overlay-macos .overlay-shell {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+/* Overlay webview viewport = panel width. At the old 228 default the quiet
+   HUD cannot show name + arch + session + land + turn + clock at once —
+   keep archetype + confidence, drop the rest in order. */
+@media (max-width: 320px) {
+  .overlay-shell.is-compact .overlay-opp-line,
+  .overlay-shell.is-compact .overlay-opp-arch-sep,
+  .overlay-shell.is-compact .overlay-clock {
+    display: none;
+  }
+}
+@media (max-width: 250px) {
+  .overlay-shell.is-compact .overlay-stat--rec {
+    display: none;
+  }
+  .overlay-shell.is-compact .overlay-land-full {
+    display: none;
+  }
+  .overlay-shell.is-compact .overlay-land-short {
+    display: inline;
+  }
+  /* Companion × steals ~18px — drop turn, keep the guess. */
+  .overlay-shell.is-compact.is-companion .overlay-chip--turn {
+    display: none;
+  }
+}
+.overlay-land-short {
+  display: none;
 }
 .overlay-stat {
   display: inline-flex;
@@ -6688,6 +6805,56 @@ html.overlay-macos .overlay-shell {
 /* Idle dim: the whole panel fades while the cursor is elsewhere (pref, default
    on). Delay on the way down so it never flickers while mousing past. */
 .overlay-shell { transition: opacity 0.15s ease; }
+.overlay-shell.is-companion {
+  --ov-alpha: 1;
+  border-radius: 8px;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.5),
+    0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.overlay-icon-btn--close {
+  font-size: 12px;
+  font-weight: 700;
+}
+.overlay-chooser {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 8px 10px;
+}
+.overlay-chooser-title {
+  margin: 0 4px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-foam);
+}
+.overlay-chooser-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.overlay-chooser-opt:hover {
+  border-color: color-mix(in srgb, var(--ov-accent) 40%, transparent);
+  background: rgba(255, 255, 255, 0.07);
+}
+.overlay-chooser-opt strong {
+  font-size: 11px;
+}
+.overlay-chooser-opt em {
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--color-muted);
+  line-height: 1.3;
+}
 .overlay-shell.is-dim {
   opacity: 0.6;
   transition: opacity 0.7s ease 1.2s;

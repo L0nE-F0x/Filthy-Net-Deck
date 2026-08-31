@@ -236,6 +236,9 @@ pub fn run() {
             overlay::overlay_save_geometry,
             overlay::overlay_set_click_through,
             overlay::overlay_set_post_match,
+            overlay::overlay_set_window_mode,
+            overlay::overlay_user_close,
+            overlay::overlay_is_companion,
             tracker::notify_set_match_end,
             toast::toast_set_enabled,
             toast::toast_show,
@@ -312,6 +315,7 @@ pub fn run() {
 
             overlay::load_enabled(app.handle());
             overlay::load_post_match(app.handle());
+            overlay::load_window_mode(app.handle());
             toast::load_enabled(app.handle());
             // Do not prewarm toast/overlay/presence at boot — each is a full
             // WebView2 renderer. Overlay + presence warm when Arena launches;

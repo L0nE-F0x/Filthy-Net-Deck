@@ -8,6 +8,7 @@ import {
   type OnboardingStep,
 } from "../services/trackerHealth";
 import { listTaggedOpponentCount } from "../services/matchupNotes";
+import { useLocale } from "../i18n";
 
 /**
  * First-session coach: log → first match → matchups (D1).
@@ -21,6 +22,7 @@ export function TrackerOnboarding({
   compact?: boolean;
   showHealthDetail?: boolean;
 }) {
+  const { t } = useLocale();
   const status = useAppStore((s) => s.trackerStatus);
   const matches = useAppStore((s) => s.trackerMatches);
   const setPage = useAppStore((s) => s.setPage);
@@ -71,7 +73,7 @@ export function TrackerOnboarding({
 
       {progress.live ? (
         <div className="tracker-onboarding-live" role="status">
-          <strong>You&apos;re live</strong>
+          <strong>{t("daily.youreLive")}</strong>
           <span>
             {matches.length} match{matches.length === 1 ? "" : "es"} on this PC
             {firstMatch?.deckName ? ` · started with ${firstMatch.deckName}` : ""}.
@@ -79,7 +81,7 @@ export function TrackerOnboarding({
           </span>
         </div>
       ) : (
-        <p className="eyebrow m-0 mb-2">First 2 minutes</p>
+        <p className="eyebrow m-0 mb-2">{t("daily.firstMinutes")}</p>
       )}
 
       <div
@@ -114,11 +116,11 @@ export function TrackerOnboarding({
             </p>
           ) : tagged === 0 ? (
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setPage("matchups")}>
-              Open Matchups →
+              {t("daily.openMatchups")}
             </button>
           ) : (
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setPage("climb")}>
-              See your climb →
+              {t("daily.seeClimb")}
             </button>
           )}
         </div>

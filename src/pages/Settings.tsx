@@ -11,6 +11,13 @@ import { DONATE_URL, FEEDBACK_URL, PRIVACY_URL, appFeedbackUrl } from "../servic
 import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
 import { isTauri } from "../services/appUpdater";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
+import {
+  detectSystemLocale,
+  isLocalePref,
+  LOCALE_IDS,
+  LOCALE_NATIVE,
+  useLocale,
+} from "../i18n";
 import { exportTrackerDiagnostic } from "../services/tracker";
 import { sendTestNotification } from "../services/notify";
 import {
@@ -21,7 +28,7 @@ import {
   type SoundCueSet,
 } from "../services/sfx";
 import { retentionSnapshot } from "../services/localRetention";
-import type { OverlayDensity } from "../overlay/overlayModel";
+import type { OverlayDensity, OverlayWindowMode } from "../overlay/overlayModel";
 
 /** Sidebar labels for the launch-page picker (nav pages only). */
 const PAGE_LABELS: Partial<Record<Page, string>> = {
@@ -50,13 +57,14 @@ function LocalOpenDaysNote() {
 
 /** X1 + v1.2 — tracker health + first-session coach. C6 — diagnostic export. */
 function TrackerHealthCard() {
+  const { t } = useLocale();
   const setPage = useAppStore((s) => s.setPage);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const [diagMsg, setDiagMsg] = useState<string | null>(null);
 
   return (
     <section className="panel settings-card settings-card-span2">
-      <h3 className="settings-card-title">Tracker health</h3>
+      <h3 className="settings-card-title">{t("settings.trackerHealth")}</h3>
       <p className="settings-card-desc mb-2">
         This check runs locally and sends nothing. Answers “is it working?” without leaving Settings.
       </p>
@@ -102,6 +110,7 @@ function TrackerHealthCard() {
 
 /** X2 — discoverability for 1–8 / Ctrl+K / F11. */
 function KeyboardCheatSheet() {
+  const { t } = useLocale();
   const rows: { keys: string; action: string }[] = [
     { keys: "1–8", action: "Jump nav: Decks · Stats · Climb · Matchups · Sets · Format Hub · Events · Settings" },
     { keys: "Ctrl+K", action: "Command palette — search cards, decks, pages" },
@@ -109,7 +118,7 @@ function KeyboardCheatSheet() {
   ];
   return (
     <section className="panel settings-card settings-card-span2">
-      <h3 className="settings-card-title">Keyboard shortcuts</h3>
+      <h3 className="settings-card-title">{t("settings.shortcuts")}</h3>
       <p className="settings-card-desc mb-2">
         Numbers work when you&apos;re not typing in a field.
       </p>
@@ -127,6 +136,8 @@ function KeyboardCheatSheet() {
 
 export const Settings = memo(function Settings() {
   const prefs = useAppStore((s) => s.prefs);
+  const { t } = useLocale();
+  const setLocalePref = useAppStore((s) => s.setLocalePref);
   const setDefaultMode = useAppStore((s) => s.setDefaultMode);
   const setNotifyArenaEve = useAppStore((s) => s.setNotifyArenaEve);
   const setNotifyMatchEnd = useAppStore((s) => s.setNotifyMatchEnd);
@@ -349,6 +360,7 @@ export const Settings = memo(function Settings() {
   const setOverlayPostMatch = useAppStore((s) => s.setOverlayPostMatch);
   const setOverlayDensity = useAppStore((s) => s.setOverlayDensity);
   const setOverlayIdleDim = useAppStore((s) => s.setOverlayIdleDim);
+  const setOverlayWindowMode = useAppStore((s) => s.setOverlayWindowMode);
   const setDecklistView = useAppStore((s) => s.setDecklistView);
   const setClimbNewestFirst = useAppStore((s) => s.setClimbNewestFirst);
   const setDefaultPage = useAppStore((s) => s.setDefaultPage);
@@ -366,6 +378,7 @@ export const Settings = memo(function Settings() {
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
   const [autostart, setAutostartState] = useState<boolean | null>(null);
+  const markAutostartAsked = useAppStore((s) => s.markAutostartAsked);
   const [testMsg, setTestMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -382,36 +395,55 @@ export const Settings = memo(function Settings() {
   return (
     <div className="settings-page">
       <div>
-        <p className="eyebrow">Settings</p>
-        <h2 className="text-2xl font-semibold m-0 tracking-tight">Preferences</h2>
+        <p className="eyebrow">{t("settings.eyebrow")}</p>
+        <h2 className="text-2xl font-semibold m-0 tracking-tight">{t("settings.title")}</h2>
       </div>
 
       <div className="settings-grid">
         {/* —— Play & look —— */}
         <section className="panel settings-card">
-          <h3 className="settings-card-title">Default play mode</h3>
-          <p className="settings-card-desc">
-            Opens with this mode. Switch Bo1 / Bo3 anytime from the top bar.
-          </p>
+          <h3 className="settings-card-title">{t("settings.playMode")}</h3>
+          <p className="settings-card-desc">{t("settings.playModeDesc")}</p>
           <BoModeToggle mode={prefs.defaultMode} onChange={setDefaultMode} />
         </section>
 
         <section className="panel settings-card">
-          <h3 className="settings-card-title">Appearance</h3>
-          <p className="settings-card-desc">
-            Dark is the default. Light lives here and on the top bar. Planeswalker
-            color themes are on the sidebar <strong className="text-foam">Themes</strong>{" "}
-            control — they stack with dark/light.
-          </p>
+          <h3 className="settings-card-title">{t("settings.appearance")}</h3>
+          <p className="settings-card-desc">{t("settings.appearanceDesc")}</p>
           <ThemeToggle showLabels />
+          <label className="settings-select-row mt-3" htmlFor="pref-locale">
+            <span>
+              <strong>{t("settings.language")}</strong>
+              <em>{t("settings.languageDesc")}</em>
+            </span>
+            <select
+              id="pref-locale"
+              className="fnd-select"
+              value={prefs.locale}
+              onChange={(e) => {
+                const v = e.target.value;
+                setLocalePref(isLocalePref(v) ? v : "system");
+              }}
+            >
+              <option value="system">
+                {t("settings.languageSystem", {
+                  name: LOCALE_NATIVE[detectSystemLocale()],
+                })}
+              </option>
+              {LOCALE_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {LOCALE_NATIVE[id]}
+                </option>
+              ))}
+            </select>
+          </label>
         </section>
 
         {isTauri() && (
           <section className="panel settings-card">
-            <h3 className="settings-card-title">Display</h3>
+            <h3 className="settings-card-title">{t("settings.display")}</h3>
             <p className="settings-card-desc">
-              Fill the whole screen — no title bar. Press{" "}
-              <strong className="text-foam">F11</strong> anytime.
+              {t("settings.displayDesc")}
             </p>
             <label className="settings-check">
               <input
@@ -419,17 +451,15 @@ export const Settings = memo(function Settings() {
                 checked={prefs.fullscreen}
                 onChange={(e) => setFullscreenPref(e.target.checked)}
               />
-              Run in fullscreen
+              {t("settings.fullscreen")}
             </label>
           </section>
         )}
 
         {isTauri() && (
           <section className="panel settings-card">
-            <h3 className="settings-card-title">Start with your PC</h3>
-            <p className="settings-card-desc">
-              Launch quietly in the tray so Arena matches are always tracked.
-            </p>
+            <h3 className="settings-card-title">{t("settings.startPc")}</h3>
+            <p className="settings-card-desc">{t("settings.startPcDesc")}</p>
             <label className="settings-check">
               <input
                 type="checkbox"
@@ -438,17 +468,18 @@ export const Settings = memo(function Settings() {
                 onChange={(e) => {
                   const want = e.target.checked;
                   setAutostartState(want);
+                  markAutostartAsked();
                   void setAutostart(want).then((actual) => setAutostartState(actual));
                 }}
               />
-              Start when I log in
+              {t("settings.startWhenLogin")}
             </label>
           </section>
         )}
 
         {/* —— Interface (v2.0 — maximum knobs, sensible defaults) —— */}
         <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">Interface</h3>
+          <h3 className="settings-card-title">{t("settings.interface")}</h3>
           <p className="settings-card-desc mb-2">
             Make the app open and read the way you want. Every choice is remembered.
           </p>
@@ -517,7 +548,7 @@ export const Settings = memo(function Settings() {
               title="Page-by-page tour — the same one that opens on first launch"
               onClick={() => setHelpOpen(true)}
             >
-              Open help &amp; tour
+              {t("settings.openHelp")}
             </button>
             {FEEDBACK_URL && (
               <button
@@ -526,7 +557,7 @@ export const Settings = memo(function Settings() {
                 title="Suggest a feature or report a bug"
                 onClick={() => void openExternal(appFeedbackUrl(APP_VERSION))}
               >
-                Suggest a feature / Report a bug
+                {t("settings.suggest")}
               </button>
             )}
           </div>
@@ -535,15 +566,8 @@ export const Settings = memo(function Settings() {
         {/* —— In-game overlay —— */}
         {isTauri() && (
           <section className="panel settings-card settings-card-span2">
-            <h3 className="settings-card-title">In-game overlay</h3>
-            <p className="settings-card-desc mb-2">
-              Slim always-on-top tracker: draw odds, lands, turn, play/draw, and
-              an Opponent tab of every card they’ve shown. Drag to move, resize
-              from the edges — position is remembered, and the{" "}
-              <strong className="text-foam">⚙ pill</strong> adjusts everything
-              in-game. All read from Arena’s own log on this PC. If exclusive
-              fullscreen hides it, switch Arena to borderless windowed.
-            </p>
+            <h3 className="settings-card-title">{t("settings.overlay")}</h3>
+            <p className="settings-card-desc mb-2">{t("settings.overlayDesc")}</p>
             <div className="settings-toggle-list">
               <label className="settings-toggle-row">
                 <input
@@ -552,9 +576,26 @@ export const Settings = memo(function Settings() {
                   onChange={(e) => setOverlayEnabled(e.target.checked)}
                 />
                 <span>
-                  <strong>Show match overlay</strong>
-                  <em>Auto show/hide with match · ▾ expands full list</em>
+                  <strong>{t("settings.showOverlay")}</strong>
+                  <em>{t("settings.showOverlayEm")}</em>
                 </span>
+              </label>
+              <label className="settings-select-row" htmlFor="pref-ov-window-mode">
+                <span>
+                  <strong>{t("settings.windowMode")}</strong>
+                  <em>{t("settings.windowModeEm")}</em>
+                </span>
+                <select
+                  id="pref-ov-window-mode"
+                  className="fnd-select"
+                  value={prefs.overlayWindowMode}
+                  onChange={(e) =>
+                    setOverlayWindowMode(e.target.value as OverlayWindowMode)
+                  }
+                >
+                  <option value="overlay">{t("settings.overlayOpt")}</option>
+                  <option value="companion">{t("settings.companionOpt")}</option>
+                </select>
               </label>
               <label className="settings-toggle-row">
                 <input
@@ -605,7 +646,7 @@ export const Settings = memo(function Settings() {
                 />
                 <span>
                   <strong>Record on the minimized bar</strong>
-                  <em>Season W–L with this deck on the collapsed bar</em>
+                  <em>Session W–L on the collapsed bar (season stays on expand)</em>
                 </span>
               </label>
               <label className="settings-toggle-row">
@@ -695,7 +736,7 @@ export const Settings = memo(function Settings() {
         <section className="panel settings-card settings-card-span2 soundscape">
           <div className="soundscape-head">
             <div>
-              <h3 className="settings-card-title">Soundscape</h3>
+              <h3 className="settings-card-title">{t("settings.soundscape")}</h3>
               <p className="settings-card-desc mb-0">
                 Soft match sounds in the main app — never in the overlay, never
                 on by default. Pick a pack, then try each cue.
@@ -773,7 +814,7 @@ export const Settings = memo(function Settings() {
 
         {/* —— Notifications (stacked compact rows) —— */}
         <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">Notifications</h3>
+          <h3 className="settings-card-title">{t("settings.notifications")}</h3>
           <p className="settings-card-desc mb-2">
             Alerts stay on this PC. They&apos;re painted in a small always-on-top
             card, top-right for 7s — click-through, so it never steals a click
@@ -850,7 +891,7 @@ export const Settings = memo(function Settings() {
         {/* —— Account (optional) —— */}
         {isTauri() && (
           <section className="panel settings-card settings-card-span2">
-            <h3 className="settings-card-title">Account</h3>
+            <h3 className="settings-card-title">{t("settings.account")}</h3>
             <p className="settings-card-desc">
               Entirely optional and free. Everything the app does today keeps
               working signed out, and always will — an account only adds extra
@@ -1133,7 +1174,7 @@ export const Settings = memo(function Settings() {
 
         {/* —— Data & privacy —— */}
         <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">Data &amp; privacy</h3>
+          <h3 className="settings-card-title">{t("settings.privacy")}</h3>
           <p className="settings-card-desc">
             Your matches, decks and stats live on this PC. Exactly two things can
             send anything out — the sharing toggle under <strong>Account</strong>{" "}
@@ -1196,7 +1237,7 @@ export const Settings = memo(function Settings() {
 
         {/* —— Updates —— */}
         <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">Updates</h3>
+          <h3 className="settings-card-title">{t("settings.updates")}</h3>
           <p className="settings-card-desc">
             You’re on <strong className="text-foam">v{APP_VERSION}</strong>
             {meta?.date ? (
@@ -1290,7 +1331,7 @@ export const Settings = memo(function Settings() {
 
         {/* —— About —— */}
         <section className="panel settings-card settings-card-span2">
-          <h3 className="settings-card-title">About</h3>
+          <h3 className="settings-card-title">{t("settings.about")}</h3>
           <p className="text-sm text-muted m-0 leading-relaxed">
             Daily <strong className="text-foam">Standard</strong> and{" "}
             <strong className="text-foam">Pioneer</strong> meta, matchup notes, climb tracking, and

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { APP_VERSION, WHATS_NEW } from "../version";
+import { useLocale } from "../i18n";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { STATUS_URL } from "../services/site";
 import {
@@ -67,6 +68,7 @@ function markWhatsNewSeen() {
 }
 
 export function StatusBanners() {
+  const { t } = useLocale();
   const feedStatus = useAppStore((s) => s.feedStatus);
   const updateAvailable = useAppStore((s) => s.updateAvailable);
   const dismissedUpdateVersion = useAppStore((s) => s.dismissedUpdateVersion);
@@ -92,7 +94,7 @@ export function StatusBanners() {
       className: `banner ${service.state === "down" ? "banner-warn" : "banner-gold"}`,
       body: (
         <>
-          <strong>{service.state === "down" ? "Tracking is down" : "Tracking is degraded"}</strong>
+          <strong>{service.state === "down" ? t("banners.trackingDown") : t("banners.trackingDegraded")}</strong>
           {" — "}
           {service.headline}
           {service.detail ? ` ${service.detail}` : ""}{" "}
@@ -101,7 +103,7 @@ export function StatusBanners() {
             className="update-dl"
             onClick={() => void openExternal(STATUS_URL)}
           >
-            Details
+            {t("banners.details")}
           </button>
         </>
       ),
@@ -114,7 +116,7 @@ export function StatusBanners() {
       className: "banner banner-gold banner-rank-up",
       body: (
         <>
-          <strong>Rank up</strong> — {rankUpMoment.from} → {rankUpMoment.to}. Keep the climb
+          <strong>{t("banners.rankUp")}</strong> — {rankUpMoment.from} → {rankUpMoment.to}. Keep the climb
           going.{" "}
           <button
             type="button"
@@ -124,7 +126,7 @@ export function StatusBanners() {
               setPage("climb");
             }}
           >
-            Open Climb
+            {t("banners.openClimb")}
           </button>{" "}
           <button
             type="button"
@@ -134,7 +136,7 @@ export function StatusBanners() {
               setPage("stats");
             }}
           >
-            My Stats
+            {t("banners.myStats")}
           </button>{" "}
           <button
             type="button"
@@ -154,7 +156,7 @@ export function StatusBanners() {
       className: "banner banner-gold",
       body: (
         <>
-          <strong>Updated to v{APP_VERSION}</strong> — {WHATS_NEW.join(" · ")}.{" "}
+          <strong>{t("banners.updatedTo", { version: APP_VERSION })}</strong> — {WHATS_NEW.join(" · ")}.{" "}
           <button
             type="button"
             className="update-dismiss"
@@ -163,7 +165,7 @@ export function StatusBanners() {
               setShowWhatsNew(false);
             }}
           >
-            Got it
+            {t("common.gotIt")}
           </button>
         </>
       ),
@@ -176,24 +178,25 @@ export function StatusBanners() {
       className: "banner banner-warn",
       body: (
         <>
-          <strong>Offline</strong> — showing your last downloaded meta. Re-syncs
-          automatically when you’re back online.
+          <strong>{t("banners.offline")}</strong> — {t("banners.offlineBody")}
         </>
       ),
     });
   }
 
-  // "Later" hides the banner for that version until next launch; the hourly
-  // sync re-detects the update but must not re-raise it. Settings still shows it.
+  // "Later" hides the banner for that version across restarts. Settings still
+  // shows it. A newer version than the dismissed one raises the banner again.
   if (updateAvailable && updateAvailable.version !== dismissedUpdateVersion) {
     banners.push({
       key: "update",
       className: "banner banner-gold banner-update",
       body: (
         <>
-          <strong>New version available</strong> — v{updateAvailable.version} is out (you have v
-          {APP_VERSION}
-          ).{" "}
+          <strong>{t("banners.newVersion")}</strong> —{" "}
+          {t("banners.newVersionBody", {
+            remote: updateAvailable.version,
+            local: APP_VERSION,
+          })}{" "}
           {updateAvailable.notes ? (
             <span className="text-muted">{updateAvailable.notes} </span>
           ) : null}
@@ -219,9 +222,9 @@ export function StatusBanners() {
                   type="button"
                   className="update-dismiss"
                   onClick={() => dismissUpdate()}
-                  title="Dismiss until next launch"
+                  title="Dismiss this version"
                 >
-                  Later
+                  {t("common.later")}
                 </button>
               </>
             )
@@ -241,7 +244,7 @@ export function StatusBanners() {
                 type="button"
                 className="update-dismiss"
                 onClick={() => dismissUpdate()}
-                title="Dismiss until next launch"
+                title="Dismiss this version"
               >
                 Later
               </button>

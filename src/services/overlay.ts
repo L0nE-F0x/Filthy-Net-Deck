@@ -25,6 +25,26 @@ export async function setOverlayPostMatch(enabled: boolean): Promise<void> {
   }
 }
 
+/** Overlay HUD vs companion window — Rust owns always-on-top / taskbar / hide. */
+export async function setOverlayWindowMode(companion: boolean): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    await invoke("overlay_set_window_mode", { companion });
+  } catch {
+    /* command unavailable in browser / older builds */
+  }
+}
+
+/** Companion close button — hide until the next match. */
+export async function overlayUserClose(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    await invoke("overlay_user_close");
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * Mirror the match-end toast toggle to Rust — the tracker thread posts the
  * toast itself so it lands while the main window is tray-hidden mid-game.

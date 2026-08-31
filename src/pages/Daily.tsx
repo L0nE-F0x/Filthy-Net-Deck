@@ -8,6 +8,8 @@ import { MetaShareTimeline } from "../components/MetaShareTimeline";
 import { PersonalMetaPanel } from "../components/PersonalMetaPanel";
 import { OpponentArchetypePanel } from "../components/OpponentArchetypePanel";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { AutostartPrompt } from "../components/AutostartPrompt";
+import { useLocale } from "../i18n";
 import { DailyDigestStrip } from "../components/DailyDigestStrip";
 import { SessionWrapBanner } from "../components/SessionWrapBanner";
 import { LocalCoachStrip } from "../components/LocalCoachStrip";
@@ -183,6 +185,7 @@ const DeckMiniCard = memo(function DeckMiniCard({
 });
 
 export const Daily = memo(function Daily() {
+  const { t } = useLocale();
   const meta = useAppStore((s) => s.meta);
   const mode = useAppStore((s) => s.mode);
   const openFormat = useAppStore((s) => s.openFormat);
@@ -287,7 +290,7 @@ export const Daily = memo(function Daily() {
       <div className="empty-state">
         <div className="skel skel-line w-64" style={{ margin: "0 auto 0.5rem" }} />
         <div className="skel skel-line w-40" style={{ margin: "0 auto" }} />
-        <p className="mt-4 loading-pulse">Loading today’s meta…</p>
+        <p className="mt-4 loading-pulse">{t("daily.loading")}</p>
       </div>
     );
   }
@@ -300,13 +303,14 @@ export const Daily = memo(function Daily() {
           <TrackerOnboarding showHealthDetail />
         </div>
       )}
+      {/* One-shot login-item ask — after the coach, never silent-on. */}
+      <AutostartPrompt />
       {showSecondary && <SessionWrapBanner />}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow m-0 mb-1">Today’s lists · {meta.date}</p>
+          <p className="eyebrow m-0 mb-1">{t("daily.todaysLists", { date: meta.date })}</p>
           <p className="text-sm text-muted m-0 max-w-2xl">
-            Eight ranked decks per format — open any deck for the full list, curve, and
-            one-click Arena import.
+            {t("daily.todaysListsBlurb")}
           </p>
         </div>
         <div className="format-switcher m-0" role="tablist" aria-label="Format">
@@ -328,8 +332,10 @@ export const Daily = memo(function Daily() {
         </div>
       </div>
 
-      <BanPulse />
-      <SpoilerPulse />
+      <div className="home-pulses">
+        <BanPulse />
+        <SpoilerPulse />
+      </div>
 
       {activeFmt && hero && (
         <section className="daily-hero" aria-label="Deck to beat">
@@ -348,9 +354,12 @@ export const Daily = memo(function Daily() {
           <div className="daily-hero-body">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="daily-hero-kicker">Deck to beat</span>
+                <span className="daily-hero-kicker">{t("daily.deckToBeat")}</span>
                 <span className="text-xs font-bold tracking-widest uppercase text-gold-400">
-                  {activeFmt.name} · {mode.toUpperCase()}
+                  {t("daily.metaKicker", {
+                    format: activeFmt.name,
+                    mode: mode.toUpperCase(),
+                  })}
                 </span>
                 <TierBadge tier={hero.tier} />
                 <MovementChip move={movementByName.get(hero.name.toLowerCase())} />

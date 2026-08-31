@@ -3,12 +3,14 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.2.0** · repo `L0nE-F0x/Filthy-Net-Deck` · branch **main**
-· tag **v3.2.0** · Windows **and** macOS both serve 3.2.0
+**Live product version: v3.2.0** (Windows + macOS) · source on **main is v3.3.0**
+· repo `L0nE-F0x/Filthy-Net-Deck`
 
-> v3.2.0 is shipped. Grok session closed 2026-08-27. Do not rebuild or
-> re-roll. Remaining is owner-only: in-app update check, Shane reply, key
-> rotate.
+> v3.3.0 source is cut. The signed Windows installer is **not** on this
+> Linux box (no `TAURI_SIGNING_PRIVATE_KEY`). Do not point version.json /
+> updater/latest.json / homepage download buttons at 3.3.0 until the
+> NSIS exe + `.sig` exist. Tag `v3.3.0` starts macOS CI; roll the dmg
+> after Windows is signed, same commit as the site.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -18,7 +20,96 @@ attaches the new one.
 
 # ▶ START HERE — next session
 
-0. **v3.2.0 is shipped. Session closed. Do not rebuild.**
+0. **v3.3.0 source cut — Windows signed build is the remaining ship path.**
+
+   Overlay companion + quiet HUD + autostart ask + Arena-language i18n
+   are in source at **3.3.0**. Live site/updater still **3.2.0** until
+   the signed NSIS setup exists. Key id `67FCA9900F523D49` lives on the
+   Windows machine (`%USERPROFILE%\.tauri\filthy-net-deck.key`). This
+   Omarchy box cannot produce updater artifacts.
+
+   Ticket + original analysis + **implementation log for this code**:
+   **`docs/FRIEND-FEEDBACK-OVERLAY-IA.md`** (read the “Implemented this
+   session” section before touching overlay files).
+
+   ### What landed (source only)
+   - Overlay vs **companion window** — same webview, not a fourth renderer.
+     Companion: not always-on-top, on the taskbar, opaque, close button,
+     survives match end and Arena quit until the user closes it.
+   - Quiet collapsed HUD: clock · turn · **session** W–L · **Land n%**
+     (next-draw) · archetype + **confidence**. Lists stay behind ▾.
+     Ranked/Unrk/Bo3/library-count chips left the collapsed bar.
+   - First overlay appearance: “HUD over Arena” vs “Normal window”
+     (`overlayWindowModeChosen` false). Default stays overlay.
+   - Set Radar pulse: persist-dismiss + “Open Set Radar in Sets →”.
+   - Update **Later** persists across restarts (`bbi.dismissedUpdateVersion`).
+   - Deck-to-beat kicker: `{format} meta · BO1`. Pulses quieter than the board.
+   - **P2 autostart ask** (2026-08-31, later): one-shot Decks prompt after
+     the Help tour. Not silent-on. Settings toggle is the same switch.
+   - **i18n (2026-08-31, later):** Arena client languages in-app —
+     en, es, fr, de, it, pt-BR, ja, ko. Settings → Appearance → Language.
+     Chrome, overlay, pulses, Daily, Settings cards, Help chrome, page
+     eyebrows wired. Remaining English: long Help bodies, some Settings
+     paragraphs, Climb/Stats inner copy. Marketing site not translated.
+
+   ### Next agent’s job
+   Owner reviews the live `tauri:dev` app (running on this box) then
+   commit or iterate. **Still do not commit unless asked. Do not bump.**
+
+   Verified 2026-08-31 (this session): chooser, companion ×, quiet HUD
+   (session / land% / Izzet Aggro 44%), Set Radar CTA + persist-dismiss,
+   Update Later persist, Settings Window mode (AT-SPI in the Tauri
+   window), deck-to-beat `{format} meta · BO1`. Demo HUD
+   `/?demo#/overlay`. Density follow-up below.
+
+   **Not live-tested (no Arena on this machine):** overlay auto-hide
+   after match end; companion staying up after match / Arena quit;
+   first-match chooser inside the real overlay webview (demo used
+   Vite). Rust `hide()` / `on_arena_quit` / `user_close` are the
+   contract — click through once Arena is up.
+
+   ### Do not sneak in
+   Spanish i18n · silent autostart-on · extra nav items · ripping out the
+   library tracker · flipping overlay default for existing users ·
+   notification centre · P2 autostart installer checkbox.
+
+   ### Working tree (uncommitted on `main`)
+   Rust: `src-tauri/src/{overlay,tracker,arena,lib}.rs`
+   Overlay HUD: `src/overlay/OverlayApp.tsx`, `overlayModel.ts`,
+     `overlayPrefs.ts` + `overlayModel.test.ts`
+   Settings / store / prefs bridge: `src/pages/Settings.tsx`,
+     `src/store/useAppStore.ts`, `src/services/overlay.ts`, `src/App.tsx`,
+     `src/presence/PresenceApp.tsx`
+   Pulses: `src/components/{SpoilerPulse,StatusBanners}.tsx`,
+     `src/services/setPulse.ts`, `src/pages/Daily.tsx`, `src/index.css`
+   Incidental: `package-lock.json` root version `2.8.2` → `3.2.0` (npm
+   install on this machine; lockfile was stale vs package.json). Keep it
+   if you commit this work; it is not a feature change.
+
+   ### Verified here / not verified
+   - Yes: `tsc --noEmit`, eslint on touched TS, vitest overlayModel +
+     setPulse. Playwright against Vite overlay demo + Decks/Settings.
+     Live Tauri Daily (Set Radar + deck-to-beat) and Settings Window
+     mode combo (Overlay / Companion).
+   - Density fix this session: default overlay width 228 → **360**
+     (saved geometry untouched). Collapsed bar at ≤320 drops name +
+     clock; at ≤250 also shortens land and, in companion, drops turn
+     so the × and the guess both fit. Do not put archetype inside the
+     ellipsizing opponent-name span.
+   - Not live: hide-on-match-end / companion-after-Arena (no Arena).
+   - Full vitest: unrelated arenaMeta/arenaCards failures
+     (`localStorage.clear` under Node 26 without `--localstorage-file`)
+     — pre-existing, not this diff.
+
+   ### Linux vibecoding setup (this machine, 2026-08-31)
+   - `mise use --global rust@stable` → rustc/cargo 1.98.0, clippy,
+     rustfmt, rust-analyzer. Lives in `~/.config/mise/config.toml`.
+   - Tauri 2 deps already had webkit2gtk-4.1; added
+     `libappindicator`, `xdotool`, `appmenu-gtk-module`, `wget`.
+   - First crate compile cached under `src-tauri/target/` (~10 min
+     cold). Later `cargo test` / `tauri:dev` should be incremental.
+
+1. **v3.2.0 is shipped. Session closed. Do not rebuild.**
 
    Grok wrapped Claude session `d46b6234` on 2026-08-27: rebased onto
    `origin/main`, signed Windows build, pushed `e695e79` + tag `v3.2.0`,
@@ -56,12 +147,12 @@ attaches the new one.
    - Add the signed-build command as `npm run release:build` in `package.json`
      so it is one memorable command per release? Not added in v3.2.0.
 
-1. **Beta-tester feedback on the marketing site.** Owner will collect
+2. **Beta-tester feedback on the marketing site.** Owner will collect
    reports and pick this up later. Do not redesign the hero unless they
    ask — the live fan (Standard/Pioneer × Bo1/Bo3) is the chosen treatment.
-2. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
+3. Web-platform plan is `docs/WEB-PLATFORM.md`. Do not start `/matchups` on
    the site until gate G2 trips (a real `n ≥ 30` crowd cell).
-3. Suggest / Report is live (site + app). FormSubmit is already
+4. Suggest / Report is live (site + app). FormSubmit is already
    activated for `ston3d4pe@gmail.com`. Leave it alone unless mail stops.
 
 ## Reply to Shane — send after v3.2.0 is live

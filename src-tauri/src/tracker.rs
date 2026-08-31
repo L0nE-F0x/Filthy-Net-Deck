@@ -2505,8 +2505,11 @@ fn publish_live(app: &AppHandle, live: Option<LiveMatch>) {
     }
     let _ = app.emit("tracker:live", &live);
     // Rust-driven show/hide so tray-hidden main WebView is not required.
-    match live.as_ref().map(|l| l.phase.as_str()) {
-        Some("playing") | Some("ended") => crate::overlay::show(app),
+    // Companion mode keeps the window after the match; overlay hides on idle.
+    match live.as_ref() {
+        Some(l) if l.phase == "playing" || l.phase == "ended" => {
+            crate::overlay::show_for_match(app, &l.match_id);
+        }
         _ => crate::overlay::hide(app),
     }
 }

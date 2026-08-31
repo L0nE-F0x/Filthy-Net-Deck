@@ -22,6 +22,7 @@ import {
   writeOverlayPrefs,
   type OverlayPrefs,
 } from "../overlay/overlayPrefs";
+import { applyLocalePref, readLocalePref, useLocale } from "../i18n";
 
 /** Fire-and-forget command; older builds simply don't have it. */
 async function call(cmd: string, args?: Record<string, unknown>) {
@@ -34,6 +35,7 @@ async function call(cmd: string, args?: Record<string, unknown>) {
 }
 
 export function PresenceApp() {
+  const { t } = useLocale();
   const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
   const [menuOpen, setMenuOpen] = useState(false);
   const [inMatch, setInMatch] = useState(false);
@@ -64,7 +66,9 @@ export function PresenceApp() {
     let cancelled = false;
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key === PREFS_KEY) setPrefs(readOverlayPrefs());
+      if (e.key !== PREFS_KEY) return;
+      setPrefs(readOverlayPrefs());
+      applyLocalePref(readLocalePref());
     };
     window.addEventListener("storage", onStorage);
 
@@ -88,7 +92,9 @@ export function PresenceApp() {
         // Reliable cross-webview prefs push (the `storage` event above is the
         // fallback — it does not always cross WebView2 windows).
         unlistenPrefs = await listen("prefs:overlay", () => {
-          if (!cancelled) setPrefs(readOverlayPrefs());
+          if (cancelled) return;
+          setPrefs(readOverlayPrefs());
+          applyLocalePref(readLocalePref());
         });
       } catch {
         /* ignore */
@@ -181,8 +187,8 @@ export function PresenceApp() {
       onMouseLeave={() => setHot(false)}
     >
       {menuOpen && (
-        <div className="fnd-presence-menu" ref={menuRef} role="menu" aria-label="Overlay settings">
-          <p className="fnd-presence-menu-title">Overlay</p>
+        <div className="fnd-presence-menu" ref={menuRef} role="menu" aria-label={t("presence.menuAria")}>
+          <p className="fnd-presence-menu-title">{t("presence.title")}</p>
           <label className="fnd-presence-row">
             <input
               type="checkbox"
@@ -192,7 +198,31 @@ export function PresenceApp() {
                 void call("overlay_set_enabled", { enabled: e.target.checked });
               }}
             />
-            <span>In-game overlay</span>
+            <span>{t("presence.inGame")}</span>
+          </label>
+          <label className="fnd-presence-row">
+            <input
+              type="radio"
+              name="fnd-ov-mode"
+              checked={prefs.windowMode !== "companion"}
+              onChange={() => {
+                patch({ overlayWindowMode: "overlay", overlayWindowModeChosen: true });
+                void call("overlay_set_window_mode", { companion: false });
+              }}
+            />
+            <span>{t("presence.hud")}</span>
+          </label>
+          <label className="fnd-presence-row">
+            <input
+              type="radio"
+              name="fnd-ov-mode"
+              checked={prefs.windowMode === "companion"}
+              onChange={() => {
+                patch({ overlayWindowMode: "companion", overlayWindowModeChosen: true });
+                void call("overlay_set_window_mode", { companion: true });
+              }}
+            />
+            <span>{t("presence.normal")}</span>
           </label>
           <label className="fnd-presence-row">
             <input
@@ -203,10 +233,10 @@ export function PresenceApp() {
                 void call("overlay_set_post_match", { enabled: e.target.checked });
               }}
             />
-            <span>Post-match summary</span>
+            <span>{t("presence.postMatch")}</span>
           </label>
           <label className="fnd-presence-slider">
-            <span>Opacity</span>
+            <span>{t("presence.opacity")}</span>
             <input
               type="range"
               min={55}

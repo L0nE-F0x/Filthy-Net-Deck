@@ -2,9 +2,11 @@ import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { bootThemeFromStorage } from "./services/theme";
+import { bootLocaleFromStorage } from "./i18n";
 
 // Apply saved appearance before first paint (avoids a dark→light flash).
 bootThemeFromStorage();
+bootLocaleFromStorage();
 
 const hash = typeof window !== "undefined" ? window.location.hash : "";
 const routed = (name: string) =>

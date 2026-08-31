@@ -15,16 +15,17 @@ import {
   type DeckSearchResult,
 } from "../services/cardWatch";
 import type { Page, PlayMode } from "../types/meta";
+import { useLocale, type MessageKey } from "../i18n";
 
-const PALETTE_PAGES: { id: Page; label: string }[] = [
-  { id: "daily", label: "Decks" },
-  { id: "stats", label: "My Stats" },
-  { id: "climb", label: "Climb" },
-  { id: "matchups", label: "Matchups" },
-  { id: "sets", label: "Sets" },
-  { id: "formats", label: "Format Hub" },
-  { id: "meta", label: "Events" },
-  { id: "settings", label: "Settings" },
+const PALETTE_PAGES: { id: Page; labelKey: MessageKey }[] = [
+  { id: "daily", labelKey: "nav.decks" },
+  { id: "stats", labelKey: "nav.stats" },
+  { id: "climb", labelKey: "nav.climb" },
+  { id: "matchups", labelKey: "nav.matchups" },
+  { id: "sets", labelKey: "nav.sets" },
+  { id: "formats", labelKey: "nav.formats" },
+  { id: "meta", labelKey: "nav.events" },
+  { id: "settings", labelKey: "nav.settings" },
 ];
 
 /** Occurrences shown under one card before collapsing into "… N more". */
@@ -56,6 +57,7 @@ function deckLine(d: DeckSearchResult): string {
  * at app-shell level; it renders nothing while closed.
  */
 export function CommandPalette(): ReactNode {
+  const { t } = useLocale();
   const meta = useAppStore((s) => s.meta);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -116,8 +118,11 @@ export function CommandPalette(): ReactNode {
   );
   const q = query.trim().toLowerCase();
   const pages = useMemo(
-    () => (q ? PALETTE_PAGES.filter((p) => p.label.toLowerCase().includes(q)) : []),
-    [q],
+    () =>
+      q
+        ? PALETTE_PAGES.filter((p) => t(p.labelKey).toLowerCase().includes(q))
+        : [],
+    [q, t],
   );
 
   // Keyboard-navigable rows in display order (occurrences → decks → pages).
@@ -129,9 +134,9 @@ export function CommandPalette(): ReactNode {
       }
     }
     for (const deck of decks) out.push({ kind: "deck", deck });
-    for (const p of pages) out.push({ kind: "page", id: p.id, label: p.label });
+    for (const p of pages) out.push({ kind: "page", id: p.id, label: t(p.labelKey) });
     return out;
-  }, [cards, decks, pages]);
+  }, [cards, decks, pages, t]);
 
   const activeRow = Math.min(active, Math.max(rows.length - 1, 0));
 
@@ -261,7 +266,7 @@ export function CommandPalette(): ReactNode {
                     onMouseEnter={() => setActive(i)}
                     onClick={() => activate(rows[i])}
                   >
-                    <span className="cp-row-title">{p.label}</span>
+                    <span className="cp-row-title">{t(p.labelKey)}</span>
                     <span className="cp-row-sub">Go to page</span>
                   </button>
                 );

@@ -8,7 +8,13 @@
  * as a fallback.
  */
 import { isTauri } from "../services/appUpdater";
-import { normalizeDensity, normalizeOpacity, type OverlayDensity } from "./overlayModel";
+import {
+  normalizeDensity,
+  normalizeOpacity,
+  normalizeWindowMode,
+  type OverlayDensity,
+  type OverlayWindowMode,
+} from "./overlayModel";
 
 /** localStorage prefs blob shared with the main window (same origin). */
 export const PREFS_KEY = "bbi.prefs";
@@ -28,6 +34,13 @@ export interface OverlayPrefs {
   overlayEnabled: boolean;
   /** Mirror alerts into the top-most card (survives fullscreen Arena). */
   notifyTopmost: boolean;
+  /**
+   * Overlay = HUD over Arena (default). Companion = opaque persistent
+   * window the user closes. Same webview, different chrome.
+   */
+  windowMode: OverlayWindowMode;
+  /** True after the user has picked overlay vs companion (first-run or Settings). */
+  windowModeChosen: boolean;
 }
 
 export function readOverlayPrefs(): OverlayPrefs {
@@ -45,6 +58,8 @@ export function readOverlayPrefs(): OverlayPrefs {
         overlayIdleDim?: boolean;
         overlayEnabled?: boolean;
         notifyTopmost?: boolean;
+        overlayWindowMode?: string;
+        overlayWindowModeChosen?: boolean;
       };
       return {
         opacity: normalizeOpacity(parsed.overlayOpacity),
@@ -57,6 +72,8 @@ export function readOverlayPrefs(): OverlayPrefs {
         idleDim: parsed.overlayIdleDim !== false,
         overlayEnabled: parsed.overlayEnabled !== false,
         notifyTopmost: parsed.notifyTopmost !== false,
+        windowMode: normalizeWindowMode(parsed.overlayWindowMode),
+        windowModeChosen: parsed.overlayWindowModeChosen === true,
       };
     }
   } catch {
@@ -73,6 +90,8 @@ export function readOverlayPrefs(): OverlayPrefs {
     idleDim: true,
     overlayEnabled: true,
     notifyTopmost: true,
+    windowMode: "overlay",
+    windowModeChosen: false,
   };
 }
 

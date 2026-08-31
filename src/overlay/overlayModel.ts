@@ -117,6 +117,63 @@ export function normalizeDensity(value: unknown): OverlayDensity {
   return value === "cozy" || value === "minimal" ? value : "compact";
 }
 
+/**
+ * How the match HUD window behaves. Overlay is the product default (over
+ * Arena, match-lifetime). Companion is a normal persistent window — same
+ * webview, different chrome. Do not add a fourth renderer for this.
+ */
+export type OverlayWindowMode = "overlay" | "companion";
+
+export function normalizeWindowMode(value: unknown): OverlayWindowMode {
+  return value === "companion" ? "companion" : "overlay";
+}
+
+/** Confidence as a short HUD chip, e.g. "72%". */
+export function formatConfidencePct(confidence: number): string {
+  if (!Number.isFinite(confidence)) return "";
+  return `${Math.round(Math.min(1, Math.max(0, confidence)) * 100)}%`;
+}
+
+/** Decided W–L in `[fromMs, toMs]` (inclusive). `toMs` defaults to no upper bound. */
+export function sessionWl(
+  matches: Array<{ result: string; endedAt: number }>,
+  fromMs: number,
+  toMs = Number.POSITIVE_INFINITY,
+): { wins: number; losses: number; wr: number | null } {
+  let wins = 0;
+  let losses = 0;
+  for (const m of matches) {
+    if (m.endedAt < fromMs || m.endedAt > toMs) continue;
+    if (m.result === "win") wins++;
+    else if (m.result === "loss") losses++;
+  }
+  const decided = wins + losses;
+  return {
+    wins,
+    losses,
+    wr: decided ? Math.round((wins / decided) * 100) : null,
+  };
+}
+
+/**
+ * Next-draw land headline for the collapsed bar. Same math as per-card
+ * `drawPct` — remaining lands / remaining library.
+ */
+export function landDrawHeadline(
+  landRemaining: number,
+  libraryTotal: number,
+): { pct: number; label: string; title: string } | null {
+  const pct = drawPct(landRemaining, libraryTotal);
+  if (pct == null) return null;
+  const shown = Number.isInteger(pct) ? String(pct) : pct.toFixed(1);
+  const landWord = landRemaining === 1 ? "land" : "lands";
+  return {
+    pct,
+    label: `Land ${shown}%`,
+    title: `Next card is a land: ${shown}% · ${landRemaining} ${landWord} left`,
+  };
+}
+
 /** Chip text for the on-play/on-draw flag (null until turn 1 locks). */
 export function playDrawLabel(
   onPlay: boolean | null | undefined,

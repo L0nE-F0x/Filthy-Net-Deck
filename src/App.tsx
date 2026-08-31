@@ -36,9 +36,10 @@ import { openExternal } from "./services/openExternal";
 import { FEEDBACK_URL, appFeedbackUrl } from "./services/site";
 import { applyFullscreen, closeToTray, restoreFullscreenIfPreferred } from "./services/windowMode";
 import { isTauri } from "./services/appUpdater";
-import { syncOverlayPrefFromStore } from "./services/overlay";
+import { setOverlayWindowMode, syncOverlayPrefFromStore } from "./services/overlay";
 import { HelpGuide } from "./components/HelpGuide";
 import { listen } from "@tauri-apps/api/event";
+import { useLocale, type MessageKey } from "./i18n";
 
 /*
  * Pages are imported statically on purpose.
@@ -62,17 +63,17 @@ function navigateTo(page: Page) {
 /** Nav order: Decks → personal loop → world → Settings. Keys 1–8. */
 const NAV: {
   id: Page;
-  label: string;
+  labelKey: MessageKey;
   icon: (p: { className?: string }) => ReactNode;
 }[] = [
-  { id: "daily", label: "Decks", icon: IconDaily },
-  { id: "stats", label: "My Stats", icon: IconStats },
-  { id: "climb", label: "Climb", icon: IconClimb },
-  { id: "matchups", label: "Matchups", icon: IconMatchups },
-  { id: "sets", label: "Sets", icon: IconSets },
-  { id: "formats", label: "Format Hub", icon: IconFormatHub },
-  { id: "meta", label: "Events", icon: IconMeta },
-  { id: "settings", label: "Settings", icon: IconSettings },
+  { id: "daily", labelKey: "nav.decks", icon: IconDaily },
+  { id: "stats", labelKey: "nav.stats", icon: IconStats },
+  { id: "climb", labelKey: "nav.climb", icon: IconClimb },
+  { id: "matchups", labelKey: "nav.matchups", icon: IconMatchups },
+  { id: "sets", labelKey: "nav.sets", icon: IconSets },
+  { id: "formats", labelKey: "nav.formats", icon: IconFormatHub },
+  { id: "meta", labelKey: "nav.events", icon: IconMeta },
+  { id: "settings", labelKey: "nav.settings", icon: IconSettings },
 ];
 
 /** Pages that work offline / without a meta download. */
@@ -85,40 +86,41 @@ const LOCAL_PAGES: Page[] = [
   "formats",
 ];
 
-function pageTitle(page: Page): string {
+function pageTitleKey(page: Page): MessageKey {
   switch (page) {
     case "daily":
-      return "Decks";
+      return "page.decks";
     case "format":
-      return "Format";
+      return "page.format";
     case "deck":
-      return "Deck";
+      return "page.deck";
     case "meta":
-      return "Events";
+      return "page.events";
     case "sets":
-      return "Sets";
+      return "page.sets";
     case "stats":
-      return "My Stats";
+      return "page.stats";
     case "matchups":
-      return "Matchups";
+      return "page.matchups";
     case "climb":
-      return "Climb Tracker";
+      return "page.climb";
     case "formats":
-      return "Format Hub";
+      return "page.formats";
     case "settings":
-      return "Settings";
+      return "page.settings";
     default:
-      return "Filthy Net Deck";
+      return "brand.name";
   }
 }
 
-function feedLabel(status: string | null): string {
-  if (status === "live") return "live";
-  if (status === "cached") return "cached";
+function feedLabel(status: string | null, t: (k: MessageKey) => string): string {
+  if (status === "live") return t("chrome.live");
+  if (status === "cached") return t("chrome.cached");
   return "—";
 }
 
 export default function App() {
+  const { t } = useLocale();
   const page = useAppStore((s) => s.page);
   const mode = useAppStore((s) => s.mode);
   const setMode = useAppStore((s) => s.setMode);
@@ -175,6 +177,9 @@ export default function App() {
           useAppStore.getState().prefs.overlayEnabled,
         );
       }
+      await setOverlayWindowMode(
+        useAppStore.getState().prefs.overlayWindowMode === "companion",
+      );
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -436,17 +441,19 @@ export default function App() {
               onClick={() => navigateTo(item.id)}
             >
               <item.icon />
-              {item.label}
+              {t(item.labelKey)}
               {item.id === "sets" && arenaDropIn != null && (
                 <span
                   className="nav-badge"
                   title={
                     arenaDropIn === 0
-                      ? "A set hits Arena today"
-                      : `Next Arena set drop in ${arenaDropIn} day${arenaDropIn === 1 ? "" : "s"}`
+                      ? t("chrome.dropToday")
+                      : arenaDropIn === 1
+                        ? t("chrome.dropInDays", { n: arenaDropIn })
+                        : t("chrome.dropInDaysPlural", { n: arenaDropIn })
                   }
                 >
-                  {arenaDropIn === 0 ? "now" : `${arenaDropIn}d`}
+                  {arenaDropIn === 0 ? t("chrome.dropNow") : `${arenaDropIn}d`}
                 </span>
               )}
             </button>
@@ -455,10 +462,10 @@ export default function App() {
         <div className="sidebar-footer mt-auto pt-4 px-1 flex flex-col gap-1.5 min-w-0">
           <PlaneswalkerThemes />
           <p className="text-[10px] text-muted leading-relaxed m-0">
-            Not affiliated with Wizards of the Coast.
+            {t("brand.unaffiliated")}
           </p>
           <p className="text-[10px] text-muted leading-relaxed m-0">
-            Built by{" "}
+            {t("brand.builtBy")}{" "}
             <button
               type="button"
               className="text-gold-300 hover:text-gold-200 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-[10px]"
@@ -473,17 +480,17 @@ export default function App() {
       <div className="main-pane">
         <header className="topbar">
           <div>
-            <h1>{pageTitle(page)}</h1>
+            <h1>{t(pageTitleKey(page))}</h1>
             <p className="meta-line">
               {meta ? (
                 <>
                   <span className={`feed-dot ${feedStatus ?? ""}`} />
-                  Meta {meta.date} · {feedLabel(feedStatus)}
+                  Meta {meta.date} · {feedLabel(feedStatus, t)}
                 </>
               ) : loading ? (
-                "Loading meta…"
+                t("chrome.loadingMeta")
               ) : (
-                "No meta loaded"
+                t("chrome.noMeta")
               )}
             </p>
           </div>
@@ -496,7 +503,7 @@ export default function App() {
                 <button
                   type="button"
                   className="fs-btn"
-                  title="Exit fullscreen (F11)"
+                  title={t("chrome.exitFullscreen")}
                   onClick={() => {
                     // Always exit — never toggle via isFullscreen(), which can
                     // desync from prefs and re-enter fullscreen instead.
@@ -518,7 +525,7 @@ export default function App() {
                 <button
                   type="button"
                   className="fs-btn"
-                  title="Close to system tray — the tracker keeps running"
+                  title={t("chrome.closeToTray")}
                   onClick={() => void closeToTray()}
                 >
                   <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
@@ -538,30 +545,30 @@ export default function App() {
             <button
               type="button"
               className="fs-btn help-btn"
-              title="Help & tour — what every page does"
-              aria-label="Open help"
+              title={t("chrome.helpTitle")}
+              aria-label={t("chrome.help")}
               onClick={() => useAppStore.getState().setHelpOpen(true)}
             >
               <IconHelp className="w-3.5 h-3.5" />
-              Help
+              {t("chrome.help")}
             </button>
             {FEEDBACK_URL && (
               <button
                 type="button"
                 className="fs-btn help-btn"
-                title="Suggest a feature or report a bug"
-                aria-label="Suggest a feature or report a bug"
+                title={t("chrome.suggestTitle")}
+                aria-label={t("chrome.suggestTitle")}
                 onClick={() => void openExternal(appFeedbackUrl(APP_VERSION))}
               >
                 <IconFeedback className="w-3.5 h-3.5" />
-                Suggest / Report
+                {t("chrome.suggest")}
               </button>
             )}
             <button
               type="button"
               className="palette-hint"
-              title="Search cards, decks, pages (Ctrl+K)"
-              aria-label="Search cards, decks, and pages"
+              title={t("chrome.searchTitle")}
+              aria-label={t("chrome.searchAria")}
               onClick={() =>
                 window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))
               }
@@ -569,7 +576,7 @@ export default function App() {
               <span className="palette-hint-ico" aria-hidden="true">
                 ⌕
               </span>
-              Search
+              {t("chrome.search")}
             </button>
           </div>
         </header>

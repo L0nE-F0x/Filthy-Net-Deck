@@ -81,7 +81,7 @@ pub fn start(app: AppHandle) {
                     let handle = app.clone();
                     let _ = app.run_on_main_thread(move || {
                         crate::presence::destroy(&handle);
-                        crate::overlay::destroy(&handle);
+                        crate::overlay::on_arena_quit(&handle);
                     });
                 }
             }

@@ -5,6 +5,7 @@ import { canShowResultsLink } from "../services/links";
 import { resolveFormatId } from "../services/formatResolve";
 import { openExternal } from "../services/openExternal";
 import { filterFreshTournaments } from "../services/eventFreshness";
+import { useLocale } from "../i18n";
 
 function platformClass(p: TournamentPlatform): string {
   return `platform-chip platform-${p}`;
@@ -44,6 +45,7 @@ const SOURCE_LINKS: Record<string, string> = {
 };
 
 export function MetaPulse() {
+  const { t } = useLocale();
   const meta = useAppStore((s) => s.meta);
   const setDailyFormatId = useAppStore((s) => s.setDailyFormatId);
   const setPage = useAppStore((s) => s.setPage);
@@ -76,7 +78,7 @@ export function MetaPulse() {
   return (
     <div className="flex flex-col gap-4 max-w-4xl">
       <div>
-        <p className="eyebrow">Events</p>
+        <p className="eyebrow">{t("events.eyebrow")}</p>
         <h2 className="text-2xl font-semibold m-0 tracking-tight">Tournament results</h2>
         <p className="text-sm text-muted mt-2 mb-0 max-w-2xl leading-relaxed">
           Recent paper, MTGO, and Arena events (last ~4 months).{" "}

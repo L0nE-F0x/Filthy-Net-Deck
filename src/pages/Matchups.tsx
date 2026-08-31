@@ -13,6 +13,7 @@ import { resolveMetaDeckByTag } from "../services/deepLinks";
 import type { MatchResult, TrackedMatch } from "../types/tracker";
 import type { FormatId } from "../types/meta";
 import { TrackerOnboarding } from "../components/TrackerOnboarding";
+import { useLocale } from "../i18n";
 import { peekSeenCard, resolveArenaMetaBatch } from "../services/arenaMeta";
 import { inferenceCandidatesFromBundle } from "../services/deckHelpers";
 import { isUncoveredFormat, localFormatOf } from "../services/arenaFormat";
@@ -173,6 +174,7 @@ function focusMatchesTag(row: MergedMatchup, tag: string): boolean {
 }
 
 export const Matchups = memo(function Matchups() {
+  const { t } = useLocale();
   const matches = useAppStore((s) => s.trackerMatches);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const meta = useAppStore((s) => s.meta);
@@ -371,7 +373,7 @@ export const Matchups = memo(function Matchups() {
     return (
       <div className="flex flex-col gap-3">
         <div className="panel">
-          <p className="eyebrow">Matchups</p>
+          <p className="eyebrow">{t("matchups.eyebrow")}</p>
           <h2 className="text-xl font-semibold m-0 tracking-tight">
             Your record vs the field
           </h2>
@@ -394,7 +396,7 @@ export const Matchups = memo(function Matchups() {
       <div className="panel">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <p className="eyebrow m-0 mb-1">Matchups</p>
+            <p className="eyebrow m-0 mb-1">{t("matchups.eyebrow")}</p>
             <h2 className="text-xl font-semibold m-0 tracking-tight">
               Your record vs the field
             </h2>

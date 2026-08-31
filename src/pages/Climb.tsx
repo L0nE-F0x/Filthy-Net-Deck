@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { FriendRace } from "../components/FriendRace";
+import { useLocale } from "../i18n";
 import {
   currentSeasonKey,
   deckKey,
@@ -588,6 +589,7 @@ function SeasonCompareCell({
 const LEGS_PREVIEW = 10;
 
 export const Climb = memo(function Climb() {
+  const { t } = useLocale();
   const matches = useAppStore((s) => s.trackerMatches);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const openStatsDeck = useAppStore((s) => s.openStatsDeck);
@@ -692,7 +694,7 @@ export const Climb = memo(function Climb() {
     return (
       <div className="flex flex-col gap-3">
         <div className="panel">
-          <p className="eyebrow">Climb Tracker</p>
+          <p className="eyebrow">{t("climb.eyebrow")}</p>
           <h2 className="text-xl font-semibold m-0 tracking-tight">Climb with a deck story</h2>
           <p className="text-sm text-muted m-0 mt-2 leading-relaxed max-w-xl">
             See which list carried each stretch of the ladder — then open that deck in My Stats
@@ -712,7 +714,7 @@ export const Climb = memo(function Climb() {
       <SeasonRecapBanner />
       <div className="panel lab-intro">
         <div>
-          <p className="eyebrow m-0">Climb Tracker</p>
+          <p className="eyebrow m-0">{t("climb.eyebrow")}</p>
           <h2 className="text-lg font-semibold m-0 tracking-tight">Rank path by deck</h2>
           <p className="text-sm text-muted m-0 mt-1 leading-relaxed">
             Hover the curve for rank + deck. Click a stretch or deck row to open{" "}

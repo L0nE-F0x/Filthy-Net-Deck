@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { newCardsBySet, totalNewCount } from "./setPulse";
+import { newCardsBySet, spoilerPulseDismissKey, totalNewCount } from "./setPulse";
 import type { SetsBundle } from "../types/sets";
 
 const bundle = {
@@ -26,5 +26,23 @@ describe("newCardsBySet", () => {
 
   it("skips first visit (no prior snap for set)", () => {
     expect(newCardsBySet(bundle, {})).toEqual({});
+  });
+});
+
+describe("spoilerPulseDismissKey", () => {
+  it("changes when the set event changes so a new pulse can reappear", () => {
+    const spoiling = spoilerPulseDismissKey({
+      code: "eoe",
+      kind: "spoiling",
+      arenaDate: null,
+    });
+    const tomorrow = spoilerPulseDismissKey({
+      code: "eoe",
+      kind: "arena_tomorrow",
+      arenaDate: "2026-09-15",
+    });
+    expect(spoiling).toBe("eoe:spoiling:");
+    expect(tomorrow).toBe("eoe:arena_tomorrow:2026-09-15");
+    expect(spoiling).not.toBe(tomorrow);
   });
 });
