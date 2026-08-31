@@ -18,43 +18,57 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.1 is the cut (Windows + macOS). Do not rebuild.**
+0. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
-   Friend (Lobo Blanco, same overlay-ticket reporter) came back with two
-   regressions that looked fixed years ago:
+   Owner confirmed end-to-end and will tell the friend to Check for
+   updates. Next session: wait for the owner. Do not invent work.
+   Do not bump.
 
-   1. **Arena import of rooms.** Copy of Mono-Black Demons failed because
-      the list said `4 Unholy Annex`. Arena wants
-      `4 Unholy Annex // Ritual Chamber`. v0.23.0 stripped every ` // `
-      name; that was right for MDFCs/adventures and **wrong for rooms**
+   This session: two friend-reported regressions + the CI mail they
+   caused. Source `20fde374`, Windows NSIS + updater in that commit,
+   macOS dmg rolled `08c4152c`, clippy gate `16f54031`.
+
+   1. **Arena import of rooms.** `4 Unholy Annex` is rejected; Arena
+      wants `4 Unholy Annex // Ritual Chamber`. v0.23.0 stripped every
+      ` // ` name — right for MDFCs/adventures, **wrong for rooms**
       (Scryfall `layout: split`, same as Fire // Ice). Keep both faces
       for split/rooms; still strip adventure / transform / modal_dfc.
    2. **`Card 81181` in the overlay.** Unfinity Swamp (Adam Paquette).
       `/cards/arena/81181` 404s; UNF is 2022 so the 180-day gap window
       never saw it. Evergreen `unf` + a sweep of every unlinked basic
-      land. 81181 now publishes as Swamp with art. Existing 3.3.0
-      clients pick this up from `meta/arena-names.json` without an
-      app bump; in-app copy of rooms needs 3.3.1.
+      land. 81181 publishes as Swamp with art.
+   3. **GitHub "Run failed: CI - main" mail.** Windows clippy `-D warnings`
+      treated the Linux-only Proton helper as dead code, so every main
+      push after `9148c48f` emailed the owner. Gated to Linux + `cfg(test)`.
+      Latest CI on `main` is green (`16f54031`).
 
-   Windows NSIS signed on this box. macOS dmg rolled from the GH Release
-   (`Filthy-Net-Deck-3.3.1-universal.dmg`, sha256 `8250f59f…934a0`,
-   22 666 785 bytes). Homepage Mac buttons point at 3.3.1.
-
-   Verified live 2026-08-31 after Netlify caught up:
+   Verified live 2026-09-01:
    - `https://filthy-net-deck.com/version.json` → `3.3.1`
    - `https://filthy-net-deck.com/updater/latest.json` → `3.3.1` (sig 428 bytes)
    - Setup-3.3.1.exe → 200, 7 850 500 bytes
    - Filthy-Net-Deck-3.3.1-universal.dmg → 200, 22 666 785 bytes
+     (sha256 `8250f59f…934a0`, GH Release + Netlify)
+   - homepage buttons + `og-image.png?v=3.3.1`
    - `meta/arena-names.json` 1602 grpIds; `81181` is Swamp
    - Mono-Black Demons import is `4 Unholy Annex // Ritual Chamber`
    - downloads = current + 1 (3.3.1 + 3.3.0, Windows and dmg)
 
-   Windows CI rustfmt/clippy is still red (pre-existing Proton `arena.rs`
-   drift, not this cut). Web job is green. Does not block auto-update.
+   Friend path: in-app **Check for updates → Update & restart**. Overlay
+   names for Unfinity basics already work on 3.3.0 via the live gap map;
+   in-app Arena import of rooms needs 3.3.1.
 
-   Owner leftovers unchanged (not blockers): Check for updates on an
-   installed 3.2.0; OG share preview `?v=3.3.1`; Shane reply; rotate
-   signing key `67FCA9900F523D49`.
+   Do **not** sneak in: silent autostart-on · extra nav items · ripping
+   out the library tracker · flipping overlay default · translating the
+   marketing site · rotating the signing key in the same commit as a
+   release.
+
+   Owner leftovers (not blockers):
+   1. In-app **Check for updates** on an installed 3.2.0 — *Update & restart*.
+   2. Link-share preview of the OG card (`?v=3.3.1`).
+   3. Reply to Shane — draft below still refers to 3.2.0 deck-library;
+      edit if sending now (3.3.1 is rooms import + Unfinity basics).
+   4. **Rotate the signing key** when convenient (passphrase was pasted
+      into a chat transcript on 2026-08-27). Key id `67FCA9900F523D49`.
 
 1. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
 
