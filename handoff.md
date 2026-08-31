@@ -18,7 +18,66 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
+0. **2026-09-01 (later) — Windows box brought up to date. No product change.**
+
+   The owner's **Windows** machine was 33 commits behind on v3.2.0 while the
+   site served v3.3.1. Fast-forwarded to `5baca63`; `main` == `origin/main`.
+   **Nothing was built, bumped, signed or released.** v3.3.1 stays live and
+   correct. This entry is a machine-sync record, not a release.
+
+   Verified on Windows after the pull:
+   - `npx tsc --noEmit` clean · `npm test` → 92 files, **723 tests, all pass**
+   - node 24.13.1 · npm 11.8.0 · cargo + rustc 1.96.1 all on PATH
+   - no `npm install` needed — the only dependency diff was the version string
+
+   ### ⚠️ A local-only stash on the Windows box — will NOT reach this file's readers
+   That working tree had **uncommitted v3.2.0-era `handoff.md` notes** (the
+   "REMIND THE OWNER" block) which collided with this file on pull. They were
+   stashed, not discarded: `stash@{0}`, message begins "v3.2.0-era handoff.md
+   notes". **A stash is local — it is invisible from the Linux box and dies
+   with that clone.** Everything still-live from it is transcribed here, so the
+   stash is safe to drop.
+
+   Four of its five parked items already survive in this file (cleanup SQL,
+   untracked-format game, key rotation, OG card). The fifth did not:
+
+   **Lost: the X format poll.** The draft lived in `x-post-v3.2.0.md`, which
+   was never committed and no longer exists in any tree — **the option text is
+   not recoverable.** What survives of the intent: it was deliberately held
+   back a couple of days after the 2026-08-27 launch post so the two would not
+   compete for engagement, and it must **keep a "Keep it focused — no" opt-out
+   option, because without one the result is not a mandate.** Rewrite from
+   scratch if the owner still wants it.
+
+   ### Drafted this session, NOT posted — owner posts, no agent posts
+   X post announcing the v3.3.0 languages. 220/280 X-weighted chars (ja/ko
+   count double):
+
+   > Eight languages. Done properly.
+   >
+   > English · Español · Français · Deutsch · Italiano · Português (BR) · 日本語 · 한국어
+   >
+   > Exactly the lineup Arena ships. FND follows your system language on its own.
+   >
+   > filthy-net-deck.com
+
+   Suggested honest reply in-thread — coverage is **336 of 341 strings**; long
+   Help bodies, some Settings and Climb/Stats copy are still English, and the
+   marketing site is not translated at all:
+
+   > Honest note: the app is ~98% translated. A few long Help pages and some
+   > Stats copy are still English, and the site itself isn't translated yet.
+   > Working on it — tell me if you hit a rough edge in your language.
+
+   ⚠️ **Accuracy note for any future i18n copy:** the app follows the
+   **OS/system** language — `detectSystemLocale()` reads `navigator.languages`
+   — **not** the Arena client. The eight-language *lineup* matches Arena's
+   client languages; the detection does not. Do not write "follows your Arena
+   client". Settings can also lock a catalog instead of following the system.
+
+   Next session: wait for the owner. Do not invent work. Do not bump.
+
+1. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
    Owner confirmed end-to-end and will tell the friend to Check for
    updates. Next session: wait for the owner. Do not invent work.
@@ -70,7 +129,7 @@ that is expected and does not block auto-update.
    4. **Rotate the signing key** when convenient (passphrase was pasted
       into a chat transcript on 2026-08-27). Key id `67FCA9900F523D49`.
 
-1. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
+2. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
 
    Owner confirmed the Linux white-`<select>` fix looks perfect and will
    keep testing. Next session: wait for the owner. Do not invent work.
@@ -88,7 +147,7 @@ that is expected and does not block auto-update.
    installed 3.2.0; OG share preview `?v=3.3.0`; Shane reply; rotate
    signing key `67FCA9900F523D49`.
 
-2. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
+3. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
 
    Shipped this session: overlay companion + quiet HUD + autostart ask +
    Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed
