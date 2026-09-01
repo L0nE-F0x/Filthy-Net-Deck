@@ -77,11 +77,15 @@ that is expected and does not block auto-update.
 
    Next session: wait for the owner. Do not invent work. Do not bump.
 
-0b. **Marketing site is multi-language. 2026-09-01. No version bump.**
+0b. **Marketing site is multi-language. LIVE 2026-09-01. No version bump.**
+
+   Shipped and verified on production. Next session: wait for the owner.
+   Do not invent work. Do not bump. Do not re-translate.
 
    Owner asked for the homepage to follow the app's Arena locales. Site
    only — **no app change, no installer, no updater, no version bump.**
-   `website/` is served straight from `main`, so pushing publishes it.
+   `website/` is served straight from `main`, so the push published it.
+   Source `d96b7411`, accuracy fix `9f5397c0`.
 
    Same eight locales as the app (`src/i18n/locales.ts`): en, es, fr, de,
    it, pt-BR, ja, ko. A discreet globe pill in the nav, between Suggest /
@@ -129,7 +133,41 @@ that is expected and does not block auto-update.
    Not translated: `privacy.html`, `feedback.html`, `status.html`,
    `meta-web/`. `privacy.html` is deliberate — AGENTS.md binds it to the
    real upload allowlist, and seven more copies is seven more places for
-   the payload description to drift.
+   the payload description to drift. `feedback.html` is the one an owner
+   might want next: a non-English visitor clicking Suggest / Report from
+   the nav lands on an English page.
+
+   ### Verified live 2026-09-01 (production, not localhost)
+   - `/i18n/{es,fr,de,it,pt-BR,ja,ko}.json` → 200, `application/json`
+   - `/i18n/i18n.js` → 200; homepage carries 111 `data-i18n` attributes,
+     `#lang-switch`, and the `__fndI18nReq` head preflight
+   - all 8 locales auto-detect on `https://filthy-net-deck.com/`
+     (incl. `pt-PT` folding to pt-BR), toggle switches, choice persists
+     across reload, no console errors
+   - translated `<title>` keeps `v3.3.1` via the `{version}` placeholder
+   - Bo1 / Standard / card names still untranslated; Windows download
+     href unchanged
+   - `version.json` and `updater/latest.json` still `3.3.1` — this
+     release touched **no** app channel
+
+   ### The one correction worth remembering
+   The feature card said "the in-app UI follows Arena". It does not —
+   `detectSystemLocale()` reads `navigator.languages`, so the app follows
+   the **OS**; only the eight-language lineup is Arena's. The claim
+   predated this work in English but had just been translated seven times,
+   so it was about to ship wrong in eight languages. Fixed in `9f5397c0`.
+   This is exactly what the ⚠️ note in item 0 was warning about — read it
+   before writing any new i18n copy.
+
+   ### Pre-existing, NOT caused by this work
+   `npm test` is red on `main`: 19 failures in
+   `src/services/arenaCards.test.ts` and `arenaMeta.test.ts`. Confirmed by
+   stashing — they fail at `02d921fc` too. Cause is one line each: both
+   use `localStorage` but the files lack the
+   `// @vitest-environment jsdom` pragma that `vitest.config.ts` expects
+   (`environment: "node"` by default). Not fixed — out of scope for a
+   marketing-site change, and it is the owner's call whether the fix is
+   the pragma or moving the storage behind a guard.
 
 1. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
