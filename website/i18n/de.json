@@ -86,7 +86,7 @@
   "companion.body": "NEU: Beim ersten Erscheinen fragt das Overlay, ob es als HUD über Arena oder als normales Fenster laufen soll. Das Begleitfenster liegt in der Taskleiste, bleibt nach dem Match stehen, und du schließt es selbst. Overlay bleibt die Voreinstellung. Die eingeklappte Leiste zeigt die Session-Bilanz, die Land-Wahrscheinlichkeit im nächsten Zug und die Gegner-Lesung samt Konfidenz.",
 
   "langs.title": "Arena-Sprachen",
-  "langs.body": "NEU: Die App-Oberfläche folgt Arena — Englisch, Spanisch, Französisch, Deutsch, Italienisch, Portugiesisch (Brasilien), Japanisch, Koreanisch. Kartennamen, Decknamen und Bo1/Bo3 bleiben unübersetzt.",
+  "langs.body": "NEU: Die App-Oberfläche folgt deiner Systemsprache, aus Arenas acht — Englisch, Spanisch, Französisch, Deutsch, Italienisch, Portugiesisch (Brasilien), Japanisch, Koreanisch. Kartennamen, Decknamen und Bo1/Bo3 bleiben unübersetzt.",
 
   "clinic.title": "Wie viele Karten daneben",
   "clinic.body": "NEU: Meine Stats vergleicht deine 75 mit der nächstliegenden Ranked-Liste von heute. Ein Tausch ist eine Karte Unterschied.",

@@ -86,7 +86,7 @@
   "companion.body": "NOVO: na primeira vez que aparece, o overlay pergunta se você quer HUD sobre o Arena ou uma janela normal. A janela companheira fica na barra de tarefas, continua depois da partida, e é você quem fecha. O overlay continua sendo o padrão. A barra recolhida mostra o retrospecto da sessão, a % de terreno na próxima compra e a leitura do oponente com o nível de confiança.",
 
   "langs.title": "Idiomas do Arena",
-  "langs.body": "NOVO: a interface do app segue o Arena — inglês, espanhol, francês, alemão, italiano, português (Brasil), japonês e coreano. Nomes de cartas, nomes de decks e Bo1/Bo3 continuam sem tradução.",
+  "langs.body": "NOVO: a interface do app segue o idioma do seu sistema, entre os oito do Arena — inglês, espanhol, francês, alemão, italiano, português (Brasil), japonês e coreano. Nomes de cartas, nomes de decks e Bo1/Bo3 continuam sem tradução.",
 
   "clinic.title": "Quantas cartas de diferença",
   "clinic.body": "NOVO: Minhas stats compara as suas 75 com a lista ranqueada mais próxima de hoje. Uma troca é uma carta de diferença.",

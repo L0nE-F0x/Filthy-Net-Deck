@@ -86,7 +86,7 @@
   "companion.body": "NOUVEAU : à sa première apparition, l’overlay demande HUD par-dessus Arena ou fenêtre normale. La fenêtre compagnon se pose dans la barre des tâches, reste après la partie, et c’est toi qui la fermes. L’overlay reste le choix par défaut. La barre repliée affiche le bilan de session, le % de terrain à la prochaine pioche, et la lecture de l’adversaire avec son niveau de confiance.",
 
   "langs.title": "Langues d’Arena",
-  "langs.body": "NOUVEAU : l’interface de l’appli suit Arena — anglais, espagnol, français, allemand, italien, portugais (Brésil), japonais, coréen. Les noms de cartes, les noms de decks et Bo1/Bo3 ne sont pas traduits.",
+  "langs.body": "NOUVEAU : l’interface de l’appli suit la langue de ton système, parmi les huit d’Arena — anglais, espagnol, français, allemand, italien, portugais (Brésil), japonais, coréen. Les noms de cartes, les noms de decks et Bo1/Bo3 ne sont pas traduits.",
 
   "clinic.title": "À combien de cartes tu es",
   "clinic.body": "NOUVEAU : Mes stats compare tes 75 à la liste classée la plus proche du jour. Un swap, c’est une carte d’écart.",
