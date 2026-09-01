@@ -10,6 +10,11 @@ function emptyBoards() {
   };
 }
 
+/** i18n lookup that also works before (and without) i18n/i18n.js. */
+function tr(key, fallback) {
+  return window.fndI18n ? window.fndI18n.t(key, fallback) : fallback;
+}
+
 function scryfallCard(id) {
   if (!id || id.length < 3) return "";
   return `https://cards.scryfall.io/normal/front/${id[0]}/${id[1]}/${id}.jpg`;
@@ -139,10 +144,11 @@ function setupFan(boards) {
     if (rank) rank.textContent = `#${d.rank ?? ""}`;
     if (name) name.textContent = d.name;
     if (metaEl) {
-      const share = d.share != null ? `${d.share}%` : "verified";
+      // Format names and Bo1/Bo3 stay untranslated — same policy as the app.
+      const share = d.share != null ? `${d.share}%` : tr("fan.verified", "verified");
       const sb =
         d.mode === "bo3" && d.sbCount
-          ? ` · ${d.sbCount}-card SB`
+          ? ` · ${tr("fan.sideboard", "{n}-card SB").replace("{n}", d.sbCount)}`
           : "";
       metaEl.textContent = `${fmtLabel} ${modeLabel} · ${share}${sb}`;
     }
@@ -231,7 +237,12 @@ function setupFan(boards) {
       .join("");
     if (dots) {
       dots.innerHTML = decks
-        .map((_, i) => `<button type="button" class="hero-dot" data-i="${i}" aria-label="Deck ${i + 1}"></button>`)
+        .map(
+          (_, i) =>
+            `<button type="button" class="hero-dot" data-i="${i}" aria-label="${escapeHtml(
+              tr("fan.deckN", "Deck {n}").replace("{n}", i + 1),
+            )}"></button>`,
+        )
         .join("");
     }
     cards = [...hand.querySelectorAll(".fan-card")];
@@ -287,6 +298,10 @@ function setupFan(boards) {
   });
 
   paint();
+
+  // The dock label and the dot aria-labels are written here, not in the
+  // markup, so i18n.js cannot swap them — repaint when the locale changes.
+  document.addEventListener("fnd:locale", () => paint());
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

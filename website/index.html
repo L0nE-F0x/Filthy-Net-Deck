@@ -52,6 +52,41 @@
     <link rel="preconnect" href="https://cards.scryfall.io" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="hero-fan.css" />
+
+    <!-- Start the catalog fetch while the HTML is still parsing, so a
+         non-English visitor sees their language on first paint instead of a
+         flash of English. i18n/i18n.js picks the promise up. English needs no
+         fetch at all — its copy is the markup below. -->
+    <script>
+      (function () {
+        var IDS = ["en","es","fr","de","it","pt-BR","ja","ko"];
+        var want = null;
+        try { want = localStorage.getItem("fnd.site.locale"); } catch (e) {}
+        if (IDS.indexOf(want) < 0) {
+          want = null;
+          var list = (navigator.languages && navigator.languages.length)
+            ? navigator.languages
+            : (navigator.language ? [navigator.language] : []);
+          for (var i = 0; i < list.length && !want; i++) {
+            var low = String(list[i]).toLowerCase();
+            if (low.indexOf("en") === 0) { want = "en"; break; }
+            if (low.indexOf("pt") === 0) { want = "pt-BR"; break; }
+            var pre = ["es","fr","de","it","ja","ko"];
+            for (var j = 0; j < pre.length; j++) {
+              if (low.indexOf(pre[j]) === 0) { want = pre[j]; break; }
+            }
+          }
+        }
+        if (want && want !== "en") {
+          window.__fndI18nReq = {
+            id: want,
+            promise: fetch("i18n/" + want + ".json", { cache: "no-cache" })
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .catch(function () { return null; }),
+          };
+        }
+      })();
+    </script>
   </head>
   <body>
     <div class="fx-root" aria-hidden="true">
@@ -67,16 +102,38 @@
         <img src="assets/app-icon.png" alt="" width="40" height="40" />
         <span>
           <strong>Filthy Net Deck</strong>
-          <small>MTG Arena companion</small>
+          <small data-i18n="brand.companion">MTG Arena companion</small>
         </span>
       </a>
       <nav class="nav-links">
-        <a href="#features">Features</a>
-        <a href="meta-web/">Public meta</a>
-        <a href="#meta">Live meta</a>
-        <a href="#formats">Formats</a>
-        <a href="feedback.html" class="nav-feedback">Suggest / Report</a>
-        <a href="#download" class="nav-cta">Download</a>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="meta-web/" data-i18n="nav.publicMeta">Public meta</a>
+        <a href="#meta" data-i18n="nav.liveMeta">Live meta</a>
+        <a href="#formats" data-i18n="nav.formats">Formats</a>
+        <a href="feedback.html" class="nav-feedback" data-i18n="nav.feedback">Suggest / Report</a>
+        <!-- Language switch. Hidden until i18n.js fills the menu, so a visitor
+             with JS off never sees a control that cannot do anything. -->
+        <div class="lang-switch" id="lang-switch" hidden>
+          <button
+            type="button"
+            class="lang-btn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-label="Change language"
+          >
+            <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18" />
+              <path d="M12 3c2.6 2.6 3.9 5.7 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.7-3.9-9S9.4 5.6 12 3Z" />
+            </svg>
+            <span class="lang-code">EN</span>
+            <svg class="lang-caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          <div class="lang-menu" role="menu" hidden></div>
+        </div>
+        <a href="#download" class="nav-cta" data-i18n="nav.download">Download</a>
       </nav>
     </header>
 
@@ -86,13 +143,13 @@
         <div class="hero-copy reveal-child">
           <p class="eyebrow">
             <span class="dot-live"></span>
-            Windows &amp; macOS · Free · Standard &amp; Pioneer
+            <span data-i18n="hero.eyebrow">Windows &amp; macOS · Free · Standard &amp; Pioneer</span>
           </p>
-          <h1>
+          <h1 data-i18n="hero.title">
             Netdeck dirty.<br />
             <span class="grad">Climb clean.</span>
           </h1>
-          <p class="lede">
+          <p class="lede" data-i18n="hero.lede">
             Daily <strong>Standard</strong> &amp; <strong>Pioneer</strong> boards
             from live tournament and ladder lists —
             <strong>magic.gg</strong>, <strong>MTGO</strong>, and the ranked
@@ -105,16 +162,16 @@
               href="downloads/Filthy-Net-Deck-Setup-3.3.1.exe"
               download
             >
-              Download for Windows
-              <span class="btn-meta">v3.3.1 · Windows installer</span>
+              <span data-i18n="cta.windows">Download for Windows</span>
+              <span class="btn-meta">v3.3.1 · <span data-i18n="cta.windowsMeta">Windows installer</span></span>
             </a>
             <a
               class="btn btn-ghost"
               href="downloads/Filthy-Net-Deck-3.3.1-universal.dmg"
               download
             >
-              Download for macOS
-              <span class="btn-meta">v3.3.1 · universal .dmg</span>
+              <span data-i18n="cta.macos">Download for macOS</span>
+              <span class="btn-meta">v3.3.1 · <span data-i18n="cta.macosMeta">universal .dmg</span></span>
             </a>
           </div>
           <p class="hero-more">
@@ -122,69 +179,69 @@
               href="https://github.com/L0nE-F0x/Filthy-Net-Deck"
               target="_blank"
               rel="noopener noreferrer"
-              >Source on GitHub</a
+              ><span data-i18n="hero.source">Source on GitHub</span></a
             >
             ·
-            <a href="feedback.html">Suggest / Report</a>
+            <a href="feedback.html" data-i18n="nav.feedback">Suggest / Report</a>
             · L0nE-F0x
           </p>
           <ul class="trust-row">
-            <li>Daily meta boards</li>
-            <li>Mid-match overlay</li>
-            <li>Revealed-card reads</li>
-            <li>Local win rates</li>
-            <li>Set Radar</li>
-            <li>No account required</li>
+            <li data-i18n="trust.boards">Daily meta boards</li>
+            <li data-i18n="trust.overlay">Mid-match overlay</li>
+            <li data-i18n="trust.reveals">Revealed-card reads</li>
+            <li data-i18n="trust.local">Local win rates</li>
+            <li data-i18n="trust.radar">Set Radar</li>
+            <li data-i18n="trust.noAccount">No account required</li>
           </ul>
         </div>
 
         <div class="hero-stage reveal-child delay-1" id="hero-stage">
           <p class="fan-kicker">
-            <span class="dot-live" title="Live metagame"></span>
-            <span class="fan-fmt" role="group" aria-label="Format">
+            <span class="dot-live" data-i18n-title="fan.live" title="Live metagame"></span>
+            <span class="fan-fmt" role="group" data-i18n-label="fan.format" aria-label="Format">
               <button type="button" data-fan-fmt="standard" class="on" aria-pressed="true">Standard</button>
               <button type="button" data-fan-fmt="pioneer" aria-pressed="false">Pioneer</button>
             </span>
-            <span class="fan-fmt" role="group" aria-label="Best of">
+            <span class="fan-fmt" role="group" data-i18n-label="fan.bestOf" aria-label="Best of">
               <button type="button" data-fan-mode="bo1" class="on" aria-pressed="true">Bo1</button>
               <button type="button" data-fan-mode="bo3" aria-pressed="false">Bo3</button>
             </span>
           </p>
-          <div class="fan-hand" id="fan-hand" aria-label="Today’s top decks"></div>
+          <div class="fan-hand" id="fan-hand" data-i18n-label="fan.topDecks" aria-label="Today’s top decks"></div>
           <div class="fan-dock" id="fan-dock">
             <p class="fan-dock-rank" id="fan-rank">#1</p>
             <div>
               <strong id="fan-name">Mono-White Auras</strong>
               <span id="fan-meta">18.1% of the board</span>
             </div>
-            <a class="fan-dock-go" id="fan-go" href="meta-web/">Open list →</a>
+            <a class="fan-dock-go" id="fan-go" href="meta-web/" data-i18n="fan.openList">Open list →</a>
           </div>
           <div class="fan-controls">
-            <button type="button" class="orbit-nav" data-fan-prev aria-label="Previous deck">‹</button>
+            <button type="button" class="orbit-nav" data-fan-prev data-i18n-label="fan.prev" aria-label="Previous deck">‹</button>
             <div class="hero-dots" id="fan-dots"></div>
-            <button type="button" class="orbit-nav" data-fan-next aria-label="Next deck">›</button>
+            <button type="button" class="orbit-nav" data-fan-next data-i18n-label="fan.next" aria-label="Next deck">›</button>
           </div>
         </div>
       </section>
 
       <!-- STATS STRIP -->
-      <section class="stats reveal" aria-label="Product facts">
+      <section class="stats reveal" data-i18n-label="stats.aria" aria-label="Product facts">
         <div class="stats-bar">
           <div class="stat reveal-child">
             <strong>2</strong>
-            <span>formats · Standard &amp; Pioneer</span>
+            <span data-i18n="stats.formats">formats · Standard &amp; Pioneer</span>
           </div>
           <div class="stat reveal-child delay-1">
             <strong>8</strong>
-            <span>ranked decks each, daily</span>
+            <span data-i18n="stats.decks">ranked decks each, daily</span>
           </div>
           <div class="stat reveal-child delay-2">
             <strong>100%</strong>
-            <span>real lists · every card verified</span>
+            <span data-i18n="stats.verified">real lists · every card verified</span>
           </div>
           <div class="stat reveal-child delay-3">
             <strong>0</strong>
-            <span>account required to track</span>
+            <span data-i18n="stats.account">account required to track</span>
           </div>
         </div>
       </section>
@@ -192,9 +249,9 @@
       <!-- FEATURES -->
       <section id="features" class="section features">
         <div class="section-head reveal">
-          <p class="eyebrow">Features</p>
-          <h2>Everything you need to stay filthy-current</h2>
-          <p class="section-lede">
+          <p class="eyebrow" data-i18n="features.eyebrow">Features</p>
+          <h2 data-i18n="features.title">Everything you need to stay filthy-current</h2>
+          <p class="section-lede" data-i18n="features.lede">
             One native app for the two constructed formats that actually have a
             public paper metagame. Daily boards, a mid-match overlay or companion
             window, and a winrate tracker that stays on this PC unless you opt in.
@@ -203,9 +260,9 @@
         <div class="feature-bento">
           <article class="fb fb-wide fb-stats reveal" id="overlay">
             <div class="fb-copy">
-              <p class="fb-kicker">Presence badge</p>
-              <h3>Always know it's running.</h3>
-              <p>
+              <p class="fb-kicker" data-i18n="badge.kicker">Presence badge</p>
+              <h3 data-i18n="badge.title">Always know it's running.</h3>
+              <p data-i18n="badge.body">
                 The match overlay only shows up once a game starts — on the home screen or
                 in the deck builder you were left guessing. Now a <em>small badge sits
                 bottom-left</em> for as long as Arena is open: the mark, a live dot, and a
@@ -221,23 +278,23 @@
                 <span class="stats-pill">● running</span>
               </div>
               <div class="stats-mock-rate">
-                <em>Arena home screen</em>
+                <em data-i18n="badge.mockHome">Arena home screen</em>
                 <b>⚙</b>
-                <span>settings without alt-tabbing</span>
+                <span data-i18n="badge.mockSettings">settings without alt-tabbing</span>
               </div>
               <div class="stats-mock-row">
-                <span>Match overlay, between games</span><i style="--w: 4%"></i><b>hidden</b>
+                <span data-i18n="badge.mockRow1">Match overlay, between games</span><i style="--w: 4%"></i><b data-i18n="badge.mockHidden">hidden</b>
               </div>
               <div class="stats-mock-row">
-                <span>Corner badge, whole session</span><i style="--w: 100%"></i><b>shown</b>
+                <span data-i18n="badge.mockRow2">Corner badge, whole session</span><i style="--w: 100%"></i><b data-i18n="badge.mockShown">shown</b>
               </div>
             </div>
           </article>
           <article class="fb fb-wide fb-stats reveal">
             <div class="fb-copy">
-              <p class="fb-kicker">Set Radar</p>
-              <h3>Spoilers like a binder — Arena first</h3>
-              <p>
+              <p class="fb-kicker" data-i18n="radar.kicker">Set Radar</p>
+              <h3 data-i18n="radar.title">Spoilers like a binder — Arena first</h3>
+              <p data-i18n="radar.body">
                 Full Scryfall galleries for upcoming sets — plus <em>Future Standard</em>
                 roadmap sets and a <em>View trailer</em> button when WotC ships the official
                 announce video (Nauctis, Titanbreach, …) — played in a sleek in-app player.
@@ -253,23 +310,23 @@
                 <span class="stats-pill">Arena · 3d</span>
               </div>
               <div class="stats-mock-rate">
-                <em>Spoiling · Std/Pio legality</em>
+                <em data-i18n="radar.mockSpoiling">Spoiling · Std/Pio legality</em>
                 <b>← →</b>
-                <span>browse · mana pips · new badges</span>
+                <span data-i18n="radar.mockBrowse">browse · mana pips · new badges</span>
               </div>
               <div class="stats-mock-row">
-                <span>Gallery filters · rarity · color · CMC</span><i style="--w: 78%"></i><b>live</b>
+                <span data-i18n="radar.mockFilters">Gallery filters · rarity · color · CMC</span><i style="--w: 78%"></i><b data-i18n="radar.mockLive">live</b>
               </div>
               <div class="stats-mock-row">
-                <span>Arena-eve notify (opt-in)</span><i style="--w: 55%"></i><b>local</b>
+                <span data-i18n="radar.mockNotify">Arena-eve notify (opt-in)</span><i style="--w: 55%"></i><b data-i18n="radar.mockLocal">local</b>
               </div>
             </div>
           </article>
           <article class="fb fb-wide fb-stats reveal">
             <div class="fb-copy">
-              <p class="fb-kicker">Matchup intel</p>
-              <h3>Your winrate vs every tagged archetype</h3>
-              <p>
+              <p class="fb-kicker" data-i18n="intel.kicker">Matchup intel</p>
+              <h3 data-i18n="intel.title">Your winrate vs every tagged archetype</h3>
+              <p data-i18n="intel.body">
                 Matchups tags the opponent from what you saw and keeps prep notes
                 as you type — then aggregates <em>your</em> record vs each tag,
                 surfaces “you 4–0 vs Izzet” chips on the Decks board, and
@@ -280,26 +337,26 @@
             <div class="fb-visual fb-stats-visual" aria-hidden="true">
               <div class="stats-mock-head">
                 <strong>vs Izzet Prowess</strong>
-                <span class="stats-pill">Tag · Bo1</span>
+                <span class="stats-pill" data-i18n="intel.mockPill">Tag · Bo1</span>
               </div>
               <div class="stats-mock-rate">
-                <em>This season · you piloting Domain</em>
+                <em data-i18n="intel.mockSeason">This season · you piloting Domain</em>
                 <b>4–0</b>
-                <span>100% · chip on Decks board</span>
+                <span data-i18n="intel.mockChip">100% · chip on Decks board</span>
               </div>
               <div class="stats-mock-row">
-                <span>Streak W3 · rolling WR sparkline</span><i style="--w: 72%"></i><b>hot</b>
+                <span data-i18n="intel.mockStreak">Streak W3 · rolling WR sparkline</span><i style="--w: 72%"></i><b data-i18n="intel.mockHot">hot</b>
               </div>
               <div class="stats-mock-row">
-                <span>One-click CSV · week recap PNG</span><i style="--w: 60%"></i><b>share</b>
+                <span data-i18n="intel.mockCsv">One-click CSV · week recap PNG</span><i style="--w: 60%"></i><b data-i18n="intel.mockShare">share</b>
               </div>
             </div>
           </article>
           <article class="fb fb-wide reveal">
             <div class="fb-copy">
-              <p class="fb-kicker">Daily boards</p>
-              <h3>Standard &amp; Pioneer — movement included</h3>
-              <p>
+              <p class="fb-kicker" data-i18n="boards.kicker">Daily boards</p>
+              <h3 data-i18n="boards.title">Standard &amp; Pioneer — movement included</h3>
+              <p data-i18n="boards.body">
                 Eight full lists per format from live metagame share — lists assigned
                 from magic.gg, MTGO challenges, then Goldfish, never invented.
                 Rising/falling chips, color filters, and a 30-day share timeline.
@@ -325,8 +382,8 @@
           </article>
           <article class="fb reveal delay-1" id="companion-feature">
             <div class="fb-icon">🪟</div>
-            <h3>Overlay or companion</h3>
-            <p>
+            <h3 data-i18n="companion.title">Overlay or companion</h3>
+            <p data-i18n="companion.body">
               NEW: first overlay appearance asks HUD over Arena or a normal window.
               Companion sits on the taskbar, stays after the match, and you close it
               yourself. Overlay stays the default. Collapsed bar shows session record,
@@ -335,8 +392,8 @@
           </article>
           <article class="fb reveal delay-1" id="i18n-feature">
             <div class="fb-icon">🌐</div>
-            <h3>Arena languages</h3>
-            <p>
+            <h3 data-i18n="langs.title">Arena languages</h3>
+            <p data-i18n="langs.body">
               NEW: the in-app UI follows Arena — English, Spanish, French, German,
               Italian, Portuguese (Brazil), Japanese, Korean. Card names, deck names,
               and Bo1/Bo3 stay untranslated.
@@ -344,33 +401,33 @@
           </article>
           <article class="fb reveal delay-1" id="clinic">
             <div class="fb-icon">📋</div>
-            <h3>How many cards off</h3>
-            <p>NEW: My Stats diffs your 75 against today&rsquo;s closest ranked list. One swap is one card off.</p>
+            <h3 data-i18n="clinic.title">How many cards off</h3>
+            <p data-i18n="clinic.body">NEW: My Stats diffs your 75 against today&rsquo;s closest ranked list. One swap is one card off.</p>
           </article>
           <article class="fb reveal delay-1">
             <div class="fb-icon">🎯</div>
-            <h3>Cards they revealed</h3>
-            <p>NEW: click a match in My Stats to see every card the opponent showed and how many of each — copy the list and rebuild their deck. Stays on this PC.</p>
+            <h3 data-i18n="reveals.title">Cards they revealed</h3>
+            <p data-i18n="reveals.body">NEW: click a match in My Stats to see every card the opponent showed and how many of each — copy the list and rebuild their deck. Stays on this PC.</p>
           </article>
           <article class="fb reveal delay-1">
             <div class="fb-icon">🎨</div>
             <h3>Jace, Kaito, Tezzeret</h3>
-            <p>NEW: three more planeswalker color themes in the sidebar — indigo mind-magic, neon night, and etherium brass. Dark and Light still stack.</p>
+            <p data-i18n="themes.body">NEW: three more planeswalker color themes in the sidebar — indigo mind-magic, neon night, and etherium brass. Dark and Light still stack.</p>
           </article>
           <article class="fb reveal delay-1">
             <div class="fb-icon">🏁</div>
-            <h3>Friends race</h3>
-            <p>NEW: friend codes in Settings and a seasonal win-rate race on Climb — no chat, just the ladder.</p>
+            <h3 data-i18n="friends.title">Friends race</h3>
+            <p data-i18n="friends.body">NEW: friend codes in Settings and a seasonal win-rate race on Climb — no chat, just the ladder.</p>
           </article>
           <article class="fb reveal delay-2">
             <div class="fb-icon">📤</div>
-            <h3>Shareable decklists</h3>
-            <p>NEW: publish a deck and get a link — <strong>filthy-net-deck.com/u/you/your-deck</strong> — with one-click copy straight into Arena. Per deck, on your terms, take it down any time.</p>
+            <h3 data-i18n="share.title">Shareable decklists</h3>
+            <p data-i18n="share.body">NEW: publish a deck and get a link — <strong>filthy-net-deck.com/u/you/your-deck</strong> — with one-click copy straight into Arena. Per deck, on your terms, take it down any time.</p>
           </article>
           <article class="fb reveal delay-2" id="deck-library-feature">
             <div class="fb-icon">🗄️</div>
-            <h3>Your deck library</h3>
-            <p>
+            <h3 data-i18n="library.title">Your deck library</h3>
+            <p data-i18n="library.body">
               NEW: every list Arena registers is kept — <strong>Standard, Explorer, Historic,
               Alchemy, Timeless, Brawl</strong> — with its format, its version history, and
               <strong>Export decklists</strong> to write the lot to a folder as Arena import text.
@@ -380,25 +437,25 @@
           </article>
           <article class="fb reveal delay-1" id="climb-feature">
             <div class="fb-icon">↗</div>
-            <h3>Climb Tracker</h3>
-            <p>Season rank curve with peak marker &amp; hover detail, win/loss streak chips, season-vs-season, games-to-next-rank.</p>
+            <h3 data-i18n="climb.title">Climb Tracker</h3>
+            <p data-i18n="climb.body">Season rank curve with peak marker &amp; hover detail, win/loss streak chips, season-vs-season, games-to-next-rank.</p>
           </article>
           <article class="fb reveal delay-2">
             <div class="fb-icon">📅</div>
-            <h3>Events feed</h3>
-            <p>Std/Pio events from magic.gg, MTGO, Melee — filters, relative dates, verified links.</p>
+            <h3 data-i18n="events.title">Events feed</h3>
+            <p data-i18n="events.body">Std/Pio events from magic.gg, MTGO, Melee — filters, relative dates, verified links.</p>
           </article>
           <article class="fb fb-wide reveal">
             <div class="fb-copy">
-              <h3>Copy straight into Arena</h3>
-              <p>
+              <h3 data-i18n="import.title">Copy straight into Arena</h3>
+              <p data-i18n="import.body">
                 Sticky import bar on every deck. One click, paste in MTG Arena, play. Scryfall art
                 for the cards that resolve — hover any row for the full card.
               </p>
             </div>
             <div class="fb-visual fb-import">
               <code>Deck<br />4 Slickshot Show-Off<br />4 Stormchaser's Talent<br />4 Boomerang Basics<br />…</code>
-              <span class="copy-pill">Copy Arena import</span>
+              <span class="copy-pill" data-i18n="import.button">Copy Arena import</span>
             </div>
           </article>
         </div>
@@ -407,9 +464,9 @@
       <!-- LIVE META -->
       <section id="meta" class="section meta-sec">
         <div class="section-head reveal">
-          <p class="eyebrow">Live meta</p>
-          <h2>Built around today’s Standard &amp; Pioneer</h2>
-          <p class="section-lede">
+          <p class="eyebrow" data-i18n="nav.liveMeta">Live meta</p>
+          <h2 data-i18n="liveMeta.title">Built around today’s Standard &amp; Pioneer</h2>
+          <p class="section-lede" data-i18n="liveMeta.lede">
             Rankings come from the live metagame. Lists are assigned in order from
             <strong>MTGO</strong> challenges, <strong>magic.gg</strong> decklists,
             then Goldfish — every card name Scryfall-verified. If a day cannot be
@@ -420,7 +477,7 @@
           <div class="meta-panel">
             <header>
               <span>Standard · Bo1</span>
-              <span class="chip-live">Live</span>
+              <span class="chip-live" data-i18n="liveMeta.chip">Live</span>
             </header>
             <div class="meta-list" id="meta-list">
               <!-- filled by script from /meta/latest.json when available -->
@@ -451,15 +508,15 @@
         <!-- Surfaces /meta-web/ properly. It was reachable only from one nav
              link, which is why almost none of it was being crawled. -->
         <div class="meta-web-cta reveal">
-          <p>
+          <p data-i18n="metaWeb.body">
             <strong>Browse the full metagame on the web</strong> — all 32 ranked archetypes across
             Standard and Pioneer, Bo1 and Bo3, with complete decklists, mana curves and Arena
             import. No download needed.
           </p>
           <div class="meta-web-links">
-            <a class="btn btn-primary" href="meta-web/">Today’s meta</a>
-            <a class="btn btn-ghost" href="meta-web/standard.html">Standard decks</a>
-            <a class="btn btn-ghost" href="meta-web/pioneer.html">Pioneer decks</a>
+            <a class="btn btn-primary" href="meta-web/" data-i18n="metaWeb.today">Today’s meta</a>
+            <a class="btn btn-ghost" href="meta-web/standard.html" data-i18n="metaWeb.standard">Standard decks</a>
+            <a class="btn btn-ghost" href="meta-web/pioneer.html" data-i18n="metaWeb.pioneer">Pioneer decks</a>
           </div>
         </div>
       </section>
@@ -467,9 +524,9 @@
       <!-- FORMATS -->
       <section id="formats" class="section formats-sec">
         <div class="section-head reveal">
-          <p class="eyebrow">Coverage</p>
-          <h2>Two formats. Done properly.</h2>
-          <p class="section-lede">
+          <p class="eyebrow" data-i18n="formats.eyebrow">Coverage</p>
+          <h2 data-i18n="formats.title">Two formats. Done properly.</h2>
+          <p class="section-lede" data-i18n="formats.lede">
             No Alchemy. No rebalanced digital-only cards. Just the two constructed formats where
             the paper metagame is real, public, and trackable — covered with verified lists only.
           </p>
@@ -479,7 +536,7 @@
           <button type="button" class="fchip featured">Pioneer</button>
         </div>
         <div class="section-head reveal" style="margin-top: 1.5rem">
-          <p class="section-lede">
+          <p class="section-lede" data-i18n="formats.promise">
             <strong>The data promise:</strong> every list in the app is a real, current build from
             the live metagame. Every card name is checked against Scryfall before it ships. If a
             deck can’t be verified, it doesn’t appear — the app never shows placeholder,
@@ -492,9 +549,9 @@
       <section id="download" class="section download reveal">
         <div class="download-card">
           <div class="download-glow" aria-hidden="true"></div>
-          <p class="eyebrow">Get the app</p>
-          <h2>Install Filthy Net Deck</h2>
-          <p class="section-lede center">
+          <p class="eyebrow" data-i18n="download.eyebrow">Get the app</p>
+          <h2 data-i18n="download.title">Install Filthy Net Deck</h2>
+          <p class="section-lede center" data-i18n="download.lede">
             Free. Native. No account required. Daily Standard &amp; Pioneer meta on launch — plus Set Radar,
             matchup intel, Climb Tracker, and a winrate tracker that stays on your PC unless you opt in.
           </p>
@@ -504,16 +561,16 @@
               href="downloads/Filthy-Net-Deck-Setup-3.3.1.exe"
               download
             >
-              Download for Windows
-              <span class="btn-meta">v3.3.1 · NSIS · current user install</span>
+              <span data-i18n="cta.windows">Download for Windows</span>
+              <span class="btn-meta">v3.3.1 · <span data-i18n="download.winMeta">NSIS · current user install</span></span>
             </a>
             <a
               class="btn btn-ghost btn-lg"
               href="downloads/Filthy-Net-Deck-3.3.1-universal.dmg"
               download
             >
-              Download for macOS
-              <span class="btn-meta">v3.3.1 · Apple silicon + Intel</span>
+              <span data-i18n="cta.macos">Download for macOS</span>
+              <span class="btn-meta">v3.3.1 · <span data-i18n="download.macMeta">Apple silicon + Intel</span></span>
             </a>
             <a
               class="btn btn-ghost btn-lg"
@@ -521,11 +578,11 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              Source &amp; releases
+              <span data-i18n="download.source">Source &amp; releases</span>
               <span class="btn-meta">github.com/L0nE-F0x/Filthy-Net-Deck</span>
             </a>
           </div>
-          <p class="download-note">
+          <p class="download-note" data-i18n="download.note">
             <strong>Windows SmartScreen:</strong> you may see
             <em>“Windows protected your PC”</em> — the installer isn’t code-signed yet (that’s normal
             for indie apps). Click <strong>More info</strong>, then <strong>Run anyway</strong>.
@@ -535,7 +592,7 @@
           </p>
           <!-- Tip jar. Free stays free — this never gates a feature.
                Keep in sync with DONATE_URL in src/services/site.ts. -->
-          <p class="support-note">
+          <p class="support-note" data-i18n="download.support">
             Filthy Net Deck is <strong>free</strong>, and stays free. If it’s helped your climb,
             you can
             <a
@@ -558,14 +615,16 @@
           <img src="assets/app-icon.png" alt="" width="32" height="32" />
           <strong>Filthy Net Deck</strong>
         </div>
-        <p>
+        <p data-i18n="footer.disclaimer">
           Fan-made companion — <strong>not affiliated with Wizards of the Coast</strong>. Magic:
           The Gathering and MTG Arena are trademarks of Wizards of the Coast LLC. Card images via
           Scryfall.
         </p>
         <p class="footer-credit">
-          <a href="privacy.html">Privacy</a> · <a href="status.html">Status</a> ·
-          <a href="feedback.html">Suggest / Report</a> · Built by
+          <a href="privacy.html" data-i18n="footer.privacy">Privacy</a> ·
+          <a href="status.html" data-i18n="footer.status">Status</a> ·
+          <a href="feedback.html" data-i18n="nav.feedback">Suggest / Report</a> ·
+          <span data-i18n="footer.builtBy">Built by</span>
           <a href="https://ame-apexforge.org/" target="_blank" rel="noopener noreferrer"
             >ApexForge</a
           >
@@ -573,6 +632,7 @@
       </div>
     </footer>
 
+    <script src="i18n/i18n.js" defer></script>
     <script src="script.js"></script>
     <script src="hero-fan.js"></script>
   </body>

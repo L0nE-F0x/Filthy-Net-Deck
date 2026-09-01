@@ -77,6 +77,60 @@ that is expected and does not block auto-update.
 
    Next session: wait for the owner. Do not invent work. Do not bump.
 
+0b. **Marketing site is multi-language. 2026-09-01. No version bump.**
+
+   Owner asked for the homepage to follow the app's Arena locales. Site
+   only — **no app change, no installer, no updater, no version bump.**
+   `website/` is served straight from `main`, so pushing publishes it.
+
+   Same eight locales as the app (`src/i18n/locales.ts`): en, es, fr, de,
+   it, pt-BR, ja, ko. A discreet globe pill in the nav, between Suggest /
+   Report and Download, opens a menu of native names.
+
+   How it works — **English is not a catalog.** The English copy stays
+   inline in `website/index.html`, which remains the hand-edited master;
+   `website/i18n/i18n.js` snapshots it on boot and uses it as the fallback
+   for every missing key. So editing English copy is still a one-file
+   change, and a half-translated catalog degrades per string.
+
+   - `data-i18n="key"` → innerHTML · `data-i18n-label` → aria-label ·
+     `data-i18n-title` → title. 114 keys.
+   - `website/i18n/<locale>.json` — one per non-English locale.
+   - First visit follows `navigator.languages` (same folding as the app:
+     `pt`/`pt-PT` → pt-BR, any `es-*` → es, unknown → en) and is **not**
+     persisted. Choosing from the menu persists to
+     `localStorage["fnd.site.locale"]` and wins from then on.
+   - `<head>` starts the catalog fetch during parse so a non-English
+     visitor does not get a flash of English.
+
+   **Untranslated on purpose** (same policy as the app): card names, deck
+   names, Bo1/Bo3, Standard/Pioneer, the version string, download hrefs.
+
+   **The version is not in the catalogs.** `page.title` writes `{version}`
+   and the runtime substitutes it from the English `<title>` — so the
+   release checklist keeps bumping the version in `index.html` only, and
+   it cannot go stale in seven translated copies.
+
+   Guard: `pipeline/site-i18n.test.mjs` (23 tests) fails if a key is added
+   or renamed in `index.html` without every catalog following, if a
+   catalog carries a stale key, or if a version literal lands in a title.
+   **A new `data-i18n` key without eight catalog entries is a red CI.**
+
+   Verified headless (Chromium via playwright, `/usr/bin/chromium`) across
+   all eight locales: auto-detect, toggle, persistence across reload,
+   fallback to English when a catalog 404s, no console errors, and nav
+   fitting at 320–1280px in the longest-label locales.
+
+   Layout changes this needed: CJK hero sizing (`汚くネットデッキ。` was
+   breaking mid-word), and the nav gap tightened at ≤700px with
+   Suggest / Report dropped at ≤560px — the language pill costs ~55px in
+   a nav that previously fitted 390px exactly.
+
+   Not translated: `privacy.html`, `feedback.html`, `status.html`,
+   `meta-web/`. `privacy.html` is deliberate — AGENTS.md binds it to the
+   real upload allowlist, and seven more copies is seven more places for
+   the payload description to drift.
+
 1. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
    Owner confirmed end-to-end and will tell the friend to Check for
@@ -117,9 +171,10 @@ that is expected and does not block auto-update.
    in-app Arena import of rooms needs 3.3.1.
 
    Do **not** sneak in: silent autostart-on · extra nav items · ripping
-   out the library tracker · flipping overlay default · translating the
-   marketing site · rotating the signing key in the same commit as a
-   release.
+   out the library tracker · flipping overlay default · rotating the
+   signing key in the same commit as a release.
+   (“Translating the marketing site” left this list on 2026-09-01 — the
+   owner asked for it; see item 0b.)
 
    Owner leftovers (not blockers):
    1. In-app **Check for updates** on an installed 3.2.0 — *Update & restart*.
@@ -186,7 +241,7 @@ that is expected and does not block auto-update.
    - P2 autostart ask (one-shot after Help tour — not silent-on).
    - i18n: en, es, fr, de, it, pt-BR, ja, ko. Remaining English: long
      Help bodies, some Settings paragraphs, Climb/Stats inner copy.
-     Marketing site not translated.
+     Marketing site translated separately on 2026-09-01 — item 0b.
 
    ### Signed Windows build on this Linux box (keep)
    Key id `67FCA9900F523D49` — `~/.tauri/filthy-net-deck.key` (copied from
@@ -231,8 +286,9 @@ that is expected and does not block auto-update.
    ### Do not sneak in
    Silent autostart-on · extra nav items · ripping out the library
    tracker · flipping overlay default for existing users · notification
-   centre · P2 autostart installer checkbox · translating the marketing
-   site · rotating the signing key in the same commit as a release.
+   centre · P2 autostart installer checkbox · rotating the signing key in
+   the same commit as a release. (The marketing site was deliberately left
+   English here; the owner asked for it on 2026-09-01 — item 0b.)
 
    ### Owner leftovers (not blockers)
    1. In-app **Check for updates** on an installed 3.2.0 — *Update & restart*.

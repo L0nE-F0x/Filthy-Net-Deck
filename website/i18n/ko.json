@@ -1,0 +1,148 @@
+{
+  "lang.switch": "언어 변경",
+
+  "brand.companion": "MTG 아레나 컴패니언",
+  "nav.features": "기능",
+  "nav.publicMeta": "공개 메타",
+  "nav.liveMeta": "실시간 메타",
+  "nav.formats": "포맷",
+  "nav.feedback": "제안 / 신고",
+  "nav.download": "다운로드",
+
+  "hero.eyebrow": "Windows & macOS · 무료 · 스탠다드 & 파이오니어",
+  "hero.title": "더럽게 넷덱.<br /><span class=\"grad\">깨끗하게 올라가라.</span>",
+  "hero.lede": "실제 토너먼트와 래더 리스트에서 뽑은 <strong>스탠다드</strong>·<strong>파이오니어</strong> 보드를 매일 제공합니다 — <strong>magic.gg</strong>, <strong>MTGO</strong>, 그리고 랭크 메타게임에서 모으고, 모든 카드는 Scryfall로 검증합니다. 오버레이는 대전 중에 상대를 읽어냅니다. 기록은 직접 공유를 선택하지 않는 한 이 PC에 남습니다.",
+  "hero.source": "GitHub 소스",
+
+  "cta.windows": "Windows용 다운로드",
+  "cta.windowsMeta": "Windows 설치 파일",
+  "cta.macos": "macOS용 다운로드",
+  "cta.macosMeta": "유니버설 .dmg",
+
+  "trust.boards": "매일 갱신되는 메타 보드",
+  "trust.overlay": "대전 중 오버레이",
+  "trust.reveals": "공개된 카드 기록",
+  "trust.local": "로컬 승률",
+  "trust.radar": "Set Radar",
+  "trust.noAccount": "계정 불필요",
+
+  "fan.live": "실시간 메타게임",
+  "fan.format": "포맷",
+  "fan.bestOf": "Best of",
+  "fan.topDecks": "오늘의 상위 덱",
+  "fan.openList": "리스트 열기 →",
+  "fan.prev": "이전 덱",
+  "fan.next": "다음 덱",
+  "fan.verified": "검증됨",
+  "fan.sideboard": "사이드보드 {n}장",
+  "fan.deckN": "덱 {n}",
+
+  "stats.aria": "제품 정보",
+  "stats.formats": "개 포맷 · 스탠다드 & 파이오니어",
+  "stats.decks": "개씩 랭크 덱, 매일",
+  "stats.verified": "실제 리스트 · 모든 카드 검증",
+  "stats.account": "개의 계정으로 기록 가능",
+
+  "features.eyebrow": "기능",
+  "features.title": "더럽게, 그리고 최신으로 유지하는 데 필요한 전부",
+  "features.lede": "공개된 종이 메타게임이 실제로 존재하는 두 구축 포맷을 위한 네이티브 앱. 매일의 보드, 대전 중 오버레이 또는 컴패니언 창, 그리고 직접 공유를 선택하지 않는 한 이 PC에 남는 승률 트래커.",
+
+  "badge.kicker": "실행 표시 배지",
+  "badge.title": "돌아가고 있다는 걸 항상 알 수 있게.",
+  "badge.body": "대전 오버레이는 게임이 시작돼야 나타납니다 — 홈 화면이나 덱 빌더에서는 켜져 있는지 알 수 없었죠. 이제 아레나가 열려 있는 동안 <em>작은 배지가 왼쪽 아래에 자리합니다</em>: 마크, 실행 중을 알리는 점, 그리고 대전 사이에 실제로 바꾸게 되는 설정을 담은 <em>⚙</em> — 오버레이 켜기/끄기, 대전 후 요약, 불투명도, 전체 화면 알림. 대전 중에는 HUD가 주인공이 되도록 흐려지고, 마우스를 올리면 바로 깨어납니다. 마크를 클릭하면 앱으로 곧장 돌아갑니다.",
+  "badge.mockHome": "아레나 홈 화면",
+  "badge.mockSettings": "alt-tab 없이 설정",
+  "badge.mockRow1": "대전 오버레이, 게임 사이",
+  "badge.mockHidden": "숨김",
+  "badge.mockRow2": "모서리 배지, 세션 내내",
+  "badge.mockShown": "표시",
+
+  "radar.kicker": "Set Radar",
+  "radar.title": "바인더처럼 보는 스포일러 — 아레나 우선",
+  "radar.body": "출시 예정 세트의 Scryfall 갤러리를 통째로 — 여기에 <em>미래의 스탠다드</em> 로드맵 세트와, WotC가 공식 공개 영상을 올리면 나타나는 <em>트레일러 보기</em> 버튼(Nauctis, Titanbreach 등)을 앱 안의 플레이어로 재생합니다. 포맷 허브: 로테이션 날짜, 파이오니어 카드풀, 카드 일러스트가 함께 실린 금지 목록. 방향키 탐색, 정직한 「출시 시점」 사용 가능 표시, 아레나 출시 전날 알림. 확인되지 않은 MythicSpoiler 유출은 Scryfall보다 먼저, 분명히 표시해서 올립니다. 알케미 없음, 리밸런스된 카드도 없음.",
+  "radar.mockSpoiling": "스포일러 · 스탠/파이오 사용 가능 여부",
+  "radar.mockBrowse": "탐색 · 마나 심볼 · 신규 배지",
+  "radar.mockFilters": "갤러리 필터 · 희귀도 · 색 · 마나 값",
+  "radar.mockLive": "실시간",
+  "radar.mockNotify": "아레나 출시 전날 알림 (선택)",
+  "radar.mockLocal": "로컬",
+
+  "intel.kicker": "매치업 정보",
+  "intel.title": "태그된 아키타입별 내 승률",
+  "intel.body": "매치업은 당신이 본 것을 바탕으로 상대에게 태그를 붙이고, 준비 메모를 입력하는 대로 저장합니다 — 그런 다음 각 태그에 대한 <em>당신의</em> 전적을 집계하고, 덱 보드에 「이젯 상대 4–0」 같은 칩을 띄우며, 기록을 CSV로 내보냅니다. 내 스탯의 오늘 칩을 누르면 모든 수치가 최근 24시간으로 좁혀집니다. 연승·연패와 오늘 타일이 현재 흐름을 계속 보여줍니다.",
+  "intel.mockPill": "태그 · Bo1",
+  "intel.mockSeason": "이번 시즌 · 도메인 사용",
+  "intel.mockChip": "100% · 덱 보드의 칩",
+  "intel.mockStreak": "3연승 · 승률 스파크라인",
+  "intel.mockHot": "상승세",
+  "intel.mockCsv": "한 번에 CSV · 주간 요약 PNG",
+  "intel.mockShare": "공유",
+
+  "boards.kicker": "매일의 보드",
+  "boards.title": "스탠다드 & 파이오니어 — 등락까지 함께",
+  "boards.body": "실제 메타게임 점유율을 기준으로 포맷마다 여덟 개의 완전한 리스트 — magic.gg, MTGO 챌린지, 그다음 Goldfish 순으로 배정하며 절대 지어내지 않습니다. 상승·하락 칩, 색 필터, 30일 점유율 타임라인.",
+
+  "companion.title": "오버레이 또는 컴패니언 창",
+  "companion.body": "신규: 오버레이가 처음 나타날 때 아레나 위에 띄우는 HUD로 할지, 일반 창으로 할지 물어봅니다. 컴패니언 창은 작업 표시줄에 남고, 대전이 끝나도 유지되며, 닫는 건 당신입니다. 기본값은 그대로 오버레이입니다. 접은 상태의 바에는 세션 전적, 다음 드로우가 대지일 확률, 그리고 확신도가 붙은 상대 판독이 표시됩니다.",
+
+  "langs.title": "아레나 언어",
+  "langs.body": "신규: 앱 UI가 아레나를 따라갑니다 — 영어, 스페인어, 프랑스어, 독일어, 이탈리아어, 포르투갈어(브라질), 일본어, 한국어. 카드 이름, 덱 이름, Bo1/Bo3는 번역하지 않습니다.",
+
+  "clinic.title": "몇 장 차이인가",
+  "clinic.body": "신규: 내 스탯이 당신의 75장을 오늘 가장 가까운 랭크 리스트와 비교합니다. 한 장 바꾸면 한 장 차이입니다.",
+
+  "reveals.title": "상대가 보여준 카드",
+  "reveals.body": "신규: 내 스탯에서 대전을 클릭하면 상대가 보여준 카드와 그 장수를 모두 볼 수 있습니다 — 리스트를 복사해 상대의 덱을 다시 짜보세요. 이 PC에만 남습니다.",
+
+  "themes.body": "신규: 사이드바에 플레인즈워커 색 테마 세 가지 추가 — 인디고 정신 마법, 네온 밤, 에테리움 황동. 다크와 라이트는 그대로 함께 적용됩니다.",
+
+  "friends.title": "친구 레이스",
+  "friends.body": "신규: 설정의 친구 코드와 Climb의 시즌 승률 레이스 — 채팅은 없고, 래더만 있습니다.",
+
+  "share.title": "공유 가능한 덱리스트",
+  "share.body": "신규: 덱을 공개하면 링크가 생깁니다 — <strong>filthy-net-deck.com/u/you/your-deck</strong> — 클릭 한 번으로 아레나에 그대로 복사됩니다. 덱 단위로, 당신의 방식대로, 언제든 내릴 수 있습니다.",
+
+  "library.title": "내 덱 라이브러리",
+  "library.body": "신규: 아레나가 등록하는 모든 리스트를 보관합니다 — <strong>스탠다드, 익스플로러, 히스토릭, 알케미, 타임리스, 브롤</strong> — 포맷과 버전 기록까지 함께. <strong>덱리스트 내보내기</strong>로 전부 폴더에 아레나 임포트 텍스트로 저장할 수 있습니다. 계정은 필요 없습니다. 아레나는 덱을 100개로 제한하지만, 나머지는 여기에 남습니다. 티어 리스트와 매치업 데이터는 스탠다드와 파이오니어로 유지됩니다.",
+
+  "climb.title": "Climb Tracker",
+  "climb.body": "최고점 표시와 마우스 오버 상세가 있는 시즌 랭크 곡선, 연승·연패 칩, 시즌 간 비교, 다음 랭크까지 남은 판수.",
+
+  "events.title": "이벤트 피드",
+  "events.body": "magic.gg, MTGO, Melee의 스탠다드·파이오니어 이벤트 — 필터, 상대 날짜, 검증된 링크.",
+
+  "import.title": "아레나로 바로 복사",
+  "import.body": "모든 덱에 고정된 임포트 바. 한 번 누르고, MTG 아레나에 붙여넣고, 플레이하세요. 매칭된 카드에는 Scryfall 일러스트가 붙고, 아무 줄에나 마우스를 올리면 카드 전체가 보입니다.",
+  "import.button": "아레나 임포트 복사",
+
+  "liveMeta.title": "오늘의 스탠다드와 파이오니어를 중심으로",
+  "liveMeta.lede": "순위는 실시간 메타게임에서 나옵니다. 리스트는 <strong>MTGO</strong> 챌린지, <strong>magic.gg</strong> 덱리스트, 그다음 Goldfish 순으로 배정하며, 카드 이름은 모두 Scryfall로 검증합니다. 어느 날의 데이터를 검증할 수 없으면 어제의 실제 데이터를 그대로 유지합니다. 지어내는 것은 없습니다.",
+  "liveMeta.chip": "실시간",
+
+  "metaWeb.body": "<strong>웹에서 전체 메타게임 보기</strong> — 스탠다드와 파이오니어의 랭크 아키타입 32개 전부를 Bo1과 Bo3로, 완전한 덱리스트·마나 커브·아레나 임포트와 함께. 다운로드는 필요 없습니다.",
+  "metaWeb.today": "오늘의 메타",
+  "metaWeb.standard": "스탠다드 덱",
+  "metaWeb.pioneer": "파이오니어 덱",
+
+  "formats.eyebrow": "다루는 범위",
+  "formats.title": "두 포맷. 제대로.",
+  "formats.lede": "알케미 없음. 리밸런스된 디지털 전용 카드 없음. 종이 메타게임이 실재하고, 공개돼 있고, 추적 가능한 두 구축 포맷만 — 검증된 리스트로만 다룹니다.",
+  "formats.promise": "<strong>데이터에 대한 약속:</strong> 앱에 실리는 모든 리스트는 실시간 메타게임에서 가져온 실제의 최신 빌드입니다. 모든 카드 이름은 배포 전에 Scryfall과 대조합니다. 검증할 수 없는 덱은 실리지 않습니다 — 이 앱은 자리만 채우는 덱도, AI가 추측한 덱도, 「미리 심어둔」 덱도 보여주지 않습니다.",
+
+  "download.eyebrow": "앱 받기",
+  "download.title": "Filthy Net Deck 설치",
+  "download.lede": "무료. 네이티브. 계정 불필요. 실행하는 순간 오늘의 스탠다드·파이오니어 메타가 준비되고 — 여기에 Set Radar, 매치업 정보, Climb Tracker, 그리고 직접 공유를 선택하지 않는 한 PC에 남는 승률 트래커까지.",
+  "download.winMeta": "NSIS · 현재 사용자 설치",
+  "download.macMeta": "Apple 실리콘 + Intel",
+  "download.source": "소스 & 릴리스",
+  "download.note": "<strong>Windows SmartScreen:</strong> <em>「Windows의 PC 보호」</em> 화면이 뜰 수 있습니다 — 설치 파일에 아직 코드 서명이 없기 때문입니다(인디 앱에서는 흔한 일입니다). <strong>추가 정보</strong>를 누른 뒤 <strong>실행</strong>을 선택하세요. <strong>macOS Gatekeeper:</strong> 처음 실행할 때는 <strong>마우스 오른쪽 클릭 → 열기</strong>가 필요합니다(앱이 아직 공증을 받지 않았습니다). 저희 쪽은 문제없습니다. 서명은 수익화를 목표로 삼는 시점까지 미룰 예정입니다.",
+  "download.support": "Filthy Net Deck은 <strong>무료</strong>이고, 앞으로도 무료입니다. 랭크 올리는 데 도움이 됐다면 <a class=\"support-link\" href=\"https://ko-fi.com/filthynetdeck\" target=\"_blank\" rel=\"noopener noreferrer\">커피 한 잔 사주셔도</a> 좋습니다. 빠진 게 있거나, 뭔가 고장 났나요? <a class=\"support-link\" href=\"feedback.html\">기능 제안 / 버그 신고</a>.",
+
+  "footer.disclaimer": "팬이 만든 컴패니언 — <strong>Wizards of the Coast와 무관합니다</strong>. Magic: The Gathering과 MTG 아레나는 Wizards of the Coast LLC의 상표입니다. 카드 이미지는 Scryfall 제공.",
+  "footer.privacy": "개인정보",
+  "footer.status": "서비스 상태",
+  "footer.builtBy": "제작",
+
+  "page.title": "Filthy Net Deck {version} — 스탠다드 & 파이오니어를 위한 MTG 아레나 컴패니언",
+  "page.description": "스탠다드와 파이오니어를 위한 무료 MTG 아레나 컴패니언: 어떤 포맷이든 플레이한 덱을 모두 보관하고 내보내며, 누구나 아레나로 복사할 수 있는 리스트로 공개할 수 있습니다. 여기에 매일의 랭크 덱, 실시간 승률 트래커, 공개된 카드 기록까지 — 전부 네이티브, 광고 없음, 군더더기 없음."
+}

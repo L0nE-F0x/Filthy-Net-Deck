@@ -2013,3 +2013,212 @@ main,
 #download {
   scroll-margin-top: 88px;
 }
+
+/* ——— language switch ———
+   Discreet by design: it sits between the nav links and the Download CTA and
+   reads as a quiet pill until hovered. Survives the 700px nav collapse — the
+   media query only hides <a> children, and this is a <div>. */
+.lang-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.42rem 0.6rem 0.42rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 61, 40, 0.95);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.lang-btn:hover,
+.lang-btn[aria-expanded="true"] {
+  color: var(--acid);
+  border-color: rgba(184, 240, 0, 0.45);
+  background: rgba(184, 240, 0, 0.07);
+}
+.lang-btn:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: 2px;
+}
+.lang-globe,
+.lang-caret {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.lang-caret {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+  transition: transform 0.2s var(--ease);
+}
+.lang-btn[aria-expanded="true"] .lang-caret {
+  transform: rotate(180deg);
+}
+.lang-code {
+  font-variant-numeric: tabular-nums;
+}
+
+/* display:flex below would otherwise beat the UA's [hidden] rule, leaving the
+   menu permanently open. */
+.lang-menu[hidden] {
+  display: none;
+}
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 60;
+  min-width: 190px;
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: 14px;
+  border: 1px solid rgba(58, 66, 48, 0.9);
+  background: color-mix(in srgb, var(--ink-900) 94%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  animation: lang-in 0.16s var(--ease);
+}
+@keyframes lang-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+.lang-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--foam);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.lang-menu button:hover {
+  background: rgba(184, 240, 0, 0.1);
+  color: var(--acid);
+}
+.lang-menu button:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: -2px;
+}
+.lang-menu button.on {
+  color: var(--acid);
+}
+.lang-menu button.on .lang-tag {
+  border-color: rgba(184, 240, 0, 0.45);
+  color: var(--acid);
+}
+.lang-tag {
+  flex: none;
+  padding: 0.1rem 0.36rem;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 61, 40, 0.95);
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-menu {
+    animation: none;
+  }
+  .lang-caret {
+    transition: none;
+  }
+}
+
+@media (max-width: 700px) {
+  /* Tighten to icon + code so the nav still fits beside the Download CTA. */
+  .lang-btn {
+    padding: 0.4rem 0.45rem;
+  }
+  .lang-btn .lang-caret {
+    display: none;
+  }
+  .lang-menu {
+    right: -0.35rem;
+    min-width: 175px;
+  }
+}
+
+/* ——— CJK typography ———
+   The hero headline is sized for Latin word-shapes. Japanese and Korean have
+   no spaces to break on, so at clamp()'s upper end "汚くネットデッキ。" split
+   mid-word onto a second line. Ease the size and forbid the awkward breaks;
+   the negative Latin letter-spacing also reads as a squeeze on CJK glyphs. */
+:root[lang="ja"] .hero h1,
+:root[lang="ko"] .hero h1 {
+  font-size: clamp(2.25rem, 4.6vw, 3.1rem);
+  letter-spacing: -0.01em;
+  line-height: 1.18;
+  line-break: strict;
+  overflow-wrap: normal;
+}
+:root[lang="ko"] .hero h1 {
+  word-break: keep-all;   /* Korean has spaces — break on them, not inside words */
+}
+:root[lang="ja"] .lede,
+:root[lang="ko"] .lede,
+:root[lang="ja"] .section-lede,
+:root[lang="ko"] .section-lede {
+  line-height: 1.75;
+  line-break: strict;
+}
+
+/* The language pill costs ~55px in a nav that already fitted 390px exactly.
+   Buy it back from the gap and the outer padding rather than dropping the
+   Suggest / Report link — measured across all eight locales at 360–414px. */
+@media (max-width: 700px) {
+  .nav {
+    padding-inline: 0.85rem;
+  }
+  .nav-links {
+    gap: 0.5rem;
+  }
+}
+@media (max-width: 380px) {
+  .lang-btn .lang-code {
+    display: none;   /* globe only — the open menu still names the language */
+  }
+  .lang-btn {
+    padding: 0.4rem 0.42rem;
+  }
+}
+
+/* Below this the brand, Suggest / Report, the language pill and Download stop
+   fitting on one line — worst case French, whose labels are the longest. The
+   700px rule above deliberately keeps Suggest / Report when there is room, so
+   drop it only here; it is still linked from the hero, the download card and
+   the footer. */
+@media (max-width: 560px) {
+  .nav-links .nav-feedback {
+    display: none;
+  }
+}

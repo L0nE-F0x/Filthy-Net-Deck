@@ -1,0 +1,148 @@
+{
+  "lang.switch": "Cambia lingua",
+
+  "brand.companion": "Compagno di MTG Arena",
+  "nav.features": "Funzioni",
+  "nav.publicMeta": "Meta pubblico",
+  "nav.liveMeta": "Meta live",
+  "nav.formats": "Formati",
+  "nav.feedback": "Suggerisci / Segnala",
+  "nav.download": "Scarica",
+
+  "hero.eyebrow": "Windows e macOS · Gratis · Standard e Pioneer",
+  "hero.title": "Netdeck sporco.<br /><span class=\"grad\">Climb pulito.</span>",
+  "hero.lede": "Board giornaliere di <strong>Standard</strong> e <strong>Pioneer</strong> da liste reali di torneo e di ladder — <strong>magic.gg</strong>, <strong>MTGO</strong> e il metagame ranked — con ogni carta verificata su Scryfall. L’overlay legge l’avversario a metà partita. La cronologia resta su questo PC, a meno che tu non scelga di condividerla.",
+  "hero.source": "Codice su GitHub",
+
+  "cta.windows": "Scarica per Windows",
+  "cta.windowsMeta": "installer Windows",
+  "cta.macos": "Scarica per macOS",
+  "cta.macosMeta": ".dmg universale",
+
+  "trust.boards": "Board del meta giornaliere",
+  "trust.overlay": "Overlay in partita",
+  "trust.reveals": "Lettura delle carte rivelate",
+  "trust.local": "Winrate in locale",
+  "trust.radar": "Set Radar",
+  "trust.noAccount": "Nessun account",
+
+  "fan.live": "Metagame live",
+  "fan.format": "Formato",
+  "fan.bestOf": "Best of",
+  "fan.topDecks": "I migliori mazzi di oggi",
+  "fan.openList": "Apri la lista →",
+  "fan.prev": "Mazzo precedente",
+  "fan.next": "Mazzo successivo",
+  "fan.verified": "verificato",
+  "fan.sideboard": "sideboard da {n} carte",
+  "fan.deckN": "Mazzo {n}",
+
+  "stats.aria": "Dati del prodotto",
+  "stats.formats": "formati · Standard e Pioneer",
+  "stats.decks": "mazzi ranked ciascuno, ogni giorno",
+  "stats.verified": "liste reali · ogni carta verificata",
+  "stats.account": "account richiesti per tracciare",
+
+  "features.eyebrow": "Funzioni",
+  "features.title": "Tutto per restare sporco e aggiornato",
+  "features.lede": "Una app nativa per i due formati costruiti che hanno davvero un metagame cartaceo pubblico. Board giornaliere, overlay in partita o finestra compagna, e un tracker di winrate che resta su questo PC a meno che tu non scelga di condividerlo.",
+
+  "badge.kicker": "Badge di presenza",
+  "badge.title": "Sai sempre che sta girando.",
+  "badge.body": "L’overlay di partita compare solo quando la partita inizia: nella schermata iniziale o nel deck builder restavi a indovinare. Ora un <em>piccolo badge sta in basso a sinistra</em> per tutto il tempo in cui Arena è aperto: il marchio, un puntino live e un <em>⚙</em> con le impostazioni che si cambiano davvero tra una partita e l’altra — overlay sì/no, riepilogo di fine partita, opacità, avvisi a schermo intero. Si attenua mentre giochi, così l’HUD resta il protagonista, e si sveglia appena ci passi sopra. Clicca il marchio per tornare subito all’app.",
+  "badge.mockHome": "Schermata iniziale di Arena",
+  "badge.mockSettings": "impostazioni senza alt-tab",
+  "badge.mockRow1": "Overlay di partita, tra una game e l’altra",
+  "badge.mockHidden": "nascosto",
+  "badge.mockRow2": "Badge nell’angolo, tutta la sessione",
+  "badge.mockShown": "visibile",
+
+  "radar.kicker": "Set Radar",
+  "radar.title": "Spoiler come un raccoglitore — prima Arena",
+  "radar.body": "Gallerie Scryfall complete per i set in arrivo — più i set della roadmap <em>Future Standard</em> e un pulsante <em>Guarda il trailer</em> quando WotC pubblica il video ufficiale di annuncio (Nauctis, Titanbreach, …), riprodotto in un player integrato. Hub dei formati: date di rotazione, pool di Pioneer, liste dei ban con le illustrazioni. Navigazione con le frecce, legalità onesta «all’uscita», avvisi la vigilia di Arena. I leak non confermati di MythicSpoiler arrivano prima di Scryfall, chiaramente etichettati. Niente Alchemy, niente carte ribilanciate.",
+  "radar.mockSpoiling": "Spoiler · legalità Std/Pio",
+  "radar.mockBrowse": "sfoglia · simboli di mana · novità",
+  "radar.mockFilters": "Filtri galleria · rarità · colore · CMC",
+  "radar.mockLive": "live",
+  "radar.mockNotify": "Avviso la vigilia di Arena (opzionale)",
+  "radar.mockLocal": "locale",
+
+  "intel.kicker": "Info sui matchup",
+  "intel.title": "Il tuo winrate contro ogni archetipo etichettato",
+  "intel.body": "Matchup etichetta l’avversario in base a quello che hai visto e tiene le tue note di preparazione mentre le scrivi — poi aggrega <em>il tuo</em> record contro ogni etichetta, mostra chip «4–0 contro Izzet» sulla board dei Mazzi ed esporta la cronologia in CSV. Un chip Oggi in Le mie stats riporta ogni numero alle ultime 24 ore. Serie e riquadri di oggi tengono la forma sotto gli occhi.",
+  "intel.mockPill": "Etichetta · Bo1",
+  "intel.mockSeason": "Questa stagione · tu con Domain",
+  "intel.mockChip": "100% · chip sulla board dei Mazzi",
+  "intel.mockStreak": "Serie V3 · sparkline del winrate",
+  "intel.mockHot": "in forma",
+  "intel.mockCsv": "CSV in un clic · riepilogo settimanale PNG",
+  "intel.mockShare": "condividi",
+
+  "boards.kicker": "Board giornaliere",
+  "boards.title": "Standard e Pioneer — movimento incluso",
+  "boards.body": "Otto liste complete per formato in base alla quota reale del metagame — assegnate da magic.gg, dalle challenge MTGO e poi da Goldfish; mai inventate. Chip di salita e discesa, filtri per colore e una linea temporale della quota a 30 giorni.",
+
+  "companion.title": "Overlay o finestra compagna",
+  "companion.body": "NUOVO: alla prima comparsa l’overlay chiede se lo vuoi come HUD sopra Arena o come finestra normale. La finestra compagna sta nella barra delle applicazioni, resta dopo la partita e la chiudi tu. L’overlay resta il default. La barra chiusa mostra il record di sessione, la % di terra alla prossima pescata e la lettura dell’avversario con la sua confidenza.",
+
+  "langs.title": "Lingue di Arena",
+  "langs.body": "NUOVO: l’interfaccia dell’app segue Arena — inglese, spagnolo, francese, tedesco, italiano, portoghese (Brasile), giapponese, coreano. I nomi delle carte, i nomi dei mazzi e Bo1/Bo3 restano non tradotti.",
+
+  "clinic.title": "A quante carte sei",
+  "clinic.body": "NUOVO: Le mie stats confronta le tue 75 con la lista ranked più vicina di oggi. Uno scambio è una carta di differenza.",
+
+  "reveals.title": "Le carte che ha mostrato",
+  "reveals.body": "NUOVO: clicca una partita in Le mie stats per vedere ogni carta mostrata dall’avversario e in quante copie — copia la lista e ricostruisci il suo mazzo. Resta su questo PC.",
+
+  "themes.body": "NUOVO: altri tre temi di colore planeswalker nella barra laterale — magia mentale indaco, notte al neon e ottone di etherium. Scuro e Chiaro si combinano ancora.",
+
+  "friends.title": "Gara con gli amici",
+  "friends.body": "NUOVO: codici amico nelle Impostazioni e una gara di winrate stagionale su Climb — niente chat, solo la scalata.",
+
+  "share.title": "Decklist condivisibili",
+  "share.body": "NUOVO: pubblica un mazzo e ottieni un link — <strong>filthy-net-deck.com/u/you/your-deck</strong> — con copia diretta in Arena in un clic. Mazzo per mazzo, alle tue condizioni, e lo togli quando vuoi.",
+
+  "library.title": "La tua libreria di mazzi",
+  "library.body": "NUOVO: ogni lista che Arena registra viene conservata — <strong>Standard, Explorer, Historic, Alchemy, Timeless, Brawl</strong> — con il suo formato, la sua cronologia delle versioni e <strong>Esporta decklist</strong> per scriverle tutte in una cartella come testo di importazione per Arena. Nessun account. Arena ti ferma a 100 mazzi; qui vivono gli altri. Le tier list e i dati sui matchup restano Standard e Pioneer.",
+
+  "climb.title": "Climb Tracker",
+  "climb.body": "Curva del rango stagionale con segnaposto del picco e dettaglio al passaggio del mouse, chip delle serie di vittorie e sconfitte, stagione contro stagione, partite al rango successivo.",
+
+  "events.title": "Feed degli eventi",
+  "events.body": "Eventi Std/Pio da magic.gg, MTGO e Melee — filtri, date relative, link verificati.",
+
+  "import.title": "Copia diretta in Arena",
+  "import.body": "Barra di importazione fissa su ogni mazzo. Un clic, incolli in MTG Arena e giochi. Illustrazioni Scryfall per le carte che risolvono — passa il mouse su una riga per vedere la carta intera.",
+  "import.button": "Copia l’importazione per Arena",
+
+  "liveMeta.title": "Costruito sullo Standard e sul Pioneer di oggi",
+  "liveMeta.lede": "Le classifiche vengono dal metagame live. Le liste sono assegnate in ordine dalle challenge <strong>MTGO</strong>, dalle decklist di <strong>magic.gg</strong> e poi da Goldfish — con ogni nome di carta verificato su Scryfall. Se un giorno non è verificabile, restano i dati reali di ieri. Niente viene inventato.",
+  "liveMeta.chip": "Live",
+
+  "metaWeb.body": "<strong>Sfoglia tutto il metagame sul web</strong> — tutti e 32 gli archetipi ranked di Standard e Pioneer, in Bo1 e Bo3, con decklist complete, curve di mana e importazione in Arena. Senza scaricare nulla.",
+  "metaWeb.today": "Il meta di oggi",
+  "metaWeb.standard": "Mazzi Standard",
+  "metaWeb.pioneer": "Mazzi Pioneer",
+
+  "formats.eyebrow": "Copertura",
+  "formats.title": "Due formati. Fatti bene.",
+  "formats.lede": "Niente Alchemy. Niente carte digitali ribilanciate. Solo i due formati costruiti dove il metagame cartaceo è reale, pubblico e tracciabile — coperti unicamente con liste verificate.",
+  "formats.promise": "<strong>La promessa sui dati:</strong> ogni lista nell’app è una build reale e attuale del metagame live. Ogni nome di carta viene controllato su Scryfall prima di essere pubblicato. Se un mazzo non è verificabile, non compare — l’app non mostra mai mazzi segnaposto, indovinati dall’IA o «precaricati».",
+
+  "download.eyebrow": "Prendi l’app",
+  "download.title": "Installa Filthy Net Deck",
+  "download.lede": "Gratis. Nativa. Nessun account. Il meta di Standard e Pioneer del giorno già all’avvio — più Set Radar, info sui matchup, Climb Tracker e un tracker di winrate che resta sul tuo PC a meno che tu non scelga di condividerlo.",
+  "download.winMeta": "NSIS · installazione per l’utente corrente",
+  "download.macMeta": "Apple silicon + Intel",
+  "download.source": "Codice e release",
+  "download.note": "<strong>SmartScreen di Windows:</strong> potresti vedere <em>«Windows ha protetto il PC»</em> — l’installer non è ancora firmato (è normale per le app indie). Clicca <strong>Ulteriori informazioni</strong>, poi <strong>Esegui comunque</strong>. <strong>Gatekeeper di macOS:</strong> al primo avvio serve <strong>clic destro → Apri</strong> (l’app non è ancora notarizzata). Dal nostro lato è tutto pulito; la firma può aspettare che monetizzare diventi l’obiettivo.",
+  "download.support": "Filthy Net Deck è <strong>gratis</strong>, e resta gratis. Se ti ha aiutato a scalare, puoi <a class=\"support-link\" href=\"https://ko-fi.com/filthynetdeck\" target=\"_blank\" rel=\"noopener noreferrer\">offrirmi un caffè</a>. Manca qualcosa, o qualcosa non funziona? <a class=\"support-link\" href=\"feedback.html\">Suggerisci una funzione / segnala un bug</a>.",
+
+  "footer.disclaimer": "Compagno fatto dai fan — <strong>non affiliato a Wizards of the Coast</strong>. Magic: The Gathering e MTG Arena sono marchi di Wizards of the Coast LLC. Immagini delle carte via Scryfall.",
+  "footer.privacy": "Privacy",
+  "footer.status": "Stato",
+  "footer.builtBy": "Fatto da",
+
+  "page.title": "Filthy Net Deck {version} — compagno di MTG Arena per Standard e Pioneer",
+  "page.description": "Compagno gratuito di MTG Arena per Standard e Pioneer: conserva ed esporta ogni mazzo che giochi, in qualsiasi formato, pubblica una lista che chiunque può copiare in Arena, più mazzi ranked ogni giorno, un tracker di winrate live e la lettura delle carte rivelate — tutto nativo, senza pubblicità, senza bloat."
+}
