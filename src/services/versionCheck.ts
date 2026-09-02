@@ -5,8 +5,9 @@ import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 export interface RemoteVersion {
   version: string;
   /**
-   * Windows installer — kept as the bare field for clients older than the
-   * `downloads` map, which read it unconditionally and must keep working.
+   * What a client older than the `downloads` map reads. Those clients read it
+   * on every OS, so it points at the download page rather than any one
+   * platform's installer — see the note in `scripts/bump-version.mjs`.
    */
   downloadUrl?: string;
   /**
@@ -94,9 +95,9 @@ export async function checkRemoteVersion(
  * The installer to offer *this* machine, or undefined when there is none.
  *
  * Falling back to the bare `downloadUrl` for every OS is what shipped through
- * 3.4.0, and it offered macOS and Linux users a Windows `.exe`. So the bare
- * field is now Windows-only, and an OS with no entry in `downloads` gets
- * nothing — Settings shows it the right route instead of a wrong download.
+ * 3.4.0, and it offered macOS and Linux users a Windows `.exe`. An OS with no
+ * entry in `downloads` now gets nothing, so Settings can show it the right
+ * route instead of a wrong download — Linux has no entry by design.
  */
 export function pickDownloadUrl(
   remote: RemoteVersion,

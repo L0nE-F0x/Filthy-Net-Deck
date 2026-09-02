@@ -40,11 +40,12 @@ describe("pickDownloadUrl", () => {
     expect(pickDownloadUrl(remote, "linux")).toBeUndefined();
   });
 
-  it("never falls back to the Windows exe for a non-Windows OS", () => {
+  it("never falls back to the bare field for an OS the map does not list", () => {
     // The 3.4.0 shape: one bare downloadUrl and no map. macOS and Linux users
-    // were offered a .exe; they must now be offered nothing instead.
-    const legacy = { version: "3.4.0", downloadUrl: "https://x/Setup-3.4.0.exe" };
-    expect(pickDownloadUrl(legacy, "windows")).toBe("https://x/Setup-3.4.0.exe");
+    // were offered a .exe; they must now be offered nothing instead, so
+    // Settings can show them the route that actually works.
+    const legacy = { version: "3.4.0", downloadUrl: "https://x/#download" };
+    expect(pickDownloadUrl(legacy, "windows")).toBe("https://x/#download");
     expect(pickDownloadUrl(legacy, "macos")).toBeUndefined();
     expect(pickDownloadUrl(legacy, "linux")).toBeUndefined();
     expect(pickDownloadUrl(legacy, "unknown")).toBeUndefined();

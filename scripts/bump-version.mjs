@@ -40,18 +40,21 @@ const conf = JSON.parse(fs.readFileSync("src-tauri/tauri.conf.json", "utf8"));
 conf.version = ver;
 fs.writeFileSync("src-tauri/tauri.conf.json", JSON.stringify(conf, null, 2) + "\n");
 
-// Per-OS installers. `downloadUrl` stays as the bare Windows field so clients
-// older than the `downloads` map keep updating. Linux is absent on purpose —
-// it installs from the AUR, and Settings shows `omarchy update` instead of a
-// download button (src/services/versionCheck.ts → pickDownloadUrl).
+// Per-OS installers. Linux is absent on purpose — it installs from the AUR,
+// and Settings names `omarchy update` instead of offering a download
+// (src/services/versionCheck.ts → pickDownloadUrl).
 const downloads = {
   windows: `https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-${ver}.exe`,
   macos: `https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-${ver}-universal.dmg`,
 };
 
+// The bare field is what every client older than the map reads, on any OS, so
+// it must not be one platform's installer — through 3.4.0 it was the Windows
+// .exe, which is what a macOS user would have been handed the moment a newer
+// version existed. The download page serves all three correctly instead.
 const soft = {
   version: ver,
-  downloadUrl: downloads.windows,
+  downloadUrl: "https://filthy-net-deck.com/#download",
   downloads,
   notes,
 };
