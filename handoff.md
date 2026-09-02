@@ -3,9 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.3.1** until this commit is on `origin/main`
-(Windows 3.4.0 installer is in the working tree). macOS still 3.3.1 until
-the dmg is rolled.
+**Live product version: v3.4.0** (Windows signed updater live; macOS dmg
+in this commit).
 · repo `L0nE-F0x/Filthy-Net-Deck`
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
@@ -20,46 +19,38 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.4.0 — Windows signed installer is in this commit. Push + tag + dmg + E2E still open.**
+0. **v3.4.0 Windows is live. This commit rolls the macOS dmg. E2E still open.**
 
    Picked up from Claude session `6de94560` on the **Windows** box. Source
    was rebased onto `origin/main` (marketing-site i18n + radar) so it is no
-   longer a local-only `08f2c72`. New hashes: `7a12d4f` source,
-   `6cb63a2` handoff rewrite, then this artifacts commit.
+   longer a local-only `08f2c72`. Release commit `5b90bf8`, tag `v3.4.0`.
 
    | Thing | State |
    |---|---|
    | Supabase migration | ✅ applied to the live project by the owner 2026-09-02 |
    | Source + version bump to 3.4.0 | ✅ `7a12d4f` (rebased onto origin) |
-   | Site copy, OG card, version.json ×2 | ✅ committed |
-   | Homepage i18n (`sync.title` / `sync.body` in 7 catalogs) | ✅ `pipeline/site-i18n.test.mjs` 23/23 |
+   | Site copy, OG card, version.json ×2 | ✅ live |
+   | Homepage i18n (`sync.title` / `sync.body` in 7 catalogs) | ✅ live; `es.json` serves `Dos PCs, un historial` |
    | Signed Windows build | ✅ NSIS 7,882,406 bytes, updater `.sig` 428 bytes |
-   | `website/downloads/Filthy-Net-Deck-Setup-3.4.0.exe` (+ `.sig`) | ✅ this commit |
-   | `website/updater/latest.json` | ✅ 3.4.0 + verbatim `.sig` + `pub_date` 2026-09-02T08:53:13Z |
-   | Pushed / tagged | ❌ neither — do both after this commit |
-   | macOS dmg | ❌ tag `v3.4.0` fires CI; then roll the file. index.html already points at `Filthy-Net-Deck-3.4.0-universal.dmg` |
-   | In-app Update & restart | ❌ not verified yet |
+   | Live `/downloads/Filthy-Net-Deck-Setup-3.4.0.exe` | ✅ 200, 7,882,406 bytes, both hosts |
+   | Live `/updater/latest.json` | ✅ 3.4.0, signature matches the `.sig` file verbatim |
+   | Pushed / tagged | ✅ `origin/main` + tag `v3.4.0` |
+   | macOS CI | ✅ run 33611379291, 9m36s, attached the dmg to the GH Release |
+   | macOS dmg on the homepage | ✅ this commit — 22,772,864 bytes, sha256 `5b6ae26b…3c39e0`. index.html already pointed at the filename |
+   | In-app Update & restart | ❌ not clicked on a 3.3.1 install yet |
    | Cross-device round trip against live Supabase | ❌ never run |
 
    ### ▶ What is left, in order
 
-   1. **Commit this tree, push `origin/main`.** Then confirm the *live* URLs,
-      not the local files: `filthy-net-deck.com/version.json` and
-      `/updater/latest.json` must both say 3.4.0, and
-      `/downloads/Filthy-Net-Deck-Setup-3.4.0.exe` must actually download
-      (~7.9 MB, not a 404 HTML page).
+   1. **Confirm this dmg is live** after the push:
+      `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-3.4.0-universal.dmg`
+      must be 200 and ~22.8 MB, not a 404. Until then the Mac button 404s.
 
-   2. **Tag `v3.4.0` and push the tag** — that is what fires
-      `.github/workflows/macos-build.yml`. It attaches a universal dmg to a
-      GitHub Release; copy it into
-      `website/downloads/Filthy-Net-Deck-3.4.0-universal.dmg` and commit.
-      **index.html already points at that filename.** v2.8.2's dmg was built
-      and never rolled — do not repeat that. Until the dmg is in `downloads/`,
-      the Mac button 404s.
+   2. **Verify in-app** *Check for updates* on an existing 3.3.1 Windows
+      install offers **Update & restart**, not just a browser download.
+      Share preview should show `og-image.png?v=3.4.0`.
 
-   3. **Verify in-app** *Check for updates* offers **Update & restart**, not
-      just a browser download, and that the share preview shows the new OG
-      card (`og-image.png?v=3.4.0`).
+   3. **The round-trip test** (never run — do not skip):
 
    ### ⚠️ The feature itself has never actually run end to end
 
