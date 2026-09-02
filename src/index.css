@@ -276,6 +276,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow: hidden;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -284,6 +285,7 @@ textarea,
 input,
 select,
 .selectable {
+  -webkit-user-select: text;
   user-select: text;
 }
 
@@ -4463,6 +4465,7 @@ html[data-theme="light"] .live-set-icon {
   font-size: 0.78rem;
   font-weight: 650;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 .soundscape-master input {
@@ -6222,6 +6225,7 @@ html.overlay-root body.overlay-body {
   overflow: hidden;
   width: 100%;
   height: 100%;
+  -webkit-user-select: none;
   user-select: none;
 }
 html.overlay-root #root {
@@ -7561,6 +7565,7 @@ html.overlay-macos .overlay-shell {
   background: var(--color-ink-900);
   border: 1px solid color-mix(in srgb, var(--color-ink-600) 70%, transparent);
   color: var(--color-gold-300);
+  -webkit-user-select: all;
   user-select: all;
 }
 
