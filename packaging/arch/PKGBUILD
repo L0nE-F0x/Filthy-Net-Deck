@@ -21,10 +21,24 @@ url="https://filthy-net-deck.com"
 license=('LicenseRef-proprietary')
 provides=("${_pkgname}=${pkgver}")
 conflicts=("${_pkgname}")
-depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'librsvg')
+# gst-plugins-good is not optional in practice. WebKitGTK routes Web Audio
+# through autoaudiosink, which lives in that package, and webkit2gtk-4.1 only
+# *suggests* it — so a box without it synthesizes every soundscape cue
+# correctly and writes it to a sink that does not exist. No error is raised
+# anywhere: the feature is simply silent, which reads as a broken app rather
+# than a missing codec. Caught on the maintainer's own Omarchy box.
+depends=(
+  'webkit2gtk-4.1'
+  'gtk3'
+  'libayatana-appindicator'
+  'librsvg'
+  'gst-plugins-good'
+)
 optdepends=(
   'hyprland: window rules for the overlay, match alert and presence badge'
   'steam: run MTG Arena through Proton'
+  'gst-libav: set trailer playback (H.264 decoding)'
+  'gst-plugins-bad: set trailer playback (additional codecs)'
 )
 install="${pkgname}.install"
 options=('!strip' '!debug')

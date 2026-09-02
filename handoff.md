@@ -18,8 +18,9 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **2026-09-02 (evening) — Omarchy is a supported target now. Match-end crash
-   fixed, cross-device sync PROVEN, Arch packaging built. IN PROGRESS.**
+0. **2026-09-02 (evening + night) — Omarchy is a supported target now. Match-end
+   crash fixed, cross-device sync PROVEN, Arch package BUILT AND INSTALLED,
+   update routes fixed for all three platforms. IN PROGRESS.**
 
    Owner decision this session: **ship a Linux release, Omarchy/Arch only**,
    and add it to the deploy pipeline. Not local-only any more. Nothing is
@@ -27,8 +28,10 @@ that is expected and does not block auto-update.
 
    ### ▶ Resume here — pick up at "What's left" below
 
-   Everything committed and pushed. `main` == `origin/main`. Working tree
-   clean. Nothing is half-applied.
+   ⚠️ **Three commits are on local `main` and NOT pushed** — `origin/main` is
+   behind by `00d5fdc5`, `42f23765`, `f873c3fb`. The owner is holding them so
+   the macOS `.exe` fix ships with the Linux release rather than alone. Working
+   tree is clean; nothing is half-applied. **Ask before pushing.**
 
    ### The crash — fixed, root cause, do not re-debug
 
@@ -91,7 +94,7 @@ that is expected and does not block auto-update.
    2.44** vs Ubuntu 22.04's 2.35, so the result would refuse to start on most
    distros. Superseded by the Arch package.
 
-   ### Arch package — built and verified, NOT installed
+   ### Arch package — built, verified, and INSTALLED (see the night entry)
 
    `packaging/arch/` (`8f2aa261`). Builds in **21 seconds**:
 
@@ -115,11 +118,12 @@ that is expected and does not block auto-update.
    appimage build has run** — that step patches the binary with bundle-type
    info. Rebuild with `--no-bundle` first.
 
-   **Not installed.** Doing so puts `/usr/bin/filthy-net-deck` beside the
-   owner's manual `~/.local/bin/filthy-net-deck`, with PATH order silently
-   deciding which the launcher runs. The swap (pacman -U, then remove the
-   manual binary + `~/.local/share/applications/filthy-net-deck.desktop`) is
-   the real end-to-end test and **needs the owner's go-ahead**.
+   **Installed 2026-09-02 night**, with the owner's go-ahead. The swap went
+   through cleanly — see "The package is installed and the swap is verified"
+   below. Note the desktop entry, not PATH, was the real conflict: PATH already
+   put `/usr/bin` ahead of `~/.local/bin`, but the manual `.desktop` hardcoded
+   an absolute `Exec=/home/lonefox/.local/bin/...`, so the launcher would have
+   kept running the old binary until that file was deleted.
 
    ### Three Wayland no-ops — the app cannot fix these, only Hyprland can
 
@@ -156,38 +160,107 @@ that is expected and does not block auto-update.
      `canAutoInstall: false`. It will NOT wrongly say "up to date".
      (This resolves workflow-doc item 6, previously untested.)
 
+   ### Done later that night — items 1, 2, 3 and the CI blocker in 7
+
+   Three commits on `main`, **not pushed** (owner is holding the whole Linux
+   release together). `npx tsc --noEmit` · `npx eslint src pipeline
+   --max-warnings 0` · **786/786** all clean.
+
+   **The update-route bug was never Linux-only.** `updater/latest.json`
+   publishes only `windows-x86_64`, so the signed check throws on macOS *and*
+   Linux and both fall through to `version.json`'s single `downloadUrl` — the
+   Windows `.exe`. The `.dmg` sniff at `Settings.tsx:1333` could never fire,
+   because no `.dmg` URL ever reached it.
+
+   It is **dormant, not live**: live 3.4.0 == installed 3.4.0, so `isNewer` is
+   false and nothing is offered. **It fires the moment a newer version is
+   published** — that is the release-day trap, so do not publish 3.4.1 with
+   this unfixed.
+
+   Shipping the map alone does not save existing macOS users: their build
+   predates it and reads the bare field. Serving them correctly from the server
+   was checked and rejected — `/version.json` is a static file, the Netlify
+   function that could vary on User-Agent is deliberately not routed
+   (`website/netlify.toml:18`), and the update path is the wrong place to start
+   varying a manifest by UA. So:
+
+   - `version.json` gained a `downloads` map; `pickDownloadUrl` reads this OS's
+     entry (`versionCheck.ts`, unit-tested).
+   - The bare `downloadUrl` is now **the download page**, not any one
+     platform's installer — correct on all three instead of correct on one.
+   - **Linux has no entry by design**, so no download button can appear.
+     Settings shows version + notes + *"FND is installed through your package
+     manager. To update: `omarchy update`"*, as the owner picked.
+   - `scripts/bump-version.mjs` writes the map too, so the next bump cannot
+     silently undo any of it.
+   - Linux now counts as `linux` in the `/version.json` install gauge instead
+     of sitting with the bots under "other".
+
+   New `src/services/platform.ts` (`detectOs` / `updatesViaPackageManager`) is
+   the one place that sniffs the OS; `healthPing.ts` lost its private copy.
+
+   ### The package is installed and the swap is verified
+
+   pacman owns all six files; `filthy-net-deck` on PATH is `/usr/bin`; the
+   manual `~/.local/bin` binary and its `.desktop` are **gone**; `fnd://`
+   resolves to the packaged entry; no missing libs. App data survived intact —
+   `auth.json` (still signed in), `install-id`, `tracker-matches.jsonl`. Owner
+   launched it from the app launcher: **works**.
+
+   Rebuild note: the binary was rebuilt `--no-bundle` first, per the appimage
+   warning above. Build + package is still ~1 min total.
+
+   ### Soundscape was silent on Linux — missing codec, not app code
+
+   Owner reported the Soundscape doing nothing. **`autoaudiosink` does not
+   exist on a stock Omarchy box.** It lives in `gst-plugins-good`, which
+   `webkit2gtk-4.1` only lists as an *optdep*, and WebKitGTK routes all Web
+   Audio through it. Every cue is synthesized correctly and written to a sink
+   that is not there — no error, no console warning, pure silence. `sfx.ts` is
+   fine; do not debug it.
+
+   Fixed in the PKGBUILD: `gst-plugins-good` is now a hard **depend**.
+   `gst-libav` + `gst-plugins-bad` added as optdepends for set-trailer
+   playback (`TrailerPlayer.tsx` embeds a YouTube iframe, which needs H.264).
+
+   ⚠️ **Suspect the same class of bug for anything media-shaped on Linux.**
+   webkit2gtk's optdeps are exactly the features that fail silently.
+
+   ### Test suite — FIXED, 786/786 on this box
+
+   The previous entry's diagnosis was wrong: vitest already defaults jsdom to
+   `http://localhost:3000`, **not** `about:blank`, so the origin was never
+   opaque and `environmentOptions.jsdom.url` fixes nothing.
+
+   Real cause: **Node 26 ships experimental Web Storage**, so `localStorage` is
+   a property of Node's own `globalThis` — an accessor that warns and returns
+   undefined without `--localstorage-file`. Vitest's jsdom environment copies
+   window properties onto that same globalThis but **skips any name already
+   present there** unless it is in its hardcoded KEYS list, and `localStorage`
+   is not in it (it never had to be). Node's dud accessor wins.
+
+   Fix: `src/test/setupJsdomStorage.ts` re-points both Storage globals at the
+   real jsdom window, which is still reachable as `globalThis.jsdom.window`.
+   No-ops outside jsdom. This was the stated precondition for Linux CI.
+
    ### What's left
 
-   1. **Settings → Check for updates, Linux text.** Owner picked: name the
-      version + release notes, then *"FND is installed through your package
-      manager. To update: `omarchy update`"*. **No download button** — hand-
-      installing a package file is wrong on Arch. Precedent to copy: the
-      existing `.dmg` sniff in `Settings.tsx:1333`.
-   2. **`version.json` download URL is wrong for Linux.** There is one
-      `downloadUrl` and it is the Windows `.exe` — a Linux user hitting the
-      fallback is offered `Filthy-Net-Deck-Setup-3.4.0.exe` today. Needs
-      platform-aware URLs or Linux-specific UI handling.
-   3. **Install the package** (owner go-ahead needed, see above).
-   4. **Website**: third download + `data-i18n` keys in all 8 locales or
+   1. **Website**: third entry + `data-i18n` keys in all 8 locales or
       `pipeline/site-i18n.test.mjs` fails CI. Plus OG regen + `?v=` bust.
-   5. **Version bump** — deliberately NOT done. Owner chose "prove the build
-      first", which was right: we would have bumped for an AppImage that
-      cannot build.
-   6. **AUR publish** as `filthy-net-deck-bin`; PKGBUILD then sources the
-      GitHub release tarball instead of local files.
-   7. **Linux CI** (workflow item 2) — nothing compiles the
-      `#[cfg(target_os = "linux")]` Proton code today. **Fix the vitest
-      issue first or CI is red on arrival.**
-
-   ### Test suite is red on this box — pre-existing, not from this work
-
-   19 failures, all `localStorage` undefined. Cause found: vitest leaves
-   jsdom's document URL at `about:blank`, and jsdom 29 throws
-   `SecurityError: localStorage is not available for opaque origins`. Both
-   files DO declare `// @vitest-environment jsdom`; three other jsdom files
-   pass because they never touch localStorage. Fix is
-   `environmentOptions.jsdom.url` in `vitest.config.ts`. 759/778 pass.
-   Windows reports 778/778, so this is environment-specific.
+      ⚠️ Make it an **install command** (`yay -S filthy-net-deck-bin`), not a
+      download button — handing an Arch user a `.pkg.tar.zst` bypasses pacman's
+      database and their next `omarchy update` will not know the app exists.
+      That is the same call as the in-app one. **So the AUR package must exist
+      first** (item 2), or the site names something that does not resolve.
+   2. **AUR publish** as `filthy-net-deck-bin`; PKGBUILD then sources the
+      GitHub release tarball instead of local files. Everything else in it is
+      now proven by a real install.
+   3. **Version bump** — still NOT done, deliberately. Owner is holding the
+      macOS `.exe` fix to ship with the Linux release rather than alone.
+   4. **Linux CI** (workflow item 2) — nothing compiles the
+      `#[cfg(target_os = "linux")]` Proton code today. The vitest blocker is
+      gone, so this is unblocked.
+   5. **Push.** Three commits are sitting on local `main`.
 
    ### Trap that cost real time — `sync.ts` is invisible to grep
 
@@ -203,8 +276,8 @@ that is expected and does not block auto-update.
    - `~/.config/fontconfig/conf.d/60-filthy-net-deck.conf` — Selawik for
      Segoe UI, real Cascadia Code. Do not remove; `--font-mono` silently
      becomes proportional without it.
-   - `~/.local/bin/filthy-net-deck` + `~/.local/share/applications/
-     filthy-net-deck.desktop` — the manual install currently in use
+   - ~~`~/.local/bin/filthy-net-deck` + its `.desktop`~~ — **removed.** The
+     pacman package owns `/usr/bin/filthy-net-deck` now.
    - `~/.tauri/` — signing keys
 
    Owner's app prefs of note: `fullscreen = true` (so the Hyprland
