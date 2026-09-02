@@ -1,5 +1,9 @@
 {
   "version": "3.4.0",
   "downloadUrl": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.4.0.exe",
+  "downloads": {
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.4.0.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.4.0-universal.dmg"
+  },
   "notes": "v3.4.0: sign in on another PC and your match history and deck library are there — every format, opponents never uploaded."
 }

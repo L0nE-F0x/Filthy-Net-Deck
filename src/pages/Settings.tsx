@@ -10,6 +10,7 @@ import { downloadInstaller, openExternal } from "../services/openExternal";
 import { DONATE_URL, FEEDBACK_URL, PRIVACY_URL, appFeedbackUrl } from "../services/site";
 import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
 import { isTauri } from "../services/appUpdater";
+import { updatesViaPackageManager } from "../services/platform";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import {
   detectSystemLocale,
@@ -388,6 +389,13 @@ export const Settings = memo(function Settings() {
   const updating = useAppStore((s) => s.updating);
   const updateProgress = useAppStore((s) => s.updateProgress);
   const meta = useAppStore((s) => s.meta);
+
+  /**
+   * Linux ships as an Arch/AUR package, so the app is not the thing that
+   * installs its own updates there. It still reports what is out, then names
+   * the command that does the work.
+   */
+  const packageManagedUpdates = updatesViaPackageManager();
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
   const [autostart, setAutostartState] = useState<boolean | null>(null);
@@ -1264,8 +1272,19 @@ export const Settings = memo(function Settings() {
                 · meta for <strong className="text-foam">{meta.date}</strong>
               </>
             ) : null}
-            . Prefer <strong className="text-foam">Update &amp; restart</strong> (signed, in-app).
-            Opening a browser download is only the fallback when auto-install isn’t available.
+            .{" "}
+            {packageManagedUpdates ? (
+              <>
+                FND is installed through your package manager, so updates arrive with the rest
+                of your system.
+              </>
+            ) : (
+              <>
+                Prefer <strong className="text-foam">Update &amp; restart</strong> (signed,
+                in-app). Opening a browser download is only the fallback when auto-install
+                isn’t available.
+              </>
+            )}
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
             <button
@@ -1279,7 +1298,9 @@ export const Settings = memo(function Settings() {
                     const avail = useAppStore.getState().updateAvailable;
                     const mode = avail?.canAutoInstall
                       ? "Update & restart ready"
-                      : "download fallback only";
+                      : packageManagedUpdates
+                        ? "run omarchy update to install it"
+                        : "download fallback only";
                     setUpdateMsg(`v${result.remote.version} is ready (${mode}).`);
                   } else if (result.status === "latest") {
                     setUpdateMsg("You’re up to date.");
@@ -1307,6 +1328,7 @@ export const Settings = memo(function Settings() {
             )}
             {updateAvailable &&
               !updateAvailable.canAutoInstall &&
+              !packageManagedUpdates &&
               updateAvailable.downloadUrl && (
                 <button
                   type="button"
@@ -1336,7 +1358,23 @@ export const Settings = memo(function Settings() {
                 Applications. Full signed auto-update for Apple is a later infra step.
               </p>
             )}
-          {updateAvailable && !updateAvailable.canAutoInstall && (
+          {updateAvailable && packageManagedUpdates && (
+            <>
+              <p className="text-sm text-gold-300 mt-2 mb-0">
+                v{updateAvailable.version} is out.
+              </p>
+              {updateAvailable.notes && (
+                <p className="text-xs text-muted mt-1 mb-0 leading-relaxed">
+                  {updateAvailable.notes}
+                </p>
+              )}
+              <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
+                FND is installed through your package manager. To update:{" "}
+                <code className="font-mono text-foam">omarchy update</code>
+              </p>
+            </>
+          )}
+          {updateAvailable && !updateAvailable.canAutoInstall && !packageManagedUpdates && (
             <p className="text-sm text-gold-300 mt-2 mb-0">
               v{updateAvailable.version} is ready via the fallback download above (not the primary
               path on Windows when signing is available).

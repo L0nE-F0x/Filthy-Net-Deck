@@ -12,7 +12,7 @@
  * Per-day aggregate counters ONLY:
  *   - total requests, split app vs other (bots/browsers)
  *   - app version distribution (once clients send ?v=, from v2.5.4+)
- *   - coarse platform (windows / macos / other) from the User-Agent
+ *   - coarse platform (windows / macos / linux / other) from the User-Agent
  * No IP address, no identifier, no per-user record, nothing that can be traced
  * back to a person. Counters are additive integers in a daily bucket.
  *
@@ -53,9 +53,12 @@ export function isAppRequest(origin: string | null): boolean {
   return origin.includes("tauri.localhost") || origin.includes("localhost:1420");
 }
 
-export function platformFrom(ua: string): "windows" | "macos" | "other" {
+export function platformFrom(ua: string): "windows" | "macos" | "linux" | "other" {
   if (/Windows NT/i.test(ua)) return "windows";
   if (/Macintosh|Mac OS X/i.test(ua)) return "macos";
+  // WebKitGTK — the Linux webview. Added when Linux became a shipped target;
+  // before that these installs were counted as "other" alongside bots.
+  if (/X11|Linux/i.test(ua)) return "linux";
   return "other";
 }
 

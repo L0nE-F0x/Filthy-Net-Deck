@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNewer, versionJsonUrl } from "./versionCheck";
+import { isNewer, pickDownloadUrl, versionJsonUrl } from "./versionCheck";
 
 describe("isNewer", () => {
   it("compares semver-ish triples", () => {
@@ -18,5 +18,35 @@ describe("versionJsonUrl", () => {
     expect(versionJsonUrl("https://example.com/")).toBe(
       "https://example.com/version.json",
     );
+  });
+});
+
+describe("pickDownloadUrl", () => {
+  const remote = {
+    version: "3.4.0",
+    downloadUrl: "https://x/Setup-3.4.0.exe",
+    downloads: {
+      windows: "https://x/Setup-3.4.0.exe",
+      macos: "https://x/3.4.0-universal.dmg",
+    },
+  };
+
+  it("hands each OS its own installer", () => {
+    expect(pickDownloadUrl(remote, "windows")).toBe("https://x/Setup-3.4.0.exe");
+    expect(pickDownloadUrl(remote, "macos")).toBe("https://x/3.4.0-universal.dmg");
+  });
+
+  it("offers Linux nothing — it updates from the package manager", () => {
+    expect(pickDownloadUrl(remote, "linux")).toBeUndefined();
+  });
+
+  it("never falls back to the Windows exe for a non-Windows OS", () => {
+    // The 3.4.0 shape: one bare downloadUrl and no map. macOS and Linux users
+    // were offered a .exe; they must now be offered nothing instead.
+    const legacy = { version: "3.4.0", downloadUrl: "https://x/Setup-3.4.0.exe" };
+    expect(pickDownloadUrl(legacy, "windows")).toBe("https://x/Setup-3.4.0.exe");
+    expect(pickDownloadUrl(legacy, "macos")).toBeUndefined();
+    expect(pickDownloadUrl(legacy, "linux")).toBeUndefined();
+    expect(pickDownloadUrl(legacy, "unknown")).toBeUndefined();
   });
 });

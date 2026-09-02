@@ -16,6 +16,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { isTauri } from "../appUpdater";
 import { APP_VERSION } from "../../version";
+import { detectOs } from "../platform";
 import type { TrackedMatch, TrackerStatus } from "../../types/tracker";
 import { cloudConfigured, functionUrl, SUPABASE_PUBLISHABLE_KEY } from "./config";
 
@@ -57,13 +58,6 @@ export function countMatchesLast24h(
   return n;
 }
 
-function osName(): string {
-  const ua = typeof navigator === "undefined" ? "" : navigator.userAgent;
-  if (/Windows/i.test(ua)) return "windows";
-  if (/Mac OS X|Macintosh/i.test(ua)) return "macos";
-  if (/Linux/i.test(ua)) return "linux";
-  return "unknown";
-}
 
 /**
  * Assemble the payload. Exported for tests and so the Settings screen can show
@@ -80,7 +74,7 @@ export function buildPing(
     installId,
     appVersion: APP_VERSION,
     parserVersion: PARSER_VERSION,
-    os: osName(),
+    os: detectOs(),
     logFound: status?.logFound ?? false,
     detailedLogs: status?.detailedLogs ?? null,
     parseErrors: status?.parseErrors ?? 0,

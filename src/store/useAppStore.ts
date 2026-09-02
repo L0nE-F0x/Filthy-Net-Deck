@@ -6,6 +6,7 @@ import { fetchSetsBundle } from "../services/setsFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
 import {
   checkRemoteVersion,
+  pickDownloadUrl,
   type VersionCheckResult,
 } from "../services/versionCheck";
 import {
@@ -1023,7 +1024,9 @@ export const useAppStore = create<AppState>((set, get) => {
       set({
         updateAvailable: resolveUpdateOffer(
           signed,
-          result.status === "update" ? result.remote : null,
+          result.status === "update"
+            ? { ...result.remote, downloadUrl: pickDownloadUrl(result.remote) }
+            : null,
         ),
       });
       return result;

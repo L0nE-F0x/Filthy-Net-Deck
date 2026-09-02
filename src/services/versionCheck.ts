@@ -1,9 +1,19 @@
 import { APP_VERSION } from "../version";
+import { detectOs, type OsName } from "./platform";
 import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
 export interface RemoteVersion {
   version: string;
+  /**
+   * Windows installer — kept as the bare field for clients older than the
+   * `downloads` map, which read it unconditionally and must keep working.
+   */
   downloadUrl?: string;
+  /**
+   * Per-OS installers. Absent entries are deliberate, not gaps: Linux ships
+   * through a package manager and has nothing to hand a browser.
+   */
+  downloads?: Partial<Record<OsName, string>>;
   notes?: string;
   /** Optional mandatory flag for future hard-force updates */
   mandatory?: boolean;
@@ -78,6 +88,23 @@ export async function checkRemoteVersion(
           : "Update check failed (network or CORS).",
     };
   }
+}
+
+/**
+ * The installer to offer *this* machine, or undefined when there is none.
+ *
+ * Falling back to the bare `downloadUrl` for every OS is what shipped through
+ * 3.4.0, and it offered macOS and Linux users a Windows `.exe`. So the bare
+ * field is now Windows-only, and an OS with no entry in `downloads` gets
+ * nothing — Settings shows it the right route instead of a wrong download.
+ */
+export function pickDownloadUrl(
+  remote: RemoteVersion,
+  os: OsName = detectOs(),
+): string | undefined {
+  const perOs = remote.downloads?.[os];
+  if (perOs) return perOs;
+  return os === "windows" ? remote.downloadUrl : undefined;
 }
 
 /** Returns true if remote is newer than local (simple semver-ish compare). */

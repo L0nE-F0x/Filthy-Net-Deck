@@ -34,6 +34,12 @@ describe("platformFrom", () => {
     expect(platformFrom("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)")).toBe("macos");
   });
 
+  it("detects Linux from the WebKitGTK UA", () => {
+    expect(
+      platformFrom("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko)"),
+    ).toBe("linux");
+  });
+
   it("falls back to other for anything unrecognised", () => {
     expect(platformFrom("curl/8.4.0")).toBe("other");
     expect(platformFrom("")).toBe("other");
