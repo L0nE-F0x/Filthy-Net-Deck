@@ -147,6 +147,140 @@ that is expected and does not block auto-update.
      updated, `PRIVACY_LASTMOD` bumped to 2026-09-02. Also fixed an orphaned
      `| Friend codes |` row in README that had escaped its table.
 
+0a. **2026-09-01 (night) — Linux/Omarchy box made to look like Windows.
+    IN PROGRESS. Resume here in the morning.**
+
+    Owner's ask: *"perfect the Linux version on my machine — look and feel
+    exactly as it would on Windows."* Explicitly **local-only**: not shipped,
+    not marketed, no version bump, no installer, no updater. Linux stays off
+    the marketing site. v3.3.1 remains live and correct.
+
+    ### ⛔ FIRST THING TOMORROW — the overlay is blocked on an Arena toggle
+
+    **Arena's Detailed Logs are OFF in the Proton prefix.** Confirmed, not
+    suspected (the old note in §3 guessed; this is measured):
+
+    ```
+    Player.log:35   DETAILED LOGS: DISABLED
+    GreToClientEvent / MatchGameRoomStateChangedEvent /
+    ClientToMatchServiceMessage / GameStateMessage   → 0 occurrences
+    ```
+
+    Log: `~/.local/share/Steam/steamapps/compatdata/2141910/pfx/drive_c/users/steamuser/AppData/LocalLow/Wizards Of The Coast/MTGA/Player.log`
+
+    The overlay only ever appears via `show_for_match()`, which needs a parsed
+    match start. There is **no preview/test affordance** — the tray only has an
+    enable/disable check item. So until this is on, the in-game HUD cannot be
+    seen at all on this box.
+
+    **Owner action (inside Arena, agent cannot do it):** Options → Account →
+    **Detailed Logs (Plugin Support)** → restart Arena → play one ranked game.
+    Then the live-overlay checks below can finally run.
+
+    ### Done and verified this session
+
+    1. **Fonts — the big one.** The app asks for `"Segoe UI"` and
+       `"Cascadia Code"`. Neither exists on Linux, and **fontconfig never
+       fails a lookup**, so it answered *both* with Liberation Sans and the
+       later entries in each CSS stack were never consulted. Measured proof:
+       the mono and sans stacks returned byte-identical widths (88.98px).
+       Practical damage: `--font-mono` resolved to a **proportional** face, so
+       `.card-list` decklists and `.overlay-clock` lost column alignment.
+       Fixed **outside the repo** (see the machine-local inventory in §3).
+
+    2. **`user-select` was being discarded.** WebKitGTK 2.52 only understands
+       `-webkit-user-select` and drops the unprefixed property at parse time.
+       So `body { user-select: none }` never applied — the whole app was
+       drag-selectable like a web page — and `.friend-code { user-select: all }`
+       (click-to-select the code) was dead. **This is the only repo change.**
+
+    3. **The window — this was the visible "hot mess".** Hyprland tiled the
+       main window into a half-screen column (581×700), ignoring Tauri's
+       1280×860 request and its declared 960px minimum. Below that minimum the
+       layout collapses: Set Radar wraps into overlapping text, a horizontal
+       scrollbar appears, the sidebar eats half the width. Fixed with a
+       Hyprland rule (float + centre + 1160×690).
+
+    4. **Overlay rendering already matches Windows.** Rendered the real route
+       (`/?demo#/overlay`, and `&phase=ended`) in WebKitGTK vs Chromium: live
+       HUD and post-match summary match. Transparency verified by replicating
+       what Tauri's `transparent: true` does on Linux (RGBA visual +
+       transparent webview background) — composites cleanly, rounded corners
+       and border glow intact, no console errors. The HUD clock was fixed by
+       the font work above.
+
+    ### Two traps — do not re-walk these
+
+    - **`GDK_SCALE=2` is a red herring.** `~/.config/hypr/monitors.lua` sets it
+      deliberately (GTK 3 has no fractional scaling) against a 1.6 monitor
+      scale. I assumed the webview laid out at the GTK scale and added an
+      `FND_UI_ZOOM` lever in `src-tauri/` to compensate. **Measuring the live
+      window against a known-width render disproved it** — WebKitGTK 2.52
+      honours the 1.6 fractional scale, so the zoom made text ~28% too small.
+      **The Rust change was fully reverted; `src-tauri/` is untouched.** Do not
+      reintroduce it. CSS px == Hyprland logical px on this box.
+    - **A short snapshot settle looks like a missing feature.** The "Land n%"
+      chip appeared absent in WebKitGTK at a 6s settle and looked like a real
+      bug; at 14s it renders identically to Chromium. Wait ~12s+ before judging
+      the HUD.
+
+    ### Verified NON-issues — don't spend time here
+
+    WebKitGTK 2.52 supports `backdrop-filter` (unprefixed), `color-mix`,
+    `:has()`, `aspect-ratio`, `position: sticky`, `oklch`, `text-wrap`,
+    `content-visibility`, `appearance`, `::-webkit-scrollbar`, `color-scheme`.
+    Probed directly with `CSS.supports` in the app's own engine.
+
+    ### Still unverified — needs the live match
+
+    All window-manager behaviour, not rendering:
+    - always-on-top over Arena · click-through (`set_ignore_cursor_events`)
+    - auto-hide at match end · companion surviving Arena quit
+    - first-match chooser inside the real overlay webview
+    - Proton process-name vs `MTGA.exe` path (badge / HUD show)
+
+    **Wayland caveats to expect:** Tauri's `always_on_top` and `skip_taskbar`
+    are **no-ops on Wayland** — no protocol lets a client raise itself.
+    Hyprland's `pin` (already in the rule) is the on-top equivalent.
+    Exclusive-fullscreen Arena will still cover the HUD: **borderless
+    windowed is required.** The Omarchy bar may list the HUD as a window.
+
+    ### Repo state — uncommitted, nothing pushed
+
+    ```
+     M src/index.css      # +5 lines: -webkit-user-select aliases
+    ```
+
+    `npx tsc --noEmit` clean. **Pre-existing, NOT caused by this work:**
+    19 tests fail in `arenaCards.test.ts` / `arenaMeta.test.ts` —
+    `localStorage` is undefined (jsdom environment). Confirmed identical with
+    the CSS change stashed. §0 records 723/723 passing on Windows (node
+    24.13.1); this box is node 26.7.0 / jsdom 29, and the suite is now 746
+    tests, so this arrived with newer tests or the newer toolchain. Worth a
+    look, but it is not from the Linux work.
+
+    ### Known cosmetic gap, deliberately left
+
+    `.friend-code`, `.settings-kbd` and `.clinic-paste-input` lead their stack
+    with `ui-monospace`, which WebKit maps to its default fixed font (JetBrains
+    Mono) while Windows gets Cascadia Code. Monospace either way — a different
+    face in three small places. Fixing it means touching shared CSS for a
+    cosmetic difference; owner has not asked.
+
+    ### Rebuild + reinstall the local binary
+
+    ```bash
+    npm run tauri:build -- --no-bundle
+    install -m755 src-tauri/target/release/filthy-net-deck ~/.local/bin/filthy-net-deck
+    ```
+
+    ⚠️ Kill the running app **before** `install` — overwriting the binary under
+    a live process segfaults its `WebKitWebProcess` and fires an Omarchy
+    "Process crashed" notification. That is the install cycle, **not an app
+    bug**: a graceful quit produces no core dump (verified, dump count
+    unchanged). Use `pkill -x filthy-net-deck` — a `pkill -f` pattern that
+    matches the agent's own command line kills the shell (exit 144).
+
 1. **2026-09-01 (later) — Windows box brought up to date. No product change.**
 
    The owner's **Windows** machine was 33 commits behind on v3.2.0 while the
@@ -439,6 +573,40 @@ that is expected and does not block auto-update.
    - HUD Hyprland rule: overlay title float+pin in `~/.config/hypr/looknfeel.lua`
    - WebKitGTK native-select theming (`21f10a42`) is in this local binary.
      Owner confirmed Settings dropdowns 2026-09-01.
+
+   #### Machine-local "look like Windows" setup — 2026-09-01 night, NOT in git
+
+   None of this is version-controlled. It lives only on this box, so it dies
+   with a reinstall and no other Linux user gets it. See §00 for the reasoning.
+
+   - **Fonts** — `~/.local/share/fonts/`
+     - `selawik/*.ttf` — Microsoft's open, **metric-compatible stand-in for
+       Segoe UI** (5 weights, from the `microsoft/Selawik` 1.01 GitHub
+       release). Segoe UI itself is proprietary and cannot be bundled.
+     - `cascadia/*.ttf` — the real **Cascadia Code + Mono** (SIL OFL),
+       extracted from the Arch `ttf-cascadia-code` package without root
+       (`pacman -Sp` for the mirror URL → `bsdtar -xf` → `install`).
+       The upstream GitHub release zip is 150 MB and downloads at ~40 KB/s;
+       do not use it.
+   - **fontconfig** — `~/.config/fontconfig/conf.d/60-filthy-net-deck.conf`
+     Maps `Segoe UI` → Selawik, `Consolas` → Cascadia Code, plus
+     `Segoe UI Variable/Emoji`. Without this fontconfig substitutes Liberation
+     Sans for **every** missing Windows family and the CSS fallback chain is
+     never reached. Run `fc-cache -f` after changes; verify with
+     `fc-match "Segoe UI"` and `fc-match "Cascadia Code"`.
+   - **Hyprland** — `~/.config/hypr/looknfeel.lua` (backup `.bak.<epoch>`
+     alongside). Two rules added next to the existing overlay rule:
+     main window `float + center + size 1160×690` (matched by class **and**
+     title so it cannot catch the HUD), and the "Filthy Net Deck — Running"
+     presence badge `float + pin + no_initial_focus`.
+     Validate any edit with `hyprctl reload && hyprctl configerrors`.
+   - **Cleared:** `~/.config/com.filthynetdeck.desktop/.window-state.json` —
+     it had the 200×200 presence badge saved as `maximized: true`.
+   - The launcher is **unchanged** (an `FND_UI_ZOOM` experiment was reverted;
+     see the §00 traps).
+
+   To check the whole font chain quickly:
+   `fc-match "Segoe UI"` → Selawik · `fc-match "Cascadia Code"` → Cascadia Code.
 
    Do **not** add Linux to the marketing site. Exclusive-fullscreen Arena
    will cover the HUD — use borderless windowed. Detailed Logs were
