@@ -122,7 +122,18 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
 
     let win = builder.build().map_err(|e| e.to_string())?;
     // Never eat a click meant for Arena.
+    //
+    // Linux/GTK cannot do this yet. tao resolves `set_ignore_cursor_events` to
+    // `gtk_widget_get_window().unwrap()`, and a window built `.visible(false)`
+    // has no GdkWindow until it is realized — so the unwrap fires inside a
+    // non-unwinding GLib dispatch and *aborts the process*. Not a hypothetical:
+    // it killed the app at the end of every match, because the match-end alert
+    // builds this window hidden. Applied in `show_toast` instead, after
+    // `show()` has realized the widget.
+    #[cfg(not(target_os = "linux"))]
     let _ = win.set_ignore_cursor_events(true);
+    #[cfg(target_os = "linux")]
+    let _ = win;
     Ok(())
 }
 
@@ -177,6 +188,11 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
             let _ = win.show();
             // Re-assert: another top-most window may have taken the layer.
             let _ = win.set_always_on_top(true);
+            // Linux: deferred from `ensure_window`, where the widget had no
+            // GdkWindow to shape yet. Safe here — window requests dispatch in
+            // order, so this lands after the `show()` above has realized it.
+            #[cfg(target_os = "linux")]
+            let _ = win.set_ignore_cursor_events(true);
             // Do not set_focus — Arena must keep input.
         }
         let _ = app_show.emit_to(TOAST_LABEL, TOAST_EVENT, payload);
