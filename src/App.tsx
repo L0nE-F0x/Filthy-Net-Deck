@@ -199,9 +199,21 @@ export default function App() {
     if (!isTauri()) return;
     void useAppStore.getState().refreshAuth();
     let un: (() => void) | undefined;
+    // Which account the last event was for. `onAuthChange` also fires on every
+    // token refresh, and a restore per refresh would be a pointless round trip
+    // — so the pull is tied to the id actually changing.
+    let lastUserId: string | null = null;
     void import("./services/cloud/auth").then(async (m) => {
       un = await m.onAuthChange((user) => {
         useAppStore.setState({ authName: m.displayNameFor(user) });
+        const id = user?.id ?? null;
+        if (id && id !== lastUserId) {
+          // Signing in on a new machine is the moment the history is expected
+          // to appear. Waiting for the next launch is what made the feature
+          // look absent in the first place.
+          void useAppStore.getState().restoreCloudHistory();
+        }
+        lastUserId = id;
       });
     });
     return () => un?.();

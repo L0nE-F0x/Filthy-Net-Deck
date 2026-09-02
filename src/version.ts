@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.3.1";
+export const APP_VERSION = "3.4.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Rooms copy into Arena as Unholy Annex // Ritual Chamber",
-  "Unfinity and other cosmetic basics named, not Card 81181",
-  "Overlay or companion window still yours to pick",
+  "Sign in on another PC — your history and decks are already there",
+  "Every format follows you, Brawl and Limited included",
+  "Opponents stay put: restored matches show your side only",
 ];
 

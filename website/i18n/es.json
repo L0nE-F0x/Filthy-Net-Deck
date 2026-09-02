@@ -105,6 +105,9 @@
   "library.title": "Tu biblioteca de mazos",
   "library.body": "NUEVO: se guarda cada lista que Arena registra — <strong>Standard, Explorer, Historic, Alchemy, Timeless, Brawl</strong> — con su formato, su historial de versiones y <strong>Exportar listas</strong> para volcarlas todas a una carpeta como texto de importación de Arena. Sin cuenta. Arena te limita a 100 mazos; aquí viven los demás. Las tier lists y los datos de enfrentamientos siguen siendo de Standard y Pioneer.",
 
+  "sync.title": "Dos PCs, un historial",
+  "sync.body": "NUEVO: inicia sesión y tu historial de partidas y tu biblioteca de mazos te siguen — de Windows a Linux a Mac, todos los formatos, no solo los que tienen tier lists. Opcional, desactivado por defecto, y tus rivales quedan fuera: sus nombres y las cartas que te enseñaron nunca salen del PC que las vio, así que una partida restaurada muestra solo tu lado. <a href=\"privacy.html\">Qué se sincroniza exactamente</a>.",
+
   "climb.title": "Climb Tracker",
   "climb.body": "Curva de rango de la temporada con marca de pico y detalle al pasar el ratón, chips de racha, temporada contra temporada y partidas para el siguiente rango.",
 

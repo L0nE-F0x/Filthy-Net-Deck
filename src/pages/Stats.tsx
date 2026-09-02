@@ -50,6 +50,11 @@ import { PasteListClinic } from "../components/ListClinic";
 export const Stats = memo(function Stats() {
   const matches = useAppStore((s) => s.trackerMatches);
   const status = useAppStore((s) => s.trackerStatus);
+  // How many of the above came from the account rather than this PC's logs.
+  // Only used to caption the list honestly — nothing branches on it.
+  const restoredHere = useAppStore((s) => s.restoredMatches.length);
+  const restoreChecked = useAppStore((s) => s.restoreChecked);
+  const authName = useAppStore((s) => s.authName);
   const clearTracker = useAppStore((s) => s.clearTracker);
   const refreshTracker = useAppStore((s) => s.refreshTracker);
   const statsFocusDeckKey = useAppStore((s) => s.statsFocusDeckKey);
@@ -277,7 +282,21 @@ export const Stats = memo(function Stats() {
       <PasteListClinic />
 
       {matches.length === 0 ? (
-        status?.logFound && status.detailedLogs !== false ? (
+        // A signed-in machine with no local history is the cross-device case:
+        // the account may well have months of matches and the restore is still
+        // in flight. Telling them "no matches recorded yet" during that window
+        // is how this feature looked missing in the first place — so say what is
+        // actually happening until the answer is known.
+        authName && !restoreChecked ? (
+          <div className="panel">
+            <h2 className="text-lg font-semibold m-0 mb-2">
+              Checking your account for saved history…
+            </h2>
+            <p className="text-sm text-muted m-0 leading-relaxed max-w-xl">
+              Anything you played on another machine will appear here in a moment.
+            </p>
+          </div>
+        ) : status?.logFound && status.detailedLogs !== false ? (
           <div className="panel">
             <h2 className="text-lg font-semibold m-0 mb-2">No matches recorded yet</h2>
             <p className="text-sm text-muted m-0 mb-3 leading-relaxed max-w-xl">
@@ -458,7 +477,16 @@ export const Stats = memo(function Stats() {
 
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="text-xs text-muted m-0">
-              Matches are read from Arena's own log and stored only on this PC.
+              {restoredHere > 0 ? (
+                <>
+                  Matches are read from Arena&apos;s own log on this PC.{" "}
+                  {restoredHere} more {restoredHere === 1 ? "was" : "were"} restored
+                  from your account — those show no opponent name or revealed
+                  cards, which never leave the PC that saw them.
+                </>
+              ) : (
+                <>Matches are read from Arena&apos;s own log and stored only on this PC.</>
+              )}
               {hiddenByRuns > 0 && (
                 <>
                   {" "}
@@ -467,7 +495,7 @@ export const Stats = memo(function Stats() {
               )}
             </p>
             {confirmClear ? (
-              <span className="flex gap-2">
+              <span className="flex gap-2 items-center flex-wrap">
                 <button
                   type="button"
                   className="btn btn-sm"
@@ -479,6 +507,19 @@ export const Stats = memo(function Stats() {
                 >
                   Really delete all history
                 </button>
+                {/*
+                  Said out loud because it reaches further than the button
+                  implies. Clearing has to remove the backup as well — Arena's
+                  logs are re-read on every launch and the cloud copy would be
+                  restored on the next one, so a clear that spared it would
+                  simply undo itself.
+                */}
+                {restoredHere > 0 && (
+                  <span className="text-xs text-muted">
+                    This also deletes these matches from your account, on every
+                    machine.
+                  </span>
+                )}
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"

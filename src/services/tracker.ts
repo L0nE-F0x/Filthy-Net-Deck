@@ -32,6 +32,23 @@ export async function deleteTrackerMatches(matchIds: string[]): Promise<void> {
   await invoke("tracker_delete_matches", { matchIds });
 }
 
+/**
+ * Ids deleted on this machine, so a cloud restore cannot resurrect them.
+ *
+ * Resolves empty on any failure, which is the safe direction for a *filter*:
+ * the worst case is a deleted match reappearing once, not a live match being
+ * hidden. The delete path also removes rows from the backup, so this is the
+ * second of two guards rather than the only one.
+ */
+export async function fetchDeletedMatchIds(): Promise<string[]> {
+  if (!isTauri()) return [];
+  try {
+    return await invoke<string[]>("tracker_deleted_ids");
+  } catch {
+    return [];
+  }
+}
+
 /** Write the full history to a CSV in Downloads; resolves to the file path. */
 export async function exportTrackerCsv(): Promise<string> {
   if (!isTauri()) throw new Error("CSV export needs the desktop app.");

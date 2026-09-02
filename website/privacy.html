@@ -159,7 +159,7 @@
     <main class="doc">
       <p class="eyebrow">Privacy</p>
       <h1>What the app sends, field by field</h1>
-      <p class="doc-updated">Last updated 2026-08-20 · applies to v2.8.2 and later</p>
+      <p class="doc-updated">Last updated 2026-09-02 · applies to v2.8.2 and later</p>
 
       <p class="lede-big">
         Filthy Net Deck works completely with <strong>no account</strong>, and in that state it
@@ -170,8 +170,9 @@
       <p>
         This page lists the fields in full rather than describing them, because the list is short
         enough to publish and a summary you cannot check is worth very little. The tables match
-        the source exactly — <code>src/services/cloud/healthPing.ts</code> and
-        <code>src/services/cloud/matchSync.ts</code> in the
+        the source exactly — <code>src/services/cloud/healthPing.ts</code>,
+        <code>src/services/cloud/matchSync.ts</code> and
+        <code>src/services/cloud/backupSync.ts</code> in the
         <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck">public repo</a>.
       </p>
 
@@ -295,6 +296,47 @@
         Exporting your decklists to a folder on your own PC — <strong>Export decklists</strong> in
         My Stats — uploads nothing and needs no account. It reads the same local history the app
         already has and writes files.
+      </p>
+
+      <h3>Your match history (new in v3.4.0)</h3>
+      <p>
+        Match sharing sends a narrow slice of a match to the community data. That slice is not
+        enough to give you your history back on a second machine — it is Standard and Pioneer
+        only, and it drops the queue, the deck name and the per-game detail. So the same toggle
+        now also keeps a <strong>private backup of your own history</strong>, in a separate table
+        that nothing aggregate ever reads. It is what makes signing in on a new PC show the
+        matches you played on the old one.
+      </p>
+      <div class="doc-table-wrap">
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Example</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>match_id</code></td><td>sha256 digest</td><td>Same hashing as above — Arena's own match id is still never sent</td></tr>
+            <tr><td><code>started_at</code> / <code>ended_at</code></td><td>timestamps</td><td>When the match ran</td></tr>
+            <tr><td><code>event_id</code></td><td><code>Brawl_Ladder</code></td><td>Arena's queue, so a Brawl game comes back as a Brawl game</td></tr>
+            <tr><td><code>best_of</code></td><td><code>1</code></td><td>Bo1 or Bo3</td></tr>
+            <tr><td><code>my_team_id</code></td><td><code>1</code></td><td>Which seat was yours — without it, won games restore as losses</td></tr>
+            <tr><td><code>games</code></td><td><code>[{onPlay, mulligans, …}]</code></td><td>Your own per-game detail: play/draw, mulligans, first land turn</td></tr>
+            <tr><td><code>result</code> / <code>result_reason</code></td><td><code>win</code></td><td>Includes unfinished matches, so the count matches the PC it came from</td></tr>
+            <tr><td><code>deck_name</code> / <code>deck_id</code> / <code>deck_hash</code></td><td><code>My Brew</code></td><td>Your own labels for your own deck</td></tr>
+            <tr><td><code>deck_main</code> / <code>deck_side</code></td><td>Arena card ids</td><td>The list you registered for that match</td></tr>
+            <tr><td><code>my_rank</code> / <code>season_ordinal</code></td><td><code>Diamond 1</code></td><td>Your rank and which season</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Your opponent is not in that table.</strong> Their name, the cards they revealed,
+        their basic land types and their platform stay on the PC that saw them — the same rule as
+        everywhere else on this page, and it is not relaxed just because these rows are private to
+        you. The visible cost is stated in the app rather than hidden: a match restored onto
+        another machine shows your side of it only. Your own Arena name is not sent either.
+      </p>
+      <p>
+        The backup is deleted along with everything else when you turn the toggle off. Deleting a
+        single match, or clearing your history, removes it from the backup too — otherwise the
+        next machine you signed in on would hand it straight back.
       </p>
 
       <h3>Public profile and friends</h3>

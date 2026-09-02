@@ -18,7 +18,92 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **2026-09-01 (later) — Windows box brought up to date. No product change.**
+0. **2026-09-02 — cross-device sync: the download half, built. NOT SHIPPED.**
+
+   Owner moved between the Windows box and the Omarchy box, signed in, and
+   found an **empty Stats page** — no history, no decks. Verified: **not a
+   regression, the feature was never built.**
+
+   `shared_matches` has one `upsert` and one `delete` in the whole client and
+   **no `select`**. Uploads have worked since v2.7.6; nothing ever read them
+   back. Match history is re-derived from whichever machine's Arena logs you
+   are sitting at (`useAppStore.refreshTracker` → `tracker_matches`), so a
+   second machine starts empty and stays empty. Cloud *decks* do download, but
+   every consumer keys them off local match history, so with no local matches
+   there are no hashes to look them up by — the deck library was empty for the
+   same root cause. Settings promised "syncing between machines" the whole
+   time. Full post-mortem: `docs/BACKEND-PHASE-2.md` §9.
+
+   ### What was built (slice 8)
+
+   - **`supabase/migrations/20260902120000_match_backup.sql`** — new private
+     per-user table, own-rows-only RLS, insert ceiling at 5000/day.
+   - **`src/services/cloud/backupSync.ts`** + 32 tests — allowlist row builder,
+     restore parser, merge helpers.
+   - `sync.ts`: `backupMatches` / `fetchBackupMatches` / `deleteBackupMatches`;
+     opt-out now deletes `match_backup` too.
+   - `syncRunner.ts`: backup rides the existing trigger; `restoreMatchesNow()`.
+   - Store: `trackerMatches` is now **derived** from `trackerLocal` +
+     `restoredMatches`. New action `restoreCloudHistory()`.
+   - Rust: new `tracker_deleted_ids` command so a restore cannot resurrect a
+     deleted match.
+   - Restore fires on launch, on sign-in, and on switching the toggle on.
+
+   **Why a second table and not `shared_matches`:** that one is Standard +
+   Pioneer only, drops the queue / deck name / per-game detail, and hashes the
+   match id. Restoring from it would lose every Brawl, Limited and Historic
+   game and mislabel the rest. Widening it would pollute the crowd rollup — the
+   exact thing the 2026-08-27 cleanup existed to undo.
+
+   **Opponent data still never leaves the machine.** Owner was offered the
+   fidelity trade explicitly and kept the rule, so `opponentName`,
+   `opponentSeen`, `opponentBasics` and `opponentPlatform` are absent from the
+   backup. Restored matches show your side only, and the UI says so.
+
+   **Arena's raw match id is still never uploaded.** `privacy.html` §3 makes
+   that claim unconditionally, so `match_backup.match_id` is the same salted
+   sha256 `shared_matches` uses. Consequence worth remembering: a restored
+   match carries that digest as its `matchId`, so the client hashes its **local**
+   ids before asking "do I already have this one?" — skip that and every machine
+   restores its own backup and doubles its history.
+
+   ### ⚠️ Two things the next session must do, in this order
+
+   1. **Apply the migration.** It is written and **not applied**. Until it runs,
+      `backupMatches` fails its insert and `fetchBackupMatches` returns `[]` —
+      the app degrades to exactly today's behaviour, which is why shipping the
+      client first is safe.
+   2. **Open the app on the Windows box first** so it uploads its history.
+      Only then will the Omarchy box have anything to restore. Backfill is
+      capped at 500 matches per run, so a long history may take two launches.
+
+   Then bump the version and cut a release — this is user-visible and the
+   release notes should say so. Suggested: **v3.4.0** (the privacy page and
+   the site copy already say "new in v3.4.0").
+
+   ### Verified on Windows this session
+
+   - `npx tsc --noEmit` clean · `npx eslint src pipeline --max-warnings 0` clean
+   - `npm test` → 93 files, **755 tests, all pass** (was 723; +32 new)
+   - `npm run build` clean · `cargo clippy --all-targets -- -D warnings` clean
+   - Both website pages re-parsed in a browser: new privacy table renders with
+     10 rows / 3 columns, new homepage card sits between "Your deck library"
+     and "Climb Tracker".
+   - **Not verified: the actual round trip.** No migration applied and no
+     second machine in this session, so upload→restore has never run against
+     the real DB. The merge, the parser and the deck rebuild are covered by
+     tests; the network path is not.
+
+   ### Public-surface rule — discharged
+
+   `AGENTS.md` line 21 binds a payload change to three surfaces. All three
+   updated: `README.md` (also fixed an orphaned `| Friend codes |` table row
+   that had escaped its table), `website/index.html` (new feature card),
+   `website/privacy.html` (new field table + "never uploaded" list re-checked
+   against the new payload), and `PRIVACY_LASTMOD` bumped to 2026-09-02.
+
+
+1. **2026-09-01 (later) — Windows box brought up to date. No product change.**
 
    The owner's **Windows** machine was 33 commits behind on v3.2.0 while the
    site served v3.3.1. Fast-forwarded to `5baca63`; `main` == `origin/main`.
@@ -77,7 +162,7 @@ that is expected and does not block auto-update.
 
    Next session: wait for the owner. Do not invent work. Do not bump.
 
-0b. **Marketing site is multi-language. LIVE 2026-09-01. No version bump.**
+2. **Marketing site is multi-language. LIVE 2026-09-01. No version bump.**
 
    Shipped and verified on production. Next session: wait for the owner.
    Do not invent work. Do not bump. Do not re-translate.
@@ -169,7 +254,7 @@ that is expected and does not block auto-update.
    marketing-site change, and it is the owner's call whether the fix is
    the pragma or moving the storage behind a guard.
 
-1. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
+3. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
    Owner confirmed end-to-end and will tell the friend to Check for
    updates. Next session: wait for the owner. Do not invent work.
@@ -222,7 +307,7 @@ that is expected and does not block auto-update.
    4. **Rotate the signing key** when convenient (passphrase was pasted
       into a chat transcript on 2026-08-27). Key id `67FCA9900F523D49`.
 
-2. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
+3. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
 
    Owner confirmed the Linux white-`<select>` fix looks perfect and will
    keep testing. Next session: wait for the owner. Do not invent work.
@@ -240,7 +325,7 @@ that is expected and does not block auto-update.
    installed 3.2.0; OG share preview `?v=3.3.0`; Shane reply; rotate
    signing key `67FCA9900F523D49`.
 
-3. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
+4. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
 
    Shipped this session: overlay companion + quiet HUD + autostart ask +
    Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed

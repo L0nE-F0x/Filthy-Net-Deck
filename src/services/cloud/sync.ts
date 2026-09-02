@@ -17,6 +17,14 @@ import {
   toCloudDeck,
   type CloudDeck,
 } from "./deckSync";
+import {
+  backupId,
+  backupIdsFor,
+  fromBackupRow,
+  pendingBackup,
+  toBackupRow,
+  type BackupRow,
+} from "./backupSync";
 import type { RollupRow } from "./crowdMeta";
 import { cloudConfigured } from "./config";
 import { arenaFormatOf, metaFormatOf, type ArenaFormat } from "../arenaFormat";
@@ -114,6 +122,10 @@ export async function setCloudEnabled(on: boolean): Promise<void> {
     // switched sharing off would break exactly that promise.
     await supabase.from("shared_matches").delete().eq("user_id", user.id);
     await supabase.from("decks").delete().eq("user_id", user.id);
+    // The history backup rides the same opt-in and the same promise. It is the
+    // most complete copy of the three, so leaving it behind would be the
+    // worst of the three to leave behind.
+    await supabase.from("match_backup").delete().eq("user_id", user.id);
     resetUploadWatermark();
     resetDeckSyncMark();
   }
@@ -373,6 +385,176 @@ export async function setDeckPublic(
     );
   }
   return data === true;
+}
+
+// ---------------------------------------------------------------------------
+// Personal history backup — cross-device restore
+// ---------------------------------------------------------------------------
+
+export interface BackupOutcome {
+  /** Matches this machine holds that the cloud did not. */
+  pending: number;
+  /** Rows actually written this run. */
+  uploaded: number;
+}
+
+let backupInFlight = false;
+
+/** Backup rows processed per run. Larger than `MAX_PER_RUN` — see below. */
+export const MAX_BACKUP_PER_RUN = 500;
+
+/**
+ * The match ids this account has already backed up.
+ *
+ * One narrow `select` of a single indexed column, which is what lets the upload
+ * skip a high-water mark entirely. That matters more here than it does for
+ * `shared_matches`: a match can be edited after the fact and a watermark would
+ * never re-send it.
+ */
+async function backedUpIds(userId: string): Promise<Set<string> | null> {
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+      .from("match_backup")
+      .select("match_id")
+      .eq("user_id", userId);
+    // null, not an empty set: "the query failed" and "nothing is backed up yet"
+    // must not look the same, or a transient outage would re-upload the entire
+    // history on every launch.
+    if (error || !data) return null;
+    return new Set(data.map((r) => String((r as { match_id: string }).match_id)));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Back up the full local history so another machine can restore it.
+ *
+ * Same opt-in as everything else, no second toggle. Unlike `uploadNewMatches`
+ * this takes *every* match — Brawl, Limited, Historic, unfinished ones — which
+ * is the whole point: it is the user's own record, not a contribution to the
+ * crowd rollup, so the filters that protect the aggregate do not apply.
+ *
+ * The per-run cap is higher than the shared-match one because these rows are
+ * cheap: no archetype inference, no card resolution, just a projection of data
+ * already in memory.
+ */
+export async function backupMatches(args: {
+  matches: readonly TrackedMatch[];
+}): Promise<BackupOutcome> {
+  const empty: BackupOutcome = { pending: 0, uploaded: 0 };
+  if (backupInFlight) return empty;
+  if (!(await isCloudEnabled())) return empty;
+  const user = await getCurrentUser();
+  if (!user) return empty;
+
+  backupInFlight = true;
+  try {
+    const known = await backedUpIds(user.id);
+    if (!known) return empty; // read failed — say nothing rather than re-send everything
+    const ids = await backupIdsFor(user.id, args.matches);
+    const pending = pendingBackup(args.matches, ids, known);
+    if (!pending.length) return empty;
+
+    // Oldest first so a capped run resumes where it stopped, and the newest
+    // matches are the ones still missing rather than a random middle slice.
+    const batch = pending
+      .slice()
+      .sort((a, b) => a.startedAt - b.startedAt)
+      .slice(0, MAX_BACKUP_PER_RUN);
+
+    const rows = batch
+      .map((m) => toBackupRow(user.id, m, ids.get(m.matchId) ?? ""))
+      .filter((r): r is BackupRow => r !== null);
+    if (!rows.length) return { pending: pending.length, uploaded: 0 };
+
+    const supabase: SupabaseClient = await getSupabase();
+    let uploaded = 0;
+    for (const part of chunk(rows)) {
+      const { error } = await supabase
+        .from("match_backup")
+        .upsert(part, { onConflict: "user_id,match_id" });
+      if (error) break; // stop at the first failure; the next run retries the rest
+      uploaded += part.length;
+    }
+    return { pending: pending.length, uploaded };
+  } catch {
+    return empty;
+  } finally {
+    backupInFlight = false;
+  }
+}
+
+/**
+ * Every match this account has backed up, newest first.
+ *
+ * Returns `[]` for signed out, opted out, offline, or a failed read — the
+ * caller merges the result into local history, and an empty merge is a no-op.
+ * That is the correct degradation: a machine with logs of its own still shows
+ * everything it parsed locally.
+ */
+export async function fetchBackupMatches(): Promise<TrackedMatch[]> {
+  if (!cloudConfigured()) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+      .from("match_backup")
+      .select(
+        "match_id,started_at,ended_at,event_id,best_of,my_team_id,games,result,result_reason,deck_name,deck_id,deck_hash,my_rank,season_ordinal,deck_main,deck_side",
+      )
+      .eq("user_id", user.id)
+      .order("ended_at", { ascending: false });
+    if (error || !data) return [];
+    return data
+      .map(fromBackupRow)
+      .filter((m): m is TrackedMatch => m !== null);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Drop specific matches from the backup.
+ *
+ * Called alongside the local delete. Without it, deleting a match would remove
+ * it here and let the next restore put it straight back — on this machine or,
+ * worse, on a different one where the local tombstone does not exist.
+ *
+ * Silent on failure by design: the local delete has already succeeded and is
+ * what the user asked for. A backend problem must not turn "match deleted" into
+ * an error dialog.
+ */
+export async function deleteBackupMatches(matchIds: readonly string[]): Promise<void> {
+  if (!matchIds.length) return;
+  if (!cloudConfigured()) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+  try {
+    // The caller's list is mixed: a match parsed here carries Arena's id and is
+    // stored under its digest, while one that arrived restored already carries
+    // the digest. Rather than guess which is which by shape, send both forms —
+    // the one that does not apply simply matches no row.
+    const hashed = await Promise.all(
+      matchIds.map((id) => backupId(user.id, id)),
+    );
+    const keys = [...new Set([...hashed, ...matchIds])];
+
+    const supabase = await getSupabase();
+    // Chunked: `in` builds a URL, and a deck-sized delete can carry hundreds of
+    // ids past what PostgREST will accept in one query string.
+    for (const part of chunk(keys)) {
+      await supabase
+        .from("match_backup")
+        .delete()
+        .eq("user_id", user.id)
+        .in("match_id", part);
+    }
+  } catch {
+    /* best effort — the local delete already happened */
+  }
 }
 
 // ---------------------------------------------------------------------------

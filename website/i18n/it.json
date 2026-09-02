@@ -105,6 +105,9 @@
   "library.title": "La tua libreria di mazzi",
   "library.body": "NUOVO: ogni lista che Arena registra viene conservata — <strong>Standard, Explorer, Historic, Alchemy, Timeless, Brawl</strong> — con il suo formato, la sua cronologia delle versioni e <strong>Esporta decklist</strong> per scriverle tutte in una cartella come testo di importazione per Arena. Nessun account. Arena ti ferma a 100 mazzi; qui vivono gli altri. Le tier list e i dati sui matchup restano Standard e Pioneer.",
 
+  "sync.title": "Due PC, una cronologia",
+  "sync.body": "NUOVO: accedi e la cronologia delle partite e la libreria dei mazzi ti seguono — da Windows a Linux a Mac, ogni formato, non solo quelli con le tier list. Facoltativo, disattivato di default, e i tuoi avversari restano fuori: i loro nomi e le carte che ti hanno mostrato non lasciano mai il PC che le ha viste, quindi una partita ripristinata mostra solo il tuo lato. <a href=\"privacy.html\">Cosa si sincronizza esattamente</a>.",
+
   "climb.title": "Climb Tracker",
   "climb.body": "Curva del rango stagionale con segnaposto del picco e dettaglio al passaggio del mouse, chip delle serie di vittorie e sconfitte, stagione contro stagione, partite al rango successivo.",
 

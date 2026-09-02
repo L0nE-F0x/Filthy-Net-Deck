@@ -251,6 +251,29 @@ pub fn tracker_matches(state: State<'_, TrackerShared>) -> Vec<TrackedMatch> {
     out
 }
 
+/// Match ids the user deleted on this machine.
+///
+/// Exists for the cloud restore. Deleting a match tombstones it so log backfill
+/// cannot resurrect it, but the tombstone file is local while the history
+/// backup is not — so without this the next restore would hand back exactly the
+/// matches the user erased. Reads the file rather than the in-memory set
+/// because `tracker_clear` deletes the file and `recorded_ids` keeps entries
+/// that were never deleted; the file is the honest answer to "what did the user
+/// remove".
+#[tauri::command]
+pub fn tracker_deleted_ids(state: State<'_, TrackerShared>) -> Vec<String> {
+    let file = {
+        let data = state.0.lock().expect("tracker lock");
+        data.deleted_file.clone()
+    };
+    let Some(file) = file else {
+        return Vec::new();
+    };
+    let mut out: Vec<String> = load_deleted(&file).into_iter().collect();
+    out.sort();
+    out
+}
+
 #[tauri::command]
 pub fn tracker_live(state: State<'_, TrackerShared>) -> Option<LiveMatch> {
     state.0.lock().expect("tracker lock").live.clone()

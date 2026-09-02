@@ -105,6 +105,9 @@
   "library.title": "Deine Deck-Bibliothek",
   "library.body": "NEU: Jede Liste, die Arena registriert, bleibt erhalten — <strong>Standard, Explorer, Historic, Alchemy, Timeless, Brawl</strong> — mit Format, Versionsverlauf und <strong>Decklisten exportieren</strong>, um alles als Arena-Importtext in einen Ordner zu schreiben. Ohne Konto. Arena begrenzt dich auf 100 Decks; hier leben die anderen. Tier-Listen und Matchup-Daten bleiben Standard und Pioneer.",
 
+  "sync.title": "Zwei PCs, eine Historie",
+  "sync.body": "NEU: Melde dich an und deine Match-Historie und Deck-Bibliothek folgen dir — von Windows zu Linux zu Mac, jedes Format, nicht nur die mit Tier-Listen. Optional, standardmäßig aus, und deine Gegner bleiben draußen: ihre Namen und die Karten, die sie dir gezeigt haben, verlassen nie den PC, der sie gesehen hat — ein wiederhergestelltes Match zeigt nur deine Seite. <a href=\"privacy.html\">Was genau synchronisiert wird</a>.",
+
   "climb.title": "Climb Tracker",
   "climb.body": "Rangkurve der Season mit Höchststand-Marker und Detail beim Überfahren, Sieges- und Niederlagenserien als Chips, Season gegen Season, Partien bis zum nächsten Rang.",
 

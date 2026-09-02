@@ -287,6 +287,19 @@ export const Settings = memo(function Settings() {
         // run is exactly when there is a backlog worth sending.
         const runner = await import("../services/cloud/syncRunner");
         void runner.syncMatchesNow();
+        // And pull the other direction. On a second machine this is the click
+        // that makes the account's history appear, so it has to happen here
+        // rather than at the next launch.
+        void useAppStore.getState().restoreCloudHistory();
+      } else {
+        // Opting out deleted the backup server-side; drop the restored matches
+        // with it so the merged list stops showing history that no longer has
+        // anywhere to come back from.
+        useAppStore.setState((s) => ({
+          restoredMatches: [],
+          trackerMatches: s.trackerLocal,
+          restoreChecked: false,
+        }));
       }
     } catch (e) {
       setCloudEnabled(!on);
@@ -1029,13 +1042,18 @@ export const Settings = memo(function Settings() {
                 */}
                 {cloudEnabled && (
                   <p className="settings-note mt-2 m-0 text-xs text-muted">
-                    Your own decklists are backed up with this
+                    Your match history and your own decklists are backed up with
+                    this
                     {deckBackupCount != null && deckBackupCount > 0
                       ? ` — ${deckBackupCount} list${deckBackupCount === 1 ? "" : "s"} saved`
                       : ""}
-                    . Arena&apos;s logs rotate and take old lists with them; these
-                    come back on any machine you sign in on. Turning this off
-                    deletes them along with your shared matches.
+                    , and both come back on any machine you sign in on. Arena&apos;s
+                    logs rotate and take old matches and lists with them; this is
+                    what survives that. Opponent names and the cards they revealed
+                    are the exception — they stay on the PC that saw them and are
+                    never uploaded, so restored matches show your side only.
+                    Turning this off deletes all of it along with your shared
+                    matches.
                   </p>
                 )}
                 <FriendCodes />

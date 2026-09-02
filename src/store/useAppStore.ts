@@ -19,10 +19,12 @@ import { resolveFormatId } from "../services/formatResolve";
 import {
   clearTrackerHistory,
   deleteTrackerMatches,
+  fetchDeletedMatchIds,
   fetchTrackerMatches,
   fetchTrackerStatus,
   subscribeTracker,
 } from "../services/tracker";
+import { mergeRestored } from "../services/cloud/backupSync";
 import type { FormatId, MetaBundle, Page, PlayMode } from "../types/meta";
 import type { SetsBundle } from "../types/sets";
 import type { TrackedMatch, TrackerStatus } from "../types/tracker";
@@ -376,7 +378,28 @@ interface AppState {
   dismissedUpdateVersion: string | null;
   /** Winrate tracker (null status = not running / browser build) */
   trackerStatus: TrackerStatus | null;
+  /**
+   * What every surface reads: this machine's matches merged with anything the
+   * cloud backup could add. Derived — never assign it directly, or the next
+   * poll will overwrite the restored half. Change `trackerLocal` or
+   * `restoredMatches` and let `applyMatches` recompute.
+   */
   trackerMatches: TrackedMatch[];
+  /**
+   * Exactly what `tracker_matches` returned. Kept separate because Rust's
+   * `matchesRecorded` is compared against it — measuring the merged list
+   * against a local-only count made every status event look like a dropped
+   * match and triggered an endless re-pull.
+   */
+  trackerLocal: TrackedMatch[];
+  /**
+   * History restored from the account, minus anything this machine already has
+   * or has deleted. Empty when signed out, opted out, or on the machine the
+   * history came from.
+   */
+  restoredMatches: TrackedMatch[];
+  /** True once a restore has run this session, so the UI can stop saying "checking". */
+  restoreChecked: boolean;
   trackerReady: boolean;
   /** Arena-first set radar (spoilers / release dates) */
   sets: SetsBundle | null;
@@ -512,6 +535,13 @@ interface AppState {
    * after tray hide — WebView can miss live `tracker:match` events while hidden.
    */
   refreshTracker: () => Promise<void>;
+  /**
+   * Pull the account's history backup and merge it under whatever this machine
+   * parsed locally. Safe to call repeatedly; a no-op when signed out or opted
+   * out. This is the half of "sync between machines" that was missing — uploads
+   * shipped in v2.7.6, nothing ever read them back.
+   */
+  restoreCloudHistory: () => Promise<void>;
   clearTracker: () => Promise<void>;
   deleteMatches: (matchIds: string[]) => Promise<void>;
 }
@@ -605,6 +635,9 @@ export const useAppStore = create<AppState>((set, get) => {
     dismissedUpdateVersion: loadDismissedUpdateVersion(),
     trackerStatus: null,
     trackerMatches: [],
+    trackerLocal: [],
+    restoredMatches: [],
+    restoreChecked: false,
     trackerReady: false,
     sets: null,
     setsLoading: false,
@@ -739,7 +772,19 @@ export const useAppStore = create<AppState>((set, get) => {
     signOutCloud: async () => {
       const m = await import("../services/cloud/auth");
       await m.signOut();
-      set({ authName: null, authError: null, authPending: false });
+      // Drop the restored half with the session. It came from an account that
+      // is no longer signed in, and leaving it on screen would show history
+      // this machine cannot account for. The local list is untouched — those
+      // matches were parsed here and have nothing to do with the account.
+      const local = get().trackerLocal;
+      set({
+        authName: null,
+        authError: null,
+        authPending: false,
+        restoredMatches: [],
+        trackerMatches: mergeRestored(local, []),
+        restoreChecked: false,
+      });
     },
     setHealthPing: (healthPing) => {
       const next = { ...get().prefs, healthPing };
@@ -1042,13 +1087,78 @@ export const useAppStore = create<AppState>((set, get) => {
         // in-place edits (an opponent tag, a deck reassignment, a corrected
         // result) whenever the list length is unchanged, and the UI would then
         // never show them. A few hundred shallow compares every 12s is free.
-        const sameMatches = sameMatchList(prev.trackerMatches, matches);
+        //
+        // Compared against `trackerLocal`, not `trackerMatches`. The merged
+        // list carries restored matches Rust has never heard of, so comparing
+        // it to a fresh `tracker_matches` would differ every single poll and
+        // re-set the store forever.
+        const sameMatches = sameMatchList(prev.trackerLocal, matches);
         if (sameStatus && sameMatches) return;
-        // Rust is the source of truth — replace, don't merge (avoids stale gaps
-        // after the WebView missed live events while the window was hidden).
-        set({ trackerStatus: status, trackerMatches: matches });
+        // Rust is the source of truth for what this machine played — replace,
+        // don't merge (avoids stale gaps after the WebView missed live events
+        // while the window was hidden). The cloud half is layered back on top
+        // afterwards; it can only ever add matches Rust does not have.
+        set({
+          trackerStatus: status,
+          trackerLocal: matches,
+          trackerMatches: mergeRestored(matches, prev.restoredMatches),
+        });
       } catch {
         /* keep prior UI state */
+      }
+    },
+
+    restoreCloudHistory: async () => {
+      try {
+        const auth = await import("../services/cloud/auth");
+        const user = await auth.getCurrentUser();
+        if (!user) {
+          set({ restoreChecked: true });
+          return;
+        }
+        const [restored, deleted] = await Promise.all([
+          import("../services/cloud/syncRunner").then((m) => m.restoreMatchesNow()),
+          // Deleting a match tombstones it locally but the backup lives on the
+          // server, so without this filter a restore hands back exactly what
+          // the user erased. The delete path clears the cloud rows too; this is
+          // the guard for the window between the two, and for a delete made on
+          // a different machine while this one was offline.
+          fetchDeletedMatchIds(),
+        ]);
+
+        const local = get().trackerLocal;
+        const { backupIdsFor, filterRestored } = await import(
+          "../services/cloud/backupSync"
+        );
+        // Backup rows are keyed by a salted digest, not Arena's match id, so
+        // "do I already have this one?" needs the local ids hashed the same
+        // way. Done once here rather than per comparison — every machine
+        // restores its own backup on the next launch, and without this the
+        // common case would be a history that doubles itself.
+        const [localIds, deletedIds] = await Promise.all([
+          backupIdsFor(user.id, local),
+          backupIdsFor(
+            user.id,
+            deleted.map((id) => ({ matchId: id })),
+          ),
+        ]);
+        // Both forms of every tombstone: raw for matches parsed here, digest
+        // for ones that arrived restored and were then deleted.
+        const tombstones = new Set([...deleted, ...deletedIds.values()]);
+        const extra = filterRestored(
+          restored,
+          new Set(localIds.values()),
+          tombstones,
+        );
+        set({
+          restoredMatches: extra,
+          trackerMatches: mergeRestored(local, extra),
+          restoreChecked: true,
+        });
+      } catch {
+        // Never surfaces: a machine with its own logs still shows everything it
+        // parsed, and the next launch retries.
+        set({ restoreChecked: true });
       }
     },
 
@@ -1065,14 +1175,25 @@ export const useAppStore = create<AppState>((set, get) => {
       void setOverlayPostMatchRust(get().prefs.overlayPostMatch);
       void setPresenceEnabledRust(get().prefs.presenceEnabled);
       await get().refreshTracker();
+      // Layer the account's history on top once the local list is in. Deliberately
+      // not awaited: it is a network round trip, and the app must not wait on it
+      // to show the matches this machine already has.
+      void get().restoreCloudHistory();
       await subscribeTracker({
         onMatch: (m) => {
-          const cur = get().trackerMatches;
+          // Checked against the local list, not the merged one. A match that
+          // exists only as a restored copy still has to be recorded locally —
+          // the local parse carries the opponent fields the backup drops, so
+          // treating the restored copy as "already have it" would keep the
+          // thinner version and lose data on the machine that has the most.
+          const cur = get().trackerLocal;
           if (cur.some((x) => x.matchId === m.matchId)) return;
           const rankUp = detectRankUp(m, cur);
           const prevCount = cur.length;
+          const local = [m, ...cur];
           set({
-            trackerMatches: [m, ...cur],
+            trackerLocal: local,
+            trackerMatches: mergeRestored(local, get().restoredMatches),
             rankUpMoment: rankUp ?? get().rankUpMoment,
           });
           // D1: one-shot first-match celebration toast
@@ -1132,7 +1253,12 @@ export const useAppStore = create<AppState>((set, get) => {
           set({ trackerStatus: s });
           // If Rust has more matches than the UI (events dropped while tray-
           // hidden), re-pull the full list. This is the main recovery path.
-          const local = get().trackerMatches.length;
+          //
+          // Counts the LOCAL list. `matchesRecorded` is Rust's own tally and
+          // knows nothing about restored matches, so measuring it against the
+          // merged list would read as a permanent shortfall on any machine with
+          // a restore — every status event would fire another full re-pull.
+          const local = get().trackerLocal.length;
           if (
             typeof s.matchesRecorded === "number" &&
             s.matchesRecorded > local
@@ -1157,9 +1283,23 @@ export const useAppStore = create<AppState>((set, get) => {
       try {
         await deleteTrackerMatches(matchIds);
         const drop = new Set(matchIds);
+        const local = get().trackerLocal.filter((m) => !drop.has(m.matchId));
+        // Restored copies go too. Dropping only the local one would leave the
+        // cloud version sitting in the merged list, so the match would appear
+        // to survive its own deletion.
+        const restored = get().restoredMatches.filter((m) => !drop.has(m.matchId));
         set({
-          trackerMatches: get().trackerMatches.filter((m) => !drop.has(m.matchId)),
+          trackerLocal: local,
+          restoredMatches: restored,
+          trackerMatches: mergeRestored(local, restored),
         });
+        // And from the backup, or the next machine to restore gets them back.
+        // Fire-and-forget: the local delete is what the user asked for and it
+        // has already happened, so a backend failure must not surface as an
+        // error on an action that succeeded.
+        void import("../services/cloud/sync").then((m) =>
+          m.deleteBackupMatches(matchIds),
+        );
       } catch (e) {
         set({
           error:
@@ -1172,8 +1312,18 @@ export const useAppStore = create<AppState>((set, get) => {
 
     clearTracker: async () => {
       try {
+        const wiped = get().trackerLocal.map((m) => m.matchId);
         await clearTrackerHistory();
-        set({ trackerMatches: [] });
+        set({ trackerLocal: [], restoredMatches: [], trackerMatches: [] });
+        // Clearing has to reach the backup too. Rust drops its tombstones on a
+        // full clear (by design — "delete + restart re-backfills from the logs"
+        // depends on it), so a surviving backup would be restored in full on
+        // the next launch and "Clear history" would look like it did nothing.
+        // Only the ids this machine actually held: a clear here is not a
+        // mandate to erase a match that only ever existed on another machine.
+        void import("../services/cloud/sync").then((m) =>
+          m.deleteBackupMatches(wiped),
+        );
       } catch (e) {
         set({
           error:

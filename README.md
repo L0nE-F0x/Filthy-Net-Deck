@@ -73,6 +73,8 @@ A free account unlocks features that need a server, and each is opt-in:
 | Public profile `/u/<handle>` | Your season climb, shared on your terms |
 | Published decklists `/u/<handle>/<deck>` | Publish one deck and anyone with the link can copy it into Arena |
 | Cloud deck sync | Backs up the lists Arena registers, which local log rotation destroys |
+| Cross-device history | Sign in on another PC and your match history and deck library are there |
+| Friend codes | Compare stat lines and race a season with people you play |
 
 Two rules about formats, because they are easy to conflate:
 
@@ -84,16 +86,24 @@ Two rules about formats, because they are easy to conflate:
   My Stats with its own format label, and **Export decklists** writes the lot to
   a folder as Arena import text with no account required. Limited is excluded:
   a draft pool is not a deck you can rebuild.
-| Friend codes | Compare stat lines and race a season with people you play |
+
+**Cross-device sync backs up every format, unlike the community data.** The two
+run off the same toggle but are different tables and different rules: the crowd
+rollup takes Standard and Pioneer only, while your own history backup takes
+everything you played, including Brawl and Limited, because it is yours and no
+aggregate reads it.
 
 Two rules hold regardless of any toggle:
 
-- **Another player's identity never leaves your machine.** `opponentName` and
-  `opponentSeen` are not uploaded — not hashed, not "anonymised". The opponent's
-  archetype is inferred locally and only the *label* is sent.
+- **Another player's identity never leaves your machine.** `opponentName`,
+  `opponentSeen`, `opponentBasics` and `opponentPlatform` are not uploaded — not
+  hashed, not "anonymised", and not into the private history backup either. The
+  opponent's archetype is inferred locally and only the *label* is sent. The
+  visible cost is stated in the app: a match restored onto a second machine
+  shows your side of it only.
 - **The upload payload is an explicit allowlist**, not a serialised object, so a
   field added to the tracker later cannot silently start being uploaded. A test
-  asserts the exact key set.
+  asserts the exact key set, for each of the three payloads.
 
 The full field list is published verbatim at
 [filthy-net-deck.com/privacy](https://filthy-net-deck.com/privacy.html).

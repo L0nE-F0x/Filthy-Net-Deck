@@ -227,6 +227,7 @@ pub fn run() {
             tracker::tracker_live,
             tracker::tracker_clear,
             tracker::tracker_delete_matches,
+            tracker::tracker_deleted_ids,
             tracker::tracker_export_csv,
             tracker::tracker_export_decklists,
             tracker::tracker_export_diagnostic,

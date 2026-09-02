@@ -15,7 +15,14 @@ import { inferOpponentArchetype } from "../opponentArchetype";
 import { peekSeenCard, resolveArenaMetaBatch } from "../arenaMeta";
 import { getOpponentNote } from "../matchupNotes";
 import { MIN_INFER_CONFIDENCE } from "./personalMatchups";
-import { fetchCloudDecks, uploadDecks, uploadNewMatches, type UploadOutcome } from "./sync";
+import {
+  backupMatches,
+  fetchBackupMatches,
+  fetchCloudDecks,
+  uploadDecks,
+  uploadNewMatches,
+  type UploadOutcome,
+} from "./sync";
 import type { CloudDeck } from "./deckSync";
 import type { TrackedMatch } from "../../types/tracker";
 
@@ -30,7 +37,13 @@ export async function syncMatchesNow(): Promise<UploadOutcome> {
   const empty = { attempted: 0, uploaded: 0, skipped: 0 };
   try {
     const state = useAppStore.getState();
-    const matches = state.trackerMatches;
+    // `trackerLocal`, not `trackerMatches`: you contribute what this machine
+    // played. Re-uploading a restored match would be wrong twice over — it was
+    // already sent by the machine that played it, and the restored copy has no
+    // `opponentSeen`, so inference would produce `opp_archetype: null` and the
+    // row would be strictly worse than the one already there. Backing it up
+    // again is likewise a no-op it does not need to discover at runtime.
+    const matches = state.trackerLocal;
     if (!matches.length) return empty;
 
     const meta = state.meta;
@@ -86,6 +99,13 @@ export async function syncMatchesNow(): Promise<UploadOutcome> {
     // the library has not changed.
     void uploadDecks({ matches, meta, decks: [...bo1, ...bo3] });
 
+    // The history backup, same opt-in again. Takes the raw list rather than
+    // anything inferred above: it stores what the tracker recorded, so none of
+    // the archetype work applies to it. Fire-and-forget for the same reason as
+    // decks — a machine that fails to back up still gets its own matches into
+    // the crowd rollup, which is the part other people are waiting on.
+    void backupMatches({ matches });
+
     return outcome;
   } catch {
     return empty;
@@ -99,6 +119,23 @@ export async function syncMatchesNow(): Promise<UploadOutcome> {
 export async function cloudDecksNow(): Promise<CloudDeck[]> {
   try {
     return await fetchCloudDecks();
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The account's backed-up history, for merging into whatever this machine
+ * parsed locally.
+ *
+ * Returns the cloud's copy raw — the merge itself lives in `backupSync` so it
+ * can be tested without a network, and the store owns when to apply it. Empty
+ * for signed out, opted out, offline, or a first machine with nothing to
+ * restore, all of which are ordinary.
+ */
+export async function restoreMatchesNow(): Promise<TrackedMatch[]> {
+  try {
+    return await fetchBackupMatches();
   } catch {
     return [];
   }

@@ -18,10 +18,12 @@
 > | 5 · match upload + hourly rollup | v2.7.6 |
 > | 6 · crowd matchup UI, gated on `games >= 30` | v2.7.6 |
 > | 7 · cloud deck sync | v2.8.0 |
+> | 8 · **cross-device history restore** (§9) | unreleased |
 >
-> **Seven migrations are live on the DB**, not the five listed in older notes:
-> `health_pings`, `core_schema`, `public_profiles`, `display_name_privacy`,
-> `decks`, `public_decks`, `friends`.
+> **Eight migrations are live on the DB** once slice 8 is applied, not the five
+> listed in older notes: `health_pings`, `core_schema`, `public_profiles`,
+> `display_name_privacy`, `decks`, `public_decks`, `friends`, `match_backup`.
+> ⚠️ `match_backup` is **written but not yet applied** — see §9.
 >
 > **Email OTP (§6) is built but hidden** behind `EMAIL_SIGN_IN_ENABLED` in
 > `src/services/cloud/config.ts` — Supabase's built-in mailer is rate-limited
@@ -544,3 +546,112 @@ thread. Ship it off, explain it, and revisit if uptake is too low to be useful.
 - ⬜ **§2.6 legal items** (WotC Fan Content Policy, Scryfall commercial terms)
   gate *taking money*, and Phase 4 is deferred indefinitely — so nothing here is
   blocked. They must be done before Phase 4 is ever revived, **not after**.
+
+---
+
+## 9. Slice 8 — cross-device history restore (2026-09-02)
+
+**Reported by the owner**, who moved between a Windows box and an Omarchy box
+and found an empty Stats page after signing in. Not a regression: the feature
+was never built. This section is the record of *why it was missed*, because the
+gap is more interesting than the fix.
+
+### The shape of the miss
+
+Slice 5 is titled "match upload". It was built exactly as titled, and every
+piece of it works. `shared_matches` has been accepting rows since v2.7.6.
+
+**Nothing ever read them back.** Grepping the client for the table returns one
+`upsert` and one `delete` and no `select`. The only match-shaped reads in the
+app are `matchup_rollup` (everyone's aggregate) and `friend_lines`. The download
+direction had no slice, no ticket, and no test that would have failed.
+
+Three things kept it invisible:
+
+1. **Deck sync looked like the missing half.** `fetchCloudDecks` genuinely does
+   download, so "cloud → client" appeared to exist. But every consumer keys the
+   result off local match history — `DeckDetail` hangs restored lists on
+   `deckMatches`, the library export runs over decks derived from local matches.
+   With no local history there are no hashes to look up, so the one real
+   download path returns rows the UI cannot place. **A restore that can only
+   fill gaps in something you already have is not a restore.**
+2. **`PLATFORM-STRATEGY.md` §1.4 lists "Cloud sync + cross-device" as a Pro
+   tier line.** It read as planned rather than absent.
+3. **Settings promised it.** "features that need a server, like syncing between
+   machines", and the deck note says lists "come back on any machine you sign in
+   on" — true of the rows, false of anything the user could see.
+
+The lesson worth keeping: **an upload with no reader is telemetry, not sync.**
+Slice 5 should have been two slices, and the second one should have had a test
+that starts from an empty local history.
+
+### Why not restore from `shared_matches`
+
+It is right there and it is the wrong table. It is a *contribution*: Standard
+and Pioneer only, no queue id, no deck name, no per-game detail, an irreversible
+hash where the match id should be, and a `buildSharedMatch` that drops any match
+whose archetype could not be resolved. Restoring a player's own history from it
+would lose every Brawl, Limited, Historic and Alchemy game and mislabel what
+survived.
+
+Widening it was rejected for the same reason the 2026-08-27 cleanup exists:
+the rollup reads that table, and loosening its format check to serve a personal
+feature is exactly how the community numbers get polluted.
+
+So slice 8 adds `match_backup` — the user's own history, complete, read by
+nothing aggregate.
+
+### What is in it, and the one thing that is not
+
+Everything on `TrackedMatch` **except** `opponentName`, `opponentSeen`,
+`opponentBasics` and `opponentPlatform`. §0 rule 1 says another player's
+identity never leaves the machine, and that holds here even though the rows are
+private to their owner: own-rows-only RLS is an access-control claim, not a
+consent one, and the opponent still did not agree to anything.
+
+The owner was offered the fidelity trade explicitly and chose to keep the rule.
+The cost is named in the UI rather than hidden — restored matches show no
+opponent handle and no revealed cards, and Settings and the Stats caption both
+say so.
+
+`myPlayerName` is absent for a duller reason: no surface reads it.
+
+Everything else round-trips, which is what makes the deck library come back —
+decks are not stored as decks, they are match history collapsed by
+`deckId ?? deckName ?? deckHash`, so restoring matches with those fields intact
+rebuilds the arsenal, its winrates and its formats for free. A test asserts
+exactly that, starting from an empty local history.
+
+### Mechanics worth remembering
+
+- **No high-water mark**, unlike `shared_matches`. A match can be edited after
+  the fact (an opponent tag, a corrected result), and "newer than X" would never
+  re-send it. The client reads back the set of `match_id`s already stored — one
+  narrow indexed select — and uploads the difference. A *failed* read returns
+  null rather than an empty set, so an outage cannot look like "nothing is
+  backed up" and re-upload the entire history.
+- **Deletes propagate both ways.** Deleting a match removes it locally, drops
+  the restored copy, and deletes the backup row. `tracker_deleted_ids` (new Rust
+  command) exposes the local tombstone file so a restore cannot resurrect
+  anything erased while the machine was offline. Clearing all history deletes
+  the backup rows for the matches *this machine held* — Rust drops its tombstones
+  on a full clear by design, so a surviving backup would restore itself on the
+  next launch and "Clear history" would silently undo itself.
+- **`trackerMatches` is now derived.** `trackerLocal` (what Rust returned) and
+  `restoredMatches` (what the cloud added) are the inputs. Two invariants broke
+  when this was naive and both are load-bearing: the 12s poll compares against
+  `trackerLocal`, not the merged list, or it re-sets the store forever; and
+  `onStatus` counts `trackerLocal` against Rust's `matchesRecorded`, or every
+  status event reads as a dropped match and fires a full re-pull.
+- **Local always wins the merge.** The local copy carries the opponent fields
+  the backup drops, so preferring the restored one would lose data on the
+  machine that has the most of it.
+
+### ⚠️ Not live yet
+
+`supabase/migrations/20260902120000_match_backup.sql` is **written and not
+applied**. Until it is run against the project, `backupMatches` fails its insert
+and `fetchBackupMatches` returns `[]` — the app degrades to exactly today's
+behaviour, which is why shipping the client first is safe. Apply the migration,
+then open the app on the machine that *has* the history so it uploads, before
+expecting a second machine to restore anything.

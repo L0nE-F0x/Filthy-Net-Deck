@@ -105,6 +105,9 @@
   "library.title": "Sua biblioteca de decks",
   "library.body": "NOVO: toda lista que o Arena registra é guardada — <strong>Standard, Explorer, Historic, Alchemy, Timeless, Brawl</strong> — com o formato, o histórico de versões e <strong>Exportar decklists</strong> para gravar tudo numa pasta como texto de importação do Arena. Sem conta. O Arena te limita a 100 decks; é aqui que os outros ficam. Tier lists e dados de matchup continuam sendo Standard e Pioneer.",
 
+  "sync.title": "Dois PCs, um histórico",
+  "sync.body": "NOVO: entre na conta e seu histórico de partidas e biblioteca de decks vão com você — do Windows ao Linux ao Mac, todos os formatos, não só os que têm tier lists. Opcional, desligado por padrão, e seus oponentes ficam de fora: os nomes e as cartas que eles te mostraram nunca saem do PC que viu, então uma partida restaurada mostra só o seu lado. <a href=\"privacy.html\">O que sincroniza exatamente</a>.",
+
   "climb.title": "Climb Tracker",
   "climb.body": "Curva de rank da temporada com marcador de pico e detalhe ao passar o mouse, chips de sequência de vitórias e derrotas, temporada contra temporada e partidas até o próximo rank.",
 
