@@ -24,6 +24,22 @@ that is expected and does not block auto-update.
    (Omarchy installation — not specified here; wait for the owner to ask).
    Grok finished the release on the Windows box and is **not** continuing.
 
+   ### ▶ If you are the agent on the OMARCHY box, start here
+
+   Read **`docs/TWO-MACHINE-WORKFLOW.md`** and work through it *with the owner*.
+
+   It is seven open questions about maintaining FND from two operating systems,
+   written by Claude on the Windows box on 2026-09-02. **It is explicitly NOT a
+   list of facts** — the owner has already said parts of it are wrong (notably
+   item 1: they have already produced Tauri/NSIS Windows builds from Linux).
+   Each item carries a confidence level and a command to check it. Verify, then
+   decide with the owner, then edit the file in place and delete what is
+   resolved. Fold anything durable into `AGENTS.md` and delete the file.
+
+   The one item I would not skip is **item 2**: `ci.yml` runs its Rust job on
+   `windows-latest` only, so the `#[cfg(target_os = "linux")]` Proton log code
+   is compiled by no CI job at all.
+
    Owner message, 2026-09-02, to transmit verbatim in intent:
 
    - Grok is done. Great work, stop.
