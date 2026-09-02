@@ -28,10 +28,12 @@ that is expected and does not block auto-update.
 
    ### ▶ Resume here — pick up at "What's left" below
 
-   ⚠️ **Three commits are on local `main` and NOT pushed** — `origin/main` is
-   behind by `00d5fdc5`, `42f23765`, `f873c3fb`. The owner is holding them so
-   the macOS `.exe` fix ships with the Linux release rather than alone. Working
-   tree is clean; nothing is half-applied. **Ask before pushing.**
+   Everything committed **and pushed**. `main` == `origin/main` at `7e010c59`.
+   Working tree clean; nothing is half-applied.
+
+   ⚠️ Pushed is **not** shipped. No version bump, site untouched, nothing on
+   the AUR — and the macOS `.exe` fix is deliberately waiting for the Linux
+   release rather than going out alone. See "What's left".
 
    ### The crash — fixed, root cause, do not re-debug
 
@@ -223,6 +225,9 @@ that is expected and does not block auto-update.
    `gst-libav` + `gst-plugins-bad` added as optdepends for set-trailer
    playback (`TrailerPlayer.tsx` embeds a YouTube iframe, which needs H.264).
 
+   **Confirmed:** owner installed the three packages, restarted, and the
+   soundscape plays. Root cause proven, not inferred.
+
    ⚠️ **Suspect the same class of bug for anything media-shaped on Linux.**
    webkit2gtk's optdeps are exactly the features that fail silently.
 
@@ -305,7 +310,7 @@ that is expected and does not block auto-update.
    4. **Linux CI** (workflow item 2) — nothing compiles the
       `#[cfg(target_os = "linux")]` Proton code today. The vitest blocker is
       gone, so this is unblocked.
-   5. **Push.** Three commits are sitting on local `main`.
+   5. ~~Push.~~ Done — `7e010c59`.
 
    ### Trap that cost real time — `sync.ts` is invisible to grep
 
