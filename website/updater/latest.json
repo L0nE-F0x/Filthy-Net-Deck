@@ -1,11 +1,11 @@
 {
-  "version": "3.3.1",
-  "notes": "v3.3.1: rooms copy into Arena as Front // Back; Unfinity basics named instead of Card 81181.",
-  "pub_date": "2026-08-31T16:40:44Z",
+  "version": "3.4.0",
+  "notes": "v3.4.0: sign in on another PC and your match history and deck library are there — every format, opponents never uploaded.",
+  "pub_date": "2026-09-02T08:53:13Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjZCemU3OVlyZ2xLNmo5WXcrY01HZ2MxOGpqRWgxbVJzTEV3K2VJVVNydzRIMklYZDY0K1hGZ3NNbWtQMDBoYmlMYk8vMzBiSm1aMVNFUStydU1OUFF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MTk0NDMxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuMy4xX3g2NC1zZXR1cC5leGUKUjV1M09RMlhaMnBOSTJYMUFHaWhWR0lwekZkTXF0QjdKSDQxOW0vY2dCV3VicnU5ODJUb3lEVU5weGhZVXlzTHRWMS9wNStWcmhyZzdEYkpYMUdzQXc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.3.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJXTEFObi94QlZDRGRST2Zqc2p5emY0T0o1TGRjZ0lEVzlCSnlMVEpJM0xnWUNRRzdzZXhZWmdIU2QxTUlNeThwNE1Ea1Z6TEFHNVRNNytha05uUmc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MzM5MTkyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNC4wX3g2NC1zZXR1cC5leGUKM3IycEdrZFU4MWNJT3puOW9wWmV3Wk82MFQzMEdKbkpaWXZhZEhBcEJZMFRGZnA1QU14TWd4SlJnU2dSL2d0VWU0WFp5SU9WVExsNzEvM09LNVg2Qnc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.4.0.exe"
     }
   }
 }
