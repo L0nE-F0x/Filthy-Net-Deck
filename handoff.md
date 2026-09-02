@@ -226,6 +226,51 @@ that is expected and does not block auto-update.
    ⚠️ **Suspect the same class of bug for anything media-shaped on Linux.**
    webkit2gtk's optdeps are exactly the features that fail silently.
 
+   How it actually went missing on this box, from `/var/log/pacman.log`:
+
+   ```
+   12:16:55  installed gst-plugins-good
+   14:49:54  pacman -Rns orca ada simdjson nodejs-lts-iron
+   14:49:59  removed gst-plugins-good        ← swept as an orphan
+   ```
+
+   `-Rns` recursed through orca's dependency tree and took gst-plugins-good
+   with it, because **nothing held a hard dependency on it** — an optdepend
+   does not protect a package from `-Rns`. That is the exact hole the PKGBUILD
+   change closes: as a hard `depends` of `filthy-net-deck-bin`, pacman would
+   have refused the removal.
+
+   ### WebKitWebProcess SIGABRT on shutdown — upstream, cosmetic, do not chase
+
+   Separate from everything above, and **not** the 19:04 pattern (which was the
+   child dying with its aborting parent). Core `28057`, 2026-09-02 22:25:58,
+   SIGABRT. Crashing thread bottom-up:
+
+   ```
+   #14 main → #13 __libc_start_main → #11 exit    ← already shutting down
+   #10 __run_exit_handlers
+   #9  libEGL_mesa.so.0                            ← Mesa atexit handler
+   #8  drmFreeDevice (libdrm)
+   #7..#3 libc malloc internals → #2 abort         ← glibc caught a bad free
+   ```
+
+   The process was inside `exit()`; it aborted while cleaning up, not while
+   doing work. Thread 28135 shows the race — `__call_tls_dtors` →
+   libwebkit2gtk → libEGL_mesa — so WebKit tears down its EGL display in a TLS
+   destructor while Mesa's exit handler frees the same DRM device on the main
+   thread. Double free, glibc aborts.
+
+   Ruled out: no OOM (12Gi available), nothing in the journal for that window,
+   and mesa / libdrm / webkit2gtk-4.1 were all last installed 2026-08-29 — no
+   recent update to blame. **The parent `filthy-net-deck` did not crash**: no
+   core for it at 22:26 and the window was still up at 22:27. It was the old
+   instance exiting on restart.
+
+   Upstream Mesa/WebKit, nothing for FND to fix, no data at risk. Expect it to
+   recur on webview teardown; the desktop notification is the only symptom.
+   `WEBKIT_DISABLE_DMABUF_RENDERER=1` avoids the EGL path but costs rendering
+   performance — not worth trading for a cosmetic notification.
+
    ### Test suite — FIXED, 786/786 on this box
 
    The previous entry's diagnosis was wrong: vitest already defaults jsdom to
