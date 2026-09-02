@@ -18,7 +18,200 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **Handed back to Claude. Grok is done. Full v3.4.0 deploy pipeline is live.**
+0. **2026-09-02 (evening) — Omarchy is a supported target now. Match-end crash
+   fixed, cross-device sync PROVEN, Arch packaging built. IN PROGRESS.**
+
+   Owner decision this session: **ship a Linux release, Omarchy/Arch only**,
+   and add it to the deploy pipeline. Not local-only any more. Nothing is
+   live yet — no version bump, site untouched, no AUR upload.
+
+   ### ▶ Resume here — pick up at "What's left" below
+
+   Everything committed and pushed. `main` == `origin/main`. Working tree
+   clean. Nothing is half-applied.
+
+   ### The crash — fixed, root cause, do not re-debug
+
+   Owner played a match; the app died at the end of it. **One bug behind
+   every symptom.** `toast.rs` built the alert window `.visible(false)` and
+   immediately called `set_ignore_cursor_events(true)`. tao lowers that to
+   `gtk_widget_get_window().unwrap()`, and an unrealized widget has no
+   GdkWindow — the unwrap fires inside a **non-unwinding GLib dispatch**, so
+   it aborts the process. `let _ =` looks like it swallows the failure; the
+   panic happens later on the dispatch thread with nothing to catch it.
+
+   Both core dumps that evening (17:39 and 19:04) have the identical stack.
+   The WebKitWebProcess SIGSEGV afterwards is the child dying with its parent.
+   **The tracker was never at fault** — the match was parsed and written to
+   `tracker-matches.jsonl` before the abort.
+
+   Fixed in `1f7c54de`: applied after `show()` instead, `#[cfg]`-gated to
+   Linux so Windows/macOS keep the call they already ship. Verified by owner
+   via Settings → Send test alert: no crash, no new core dumps.
+
+   The overlay has the **same latent bug** and was only saved by
+   `overlayClickThrough = false` taking the non-unwrap `else` branch. If
+   click-through is ever enabled while the overlay window is hidden, expect
+   the same abort. Not fixed — no repro path today.
+
+   ### Cross-device sync — PROVEN, end to end, both directions
+
+   The thing that had never once run against the live database now has.
+
+   - Windows had uploaded **exactly 500** rows — that is `MAX_BACKUP_PER_RUN`
+     (`sync.ts:404`), i.e. one capped run, oldest-first. Covered
+     2026-07-13 → 2026-08-13.
+   - This box restored them on launch.
+   - The Linux match uploaded: `match_backup` went **500 → 501**, newest row
+     `2026-09-02T11:04:35Z`, Ladder / loss / Mono Red Dragons / Platinum 3 —
+     byte-for-byte the game just played.
+
+   **Still incomplete:** everything after 2026-08-13 is not backed up yet.
+   500 per launch, so the Windows box needs several more launches with cloud
+   on to finish the backfill. That is expected behaviour, not a bug.
+
+   Two asymmetries worth knowing:
+   - **Restore needs only sign-in.** `fetchBackupMatches` gates on
+     `cloudConfigured()` + a user, *not* the cloud toggle. Upload gates on
+     `isCloudEnabled()`. Different preconditions.
+   - **`cloud_enabled` is server-side and account-wide** (profiles row), not
+     per machine. Turning it on anywhere turns it on everywhere.
+
+   ### AppImage is a dead end on Arch — do not retry it
+
+   Three independent failures, each Arch being newer than linuxdeploy:
+
+   | Failure | Cause | Workaround |
+   |---|---|---|
+   | linuxdeploy won't start | needs `libfuse.so.2`; Arch has fuse3 only | `APPIMAGE_EXTRACT_AND_RUN=1` |
+   | `strip` fails on every lib | Arch libs carry `.relr.dyn`; vendored binutils predates RELR | `NO_STRIP=1` |
+   | GTK plugin dies | gdk-pixbuf 2.44 removed `/usr/lib/gdk-pixbuf-2.0/`, which it hardcodes | none |
+
+   And it would have been the wrong artifact anyway: this box is **glibc
+   2.44** vs Ubuntu 22.04's 2.35, so the result would refuse to start on most
+   distros. Superseded by the Arch package.
+
+   ### Arch package — built and verified, NOT installed
+
+   `packaging/arch/` (`8f2aa261`). Builds in **21 seconds**:
+
+   ```bash
+   # stage (binary must be a --no-bundle build, NOT one an appimage run patched)
+   cp src-tauri/target/release/filthy-net-deck  <build>/filthy-net-deck
+   cp packaging/arch/{PKGBUILD,*.install,*.desktop} <build>/
+   cp packaging/arch/hypr/filthy-net-deck.lua   <build>/filthy-net-deck.lua
+   for px in 32 64 128; do cp src-tauri/icons/${px}x${px}.png <build>/icon-$px.png; done
+   cd <build> && makepkg -f
+   ```
+
+   Produces `filthy-net-deck-bin-3.4.0-1-x86_64.pkg.tar.zst`, 11M. Contents
+   verified: `/usr/bin`, `.desktop`, icons ×3, and the Hyprland rules at
+   `/usr/share/filthy-net-deck/hypr/`.
+
+   ⚠️ **`makepkg` resolves local `source=()` entries by basename** — a
+   `hypr/x.lua` path fails. Keep them flat.
+
+   ⚠️ **Do not package `src-tauri/target/release/filthy-net-deck` after an
+   appimage build has run** — that step patches the binary with bundle-type
+   info. Rebuild with `--no-bundle` first.
+
+   **Not installed.** Doing so puts `/usr/bin/filthy-net-deck` beside the
+   owner's manual `~/.local/bin/filthy-net-deck`, with PATH order silently
+   deciding which the launcher runs. The swap (pacman -U, then remove the
+   manual binary + `~/.local/share/applications/filthy-net-deck.desktop`) is
+   the real end-to-end test and **needs the owner's go-ahead**.
+
+   ### Three Wayland no-ops — the app cannot fix these, only Hyprland can
+
+   `always_on_top`, `skip_taskbar` and **`set_position`** are all silent
+   no-ops under Wayland. `presence.rs` (`corner_position` → `set_position`)
+   and `toast.rs` genuinely ask for their corners; Wayland ignores them and
+   Hyprland centres the windows over the game. This is why the "RUNNING"
+   badge sat mid-screen.
+
+   Fixed in `~/.config/hypr/looknfeel.lua` (machine-local, **not in git** —
+   backup `looknfeel.lua.bak.1788347656`), and shipped as data in
+   `packaging/arch/hypr/filthy-net-deck.lua`.
+
+   ⚠️ **Hyprland positions with `monitor_w`/`monitor_h` arithmetic, never
+   percentages.** `move = "100%-360 16"` is silently discarded — no
+   `hyprctl configerrors` warning — and the window falls back to centred.
+   That cost a round trip. Correct: `move = "monitor_w-360 16"`.
+   Canonical example: `/usr/share/hypr/hyprland.lua:354`.
+
+   Verified by spawning throwaway windows titled exactly like the app's:
+   alert landed `[840, 16]`, badge `[16, 694]`. Both exact.
+
+   ### Verified working on this box
+
+   - Arena through Proton, Detailed Logs **ON** (142 `GreToClientEvent`)
+   - Match parsed correctly: Ladder Bo1, loss, Mono Red Dragons, Platinum 3,
+     opponent Vaccaria, 12 cards seen
+   - Signing keys present at `~/.tauri/`, pubkey **matches** `tauri.conf.json`
+   - `omarchy update` runs `omarchy-update-aur-pkgs`, so AUR packages are
+     covered by it — the chosen Settings wording is literally accurate
+   - Updater on Linux **degrades safely**: a missing platform key returns
+     `Error::TargetNotFound`, so `check()` throws and
+     `resolveUpdateOffer` falls to the version.json path with
+     `canAutoInstall: false`. It will NOT wrongly say "up to date".
+     (This resolves workflow-doc item 6, previously untested.)
+
+   ### What's left
+
+   1. **Settings → Check for updates, Linux text.** Owner picked: name the
+      version + release notes, then *"FND is installed through your package
+      manager. To update: `omarchy update`"*. **No download button** — hand-
+      installing a package file is wrong on Arch. Precedent to copy: the
+      existing `.dmg` sniff in `Settings.tsx:1333`.
+   2. **`version.json` download URL is wrong for Linux.** There is one
+      `downloadUrl` and it is the Windows `.exe` — a Linux user hitting the
+      fallback is offered `Filthy-Net-Deck-Setup-3.4.0.exe` today. Needs
+      platform-aware URLs or Linux-specific UI handling.
+   3. **Install the package** (owner go-ahead needed, see above).
+   4. **Website**: third download + `data-i18n` keys in all 8 locales or
+      `pipeline/site-i18n.test.mjs` fails CI. Plus OG regen + `?v=` bust.
+   5. **Version bump** — deliberately NOT done. Owner chose "prove the build
+      first", which was right: we would have bumped for an AppImage that
+      cannot build.
+   6. **AUR publish** as `filthy-net-deck-bin`; PKGBUILD then sources the
+      GitHub release tarball instead of local files.
+   7. **Linux CI** (workflow item 2) — nothing compiles the
+      `#[cfg(target_os = "linux")]` Proton code today. **Fix the vitest
+      issue first or CI is red on arrival.**
+
+   ### Test suite is red on this box — pre-existing, not from this work
+
+   19 failures, all `localStorage` undefined. Cause found: vitest leaves
+   jsdom's document URL at `about:blank`, and jsdom 29 throws
+   `SecurityError: localStorage is not available for opaque origins`. Both
+   files DO declare `// @vitest-environment jsdom`; three other jsdom files
+   pass because they never touch localStorage. Fix is
+   `environmentOptions.jsdom.url` in `vitest.config.ts`. 759/778 pass.
+   Windows reports 778/778, so this is environment-specific.
+
+   ### Trap that cost real time — `sync.ts` is invisible to grep
+
+   `src/services/cloud/sync.ts` contains **literal control bytes** (NUL and
+   0x1F) at line 604, inside a display-name validation regex. `file` reports
+   it as `data`, and plain `grep` returns **exit 1, no output** — a silent
+   false negative on a 700-line core file, not even a "binary file matches"
+   notice. Use `grep -a` or ripgrep. Worth fixing with escape sequences.
+
+   ### Machine-local, outside git — survives reboot, but nothing backs it up
+
+   - `~/.config/hypr/looknfeel.lua` — FND window rules (overlay/alert/badge)
+   - `~/.config/fontconfig/conf.d/60-filthy-net-deck.conf` — Selawik for
+     Segoe UI, real Cascadia Code. Do not remove; `--font-mono` silently
+     becomes proportional without it.
+   - `~/.local/bin/filthy-net-deck` + `~/.local/share/applications/
+     filthy-net-deck.desktop` — the manual install currently in use
+   - `~/.tauri/` — signing keys
+
+   Owner's app prefs of note: `fullscreen = true` (so the Hyprland
+   1160x690 size rule is correctly moot), `defaultPage = daily`,
+   `notifyMatchEnd = true`, `overlayClickThrough = false`.
+
+1. **Handed back to Claude. Grok is done. Full v3.4.0 deploy pipeline is live.**
 
    **Picked up by: Claude.** Owner is routing the next question to Claude
    (Omarchy installation — not specified here; wait for the owner to ask).
@@ -147,7 +340,7 @@ that is expected and does not block auto-update.
      updated, `PRIVACY_LASTMOD` bumped to 2026-09-02. Also fixed an orphaned
      `| Friend codes |` row in README that had escaped its table.
 
-0a. **2026-09-01 (night) — Linux/Omarchy box made to look like Windows.
+1a. **2026-09-01 (night) — Linux/Omarchy box made to look like Windows.
     IN PROGRESS. Resume here in the morning.**
 
     Owner's ask: *"perfect the Linux version on my machine — look and feel
@@ -281,7 +474,7 @@ that is expected and does not block auto-update.
     unchanged). Use `pkill -x filthy-net-deck` — a `pkill -f` pattern that
     matches the agent's own command line kills the shell (exit 144).
 
-1. **2026-09-01 (later) — Windows box brought up to date. No product change.**
+2. **2026-09-01 (later) — Windows box brought up to date. No product change.**
 
    The owner's **Windows** machine was 33 commits behind on v3.2.0 while the
    site served v3.3.1. Fast-forwarded to `5baca63`; `main` == `origin/main`.
@@ -340,7 +533,7 @@ that is expected and does not block auto-update.
 
    Next session: wait for the owner. Do not invent work. Do not bump.
 
-2. **Marketing site is multi-language. LIVE 2026-09-01. No version bump.**
+3. **Marketing site is multi-language. LIVE 2026-09-01. No version bump.**
 
    Shipped and verified on production. Next session: wait for the owner.
    Do not invent work. Do not bump. Do not re-translate.
@@ -432,7 +625,7 @@ that is expected and does not block auto-update.
    marketing-site change, and it is the owner's call whether the fix is
    the pragma or moving the storage behind a guard.
 
-3. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
+4. **v3.3.1 is live. 2026-09-01 session wrapped. Do not rebuild.**
 
    Owner confirmed end-to-end and will tell the friend to Check for
    updates. Next session: wait for the owner. Do not invent work.
@@ -485,7 +678,7 @@ that is expected and does not block auto-update.
    4. **Rotate the signing key** when convenient (passphrase was pasted
       into a chat transcript on 2026-08-27). Key id `67FCA9900F523D49`.
 
-3. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
+5. **v3.3.0 is live. 2026-09-01 session wrapped. Historical.**
 
    Owner confirmed the Linux white-`<select>` fix looks perfect and will
    keep testing. Next session: wait for the owner. Do not invent work.
@@ -503,7 +696,7 @@ that is expected and does not block auto-update.
    installed 3.2.0; OG share preview `?v=3.3.0`; Shane reply; rotate
    signing key `67FCA9900F523D49`.
 
-4. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
+6. **v3.3.0 was shipped 2026-08-31. Historical. Do not rebuild.**
 
    Shipped this session: overlay companion + quiet HUD + autostart ask +
    Arena-language i18n (source `30308a45`, installers `aa26eefc`). Signed
