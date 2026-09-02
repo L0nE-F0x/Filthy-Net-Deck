@@ -6,6 +6,18 @@
 **Live product version: v3.3.1** (Windows signed updater + macOS dmg)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 
+> ### ⚠️ 2026-09-02 · v3.4.0 is committed but UNPUSHED, on the **Windows** box
+>
+> `08f2c72` exists only in the Windows clone. **It is invisible from Omarchy
+> and dies with that clone** — same trap as the stash in entry 1. Whoever
+> finishes this release must either work on the Windows box, or get that
+> commit pushed first. `git log --oneline -1` should say
+> *release: v3.4.0 source — cross-device history restore*; if it says
+> `908db69 docs: wrap 2026-09-01…` you are on a machine that does not have it.
+>
+> Why it was not pushed: the site advertises v3.4.0 and links to an installer
+> that does not exist yet. See entry 0.
+
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
 attaches the new one.
@@ -18,90 +30,136 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **2026-09-02 — cross-device sync: the download half, built. NOT SHIPPED.**
+0. **v3.4.0 — cross-device sync. Committed, NOT pushed. Release half-finished.**
 
-   Owner moved between the Windows box and the Omarchy box, signed in, and
-   found an **empty Stats page** — no history, no decks. Verified: **not a
-   regression, the feature was never built.**
+   **Picked up by:** whoever is next (owner is routing the signed build to Grok).
+   Local `main` is **one commit ahead of origin**: `08f2c72`
+   *release: v3.4.0 source — cross-device history restore*.
 
-   `shared_matches` has one `upsert` and one `delete` in the whole client and
-   **no `select`**. Uploads have worked since v2.7.6; nothing ever read them
-   back. Match history is re-derived from whichever machine's Arena logs you
-   are sitting at (`useAppStore.refreshTracker` → `tracker_matches`), so a
-   second machine starts empty and stays empty. Cloud *decks* do download, but
-   every consumer keys them off local match history, so with no local matches
-   there are no hashes to look them up by — the deck library was empty for the
-   same root cause. Settings promised "syncing between machines" the whole
-   time. Full post-mortem: `docs/BACKEND-PHASE-2.md` §9.
+   | Thing | State |
+   |---|---|
+   | Supabase migration | ✅ **applied to the live project** by the owner 2026-09-02 |
+   | Source + version bump to 3.4.0 | ✅ committed |
+   | Site copy, OG card, version.json ×2 | ✅ committed |
+   | Signed Windows build | ❌ **not run** |
+   | `website/downloads/*3.4.0*` | ❌ do not exist |
+   | `website/updater/latest.json` | ⚠️ **deliberately still on 3.3.1** |
+   | Pushed / tagged | ❌ neither |
 
-   ### What was built (slice 8)
+   ### ⚠️ Do not push before the installer exists
 
-   - **`supabase/migrations/20260902120000_match_backup.sql`** — new private
-     per-user table, own-rows-only RLS, insert ceiling at 5000/day.
-   - **`src/services/cloud/backupSync.ts`** + 32 tests — allowlist row builder,
-     restore parser, merge helpers.
-   - `sync.ts`: `backupMatches` / `fetchBackupMatches` / `deleteBackupMatches`;
-     opt-out now deletes `match_backup` too.
-   - `syncRunner.ts`: backup rides the existing trigger; `restoreMatchesNow()`.
-   - Store: `trackerMatches` is now **derived** from `trackerLocal` +
-     `restoredMatches`. New action `restoreCloudHistory()`.
-   - Rust: new `tracker_deleted_ids` command so a restore cannot resurrect a
-     deleted match.
-   - Restore fires on launch, on sign-in, and on switching the toggle on.
+   Two independent breakages, both hit real users:
 
-   **Why a second table and not `shared_matches`:** that one is Standard +
-   Pioneer only, drops the queue / deck name / per-game detail, and hashes the
-   match id. Restoring from it would lose every Brawl, Limited and Historic
-   game and mislabel the rest. Widening it would pollute the crowd rollup — the
-   exact thing the 2026-08-27 cleanup existed to undo.
+   - `website/index.html` already links `downloads/Filthy-Net-Deck-Setup-3.4.0.exe`
+     and `downloads/Filthy-Net-Deck-3.4.0-universal.dmg`. Push without the files
+     and every Download click 404s.
+   - `updater/latest.json` was left on **3.3.1 on purpose**. Bumping it to 3.4.0
+     with a dead URL makes every *already-installed* copy prompt an update that
+     then fails. Update it only once the `.exe` is in place, in the same commit.
 
-   **Opponent data still never leaves the machine.** Owner was offered the
-   fidelity trade explicitly and kept the rule, so `opponentName`,
-   `opponentSeen`, `opponentBasics` and `opponentPlatform` are absent from the
-   backup. Restored matches show your side only, and the UI says so.
+   ### ▶ What is left, in order
 
-   **Arena's raw match id is still never uploaded.** `privacy.html` §3 makes
-   that claim unconditionally, so `match_backup.match_id` is the same salted
-   sha256 `shared_matches` uses. Consequence worth remembering: a restored
-   match carries that digest as its `matchId`, so the client hashes its **local**
-   ids before asking "do I already have this one?" — skip that and every machine
-   restores its own backup and doubles its history.
+   1. **Signed Windows build** (owner or Grok — key + passphrase both in `~/.tauri/`,
+      nothing needs typing):
 
-   ### ⚠️ Two things the next session must do, in this order
+      ```
+      TAURI_SIGNING_PRIVATE_KEY="$(tr -d '\r\n' < ~/.tauri/filthy-net-deck.key)" \
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(tr -d '\r\n' < ~/.tauri/filthy-net-deck-key-password.txt)" \
+      npm run tauri:build
+      ```
 
-   1. **Apply the migration.** It is written and **not applied**. Until it runs,
-      `backupMatches` fails its insert and `fetchBackupMatches` returns `[]` —
-      the app degrades to exactly today's behaviour, which is why shipping the
-      client first is safe.
-   2. **Open the app on the Windows box first** so it uploads its history.
-      Only then will the Omarchy box have anything to restore. Backfill is
-      capped at 500 matches per run, so a long history may take two launches.
+      Run it **on the Windows box** if there is a choice — Omarchy can produce the
+      NSIS + `.sig` but skips Authenticode.
 
-   Then bump the version and cut a release — this is user-visible and the
-   release notes should say so. Suggested: **v3.4.0** (the privacy page and
-   the site copy already say "new in v3.4.0").
+   2. **Stage the artifacts.** Build output lands in
+      `src-tauri/target/release/bundle/nsis/`:
+
+      ```
+      cp "src-tauri/target/release/bundle/nsis/Filthy Net Deck_3.4.0_x64-setup.exe"     website/downloads/Filthy-Net-Deck-Setup-3.4.0.exe
+      cp "src-tauri/target/release/bundle/nsis/Filthy Net Deck_3.4.0_x64-setup.exe.sig" website/downloads/Filthy-Net-Deck-Setup-3.4.0.exe.sig
+      ```
+
+   3. **`website/updater/latest.json`** — set `version` to `3.4.0`, `pub_date` to
+      the build time (ISO Z), `platforms.windows-x86_64.url` to
+      `https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.4.0.exe`,
+      and `signature` to the **entire contents of the `.exe.sig` file, verbatim**
+      (one long base64 line — not the file path, not a hash of it). `notes` should
+      match `website/version.json`, which already reads:
+      *"v3.4.0: sign in on another PC and your match history and deck library are
+      there — every format, opponents never uploaded."*
+
+   4. **Commit + push `main`.** Then confirm the *live* URLs, not the local files:
+      `filthy-net-deck.com/version.json` and `/updater/latest.json` must both say
+      3.4.0, and `/downloads/Filthy-Net-Deck-Setup-3.4.0.exe` must actually download.
+
+   5. **Tag `v3.4.0` and push the tag** — that is what fires
+      `.github/workflows/macos-build.yml`. It attaches a universal dmg to a GitHub
+      Release; curl it into `website/downloads/Filthy-Net-Deck-3.4.0-universal.dmg`
+      and commit. **index.html already points at that filename**, so nothing else
+      needs editing — but v2.8.2's dmg was built and never rolled, leaving macOS
+      visitors a version behind. Do not repeat that.
+
+   6. **Verify in-app** *Check for updates* offers **Update & restart**, not just a
+      browser download, and that the share preview shows the new OG card.
+
+   ### ⚠️ The feature itself has never actually run end to end
+
+   Tests cover the merge, the parser, the deck rebuild and the privacy allowlist —
+   **755 passing, up from 723**. What has *not* happened is a real signed-in client
+   uploading to Supabase and a second machine restoring from it. The table is
+   confirmed live (exists, and denies anon with `42501` exactly like
+   `shared_matches`), but the authenticated round trip is unproven.
+
+   **Test it in this order, or it will look broken:**
+   1. Install 3.4.0 on the **Windows** box and make sure the cloud toggle is on.
+      It uploads in the background — **capped at 500 matches per run**, so a long
+      history may need two launches.
+   2. *Then* sign in on **Omarchy**. History and deck library should appear.
+
+   Restoring before step 1 finishes shows an empty page, which is
+   indistinguishable from the original bug. Do not report it as a regression
+   without checking the Windows box uploaded first.
+
+   ### What v3.4.0 actually is
+
+   Owner moved between the two boxes, signed in, and found an empty Stats page.
+   **Not a regression — the download half of sync was never built.**
+   `shared_matches` had one upsert and one delete in the whole client and *no
+   select*; uploads have worked since v2.7.6 and nothing ever read them back.
+   Decks were empty for the same root cause: a deck is match history grouped by
+   list, and cloud decks only ever filled gaps in matches you already had locally.
+
+   New `match_backup` table — **not** a widening of `shared_matches`, which is
+   Standard/Pioneer-only and drops the queue, deck name and per-game detail.
+   Full post-mortem and every design call: **`docs/BACKEND-PHASE-2.md` §9.**
+
+   Three things not to undo without reading that section first:
+
+   - **Opponent fields are absent from the backup by choice** (`opponentName`,
+     `opponentSeen`, `opponentBasics`, `opponentPlatform`). Owner was offered the
+     fidelity trade and kept the rule. Restored matches show your side only, and
+     the UI says so.
+   - **`match_backup.match_id` is a salted sha256, not Arena's id** — privacy.html
+     §3 claims that unconditionally. Consequence: a restored match carries the
+     digest as its `matchId`, so the client hashes its **local** ids before asking
+     "do I have this one?". Remove that and every machine restores its own backup
+     and doubles its history.
+   - **`trackerMatches` is now derived** from `trackerLocal` + `restoredMatches`.
+     The 12s poll compares against `trackerLocal` or it re-sets forever, and
+     `onStatus` counts `trackerLocal` against Rust's `matchesRecorded` or every
+     status event fires a full re-pull.
 
    ### Verified on Windows this session
 
-   - `npx tsc --noEmit` clean · `npx eslint src pipeline --max-warnings 0` clean
-   - `npm test` → 93 files, **755 tests, all pass** (was 723; +32 new)
-   - `npm run build` clean · `cargo clippy --all-targets -- -D warnings` clean
-   - Both website pages re-parsed in a browser: new privacy table renders with
-     10 rows / 3 columns, new homepage card sits between "Your deck library"
-     and "Climb Tracker".
-   - **Not verified: the actual round trip.** No migration applied and no
-     second machine in this session, so upload→restore has never run against
-     the real DB. The merge, the parser and the deck rebuild are covered by
-     tests; the network path is not.
-
-   ### Public-surface rule — discharged
-
-   `AGENTS.md` line 21 binds a payload change to three surfaces. All three
-   updated: `README.md` (also fixed an orphaned `| Friend codes |` table row
-   that had escaped its table), `website/index.html` (new feature card),
-   `website/privacy.html` (new field table + "never uploaded" list re-checked
-   against the new payload), and `PRIVACY_LASTMOD` bumped to 2026-09-02.
-
+   - `npx tsc --noEmit` · `npx eslint src pipeline --max-warnings 0` ·
+     `cargo clippy --all-targets -- -D warnings` · `npm run build` — all clean
+   - `npm test` → 93 files, **755 tests pass**
+   - OG card regenerated and eyeballed: badge reads `NEW · v3.4.0 · CROSS-DEVICE SYNC`
+   - Both website pages re-parsed in a browser — new privacy field table (10 rows)
+     and the new homepage card both land in the right place
+   - `AGENTS.md` payload rule discharged: README + index.html + privacy.html all
+     updated, `PRIVACY_LASTMOD` bumped to 2026-09-02. Also fixed an orphaned
+     `| Friend codes |` row in README that had escaped its table.
 
 1. **2026-09-01 (later) — Windows box brought up to date. No product change.**
 
