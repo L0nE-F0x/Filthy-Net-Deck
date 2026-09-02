@@ -18,53 +18,70 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.4.0 is live on Windows and macOS. E2E round-trip still open.**
+0. **Handed back to Claude. Grok is done. Full v3.4.0 deploy pipeline is live.**
 
-   Picked up from Claude session `6de94560` on the **Windows** box. Source
-   was rebased onto `origin/main` (marketing-site i18n + radar) so it is no
-   longer a local-only `08f2c72`. Release commit `5b90bf8`, tag `v3.4.0`.
+   **Picked up by: Claude.** Owner is routing the next question to Claude
+   (Omarchy installation — not specified here; wait for the owner to ask).
+   Grok finished the release on the Windows box and is **not** continuing.
+
+   Owner message, 2026-09-02, to transmit verbatim in intent:
+
+   - Grok is done. Great work, stop.
+   - The **full deploy pipeline is complete** — do not rebuild, re-sign, or
+     re-tag v3.4.0.
+   - Owner is **running the round-trip test now** on Windows (Check for
+     updates → Update & restart, then cloud toggle on, then upload). They
+     will **report the result back to Claude**, including what happens after
+     the update and the match upload.
+   - Owner also has **something to ask Claude about the Omarchy installation**.
+     That is the next product question. Do not invent work while waiting.
+
+   HEAD at handoff: `89bb78c` *docs: verify v3.4.0 live on Netlify*
+   (this wrap is the next commit). Tag `v3.4.0`. `main` == `origin/main`
+   after this push — **pull on Omarchy before doing anything**, the old
+   `08f2c72` hash is gone (rebased).
 
    | Thing | State |
    |---|---|
    | Supabase migration | ✅ applied to the live project by the owner 2026-09-02 |
-   | Source + version bump to 3.4.0 | ✅ `7a12d4f` (rebased onto origin) |
+   | Source + version bump to 3.4.0 | ✅ `7a12d4f` (rebased onto origin; i18n homepage underneath) |
    | Site copy, OG card, version.json ×2 | ✅ live |
    | Homepage i18n (`sync.title` / `sync.body` in 7 catalogs) | ✅ live; `es.json` serves `Dos PCs, un historial` |
    | Signed Windows build | ✅ NSIS 7,882,406 bytes, updater `.sig` 428 bytes |
    | Live `/downloads/Filthy-Net-Deck-Setup-3.4.0.exe` | ✅ 200, 7,882,406 bytes, both hosts |
    | Live `/updater/latest.json` | ✅ 3.4.0, signature matches the `.sig` file verbatim |
    | Pushed / tagged | ✅ `origin/main` + tag `v3.4.0` |
-   | macOS CI | ✅ run 33611379291, 9m36s, attached the dmg to the GH Release |
+   | macOS CI | ✅ run 33611379291, 9m36s, dmg attached to the GH Release |
    | macOS dmg on the homepage | ✅ live 200, 22,772,864 bytes, both hosts. sha256 `5b6ae26b…3c39e0` |
-   | In-app Update & restart | ❌ not clicked on a 3.3.1 install yet |
-   | Cross-device round trip against live Supabase | ❌ never run |
+   | In-app Update & restart | ⏳ **owner is doing this now** on the Windows 3.3.1 install |
+   | Cross-device round trip against live Supabase | ⏳ **owner is doing this now** — report comes back to Claude |
 
-   ### ▶ What is left, in order
+   ### ⚠️ Do not treat an empty Omarchy Stats page as a regression yet
 
-   1. **Verify in-app** *Check for updates* on an existing 3.3.1 Windows
-      install offers **Update & restart**, not just a browser download.
-      Share preview should show `og-image.png?v=3.4.0`.
+   The authenticated round trip has still never been observed. Tests cover
+   merge / parser / deck rebuild / privacy allowlist / homepage keys —
+   **778 passing**, 94 files. The table is live (exists, denies anon with
+   `42501` like `shared_matches`). What has *not* been proven is a signed-in
+   3.4.0 client uploading and a second machine restoring.
 
-   2. **The round-trip test** (never run — do not skip):
+   **Order the owner is following — empty restore first looks like the
+   original bug:**
+   1. Windows: Check for updates → Update & restart (or install 3.4.0).
+   2. Cloud toggle **on**. Upload is background, **capped at 500 matches
+      per launch** — a long history may need two launches.
+   3. *Then* Omarchy sign-in. History and deck library should appear.
 
-   ### ⚠️ The feature itself has never actually run end to end
+   Owner will tell Claude what actually happened. Until that report, do not
+   start a "sync is still broken" investigation.
 
-   Tests cover the merge, the parser, the deck rebuild, the privacy allowlist
-   and the new homepage keys — **778 passing** (94 files; was 755 before the
-   i18n catalog tests landed on origin). What has *not* happened is a real
-   signed-in client uploading to Supabase and a second machine restoring from
-   it. The table is confirmed live (exists, and denies anon with `42501`
-   exactly like `shared_matches`), but the authenticated round trip is unproven.
+   ### What Claude should do
 
-   **Test it in this order, or it will look broken:**
-   1. Install 3.4.0 on the **Windows** box and make sure the cloud toggle is on.
-      It uploads in the background — **capped at 500 matches per run**, so a long
-      history may need two launches.
-   2. *Then* sign in on **Omarchy**. History and deck library should appear.
-
-   Restoring before step 1 finishes shows an empty page, which is
-   indistinguishable from the original bug. Do not report it as a regression
-   without checking the Windows box uploaded first.
+   1. **Wait for the owner.** First question is the Omarchy installation.
+      Second is the round-trip report. Do not invent work. Do not bump.
+   2. Pull `origin/main` on Omarchy before building or installing anything
+      there — this wrap exists so that clone can see the live 3.4.0 state.
+   3. Do not undo the three design calls in § below without reading
+      `docs/BACKEND-PHASE-2.md` §9.
 
    ### What v3.4.0 actually is
 
