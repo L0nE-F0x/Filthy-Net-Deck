@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Filthy Net Deck
+Comment=MTG Arena meta companion — Standard & Pioneer
+Exec=/usr/bin/filthy-net-deck %u
+Icon=filthy-net-deck
+Terminal=false
+Categories=Game;
+MimeType=x-scheme-handler/fnd;
+StartupWMClass=filthy-net-deck
+Keywords=MTG;Arena;Magic;

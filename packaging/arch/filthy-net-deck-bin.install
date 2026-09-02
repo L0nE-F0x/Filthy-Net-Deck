@@ -1,0 +1,29 @@
+post_install() {
+  cat <<'MSG'
+
+  Filthy Net Deck is installed.
+
+  Hyprland users — add the window rules, or the match alert and the
+  presence badge will open centred over Arena. Wayland does not let the
+  app place them itself:
+
+      dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")
+
+  Put that line in ~/.config/hypr/hyprland.lua (or any file it loads),
+  then run: hyprctl reload
+
+  Arena must run in BORDERLESS WINDOWED mode. Exclusive fullscreen covers
+  the overlay and no compositor rule can lift a window above it.
+
+  Match tracking needs Arena's detailed logs:
+      Options -> Account -> Detailed Logs (Plugin Support)
+  then restart Arena.
+
+  Updates come from your package manager, not from inside the app.
+
+MSG
+}
+
+post_upgrade() {
+  echo "  Filthy Net Deck upgraded. If the overlay misbehaves: hyprctl reload"
+}

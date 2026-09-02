@@ -1,0 +1,57 @@
+# Maintainer: Lone Fox <kyubi9tail@gmail.com>
+#
+# Prebuilt package. FND is a Tauri app: building from source needs the Rust
+# toolchain plus a full npm install, which is a long compile on every user's
+# machine for a binary we already build and sign ourselves. `-bin` keeps
+# installs and upgrades quick.
+#
+# AppImage is deliberately not used. Arch's toolchain is newer than
+# linuxdeploy's: fuse2 is gone, system libraries carry .relr.dyn relocations
+# its bundled strip cannot parse, and gdk-pixbuf 2.44 removed the loaders
+# directory its GTK plugin hardcodes. A native package sidesteps all three and
+# links against system libraries, which is correct on a rolling release.
+
+pkgname=filthy-net-deck-bin
+_pkgname=filthy-net-deck
+pkgver=3.4.0
+pkgrel=1
+pkgdesc="MTG Arena meta companion and match tracker — Standard & Pioneer"
+arch=('x86_64')
+url="https://filthy-net-deck.com"
+license=('LicenseRef-proprietary')
+provides=("${_pkgname}=${pkgver}")
+conflicts=("${_pkgname}")
+depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'librsvg')
+optdepends=(
+  'hyprland: window rules for the overlay, match alert and presence badge'
+  'steam: run MTG Arena through Proton'
+)
+install="${pkgname}.install"
+options=('!strip' '!debug')
+
+# Local build for now. The published package sources the signed tarball from
+# the GitHub release tag instead.
+source=(
+  "${_pkgname}"
+  "${_pkgname}.desktop"
+  "${_pkgname}.lua"
+  "icon-32.png"
+  "icon-64.png"
+  "icon-128.png"
+)
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+  install -Dm755 "${srcdir}/${_pkgname}"          "${pkgdir}/usr/bin/${_pkgname}"
+  install -Dm644 "${srcdir}/${_pkgname}.desktop"  "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+  # Hyprland rules. Shipped as data, never written into the user's config —
+  # the .install scriptlet prints the one line to source it.
+  install -Dm644 "${srcdir}/${_pkgname}.lua" \
+    "${pkgdir}/usr/share/${_pkgname}/hypr/${_pkgname}.lua"
+
+  for _px in 32 64 128; do
+    install -Dm644 "${srcdir}/icon-${_px}.png" \
+      "${pkgdir}/usr/share/icons/hicolor/${_px}x${_px}/apps/${_pkgname}.png"
+  done
+}
