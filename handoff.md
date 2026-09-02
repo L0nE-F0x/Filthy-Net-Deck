@@ -3,8 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.4.0** (Windows signed updater live; macOS dmg
-in this commit).
+**Live product version: v3.4.0** (Windows signed updater + macOS dmg)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
@@ -19,7 +18,7 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **v3.4.0 Windows is live. This commit rolls the macOS dmg. E2E still open.**
+0. **v3.4.0 is live on Windows and macOS. E2E round-trip still open.**
 
    Picked up from Claude session `6de94560` on the **Windows** box. Source
    was rebased onto `origin/main` (marketing-site i18n + radar) so it is no
@@ -36,21 +35,17 @@ that is expected and does not block auto-update.
    | Live `/updater/latest.json` | ✅ 3.4.0, signature matches the `.sig` file verbatim |
    | Pushed / tagged | ✅ `origin/main` + tag `v3.4.0` |
    | macOS CI | ✅ run 33611379291, 9m36s, attached the dmg to the GH Release |
-   | macOS dmg on the homepage | ✅ this commit — 22,772,864 bytes, sha256 `5b6ae26b…3c39e0`. index.html already pointed at the filename |
+   | macOS dmg on the homepage | ✅ live 200, 22,772,864 bytes, both hosts. sha256 `5b6ae26b…3c39e0` |
    | In-app Update & restart | ❌ not clicked on a 3.3.1 install yet |
    | Cross-device round trip against live Supabase | ❌ never run |
 
    ### ▶ What is left, in order
 
-   1. **Confirm this dmg is live** after the push:
-      `https://filthy-net-deck.com/downloads/Filthy-Net-Deck-3.4.0-universal.dmg`
-      must be 200 and ~22.8 MB, not a 404. Until then the Mac button 404s.
-
-   2. **Verify in-app** *Check for updates* on an existing 3.3.1 Windows
+   1. **Verify in-app** *Check for updates* on an existing 3.3.1 Windows
       install offers **Update & restart**, not just a browser download.
       Share preview should show `og-image.png?v=3.4.0`.
 
-   3. **The round-trip test** (never run — do not skip):
+   2. **The round-trip test** (never run — do not skip):
 
    ### ⚠️ The feature itself has never actually run end to end
 
