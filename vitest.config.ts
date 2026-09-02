@@ -10,6 +10,8 @@ export default defineConfig({
     // The handful of component tests opt in per-file with
     // `// @vitest-environment jsdom` rather than slowing the whole suite down.
     environment: "node",
+    // Runs in every environment; see the file for why it no-ops outside jsdom.
+    setupFiles: ["src/test/setupJsdomStorage.ts"],
     include: [
       "src/**/*.test.ts",
       "src/**/*.test.tsx",
