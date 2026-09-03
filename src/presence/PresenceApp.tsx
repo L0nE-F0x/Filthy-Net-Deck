@@ -7,73 +7,36 @@
  * settings worth changing *between* matches; the mid-match knobs stay on the
  * HUD's own pill.
  *
- * Rust owns show/hide (driven by the Arena process watcher) and the window
- * resize around the menu. Browser demo: `/?demo#/presence`.
+ * Rust owns show/hide (driven by the Arena process watcher). The cog menu is
+ * a second window (`#/presence-menu`) so this surface stays badge-sized.
+ * Browser demo (`/?demo#/presence`) still opens the menu inline.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type { LiveMatch } from "../types/tracker";
-import { bootThemeFromStorage } from "../services/theme";
 import { isTauri } from "../services/appUpdater";
-import {
-  PREFS_KEY,
-  readOverlayPrefs,
-  writeOverlayPrefs,
-  type OverlayPrefs,
-} from "../overlay/overlayPrefs";
-import { applyLocalePref, readLocalePref, useLocale } from "../i18n";
-
-/** Fire-and-forget command; older builds simply don't have it. */
-async function call(cmd: string, args?: Record<string, unknown>) {
-  if (!isTauri()) return;
-  try {
-    await invoke(cmd, args);
-  } catch {
-    /* command unavailable in browser / older builds */
-  }
-}
+import { PresenceMenu } from "./PresenceMenu";
+import { presenceCall } from "./presenceCall";
+import { usePresenceChrome } from "./usePresenceChrome";
 
 export function PresenceApp() {
-  const { t } = useLocale();
-  const [prefs, setPrefs] = useState<OverlayPrefs>(() => readOverlayPrefs());
+  const { prefs, patch } = usePresenceChrome();
   const [menuOpen, setMenuOpen] = useState(false);
   const [inMatch, setInMatch] = useState(false);
   const [hot, setHot] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const measureRef = useRef<HTMLDivElement | null>(null);
   const lastSize = useRef("");
-
-  useEffect(() => {
-    bootThemeFromStorage();
-    document.documentElement.classList.add("overlay-root");
-    document.body.classList.add("overlay-body");
-    // macOS windows can't be transparent (see overlay.rs) — paint it opaque.
-    if (/Mac OS X|Macintosh/.test(navigator.userAgent)) {
-      document.documentElement.classList.add("overlay-macos");
-    }
-    return () => {
-      document.documentElement.classList.remove("overlay-root");
-      document.body.classList.remove("overlay-body");
-      document.documentElement.classList.remove("overlay-macos");
-    };
-  }, []);
+  const tauri = isTauri();
 
   // Match state only drives the dim — Rust decides whether we're visible.
   useEffect(() => {
     let unlistenLive: (() => void) | undefined;
-    let unlistenPrefs: (() => void) | undefined;
     let cancelled = false;
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key !== PREFS_KEY) return;
-      setPrefs(readOverlayPrefs());
-      applyLocalePref(readLocalePref());
-    };
-    window.addEventListener("storage", onStorage);
-
     void (async () => {
-      if (!isTauri()) return;
+      if (!tauri) return;
       try {
         const snap = await invoke<LiveMatch | null>("tracker_live");
         if (!cancelled) setInMatch(snap?.phase === "playing" || snap?.phase === "ended");
@@ -88,95 +51,112 @@ export function PresenceApp() {
       } catch {
         /* ignore */
       }
+    })();
+
+    return () => {
+      cancelled = true;
+      unlistenLive?.();
+    };
+  }, [tauri]);
+
+  useEffect(() => {
+    if (!tauri) return;
+    let unlisten: (() => void) | undefined;
+    void (async () => {
       try {
-        // Reliable cross-webview prefs push (the `storage` event above is the
-        // fallback — it does not always cross WebView2 windows).
-        unlistenPrefs = await listen("prefs:overlay", () => {
-          if (cancelled) return;
-          setPrefs(readOverlayPrefs());
-          applyLocalePref(readLocalePref());
+        unlisten = await listen<boolean>("presence:menu", (e) => {
+          setMenuOpen(!!e.payload);
         });
       } catch {
         /* ignore */
       }
     })();
-
-    return () => {
-      cancelled = true;
-      window.removeEventListener("storage", onStorage);
-      unlistenLive?.();
-      unlistenPrefs?.();
-    };
-  }, []);
-
-  const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
+    return () => unlisten?.();
+  }, [tauri]);
 
   /**
-   * Keep the OS window exactly the size of what we paint. This window is
-   * always on top of Arena, so every pixel it owns is a pixel Arena can't be
-   * clicked through — measure the real content box and hand it to Rust, which
-   * re-anchors to the bottom-left corner.
+   * Keep the OS window exactly the size of the badge. Growing it around the
+   * cog menu is what pushed the window off-screen on Wayland — the menu is
+   * its own window now.
    */
   useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el) return;
     const report = () => {
       const bar = el.querySelector(".fnd-presence-bar");
-      const menu = el.querySelector(".fnd-presence-menu");
       if (!bar) return;
       const barBox = bar.getBoundingClientRect();
-      const menuBox = menu?.getBoundingClientRect();
-      const width = Math.ceil(Math.max(barBox.width, menuBox?.width ?? 0));
-      // 8px is the flex gap between the menu and the bar (see index.css).
-      const height = Math.ceil(barBox.height + (menuBox ? menuBox.height + 8 : 0));
-      // Resizing the window resizes the root, which re-fires the observer —
-      // bail on a no-op so the two can't chase each other.
+      const width = Math.ceil(barBox.width);
+      const height = Math.ceil(barBox.height);
       const key = `${width}x${height}`;
       if (key === lastSize.current) return;
       lastSize.current = key;
-      void call("presence_set_size", { width, height });
+      void presenceCall("presence_set_size", { width, height });
     };
     report();
-    // Fonts/labels settle a frame late, and the menu animates in.
     const ro = new ResizeObserver(report);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [menuOpen, inMatch]);
+  }, [inMatch]);
 
-  // Dismiss so the window shrinks back off Arena: click outside, Escape, or
-  // clicking away into the game (which blurs this window).
+  const closeMenu = useCallback(
+    (force = true) => {
+      if (!tauri) {
+        setMenuOpen(false);
+        return;
+      }
+      void presenceCall(force ? "presence_close_menu" : "presence_close_menu_if_unfocused");
+    },
+    [tauri],
+  );
+
+  const openMenu = useCallback(() => {
+    if (!tauri) {
+      setMenuOpen(true);
+      return;
+    }
+    const menu = measureRef.current?.querySelector(".fnd-presence-menu");
+    const box = menu?.getBoundingClientRect();
+    const width = Math.ceil(box?.width || 264);
+    const height = Math.ceil(box?.height || 320);
+    setMenuOpen(true);
+    void presenceCall("presence_open_menu", { width, height });
+  }, [tauri]);
+
+  const toggleMenu = useCallback(() => {
+    if (menuOpen) closeMenu(true);
+    else openMenu();
+  }, [menuOpen, closeMenu, openMenu]);
+
   useEffect(() => {
     if (!menuOpen) return;
-    const close = () => {
-      setMenuOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu(true);
     };
     const onDown = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (menuRef.current?.contains(t)) return;
-      // The cog runs its own toggle on click — closing here too would reopen it.
-      if (t?.closest(".fnd-presence-cog")) return;
-      close();
+      if (tauri) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".fnd-presence-menu")) return;
+      if (target?.closest(".fnd-presence-cog")) return;
+      closeMenu(true);
     };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    const onBlur = () => {
+      if (!tauri) {
+        closeMenu(true);
+        return;
+      }
+      window.setTimeout(() => closeMenu(false), 100);
     };
-    window.addEventListener("mousedown", onDown);
     window.addEventListener("keydown", onKey);
-    window.addEventListener("blur", close);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("blur", onBlur);
     return () => {
-      window.removeEventListener("mousedown", onDown);
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("blur", close);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("blur", onBlur);
     };
-  }, [menuOpen]);
+  }, [menuOpen, tauri, closeMenu]);
 
-  const patch = useCallback((p: Record<string, unknown>) => {
-    writeOverlayPrefs(p);
-    setPrefs(readOverlayPrefs());
-  }, []);
-
-  // Dim while a match is live — the HUD is the primary surface then. Hover
-  // always wakes it, and an open menu is never dimmed.
   const dimmed = inMatch && !hot && !menuOpen;
 
   return (
@@ -186,106 +166,13 @@ export function PresenceApp() {
       onMouseEnter={() => setHot(true)}
       onMouseLeave={() => setHot(false)}
     >
-      {menuOpen && (
-        <div className="fnd-presence-menu" ref={menuRef} role="menu" aria-label={t("presence.menuAria")}>
-          <p className="fnd-presence-menu-title">{t("presence.title")}</p>
-          <label className="fnd-presence-row">
-            <input
-              type="checkbox"
-              checked={prefs.overlayEnabled}
-              onChange={(e) => {
-                patch({ overlayEnabled: e.target.checked });
-                void call("overlay_set_enabled", { enabled: e.target.checked });
-              }}
-            />
-            <span>{t("presence.inGame")}</span>
-          </label>
-          <label className="fnd-presence-row">
-            <input
-              type="radio"
-              name="fnd-ov-mode"
-              checked={prefs.windowMode !== "companion"}
-              onChange={() => {
-                patch({ overlayWindowMode: "overlay", overlayWindowModeChosen: true });
-                void call("overlay_set_window_mode", { companion: false });
-              }}
-            />
-            <span>{t("presence.hud")}</span>
-          </label>
-          <label className="fnd-presence-row">
-            <input
-              type="radio"
-              name="fnd-ov-mode"
-              checked={prefs.windowMode === "companion"}
-              onChange={() => {
-                patch({ overlayWindowMode: "companion", overlayWindowModeChosen: true });
-                void call("overlay_set_window_mode", { companion: true });
-              }}
-            />
-            <span>{t("presence.normal")}</span>
-          </label>
-          <label className="fnd-presence-row">
-            <input
-              type="checkbox"
-              checked={prefs.postMatch}
-              onChange={(e) => {
-                patch({ overlayPostMatch: e.target.checked });
-                void call("overlay_set_post_match", { enabled: e.target.checked });
-              }}
-            />
-            <span>{t("presence.postMatch")}</span>
-          </label>
-          <label className="fnd-presence-slider">
-            <span>{t("presence.opacity")}</span>
-            <input
-              type="range"
-              min={55}
-              max={100}
-              step={1}
-              value={Math.round(prefs.opacity * 100)}
-              onChange={(e) => patch({ overlayOpacity: Number(e.target.value) / 100 })}
-              aria-label="Overlay opacity"
-            />
-            <em>{Math.round(prefs.opacity * 100)}%</em>
-          </label>
-
-          <p className="fnd-presence-menu-title">Alerts</p>
-          <label className="fnd-presence-row">
-            <input
-              type="checkbox"
-              checked={prefs.notifyTopmost}
-              onChange={(e) => {
-                patch({ notifyTopmost: e.target.checked });
-                void call("toast_set_enabled", { enabled: e.target.checked });
-              }}
-            />
-            <span>Show over fullscreen Arena</span>
-          </label>
-
-          <button
-            type="button"
-            className="fnd-presence-danger"
-            title="The HUD ignores the mouse from now on — turn it back off in the main app (Settings → In-game overlay)"
-            onClick={() => {
-              patch({ overlayClickThrough: true });
-              void call("overlay_set_click_through", { ignore: true });
-              setMenuOpen(false);
-            }}
-          >
-            Enable click-through
-            <em>undo from the main app</em>
-          </button>
-          <button
-            type="button"
-            className="fnd-presence-open"
-            onClick={() => {
-              setMenuOpen(false);
-              void call("presence_open_main");
-            }}
-          >
-            Open Filthy Net Deck →
-          </button>
+      {tauri && (
+        <div className="fnd-presence-measure" ref={measureRef} aria-hidden="true">
+          <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => undefined} inert />
         </div>
+      )}
+      {!tauri && menuOpen && (
+        <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => closeMenu(true)} />
       )}
 
       <div className="fnd-presence-bar">
@@ -293,7 +180,7 @@ export function PresenceApp() {
           type="button"
           className="fnd-presence-mark"
           title="Filthy Net Deck is running — click to open it"
-          onClick={() => void call("presence_open_main")}
+          onClick={() => void presenceCall("presence_open_main")}
         >
           <img src="/app-icon.png" alt="" width={20} height={20} />
           <span className="fnd-presence-dot" aria-hidden="true" />
@@ -306,6 +193,7 @@ export function PresenceApp() {
           className={`fnd-presence-cog${menuOpen ? " is-open" : ""}`}
           title="Overlay settings"
           aria-expanded={menuOpen}
+          aria-haspopup="menu"
           onClick={toggleMenu}
         >
           ⚙

@@ -14,9 +14,9 @@ const routed = (name: string) =>
 
 /*
  * Route-level code splitting: each Tauri webview (main / overlay / toast /
- * presence) loads only its own JS. Eager imports used to pull the full main
- * app (all pages + store + meta services) into every secondary window, so a
- * 30-line toast paid for the whole companion.
+ * presence / presence-menu) loads only its own JS. Eager imports used to pull
+ * the full main app (all pages + store + meta services) into every secondary
+ * window, so a 30-line toast paid for the whole companion.
  */
 const App = lazy(() => import("./App"));
 const OverlayApp = lazy(() =>
@@ -28,10 +28,14 @@ const ToastApp = lazy(() =>
 const PresenceApp = lazy(() =>
   import("./presence/PresenceApp").then((m) => ({ default: m.PresenceApp })),
 );
+const PresenceMenuApp = lazy(() =>
+  import("./presence/PresenceMenuApp").then((m) => ({ default: m.PresenceMenuApp })),
+);
 
 function Root() {
   if (routed("overlay")) return <OverlayApp />;
   if (routed("toast")) return <ToastApp />;
+  if (routed("presence-menu")) return <PresenceMenuApp />;
   if (routed("presence")) return <PresenceApp />;
   return <App />;
 }

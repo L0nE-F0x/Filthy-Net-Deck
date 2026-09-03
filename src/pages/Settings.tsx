@@ -10,7 +10,7 @@ import { downloadInstaller, openExternal } from "../services/openExternal";
 import { DONATE_URL, FEEDBACK_URL, PRIVACY_URL, appFeedbackUrl } from "../services/site";
 import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
 import { isTauri } from "../services/appUpdater";
-import { updatesViaPackageManager } from "../services/platform";
+import { overlayClickThroughAvailable, updatesViaPackageManager } from "../services/platform";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import {
   detectSystemLocale,
@@ -719,6 +719,7 @@ export const Settings = memo(function Settings() {
                   <option value="minimal">Minimal (text only)</option>
                 </select>
               </label>
+              {overlayClickThroughAvailable() ? (
               <label className="settings-toggle-row">
                 <input
                   type="checkbox"
@@ -733,6 +734,7 @@ export const Settings = memo(function Settings() {
                   </em>
                 </span>
               </label>
+              ) : null}
               <label className="settings-slider-row">
                 <span>
                   <strong>Panel opacity</strong>

@@ -153,9 +153,10 @@ const TOPICS: Topic[] = [
         <p>
           It starts as a minimal bar — <K>▾</K> expands the full list. The minimized bar shows
           library / lands / record / clock; the <K>⚙</K> pill in the expanded footer changes
-          opacity and toggles <em>without alt-tabbing</em>. Careful with{" "}
+          opacity and toggles <em>without alt-tabbing</em>. On Windows and macOS, careful with{" "}
           <strong>click-through</strong>: the overlay stops taking mouse input entirely — turn it
-          back off in Settings in the main app.
+          back off in Settings in the main app. Linux has no click-through toggle: GTK cannot
+          punch clicks through a transparent HUD.
         </p>
         <p>
           If Arena runs exclusive fullscreen and hides the overlay, switch Arena to borderless

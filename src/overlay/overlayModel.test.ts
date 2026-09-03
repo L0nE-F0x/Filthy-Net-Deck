@@ -14,6 +14,7 @@ import {
   normalizeOpacity,
   normalizeWindowMode,
   opponentCardsSeenCount,
+  overlayHudReady,
   parseManaCost,
   pipText,
   pipTone,
@@ -308,6 +309,31 @@ describe("showSideboardTab", () => {
         bestOf: 1,
         sideboard: [{ grpId: 1, remaining: 2, total: 2 }],
         sideboardTotal: 2,
+      }),
+    ).toBe(true);
+  });
+});
+
+describe("overlayHudReady", () => {
+  it("is false until a live match has something to paint", () => {
+    expect(overlayHudReady(null)).toBe(false);
+    expect(
+      overlayHudReady({
+        matchId: "m",
+        phase: "playing",
+        startedAt: 1,
+        eventId: "Ladder",
+        bestOf: 1,
+      }),
+    ).toBe(false);
+    expect(
+      overlayHudReady({
+        matchId: "m",
+        phase: "playing",
+        startedAt: 1,
+        eventId: "Ladder",
+        bestOf: 1,
+        opponentName: "Rival",
       }),
     ).toBe(true);
   });

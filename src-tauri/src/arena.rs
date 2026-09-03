@@ -91,9 +91,11 @@ pub fn start(app: AppHandle) {
                     // for a second renderer all day when the game is closed.
                     crate::overlay::prewarm_if_enabled(&app);
                 } else {
-                    // Drop secondary webviews when Arena quits. Each is a full
-                    // Chromium renderer; hiding leaves that RAM held. Teardown
-                    // (unlike create) is safe on the main thread.
+                    // Drop secondary webviews when Arena quits. Windows
+                    // destroys them (WebView2 RAM). Linux hides them —
+                    // WebKitGTK teardown aborts WebKitWebProcess (NVIDIA
+                    // EGL/Mesa) and Omarchy paints a crash banner over the
+                    // desktop. Teardown/hide is safe on the main thread.
                     let handle = app.clone();
                     let _ = app.run_on_main_thread(move || {
                         crate::presence::destroy(&handle);

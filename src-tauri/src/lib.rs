@@ -78,6 +78,52 @@ pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
     true
 }
 
+/// Drop a secondary webview (overlay / toast / presence / presence-menu).
+///
+/// Windows: `destroy()` — each WebView2 window is a Chromium renderer, and
+/// holding one hidden between rare uses (toasts, Arena-quit) wastes RAM.
+///
+/// Linux: `hide()` only. Destroying a WebKitGTK webview tears down
+/// `WebKitWebProcess` through NVIDIA EGL + Mesa TLS destructors, which abort
+/// inside `exit()`. The parent lives; systemd-coredump still records it and
+/// Omarchy posts a "Process crashed: WebKitWebProcess" banner over Arena.
+/// Hide keeps the renderer warm (same as the overlay between matches).
+pub(crate) fn drop_secondary_webview(win: &tauri::WebviewWindow) {
+    #[cfg(target_os = "linux")]
+    {
+        let _ = win.hide();
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = win.destroy();
+    }
+}
+
+/// `tao` on Linux resolves this to `gtk_widget_get_window().unwrap()`. A
+/// window built `.visible(false)` has no GdkWindow until it is realized, so
+/// the unwrap fires inside a non-unwinding GLib dispatch and aborts the
+/// process. That killed the app at the end of every match (toast.rs) and is
+/// latent in the overlay if click-through is enabled while the HUD is hidden.
+///
+/// After `show()` the request is queued behind realize and is safe. Skip the
+/// call entirely while the window reports it is not visible.
+pub(crate) fn set_ignore_cursor_events_safe(win: &tauri::WebviewWindow, ignore: bool) {
+    #[cfg(target_os = "linux")]
+    {
+        if !win.is_visible().unwrap_or(false) {
+            return;
+        }
+    }
+    let _ = win.set_ignore_cursor_events(ignore);
+}
+
+/// Call only after `show()`. Linux still needs this — `is_visible()` can
+/// lag the queued realize, and skipping here would leave the toast eating
+/// Arena clicks.
+pub(crate) fn set_ignore_cursor_events_after_show(win: &tauri::WebviewWindow, ignore: bool) {
+    let _ = win.set_ignore_cursor_events(ignore);
+}
+
 /// Surface the main window. Every reopen path (tray click, tray menu,
 /// second-instance, presence badge, deep link) must go through here so a
 /// hide that dropped exclusive fullscreen is undone.
@@ -236,6 +282,7 @@ pub fn run() {
             overlay::overlay_get_geometry,
             overlay::overlay_save_geometry,
             overlay::overlay_set_click_through,
+            overlay::overlay_set_extent,
             overlay::overlay_set_post_match,
             overlay::overlay_set_window_mode,
             overlay::overlay_user_close,
@@ -248,6 +295,9 @@ pub fn run() {
             presence::presence_is_enabled,
             presence::presence_set_size,
             presence::presence_open_main,
+            presence::presence_open_menu,
+            presence::presence_close_menu,
+            presence::presence_close_menu_if_unfocused,
             arena::arena_is_running,
             main_window_set_fullscreen,
             main_window_hide_to_tray,
@@ -273,8 +323,8 @@ pub fn run() {
                 // is excluded: --hidden / tray logic owns that. Fullscreen
                 // is excluded too — hide-to-tray has to drop the OS bit, and
                 // persisting that would reopen windowed against the pref.
-                // Overlay is denylisted so its position is not restored over
-                // the main UI.
+                // Overlay / presence chrome is denylisted so restored geometry
+                // cannot fight the compositor rules (or sit over the main UI).
                 app.handle().plugin(
                     tauri_plugin_window_state::Builder::new()
                         .with_state_flags(
@@ -282,7 +332,7 @@ pub fn run() {
                                 - tauri_plugin_window_state::StateFlags::VISIBLE
                                 - tauri_plugin_window_state::StateFlags::FULLSCREEN,
                         )
-                        .with_denylist(&["overlay"])
+                        .with_denylist(&["overlay", "presence", "presence-menu", "toast"])
                         .build(),
                 )?;
                 if std::env::args().any(|a| a == "--hidden") {
@@ -388,9 +438,10 @@ pub fn run() {
 
             Ok(())
         })
-        // Only `main` hides to the tray. The overlay, toast and presence
-        // webviews are Rust-owned chrome: if this handler catches them too, a
-        // stray minimize event hides the very window we just asked to show.
+        // Only `main` hides to the tray. The overlay, toast, presence and
+        // presence-menu webviews are Rust-owned chrome: if this handler
+        // catches them too, a stray minimize event hides the very window we
+        // just asked to show.
         .on_window_event(|window, event| {
             if window.label() != "main" {
                 return;

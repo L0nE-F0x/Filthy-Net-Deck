@@ -30,3 +30,13 @@ export function detectOs(
 export function updatesViaPackageManager(os: OsName = detectOs()): boolean {
   return os === "linux";
 }
+
+/**
+ * Overlay click-through needs the OS to punch mouse events through a
+ * transparent always-on-top window. tao/GTK cannot do that on Linux (and
+ * asking while the widget is hidden aborts the process). Hide the control
+ * there rather than ship a toggle that cannot work.
+ */
+export function overlayClickThroughAvailable(os: OsName = detectOs()): boolean {
+  return os === "windows" || os === "macos";
+}

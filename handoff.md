@@ -5,6 +5,7 @@
 
 **Live product version: v3.4.0** (Windows signed updater + macOS dmg)
 · repo `L0nE-F0x/Filthy-Net-Deck`
+· **Next: Claude ships early Linux (Omarchy/Arch) as a real version bump — see START HERE.**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -18,22 +19,189 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **2026-09-02 (evening + night) — Omarchy is a supported target now. Match-end
-   crash fixed, cross-device sync PROVEN, Arch package BUILT AND INSTALLED,
-   update routes fixed for all three platforms. IN PROGRESS.**
+0. **2026-09-03 afternoon — Grok wrapping. Owner go-ahead: ship the early
+   Linux (Omarchy/Arch) version. Claude runs the full deploy pipeline.**
 
-   Owner decision this session: **ship a Linux release, Omarchy/Arch only**,
-   and add it to the deploy pipeline. Not local-only any more. Nothing is
-   live yet — no version bump, site untouched, no AUR upload.
+   **Picked up by: Claude.** Grok is done on this box. Owner is saving Grok
+   Build credits for something else later today. Do not wait for Grok.
 
-   ### ▶ Resume here — pick up at "What's left" below
+   ### Owner decision (explicit)
 
-   Everything committed **and pushed**. `main` == `origin/main` at `7e010c59`.
-   Working tree clean; nothing is half-applied.
+   "everything seems pretty good" after playing with the 10:28 hide-not-destroy
+   package. **Ship an early Linux version now.** Omarchy/Arch only — not
+   AppImage, not deb, not rpm, not mobile. Full `AGENTS.md` definition of
+   done, including Windows signed updater + macOS dmg roll, because this is
+   a real version bump, not a Linux-only git push.
 
-   ⚠️ Pushed is **not** shipped. No version bump, site untouched, nothing on
-   the AUR — and the macOS `.exe` fix is deliberately waiting for the Linux
-   release rather than going out alone. See "What's left".
+   Live product is still **v3.4.0**. Nothing below is on origin except
+   `acd880e6` and its ancestors. AUR does not exist. Site has no Linux
+   install path (third button is GitHub source).
+
+   ### Git state at wrap (do not invent a different one)
+
+   ```
+   branch: main
+   origin/main: acd880e6  docs: main is pushed, and the soundscape fix is confirmed working
+   HEAD:        f8a27d15  fix(linux): presence badge frame, workspace and anchor in the Hyprland rules
+                (ahead 1, not pushed)
+   working tree: DIRTY — ~24 modified + 5 untracked presence-menu files
+   version everywhere: 3.4.0 (package.json, version.ts, Cargo.toml, tauri.conf.json,
+                      website/version.json, public/version.json, updater/latest.json)
+   ```
+
+   Untracked (must be in the product commit):
+
+   ```
+   src/presence/PresenceMenu.tsx
+   src/presence/PresenceMenuApp.tsx
+   src/presence/PresenceMenu.test.tsx
+   src/presence/presenceCall.ts
+   src/presence/usePresenceChrome.ts
+   ```
+
+   Do **not** commit: `~/.config/hypr/looknfeel.lua`,
+   `~/.config/systemd/user/omarchy-crash-watch.service.d/ignore-webkit.conf`,
+   `/tmp/fnd-arch-build/*`, `src-tauri/target/`.
+
+   ### What the dirty tree actually contains (commit this, then bump)
+
+   One product commit is fine; do not split into "linux-only" vs "shared" unless
+   you have a reason. **Presence-menu is not `#[cfg(linux)]`** — it ships to
+   Windows and macOS as a fifth webview. Call that out in WHATS_NEW / notes.
+
+   | Area | What changed |
+   |---|---|
+   | Presence cog | Own window `#/presence-menu` so Wayland `set_position` + Hyprland-resize-about-centre cannot shove the badge off-screen. Capabilities + authStorage comments updated for five webviews. |
+   | Overlay collapse | `overlay_set_extent` + Linux `hyprland_force_size` via `hyprctl dispatch hl.dsp.window.resize` on the overlay title. GTK will not shrink a webview; Wayland `setSize` is often a no-op. `overlayHudReady()` refuses to expand an empty shell. Chevron is `no-drag` so WebKitGTK does not eat the second click. |
+   | Linux hide-not-destroy | `drop_secondary_webview`: Linux `hide()`, Windows/macOS `destroy()`. Stops toast-linger / cog-close / Arena-quit from tearing down `WebKitWebProcess` (NVIDIA EGL + Mesa TLS abort inside `exit()`). Menu `open_menu` re-shows a hidden window. |
+   | Click-through | Hidden on Linux (`overlayClickThroughAvailable()`). Rust forces `false`. Asking GTK while hidden aborts the process — same class as the 09-02 match-end crash. |
+   | Tracker | Proton `Player.log` follows Steam `libraryfolders.vdf` extra libraries, not only `~/.local/share/Steam`. |
+   | Overlay click-through guard | Applied after `show()`, never on an unrealized GTK widget. |
+   | CI | New `rust-linux` job in `.github/workflows/ci.yml` (ubuntu, WebKitGTK deps, `cargo test --lib`). Confirm green after the first push that includes it. |
+   | PKGBUILD | `ttf-cascadia-code` optdepend. |
+   | Hyprland packaged rules | `packaging/arch/hypr/filthy-net-deck.lua` now docks badge/menu/overlay/alert to Arena (including `special:scratchpad` by **name**, not workspace id `-98`), z-order tick, presence-menu window, no orange frame. |
+   | Help/Settings | Click-through copy gated; Linux Settings omits the toggle. |
+
+   ### Installed on this Omarchy box right now
+
+   - `filthy-net-deck-bin 3.4.0-1` → `/usr/bin/filthy-net-deck` mtime **2026-09-03 10:28:53**
+     (the hide-not-destroy + overlay-extent build). Owner relaunched; said it
+     feels good. Local package still at
+     `/tmp/fnd-arch-build/filthy-net-deck-bin-3.4.0-1-x86_64.pkg.tar.zst` —
+     that file is **3.4.0**, rebuild after the version bump.
+   - Crash banner filtered **on this machine only**:
+     `~/.config/systemd/user/omarchy-crash-watch.service.d/ignore-webkit.conf`
+     `OMARCHY_CRASH_IGNORE=^(WebKitWebProcess|WebKitNetworkProcess)$`.
+     Do not `omarchy toggle crash capture`. Consider a sentence in the
+     PKGBUILD `.install` scriptlet so AUR users know; do **not** ship a
+     systemd drop-in that mutes WebKit for the whole session.
+   - Live compositor rules are `~/.config/hypr/looknfeel.lua` (Omarchy
+     `o.window`, **not in git**). AUR users get
+     `dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")`
+     (`hl.window_rule`). Diff the follow-Arena script in both before
+     publish so AUR users are not a revision behind this box.
+
+   ### Claude's job — ordered. Source-only is not a release.
+
+   Copy the `AGENTS.md` checklist into the PR/commit message and tick it.
+
+   1. **Commit the dirty tree** (product + tests + packaged lua + CI job).
+      `handoff.md` can ride along. Run:
+      `npx tsc --noEmit` · `npx eslint src pipeline --max-warnings 0` ·
+      `npm test` · `cargo test --lib` in `src-tauri`.
+      Node 26 localStorage was already fixed (`00d5fdc5`); do not "fix" it
+      again. `sync.ts` has literal NUL/0x1F — use `rg` / `grep -a`.
+   2. **Agree the version with the owner.** Conservative early Linux = **3.4.1**.
+      Marketing Linux as a platform = **3.5.0**. Do not bump until they pick.
+      `node scripts/bump-version.mjs <ver> "<notes>"` already writes the
+      per-OS `downloads` map and **omits Linux on purpose**. Bare
+      `downloadUrl` is the download page, not the Windows `.exe` (that trap
+      is already on origin: `42f23765` / `f873c3fb`). After bump, refresh
+      `Cargo.lock`.
+   3. **Windows signed NSIS on this Omarchy box.** Keys in `~/.tauri/`,
+      cargo-xwin, local NSIS. Authenticode is skipped on Linux — expected,
+      does not block auto-update. Copy setup + `.sig` into
+      `website/downloads/`. Fill `website/updater/latest.json`
+      (`windows-x86_64` url + signature). Prefer Update & restart.
+   4. **Linux package at the new `pkgver`.** `--no-bundle` then the
+      `packaging/arch/` makepkg recipe (flat basenames). Never package a
+      binary an AppImage run has patched. Do not overwrite `/usr/bin`
+      under a live FND process — tray-quit first. `pkexec` hangs waiting
+      for a password; let the owner type it.
+   5. **AUR `filthy-net-deck-bin` BEFORE the site names it.** PKGBUILD must
+      source a GitHub-release tarball, not local `SKIP` files. Site copy is
+      an **install command** (`yay -S filthy-net-deck-bin` / `omarchy update`),
+      never a `.pkg.tar.zst` download button (that bypasses pacman and the
+      next `omarchy update` will not know the app exists). `omarchy update`
+      already runs `omarchy-update-aur-pkgs`, so Settings wording is accurate
+      once the AUR package exists.
+   6. **macOS.** Tag `vX.Y.Z` so `.github/workflows/macos-build.yml` builds
+      the universal dmg. Roll that dmg into `website/downloads/` **and**
+      update `index.html` links. v2.8.2's dmg was built and never rolled —
+      do not repeat. The old "macOS gets the Windows .exe" bug is already
+      fixed in `version.json`; this tag is so they get a matching dmg.
+   7. **Marketing site.** Third OS entry + new `data-i18n` keys in **all 8**
+      locales or `pipeline/site-i18n.test.mjs` fails CI. English lives inline
+      in `index.html`. Version strings stay out of catalogs (`{version}`).
+      OG/Twitter meta + `website/assets/_gen_og.py` + `og-image.png?v=<ver>`.
+      Upload payload did **not** change — do not churn README/privacy unless
+      you touch `matchSync` / `healthPing` / `backupSync`.
+   8. **Push `main`, confirm Netlify.** Live `version.json` / `updater/latest.json`
+      / OG card, not just local files. Then the version tag if not already
+      pushed for macOS CI.
+
+   Linux `updater/latest.json` has **no platform key on purpose**.
+   `plugin-updater` throws `TargetNotFound` → Settings falls to
+   `version.json` with `canAutoInstall: false` and the package-manager
+   sentence. Do not add a Linux key to the signed updater.
+
+   ### Do not do
+
+   - AppImage (three independent Arch failures; glibc 2.44 vs Ubuntu 2.35).
+   - `hyprctl set_prop max_size` — it crashed Hyprland (socket disconnect,
+     SIGKILL). Overlay shrink uses `dispatch … window.resize` only.
+   - `WEBKIT_DISABLE_DMABUF_RENDERER=1` as a product default (perf hit for
+     a cosmetic dump).
+   - Re-debug the 09-02 match-end abort (`toast.rs` unwrap on unrealized
+     GTK window) — fixed in `1f7c54de`, verified.
+   - Re-debug Mesa/NVIDIA `WebKitWebProcess` abort inside `exit()` — upstream,
+     parent lives, banner is Omarchy crash-watch.
+   - Android/iOS / APK tracking promises.
+   - In-draft overlay, paywalls, Alchemy/Historic.
+   - Claiming the Linux UI is live after only a git push.
+
+   ### Accepted early-Linux gaps (do not block the ship)
+
+   - Overlay drag-persist: Wayland `set_position` is a no-op; we dock to
+     Arena's top-left. Owner said saved overlay position is not a big deal.
+   - Click-through does not exist on Linux (hidden, not broken-looking).
+   - GTK/WebKit often refuses a client size under ~200×200; compositor clips
+     the badge. Overlay collapse is the `overlay_set_extent` path.
+   - `always_on_top` / `skip_taskbar` remain Wayland no-ops; Hyprland rules
+     cover them.
+   - Autostart ("Start with PC") not play-tested on uwsm.
+   - Selawik is user-local (not in extra). Cascadia is a PKGBUILD optdepend.
+   - WebKit children can still dump on **full process quit**; crash-watch
+     ignore is machine-local. hide-not-destroy covers toast/overlay/presence
+     during a session.
+   - Workspace follow uses workspace **name** `special:scratchpad`. Numeric
+     id `-98` is a silent Hyprland no-op.
+
+   ### Verified on this box (do not re-prove)
+
+   Proton Arena + Detailed Logs; match parse; cloud restore 500 Windows rows
+   + Linux match uploaded as 501; soundscape needs `gst-plugins-good` (hard
+   depend); updater degrades safely on Linux; signing pubkey matches
+   `tauri.conf.json`; owner played with overlay expand/collapse, post-match
+   graph, presence badge, and the 10:28 binary.
+
+   Historical detail from 09-02/03 (crash stacks, AppImage autopsy, sync
+   caps, Hyprland token traps) stays below. Do not re-litigate it.
+
+   `docs/TWO-MACHINE-WORKFLOW.md` items 1, 2, 6 are now decided (real Arch
+   package, Linux CI job in the tree, AUR updates). Fold anything durable
+   into `AGENTS.md` if you touch that file; do not workshop the seven
+   questions with the owner again.
 
    ### The crash — fixed, root cause, do not re-debug
 
@@ -293,24 +461,50 @@ that is expected and does not block auto-update.
    real jsdom window, which is still reachable as `globalThis.jsdom.window`.
    No-ops outside jsdom. This was the stated precondition for Linux CI.
 
-   ### What's left
+   ### What's left — superseded 2026-09-03 afternoon
 
-   1. **Website**: third entry + `data-i18n` keys in all 8 locales or
-      `pipeline/site-i18n.test.mjs` fails CI. Plus OG regen + `?v=` bust.
-      ⚠️ Make it an **install command** (`yay -S filthy-net-deck-bin`), not a
-      download button — handing an Arch user a `.pkg.tar.zst` bypasses pacman's
-      database and their next `omarchy update` will not know the app exists.
-      That is the same call as the in-app one. **So the AUR package must exist
-      first** (item 2), or the site names something that does not resolve.
-   2. **AUR publish** as `filthy-net-deck-bin`; PKGBUILD then sources the
-      GitHub release tarball instead of local files. Everything else in it is
-      now proven by a real install.
-   3. **Version bump** — still NOT done, deliberately. Owner is holding the
-      macOS `.exe` fix to ship with the Linux release rather than alone.
-   4. **Linux CI** (workflow item 2) — nothing compiles the
-      `#[cfg(target_os = "linux")]` Proton code today. The vitest blocker is
-      gone, so this is unblocked.
-   5. ~~Push.~~ Done — `7e010c59`.
+   Owner verified in-game and told Grok to ship. The live checklist is the
+   **START HERE ship brief** at the top of this file (commit dirty tree →
+   version bump with owner → Windows NSIS → Linux pkgver → AUR before site
+   copy → macOS dmg roll → Netlify). Do not use this older numbered list;
+   several items in it are stale (cog-menu "unverified", macOS `.exe` fix
+   "unshipped" — that fix is already on origin as `42f23765`/`f873c3fb`).
+
+   ### 2026-09-03 Linux parity audit (while owner at school run)
+
+   Fixed in the working tree + live Hyprland config:
+
+   - Overlay click-through on a hidden GTK window would abort the process
+     the same way toast did. Guarded; applied after `show()`.
+   - Proton `Player.log` now follows Steam `libraryfolders.vdf` extra
+     libraries, not only `~/.local/share/Steam`.
+   - HUD overlay + match-end alert now follow Arena onto
+     `special:scratchpad` and raise above Proton (same script as the badge).
+   - Linux Rust CI job added so Proton cfg actually compiles.
+   - Presence cog is its own window (earlier this session).
+
+   Local 3.4.0 package at `/tmp/fnd-arch-build/` **was** installed (10:11
+   overlay-extent, then 10:28 hide-not-destroy). `/usr/bin/filthy-net-deck`
+   mtime 2026-09-03 10:28:53. Rebuild after the version bump; do not
+   reinstall 3.4.0-1 over a bumped tree.
+
+   Left on purpose / still not Windows-identical:
+
+   - Overlay drag-persist: Wayland `set_position` is a no-op, so saved HUD
+     geometry cannot restore; we dock to Arena's top-left each map.
+   - GTK/WebKit minimum ~200×200 on the badge — compositor clips; click-steal
+     from leftover transparent pixels if clip fails.
+   - Overlay click-through itself is still a GTK maybe: we no longer crash,
+     but Wayland may not punch clicks through to Arena.
+   - Autostart ("Start with PC") not play-tested on Omarchy/uwsm.
+   - Fonts: Selawik+Cascadia are user-local, not packaged (Selawik is not in
+     extra). Cascadia is now a PKGBUILD optdepend.
+   - `always_on_top` / `skip_taskbar` remain Wayland no-ops; Hyprland rules
+     cover them.
+   - WebKitWebProcess SIGABRT on shutdown: upstream, cosmetic.
+   - Overlay latent click-through if `overlayClickThrough=true` *and* the
+     window is hidden is fixed in the 10:28 binary (Linux also hides the
+     Settings toggle).
 
    ### Trap that cost real time — `sync.ts` is invisible to grep
 
@@ -329,12 +523,16 @@ that is expected and does not block auto-update.
    - ~~`~/.local/bin/filthy-net-deck` + its `.desktop`~~ — **removed.** The
      pacman package owns `/usr/bin/filthy-net-deck` now.
    - `~/.tauri/` — signing keys
+   - `~/.config/systemd/user/omarchy-crash-watch.service.d/ignore-webkit.conf`
+     — mutes Omarchy's "Process crashed: WebKitWebProcess" banner. Machine
+     local on purpose.
 
    Owner's app prefs of note: `fullscreen = true` (so the Hyprland
    1160x690 size rule is correctly moot), `defaultPage = daily`,
    `notifyMatchEnd = true`, `overlayClickThrough = false`.
 
 1. **Handed back to Claude. Grok is done. Full v3.4.0 deploy pipeline is live.**
+   *(Historical — 2026-09-02 Windows box wrap. Today's job is entry 0 at the top.)*
 
    **Picked up by: Claude.** Owner is routing the next question to Claude
    (Omarchy installation — not specified here; wait for the owner to ask).

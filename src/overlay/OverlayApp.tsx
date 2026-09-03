@@ -24,6 +24,7 @@ import {
   type ArenaCardMeta,
 } from "../services/arenaMeta";
 import { isTauri } from "../services/appUpdater";
+import { overlayClickThroughAvailable } from "../services/platform";
 import {
   drawPct,
   formatClock,
@@ -33,6 +34,7 @@ import {
   landDrawHeadline,
   matchupHudLine,
   opponentCardsSeenCount,
+  overlayHudReady,
   parseManaCost,
   pipText,
   pipTone,
@@ -66,6 +68,11 @@ const SNAP_PX = 24;
 const COLLAPSED_H = 34;
 /** Expanded window never goes below this when restoring. */
 const MIN_EXPANDED_H = 120;
+/** Match overlay.rs builder clamps — GTK will not shrink the webview unless
+ *  max-size is clamped to the bar when collapsing. */
+const OVERLAY_MIN_W = 164;
+const OVERLAY_MAX_W = 420;
+const OVERLAY_MAX_H = 900;
 /** Grow the panel to at least this tall while the post-match summary is up. */
 const SUMMARY_MIN_H = 252;
 /** First-run overlay vs companion chooser. */
@@ -82,6 +89,45 @@ interface OverlayGeometry {
   expanded: boolean;
 }
 
+
+/** Resize the HUD. Prefers the Rust command (GTK clamp + Hyprland resize). */
+async function applyOverlayExtent(opts: {
+  width: number;
+  height: number;
+  compact: boolean;
+}): Promise<void> {
+  const w = Math.min(OVERLAY_MAX_W, Math.max(OVERLAY_MIN_W, opts.width));
+  const h = opts.compact ? COLLAPSED_H : Math.max(opts.height, MIN_EXPANDED_H);
+  if (isTauri()) {
+    try {
+      await invoke("overlay_set_extent", {
+        width: w,
+        height: h,
+        compact: opts.compact,
+      });
+      return;
+    } catch {
+      /* older builds */
+    }
+  }
+  try {
+    const { getCurrentWindow, LogicalSize } = await import(
+      "@tauri-apps/api/window"
+    );
+    const win = getCurrentWindow();
+    if (opts.compact) {
+      await win.setMaxSize(new LogicalSize(OVERLAY_MAX_W, COLLAPSED_H));
+      await win.setMinSize(new LogicalSize(OVERLAY_MIN_W, COLLAPSED_H));
+      await win.setSize(new LogicalSize(w, COLLAPSED_H));
+      return;
+    }
+    await win.setMinSize(new LogicalSize(OVERLAY_MIN_W, MIN_EXPANDED_H));
+    await win.setMaxSize(new LogicalSize(OVERLAY_MAX_W, OVERLAY_MAX_H));
+    await win.setSize(new LogicalSize(w, h));
+  } catch {
+    /* browser demo */
+  }
+}
 
 function loadMetaCache(): MetaBundle | null {
   try {
@@ -124,8 +170,9 @@ function seasonRecord(
 /** Passive-HUD mode: make this window ignore cursor events (clicks fall through). */
 async function applyClickThrough(ignore: boolean) {
   if (!isTauri()) return;
+  const on = overlayClickThroughAvailable() && ignore;
   try {
-    await invoke("overlay_set_click_through", { ignore });
+    await invoke("overlay_set_click_through", { ignore: on });
   } catch {
     /* older builds without the command */
   }
@@ -558,6 +605,8 @@ export function OverlayApp() {
   const appliedSummaryRef = useRef<string | null>(null);
   /** Panel height before the summary grew it — restored on the next match. */
   const preSummaryH = useRef<number | null>(null);
+  /** Disk said expanded, but the HUD had nothing to paint yet. */
+  const restoreExpandedWhenReady = useRef(false);
 
   /** Snapshot used by every persist path so saves stay consistent. */
   const geometrySnapshot = useCallback(
@@ -698,7 +747,7 @@ export function OverlayApp() {
 
       if (isTauri()) {
         try {
-          const { getCurrentWindow, LogicalSize } = await import(
+          const { getCurrentWindow } = await import(
             "@tauri-apps/api/window"
           );
           const win = getCurrentWindow();
@@ -713,17 +762,17 @@ export function OverlayApp() {
             if (geo) {
               expandedH.current = Math.max(geo.height, MIN_EXPANDED_H);
               expandedW.current = geo.width;
-              const wantCompact = !geo.expanded;
-              compactRef.current = wantCompact;
-              setCompact(wantCompact);
+              // Never map tall-and-empty. Expand later once live data exists.
+              restoreExpandedWhenReady.current = geo.expanded;
+              compactRef.current = true;
+              setCompact(true);
               programmaticResize.current = true;
               try {
-                await win.setSize(
-                  new LogicalSize(
-                    geo.width,
-                    wantCompact ? COLLAPSED_H : expandedH.current,
-                  ),
-                );
+                await applyOverlayExtent({
+                  width: geo.width,
+                  height: COLLAPSED_H,
+                  compact: true,
+                });
               } finally {
                 window.setTimeout(() => {
                   programmaticResize.current = false;
@@ -739,7 +788,11 @@ export function OverlayApp() {
               if (wantCompact && curH > COLLAPSED_H + 4) {
                 programmaticResize.current = true;
                 try {
-                  await win.setSize(new LogicalSize(curW, COLLAPSED_H));
+                  await applyOverlayExtent({
+                    width: curW,
+                    height: COLLAPSED_H,
+                    compact: true,
+                  });
                 } finally {
                   window.setTimeout(() => {
                     programmaticResize.current = false;
@@ -951,7 +1004,7 @@ export function OverlayApp() {
     if (!isTauri()) return;
     void (async () => {
       try {
-        const { getCurrentWindow, LogicalSize } = await import(
+        const { getCurrentWindow } = await import(
           "@tauri-apps/api/window"
         );
         const win = getCurrentWindow();
@@ -969,11 +1022,17 @@ export function OverlayApp() {
             } else if (curH >= MIN_EXPANDED_H) {
               expandedH.current = curH;
             }
-            await win.setSize(new LogicalSize(w, COLLAPSED_H));
+            await applyOverlayExtent({
+              width: w,
+              height: COLLAPSED_H,
+              compact: true,
+            });
           } else {
-            await win.setSize(
-              new LogicalSize(w, Math.max(expandedH.current, MIN_EXPANDED_H)),
-            );
+            await applyOverlayExtent({
+              width: w,
+              height: Math.max(expandedH.current, MIN_EXPANDED_H),
+              compact: false,
+            });
             await ensureOnScreen();
           }
         } finally {
@@ -1025,7 +1084,7 @@ export function OverlayApp() {
       }
       void (async () => {
         try {
-          const { getCurrentWindow, LogicalSize } = await import(
+          const { getCurrentWindow } = await import(
             "@tauri-apps/api/window"
           );
           const win = getCurrentWindow();
@@ -1046,15 +1105,26 @@ export function OverlayApp() {
           expandedW.current = w;
           programmaticResize.current = true;
           try {
-            if (wantExpanded) {
+            const ready = overlayHudReady(live);
+            if (wantExpanded && ready) {
+              restoreExpandedWhenReady.current = false;
               compactRef.current = false;
               setCompact(false);
-              await win.setSize(new LogicalSize(w, h));
+              await applyOverlayExtent({
+                width: w,
+                height: h,
+                compact: false,
+              });
               await ensureOnScreen();
             } else {
+              restoreExpandedWhenReady.current = wantExpanded && !ready;
               compactRef.current = true;
               setCompact(true);
-              await win.setSize(new LogicalSize(w, COLLAPSED_H));
+              await applyOverlayExtent({
+                width: w,
+                height: COLLAPSED_H,
+                compact: true,
+              });
             }
           } finally {
             window.setTimeout(() => {
@@ -1066,7 +1136,14 @@ export function OverlayApp() {
         }
       })();
     }
-  }, [liveMatchId, livePhase, setCompactMode]);
+  }, [liveMatchId, livePhase, live, setCompactMode]);
+
+  useEffect(() => {
+    if (!restoreExpandedWhenReady.current) return;
+    if (!overlayHudReady(live)) return;
+    restoreExpandedWhenReady.current = false;
+    setCompactMode(false);
+  }, [live, setCompactMode]);
 
   // Post-match summary: briefly expand tall enough for the card. Does NOT
   // write geometry — the user's saved size/mode is restored on the next match.
@@ -1085,7 +1162,7 @@ export function OverlayApp() {
       }
       void (async () => {
         try {
-          const { getCurrentWindow, LogicalSize } = await import(
+          const { getCurrentWindow } = await import(
             "@tauri-apps/api/window"
           );
           const win = getCurrentWindow();
@@ -1103,12 +1180,11 @@ export function OverlayApp() {
           }
           programmaticResize.current = true;
           try {
-            await win.setSize(
-              new LogicalSize(
-                w,
-                Math.max(wasCompact ? expandedH.current : curH, SUMMARY_MIN_H),
-              ),
-            );
+            await applyOverlayExtent({
+              width: w,
+              height: Math.max(wasCompact ? expandedH.current : curH, SUMMARY_MIN_H),
+              compact: false,
+            });
             await ensureOnScreen();
           } finally {
             // Hold the flag long enough that onResized cannot persist the grow.
@@ -1128,7 +1204,7 @@ export function OverlayApp() {
       const target = Math.max(expandedH.current, MIN_EXPANDED_H);
       void (async () => {
         try {
-          const { getCurrentWindow, LogicalSize } = await import(
+          const { getCurrentWindow } = await import(
             "@tauri-apps/api/window"
           );
           const win = getCurrentWindow();
@@ -1137,7 +1213,11 @@ export function OverlayApp() {
           if (size.height / factor <= target + 2) return;
           programmaticResize.current = true;
           try {
-            await win.setSize(new LogicalSize(size.width / factor, target));
+            await applyOverlayExtent({
+              width: size.width / factor,
+              height: target,
+              compact: false,
+            });
           } finally {
             window.setTimeout(() => {
               programmaticResize.current = false;
@@ -1263,7 +1343,7 @@ export function OverlayApp() {
     if (!showChooser || !isTauri()) return;
     void (async () => {
       try {
-        const { getCurrentWindow, LogicalSize } = await import(
+        const { getCurrentWindow } = await import(
           "@tauri-apps/api/window"
         );
         const win = getCurrentWindow();
@@ -1278,9 +1358,11 @@ export function OverlayApp() {
         }
         programmaticResize.current = true;
         try {
-          await win.setSize(
-            new LogicalSize(w, Math.max(curH, CHOOSER_MIN_H)),
-          );
+          await applyOverlayExtent({
+            width: w,
+            height: Math.max(curH, CHOOSER_MIN_H),
+            compact: false,
+          });
         } finally {
           window.setTimeout(() => {
             programmaticResize.current = false;
@@ -1321,7 +1403,7 @@ export function OverlayApp() {
     !companion &&
     prefs.idleDim &&
     !hot &&
-    !prefs.clickThrough &&
+    !(overlayClickThroughAvailable() && prefs.clickThrough) &&
     !menuOpen &&
     !ended &&
     !showChooser;
@@ -1360,13 +1442,13 @@ export function OverlayApp() {
         </>
       )}
 
-      <header
-        className="overlay-bar"
-        data-tauri-drag-region
-        onMouseDown={onDragHandleDown}
-        onMouseUp={onDragHandleUp}
-      >
-        <div className="overlay-bar-main" data-tauri-drag-region>
+      <header className="overlay-bar">
+        <div
+          className="overlay-bar-main"
+          data-tauri-drag-region
+          onMouseDown={onDragHandleDown}
+          onMouseUp={onDragHandleUp}
+        >
           {resultLabel ? (
             <span className={`overlay-pill overlay-pill--${hud.result}`}>
               {resultLabel}
@@ -1412,7 +1494,12 @@ export function OverlayApp() {
             ) : null}
           </span>
         </div>
-        <div className="overlay-bar-stats" data-tauri-drag-region>
+        <div
+          className="overlay-bar-stats"
+          data-tauri-drag-region
+          onMouseDown={onDragHandleDown}
+          onMouseUp={onDragHandleUp}
+        >
           {compact && prefs.barRecord && session.wr != null ? (
             <span
               className="overlay-stat overlay-stat--rec"
@@ -1470,6 +1557,7 @@ export function OverlayApp() {
             <MatchClock startedAt={hud.startedAt} />
           ) : null}
         </div>
+        <div className="overlay-bar-actions">
         <button
           type="button"
           className="overlay-icon-btn"
@@ -1496,6 +1584,7 @@ export function OverlayApp() {
             ×
           </button>
         ) : null}
+        </div>
       </header>
 
       {showChooser ? <OverlayModeChooser onPick={pickWindowMode} /> : null}
@@ -1780,7 +1869,7 @@ export function OverlayApp() {
                   />
                   <span>{t("overlay.postMatch")}</span>
                 </label>
-                {companion ? null : (
+                {companion || !overlayClickThroughAvailable() ? null : (
                 <button
                   type="button"
                   className="overlay-menu-danger"

@@ -7,7 +7,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, LogicalSize, Manager, WebviewUrl, WebviewWindowBuilder};
 
 const OVERLAY_LABEL: &str = "overlay";
 const ENABLED_FILE: &str = "overlay-enabled";
@@ -24,9 +24,15 @@ const MIN_W: f64 = 164.0;
 const MIN_H: f64 = 32.0;
 const MAX_W: f64 = 420.0;
 const MAX_H: f64 = 900.0;
+/// Collapsed bar height. Keep in sync with OverlayApp COLLAPSED_H.
+const COLLAPSED_H: f64 = 34.0;
 
 static ENABLED: AtomicBool = AtomicBool::new(true);
 static POST_MATCH: AtomicBool = AtomicBool::new(true);
+/// Last requested click-through. Applied on `show()` because Linux cannot
+/// set this on an unrealized (hidden) GTK widget — see
+/// `set_ignore_cursor_events_safe`.
+static CLICK_THROUGH: AtomicBool = AtomicBool::new(false);
 /// Companion window: opaque-ish, not always-on-top, user-closed, survives match end.
 static COMPANION: AtomicBool = AtomicBool::new(false);
 /// User closed the companion this match — stay hidden until the next match id.
@@ -156,7 +162,7 @@ fn apply_chrome(app: &AppHandle) {
             "Filthy Net Deck — Overlay"
         });
         if companion {
-            let _ = win.set_ignore_cursor_events(false);
+            crate::set_ignore_cursor_events_safe(&win, false);
         }
     }
 }
@@ -266,10 +272,14 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
     // Open in the last mode the user left the panel in. Height on disk is the
     // *expanded* height; the collapsed bar uses a fixed chrome height so a
     // restart does not flash a tall empty column before JS boots.
-    const COLLAPSED_H: f64 = 34.0;
     let (w, h, expanded) = geo
         .as_ref()
         .map(|g| {
+            // WebKitGTK will not later shrink a window created tall (~200px
+            // min). Always map at the bar; JS expands once live data is in.
+            #[cfg(target_os = "linux")]
+            let h = COLLAPSED_H;
+            #[cfg(not(target_os = "linux"))]
             let h = if g.expanded { g.height } else { COLLAPSED_H };
             (g.width, h, g.expanded)
         })
@@ -327,7 +337,24 @@ pub fn show(app: &AppHandle) {
         if is_companion() {
             let _ = win.unminimize();
         }
+        apply_click_through_after_show(&win);
     }
+}
+
+fn apply_click_through_after_show(win: &tauri::WebviewWindow) {
+    if is_companion() {
+        crate::set_ignore_cursor_events_after_show(win, false);
+        return;
+    }
+    crate::set_ignore_cursor_events_after_show(win, CLICK_THROUGH.load(Ordering::SeqCst));
+}
+
+fn apply_click_through(win: &tauri::WebviewWindow) {
+    if is_companion() {
+        crate::set_ignore_cursor_events_safe(win, false);
+        return;
+    }
+    crate::set_ignore_cursor_events_safe(win, CLICK_THROUGH.load(Ordering::SeqCst));
 }
 
 /// Show for this match. Companion: if the user closed the window, stay hidden
@@ -365,8 +392,9 @@ pub fn user_close(app: &AppHandle) {
     }
 }
 
-/// Arena quit: drop the HUD renderer to free RAM. Companion stays if the
-/// user left it open — that's the "I close it myself" contract.
+/// Arena quit: drop the HUD. Companion stays if the user left it open —
+/// that's the "I close it myself" contract. Linux hides rather than
+/// destroying the webview (WebKit teardown abort).
 pub fn on_arena_quit(app: &AppHandle) {
     if is_companion() && !USER_CLOSED.load(Ordering::SeqCst) {
         return;
@@ -374,14 +402,12 @@ pub fn on_arena_quit(app: &AppHandle) {
     destroy(app);
 }
 
-/// Fully tear down the overlay webview (frees its WebView2 renderer).
-///
-/// Prefer this over [`hide`] when the HUD will not be needed for a while —
-/// e.g. Arena quit, or the user turned the overlay off in Settings. Match
-/// mid-session still uses [`hide`] so the next game does not pay cold start.
+/// Drop the overlay webview. Windows destroys it (WebView2 RAM); Linux hides
+/// it so WebKitGTK does not abort its GPU process on teardown — see
+/// [`crate::drop_secondary_webview`]. Match mid-session still uses [`hide`].
 pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
-        let _ = win.destroy();
+        crate::drop_secondary_webview(&win);
     }
 }
 
@@ -441,20 +467,69 @@ pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
     save_geometry(&app, &g);
 }
 
+/// Resize the HUD. `compact` clamps min=max to the bar so GTK cannot keep
+/// the last expanded size. On Hyprland we also dispatch a compositor resize
+/// because Wayland clients cannot rely on `set_size` alone.
+#[tauri::command]
+pub fn overlay_set_extent(app: AppHandle, width: f64, height: f64, compact: bool) {
+    let w = width.clamp(MIN_W, MAX_W);
+    let h = if compact {
+        COLLAPSED_H
+    } else {
+        height.clamp(MIN_H, MAX_H).max(120.0)
+    };
+    let Some(win) = app.get_webview_window(OVERLAY_LABEL) else {
+        return;
+    };
+    if compact {
+        let _ = win.set_max_size(Some(LogicalSize::new(MAX_W, COLLAPSED_H)));
+        let _ = win.set_min_size(Some(LogicalSize::new(MIN_W, COLLAPSED_H)));
+    } else {
+        let _ = win.set_min_size(Some(LogicalSize::new(MIN_W, 120.0)));
+        let _ = win.set_max_size(Some(LogicalSize::new(MAX_W, MAX_H)));
+    }
+    let _ = win.set_size(LogicalSize::new(w, h));
+    #[cfg(target_os = "linux")]
+    hyprland_force_size(&win, w, h);
+}
+
+#[cfg(target_os = "linux")]
+fn hyprland_force_size(win: &tauri::WebviewWindow, w: f64, h: f64) {
+    if std::env::var_os("HYPRLAND_INSTANCE_SIGNATURE").is_none() {
+        return;
+    }
+    let title = win
+        .title()
+        .unwrap_or_else(|_| "Filthy Net Deck — Overlay".into());
+    let w = w.round().clamp(1.0, 8000.0) as i32;
+    let h = h.round().clamp(1.0, 8000.0) as i32;
+    let expr = format!(
+        "hl.dsp.window.resize({{ x = {w}, y = {h}, relative = false, window = \"title:{title}\" }})"
+    );
+    let _ = std::process::Command::new("hyprctl")
+        .args(["dispatch", &expr])
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn();
+}
+
 /// Passive-HUD mode: the overlay window ignores cursor events so clicks fall
 /// through to the game. The overlay webview re-applies this from prefs on
 /// mount and on every prefs push, so the window always exists here.
 #[tauri::command]
 pub fn overlay_set_click_through(app: AppHandle, ignore: bool) {
-    if is_companion() {
-        // Companion is a real window — clicks have to land on it.
-        if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
-            let _ = win.set_ignore_cursor_events(false);
-        }
-        return;
-    }
+    // Linux GTK cannot punch clicks through a transparent window, and asking
+    // while the widget is hidden aborts the process. The UI hides the toggle
+    // there; this is the belt if an old pref or a stale webview still asks.
+    #[cfg(target_os = "linux")]
+    let ignore = {
+        let _ = ignore;
+        false
+    };
+    CLICK_THROUGH.store(ignore, Ordering::SeqCst);
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
-        let _ = win.set_ignore_cursor_events(ignore);
+        apply_click_through(&win);
     }
 }
 

@@ -627,16 +627,11 @@ pub fn tracker_delete_matches(
 /// the Proton tail landed emailed a CI failure.
 #[cfg(any(target_os = "linux", test))]
 fn steam_proton_mtga_log_dir(home: &Path) -> Option<PathBuf> {
-    const STEAM_ROOTS: &[&str] = &[
-        ".local/share/Steam",
-        ".steam/steam",
-        ".var/app/com.valvesoftware.Steam/.local/share/Steam",
-    ];
     const LOG_SUFFIX: &str =
         "pfx/drive_c/users/steamuser/AppData/LocalLow/Wizards Of The Coast/MTGA";
     let mut empty_dir = None;
-    for rel in STEAM_ROOTS {
-        let compat = home.join(rel).join("steamapps").join("compatdata");
+    for root in steam_library_roots(home) {
+        let compat = root.join("steamapps").join("compatdata");
         let Ok(entries) = fs::read_dir(&compat) else {
             continue;
         };
@@ -651,6 +646,72 @@ fn steam_proton_mtga_log_dir(home: &Path) -> Option<PathBuf> {
         }
     }
     empty_dir
+}
+
+/// Steam libraries this user actually has: `libraryfolders.vdf` first, then
+/// the well-known home-relative roots. Extra libraries (a second drive) are
+/// how most Proton prefixes miss the hardcoded `~/.local/share/Steam` walk.
+#[cfg(any(target_os = "linux", test))]
+fn steam_library_roots(home: &Path) -> Vec<PathBuf> {
+    const STEAM_ROOTS: &[&str] = &[
+        ".local/share/Steam",
+        ".steam/steam",
+        ".var/app/com.valvesoftware.Steam/.local/share/Steam",
+    ];
+    const VDFS: &[&str] = &[
+        ".local/share/Steam/steamapps/libraryfolders.vdf",
+        ".local/share/Steam/config/libraryfolders.vdf",
+        ".steam/steam/steamapps/libraryfolders.vdf",
+        ".steam/steam/config/libraryfolders.vdf",
+        ".var/app/com.valvesoftware.Steam/.local/share/Steam/config/libraryfolders.vdf",
+    ];
+    let mut roots = Vec::new();
+    let mut seen = HashSet::new();
+    let mut add = |p: PathBuf| {
+        let key = p.canonicalize().unwrap_or_else(|_| p.clone());
+        if seen.insert(key) {
+            roots.push(p);
+        }
+    };
+    for rel in VDFS {
+        let vdf = home.join(rel);
+        let Ok(text) = fs::read_to_string(&vdf) else {
+            continue;
+        };
+        for path in vdf_library_paths(&text) {
+            add(PathBuf::from(path));
+        }
+    }
+    for rel in STEAM_ROOTS {
+        add(home.join(rel));
+    }
+    roots
+}
+
+/// Pull `"path"` entries out of a Steam `libraryfolders.vdf`.
+///
+/// Steam writes both `"path"\t"/foo"` and `"path""/foo"` (no whitespace).
+#[cfg(any(target_os = "linux", test))]
+fn vdf_library_paths(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = text;
+    while let Some(pos) = rest.find("\"path\"") {
+        rest = &rest[pos + 6..];
+        let trimmed = rest.trim_start();
+        if !trimmed.starts_with('"') {
+            continue;
+        }
+        let inner = &trimmed[1..];
+        let Some(end) = inner.find('"') else {
+            break;
+        };
+        let path = &inner[..end];
+        if path.starts_with('/') || path.get(1..2) == Some(":") {
+            out.push(path.to_string());
+        }
+        rest = &inner[end + 1..];
+    }
+    out
 }
 
 fn arena_log_dir() -> Option<PathBuf> {
@@ -2895,6 +2956,57 @@ mod tests {
         ));
         fs::create_dir_all(root.join(".local/share/Steam/steamapps/compatdata/1493710")).unwrap();
         assert!(steam_proton_mtga_log_dir(&root).is_none());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn vdf_library_paths_reads_steam_and_spaced_forms() {
+        let vdf = r#"
+"libraryfolders"
+{
+"0"
+{
+"path""/home/me/.local/share/Steam"
+"apps"{ "2141910""1" }
+}
+"1"
+{
+"path"		"/mnt/games/SteamLibrary"
+}
+}
+"#;
+        let paths = vdf_library_paths(vdf);
+        assert_eq!(
+            paths,
+            vec![
+                "/home/me/.local/share/Steam".to_string(),
+                "/mnt/games/SteamLibrary".to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn steam_proton_follows_libraryfolders_vdf() {
+        let root =
+            std::env::temp_dir().join(format!("fnd-steam-vdf-{}-{}", std::process::id(), now_ms()));
+        let extra = root.join("extra-library");
+        let log_dir = extra.join(
+            "steamapps/compatdata/2141910/pfx/drive_c/users/steamuser/AppData/LocalLow/Wizards Of The Coast/MTGA",
+        );
+        fs::create_dir_all(&log_dir).unwrap();
+        fs::write(log_dir.join("Player.log"), b"DETAILED LOGS: ENABLED\n").unwrap();
+        let steam = root.join(".local/share/Steam");
+        fs::create_dir_all(steam.join("config")).unwrap();
+        fs::write(
+            steam.join("config/libraryfolders.vdf"),
+            format!(
+                "\"libraryfolders\"{{\n\"0\"{{\n\"path\"\"{}\"\n}}\n}}\n",
+                extra.display()
+            ),
+        )
+        .unwrap();
+        let found = steam_proton_mtga_log_dir(&root).expect("vdf extra library");
+        assert_eq!(found, log_dir);
         let _ = fs::remove_dir_all(&root);
     }
 

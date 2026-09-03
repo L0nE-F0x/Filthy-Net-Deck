@@ -39,6 +39,7 @@ optdepends=(
   'steam: run MTG Arena through Proton'
   'gst-libav: set trailer playback (H.264 decoding)'
   'gst-plugins-bad: set trailer playback (additional codecs)'
+  'ttf-cascadia-code: HUD clock and decklist monospace (Windows uses Cascadia)'
 )
 install="${pkgname}.install"
 options=('!strip' '!debug')

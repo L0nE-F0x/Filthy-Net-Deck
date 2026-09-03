@@ -76,7 +76,7 @@ fn set_enabled(app: &AppHandle, enabled: bool) {
         let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
     }
     if !enabled {
-        // Drop the renderer when the feature is off — no reason to hold RAM.
+        // Windows: drop the renderer. Linux: hide — see drop_secondary_webview.
         destroy(app);
     }
 }
@@ -121,15 +121,9 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     };
 
     let win = builder.build().map_err(|e| e.to_string())?;
-    // Never eat a click meant for Arena.
-    //
-    // Linux/GTK cannot do this yet. tao resolves `set_ignore_cursor_events` to
-    // `gtk_widget_get_window().unwrap()`, and a window built `.visible(false)`
-    // has no GdkWindow until it is realized — so the unwrap fires inside a
-    // non-unwinding GLib dispatch and *aborts the process*. Not a hypothetical:
-    // it killed the app at the end of every match, because the match-end alert
-    // builds this window hidden. Applied in `show_toast` instead, after
-    // `show()` has realized the widget.
+    // Never eat a click meant for Arena. Linux cannot do this on a hidden
+    // window (tao unwraps a null GdkWindow and aborts) — applied after
+    // `show()` in `show_toast`.
     #[cfg(not(target_os = "linux"))]
     let _ = win.set_ignore_cursor_events(true);
     #[cfg(target_os = "linux")]
@@ -137,14 +131,12 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Tear down the toast webview entirely.
-///
-/// Each WebView2 window is a real Chromium renderer (~tens of MB idle). Toasts
-/// fire a few times per session at most, so keeping a hidden webview warm is a
-/// poor trade — recreate on the next alert instead (see [`show_toast`]).
+/// Drop the toast webview. Windows destroys it (WebView2 RAM); Linux hides
+/// it so WebKitGTK does not abort its GPU process on teardown — see
+/// [`crate::drop_secondary_webview`].
 pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(TOAST_LABEL) {
-        let _ = win.destroy();
+        crate::drop_secondary_webview(&win);
     }
 }
 
@@ -191,8 +183,7 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
             // Linux: deferred from `ensure_window`, where the widget had no
             // GdkWindow to shape yet. Safe here — window requests dispatch in
             // order, so this lands after the `show()` above has realized it.
-            #[cfg(target_os = "linux")]
-            let _ = win.set_ignore_cursor_events(true);
+            crate::set_ignore_cursor_events_after_show(&win, true);
             // Do not set_focus — Arena must keep input.
         }
         let _ = app_show.emit_to(TOAST_LABEL, TOAST_EVENT, payload);
@@ -206,9 +197,9 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
             return;
         }
         let target = app_hide.clone();
-        // Destroy (not merely hide): free the WebView2 renderer between alerts.
-        // The next toast rebuilds via ensure_window — same path as a cold first
-        // alert, which is already deadlock-safe (create off the main-thread hop).
+        // Windows: destroy to free WebView2. Linux: hide — destroying a
+        // WebKitGTK webview dumps WebKitWebProcess (NVIDIA EGL/Mesa abort
+        // inside exit()) and Omarchy paints a crash banner over Arena.
         let _ = app_hide.run_on_main_thread(move || destroy(&target));
     });
 }

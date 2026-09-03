@@ -1,6 +1,7 @@
 /**
  * The overlay prefs blob, shared by every webview that can edit it: the
- * in-match HUD (OverlayApp) and the corner presence badge (PresenceApp).
+ * in-match HUD (OverlayApp), the corner presence badge (PresenceApp), and
+ * the badge's cog-menu window (PresenceMenuApp).
  *
  * Storage is the same-origin `bbi.prefs` localStorage entry the main window
  * owns. Writes broadcast `prefs:overlay` because the DOM `storage` event is

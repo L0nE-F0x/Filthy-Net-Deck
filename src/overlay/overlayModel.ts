@@ -2,7 +2,7 @@
  * Pure presentation logic for the in-game overlay — kept free of React/Tauri
  * so it stays unit-testable (see overlayModel.test.ts).
  */
-import type { LiveCardCount } from "../types/tracker";
+import type { LiveCardCount, LiveMatch } from "../types/tracker";
 import type { ArenaCardMeta } from "../services/arenaMeta";
 
 export type OverlayGroupId = "land" | "creature" | "spell";
@@ -319,4 +319,17 @@ export function showSideboardTab(live: {
   if ((live.bestOf ?? 1) > 1) return true;
   if ((live.sideboardTotal ?? 0) > 0) return true;
   return (live.sideboard?.length ?? 0) > 0;
+}
+
+/** True once the HUD has something to paint besides an empty expanded shell. */
+export function overlayHudReady(live: LiveMatch | null | undefined): boolean {
+  if (!live) return false;
+  if (live.phase !== "playing" && live.phase !== "ended") return false;
+  return Boolean(
+    live.deckName ||
+      live.opponentName ||
+      (live.library && live.library.length > 0) ||
+      (live.opponentSeen && live.opponentSeen.length > 0) ||
+      live.turn != null,
+  );
 }

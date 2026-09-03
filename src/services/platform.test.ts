@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { detectOs, updatesViaPackageManager } from "./platform";
+import {
+  detectOs,
+  overlayClickThroughAvailable,
+  updatesViaPackageManager,
+} from "./platform";
 
 describe("detectOs", () => {
   it("reads the three desktop webviews", () => {
@@ -26,5 +30,14 @@ describe("updatesViaPackageManager", () => {
     expect(updatesViaPackageManager("windows")).toBe(false);
     expect(updatesViaPackageManager("macos")).toBe(false);
     expect(updatesViaPackageManager("unknown")).toBe(false);
+  });
+});
+
+describe("overlayClickThroughAvailable", () => {
+  it("is Windows and macOS only — Linux GTK cannot punch clicks through", () => {
+    expect(overlayClickThroughAvailable("windows")).toBe(true);
+    expect(overlayClickThroughAvailable("macos")).toBe(true);
+    expect(overlayClickThroughAvailable("linux")).toBe(false);
+    expect(overlayClickThroughAvailable("unknown")).toBe(false);
   });
 });
