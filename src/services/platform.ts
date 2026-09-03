@@ -22,7 +22,7 @@ export function detectOs(
 }
 
 /**
- * Linux ships as a distro package (Arch/AUR today), so the app never installs
+ * Linux ships as a distro package (an Arch pacman package today), so the app never installs
  * its own updates there: no signed updater target is published, and handing
  * someone a package file to run by hand is the wrong move on a rolling distro.
  * Settings uses this to swap the download button for package-manager wording.

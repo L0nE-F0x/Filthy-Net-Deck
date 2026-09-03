@@ -76,6 +76,31 @@ that is expected and does not block auto-update.
       - `packaging/arch/filthy-net-deck-bin.install` → the update paragraph
       That is a real version bump (3.5.1), because the app copy changes.
 
+   ### ⚠️ The shipped 3.5.0 binaries say "installed from the AUR"
+
+   `WHATS_NEW[0]` in `src/version.ts` read *"Arch and Omarchy, installed from
+   the AUR"* when the Windows `.exe`, the macOS `.dmg` and the Linux binary
+   were built. It was written before Arch turned out to have registration
+   paused, and it is **compiled into all three artifacts** — the post-update
+   "What's new" panel shows it once, to whoever installs 3.5.0.
+
+   Source is now corrected to *"as a real pacman package"*, so `main` no longer
+   carries the false claim, but **the released binaries still have the old
+   line**. Fixing them properly means rebuild + re-sign + move the `v3.5.0`
+   tag + a fresh macOS dmg, i.e. cutting 3.5.1.
+
+   Owner's call, not an agent's. Two honest options:
+   - **Leave it.** One bullet, shown once, and it becomes *true* the day the
+     AUR package lands.
+   - **Cut 3.5.1 now.** ~15 min of builds plus a reinstall on this box.
+
+   Everything *server-side* was already corrected and is live: `version.json`
+   ×2 and `updater/latest.json` notes, plus `og:description` /
+   `twitter:description`, all now say "a real pacman package".
+
+   The 3.5.1 that publishes to the AUR has to rewrite this line anyway, so
+   the two fixes collapse into one release if you wait.
+
    ### The interim Linux install — what visitors actually get today
 
    ```bash

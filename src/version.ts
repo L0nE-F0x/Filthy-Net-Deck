@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Filthy Net Deck runs on Linux — Arch and Omarchy, installed from the AUR",
+  "Filthy Net Deck runs on Linux — Arch and Omarchy, as a real pacman package",
   "Collapse the in-game overlay to a sliver, expand it back with one click",
   "The RUNNING badge menu opens in its own window, so nothing can clip it"
 ];

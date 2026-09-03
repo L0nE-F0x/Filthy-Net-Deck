@@ -5,5 +5,5 @@
     "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.5.0.exe",
     "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.5.0-universal.dmg"
   },
-  "notes": "v3.5.0: Filthy Net Deck runs on Linux — Arch and Omarchy, straight from the AUR. Plus a collapsible in-game overlay and a steadier RUNNING badge menu."
+  "notes": "v3.5.0: Filthy Net Deck runs on Linux — Arch and Omarchy, as a real pacman package. Plus a collapsible in-game overlay and a steadier RUNNING badge menu."
 }

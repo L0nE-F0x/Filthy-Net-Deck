@@ -1,6 +1,6 @@
 /**
  * A4 - Public meta site: static HTML from website/meta/latest.json + history.json.
- * Funnels search traffic to the free Windows/macOS download.
+ * Funnels search traffic to the free Windows/macOS/Linux download.
  *
  * Usage:
  *   node pipeline/build-meta-site.mjs
@@ -33,8 +33,10 @@ function resolveDownloads() {
     ver,
     win: `../index.html#download`,
     mac: `../index.html#download`,
+    lin: `../index.html#download`,
     winDeep: `../../index.html#download`,
     macDeep: `../../index.html#download`,
+    linDeep: `../../index.html#download`,
   };
 }
 
@@ -312,7 +314,7 @@ ${body}
     </p>
     <p class="foot-links">
       <a href="../">Home</a> ·
-      <a href="../#download">Windows &amp; macOS app</a> &middot;
+      <a href="../#download">Windows, macOS &amp; Linux app</a> &middot;
       <a href="../feedback.html">Suggest / Report</a> &middot;
       <a href="https://github.com/L0nE-F0x/Filthy-Net-Deck">GitHub</a>
     </p>
@@ -327,6 +329,7 @@ function downloadBanner(date, nest = 0) {
   const dl = resolveDownloads();
   const win = nest ? dl.winDeep : dl.win;
   const mac = nest ? dl.macDeep : dl.mac;
+  const lin = nest ? dl.linDeep : dl.lin;
   return `
     <aside class="download-banner">
       <div>
@@ -336,6 +339,7 @@ function downloadBanner(date, nest = 0) {
       <div class="dl-row">
         <a class="btn" href="${win}">Windows</a>
         <a class="btn ghost" href="${mac}">macOS</a>
+        <a class="btn ghost" href="${lin}">Linux</a>
       </div>
     </aside>`;
 }
@@ -599,7 +603,7 @@ function buildHub(bundle) {
 
   return layout({
     title: `MTG Standard & Pioneer Meta ${date} - Filthy Net Deck`,
-    description: `Daily Standard and Pioneer metagame for ${date}. Real ranked lists, Scryfall-verified. Free Windows & macOS companion.`,
+    description: `Daily Standard and Pioneer metagame for ${date}. Real ranked lists, Scryfall-verified. Free Windows, macOS & Linux companion.`,
     canonicalPath: "/meta-web/",
     body,
     active: "hub",
@@ -1187,7 +1191,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
   background: linear-gradient(135deg, rgba(184, 240, 0, 0.1), rgba(212, 168, 75, 0.08));
 }
 .download-banner p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
-.dl-row { display: flex; gap: 0.5rem; }
+.dl-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .btn {
   display: inline-block;
   background: var(--acid);

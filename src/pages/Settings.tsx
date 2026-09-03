@@ -391,7 +391,7 @@ export const Settings = memo(function Settings() {
   const meta = useAppStore((s) => s.meta);
 
   /**
-   * Linux ships as an Arch/AUR package, so the app is not the thing that
+   * Linux ships as an Arch pacman package, so the app is not the thing that
    * installs its own updates there. It still reports what is out, then names
    * the command that does the work.
    */
