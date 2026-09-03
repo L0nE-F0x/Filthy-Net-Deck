@@ -138,23 +138,45 @@ that is expected and does not block auto-update.
      (`hl.window_rule`). Diff the follow-Arena script in both before
      the next publish so package users are not a revision behind this box.
 
-   ### Left to finish on this release
+   ### Verified LIVE on filthy-net-deck.com — not just committed
 
    ```
-   [ ] macOS dmg rolled from the GH Release into website/downloads/ AND
-       index.html links updated — v2.8.2's dmg was built and never rolled,
-       do not repeat
-   [ ] Push main; confirm LIVE https://filthy-net-deck.com/version.json is
-       3.5.0 (not just the local file), plus updater/latest.json and the OG
-       card in a private-window share preview
+   version.json           3.5.0, notes say "a real pacman package"
+   updater/latest.json    3.5.0, windows-x86_64 only (Linux key absent BY DESIGN)
+   Setup-3.5.0.exe        7,947,265 bytes   .sig  428 bytes
+   3.5.0-universal.dmg    22,920,826 bytes  (macOS run 33710955191, success)
+   filthy-net-deck-bin.tar.gz  2,397 bytes
+   og:title               "Filthy Net Deck v3.5.0 — now on Linux"
+   og:image               ?v=3.5.0
+   /meta-web/*            Linux button present, og cache-bust now 3.5.0
+   ```
+
+   **The published install command was run verbatim from the live site** —
+   `curl … | tar xz && makepkg` retrieved the release tarball, passed the
+   sha256, and produced `filthy-net-deck-bin 3.5.0-1`. Not inferred.
+
+   `main` == `origin/main` at `62efa5b2`. Tag `v3.5.0` → `a8a4bcad`, still
+   reachable from `main`: the automated set-radar commits were **merged, not
+   rebased**, on purpose — rebasing would have moved the commit whose tree
+   the macOS runner built the released dmg from.
+
+   ### Still open
+
+   ```
    [ ] Owner round-trip on Windows: Check for updates → Update & restart
-   [ ] AUR — blocked, see above
+   [ ] Share preview in a private window (X/Discord cache)
+   [ ] WHATS_NEW wording in the shipped binaries — owner's call, see above
+   [ ] AUR — blocked on Arch reopening registration
    ```
 
-   `main` is **ahead of origin by 2 commits** (`78ae8db6` product,
-   `a8a4bcad` release). The tag `v3.5.0` is pushed and points at `a8a4bcad`;
-   the dmg roll will land on top of it on `main` and that is fine — the tag
-   only needs the source the macOS runner builds.
+   ⚠️ **The marketing site has TWO download surfaces.** The homepage
+   (`website/index.html`) and the generated public-meta pages
+   (`pipeline/build-meta-site.mjs` → `/meta-web/`: hub, 2 formats, 32 deck
+   pages, 354 card pages). v3.5.0 shipped with the homepage updated and the
+   meta pages still offering Windows/macOS only — the owner caught it on a
+   live deck page. **Both must move together on any platform or version
+   change**, and `npm run meta:site` regenerates the second one. Those pages
+   also carry `og-image.png?v=` and had been serving the 3.4.0 cache-bust.
 
    ### Do not do
 
