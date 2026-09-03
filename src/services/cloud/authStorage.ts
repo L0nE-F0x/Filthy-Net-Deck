@@ -2,11 +2,10 @@
  * Session storage for the Supabase client.
  *
  * supabase-js defaults to `localStorage`, which in this app is shared by all
- * the companion webviews (main / overlay / toast / presence / presence-menu)
- * because they share an origin. Tokens have no business being reachable from
- * the overlay, so the
- * desktop build keeps them in the Tauri store instead — a file in the app data
- * dir, outside the webview origin.
+ * five webviews (main / overlay / toast / presence / presence-menu) because
+ * they share an origin. Tokens have no business being reachable from the
+ * overlay, so the desktop build keeps them in the Tauri store instead — a
+ * file in the app data dir, outside the webview origin.
  *
  * Honest scope: this is compartmentalisation, not encryption. A desktop app's
  * tokens are readable by anything running as that user either way; the OS

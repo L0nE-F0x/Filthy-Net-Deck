@@ -1,9 +1,12 @@
 # Quality gate for every push / PR.
 #
-# Two jobs:
-#   web  (ubuntu)  — tsc --noEmit, vitest, production vite build
-#   rust (windows) — rustfmt check, clippy -D warnings, cargo test
-#                    (windows-latest matches the primary ship target)
+# Three jobs:
+#   web         (ubuntu)  — tsc --noEmit, vitest, production vite build
+#   rust        (windows) — rustfmt check, clippy -D warnings, cargo test
+#                           (windows-latest matches the primary ship target)
+#   rust-linux  (ubuntu)  — cargo test --lib, so the #[cfg(target_os = "linux")]
+#                           Proton log paths are compiled by something. The
+#                           windows job cannot see that code at all.
 #
 # Data-only commits (daily meta JSON, website/, docs) skip the gate — the
 # pipeline workflows have their own failure-issue automation.

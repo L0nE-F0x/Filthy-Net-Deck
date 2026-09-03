@@ -3,13 +3,15 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.4.0** (Windows signed updater + macOS dmg)
-· repo `L0nE-F0x/Filthy-Net-Deck`
-· **Next: Claude ships early Linux (Omarchy/Arch) as a real version bump — see START HERE.**
+**Live product version: v3.5.0** (Windows signed updater · macOS dmg · Linux
+pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration — see START HERE.**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
-attaches the new one.
+attaches the new one. Linux is a pacman package built from the release
+tarball; it is never a `.pkg.tar.zst` download button.
 
 This Omarchy box **can** produce the signed NSIS + updater `.sig` (key in
 `~/.tauri`, cargo-xwin, local NSIS). Authenticode is skipped on Linux;
@@ -19,144 +21,124 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-0. **2026-09-03 afternoon — Grok wrapping. Owner go-ahead: ship the early
-   Linux (Omarchy/Arch) version. Claude runs the full deploy pipeline.**
+0. **2026-09-03 — v3.5.0 shipped. Linux is a supported platform. One item is
+   parked on an external blocker: the AUR.**
 
-   **Picked up by: Claude.** Grok is done on this box. Owner is saving Grok
-   Build credits for something else later today. Do not wait for Grok.
+   **Shipped by: Claude**, on the owner's explicit "ship an early Linux
+   version now" and their choice of **3.5.0** ("Linux is a platform now")
+   over a quiet 3.4.1.
 
-   ### Owner decision (explicit)
+   ### What is live
 
-   "everything seems pretty good" after playing with the 10:28 hide-not-destroy
-   package. **Ship an early Linux version now.** Omarchy/Arch only — not
-   AppImage, not deb, not rpm, not mobile. Full `AGENTS.md` definition of
-   done, including Windows signed updater + macOS dmg roll, because this is
-   a real version bump, not a Linux-only git push.
-
-   Live product is still **v3.4.0**. Nothing below is on origin except
-   `acd880e6` and its ancestors. AUR does not exist. Site has no Linux
-   install path (third button is GitHub source).
-
-   ### Git state at wrap (do not invent a different one)
-
-   ```
-   branch: main
-   origin/main: acd880e6  docs: main is pushed, and the soundscape fix is confirmed working
-   HEAD:        f8a27d15  fix(linux): presence badge frame, workspace and anchor in the Hyprland rules
-                (ahead 1, not pushed)
-   working tree: DIRTY — ~24 modified + 5 untracked presence-menu files
-   version everywhere: 3.4.0 (package.json, version.ts, Cargo.toml, tauri.conf.json,
-                      website/version.json, public/version.json, updater/latest.json)
-   ```
-
-   Untracked (must be in the product commit):
-
-   ```
-   src/presence/PresenceMenu.tsx
-   src/presence/PresenceMenuApp.tsx
-   src/presence/PresenceMenu.test.tsx
-   src/presence/presenceCall.ts
-   src/presence/usePresenceChrome.ts
-   ```
-
-   Do **not** commit: `~/.config/hypr/looknfeel.lua`,
-   `~/.config/systemd/user/omarchy-crash-watch.service.d/ignore-webkit.conf`,
-   `/tmp/fnd-arch-build/*`, `src-tauri/target/`.
-
-   ### What the dirty tree actually contains (commit this, then bump)
-
-   One product commit is fine; do not split into "linux-only" vs "shared" unless
-   you have a reason. **Presence-menu is not `#[cfg(linux)]`** — it ships to
-   Windows and macOS as a fifth webview. Call that out in WHATS_NEW / notes.
-
-   | Area | What changed |
+   | Surface | State |
    |---|---|
-   | Presence cog | Own window `#/presence-menu` so Wayland `set_position` + Hyprland-resize-about-centre cannot shove the badge off-screen. Capabilities + authStorage comments updated for five webviews. |
-   | Overlay collapse | `overlay_set_extent` + Linux `hyprland_force_size` via `hyprctl dispatch hl.dsp.window.resize` on the overlay title. GTK will not shrink a webview; Wayland `setSize` is often a no-op. `overlayHudReady()` refuses to expand an empty shell. Chevron is `no-drag` so WebKitGTK does not eat the second click. |
-   | Linux hide-not-destroy | `drop_secondary_webview`: Linux `hide()`, Windows/macOS `destroy()`. Stops toast-linger / cog-close / Arena-quit from tearing down `WebKitWebProcess` (NVIDIA EGL + Mesa TLS abort inside `exit()`). Menu `open_menu` re-shows a hidden window. |
-   | Click-through | Hidden on Linux (`overlayClickThroughAvailable()`). Rust forces `false`. Asking GTK while hidden aborts the process — same class as the 09-02 match-end crash. |
-   | Tracker | Proton `Player.log` follows Steam `libraryfolders.vdf` extra libraries, not only `~/.local/share/Steam`. |
-   | Overlay click-through guard | Applied after `show()`, never on an unrealized GTK widget. |
-   | CI | New `rust-linux` job in `.github/workflows/ci.yml` (ubuntu, WebKitGTK deps, `cargo test --lib`). Confirm green after the first push that includes it. |
-   | PKGBUILD | `ttf-cascadia-code` optdepend. |
-   | Hyprland packaged rules | `packaging/arch/hypr/filthy-net-deck.lua` now docks badge/menu/overlay/alert to Arena (including `special:scratchpad` by **name**, not workspace id `-98`), z-order tick, presence-menu window, no orange frame. |
-   | Help/Settings | Click-through copy gated; Linux Settings omits the toggle. |
+   | Tag + GitHub Release `v3.5.0` | ✅ pushed, release created with notes |
+   | Windows signed NSIS | ✅ 7,947,265 bytes + 428-byte updater `.sig` |
+   | `updater/latest.json` | ✅ 3.5.0, signature byte-identical to the `.sig` |
+   | Signing key id | ✅ `67FCA9900F523D49` — sig key id == `tauri.conf.json` pubkey key id, verified by decode, not by assumption |
+   | Linux release tarball | ✅ `filthy-net-deck-3.5.0-x86_64.tar.gz` (11,705,930 bytes) attached to the release |
+   | Arch package | ✅ `filthy-net-deck-bin 3.5.0-1` built **from the published URL** and installed on this box |
+   | macOS dmg | see the checklist at the bottom of this entry |
+   | Marketing site | third OS entry, install recipe, 4 new i18n keys in all 7 catalogs |
+   | OG card | `NEW · v3.5.0 · NOW ON LINUX`, `?v=3.5.0` cache-bust |
+
+   ### The AUR is blocked — this is the top of the todo
+
+   Arch has **new-account registration paused** ("a wave of automated account
+   creation"), so `filthy-net-deck-bin` does not exist on the AUR and
+   **nothing on the site, in the app, or in the package says `yay -S`.**
+   Do not add that wording back until the package is actually published.
+
+   An ed25519 key is already generated and waiting:
+
+   ```
+   ~/.ssh/aur          (private, mode 600)
+   ~/.ssh/aur.pub      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXdoNoGqB7qZNUw+LqnmOL1D7VweskFLtQ2OVitf22K
+   ~/.ssh/config       Host aur.archlinux.org → User aur, IdentityFile ~/.ssh/aur
+   ```
+
+   When registration reopens, the whole job is:
+
+   1. Owner registers at aur.archlinux.org and pastes `~/.ssh/aur.pub` into
+      My Account → SSH Public Key. **Only the owner can do this.**
+   2. `git clone ssh://aur@aur.archlinux.org/filthy-net-deck-bin.git`
+   3. Copy `packaging/arch/PKGBUILD` + `filthy-net-deck-bin.install` in
+      **verbatim** — the PKGBUILD already sources the checksummed GitHub
+      release tarball, which is exactly what the AUR requires. This was done
+      deliberately so publishing is a copy, not a rewrite.
+   4. `makepkg --printsrcinfo > .SRCINFO`, commit, push.
+   5. Then and only then, swap the three places back to the one-liner:
+      - `website/index.html` → `download.linuxCmd` + the `<pre class="install-block">`
+        + the Linux button `href` (currently the GitHub release page)
+      - all 7 `website/i18n/*.json` → `download.linuxCmd`
+      - `src/pages/Settings.tsx:~1373` → back to `omarchy update`
+        (the comment there says the same thing)
+      - `packaging/arch/filthy-net-deck-bin.install` → the update paragraph
+      That is a real version bump (3.5.1), because the app copy changes.
+
+   ### The interim Linux install — what visitors actually get today
+
+   ```bash
+   curl -L https://filthy-net-deck.com/downloads/filthy-net-deck-bin.tar.gz | tar xz
+   cd filthy-net-deck-bin && makepkg -si
+   ```
+
+   `website/downloads/filthy-net-deck-bin.tar.gz` holds PKGBUILD +
+   `.install` and is **unversioned on purpose** — the command in eight
+   locales must not carry a version string. It gets `max-age=60` in
+   `website/netlify.toml` (all other `/downloads/*` are an hour) so a stale
+   copy cannot hand someone a recipe for a tarball the new release lacks.
+
+   ⚠️ `makepkg` needs the `.install` file **next to the PKGBUILD**, not in
+   `source=()`. That is the whole reason the recipe ships as a tarball rather
+   than a bare PKGBUILD link.
+
+   **Verified end to end**, not assumed: fresh directory → extract the site's
+   recipe tarball → `makepkg` downloaded the 11 MB payload from the GitHub
+   release, passed the sha256, and produced `filthy-net-deck-bin-3.5.0-1`.
 
    ### Installed on this Omarchy box right now
 
-   - `filthy-net-deck-bin 3.4.0-1` → `/usr/bin/filthy-net-deck` mtime **2026-09-03 10:28:53**
-     (the hide-not-destroy + overlay-extent build). Owner relaunched; said it
-     feels good. Local package still at
-     `/tmp/fnd-arch-build/filthy-net-deck-bin-3.4.0-1-x86_64.pkg.tar.zst` —
-     that file is **3.4.0**, rebuild after the version bump.
+   - `filthy-net-deck-bin 3.5.0-1` → `/usr/bin/filthy-net-deck`, installed by
+     the owner with `sudo pacman -U`. Older 3.4.0-1 replaced cleanly.
    - Crash banner filtered **on this machine only**:
      `~/.config/systemd/user/omarchy-crash-watch.service.d/ignore-webkit.conf`
      `OMARCHY_CRASH_IGNORE=^(WebKitWebProcess|WebKitNetworkProcess)$`.
-     Do not `omarchy toggle crash capture`. Consider a sentence in the
-     PKGBUILD `.install` scriptlet so AUR users know; do **not** ship a
-     systemd drop-in that mutes WebKit for the whole session.
+     Do not `omarchy toggle crash capture`. The package `.install` scriptlet
+     now *explains* the banner to AUR users; it does **not** ship a systemd
+     drop-in that mutes WebKit for the whole session.
    - Live compositor rules are `~/.config/hypr/looknfeel.lua` (Omarchy
-     `o.window`, **not in git**). AUR users get
+     `o.window`, **not in git**). Package users get
      `dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")`
      (`hl.window_rule`). Diff the follow-Arena script in both before
-     publish so AUR users are not a revision behind this box.
+     the next publish so package users are not a revision behind this box.
 
-   ### Claude's job — ordered. Source-only is not a release.
+   ### Left to finish on this release
 
-   Copy the `AGENTS.md` checklist into the PR/commit message and tick it.
+   ```
+   [ ] macOS dmg rolled from the GH Release into website/downloads/ AND
+       index.html links updated — v2.8.2's dmg was built and never rolled,
+       do not repeat
+   [ ] Push main; confirm LIVE https://filthy-net-deck.com/version.json is
+       3.5.0 (not just the local file), plus updater/latest.json and the OG
+       card in a private-window share preview
+   [ ] Owner round-trip on Windows: Check for updates → Update & restart
+   [ ] AUR — blocked, see above
+   ```
 
-   1. **Commit the dirty tree** (product + tests + packaged lua + CI job).
-      `handoff.md` can ride along. Run:
-      `npx tsc --noEmit` · `npx eslint src pipeline --max-warnings 0` ·
-      `npm test` · `cargo test --lib` in `src-tauri`.
-      Node 26 localStorage was already fixed (`00d5fdc5`); do not "fix" it
-      again. `sync.ts` has literal NUL/0x1F — use `rg` / `grep -a`.
-   2. **Agree the version with the owner.** Conservative early Linux = **3.4.1**.
-      Marketing Linux as a platform = **3.5.0**. Do not bump until they pick.
-      `node scripts/bump-version.mjs <ver> "<notes>"` already writes the
-      per-OS `downloads` map and **omits Linux on purpose**. Bare
-      `downloadUrl` is the download page, not the Windows `.exe` (that trap
-      is already on origin: `42f23765` / `f873c3fb`). After bump, refresh
-      `Cargo.lock`.
-   3. **Windows signed NSIS on this Omarchy box.** Keys in `~/.tauri/`,
-      cargo-xwin, local NSIS. Authenticode is skipped on Linux — expected,
-      does not block auto-update. Copy setup + `.sig` into
-      `website/downloads/`. Fill `website/updater/latest.json`
-      (`windows-x86_64` url + signature). Prefer Update & restart.
-   4. **Linux package at the new `pkgver`.** `--no-bundle` then the
-      `packaging/arch/` makepkg recipe (flat basenames). Never package a
-      binary an AppImage run has patched. Do not overwrite `/usr/bin`
-      under a live FND process — tray-quit first. `pkexec` hangs waiting
-      for a password; let the owner type it.
-   5. **AUR `filthy-net-deck-bin` BEFORE the site names it.** PKGBUILD must
-      source a GitHub-release tarball, not local `SKIP` files. Site copy is
-      an **install command** (`yay -S filthy-net-deck-bin` / `omarchy update`),
-      never a `.pkg.tar.zst` download button (that bypasses pacman and the
-      next `omarchy update` will not know the app exists). `omarchy update`
-      already runs `omarchy-update-aur-pkgs`, so Settings wording is accurate
-      once the AUR package exists.
-   6. **macOS.** Tag `vX.Y.Z` so `.github/workflows/macos-build.yml` builds
-      the universal dmg. Roll that dmg into `website/downloads/` **and**
-      update `index.html` links. v2.8.2's dmg was built and never rolled —
-      do not repeat. The old "macOS gets the Windows .exe" bug is already
-      fixed in `version.json`; this tag is so they get a matching dmg.
-   7. **Marketing site.** Third OS entry + new `data-i18n` keys in **all 8**
-      locales or `pipeline/site-i18n.test.mjs` fails CI. English lives inline
-      in `index.html`. Version strings stay out of catalogs (`{version}`).
-      OG/Twitter meta + `website/assets/_gen_og.py` + `og-image.png?v=<ver>`.
-      Upload payload did **not** change — do not churn README/privacy unless
-      you touch `matchSync` / `healthPing` / `backupSync`.
-   8. **Push `main`, confirm Netlify.** Live `version.json` / `updater/latest.json`
-      / OG card, not just local files. Then the version tag if not already
-      pushed for macOS CI.
-
-   Linux `updater/latest.json` has **no platform key on purpose**.
-   `plugin-updater` throws `TargetNotFound` → Settings falls to
-   `version.json` with `canAutoInstall: false` and the package-manager
-   sentence. Do not add a Linux key to the signed updater.
+   `main` is **ahead of origin by 2 commits** (`78ae8db6` product,
+   `a8a4bcad` release). The tag `v3.5.0` is pushed and points at `a8a4bcad`;
+   the dmg roll will land on top of it on `main` and that is fine — the tag
+   only needs the source the macOS runner builds.
 
    ### Do not do
 
+   - Add a Linux key to `updater/latest.json`. Its absence is deliberate:
+     `plugin-updater` throws `TargetNotFound` → Settings falls back to
+     `version.json` with `canAutoInstall: false` and the package-manager
+     sentence. It will NOT wrongly say "up to date".
+   - Offer a `.pkg.tar.zst` download button. It bypasses pacman, and nothing
+     would ever upgrade it.
    - AppImage (three independent Arch failures; glibc 2.44 vs Ubuntu 2.35).
    - `hyprctl set_prop max_size` — it crashed Hyprland (socket disconnect,
      SIGKILL). Overlay shrink uses `dispatch … window.resize` only.
@@ -170,7 +152,7 @@ that is expected and does not block auto-update.
    - In-draft overlay, paywalls, Alchemy/Historic.
    - Claiming the Linux UI is live after only a git push.
 
-   ### Accepted early-Linux gaps (do not block the ship)
+   ### Accepted early-Linux gaps (shipped knowingly)
 
    - Overlay drag-persist: Wayland `set_position` is a no-op; we dock to
      Arena's top-left. Owner said saved overlay position is not a big deal.
@@ -186,6 +168,20 @@ that is expected and does not block auto-update.
      during a session.
    - Workspace follow uses workspace **name** `special:scratchpad`. Numeric
      id `-98` is a silent Hyprland no-op.
+   - No automatic Linux updates until the AUR package exists.
+
+   ### Two traps fixed this session — do not reintroduce
+
+   - **The OG card had a feature line running off the right edge in v3.4.0**
+     and nobody saw it, because the only way to notice is to open the PNG.
+     `website/assets/_gen_og.py` now measures every line against the card
+     width and **raises SystemExit** rather than writing a cut-off card.
+     There is no wrapping in that script; a long line is a lost line.
+   - **The i18n catalogs use blank-line grouping** that mirrors the page
+     order. `json.dump` flattens it and produces a ~220-line diff of pure
+     noise. Patch `website/i18n/*.json` as **text**, inserting each key next
+     to its siblings. `pipeline/site-i18n.test.mjs` enforces an exact key set
+     across all seven — no missing keys, no stale ones.
 
    ### Verified on this box (do not re-prove)
 
@@ -193,7 +189,7 @@ that is expected and does not block auto-update.
    + Linux match uploaded as 501; soundscape needs `gst-plugins-good` (hard
    depend); updater degrades safely on Linux; signing pubkey matches
    `tauri.conf.json`; owner played with overlay expand/collapse, post-match
-   graph, presence badge, and the 10:28 binary.
+   graph, presence badge, and the 3.5.0 binary.
 
    Historical detail from 09-02/03 (crash stacks, AppImage autopsy, sync
    caps, Hyprland token traps) stays below. Do not re-litigate it.

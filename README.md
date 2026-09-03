@@ -23,7 +23,7 @@ npm run tauri:dev
 
 ```bash
 npm run meta         # build today's live meta (Standard + Pioneer)
-npm run tauri:build  # Windows/macOS installers
+npm run tauri:build  # Windows/macOS installers (Linux: --no-bundle, then packaging/arch)
 ```
 
 ## Meta pipeline
