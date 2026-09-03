@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.4.0";
+export const APP_VERSION = "3.5.0";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,8 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Sign in on another PC — your history and decks are already there",
-  "Every format follows you, Brawl and Limited included",
-  "Opponents stay put: restored matches show your side only",
+  "Filthy Net Deck runs on Linux — Arch and Omarchy, installed from the AUR",
+  "Collapse the in-game overlay to a sliver, expand it back with one click",
+  "The RUNNING badge menu opens in its own window, so nothing can clip it"
 ];
-

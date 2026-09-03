@@ -56,6 +56,17 @@
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"
 
+# The Arch recipe is the one download at an UNVERSIONED path — it is overwritten
+# every release, and the PKGBUILD inside pins that release's version and sha256.
+# An hour of the previous copy would hand a visitor a recipe for a tarball the
+# new release does not have, so this one gets a short cache. Must stay below the
+# /downloads/* rule above: later rules win.
+[[headers]]
+  for = "/downloads/filthy-net-deck-bin.tar.gz"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60"
+
 # Ported from the repo-root netlify.toml, which Netlify never reads for headers
 # (see the warning at the top of that file). Social scrapers refetch the OG card
 # constantly and it only changes on release, so a day of caching is free. This

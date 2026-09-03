@@ -19,7 +19,16 @@ post_install() {
       Options -> Account -> Detailed Logs (Plugin Support)
   then restart Arena.
 
-  Updates come from your package manager, not from inside the app.
+  Updates never come from inside the app. Until filthy-net-deck-bin is on
+  the AUR (Arch has new-account registration paused), rebuild it from the
+  current release — the two lines are at:
+
+      https://filthy-net-deck.com/#download
+
+  Omarchy's crash watcher may pop a "Process crashed: WebKitWebProcess"
+  banner when you quit FND. That is WebKitGTK's render process going down
+  with its parent on an NVIDIA/Mesa box, not the app losing anything —
+  matches are written to disk before shutdown starts.
 
 MSG
 }

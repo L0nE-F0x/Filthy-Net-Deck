@@ -1277,8 +1277,8 @@ export const Settings = memo(function Settings() {
             .{" "}
             {packageManagedUpdates ? (
               <>
-                FND is installed through your package manager, so updates arrive with the rest
-                of your system.
+                FND is installed as a system package, so updates come from outside the app —
+                there is nothing here to click.
               </>
             ) : (
               <>
@@ -1301,7 +1301,7 @@ export const Settings = memo(function Settings() {
                     const mode = avail?.canAutoInstall
                       ? "Update & restart ready"
                       : packageManagedUpdates
-                        ? "run omarchy update to install it"
+                        ? "rebuild the package to install it"
                         : "download fallback only";
                     setUpdateMsg(`v${result.remote.version} is ready (${mode}).`);
                   } else if (result.status === "latest") {
@@ -1370,9 +1370,15 @@ export const Settings = memo(function Settings() {
                   {updateAvailable.notes}
                 </p>
               )}
+              {/* Until filthy-net-deck-bin is on the AUR, `omarchy update` cannot
+                  see this package — it was built straight from a release, so
+                  nothing tracks it upstream. Point at the recipe that does work,
+                  and swap this for `omarchy update` on the release that publishes
+                  to the AUR. */}
               <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
-                FND is installed through your package manager. To update:{" "}
-                <code className="font-mono text-foam">omarchy update</code>
+                FND is installed as a pacman package. To update, rebuild it from the current
+                release — the two lines are at{" "}
+                <code className="font-mono text-foam">filthy-net-deck.com/#download</code>
               </p>
             </>
           )}

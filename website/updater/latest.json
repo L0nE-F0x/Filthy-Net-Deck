@@ -1,11 +1,11 @@
 {
-  "version": "3.4.0",
-  "notes": "v3.4.0: sign in on another PC and your match history and deck library are there — every format, opponents never uploaded.",
-  "pub_date": "2026-09-02T08:53:13Z",
+  "version": "3.5.0",
+  "notes": "v3.5.0: Filthy Net Deck runs on Linux — Arch and Omarchy, straight from the AUR. Plus a collapsible in-game overlay and a steadier RUNNING badge menu.",
+  "pub_date": "2026-09-03T02:53:45Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJXTEFObi94QlZDRGRST2Zqc2p5emY0T0o1TGRjZ0lEVzlCSnlMVEpJM0xnWUNRRzdzZXhZWmdIU2QxTUlNeThwNE1Ea1Z6TEFHNVRNNytha05uUmc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MzM5MTkyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNC4wX3g2NC1zZXR1cC5leGUKM3IycEdrZFU4MWNJT3puOW9wWmV3Wk82MFQzMEdKbkpaWXZhZEhBcEJZMFRGZnA1QU14TWd4SlJnU2dSL2d0VWU0WFp5SU9WVExsNzEvM09LNVg2Qnc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.4.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJLclNrQ2FoOTN6NkZiN09DT2tCamVnTVJYT1JBczBXVXo4aHF5eXg2blBZZ2NSL0NVbDV2Y1ZTTi9MUmZENUhta0k1VXA0R2tqQ0tpbGVoSWlxWXdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NDA0MDA0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNS4wX3g2NC1zZXR1cC5leGUKSFk3ZkRxeEgxcHJXbXFNTmRkei9ML1g3K0VIYmtCak0wRUsrOUU3VHYzU2N3SFFVOGltSCtreUh0S0x3ZnM1QWxHY29QUGJFVWo3b1I1dlU4dDhMRHc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.5.0.exe"
     }
   }
 }

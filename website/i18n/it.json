@@ -9,7 +9,7 @@
   "nav.feedback": "Suggerisci / Segnala",
   "nav.download": "Scarica",
 
-  "hero.eyebrow": "Windows e macOS · Gratis · Standard e Pioneer",
+  "hero.eyebrow": "Windows, macOS e Linux · Gratis · Standard e Pioneer",
   "hero.title": "Netdeck sporco.<br /><span class=\"grad\">Climb pulito.</span>",
   "hero.lede": "Board giornaliere di <strong>Standard</strong> e <strong>Pioneer</strong> da liste reali di torneo e di ladder — <strong>magic.gg</strong>, <strong>MTGO</strong> e il metagame ranked — con ogni carta verificata su Scryfall. L’overlay legge l’avversario a metà partita. La cronologia resta su questo PC, a meno che tu non scelga di condividerla.",
   "hero.source": "Codice su GitHub",
@@ -18,6 +18,8 @@
   "cta.windowsMeta": "installer Windows",
   "cta.macos": "Scarica per macOS",
   "cta.macosMeta": ".dmg universale",
+  "cta.linux": "Installa su Linux",
+  "cta.linuxMeta": "Arch e Omarchy · pacchetto pacman",
 
   "trust.boards": "Board del meta giornaliere",
   "trust.overlay": "Overlay in partita",
@@ -137,7 +139,9 @@
   "download.lede": "Gratis. Nativa. Nessun account. Il meta di Standard e Pioneer del giorno già all’avvio — più Set Radar, info sui matchup, Climb Tracker e un tracker di winrate che resta sul tuo PC a meno che tu non scelga di condividerlo.",
   "download.winMeta": "NSIS · installazione per l’utente corrente",
   "download.macMeta": "Apple silicon + Intel",
+  "download.linuxMeta": "Arch e Omarchy · pacchetto pacman",
   "download.source": "Codice e release",
+  "download.linuxCmd": "<strong>Arch e Omarchy</strong> — compila il pacchetto dalla release attuale. Da lì lo gestisce pacman, e le regole finestra di Hyprland per l’overlay, l’avviso di partita e il badge di presenza sono già dentro. Il pacchetto AUR arriverà: Arch ha sospeso la registrazione di nuovi account, e appena riapre basterà una riga.",
   "download.note": "<strong>SmartScreen di Windows:</strong> potresti vedere <em>«Windows ha protetto il PC»</em> — l’installer non è ancora firmato (è normale per le app indie). Clicca <strong>Ulteriori informazioni</strong>, poi <strong>Esegui comunque</strong>. <strong>Gatekeeper di macOS:</strong> al primo avvio serve <strong>clic destro → Apri</strong> (l’app non è ancora notarizzata). Dal nostro lato è tutto pulito; la firma può aspettare che monetizzare diventi l’obiettivo.",
   "download.support": "Filthy Net Deck è <strong>gratis</strong>, e resta gratis. Se ti ha aiutato a scalare, puoi <a class=\"support-link\" href=\"https://ko-fi.com/filthynetdeck\" target=\"_blank\" rel=\"noopener noreferrer\">offrirmi un caffè</a>. Manca qualcosa, o qualcosa non funziona? <a class=\"support-link\" href=\"feedback.html\">Suggerisci una funzione / segnala un bug</a>.",
 
@@ -147,5 +151,5 @@
   "footer.builtBy": "Fatto da",
 
   "page.title": "Filthy Net Deck {version} — compagno di MTG Arena per Standard e Pioneer",
-  "page.description": "Compagno gratuito di MTG Arena per Standard e Pioneer: conserva ed esporta ogni mazzo che giochi, in qualsiasi formato, pubblica una lista che chiunque può copiare in Arena, più mazzi ranked ogni giorno, un tracker di winrate live e la lettura delle carte rivelate — tutto nativo, senza pubblicità, senza bloat."
+  "page.description": "Compagno gratuito di MTG Arena per Standard e Pioneer su Windows, macOS e Linux: conserva ed esporta ogni mazzo che giochi, in qualsiasi formato, pubblica una lista che chiunque può copiare in Arena, più mazzi ranked ogni giorno, un tracker di winrate live e la lettura delle carte rivelate — tutto nativo, senza pubblicità, senza bloat."
 }

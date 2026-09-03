@@ -9,7 +9,7 @@
   "nav.feedback": "要望 / 不具合報告",
   "nav.download": "ダウンロード",
 
-  "hero.eyebrow": "Windows と macOS · 無料 · スタンダードとパイオニア",
+  "hero.eyebrow": "Windows・macOS・Linux · 無料 · スタンダードとパイオニア",
   "hero.title": "汚くネットデッキ。<br /><span class=\"grad\">きれいに登る。</span>",
   "hero.lede": "実際のトーナメントとラダーのリストから作る、毎日の<strong>スタンダード</strong>と<strong>パイオニア</strong>のボード。<strong>magic.gg</strong>、<strong>MTGO</strong>、そしてランク戦のメタゲームから集め、全カードをScryfallで検証しています。オーバーレイは対戦中に相手を読み取ります。履歴は、あなたが共有を選ばないかぎりこのPCに残ります。",
   "hero.source": "GitHubのソース",
@@ -18,6 +18,8 @@
   "cta.windowsMeta": "Windowsインストーラ",
   "cta.macos": "macOS版をダウンロード",
   "cta.macosMeta": "ユニバーサル .dmg",
+  "cta.linux": "Linux版を入手",
+  "cta.linuxMeta": "Arch・Omarchy · pacman パッケージ",
 
   "trust.boards": "毎日のメタボード",
   "trust.overlay": "対戦中のオーバーレイ",
@@ -137,7 +139,9 @@
   "download.lede": "無料。ネイティブ。アカウント不要。起動した時点で今日のスタンダードとパイオニアのメタが揃い、さらにSet Radar、対戦データ、Climb Tracker、そして共有を選ばないかぎりPCに残る勝率トラッカーが使えます。",
   "download.winMeta": "NSIS · 現在のユーザーにインストール",
   "download.macMeta": "Apple シリコン + Intel",
+  "download.linuxMeta": "Arch・Omarchy · pacman パッケージ",
   "download.source": "ソースとリリース",
+  "download.linuxCmd": "<strong>Arch・Omarchy</strong> — 最新リリースからパッケージをビルドします。あとは pacman が管理し、オーバーレイ・対戦アラート・プレゼンスバッジ用の Hyprland ウィンドウルールも同梱されています。AUR パッケージは準備中です。Arch が新規アカウント登録を一時停止しているためで、再開すればコマンド 1 行になります。",
   "download.note": "<strong>Windows SmartScreen：</strong><em>「WindowsによってPCが保護されました」</em>と出ることがあります——インストーラはまだコード署名されていません（個人開発のアプリでは普通のことです）。<strong>詳細情報</strong>をクリックし、<strong>実行</strong>を選んでください。<strong>macOS Gatekeeper：</strong>初回起動は<strong>右クリック → 開く</strong>が必要です（アプリはまだ公証を受けていません）。こちら側は問題ありません。署名は、収益化を目指す段階まで待つ方針です。",
   "download.support": "Filthy Net Deckは<strong>無料</strong>で、これからも無料です。ランク上げの役に立ったなら、<a class=\"support-link\" href=\"https://ko-fi.com/filthynetdeck\" target=\"_blank\" rel=\"noopener noreferrer\">コーヒーを一杯おごって</a>もらえます。足りないものや、壊れているものがありますか？ <a class=\"support-link\" href=\"feedback.html\">機能の要望 / 不具合の報告はこちら</a>。",
 
@@ -147,5 +151,5 @@
   "footer.builtBy": "開発",
 
   "page.title": "Filthy Net Deck {version} — スタンダードとパイオニアのためのMTGアリーナ用コンパニオン",
-  "page.description": "スタンダードとパイオニアのための無料のMTGアリーナ用コンパニオン。どのフォーマットでも、遊んだデッキをすべて保存して書き出し、誰でもアリーナにコピーできるリストとして公開できます。さらに毎日のランク戦デッキ、ライブの勝率トラッカー、公開されたカードの記録も。すべてネイティブ、広告なし、余計な重さもなし。"
+  "page.description": "Windows・macOS・Linux で動く、スタンダードとパイオニアのための無料のMTGアリーナ用コンパニオン。どのフォーマットでも、遊んだデッキをすべて保存して書き出し、誰でもアリーナにコピーできるリストとして公開できます。さらに毎日のランク戦デッキ、ライブの勝率トラッカー、公開されたカードの記録も。すべてネイティブ、広告なし、余計な重さもなし。"
 }

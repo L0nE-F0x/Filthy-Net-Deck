@@ -119,10 +119,10 @@ def main() -> None:
     tx, ty = 500, 118
     mid = "\u00b7"  # middle dot
 
-    # Eyebrow — spell out both platforms clearly (X crops tight previews)
+    # Eyebrow — spell out every platform clearly (X crops tight previews)
     draw.text(
         (tx, ty),
-        f"FREE  {mid}  WINDOWS + MACOS  {mid}  MTG ARENA",
+        f"FREE  {mid}  WINDOWS + MACOS + LINUX  {mid}  MTG ARENA",
         font=chip_font,
         fill=ACID,
     )
@@ -134,7 +134,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v3.4.0  {mid}  CROSS-DEVICE SYNC"
+    badge_text = f"NEW  {mid}  v3.5.0  {mid}  NOW ON LINUX"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -149,10 +149,20 @@ def main() -> None:
     draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
-        "Sign in on another PC — history and decks are there",
-        "Every format follows you, Brawl and Limited included",
-        "Opponents never leave the PC that saw them",
+        "Now on Linux — Arch and Omarchy, via pacman",
+        "Collapse the in-game overlay to a sliver",
+        "History stays on your PC unless you opt in",
     ]
+    # v3.4.0's card shipped with a feature line running off the right edge and
+    # nobody saw it until the PNG was opened. Fail the build instead: there is
+    # no wrapping here, so a line that does not fit is a line that gets cut.
+    right_margin = 40
+    budget = W - tx - right_margin
+    for line in [*lines, f"FREE  {mid}  WINDOWS + MACOS + LINUX  {mid}  MTG ARENA"]:
+        width = draw.textlength(line, font=body_font if line in lines else chip_font)
+        if width > budget:
+            raise SystemExit(f"og line overflows by {width - budget:.0f}px: {line!r}")
+
     dy = ty + 236
     for line in lines:
         draw.text((tx, dy), line, font=body_font, fill=MUTED)
@@ -161,7 +171,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v3.4.0  ·  Windows + macOS", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v3.5.0  ·  Win + macOS + Linux", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.com", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")

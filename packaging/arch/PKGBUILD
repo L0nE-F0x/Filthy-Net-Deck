@@ -13,7 +13,7 @@
 
 pkgname=filthy-net-deck-bin
 _pkgname=filthy-net-deck
-pkgver=3.4.0
+pkgver=3.5.0
 pkgrel=1
 pkgdesc="MTG Arena meta companion and match tracker — Standard & Pioneer"
 arch=('x86_64')
@@ -44,29 +44,26 @@ optdepends=(
 install="${pkgname}.install"
 options=('!strip' '!debug')
 
-# Local build for now. The published package sources the signed tarball from
-# the GitHub release tag instead.
-source=(
-  "${_pkgname}"
-  "${_pkgname}.desktop"
-  "${_pkgname}.lua"
-  "icon-32.png"
-  "icon-64.png"
-  "icon-128.png"
-)
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+# One tarball from the GitHub release tag, checksummed. This is the same
+# recipe the AUR package will carry — nothing local, nothing SKIPped — so
+# publishing to the AUR later is a push of this file, not a rewrite.
+_relbase="https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download"
+source=("${_pkgname}-${pkgver}-x86_64.tar.gz::${_relbase}/v${pkgver}/${_pkgname}-${pkgver}-x86_64.tar.gz")
+sha256sums=('3a1a570296813b31c7426fc71d590fbbcd41c199761fecf9d998194ebd1a7ef5')
 
 package() {
-  install -Dm755 "${srcdir}/${_pkgname}"          "${pkgdir}/usr/bin/${_pkgname}"
-  install -Dm644 "${srcdir}/${_pkgname}.desktop"  "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+  local _src="${srcdir}/${_pkgname}-${pkgver}"
+
+  install -Dm755 "${_src}/${_pkgname}"          "${pkgdir}/usr/bin/${_pkgname}"
+  install -Dm644 "${_src}/${_pkgname}.desktop"  "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
 
   # Hyprland rules. Shipped as data, never written into the user's config —
   # the .install scriptlet prints the one line to source it.
-  install -Dm644 "${srcdir}/${_pkgname}.lua" \
+  install -Dm644 "${_src}/${_pkgname}.lua" \
     "${pkgdir}/usr/share/${_pkgname}/hypr/${_pkgname}.lua"
 
   for _px in 32 64 128; do
-    install -Dm644 "${srcdir}/icon-${_px}.png" \
+    install -Dm644 "${_src}/icon-${_px}.png" \
       "${pkgdir}/usr/share/icons/hicolor/${_px}x${_px}/apps/${_pkgname}.png"
   done
 }
