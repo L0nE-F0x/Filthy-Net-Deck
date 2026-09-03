@@ -160,14 +160,31 @@ that is expected and does not block auto-update.
    rebased**, on purpose — rebasing would have moved the commit whose tree
    the macOS runner built the released dmg from.
 
-   ### Still open
+   ### Still open — and who has to do each
 
    ```
-   [ ] Owner round-trip on Windows: Check for updates → Update & restart
-   [ ] Share preview in a private window (X/Discord cache)
-   [ ] WHATS_NEW wording in the shipped binaries — owner's call, see above
-   [ ] AUR — blocked on Arch reopening registration
+   [ ] Owner, on Windows at work: Check for updates → Update & restart.
+       OWNER SAID they would run this "in a couple of hours" from the
+       2026-09-03 late-morning wrap. Nothing blocks on it; it is the
+       confirmation that the signed updater path works for real users.
+   [ ] Share preview in a private window (X/Discord cache the old card)
+   [ ] WHATS_NEW wording in the shipped 3.5.0 binaries — owner's call,
+       see the ⚠️ section above. Not a regression; a premature claim.
+   [ ] AUR — blocked on Arch reopening registration. Key is generated and
+       waiting; the publish is five steps and they are written out above.
    ```
+
+   **If the Windows round-trip fails**, the two things to look at first are
+   `updater/latest.json`'s signature (verified byte-identical to the `.sig`
+   on 09-03, and the key id decodes to `67FCA9900F523D49`, matching
+   `tauri.conf.json`) and whether the installed build is old enough to
+   predate the `downloads` map — a pre-3.5.0 client reads the bare
+   `downloadUrl`, which is now the download page rather than the `.exe`.
+   That is correct behaviour, not the bug.
+
+   **Do not redo any of the shipped work to "check" it.** Everything in the
+   table above was verified against the live site, including running the
+   published install command verbatim. Start from what is open.
 
    ⚠️ **The marketing site has TWO download surfaces.** The homepage
    (`website/index.html`) and the generated public-meta pages
