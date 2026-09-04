@@ -37,6 +37,10 @@ export const ja: Messages = {
     failed: "Aetherfield を起動できませんでした",
     missing: "このビルドには銀河が含まれていません。",
     retry: "再試行",
+    expand: "全画面",
+    collapse: "元に戻す",
+    expandHint: "銀河でウィンドウを埋める",
+    collapseHint: "アプリに戻る — Escape でも戻れます",
   },
   chrome: {
     help: "ヘルプ",

@@ -37,6 +37,10 @@ export const ptBR: Messages = {
     failed: "O Aetherfield não pôde iniciar",
     missing: "A galáxia não foi incluída nesta versão.",
     retry: "Tentar novamente",
+    expand: "Expandir",
+    collapse: "Recolher",
+    expandHint: "Preencher a janela com a galáxia",
+    collapseHint: "Voltar ao app — ou aperte Esc",
   },
   chrome: {
     help: "Ajuda",

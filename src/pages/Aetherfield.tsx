@@ -57,6 +57,15 @@ export function Aetherfield() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState<Status>("booting");
   const [detail, setDetail] = useState<string | null>(null);
+  /**
+   * Immersive mode: the galaxy takes the whole window, sidebar and topbar
+   * included. Deliberately not the browser Fullscreen API — this is a desktop
+   * app whose window is already the screen when the user wants it to be (F11),
+   * and a real fullscreen request inside a webview leaves no chrome to come
+   * back through. Hiding the app's own chrome gets the same picture and keeps
+   * an obvious way out.
+   */
+  const [immersive, setImmersive] = useState(false);
   // Changing this remounts the iframe, which is the only reliable way to retry
   // a boot: reloading in place keeps whatever half-initialised GL state failed.
   const [attempt, setAttempt] = useState(0);
@@ -66,6 +75,26 @@ export function Aetherfield() {
     setDetail(null);
     setAttempt((n) => n + 1);
   }, []);
+
+  // The class lives on the shell, which is outside this component's tree.
+  useEffect(() => {
+    const shell = document.querySelector(".app-shell");
+    if (!shell) return;
+    shell.classList.toggle("app-shell--immersive", immersive);
+    // Leaving the page while immersive would stick the whole app in it.
+    return () => shell.classList.remove("app-shell--immersive");
+  }, [immersive]);
+
+  useEffect(() => {
+    if (!immersive) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setImmersive(false);
+    };
+    // Capture: Aetherfield uses Escape itself, and the frame swallows keys that
+    // reach it, so the host has to see this one first.
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [immersive]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -104,13 +133,40 @@ export function Aetherfield() {
   return (
     <div className="aether-frame-wrap">
       {status !== "failed" && (
-        <iframe
-          key={attempt}
-          ref={frameRef}
-          className="aether-frame"
-          src={SRC}
-          title={t("aether.title")}
-        />
+        <>
+          <iframe
+            key={attempt}
+            ref={frameRef}
+            className="aether-frame"
+            src={SRC}
+            title={t("aether.title")}
+          />
+          {/*
+            Bottom-right: the one corner Aetherfield's own UI leaves empty.
+            Top-right holds its search and Settings, bottom-centre its layout
+            switcher, and the left is the filter panel.
+          */}
+          <button
+            type="button"
+            className="aether-expand"
+            onClick={() => setImmersive((v) => !v)}
+            title={immersive ? t("aether.collapseHint") : t("aether.expandHint")}
+            aria-pressed={immersive}
+          >
+            {immersive ? (
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                <path d="M6.5 1.5v5h-5M9.5 14.5v-5h5" fill="none" stroke="currentColor"
+                      strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                <path d="M1.5 6.5v-5h5M14.5 9.5v5h-5" fill="none" stroke="currentColor"
+                      strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            {immersive ? t("aether.collapse") : t("aether.expand")}
+          </button>
+        </>
       )}
       {status === "failed" && (
         <div className="aether-fallback">

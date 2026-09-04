@@ -39,6 +39,10 @@ export const en = {
     failed: "Aetherfield could not start",
     missing: "The galaxy was not included in this build.",
     retry: "Retry",
+    expand: "Expand",
+    collapse: "Collapse",
+    expandHint: "Fill the window with the galaxy",
+    collapseHint: "Back to the app — or press Escape",
   },
   chrome: {
     help: "Help",

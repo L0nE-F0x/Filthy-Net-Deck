@@ -37,6 +37,10 @@ export const ko: Messages = {
     failed: "Aetherfield를 시작할 수 없습니다",
     missing: "이 빌드에는 은하가 포함되어 있지 않습니다.",
     retry: "다시 시도",
+    expand: "전체 화면",
+    collapse: "되돌리기",
+    expandHint: "은하로 창을 채웁니다",
+    collapseHint: "앱으로 돌아가기 — Esc 키로도 가능",
   },
   chrome: {
     help: "도움말",

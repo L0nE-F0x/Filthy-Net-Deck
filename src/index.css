@@ -518,7 +518,13 @@ select option {
  * iframe is sized to the box, and `.content`'s default `overflow: auto` would
  * otherwise give it a scrollbar it can never fill.
  */
-.content--flush {
+/*
+ * Doubled class on purpose. A later `.content { padding: … }` rule further
+ * down this file has identical specificity, so a single `.content--flush`
+ * lost to it and the galaxy kept a 2.5rem strip of dead space along the
+ * bottom of the window.
+ */
+.content.content--flush {
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -538,6 +544,57 @@ select option {
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/*
+ * Immersive mode: the galaxy takes the window. Collapsing the grid column and
+ * hiding the topbar rather than overlaying, so the frame genuinely resizes and
+ * Aetherfield reframes itself, instead of being cropped by something on top.
+ */
+/*
+ * Doubled class, and a single column rather than a zeroed one. Two traps here,
+ * both caught by measuring the frame instead of trusting the CSS:
+ *
+ *  - A later `.app-shell { grid-template-columns: 200px 1fr }` in this file has
+ *    the same specificity, so a single class lost to it.
+ *  - Hiding the sidebar takes it out of grid flow, which promotes `.main-pane`
+ *    into the *first* column. With a `200px 1fr` track list still in force that
+ *    made the galaxy exactly 200px wide.
+ */
+.app-shell.app-shell--immersive {
+  grid-template-columns: 1fr;
+}
+.app-shell--immersive .sidebar,
+.app-shell--immersive .topbar {
+  display: none;
+}
+
+.aether-expand {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid color-mix(in srgb, #7b6bff 34%, transparent);
+  border-radius: 9px;
+  /* Near-opaque: it sits over a moving starfield, and a translucent chip on
+     that background is unreadable half the time. */
+  background: color-mix(in srgb, #0a0c16 92%, transparent);
+  color: #cfe4ff;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.aether-expand:hover,
+.aether-expand:focus-visible {
+  opacity: 1;
+  border-color: color-mix(in srgb, #5ee7ff 70%, transparent);
 }
 
 .aether-fallback {

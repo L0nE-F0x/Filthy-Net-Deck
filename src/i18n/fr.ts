@@ -37,6 +37,10 @@ export const fr: Messages = {
     failed: "Aetherfield n'a pas pu démarrer",
     missing: "La galaxie n'est pas incluse dans cette version.",
     retry: "Réessayer",
+    expand: "Agrandir",
+    collapse: "Réduire",
+    expandHint: "Remplir la fenêtre avec la galaxie",
+    collapseHint: "Revenir à l'app — ou appuyez sur Échap",
   },
   chrome: {
     help: "Aide",
