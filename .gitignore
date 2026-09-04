@@ -31,3 +31,7 @@ marketing-video/out/
 marketing-video/.remotion/
 marketing-video/public/*.wav
 
+
+# Linux release tarball staging (npm run linux:tarball) — the artifact is
+# attached to the GitHub release, never committed.
+dist-linux/

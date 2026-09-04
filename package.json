@@ -1,7 +1,7 @@
 {
   "name": "filthy-net-deck",
   "private": true,
-  "version": "3.5.0",
+  "version": "3.6.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -19,7 +19,9 @@
     "lint": "eslint src pipeline --max-warnings 0",
     "typecheck:functions": "tsc -p netlify/tsconfig.json",
     "meta:site": "node pipeline/build-meta-site.mjs",
-    "aetherfield": "node scripts/sync-aetherfield.mjs"
+    "aetherfield": "node scripts/sync-aetherfield.mjs",
+    "linux:tarball": "node scripts/build-linux-tarball.mjs",
+    "linux:recipe": "tar --sort=name --owner=0 --group=0 --numeric-owner -czf website/downloads/filthy-net-deck-bin.tar.gz -C packaging/arch --transform \"s,^,filthy-net-deck-bin/,\" PKGBUILD filthy-net-deck-bin.install"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",
