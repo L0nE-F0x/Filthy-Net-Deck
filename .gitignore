@@ -15,6 +15,13 @@ src-tauri/target
 # website/downloads/ instead.
 public/downloads/
 
+# NOTE: public/aetherfield/ is deliberately NOT ignored. It is Aetherfield's
+# built site (~7 MB, mostly the generated star catalogue), vendored by
+# `npm run aetherfield`. CI builds this app from a plain checkout and never
+# regenerates it, so an ignored folder would ship a galaxy page that boots
+# straight to "could not start". Refresh it when Aetherfield changes and
+# commit the result. See scripts/sync-aetherfield.mjs.
+
 # Tauri updater signing keys — never commit these
 *.key
 *.key.pub

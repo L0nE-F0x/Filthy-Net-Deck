@@ -12,6 +12,7 @@ import { Climb } from "./pages/Climb";
 import { Settings } from "./pages/Settings";
 import { Sets } from "./pages/Sets";
 import { FormatHubPage } from "./pages/FormatHub";
+import { Aetherfield } from "./pages/Aetherfield";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -29,6 +30,7 @@ import {
   IconFormatHub,
   IconHelp,
   IconFeedback,
+  IconAetherfield,
 } from "./components/NavIcons";
 import type { Page } from "./types/meta";
 import { APP_VERSION } from "./version";
@@ -60,7 +62,13 @@ function navigateTo(page: Page) {
   useAppStore.getState().setPage(page);
 }
 
-/** Nav order: Decks → personal loop → world → Settings. Keys 1–8. */
+/**
+ * Nav order: Decks → personal loop → world → Settings. Keys 1–8.
+ *
+ * Aetherfield is deliberately absent: it lives in the sidebar footer, and
+ * adding it here would either shift the number keys everyone has learned or
+ * give it a ninth that does not match its position.
+ */
 const NAV: {
   id: Page;
   labelKey: MessageKey;
@@ -84,6 +92,8 @@ const LOCAL_PAGES: Page[] = [
   "climb",
   "sets",
   "formats",
+  // Ships its own catalogue in the bundle; never touches the meta feed.
+  "aether",
 ];
 
 function pageTitleKey(page: Page): MessageKey {
@@ -106,6 +116,8 @@ function pageTitleKey(page: Page): MessageKey {
       return "page.climb";
     case "formats":
       return "page.formats";
+    case "aether":
+      return "aether.title";
     case "settings":
       return "page.settings";
     default:
@@ -472,6 +484,19 @@ export default function App() {
           );
         })}
         <div className="sidebar-footer mt-auto pt-4 px-1 flex flex-col gap-1.5 min-w-0">
+          <button
+            type="button"
+            className={`aether-launch${page === "aether" ? " active" : ""}`}
+            title={t("aether.tagline")}
+            aria-current={page === "aether" ? "page" : undefined}
+            onClick={() => navigateTo("aether")}
+          >
+            <IconAetherfield />
+            <span className="aether-launch-text">
+              <strong>{t("aether.title")}</strong>
+              <small>{t("aether.tagline")}</small>
+            </span>
+          </button>
           <PlaneswalkerThemes />
           <p className="text-[10px] text-muted leading-relaxed m-0">
             {t("brand.unaffiliated")}
@@ -613,7 +638,10 @@ export default function App() {
           click. Swap only the active child; the fade is restarted by the
           `content-enter` effect above.
         */}
-        <main className="content" ref={contentRef}>
+        <main
+          className={`content${page === "aether" ? " content--flush" : ""}`}
+          ref={contentRef}
+        >
           {!meta && !loading && !LOCAL_PAGES.includes(page) ? (
             <div className="empty-state">
               <h2 className="text-lg font-semibold m-0 mb-2">No deck data available</h2>
@@ -640,6 +668,7 @@ export default function App() {
               {page === "matchups" && <Matchups />}
               {page === "climb" && <Climb />}
               {page === "formats" && <FormatHubPage />}
+              {page === "aether" && <Aetherfield />}
               {page === "settings" && <Settings />}
             </>
           )}

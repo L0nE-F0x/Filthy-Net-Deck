@@ -21,6 +21,37 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-04 — Aetherfield is embedded, in the working tree, NOT released.**
+New sidebar destination below the eight nav items: Aetherfield, the 117,621-card
+galaxy from `L0nE-F0x/MTG-Multiverse`, shown in an iframe over its built site
+vendored into `public/aetherfield/` by `npm run aetherfield`. Full rationale,
+message contract and failure modes: `docs/AETHERFIELD-EMBED.md`.
+
+Touched: `src/pages/Aetherfield.tsx` (new) · `src/App.tsx` (launcher, page,
+`content--flush`) · `src/index.css` · `src/components/NavIcons.tsx` ·
+`src/types/meta.ts` · `scripts/sync-aetherfield.mjs` (new) · all eight i18n
+catalogues · `.gitignore` · `package.json`.
+
+Green: `tsc --noEmit`, `npm run lint`, `npm test` (790/790, i18n parity
+included), `npm run build`. Driven end to end in headless Chromium against the
+real `dist/`: the launcher is visible at both 1280×860 and the 960×640 minimum,
+clicking it mounts the frame, the galaxy boots to 117,621 cards with the title
+screen skipped, and the nav stays reachable. FND's own App chunk grew ~2 KB —
+three.js is in the vendored folder, not this bundle.
+
+**Release checklist in `AGENTS.md` has NOT been run for this.** No version bump,
+no installer, no `website/` copy, no `meta:site`, nothing pushed. It is a
+user-visible feature, so all of that applies before it counts as shipped.
+
+**Known trade, decide before refreshing often:** `public/aetherfield/` is 7.4 MB
+committed, 6.5 MB of which is the star catalogue. See the *Git size* section of
+`docs/AETHERFIELD-EMBED.md` and `docs/GIT-HISTORY-BLOAT.md` — the escape hatch
+is serving `data/` from filthy-net-deck.com instead.
+
+**Parked by the owner:** a Sets-page entry point that deep-links into a set's
+cluster, and "show this deck in the galaxy" from DeckView.
+
+
 0. **2026-09-03 — v3.5.0 shipped. Linux is a supported platform. One item is
    parked on an external blocker: the AUR.**
 

@@ -30,6 +30,14 @@ export const de: Messages = {
     formats: "Formate",
     settings: "Einstellungen",
   },
+  aether: {
+    // A product name, not a word — untranslated in every catalogue.
+    title: "Aetherfield",
+    tagline: "Jede Karte als Galaxie",
+    failed: "Aetherfield konnte nicht starten",
+    missing: "Die Galaxie ist in diesem Build nicht enthalten.",
+    retry: "Erneut versuchen",
+  },
   chrome: {
     help: "Hilfe",
     helpTitle: "Hilfe & Tour — was jede Seite macht",

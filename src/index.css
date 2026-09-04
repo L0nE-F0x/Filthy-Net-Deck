@@ -438,6 +438,135 @@ select option {
   opacity: 0.9;
 }
 
+/*
+ * Aetherfield launcher — sidebar footer, above the themes picker.
+ *
+ * Deliberately not a .nav-btn: it is not one of the eight numbered pages, and
+ * the cyan/violet edge is the visualisation's own palette rather than the
+ * app's gold, so it reads as a door out of the app rather than another tab.
+ */
+.aether-launch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid color-mix(in srgb, #7b6bff 32%, transparent);
+  border-radius: 11px;
+  background:
+    radial-gradient(ellipse 120% 140% at 15% 50%, color-mix(in srgb, #5ee7ff 13%, transparent), transparent 62%),
+    radial-gradient(ellipse 110% 130% at 95% 50%, color-mix(in srgb, #a56bff 16%, transparent), transparent 60%),
+    color-mix(in srgb, var(--color-ink-800) 88%, transparent);
+  color: var(--color-foam);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.aether-launch:hover {
+  border-color: color-mix(in srgb, #a56bff 62%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, #5ee7ff 18%, transparent);
+}
+
+.aether-launch.active {
+  border-color: color-mix(in srgb, #5ee7ff 65%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #5ee7ff 22%, transparent),
+    0 0 20px color-mix(in srgb, #a56bff 22%, transparent);
+}
+
+.aether-launch svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  color: #8fd8ff;
+}
+
+/* min-width:0 on the flex child, or the ellipsis below never engages. */
+.aether-launch-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.aether-launch-text strong {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.aether-launch-text small {
+  font-size: 0.62rem;
+  line-height: 1.3;
+  color: var(--color-muted);
+  /*
+   * The sidebar text column is ~140px, which is under 20 characters at this
+   * size — every locale's tagline wraps. Clamp to two lines rather than
+   * ellipsing one: a phrase cut mid-word reads as a bug, not as a design.
+   */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/*
+ * The galaxy owns its whole pane: no page padding, and no scrolling — the
+ * iframe is sized to the box, and `.content`'s default `overflow: auto` would
+ * otherwise give it a scrollbar it can never fill.
+ */
+.content--flush {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  min-height: 0;
+}
+
+.aether-frame-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background: #04050b;
+}
+
+.aether-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.aether-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.aether-fallback h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-foam);
+}
+
+.aether-fallback p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
 .main-pane {
   display: flex;
   flex-direction: column;

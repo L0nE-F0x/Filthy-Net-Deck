@@ -15,6 +15,8 @@ export type Page =
   | "climb"
   /** Standalone Format Hub (legality / rotation / bans). Not FormatView. */
   | "formats"
+  /** Embedded Aetherfield galaxy. Reached from the sidebar, not the 1–8 keys. */
+  | "aether"
   | "settings";
 
 export interface CardEntry {

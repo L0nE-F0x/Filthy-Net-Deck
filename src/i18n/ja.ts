@@ -30,6 +30,14 @@ export const ja: Messages = {
     formats: "フォーマット",
     settings: "設定",
   },
+  aether: {
+    // A product name, not a word — untranslated in every catalogue.
+    title: "Aetherfield",
+    tagline: "全カードを銀河に",
+    failed: "Aetherfield を起動できませんでした",
+    missing: "このビルドには銀河が含まれていません。",
+    retry: "再試行",
+  },
   chrome: {
     help: "ヘルプ",
     helpTitle: "ヘルプとツアー — 各ページの説明",

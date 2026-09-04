@@ -142,3 +142,18 @@ export function IconFormatHub({ className }: IconProps): ReactNode {
     </svg>
   );
 }
+
+/**
+ * Aetherfield: a spiral galaxy seen face-on. Drawn as two arms plus a core
+ * rather than a filled disc — at 18px a disc reads as a blob, and the arms are
+ * what the visualisation is actually about.
+ */
+export function IconAetherfield({ className }: IconProps): ReactNode {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <path d="M12 7.4c3.2 0 5.6 1.9 5.6 4.6 0 3.3-3 5.6-6.6 5.6-2.6 0-4.6-1.3-4.6-3" strokeLinecap="round" />
+      <path d="M12 16.6c-3.2 0-5.6-1.9-5.6-4.6 0-3.3 3-5.6 6.6-5.6 2.6 0 4.6 1.3 4.6 3" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

@@ -30,6 +30,14 @@ export const ko: Messages = {
     formats: "포맷",
     settings: "설정",
   },
+  aether: {
+    // A product name, not a word — untranslated in every catalogue.
+    title: "Aetherfield",
+    tagline: "모든 카드를 은하로",
+    failed: "Aetherfield를 시작할 수 없습니다",
+    missing: "이 빌드에는 은하가 포함되어 있지 않습니다.",
+    retry: "다시 시도",
+  },
   chrome: {
     help: "도움말",
     helpTitle: "도움말과 투어 — 각 페이지 설명",

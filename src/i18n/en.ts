@@ -32,6 +32,14 @@ export const en = {
     formats: "Format Hub",
     settings: "Settings",
   },
+  aether: {
+    // A product name, not a word — untranslated in every catalogue.
+    title: "Aetherfield",
+    tagline: "Every card, as a galaxy",
+    failed: "Aetherfield could not start",
+    missing: "The galaxy was not included in this build.",
+    retry: "Retry",
+  },
   chrome: {
     help: "Help",
     helpTitle: "Help & tour — what every page does",

@@ -30,6 +30,14 @@ export const ptBR: Messages = {
     formats: "Formatos",
     settings: "Ajustes",
   },
+  aether: {
+    // A product name, not a word — untranslated in every catalogue.
+    title: "Aetherfield",
+    tagline: "Cada carta, uma galáxia",
+    failed: "O Aetherfield não pôde iniciar",
+    missing: "A galáxia não foi incluída nesta versão.",
+    retry: "Tentar novamente",
+  },
   chrome: {
     help: "Ajuda",
     helpTitle: "Ajuda e tour — o que cada página faz",

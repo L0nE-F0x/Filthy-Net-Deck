@@ -26,6 +26,8 @@ const PALETTE_PAGES: { id: Page; labelKey: MessageKey }[] = [
   { id: "formats", labelKey: "nav.formats" },
   { id: "meta", labelKey: "nav.events" },
   { id: "settings", labelKey: "nav.settings" },
+  // Last, mirroring the sidebar, where the launcher sits below Settings.
+  { id: "aether", labelKey: "aether.title" },
 ];
 
 /** Occurrences shown under one card before collapsing into "… N more". */
