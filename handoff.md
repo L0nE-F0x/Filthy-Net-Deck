@@ -21,6 +21,96 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-05 — three owner questions answered. Read this before touching the embed.**
+
+Owner is continuing tonight with other models. These are the answers, with the
+evidence, so nobody re-derives them.
+
+### 1. Pushing to the Aetherfield repo does NOT update FND
+
+This is the one that matters. **FND does not load Aetherfield over the
+network.** `src/pages/Aetherfield.tsx` sets
+`SRC = "/aetherfield/index.html?shell=play"` — a path *inside the app bundle*.
+`public/aetherfield/` is a vendored copy of Aetherfield's built `dist/`, baked
+into the installer by `npm run aetherfield`.
+
+So a push to `L0nE-F0x/MTG-Multiverse` updates only the public website. FND
+keeps showing whatever was compiled into the version the user installed. To
+land Aetherfield changes in FND:
+
+```
+cd Filthy-Net-Deck
+npm run aetherfield      # rebuild Aetherfield + copy dist/ -> public/aetherfield/
+git commit
+# then a version bump and a full release — users run installers.
+```
+
+That last step is AGENTS.md hard rule 1, not a formality.
+
+**If the owner wants Aetherfield to update without an FND release**, the change
+is small: point `SRC` at `https://filthy-net-deck.com/aetherfield/` (see §3) and
+add that origin to `frame-src` in `src-tauri/tauri.conf.json` — it is currently
+`'self'` plus the two YouTube origins, so a remote frame is blocked today.
+
+Trade-offs, honestly: the galaxy stops working offline; the 6.5 MB catalogue
+becomes a download instead of shipping in the installer (which drops ~4.5 MB);
+and a bad Aetherfield deploy instantly breaks the page for every FND user with
+no version pinning. The failure panel already handles "did not load", so the
+failure mode is at least graceful. **If it goes remote, also add an origin check
+to `isAetherMessage` in Aetherfield.tsx** — it currently only matches
+`event.source`, which is fine same-origin but thin for a cross-origin frame.
+
+The best long-term shape is a hybrid: try remote, fall back to the vendored
+copy. Nobody has built that.
+
+### 2. The Aetherfield landing page inside FND — yes, one line
+
+It is skipped on purpose: `?shell=play` in that same `SRC`. Drop the parameter
+and the title screen appears, with ENTER THE MULTIVERSE / TOUR / SETTINGS. The
+reasoning for skipping it was that the sidebar button already asked "do you
+want this?" — but the owner likes the page and wants the tour, which is a fair
+trade. A nicer middle ground: show it on first open, skip it afterwards.
+
+**One papercut to fix if it is enabled:** the title screen's INSTALL APP button
+is visible by default (`ui/title.ts` only hides it for an installed PWA), and
+inside a Tauri webview `beforeinstallprompt` never fires, so it does nothing
+when clicked. Hide it when framed — `isEmbedded()` is already exported from
+Aetherfield's `src/core/embed.ts`.
+
+### 3. Renaming the Netlify site cannot break FND
+
+Same reason as §1 — FND never reads that URL. Renaming affects the public
+website only. The one place the URL appears is `%SITE_URL%` in Aetherfield's
+`vite.config.ts`, used for `og:`/canonical tags, and Netlify sets `URL` itself,
+so it self-corrects on deploy.
+
+**Consolidating onto filthy-net-deck.com** is worth doing. Two clean ways, both
+of which avoid a second copy of the 7 MB payload:
+
+- **Subdomain** — add `aetherfield.filthy-net-deck.com` as a custom domain on
+  the Aetherfield Netlify site. Pure DNS, no build changes. Simplest.
+- **Path proxy** — keep Aetherfield on its own site and add to
+  `website/netlify.toml` (redirects live in *that* file, not the root one):
+
+  ```toml
+  [[redirects]]
+    from = "/aetherfield/*"
+    to = "https://mtg-multiverse.netlify.app/:splat"
+    status = 200
+  ```
+
+  This gives exactly `filthy-net-deck.com/aetherfield` with no duplicated
+  files. It works because Aetherfield builds with `base: './'` — its assets are
+  document-relative, so they resolve under any path. The marketing site has no
+  `/aetherfield` path today, so nothing collides.
+
+**Do NOT** copy Aetherfield's `dist/` into `website/aetherfield/` as well. That
+is a second 7 MB in this repo on top of `public/aetherfield/`, and
+`GIT-HISTORY-BLOAT.md` is already a live concern.
+
+Neither option complicates the workflow. What *would* is merging the repos or
+duplicating the build.
+
 **2026-09-05 — v3.6.1 shipped: Aetherfield polish.**
 
 Owner ran 3.6.0 on Linux and Windows and found the galaxy jumbled: dead space
