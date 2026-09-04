@@ -194,10 +194,9 @@ cluster, and "show this deck in the galaxy" from DeckView.
    ### Still open — and who has to do each
 
    ```
-   [ ] Owner, on Windows at work: Check for updates → Update & restart.
-       OWNER SAID they would run this "in a couple of hours" from the
-       2026-09-03 late-morning wrap. Nothing blocks on it; it is the
-       confirmation that the signed updater path works for real users.
+   [x] DONE 2026-09-03 — Owner ran Check for updates → Update & restart on
+       Windows. The signed updater path works end to end for real users.
+       Confirmed by the owner and corroborated on disk; see below.
    [ ] Share preview in a private window (X/Discord cache the old card)
    [ ] WHATS_NEW wording in the shipped 3.5.0 binaries — owner's call,
        see the ⚠️ section above. Not a regression; a premature claim.
@@ -205,7 +204,92 @@ cluster, and "show this deck in the galaxy" from DeckView.
        waiting; the publish is five steps and they are written out above.
    ```
 
-   **If the Windows round-trip fails**, the two things to look at first are
+   ### The Windows box, 2026-09-03 — two findings from the owner's machine
+
+   Found on the owner's Windows box after pulling this release. Neither was
+   visible from Omarchy; both are recorded so the next session does not
+   re-derive them.
+
+   **1. The system clock was exactly 8 hours slow, and `w32time` was stopped.**
+
+   Netlify's `Date` header said `05:41:21 GMT`; the box said `21:41:21 GMT`
+   the previous day — same seconds, eight hours apart. The timezone was set
+   to Singapore (+08:00) but the wall clock held UTC as if it were local.
+
+   This is not cosmetic. `tracker.rs:751` stamps every match from
+   `SystemTime::now()`, and `iso_date()` derives the calendar date from that
+   number, so **every match recorded on that box was timestamped 8h early**
+   and any game played in the first 8h of a UTC day was filed under the
+   previous date. With cross-device history live, Windows and Linux rows
+   interleave wrongly. The already-synced 500 rows are internally
+   consistent, just shifted.
+
+   Machine config, not a code bug. Owner fixed it (`Start-Service w32time;
+   w32tm /resync /force`); verified back in sync to the second.
+
+   ⚠️ Any forensics on that box dated **before** the fix reads 8h early in
+   absolute terms. Under the skew, *displayed local time happened to equal
+   true UTC* — which is why the file timestamps below need care.
+
+   **2. The signed updater round-trip is CONFIRMED — and it leaves a stale
+   Add/Remove Programs entry behind. Cosmetic, but unexplained.**
+
+   The round-trip (the thing the release was waiting on) is proven:
+
+   - The owner confirms they clicked **Check for updates → Update & restart**
+     at ~13:34 +08 on 2026-09-03.
+   - Nothing was manually downloaded — no installer anywhere in Downloads.
+   - The installed `filthy-net-deck.exe` reports FileVersion and
+     ProductVersion **3.5.0**.
+   - The installed `uninstall.exe` **embeds 3.5.0**, and NSIS only writes
+     that file from `Section Install`. So the 3.5.0 installer really ran.
+   - `uninstall.exe`, the Start Menu shortcut and the app relaunch all carry
+     the same second: true `2026-09-03T05:34:25Z`.
+
+   The signature verified (the installer would not have run otherwise), NSIS
+   installed, the app relaunched. **Do not re-prove this.**
+
+   The leftover: `HKCU\...\Uninstall\Filthy Net Deck` still reads
+
+   ```
+   DisplayVersion  3.1.0          EstimatedSize  21120 KB
+   ```
+
+   while the 3.5.0 binary alone is 21,619 KB. Both values are pre-3.5.0, and
+   `EstimatedSize` matches no recent build (the 3.4.0 script defines
+   `ESTIMATEDSIZE 22027`). There is exactly one such key — checked across
+   HKCU, HKLM, WOW6432Node and every loaded hive in `HKEY_USERS`. The app is
+   `installMode: currentUser`, unchanged since v0.2, so `SHCTX` is HKCU.
+
+   Why this is odd rather than obvious: `Section Install` writes
+   `DisplayVersion "${VERSION}"` **unconditionally** — no `$UpdateMode`
+   guard — at `src-tauri/target/release/nsis/x64/installer.nsi:677`, in the
+   section spanning 628–715, *six lines before* the `uninstall.exe` write
+   that demonstrably succeeded. The released
+   `website/downloads/Filthy-Net-Deck-Setup-3.5.0.exe` contains **only**
+   `3.5.0` as a version string (UTF-16LE, twice; no `3.1.0` anywhere), so
+   its `VERSION` define is correct. Every version field in the repo is
+   consistently 3.5.0 and `scripts/bump-version.mjs` writes all four.
+
+   So the file writes in that section stuck and the registry writes did not.
+   NSIS `WriteRegStr` fails silently unless the error flag is checked.
+   **Mechanism unexplained — do not assume it is understood.**
+
+   Impact is cosmetic and bounded: nothing in FND reads `DisplayVersion`
+   (grepped), so no player-facing behaviour is wrong. The cost is
+   diagnostic — asking a user "what version does Windows Apps & Features
+   say" returns a wrong answer, and it has been wrong since 3.1.0.
+
+   Next Windows release is the free experiment: watch whether that key moves
+   off 3.1.0. No need to manufacture a downgrade to test it.
+
+   ⚠️ Caveat on the above: the `installer.nsi` read is the **3.4.0**
+   generated script (the last Windows build made on that box), not 3.5.0's.
+   Same tauri CLI, so the structure holds, but it is an inference.
+
+   **The Windows round-trip has since PASSED** (2026-09-03, owner-confirmed
+   — see the Windows-box findings above). Kept for the next release: if it
+   ever fails, the two things to look at first are
    `updater/latest.json`'s signature (verified byte-identical to the `.sig`
    on 09-03, and the key id decodes to `67FCA9900F523D49`, matching
    `tauri.conf.json`) and whether the installed build is old enough to
