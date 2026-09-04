@@ -1,9 +1,9 @@
 {
-  "version": "3.6.0",
+  "version": "3.6.1",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.6.0.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.6.0-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.6.1.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.6.1-universal.dmg"
   },
-  "notes": "v3.6.0: Aetherfield — every Magic card ever printed, as an explorable galaxy, built into the app. Plus the usual daily Standard & Pioneer meta."
+  "notes": "v3.6.1: Aetherfield polish — the galaxy uses the whole pane, panels no longer overlap, a new Expand button fills the window, and your render settings are remembered."
 }

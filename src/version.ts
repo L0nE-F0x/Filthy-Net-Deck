@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.6.0";
+export const APP_VERSION = "3.6.1";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,8 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Aetherfield: all 117,621 printed cards as an explorable galaxy — open it from the sidebar",
-  "Spiral arms are colour identity, distance from the core is release date",
-  "Six layouts to fly through: galaxy, timeline, sets, colour wheel, rarity shells and price"
+  "Aetherfield fills the whole pane, and its panels no longer sit on top of each other",
+  "New Expand button gives the galaxy the entire window — Escape comes back",
+  "Aetherfield remembers your render settings between visits",
+  "The overlay scales to your screen instead of assuming one resolution"
 ];
