@@ -134,7 +134,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v3.5.0  {mid}  NOW ON LINUX"
+    badge_text = f"NEW  {mid}  v3.6.0  {mid}  AETHERFIELD"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -149,8 +149,8 @@ def main() -> None:
     draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
-        "Now on Linux — Arch and Omarchy, via pacman",
-        "Collapse the in-game overlay to a sliver",
+        "Aetherfield — 117,621 cards as a galaxy",
+        "Daily Standard & Pioneer, verified on Scryfall",
         "History stays on your PC unless you opt in",
     ]
     # v3.4.0's card shipped with a feature line running off the right edge and
@@ -171,7 +171,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v3.5.0  ·  Win + macOS + Linux", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v3.6.0  ·  Win + macOS + Linux", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.com", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")

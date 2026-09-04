@@ -21,32 +21,66 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-04 — Aetherfield is embedded, in the working tree, NOT released.**
-New sidebar destination below the eight nav items: Aetherfield, the 117,621-card
+**2026-09-04 — v3.6.0 shipped: Aetherfield.**
+
+New sidebar destination below the eight numbered nav items: the 117,621-card
 galaxy from `L0nE-F0x/MTG-Multiverse`, shown in an iframe over its built site
-vendored into `public/aetherfield/` by `npm run aetherfield`. Full rationale,
+vendored into `public/aetherfield/` by `npm run aetherfield`. Rationale,
 message contract and failure modes: `docs/AETHERFIELD-EMBED.md`.
 
-Touched: `src/pages/Aetherfield.tsx` (new) · `src/App.tsx` (launcher, page,
-`content--flush`) · `src/index.css` · `src/components/NavIcons.tsx` ·
-`src/types/meta.ts` · `scripts/sync-aetherfield.mjs` (new) · all eight i18n
-catalogues · `.gitignore` · `package.json`.
+### What is live
 
-Green: `tsc --noEmit`, `npm run lint`, `npm test` (790/790, i18n parity
-included), `npm run build`. Driven end to end in headless Chromium against the
-real `dist/`: the launcher is visible at both 1280×860 and the 960×640 minimum,
-clicking it mounts the frame, the galaxy boots to 117,621 cards with the title
-screen skipped, and the nav stays reachable. FND's own App chunk grew ~2 KB —
-three.js is in the vendored folder, not this bundle.
+| Surface | State |
+|---|---|
+| Tag + GitHub Release `v3.6.0` | ✅ pushed, release created with notes |
+| Windows signed NSIS | ✅ 12,438,547 bytes + 428-byte updater `.sig` |
+| Signing key id | ✅ `67FCA9900F523D49` — sig key id == `tauri.conf.json` pubkey key id, verified by decoding both, not assumed |
+| `updater/latest.json` | ✅ 3.6.0, signature byte-identical to the `.sig` |
+| Linux release tarball | ✅ `filthy-net-deck-3.6.0-x86_64.tar.gz` (16,141,880 bytes) attached to the release |
+| PKGBUILD | ✅ `pkgver=3.6.0`, sha256 verified by re-downloading the published tarball and hashing it |
+| Site recipe tarball | ✅ regenerated (`npm run linux:recipe`) |
+| macOS dmg | see the macOS row below |
+| `version.json` ×2, `index.html`, OG, `/meta-web/` | ✅ 3.6.0, og cache-bust `?v=3.6.0` |
+| Downloads pruned | ✅ 3.3.0 / 3.3.1 / 3.4.0 removed; 3.5.0 + 3.6.0 kept |
 
-**Release checklist in `AGENTS.md` has NOT been run for this.** No version bump,
-no installer, no `website/` copy, no `meta:site`, nothing pushed. It is a
-user-visible feature, so all of that applies before it counts as shipped.
+### Two process notes worth keeping
 
-**Known trade, decide before refreshing often:** `public/aetherfield/` is 7.4 MB
-committed, 6.5 MB of which is the star catalogue. See the *Git size* section of
-`docs/AETHERFIELD-EMBED.md` and `docs/GIT-HISTORY-BLOAT.md` — the escape hatch
-is serving `data/` from filthy-net-deck.com instead.
+**The website was held back from the first push on purpose.** The macOS dmg is
+built by CI from the tag, so any site copy advertising 3.6.0 before the dmg
+exists links a download that 404s. Source went up first (CI builds from that
+tree; `website/` does not affect the app), the live site kept advertising 3.5.0
+consistently, and everything flipped in one later commit. Do this again — the
+alternative is a window where the macOS button is broken.
+
+**`git merge`, never rebase, when the automation has landed commits.** The
+first `git push` was rejected because the daily meta / set-radar jobs had
+pushed. The tag was already on the local commit, and rebasing would have moved
+the tree the macOS runner was building. Same reasoning as v3.5.0.
+
+`scripts/build-linux-tarball.mjs` is new: 3.5.0's tarball was hand-assembled,
+and its layout is a published contract — `package()` reads exact paths out of a
+top-level `filthy-net-deck-<ver>/`, so a mis-named staging dir yields a tarball
+that checksums fine and installs nothing.
+
+### Retired by this release
+
+The 3.5.0 binaries' `WHATS_NEW[0]` claimed the Linux package was "installed
+from the AUR", written before Arch paused registration and compiled into all
+three artifacts. 3.6.0's what's-new replaces it. **The AUR itself is still
+blocked** — the interim `curl … | tar xz && makepkg` recipe is still what the
+site publishes, and swapping to the one-liner is still its own release (see the
+AUR section below, unchanged).
+
+### Known trade — decide before refreshing often
+
+`public/aetherfield/` is 7.4 MB committed, 6.5 MB of which is the star
+catalogue. See the *Git size* section of `docs/AETHERFIELD-EMBED.md` and
+`docs/GIT-HISTORY-BLOAT.md`; the escape hatch is serving `data/` from
+filthy-net-deck.com instead. Refresh only when the catalogue actually changed.
+
+**Upload payload did not change**, so `README.md` / `index.html` /
+`privacy.html` upload claims were correctly left alone — Aetherfield is
+entirely local and talks only to Scryfall from the client.
 
 **Parked by the owner:** a Sets-page entry point that deep-links into a set's
 cluster, and "show this deck in the galaxy" from DeckView.

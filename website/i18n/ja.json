@@ -1,6 +1,5 @@
 {
   "lang.switch": "言語を変更",
-
   "brand.companion": "MTGアリーナ用コンパニオン",
   "nav.features": "機能",
   "nav.publicMeta": "公開メタ",
@@ -8,26 +7,22 @@
   "nav.formats": "フォーマット",
   "nav.feedback": "要望 / 不具合報告",
   "nav.download": "ダウンロード",
-
   "hero.eyebrow": "Windows・macOS・Linux · 無料 · スタンダードとパイオニア",
   "hero.title": "汚くネットデッキ。<br /><span class=\"grad\">きれいに登る。</span>",
   "hero.lede": "実際のトーナメントとラダーのリストから作る、毎日の<strong>スタンダード</strong>と<strong>パイオニア</strong>のボード。<strong>magic.gg</strong>、<strong>MTGO</strong>、そしてランク戦のメタゲームから集め、全カードをScryfallで検証しています。オーバーレイは対戦中に相手を読み取ります。履歴は、あなたが共有を選ばないかぎりこのPCに残ります。",
   "hero.source": "GitHubのソース",
-
   "cta.windows": "Windows版をダウンロード",
   "cta.windowsMeta": "Windowsインストーラ",
   "cta.macos": "macOS版をダウンロード",
   "cta.macosMeta": "ユニバーサル .dmg",
   "cta.linux": "Linux版を入手",
   "cta.linuxMeta": "Arch・Omarchy · pacman パッケージ",
-
   "trust.boards": "毎日のメタボード",
   "trust.overlay": "対戦中のオーバーレイ",
   "trust.reveals": "公開されたカードの記録",
   "trust.local": "ローカルの勝率",
   "trust.radar": "Set Radar",
   "trust.noAccount": "アカウント不要",
-
   "fan.live": "ライブメタゲーム",
   "fan.format": "フォーマット",
   "fan.bestOf": "Best of",
@@ -38,17 +33,14 @@
   "fan.verified": "検証済み",
   "fan.sideboard": "サイドボード{n}枚",
   "fan.deckN": "デッキ {n}",
-
   "stats.aria": "製品のデータ",
   "stats.formats": "フォーマット · スタンダードとパイオニア",
   "stats.decks": "各フォーマットのランク戦デッキを毎日",
   "stats.verified": "実在のリスト · 全カード検証済み",
   "stats.account": "件のアカウントで記録できます",
-
   "features.eyebrow": "機能",
   "features.title": "汚く、最新であり続けるためのすべて",
   "features.lede": "公開された紙のメタゲームが実際に存在する2つの構築フォーマットのための、ネイティブアプリ。毎日のボード、対戦中のオーバーレイまたはコンパニオンウィンドウ、そして共有を選ばないかぎりこのPCに残る勝率トラッカー。",
-
   "badge.kicker": "常駐バッジ",
   "badge.title": "動いていることが常にわかる。",
   "badge.body": "対戦オーバーレイはゲームが始まってからしか出ないため、ホーム画面やデッキビルダーでは動作しているか分かりませんでした。今はアリーナが開いているあいだずっと、<em>小さなバッジが左下に表示されます</em>。マーク、ライブ表示のドット、そして対戦の合間に本当に変えたい設定をまとめた<em>⚙</em>——オーバーレイのオン/オフ、対戦後のサマリー、不透明度、フルスクリーン時の通知。対戦中はHUDを主役にするため薄くなり、カーソルを乗せた瞬間に戻ります。マークをクリックすればアプリに直接戻れます。",
@@ -58,7 +50,6 @@
   "badge.mockHidden": "非表示",
   "badge.mockRow2": "隅のバッジ、セッション中ずっと",
   "badge.mockShown": "表示",
-
   "radar.kicker": "Set Radar",
   "radar.title": "バインダーのように見るスポイラー——アリーナ優先",
   "radar.body": "発売前セットのScryfallギャラリーを丸ごと。さらに<em>今後のスタンダード</em>のロードマップ収録セットと、WotCが公式の告知映像を公開したときに出る<em>トレーラーを見る</em>ボタン（Nauctis、Titanbreach など）を、アプリ内のプレイヤーで再生できます。フォーマットハブ：ローテーション日、パイオニアのカードプール、カードイラスト付きの禁止リスト。矢印キーでの閲覧、「発売時点」の正直な使用可能表示、アリーナ実装前夜の通知。MythicSpoilerの未確認リークはScryfallより先に、はっきり明示して掲載します。アルケミーなし、調整済みカードもなし。",
@@ -68,7 +59,6 @@
   "radar.mockLive": "ライブ",
   "radar.mockNotify": "アリーナ実装前夜の通知（任意）",
   "radar.mockLocal": "ローカル",
-
   "intel.kicker": "対戦データ",
   "intel.title": "タグ付けしたアーキタイプごとの、あなたの勝率",
   "intel.body": "「対戦」は見えた情報から相手にタグを付け、入力した準備メモをそのまま保存します。そのうえでタグごとの<em>あなた自身の</em>成績を集計し、デッキ一覧に「イゼットに4–0」といったチップを表示し、履歴をCSVに書き出します。「マイスタッツ」の今日チップを押せば、すべての数値が直近24時間に絞られます。連勝連敗と今日のタイルで、調子が常に見えます。",
@@ -79,61 +69,44 @@
   "intel.mockHot": "好調",
   "intel.mockCsv": "ワンクリックCSV · 週間まとめPNG",
   "intel.mockShare": "共有",
-
   "boards.kicker": "毎日のボード",
   "boards.title": "スタンダードとパイオニア——増減も込みで",
   "boards.body": "実際のメタゲーム占有率にもとづく、フォーマットごとに8つの完全なリスト。magic.gg、MTGOのチャレンジ、そしてGoldfishの順で割り当て、決して創作しません。上昇・下降のチップ、色フィルタ、30日間の占有率タイムライン付き。",
-
   "companion.title": "オーバーレイかコンパニオンか",
   "companion.body": "新機能：オーバーレイが初めて出るとき、アリーナに重ねるHUDか、通常のウィンドウかを選べます。コンパニオンはタスクバーに並び、対戦が終わっても残り、閉じるのはあなたです。既定はこれまでどおりオーバーレイ。折りたたんだバーには、セッションの戦績、次のドローが土地である確率、そして相手の読みと確信度が出ます。",
-
   "langs.title": "アリーナの言語",
   "langs.body": "新機能：アプリのUIはお使いのシステムの言語に従います。アリーナと同じ8言語——英語、スペイン語、フランス語、ドイツ語、イタリア語、ポルトガル語（ブラジル）、日本語、韓国語。カード名、デッキ名、Bo1/Bo3は翻訳しません。",
-
   "clinic.title": "何枚ずれているか",
   "clinic.body": "新機能：「マイスタッツ」があなたの75枚を、今日いちばん近いランク戦のリストと突き合わせます。1枚入れ替えれば1枚差です。",
-
   "reveals.title": "相手が見せたカード",
   "reveals.body": "新機能：「マイスタッツ」で対戦をクリックすると、相手が見せたカードと、その枚数がすべて分かります。リストをコピーして相手のデッキを組み直せます。データはこのPCに残ります。",
-
   "themes.body": "新機能：サイドバーのプレインズウォーカー配色に3種類追加——藍色の精神魔法、ネオンの夜、エーテリウムの真鍮。ダークとライトは引き続き組み合わせられます。",
-
   "friends.title": "フレンドレース",
   "friends.body": "新機能：設定のフレンドコードと、Climbでのシーズン勝率レース——チャットはなし、ラダーだけ。",
-
   "share.title": "共有できるデッキリスト",
   "share.body": "新機能：デッキを公開するとリンクが手に入ります——<strong>filthy-net-deck.com/u/you/your-deck</strong>——ワンクリックでそのままアリーナにコピーできます。デッキ単位で、あなたの判断で、いつでも取り下げられます。",
-
   "library.title": "あなたのデッキライブラリ",
   "library.body": "新機能：アリーナが登録したリストはすべて保存されます——<strong>スタンダード、エクスプローラー、ヒストリック、アルケミー、タイムレス、ブロール</strong>——フォーマット、バージョン履歴つき。<strong>デッキリストを書き出す</strong>を使えば、まとめてフォルダにアリーナのインポート用テキストとして保存できます。アカウントは不要です。アリーナのデッキ上限は100個ですが、その先はここに置けます。ティアリストと対戦データはスタンダードとパイオニアのままです。",
-
   "sync.title": "2台のPC、ひとつの履歴",
   "sync.body": "新機能：サインインすると、対戦履歴とデッキライブラリがついてきます。Windows から Linux、Mac まで、ティアリストのあるフォーマットに限りません。任意で、初期状態はオフ。対戦相手は対象外：名前も見せられたカードも、見たそのPCから出ません。復元された対戦は自分側だけ表示されます。<a href=\"privacy.html\">同期される内容</a>。",
-
   "climb.title": "Climb Tracker",
   "climb.body": "シーズンのランク推移カーブ（最高到達点のマーカーとホバー詳細つき）、連勝・連敗チップ、シーズン比較、次のランクまでの必要試合数。",
-
   "events.title": "イベントフィード",
   "events.body": "magic.gg、MTGO、Meleeからのスタンダード／パイオニアのイベント——絞り込み、相対日付、検証済みリンク。",
-
   "import.title": "そのままアリーナへコピー",
   "import.body": "どのデッキにも固定のインポートバー。1クリックでコピーし、MTGアリーナに貼り付けて、そのままプレイ。解決したカードにはScryfallのイラストが付き、行にカーソルを乗せればカード全体が見られます。",
   "import.button": "アリーナ用インポートをコピー",
-
   "liveMeta.title": "今日のスタンダードとパイオニアを軸に",
   "liveMeta.lede": "順位はライブのメタゲームから出しています。リストは<strong>MTGO</strong>のチャレンジ、<strong>magic.gg</strong>のデッキリスト、そしてGoldfishの順に割り当て、カード名はすべてScryfallで検証します。ある日のデータを検証できないときは、前日の実データをそのまま表示します。創作はしません。",
   "liveMeta.chip": "ライブ",
-
   "metaWeb.body": "<strong>メタゲーム全体をウェブで見る</strong>——スタンダードとパイオニアのランク戦アーキタイプ32種すべてを、Bo1とBo3で。完全なデッキリスト、マナカーブ、アリーナへのインポート付き。ダウンロードは不要です。",
   "metaWeb.today": "今日のメタ",
   "metaWeb.standard": "スタンダードのデッキ",
   "metaWeb.pioneer": "パイオニアのデッキ",
-
   "formats.eyebrow": "対応範囲",
   "formats.title": "2つのフォーマットを、きちんと。",
   "formats.lede": "アルケミーなし。調整済みのデジタル専用カードもなし。紙のメタゲームが実在し、公開され、追跡できる2つの構築フォーマットだけを、検証済みのリストのみで扱います。",
   "formats.promise": "<strong>データについての約束：</strong>アプリに載るリストはすべて、ライブのメタゲームから取った実在の最新ビルドです。カード名は公開前にすべてScryfallと照合します。検証できないデッキは載せません——仮のデッキも、AIが推測したデッキも、「種まき」のデッキも、このアプリには出てきません。",
-
   "download.eyebrow": "アプリを入手",
   "download.title": "Filthy Net Deckをインストール",
   "download.lede": "無料。ネイティブ。アカウント不要。起動した時点で今日のスタンダードとパイオニアのメタが揃い、さらにSet Radar、対戦データ、Climb Tracker、そして共有を選ばないかぎりPCに残る勝率トラッカーが使えます。",
@@ -144,12 +117,19 @@
   "download.linuxCmd": "<strong>Arch・Omarchy</strong> — 最新リリースからパッケージをビルドします。あとは pacman が管理し、オーバーレイ・対戦アラート・プレゼンスバッジ用の Hyprland ウィンドウルールも同梱されています。AUR パッケージは準備中です。Arch が新規アカウント登録を一時停止しているためで、再開すればコマンド 1 行になります。",
   "download.note": "<strong>Windows SmartScreen：</strong><em>「WindowsによってPCが保護されました」</em>と出ることがあります——インストーラはまだコード署名されていません（個人開発のアプリでは普通のことです）。<strong>詳細情報</strong>をクリックし、<strong>実行</strong>を選んでください。<strong>macOS Gatekeeper：</strong>初回起動は<strong>右クリック → 開く</strong>が必要です（アプリはまだ公証を受けていません）。こちら側は問題ありません。署名は、収益化を目指す段階まで待つ方針です。",
   "download.support": "Filthy Net Deckは<strong>無料</strong>で、これからも無料です。ランク上げの役に立ったなら、<a class=\"support-link\" href=\"https://ko-fi.com/filthynetdeck\" target=\"_blank\" rel=\"noopener noreferrer\">コーヒーを一杯おごって</a>もらえます。足りないものや、壊れているものがありますか？ <a class=\"support-link\" href=\"feedback.html\">機能の要望 / 不具合の報告はこちら</a>。",
-
   "footer.disclaimer": "ファンが作ったコンパニオンです——<strong>Wizards of the Coastとは無関係です</strong>。Magic: The GatheringおよびMTGアリーナは Wizards of the Coast LLC の商標です。カード画像はScryfall提供。",
   "footer.privacy": "プライバシー",
   "footer.status": "稼働状況",
   "footer.builtBy": "開発",
-
   "page.title": "Filthy Net Deck {version} — スタンダードとパイオニアのためのMTGアリーナ用コンパニオン",
-  "page.description": "Windows・macOS・Linux で動く、スタンダードとパイオニアのための無料のMTGアリーナ用コンパニオン。どのフォーマットでも、遊んだデッキをすべて保存して書き出し、誰でもアリーナにコピーできるリストとして公開できます。さらに毎日のランク戦デッキ、ライブの勝率トラッカー、公開されたカードの記録も。すべてネイティブ、広告なし、余計な重さもなし。"
+  "page.description": "Windows・macOS・Linux で動く、スタンダードとパイオニアのための無料のMTGアリーナ用コンパニオン。どのフォーマットでも、遊んだデッキをすべて保存して書き出し、誰でもアリーナにコピーできるリストとして公開できます。さらに毎日のランク戦デッキ、ライブの勝率トラッカー、公開されたカードの記録も。すべてネイティブ、広告なし、余計な重さもなし。",
+  "aether.kicker": "Aetherfield",
+  "aether.title": "これまでに印刷された全カードを、ひとつの銀河に",
+  "aether.body": "117,621枚のMagicの印刷すべてを、探索できる銀河としてアプリの中に。ブラウザも追加ダウンロードも要りません。渦状腕はカラー・アイデンティティ、中心からの距離は発売時期、そしてもっとも明るい星はあなたがよく知るカードです。銀河、年ごとのタイムライン、セットごとの星団、カラーホイール、レアリティの球殻、価格の地形——6つの配置を飛び回れます。どの印刷でも検索でき、好きな条件で絞り込み、どの星を開いてもScryfallの完全な情報が見られます。",
+  "aether.mockArms": "渦状腕 · カラー・アイデンティティ",
+  "aether.mockRadius": "半径 · 発売時期",
+  "aether.mockLayouts": "6つの配置 · 銀河、時系列、セット、価格",
+  "aether.mockLayoutsVal": "アプリ内",
+  "aether.mockOffline": "アプリに同梱",
+  "aether.mockOfflineVal": "オフライン"
 }

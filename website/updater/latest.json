@@ -1,11 +1,11 @@
 {
-  "version": "3.5.0",
-  "notes": "v3.5.0: Filthy Net Deck runs on Linux — Arch and Omarchy, as a real pacman package. Plus a collapsible in-game overlay and a steadier RUNNING badge menu.",
-  "pub_date": "2026-09-03T02:53:45Z",
+  "version": "3.6.0",
+  "notes": "v3.6.0: Aetherfield \u2014 every Magic card ever printed, as an explorable galaxy, built into the app. Plus the usual daily Standard & Pioneer meta.",
+  "pub_date": "2026-09-04T15:00:13Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjJLclNrQ2FoOTN6NkZiN09DT2tCamVnTVJYT1JBczBXVXo4aHF5eXg2blBZZ2NSL0NVbDV2Y1ZTTi9MUmZENUhta0k1VXA0R2tqQ0tpbGVoSWlxWXdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NDA0MDA0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNS4wX3g2NC1zZXR1cC5leGUKSFk3ZkRxeEgxcHJXbXFNTmRkei9ML1g3K0VIYmtCak0wRUsrOUU3VHYzU2N3SFFVOGltSCtreUh0S0x3ZnM1QWxHY29QUGJFVWo3b1I1dlU4dDhMRHc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.5.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wng2cnNiUXJhTjZZZ0s4YmYwem9pOW1rbHVIdGROdldrbjJnNDhTRml3TWhWMXBBT2Rydm45TVlEa3VUN1R5L09wck1ZbzZUeGRQMndBaXU0aUZIUEFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NTMzNzQ5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNi4wX3g2NC1zZXR1cC5leGUKZHcvNjdJREdNNWkySWlQNG1vb0o4T1JiWHBYdmxaeUYxRmVaUzJLQkg5aFdLU2Q5b1ZLZDVVR2lubmpIdEV0Nlk4SDgxOXA0dnpQR3N1OEpZUHpuREE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.6.0.exe"
     }
   }
 }

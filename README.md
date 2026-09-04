@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/L0nE-F0x/Filthy-Net-Deck/actions/workflows/ci.yml/badge.svg)](https://github.com/L0nE-F0x/Filthy-Net-Deck/actions/workflows/ci.yml)
 
-Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, tournament pulse, and a **local winrate tracker** for your own Arena matches.
+Desktop meta companion for **Magic: The Gathering** — the daily **Standard** and **Pioneer** metagame, 8 ranked decks per format, Bo1/Bo3 modes, tiers, card art, Arena import, tournament pulse, and a **local winrate tracker** for your own Arena matches. Since v3.6.0 it also ships **Aetherfield**: every one of the 117,621 printed Magic cards as an explorable galaxy, built into the app.
 
 **Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.
 
@@ -25,6 +25,15 @@ npm run tauri:dev
 npm run meta         # build today's live meta (Standard + Pioneer)
 npm run tauri:build  # Windows/macOS installers (Linux: --no-bundle, then packaging/arch)
 ```
+
+### Aetherfield
+
+The galaxy on the Aetherfield page is a separate app
+([L0nE-F0x/MTG-Multiverse](https://github.com/L0nE-F0x/MTG-Multiverse)), vendored
+into `public/aetherfield/` as a built folder and shown in an iframe. Refresh it
+with `npm run aetherfield` (needs that repo checked out alongside this one, or
+`AETHERFIELD_DIR` set). CI never rebuilds it — see `docs/AETHERFIELD-EMBED.md`
+for why, and for the message contract between the two.
 
 ## Meta pipeline
 

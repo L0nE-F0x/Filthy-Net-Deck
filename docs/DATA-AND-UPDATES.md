@@ -323,14 +323,40 @@ back to showing `Card #<grpId>` while `arena-names.json` stops changing.
 
 Ship steps when releasing a new app build:
 
-1. Bump `package.json` / `src/version.ts` / `src-tauri` version.
-2. `npm run tauri:build` with `TAURI_SIGNING_PRIVATE_KEY` (+ password) → copy installer + `.sig` into `website/downloads/`.
-3. Update `website/updater/latest.json` (version, notes, url, **signature**).
-4. Update `website/version.json` + `public/version.json`.
-5. Update `website/index.html` download links + marketed copy.
+1. `node scripts/bump-version.mjs <ver> <notes> '<whatsNewJson>'` — writes
+   `package.json`, `src/version.ts`, `src-tauri/{Cargo.toml,tauri.conf.json}`
+   and both `version.json` files in one go.
+2. `npm run tauri:build -- --bundles nsis --runner cargo-xwin --target x86_64-pc-windows-msvc`
+   with `TAURI_SIGNING_PRIVATE_KEY` (+ password) → copy installer + `.sig` into
+   `website/downloads/`.
+3. Update `website/updater/latest.json` (version, notes, url, **signature** —
+   byte-identical to the `.sig`).
+4. Linux: `npm run tauri:build -- --no-bundle`, then `npm run linux:tarball`
+   (builds the release tarball and writes its sha256 into the PKGBUILD), then
+   `npm run linux:recipe` (repacks the site's PKGBUILD + `.install` tarball).
+   Attach the release tarball to the GitHub release.
+5. Update `website/index.html` download links + marketed copy. New or reworded
+   marketed copy needs a `data-i18n` key in all seven `website/i18n/*.json`, or
+   `pipeline/site-i18n.test.mjs` fails.
 6. **Share card:** update `og:*` / `twitter:*` / page title+description; edit `website/assets/_gen_og.py` (version + features); run `python website/assets/_gen_og.py`; set image URLs to `og-image.png?v=<version>` so caches refresh.
-7. Push `main` (Netlify). Confirm live `version.json` / `updater/latest.json` / OG image.
-8. Tag `vX.Y.Z` for macOS CI when shipping a mac build.
+7. `npm run meta:site` so `/meta-web/` picks up the new version + og cache-bust.
+8. Prune superseded installers from `website/downloads/` — see `GIT-HISTORY-BLOAT.md`.
+9. Push `main` (Netlify). Confirm live `version.json` / `updater/latest.json` / OG image.
+10. Tag `vX.Y.Z` for macOS CI when shipping a mac build.
+
+**Ordering, when a macOS dmg is part of the release.** The dmg is built by CI
+*from the tag*, so it does not exist when the tag is pushed. Push the source
+bump and tag first and hold every `website/` change back; the live site keeps
+advertising the previous version consistently, with every link valid. Once the
+dmg is attached to the release, land the whole website flip — copy, OG,
+`version.json`, `updater/latest.json`, installers, `meta-web/` — in one commit.
+Flipping the site first leaves the macOS button pointing at a 404 for the length
+of the CI run.
+
+**Merge, never rebase, if the automation pushed while you were building.** The
+daily meta and set-radar jobs commit to `main` on their own schedule. The
+release tag is already on your local commit, and rebasing moves the tree the
+macOS runner is building from.
 
 Full checklist: root `AGENTS.md`.
 
