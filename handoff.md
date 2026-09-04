@@ -21,6 +21,58 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-05 — v3.6.1 shipped: Aetherfield polish.**
+
+Owner ran 3.6.0 on Linux and Windows and found the galaxy jumbled: dead space
+along the bottom, the layout switcher sitting on top of the filter panel, and
+the galaxy centred on the whole pane so its left third hid behind that panel.
+All fixed, plus persistent render settings, overlay scaling, and an Expand
+control. Previewed by the owner on this box before the push, from a directly
+run build — approved on both Linux and, for the earlier build, Windows.
+
+### The two CSS bugs are the same bug, twice
+
+`.content--flush` and `.app-shell--immersive` each lost to a **later rule of
+identical specificity** further down `index.css` (`.content { padding: … }` at
+~998, `.app-shell { grid-template-columns: 200px 1fr }` at ~998). Single-class
+modifiers in that file are not safe; double the class. The immersive one also
+hid `.sidebar`, which takes it out of grid flow and promotes `.main-pane` into
+the *first* column — with a `200px 1fr` track list still in force, the "full
+window" galaxy came out exactly 200px wide.
+
+Neither was visible by reading the CSS. Both were caught by measuring the
+frame's `getBoundingClientRect()` in the harness. Keep asserting geometry, not
+appearance.
+
+### The galaxy shift is a projection offset, not a moved camera
+
+`camera.setViewOffset` in `App.resize()`. The picker renders its pass with the
+same camera object, so the offset carries; moving the camera instead would
+leave picking silently disagreeing with the screen by the offset — the same
+shape as the old dpr-scaled pick buffer. Interaction suite still lands on
+Black Lotus under the cursor, which is the check that proves it.
+
+Panels report what they occlude through `store.insets` (UI must not import
+three; the store is the only channel). `--mcu-inset-left` carries the same
+number to CSS for the layout switcher.
+
+### Nebula: investigated, deliberately unchanged
+
+Owner thought it sat left. It does not: `ARM_TWIST` (shader) and `TWIST`
+(layouts) both read 0.0092, and every structural term in `densityAt` — disc,
+bulge, vertical falloff, arm — is measured from the world origin, same as the
+stars. The only asymmetry is the noise field, sampled with a **time-varying**
+offset, so the densest gas genuinely wanders. A fixed world-space nudge would
+only look right from one camera angle and would drag the gas off the arms.
+Owner re-checked after the centring fix and agreed it looks fine. Do not
+"fix" this without measuring luminance centroids with the nebula on and off.
+
+### What is live
+
+Windows NSIS 12,529,261 bytes + 428-byte `.sig`, key id `67FCA9900F523D49`
+verified by decode. Linux tarball 16,240,531 bytes, sha256 re-checked against
+the published file. macOS dmg from CI. Downloads pruned to 3.6.0 + 3.6.1.
+
 **2026-09-04 — v3.6.0 shipped: Aetherfield.**
 
 New sidebar destination below the eight numbered nav items: the 117,621-card
