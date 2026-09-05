@@ -51,6 +51,10 @@ The frame is mounted **only** while the page is open. Navigating away unmounts
 it, and the WebGL context and render loop die with the document — nothing keeps
 drawing a galaxy behind the rest of the app, or behind a game of Arena.
 
+The public browser URL `https://filthy-net-deck.com/aetherfield/` is a Netlify
+proxy in `website/netlify.toml` onto Aetherfield's own site. It is not this
+iframe, and it must not become a second committed `dist/`.
+
 ## Git size — read before refreshing
 
 `public/aetherfield/` is committed, and 6.5 MB of its 7.4 MB is the generated

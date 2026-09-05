@@ -131,5 +131,6 @@
   "aether.mockLayouts": "Sechs Anordnungen · Galaxie, Zeit, Sets, Preis",
   "aether.mockLayoutsVal": "in der App",
   "aether.mockOffline": "Steckt in der App",
-  "aether.mockOfflineVal": "offline"
+  "aether.mockOfflineVal": "offline",
+  "aether.openWeb": "Aetherfield im Browser öffnen"
 }

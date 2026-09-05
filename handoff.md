@@ -21,6 +21,20 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-05 — phase 2: `filthy-net-deck.com/aetherfield` is a path proxy.**
+
+`website/netlify.toml` rewrites `/aetherfield/*` → `https://mtg-multiverse.netlify.app/:splat`
+(200) and 301s the bare `/aetherfield` to the slash form. Homepage link +
+sitemap + i18n `aether.openWeb` are in. **No second copy of `dist/`.** The
+app iframe is still vendored; this does not need a version bump.
+
+Push Aetherfield (`MTG-Multiverse`) *before* or with this, or the proxy
+serves the previous galaxy. `sw.js` is 404'd on this path on purpose.
+
+Next: phase 3 (title/tour/settings in the app — drop `?shell=play`) and
+phase 4 (Sets/DeckView buttons already exist in this tree) as **one** FND
+release.
+
 **2026-09-05 — three owner questions answered. Read this before touching the embed.**
 
 Owner is continuing tonight with other models. These are the answers, with the

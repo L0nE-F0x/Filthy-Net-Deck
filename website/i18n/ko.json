@@ -131,5 +131,6 @@
   "aether.mockLayouts": "여섯 가지 배치 · 은하, 시간순, 세트, 가격",
   "aether.mockLayoutsVal": "앱 내장",
   "aether.mockOffline": "앱에 포함",
-  "aether.mockOfflineVal": "오프라인"
+  "aether.mockOfflineVal": "오프라인",
+  "aether.openWeb": "브라우저에서 Aetherfield 열기"
 }

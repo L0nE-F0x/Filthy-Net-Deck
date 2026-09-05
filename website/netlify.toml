@@ -77,3 +77,32 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
     Content-Type = "image/png"
+
+# Aetherfield lives on its own Netlify site. Proxy it under this path so
+# filthy-net-deck.com/aetherfield works without a second 7 MB copy in git.
+# `base: './'` in that build makes assets document-relative, so they resolve
+# under this prefix. Trailing slash is mandatory: without it, `./assets/…`
+# hits this site's /assets/ and collides with the marketing bundle.
+#
+# Do NOT copy Aetherfield's dist/ into website/aetherfield/.
+# Do NOT 301 the origin (mtg-multiverse.netlify.app) here — that would loop.
+#
+# sw.js is excluded: the origin sends Service-Worker-Allowed: /, which would
+# let a worker registered from this path control the whole marketing origin.
+
+[[redirects]]
+  from = "/aetherfield/sw.js"
+  to = "/index.html"
+  status = 404
+
+[[redirects]]
+  from = "/aetherfield"
+  to = "/aetherfield/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/aetherfield/*"
+  to = "https://mtg-multiverse.netlify.app/:splat"
+  status = 200
+  force = true

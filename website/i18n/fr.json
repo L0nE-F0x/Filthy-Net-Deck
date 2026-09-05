@@ -131,5 +131,6 @@
   "aether.mockLayouts": "Six dispositions · galaxie, frise, extensions, prix",
   "aether.mockLayoutsVal": "dans l'app",
   "aether.mockOffline": "Intégrée à l'application",
-  "aether.mockOfflineVal": "hors ligne"
+  "aether.mockOfflineVal": "hors ligne",
+  "aether.openWeb": "Ouvrir Aetherfield dans le navigateur"
 }
