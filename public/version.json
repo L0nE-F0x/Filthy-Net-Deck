@@ -1,9 +1,9 @@
 {
-  "version": "3.6.1",
+  "version": "3.7.0",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.6.1.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.6.1-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.0.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.0-universal.dmg"
   },
-  "notes": "v3.6.1: Aetherfield polish — the galaxy uses the whole pane, panels no longer overlap, a new Expand button fills the window, and your render settings are remembered."
+  "notes": "v3.7.0: Aetherfield now opens on its title screen with Tour and Settings. Show a set or a deck in the galaxy from Sets and Deck View."
 }
