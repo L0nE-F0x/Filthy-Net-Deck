@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.5.0** (Windows signed updater · macOS dmg · Linux
+**Live product version: v3.7.0** (Windows signed updater · macOS dmg · Linux
 pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration — see START HERE.**
@@ -21,20 +21,20 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-05 — phase 3: title / tour / settings inside the app.**
+**2026-09-05 — v3.7.0 shipped: Aetherfield title, tour, deep links.**
 
-Sidebar launch loads `/aetherfield/index.html` with no query, so Aetherfield's
-own title shows (Enter / Tour / Settings). Sets and DeckView still pass
-`shell=play` plus `set=` / `cards=` so those land in the galaxy. Install is
-already hidden when framed. Phase 4 (those two buttons) is in this tree.
+Phases 3 and 4 are in the installer. Sidebar opens Aetherfield on its title
+(Enter / Tour / Settings). Sets and Deck View pass `shell=play` plus `set=` /
+`cards=`. The vendored galaxy is the polished one. Public URL
+filthy-net-deck.com/aetherfield is a 200 path proxy — do not 301 slash forms
+(that loops). `sw.js` is 404'd on that path on purpose.
 
-This is **not live in installers** until a version bump and a full release
-(AGENTS.md rule 1). Re-vendor with `npm run aetherfield` so the iframe is
-the polished galaxy, not v3.6.1's copy.
+Windows NSIS 12,543,732 bytes + 428-byte updater `.sig` (key id
+67FCA9900F523D49). macOS dmg 32,066,702 bytes, size-checked against the
+release asset. Linux tarball 16,252,717 bytes. Downloads pruned to 3.6.1 +
+3.7.0.
 
-Phase 2 (done): `filthy-net-deck.com/aetherfield` is a 200 path proxy onto
-mtg-multiverse.netlify.app. Do not 301 `/aetherfield` → `/aetherfield/` —
-that loops. No DNS change. `sw.js` is 404'd on that path on purpose.
+AUR publish of `filthy-net-deck-bin` still waits on Arch registration.
 
 **2026-09-05 — three owner questions answered. Read this before touching the embed.**
 

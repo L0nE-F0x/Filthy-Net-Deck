@@ -1,11 +1,11 @@
 {
-  "version": "3.6.1",
-  "notes": "v3.6.1: Aetherfield polish \u2014 the galaxy uses the whole pane, panels no longer overlap, a new Expand button fills the window, and your render settings are remembered.",
-  "pub_date": "2026-09-04T16:19:18Z",
+  "version": "3.7.0",
+  "notes": "v3.7.0: Aetherfield now opens on its title screen with Tour and Settings. Show a set or a deck in the galaxy from Sets and Deck View.",
+  "pub_date": "2026-09-05T05:22:49Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wi9EVktyU0RuT0IzKzJpMlpJLzNpMGJGNmRzcDdIMit5MFB4ZUkzOVRDd1pzTXdmeitvR2pQVG5lMkQzc2pkcFhYQzdEdVJweHlUbFlONHNYZGd1UXd3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NTM4NjkzCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNi4xX3g2NC1zZXR1cC5leGUKcXI4SVV4eC8zaWNJK0wrVzBSK0VmZ0NYa21sQ3BrZEEyVmdXb1JLc1RwM1NwWUZWSnhaSnRHQmZUcnJiWFFpVmIxTFh4ZzcxcnBhVFp6QndPTHFlRHc9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.6.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjhIV2NDSS8zVzdUVlM4cWpwYWI1SGJ0MlNyemlnRnhuQlV0dEVDd050THpLU2hnMjRJSnFUalh2SUZpTWZzTTV4czFHMGVmS3Fobm5CNmRxR2l1WndrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NTg1MzgxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNy4wX3g2NC1zZXR1cC5leGUKbFl6NWJMTHhuK1dCZHp1cks3Zm5JUUVCVEZoeUJuN3BWam5kU0Q5N2hqSWJSdzB3aVYrY1laZ2k4ZHVJK3hDRXAxTWo3SU9Ha21kbUpFeDd2eEtDRFE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.0.exe"
     }
   }
 }
