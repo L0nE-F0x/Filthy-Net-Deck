@@ -21,22 +21,20 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-05 — phase 2: `filthy-net-deck.com/aetherfield` is a path proxy.**
+**2026-09-05 — phase 3: title / tour / settings inside the app.**
 
-`website/netlify.toml` rewrites `/aetherfield` and `/aetherfield/*` →
-`https://mtg-multiverse.netlify.app/` (200, `force`). **No 301 to add a
-trailing slash** — Netlify treats `/aetherfield` and `/aetherfield/` as the
-same rule, so that 301 looped (`ERR_TOO_MANY_REDIRECTS`). Homepage + sitemap
-still link the slashed form so `base: './'` assets resolve. `sw.js` is 404'd
-on this path on purpose. **No second copy of `dist/`.** The app iframe is
-still vendored; this does not need a version bump. No DNS change.
+Sidebar launch loads `/aetherfield/index.html` with no query, so Aetherfield's
+own title shows (Enter / Tour / Settings). Sets and DeckView still pass
+`shell=play` plus `set=` / `cards=` so those land in the galaxy. Install is
+already hidden when framed. Phase 4 (those two buttons) is in this tree.
 
-Push Aetherfield (`MTG-Multiverse`) *before* or with this, or the proxy
-serves the previous galaxy.
+This is **not live in installers** until a version bump and a full release
+(AGENTS.md rule 1). Re-vendor with `npm run aetherfield` so the iframe is
+the polished galaxy, not v3.6.1's copy.
 
-Next: phase 3 (title/tour/settings in the app — drop `?shell=play`) and
-phase 4 (Sets/DeckView buttons already exist in this tree) as **one** FND
-release.
+Phase 2 (done): `filthy-net-deck.com/aetherfield` is a 200 path proxy onto
+mtg-multiverse.netlify.app. Do not 301 `/aetherfield` → `/aetherfield/` —
+that loops. No DNS change. `sw.js` is 404'd on that path on purpose.
 
 **2026-09-05 — three owner questions answered. Read this before touching the embed.**
 
@@ -46,8 +44,8 @@ evidence, so nobody re-derives them.
 ### 1. Pushing to the Aetherfield repo does NOT update FND
 
 This is the one that matters. **FND does not load Aetherfield over the
-network.** `src/pages/Aetherfield.tsx` sets
-`SRC = "/aetherfield/index.html?shell=play"` — a path *inside the app bundle*.
+network.** `src/pages/Aetherfield.tsx` loads `/aetherfield/index.html` — a path
+*inside the app bundle* (plus an optional query from Sets / DeckView).
 `public/aetherfield/` is a vendored copy of Aetherfield's built `dist/`, baked
 into the installer by `npm run aetherfield`.
 
@@ -80,19 +78,12 @@ to `isAetherMessage` in Aetherfield.tsx** — it currently only matches
 The best long-term shape is a hybrid: try remote, fall back to the vendored
 copy. Nobody has built that.
 
-### 2. The Aetherfield landing page inside FND — yes, one line
+### 2. The Aetherfield landing page inside FND — done (phase 3)
 
-It is skipped on purpose: `?shell=play` in that same `SRC`. Drop the parameter
-and the title screen appears, with ENTER THE MULTIVERSE / TOUR / SETTINGS. The
-reasoning for skipping it was that the sidebar button already asked "do you
-want this?" — but the owner likes the page and wants the tour, which is a fair
-trade. A nicer middle ground: show it on first open, skip it afterwards.
-
-**One papercut to fix if it is enabled:** the title screen's INSTALL APP button
-is visible by default (`ui/title.ts` only hides it for an installed PWA), and
-inside a Tauri webview `beforeinstallprompt` never fires, so it does nothing
-when clicked. Hide it when framed — `isEmbedded()` is already exported from
-Aetherfield's `src/core/embed.ts`.
+The sidebar launch has no query, so the title shows (Enter / Tour / Settings).
+Sets and DeckView still pass `?shell=play` because those clicks already chose
+a destination. Install is hidden when `isEmbedded()` — `beforeinstallprompt`
+never fires in a Tauri webview, so that button would have done nothing.
 
 ### 3. Renaming the Netlify site cannot break FND
 

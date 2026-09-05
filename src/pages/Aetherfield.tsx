@@ -21,11 +21,19 @@ import { useAppStore } from "../store/useAppStore";
  * it, and the WebGL context and render loop die with the document. Nothing
  * keeps drawing a galaxy behind the rest of the app.
  *
- * `?shell=play` skips Aetherfield's own title screen — the sidebar button was
- * already the "do you want this?" click.
+ * The sidebar launch has no query string, so Aetherfield opens on its own
+ * title (Enter / Tour / Settings). Sets and DeckView pass `shell=play` plus
+ * `set=` / `cards=` — those clicks already said where to go, so a second
+ * title would be a door to walk through twice. Install stays hidden in the
+ * frame: Aetherfield's `isEmbedded()` gates it.
  */
 
 const BASE = "/aetherfield/index.html";
+
+/** Iframe URL. Empty query → title screen; Sets/DeckView pass their own. */
+export function aetherFrameSrc(query: string): string {
+  return query ? `${BASE}?${query}` : BASE;
+}
 
 /**
  * How long to wait for the ready ping before calling it dead.
@@ -58,7 +66,7 @@ export function Aetherfield() {
   const { t } = useLocale();
   const aetherQuery = useAppStore((s) => s.aetherQuery);
   const trackerMatches = useAppStore((s) => s.trackerMatches);
-  const src = `${BASE}?${aetherQuery || "shell=play"}`;
+  const src = aetherFrameSrc(aetherQuery);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState<Status>("booting");
   const [detail, setDetail] = useState<string | null>(null);

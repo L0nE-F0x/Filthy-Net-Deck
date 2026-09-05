@@ -42,10 +42,10 @@ are tagged `source: "aetherfield"`, and the host only listens to its own frame.
 | `error` | frame → host | Boot failed — no WebGL2, missing catalogue. Carries the message the galaxy would have shown. |
 | `open-external` | frame → host | `target="_blank"` does nothing inside a Tauri webview: no error, no navigation, the Scryfall link is simply dead. The frame forwards outbound links here and the host runs them through `openExternal()`. |
 
-Two query parameters matter: `?shell=play` skips Aetherfield's own title screen
-(the sidebar button was already the "do you want this?" click), and `?layout=`
-/ `?card=` are how a future deep link from Sets or DeckView would land somewhere
-specific.
+The sidebar launch loads `/aetherfield/index.html` with no query, so the title
+screen (Enter / Tour / Settings) shows in-app. `?shell=play` is reserved for
+deep links from Sets (`set=`, `layout=sets`) and DeckView (`cards=`), which
+have already chosen a destination. Install is hidden when `isEmbedded()`.
 
 The frame is mounted **only** while the page is open. Navigating away unmounts
 it, and the WebGL context and render loop die with the document — nothing keeps
