@@ -52,8 +52,10 @@ it, and the WebGL context and render loop die with the document — nothing keep
 drawing a galaxy behind the rest of the app, or behind a game of Arena.
 
 The public browser URL `https://filthy-net-deck.com/aetherfield/` is a Netlify
-proxy in `website/netlify.toml` onto Aetherfield's own site. It is not this
-iframe, and it must not become a second committed `dist/`.
+**200 proxy** in `website/netlify.toml` onto Aetherfield's own site. It is not
+this iframe, and it must not become a second committed `dist/`. Do not 301
+`/aetherfield` → `/aetherfield/`: Netlify normalises those paths to the same
+rule and the 301 loops.
 
 ## Git size — read before refreshing
 

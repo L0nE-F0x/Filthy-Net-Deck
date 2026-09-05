@@ -23,13 +23,16 @@ that is expected and does not block auto-update.
 
 **2026-09-05 — phase 2: `filthy-net-deck.com/aetherfield` is a path proxy.**
 
-`website/netlify.toml` rewrites `/aetherfield/*` → `https://mtg-multiverse.netlify.app/:splat`
-(200) and 301s the bare `/aetherfield` to the slash form. Homepage link +
-sitemap + i18n `aether.openWeb` are in. **No second copy of `dist/`.** The
-app iframe is still vendored; this does not need a version bump.
+`website/netlify.toml` rewrites `/aetherfield` and `/aetherfield/*` →
+`https://mtg-multiverse.netlify.app/` (200, `force`). **No 301 to add a
+trailing slash** — Netlify treats `/aetherfield` and `/aetherfield/` as the
+same rule, so that 301 looped (`ERR_TOO_MANY_REDIRECTS`). Homepage + sitemap
+still link the slashed form so `base: './'` assets resolve. `sw.js` is 404'd
+on this path on purpose. **No second copy of `dist/`.** The app iframe is
+still vendored; this does not need a version bump. No DNS change.
 
 Push Aetherfield (`MTG-Multiverse`) *before* or with this, or the proxy
-serves the previous galaxy. `sw.js` is 404'd on this path on purpose.
+serves the previous galaxy.
 
 Next: phase 3 (title/tour/settings in the app — drop `?shell=play`) and
 phase 4 (Sets/DeckView buttons already exist in this tree) as **one** FND

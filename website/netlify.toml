@@ -81,11 +81,17 @@
 # Aetherfield lives on its own Netlify site. Proxy it under this path so
 # filthy-net-deck.com/aetherfield works without a second 7 MB copy in git.
 # `base: './'` in that build makes assets document-relative, so they resolve
-# under this prefix. Trailing slash is mandatory: without it, `./assets/…`
-# hits this site's /assets/ and collides with the marketing bundle.
+# under this prefix. The homepage and sitemap use the trailing slash so
+# `./assets/…` stays under /aetherfield/ rather than this site's /assets/.
 #
 # Do NOT copy Aetherfield's dist/ into website/aetherfield/.
 # Do NOT 301 the origin (mtg-multiverse.netlify.app) here — that would loop.
+#
+# Do NOT 301 /aetherfield → /aetherfield/. Netlify's CDN normalises trailing
+# slashes *before* matching, so those two paths are the same rule; a force-301
+# to the slashed form 301s /aetherfield/ to itself (ERR_TOO_MANY_REDIRECTS).
+# You cannot add or remove a trailing slash with a redirect rule.
+# 200-proxy the exact path (slash-equivalent) and the splat instead.
 #
 # sw.js is excluded: the origin sends Service-Worker-Allowed: /, which would
 # let a worker registered from this path control the whole marketing origin.
@@ -97,8 +103,8 @@
 
 [[redirects]]
   from = "/aetherfield"
-  to = "/aetherfield/"
-  status = 301
+  to = "https://mtg-multiverse.netlify.app/"
+  status = 200
   force = true
 
 [[redirects]]
