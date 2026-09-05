@@ -41,6 +41,9 @@ export const ja: Messages = {
     collapse: "元に戻す",
     expandHint: "銀河でウィンドウを埋める",
     collapseHint: "アプリに戻る — Escape でも戻れます",
+    showInGalaxy: "銀河で見る",
+    showDeck: "このデッキを銀河で見る",
+    showCollection: "自分のカードを光らせる",
   },
   chrome: {
     help: "ヘルプ",

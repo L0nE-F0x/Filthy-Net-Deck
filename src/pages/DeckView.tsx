@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { t } from "../i18n";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
@@ -211,6 +212,21 @@ export function DeckView() {
       commander: deck.commander,
     }),
   );
+
+  const onShowInGalaxy = () => {
+    const names = [
+      ...new Set(
+        [
+          ...deck.mainboard.map((c) => c.name),
+          ...deck.sideboard.map((c) => c.name),
+          ...(deck.commander ? [deck.commander] : []),
+        ].filter(Boolean),
+      ),
+    ];
+    useAppStore
+      .getState()
+      .openAether(`shell=play&cards=${encodeURIComponent(names.join(","))}`);
+  };
 
   const onCopy = async () => {
     const ok = await copyToClipboard(arenaText);
@@ -492,6 +508,13 @@ export function DeckView() {
           </span>
         </div>
         <div className="flex gap-2">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={onShowInGalaxy}
+          >
+            {t("aether.showDeck")}
+          </button>
           <button
             type="button"
             className="btn btn-primary btn-sm"

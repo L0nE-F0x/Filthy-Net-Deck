@@ -411,6 +411,9 @@ interface AppState {
   /** Ban-list changes vs the last-acknowledged snapshot (B&R pulse). */
   banChanges: BanChange[];
 
+  /** Query string (no ?) for the Aetherfield iframe, e.g. `shell=play&set=fdn`. */
+  aetherQuery: string;
+  openAether: (query?: string) => void;
   setPage: (p: Page) => void;
   setMode: (m: PlayMode) => void;
   setDailyFormatId: (id: FormatId | null) => void;
@@ -650,7 +653,9 @@ export const useAppStore = create<AppState>((set, get) => {
     // `useSyncExternalStore`, and React always renders external-store updates
     // synchronously — the wrapper deferred nothing and only hid that fact. Page
     // chunks are kept warm by App's idle prefetch instead.
-    setPage: (page) => set({ page }),
+    aetherQuery: "",
+    openAether: (query = "") => set({ page: "aether", aetherQuery: query }),
+    setPage: (page) => set({ page, ...(page === "aether" ? { aetherQuery: "" } : {}) }),
     setMode: (mode) => set({ mode }),
     setDailyFormatId: (dailyFormatId) => {
       if (dailyFormatId) {

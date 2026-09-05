@@ -395,13 +395,24 @@ function SetGallery({
             </span>
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => void openExternal(set.scryfallUri)}
-        >
-          Open on Scryfall
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() =>
+              useAppStore.getState().openAether(`shell=play&set=${encodeURIComponent(set.code)}&layout=sets`)
+            }
+          >
+            {t("aether.showInGalaxy")}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => void openExternal(set.scryfallUri)}
+          >
+            Open on Scryfall
+          </button>
+        </div>
       </div>
 
       {set.freshSpoilers?.length ? <FreshSpoilers cards={set.freshSpoilers} /> : null}

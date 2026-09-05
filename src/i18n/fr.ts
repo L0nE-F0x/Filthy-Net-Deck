@@ -41,6 +41,9 @@ export const fr: Messages = {
     collapse: "Réduire",
     expandHint: "Remplir la fenêtre avec la galaxie",
     collapseHint: "Revenir à l'app — ou appuyez sur Échap",
+    showInGalaxy: "Voir dans la galaxie",
+    showDeck: "Voir ce deck dans la galaxie",
+    showCollection: "Allumer mes cartes",
   },
   chrome: {
     help: "Aide",

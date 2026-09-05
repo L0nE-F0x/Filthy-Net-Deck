@@ -41,6 +41,9 @@ export const ko: Messages = {
     collapse: "되돌리기",
     expandHint: "은하로 창을 채웁니다",
     collapseHint: "앱으로 돌아가기 — Esc 키로도 가능",
+    showInGalaxy: "은하에서 보기",
+    showDeck: "이 덱을 은하에서 보기",
+    showCollection: "내 카드 밝히기",
   },
   chrome: {
     help: "도움말",

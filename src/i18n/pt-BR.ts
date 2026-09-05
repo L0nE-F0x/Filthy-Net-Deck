@@ -41,6 +41,9 @@ export const ptBR: Messages = {
     collapse: "Recolher",
     expandHint: "Preencher a janela com a galáxia",
     collapseHint: "Voltar ao app — ou aperte Esc",
+    showInGalaxy: "Ver na galáxia",
+    showDeck: "Ver este deck na galáxia",
+    showCollection: "Acender minhas cartas",
   },
   chrome: {
     help: "Ajuda",

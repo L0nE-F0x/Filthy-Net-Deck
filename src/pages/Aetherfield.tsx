@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "../i18n";
 import { openExternal } from "../services/openExternal";
+import { resolveArenaCardNames } from "../services/arenaCards";
+import { useAppStore } from "../store/useAppStore";
 
 /**
  * Aetherfield — every printed Magic card as an explorable galaxy.
@@ -23,7 +25,7 @@ import { openExternal } from "../services/openExternal";
  * already the "do you want this?" click.
  */
 
-const SRC = "/aetherfield/index.html?shell=play";
+const BASE = "/aetherfield/index.html";
 
 /**
  * How long to wait for the ready ping before calling it dead.
@@ -54,6 +56,9 @@ type Status = "booting" | "ready" | "failed";
 
 export function Aetherfield() {
   const { t } = useLocale();
+  const aetherQuery = useAppStore((s) => s.aetherQuery);
+  const trackerMatches = useAppStore((s) => s.trackerMatches);
+  const src = `${BASE}?${aetherQuery || "shell=play"}`;
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [status, setStatus] = useState<Status>("booting");
   const [detail, setDetail] = useState<string | null>(null);
@@ -106,6 +111,7 @@ export function Aetherfield() {
       switch (event.data.type) {
         case "ready":
           setStatus("ready");
+          void pushCollection(frameRef.current?.contentWindow, trackerMatches);
           break;
         case "error":
           setDetail(event.data.message);
@@ -128,17 +134,17 @@ export function Aetherfield() {
       window.removeEventListener("message", onMessage);
       window.clearTimeout(timer);
     };
-  }, [attempt]);
+  }, [attempt, trackerMatches]);
 
   return (
     <div className="aether-frame-wrap">
       {status !== "failed" && (
         <>
           <iframe
-            key={attempt}
+            key={`${attempt}-${src}`}
             ref={frameRef}
             className="aether-frame"
-            src={SRC}
+            src={src}
             title={t("aether.title")}
           />
           {/*
@@ -179,4 +185,21 @@ export function Aetherfield() {
       )}
     </div>
   );
+}
+
+async function pushCollection(
+  win: Window | null | undefined,
+  matches: { deckMain?: number[]; deckSide?: number[] }[],
+): Promise<void> {
+  if (!win) return;
+  const ids: number[] = [];
+  for (const m of matches) {
+    if (m.deckMain) ids.push(...m.deckMain);
+    if (m.deckSide) ids.push(...m.deckSide);
+  }
+  if (ids.length === 0) return;
+  const names = await resolveArenaCardNames(ids);
+  const unique = [...new Set(Object.values(names))].filter(Boolean);
+  if (unique.length === 0) return;
+  win.postMessage({ source: "aetherfield", type: "highlight", names: unique }, "*");
 }

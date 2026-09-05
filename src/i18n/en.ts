@@ -43,6 +43,9 @@ export const en = {
     collapse: "Collapse",
     expandHint: "Fill the window with the galaxy",
     collapseHint: "Back to the app — or press Escape",
+    showInGalaxy: "Show in galaxy",
+    showDeck: "Show this deck in the galaxy",
+    showCollection: "Light up my cards",
   },
   chrome: {
     help: "Help",
