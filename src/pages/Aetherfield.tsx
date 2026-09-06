@@ -36,6 +36,15 @@ export function aetherFrameSrc(query: string): string {
 }
 
 /**
+ * True when the iframe URL already names a deck. Collection overlay must not
+ * replace that highlight — `highlight` is wholesale, so posting the cards this
+ * machine has played would throw away the deck the user just asked to see.
+ */
+export function queryPinsDeck(query: string): boolean {
+  return /(?:^|&)cards=/.test(query);
+}
+
+/**
  * How long to wait for the ready ping before calling it dead.
  *
  * There is no cheaper signal to wait on: an iframe fires `load` for a 404 page
@@ -162,10 +171,13 @@ export function Aetherfield() {
    * Hand the galaxy what this machine has played — on boot, and again whenever
    * the tracker learns something new. The tracker gains matches while the page
    * sits open, and a highlight frozen at boot goes quietly stale. `highlight`
-   * replaces the galaxy's set wholesale, so re-sending it is idempotent.
+   * replaces the galaxy's set wholesale, so re-sending it is idempotent — and
+   * that is also why a deck deep-link must skip this: posting the collection
+   * would throw the deck away.
    */
   useEffect(() => {
     if (status !== "ready") return;
+    if (queryPinsDeck(aetherQuery)) return;
     let cancelled = false;
     void pushCollection(
       frameRef.current?.contentWindow,
@@ -175,7 +187,7 @@ export function Aetherfield() {
     return () => {
       cancelled = true;
     };
-  }, [status, trackerMatches]);
+  }, [status, trackerMatches, aetherQuery]);
 
   return (
     <div className="aether-frame-wrap">

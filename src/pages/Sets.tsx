@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { t, useLocale } from "../i18n";
+import { useLocale } from "../i18n";
 import { scryfallCdnUrl } from "../services/scryfall";
 import { ScryfallImg } from "../components/ScryfallImg";
 import { openExternal } from "../services/openExternal";
@@ -211,6 +211,7 @@ function CardDetailDrawer({
  * automatically once the card is confirmed in the gallery.
  */
 function FreshSpoilers({ cards }: { cards: FreshSpoilerCard[] }): ReactNode {
+  const { t } = useLocale();
   if (!cards.length) return null;
   return (
     <section className="fresh-spoilers panel !p-3" aria-label="Just spoiled — unconfirmed">
@@ -602,6 +603,7 @@ function FutureStandardSection({
   futureSets: FutureSet[];
   onPlayTrailer: (setName: string, trailer: SetTrailer) => void;
 }) {
+  const { t } = useLocale();
   if (!futureSets.length) return null;
   return (
     <section>
@@ -689,6 +691,7 @@ function SetCard({
   rotationDays?: number | null;
   rotationLabel?: string | null;
 }) {
+  const { t } = useLocale();
   const trailer = trailerForSet({
     code: set.code,
     name: set.name,

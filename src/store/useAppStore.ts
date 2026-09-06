@@ -655,7 +655,15 @@ export const useAppStore = create<AppState>((set, get) => {
     // chunks are kept warm by App's idle prefetch instead.
     aetherQuery: "",
     openAether: (query = "") => set({ page: "aether", aetherQuery: query }),
-    setPage: (page) => set({ page, ...(page === "aether" ? { aetherQuery: "" } : {}) }),
+    // Clicking the already-open Aetherfield item must not wipe a deck/set
+    // deep link: that remounted the iframe onto the title and looked like
+    // the galaxy "reset itself". Leave the page, then come back via the
+    // sidebar, to get the title again.
+    setPage: (page) =>
+      set((s) => {
+        if (page === s.page) return s;
+        return { page, ...(page === "aether" ? { aetherQuery: "" } : {}) };
+      }),
     setMode: (mode) => set({ mode }),
     setDailyFormatId: (dailyFormatId) => {
       if (dailyFormatId) {
