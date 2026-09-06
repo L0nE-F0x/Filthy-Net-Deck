@@ -1,9 +1,9 @@
 {
-  "version": "3.7.3",
+  "version": "3.7.4",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.3.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.2-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.4.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.4-universal.dmg"
   },
-  "notes": "v3.7.3: The reprint thread dismisses cleanly, Saved Views is gone, settings explain themselves, and the galaxy looks a bit richer."
+  "notes": "v3.7.4: Aetherfield look pass — fly a colour arm, a reprint thread that reads, era ticks, and a newest-set pulse."
 }

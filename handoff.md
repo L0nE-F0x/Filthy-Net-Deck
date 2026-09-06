@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.3** (Windows signed updater · macOS still on the
+**Live product version: v3.7.4** (Windows signed updater · macOS still on the
 3.7.2 dmg until CI · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration — see START HERE.**
@@ -20,6 +20,16 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-06 — v3.7.4: Aetherfield look pass (arm flights, focus, era ticks).**
+
+Vendors the second Aetherfield pass plus arm fly-ins, selected-card dim,
+readable era ticks, and a newest-set rim pulse.
+
+Windows NSIS + updater `.sig` (key id `67FCA9900F523D49`). Linux tarball
+`filthy-net-deck-3.7.4-x86_64.tar.gz`, sha256
+`7213923e07d5347febccff8ebacf9761e2707d955db4e92701be31a39c885d2d`.
+macOS still serves the 3.7.2 dmg until CI attaches 3.7.4.
 
 **2026-09-06 — v3.7.3: reprint thread, Saved Views gone, settings tips, look.**
 

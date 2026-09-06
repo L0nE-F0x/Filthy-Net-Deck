@@ -134,7 +134,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v3.7.3  {mid}  AETHERFIELD"
+    badge_text = f"NEW  {mid}  v3.7.4  {mid}  AETHERFIELD"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
