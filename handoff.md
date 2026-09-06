@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.2** (Windows signed updater · macOS dmg · Linux
-pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+**Live product version: v3.7.3** (Windows signed updater · macOS still on the
+3.7.2 dmg until CI · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration — see START HERE.**
 
@@ -20,6 +20,14 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-06 — v3.7.3: reprint thread, Saved Views gone, settings tips, look.**
+
+Vendors the Aetherfield pass: the printing thread dismisses and stays gone
+across layout switches; Saved Views is stripped; settings sliders have hover
+explanations; colour-pie compass and bloom/nebula got a polish.
+
+macOS still serves the 3.7.2 dmg until CI attaches 3.7.3.
 
 **2026-09-06 — v3.7.2 shipped: the galaxy deck is isolated again.**
 

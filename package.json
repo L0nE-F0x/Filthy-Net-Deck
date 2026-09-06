@@ -1,7 +1,7 @@
 {
   "name": "filthy-net-deck",
   "private": true,
-  "version": "3.7.2",
+  "version": "3.7.3",
   "license": "MIT",
   "type": "module",
   "scripts": {

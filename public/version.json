@@ -1,9 +1,9 @@
 {
-  "version": "3.7.2",
+  "version": "3.7.3",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.2.exe",
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.3.exe",
     "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.2-universal.dmg"
   },
-  "notes": "v3.7.2: Show this deck in the galaxy isolates your list again. Commander names still work, the link survives a reload, and your collection no longer overwrites the deck."
+  "notes": "v3.7.3: The reprint thread dismisses cleanly, Saved Views is gone, settings explain themselves, and the galaxy looks a bit richer."
 }
