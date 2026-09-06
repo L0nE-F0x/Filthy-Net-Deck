@@ -3,10 +3,11 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.1** (Windows signed updater · macOS dmg · Linux
-pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
-· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
-registration — see START HERE.**
+**Live product version: v3.7.2** (Windows signed updater · Linux pacman
+package · macOS still on the 3.7.1 dmg until CI attaches 3.7.2)
+· repo `L0nE-F0x/Filthy-Net-Deck`
+· **Next: roll the 3.7.2 macOS dmg from the GitHub Release, then publish
+`filthy-net-deck-bin` to the AUR the day Arch reopens registration.**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -20,6 +21,25 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-06 — v3.7.2 shipped: the galaxy deck is isolated again.**
+
+The audit's v3.7.1 "highlight in place" made Show this deck look like nothing
+happened. Additive blending of 117k dimmed stars is still a full galaxy, the
+nebula stayed at full strength, and FND then posted the tracker's whole
+collection over the highlight, so anyone with match history never saw the
+deck they clicked.
+
+v3.7.2 restores isolation (filter + highlight), keeps the real audit fixes
+(commander commas, URL round-trip, nebula invalidate, WebView2 defaults),
+skips collection overlay when `?cards=` is on the iframe, and no-ops a
+sidebar click while Aetherfield is already open.
+
+Windows NSIS + updater `.sig` (key id `67FCA9900F523D49`). Linux tarball
+`filthy-net-deck-3.7.2-x86_64.tar.gz`, sha256
+`0e77ede23d635934f8fb58f4a1cfece1076d3e89967a3b795d1088effaa4ba75`.
+macOS still serves the 3.7.1 dmg until CI builds 3.7.2 on the tag — same
+pattern as 3.7.1. Downloads pruned to 3.7.1 + 3.7.2.
 
 **2026-09-06 — v3.7.1 shipped: the audit fixes, and the galaxy deck link.**
 

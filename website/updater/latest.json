@@ -1,11 +1,11 @@
 {
-  "version": "3.7.1",
-  "notes": "v3.7.1: Show deck in galaxy works for commanders and survives a reload, and lights your deck up in place instead of hiding every other card. Nebula controls respond with auto-rotate off. Saved views work on macOS. Windows privacy defaults restored.",
-  "pub_date": "2026-09-06T13:09:00Z",
+  "version": "3.7.2",
+  "notes": "v3.7.2: Show this deck in the galaxy isolates your list again. Commander names still work, the link survives a reload, and your collection no longer overwrites the deck.",
+  "pub_date": "2026-09-06T08:56:29Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjd5U0gra2h2ZFVNOSsrRTV6OTA3Nm5jZ3dhZ29Odm45VnhxOWV0cWhPOUFTYnhUeEtRYzh5Qk9ZYlhCdzVRN0Flb2EvbnBmUjJmM1M4dXMrM2FoU3drPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4NjcxMjMwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNy4xX3g2NC1zZXR1cC5leGUKdExzbW5QSUs3UWlGTkNzOWFNWFJsb1llRUk3SWtCdVkyOUQ3cEcvQU5ZSlNvcmFXc0VPWTZxc0hqbFZIZDdsSnhlTEZSSGxSQ09oRmh2bFV4elE3QVE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjc2WDNuaFZ5WS9sb3B0NkVpbmgyRStxckdwT01PcmwvWmFzdXptSFl1RnlCSGUycGJHM3VBczE2QkppYmR2bm9iZFFJYWl2bDZBNnVOa1JHWFhwTWdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4Njg0OTUyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuNy4yX3g2NC1zZXR1cC5leGUKSW1KdkZoOFptekNuTHdwVXRraWN5TzlYTjRSNTdRS2RQSmcyN2ZBRkRFcit6OEY0ZTNxRGpLUXljZ1QwYkdxaTR6TjNhK1J2WldLTU1xc2xyald5RGc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.2.exe"
     }
   }
 }

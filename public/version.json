@@ -1,9 +1,9 @@
 {
-  "version": "3.7.1",
+  "version": "3.7.2",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.1.exe",
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.2.exe",
     "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.1-universal.dmg"
   },
-  "notes": "Deck links to the galaxy survive a reload and work for commanders. The galaxy highlights your deck in place instead of hiding everything else. Nebula controls respond with auto-rotate off. Saved views work on macOS. Windows privacy defaults restored."
+  "notes": "v3.7.2: Show this deck in the galaxy isolates your list again. Commander names still work, the link survives a reload, and your collection no longer overwrites the deck."
 }
