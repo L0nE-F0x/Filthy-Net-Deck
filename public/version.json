@@ -1,9 +1,9 @@
 {
-  "version": "3.7.0",
+  "version": "3.7.1",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.0.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.0-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.1.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.1-universal.dmg"
   },
-  "notes": "v3.7.0: Aetherfield now opens on its title screen with Tour and Settings. Show a set or a deck in the galaxy from Sets and Deck View."
+  "notes": "Deck links to the galaxy survive a reload and work for commanders. The galaxy highlights your deck in place instead of hiding everything else. Nebula controls respond with auto-rotate off. Saved views work on macOS. Windows privacy defaults restored."
 }
