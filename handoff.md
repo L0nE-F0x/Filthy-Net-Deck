@@ -21,6 +21,14 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-06 night — session closed. v3.7.4 is on all three platforms.**
+
+Windows NSIS + updater, Linux tarball, macOS universal dmg (32,265,102 bytes)
+all live. Homepage Download for macOS is v3.7.4.
+
+Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration. Nothing else.
+
 **2026-09-06 — v3.7.4: Aetherfield look pass (arm flights, focus, era ticks).**
 
 Vendors the second Aetherfield pass plus arm fly-ins, selected-card dim,
