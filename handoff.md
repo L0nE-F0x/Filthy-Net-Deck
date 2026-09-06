@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.0** (Windows signed updater · macOS dmg · Linux
+**Live product version: v3.7.1** (Windows signed updater · macOS dmg · Linux
 pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration — see START HERE.**
@@ -20,6 +20,43 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-06 — v3.7.1 shipped: the audit fixes, and the galaxy deck link.**
+
+A bug-fix release that exists mainly to get the Aetherfield audit fixes into
+the installer. Pushing the galaxy's repo only updates the public website —
+FND ships a vendored `public/aetherfield/`, so nothing reached users until
+this bump. `npm run aetherfield` was re-run; the vendored bundle is the fixed
+one.
+
+The headline: **Show deck in galaxy was broken for every commander.** The
+list was `encodeURIComponent(names.join(","))`, and a tenth of card names
+contain a comma — every "Narset, Parter of Veils", which is to say every
+commander the button deliberately appends. After decoding, a separator and a
+comma inside a name are the same character. Both sides encode per token now,
+and the galaxy re-splits an unresolved token so links already shared still
+work. The link also survives a reload, and the deck now **highlights in
+place** rather than filtering the galaxy down to itself.
+
+Windows privacy defaults are restored — see the commit. 3.7.0's
+`additionalBrowserArgs` replaced wry's default string instead of adding to
+it, which silently re-enabled `msSmartScreenProtection`.
+
+Artifacts: Windows NSIS 12,591,286 bytes + 428-byte updater `.sig`, key id
+`67FCA9900F523D49` (decoded from both the sig and `tauri.conf.json`, matched,
+not assumed). Linux tarball 16,303,473 bytes, sha256
+`6075a4a4d3bb0f93695c04eeb86ef1c78e0037f4527757b3d0c760719d665979`, already
+in the PKGBUILD. Downloads pruned to 3.7.0 + 3.7.1.
+
+**Full audit of the v3.7.0 work is `../Magic Card Universe/AUDIT-2026-09-05.md`**
+— every finding in it is now fixed and shipped, across both repos.
+
+**Still open:** four module-level `t()` call sites in `Sets.tsx` (219, 610,
+766, 777) have the same memo-fragility as the two the audit named. Left
+alone deliberately; not user-visible today.
+
+AUR publish of `filthy-net-deck-bin` still waits on Arch registration — the
+PKGBUILD is already at 3.7.1 with the right checksum.
 
 **2026-09-05 — v3.7.0 shipped: Aetherfield title, tour, deep links.**
 
