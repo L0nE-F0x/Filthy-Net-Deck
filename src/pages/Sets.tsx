@@ -252,6 +252,7 @@ function SetGallery({
   /** Z2 drop-day: open with "new" filter when there are new cards. */
   preferNewFilter?: boolean;
 }): ReactNode {
+  const { t } = useLocale();
   const [rarity, setRarity] = useState<RarityFilter>("all");
   const [color, setColor] = useState<ColorFilter>("all");
   const [typeF, setTypeF] = useState<TypeFilter>("all");

@@ -37,7 +37,7 @@
         "resizable": true,
         "fullscreen": false,
         "center": true,
-        "additionalBrowserArgs": "--ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy --disable-gpu-driver-bug-workarounds"
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --force_high_performance_gpu"
       }
     ],
     "security": {

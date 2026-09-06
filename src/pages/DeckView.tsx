@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { t } from "../i18n";
+import { useLocale } from "../i18n";
 import { useAppStore } from "../store/useAppStore";
 import { TierBadge } from "../components/TierBadge";
 import { ColorPips } from "../components/ColorPips";
@@ -116,6 +116,7 @@ function averageManaValue(cards: CardEntry[]): number | null {
 }
 
 export function DeckView() {
+  const { t } = useLocale();
   const meta = useAppStore((s) => s.meta);
   const sets = useAppStore((s) => s.sets);
   const deckId = useAppStore((s) => s.selectedDeckId);
@@ -223,9 +224,16 @@ export function DeckView() {
         ].filter(Boolean),
       ),
     ];
+    // Encode each name, then join: `cards=` is a comma-separated list, and a
+    // tenth of all card names contain a comma — every "Narset, Parter of
+    // Veils", which is to say every commander this deliberately appends.
+    // Encoding the joined string instead made the separators and the commas
+    // inside names both bare commas, and the galaxy split the legends in half.
     useAppStore
       .getState()
-      .openAether(`shell=play&cards=${encodeURIComponent(names.join(","))}`);
+      .openAether(
+        `shell=play&cards=${names.map(encodeURIComponent).join(",")}`,
+      );
   };
 
   const onCopy = async () => {

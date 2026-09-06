@@ -36,11 +36,20 @@ regenerated.
 `src/core/embed.ts` in the Aetherfield repo is the other half of this. Messages
 are tagged `source: "aetherfield"`, and the host only listens to its own frame.
 
-| Message | Direction | Why it exists |
-|---|---|---|
-| `ready` | frame → host | An iframe fires `load` for a 404 page exactly as it does for a real one. Without an explicit ping there is no way to tell a missing `public/aetherfield/` from a slow boot, so the host waits for this and falls back on a timeout. |
-| `error` | frame → host | Boot failed — no WebGL2, missing catalogue. Carries the message the galaxy would have shown. |
-| `open-external` | frame → host | `target="_blank"` does nothing inside a Tauri webview: no error, no navigation, the Scryfall link is simply dead. The frame forwards outbound links here and the host runs them through `openExternal()`. |
+| Message | Direction | Payload | Why it exists |
+|---|---|---|---|
+| `ready` | frame → host | `{ cards: number }` | An iframe fires `load` for a 404 page exactly as it does for a real one. Without an explicit ping there is no way to tell a missing `public/aetherfield/` from a slow boot, so the host waits for this and falls back on a timeout. |
+| `error` | frame → host | `{ message: string }` | Boot failed — no WebGL2, missing catalogue. Carries the message the galaxy would have shown. |
+| `open-external` | frame → host | `{ url: string }` | `target="_blank"` does nothing inside a Tauri webview: no error, no navigation, the Scryfall link is simply dead. The frame forwards outbound links here and the host runs them through `openExternal()`. |
+| `highlight` | host → frame | `{ names?: string[]; uuids?: string[] }` | Lights up the cards this machine has actually played. `pushCollection()` sends it on `ready` and again whenever the tracker gains a match — it replaces the galaxy's highlight set wholesale, so re-sending is idempotent. Names are resolved from Arena ids via `resolveArenaCardNames()`; `uuids` is the alternative for a caller that already has Scryfall ids. |
+| `show-set` | host → frame | `{ code: string }` | Filters to one set and switches to the `sets` layout. **Not sent today** — Sets deep-links with `?set=` on the frame URL instead, because that click also wants the title screen skipped. Handled by the frame, so it stays available without a reload. |
+| `clear-highlight` | host → frame | *(none)* | Drops the highlight set and restores the default oracle filter. **Not sent today**; the frame's handler exists so the host can undo a `highlight` without remounting. |
+
+Host → frame messages are posted at the frame's `contentWindow` with the same
+`source: "aetherfield"` tag and `targetOrigin: "*"` — the vendored build is
+same-origin, but the loose origin keeps a dev-server embed working, and nothing
+here is private. The frame's `onHostMessage()` ignores anything else on the
+channel.
 
 The sidebar launch loads `/aetherfield/index.html` with no query, so the title
 screen (Enter / Tour / Settings) shows in-app. `?shell=play` is reserved for
@@ -85,3 +94,24 @@ remounts the frame. In order of likelihood:
    `vite.config.ts` still has `base: './'`; a root-absolute `/assets/…` resolves
    against this app's origin and collides with this app's own bundle. The sync
    script fails loudly on this, so it usually means the folder was hand-edited.
+
+## `additionalBrowserArgs` replaces wry's defaults — it does not extend them
+
+JSON takes no comments, so the warning lives here. The window's
+`additionalBrowserArgs` in `src-tauri/tauri.conf.json` is read with
+`unwrap_or_else` (`wry-0.55.1/src/webview2/mod.rs:294`), so **any** value
+supplied there drops wry's entire default string:
+
+```
+--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection
+```
+
+Losing it re-enables WebView2's mini-menu (wry#535), the PDF out-of-process UI,
+and SmartScreen's per-navigation reputation call to Microsoft — not a thing an
+app that pitches local-only tracking should be making. Keep those three
+re-listed in whatever else the value asks for.
+
+The flag that actually picks the discrete GPU is `--force_high_performance_gpu`.
+`--ignore-gpu-blocklist` and `--disable-gpu-driver-bug-workarounds` do not ask
+for it; they re-enable the driver paths Chromium blocklists *because* they
+crash, which on this page is the worst place to find out.

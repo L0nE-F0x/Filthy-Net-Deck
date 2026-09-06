@@ -109,7 +109,21 @@ export function Aetherfield() {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [immersive]);
 
+  /**
+   * One listener and one boot timeout per mounted frame.
+   *
+   * The deps are exactly what remounts the iframe — its `key` is
+   * `attempt`-`src` — and nothing else. Keying this to the tracker instead
+   * restarted the 45 s timer on every poll that changed a match, so during a
+   * game a genuinely dead frame never reached the fallback.
+   */
   useEffect(() => {
+    // A new `src` is a new document, so the last boot's verdict does not carry
+    // over. Without this a src-driven remount would leave `status` at "ready"
+    // with nothing armed to notice the new frame never booting.
+    setStatus("booting");
+    setDetail(null);
+
     const onMessage = (event: MessageEvent) => {
       // A window receives everything anyone posts at it. Only listen to our
       // own frame, and only to messages wearing the channel tag.
@@ -118,8 +132,8 @@ export function Aetherfield() {
 
       switch (event.data.type) {
         case "ready":
+          // The collection push hangs off `status`, below.
           setStatus("ready");
-          void pushCollection(frameRef.current?.contentWindow, trackerMatches);
           break;
         case "error":
           setDetail(event.data.message);
@@ -142,7 +156,26 @@ export function Aetherfield() {
       window.removeEventListener("message", onMessage);
       window.clearTimeout(timer);
     };
-  }, [attempt, trackerMatches]);
+  }, [attempt, src]);
+
+  /**
+   * Hand the galaxy what this machine has played — on boot, and again whenever
+   * the tracker learns something new. The tracker gains matches while the page
+   * sits open, and a highlight frozen at boot goes quietly stale. `highlight`
+   * replaces the galaxy's set wholesale, so re-sending it is idempotent.
+   */
+  useEffect(() => {
+    if (status !== "ready") return;
+    let cancelled = false;
+    void pushCollection(
+      frameRef.current?.contentWindow,
+      trackerMatches,
+      () => cancelled,
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [status, trackerMatches]);
 
   return (
     <div className="aether-frame-wrap">
@@ -198,6 +231,7 @@ export function Aetherfield() {
 async function pushCollection(
   win: Window | null | undefined,
   matches: { deckMain?: number[]; deckSide?: number[] }[],
+  cancelled?: () => boolean,
 ): Promise<void> {
   if (!win) return;
   const ids: number[] = [];
@@ -207,6 +241,9 @@ async function pushCollection(
   }
   if (ids.length === 0) return;
   const names = await resolveArenaCardNames(ids);
+  // Names resolve from cache or from Scryfall, so two pushes can finish out of
+  // order. The one that was superseded mid-resolve must not post the older set.
+  if (cancelled?.()) return;
   const unique = [...new Set(Object.values(names))].filter(Boolean);
   if (unique.length === 0) return;
   win.postMessage({ source: "aetherfield", type: "highlight", names: unique }, "*");

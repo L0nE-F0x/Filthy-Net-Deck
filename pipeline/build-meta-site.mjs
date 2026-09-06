@@ -1637,6 +1637,8 @@ function sitemapPriority(p) {
 /** Bump when `website/privacy.html` is substantively edited. */
 const PRIVACY_LASTMOD = "2026-09-02";
 const FEEDBACK_LASTMOD = "2026-08-17";
+/** `/aetherfield/` is a Netlify 200 proxy, so it changes when Aetherfield ships. */
+const AETHERFIELD_LASTMOD = "2026-09-05";
 
 function writeSitemap(paths, lastmod) {
   const mod = /^\d{4}-\d{2}-\d{2}$/.test(String(lastmod || "")) ? String(lastmod) : null;
@@ -1660,6 +1662,12 @@ function writeSitemap(paths, lastmod) {
     <loc>${SITE}/</loc>${modTag}
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${SITE}/aetherfield/</loc>
+    <lastmod>${AETHERFIELD_LASTMOD}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>${SITE}/privacy.html</loc>
