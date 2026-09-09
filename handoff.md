@@ -3,9 +3,10 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.4** — **v3.8.0 in progress** (Set Radar spoiler
-talk). Do not advertise 3.8.0 on the site until the macOS dmg is attached.
-Repo `L0nE-F0x/Filthy-Net-Deck`. AUR still blocked on Arch registration.
+**Live product version: v3.8.0** (Windows signed updater · macOS universal dmg
+rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration.**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -20,12 +21,16 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-09 — v3.8.0 Set Radar spoiler-talk. Source tagged; website held
-until the macOS dmg lands.**
+**2026-09-09 — v3.8.0 shipped: Set Radar for spoiler season.**
 
-Do not flip `website/` to 3.8.0 until
-`Filthy-Net-Deck-3.8.0-universal.dmg` is on the GitHub Release. The macOS
-button 404s if the site moves first.
+Filter by the day a card was spoiled, zoom unconfirmed previews, hourly
+MythicSpoiler + Scryfall. Windows NSIS 12,789,630 bytes + 428-byte updater
+`.sig` (key id `67FCA9900F523D49`). Linux tarball
+`filthy-net-deck-3.8.0-x86_64.tar.gz` 16,517,712 bytes, sha256
+`a32e1a9325fd964a58b7686f1a4ac3d315f175b03357dec00989f20b10eb5f70`.
+macOS dmg 32,603,132 bytes, size-checked against the release asset.
+
+Downloads pruned to 3.7.4 + 3.8.0. AUR still waits on Arch registration.
 
 **2026-09-09 — Set Radar spoiler-talk pass is in the working tree, not shipped.**
 
