@@ -21,6 +21,41 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-09 — 4c Reanimator was shipping the wrong 60. Matcher tightened,
+live feed republished. No app version bump.**
+
+Owner opened Standard Bo1 #5 "4c Reanimator" and got a Llanowar Elves
+pile (no Bringer of the Last Gift) while the art strip still showed
+Bringer. Root cause: `scoreListForArchetype` accepted any tournament
+list that hit 2 of 3 Goldfish tile keys. Formidable Speaker + Superior
+Spider-Man are midrange staples; the 2026-09-08 Challenge 32 "xfile"
+60 passed and beat the actual Bringer representative (C3 prefers MTGO).
+
+Fix: when a Goldfish prototype exists, require real *spell* overlap
+(lands no longer count). Regression in `pipeline/listMatch.test.mjs`.
+Re-ran `npm run meta`: Bo1 4c Reanimator is now the magic.gg Traditional
+list with 4 Bringer / 0 Elves. Art strip skips key cards that are not
+in the 60 (ships with the next app release; the feed fix is what users
+see today).
+
+Push `origin/main` so Netlify serves the new `latest.json` — the app
+re-fetches on launch / when the loaded copy is >90 minutes old.
+
+Product still v3.7.4. Next remains AUR `filthy-net-deck-bin`.
+
+**2026-09-08 — session closed. Meta audit: Bo1 board is correct.**
+
+Owner saw a lot of Izzet Spellementals in Arena Bo1 and it was not on
+FND's top 8. Not a pipeline miss. Live feed 2026-09-08; daily-meta CI
+green. Standard Bo3 (Goldfish) has Spellementals at **#2 / 11.7%**.
+Standard Bo1 (Untapped all-ranks Ladder, period 734 since 11 Aug) has
+it at **#14 / 2.1%**. App + homepage default to Bo1. Owner's 19 tracked
+Platinum Bo1 games 2–7 Sep: **zero** Spellementals (no Eddymurk Crab /
+Hearth Elemental / Sunderflock). Do not "fix" Bo1 ranking to match Bo3.
+
+No code landed. Product still v3.7.4. Next remains AUR
+`filthy-net-deck-bin` when Arch reopens registration.
+
 **2026-09-06 night — session closed. v3.7.4 is on all three platforms.**
 
 Windows NSIS + updater, Linux tarball, macOS universal dmg (32,265,102 bytes)

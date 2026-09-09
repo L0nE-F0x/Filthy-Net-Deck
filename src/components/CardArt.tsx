@@ -142,22 +142,40 @@ function isLand(entry: CardEntry): boolean {
  * source, i.e. the archetype's signature cards) → highest-count nonland
  * mainboard cards. scryfallIds are pulled from the list when available.
  */
+function frontName(name: string): string {
+  return name.split("//")[0]?.trim().toLowerCase() ?? "";
+}
+
 export function pickPreviewCards(
   deck: Pick<Deck, "mainboard" | "commander" | "keyCards">,
 ): ArtRef[] {
   const byName = new Map<string, CardEntry>();
-  for (const c of deck.mainboard) byName.set(c.name.toLowerCase(), c);
+  const byFront = new Map<string, CardEntry>();
+  for (const c of deck.mainboard) {
+    byName.set(c.name.toLowerCase(), c);
+    const front = frontName(c.name);
+    if (front && !byFront.has(front)) byFront.set(front, c);
+  }
 
   const out: ArtRef[] = [];
   const seen = new Set<string>();
-  const push = (name: string) => {
-    const k = name.toLowerCase();
-    if (!name || seen.has(k)) return;
+  const pushEntry = (entry: CardEntry) => {
+    const k = entry.name.toLowerCase();
+    if (seen.has(k)) return;
     seen.add(k);
-    out.push({ name: byName.get(k)?.name ?? name, scryfallId: byName.get(k)?.scryfallId });
+    out.push({ name: entry.name, scryfallId: entry.scryfallId });
+  };
+  const push = (name: string) => {
+    if (!name) return;
+    const entry = byName.get(name.toLowerCase()) ?? byFront.get(frontName(name));
+    if (entry) pushEntry(entry);
   };
 
   if (deck.commander) push(deck.commander);
+  // Key cards come from the Goldfish tile, the 60 from a different source.
+  // A mismatched assignment (4c Reanimator, 2026-09-09) showed Bringer of the
+  // Last Gift in the strip while the list had Llanowar Elves. Skip keys that
+  // are not actually in the mainboard — same rule as the public meta-web pages.
   for (const k of deck.keyCards ?? []) push(k);
 
   const nonLands = [...deck.mainboard]

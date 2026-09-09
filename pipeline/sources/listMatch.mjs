@@ -12,6 +12,120 @@ export function normalizeCardName(name) {
     .replace(/\s+/g, " ");
 }
 
+/**
+ * Last token of common duals / utility lands. Shared mana bases must not
+ * count as archetype evidence — 2026-09-09 a Llanowar Elves pile matched
+ * "4c Reanimator" on Formidable Speaker + Superior Spider-Man + five duals.
+ */
+const LAND_LAST = new Set([
+  "plains",
+  "island",
+  "swamp",
+  "mountain",
+  "forest",
+  "wastes",
+  "verge",
+  "pathway",
+  "fountain",
+  "crypt",
+  "foundry",
+  "garden",
+  "tomb",
+  "grave",
+  "pool",
+  "shrine",
+  "temple",
+  "thicket",
+  "courtyard",
+  "sanctuary",
+  "canal",
+  "vantage",
+  "marsh",
+  "sanctum",
+  "sewers",
+  "archive",
+  "reef",
+  "cascade",
+  "passage",
+  "hamlet",
+  "encampment",
+  "lair",
+  "cottage",
+  "field",
+  "tunnel",
+  "town",
+  "citadel",
+  "spire",
+  "hall",
+  "mire",
+  "grove",
+  "desert",
+  "tower",
+  "keep",
+  "outpost",
+  "station",
+  "summit",
+  "meadow",
+  "strand",
+  "heath",
+  "tarn",
+  "catacombs",
+  "mesa",
+  "flats",
+  "foothills",
+  "rainforest",
+  "vista",
+  "wilds",
+  "expanse",
+  "grotto",
+  "vale",
+  "quarter",
+  "shores",
+  "lagoon",
+  "delta",
+  "ridge",
+  "caves",
+]);
+
+const LAND_EXACT = new Set([
+  "cavern of souls",
+  "ba sing se",
+  "the lonely mountain",
+  "castle doom",
+  "boseiju, who endures",
+  "otawara, soaring city",
+  "eiganjo, seat of the empire",
+  "takenuma, abandoned mire",
+  "sokenzan, crucible of defiance",
+  "minamo, school at water's edge",
+  "nykthos, shrine to nyx",
+  "plaza of heroes",
+  "unclaimed territory",
+  "fabled passage",
+  "multiversal passage",
+  "starting town",
+  "demolition field",
+  "escape tunnel",
+  "petrified hamlet",
+  "great hall of the biblioplex",
+  "soulstone sanctuary",
+  "hidden lair",
+  "dalkovan encampment",
+]);
+
+/** Best-effort land detector for overlap scoring (no Scryfall at match time). */
+export function looksLikeLandName(name) {
+  const n = normalizeCardName(name);
+  if (!n) return false;
+  if (/^(snow-covered )?(plains|island|swamp|mountain|forest|wastes)$/.test(n)) {
+    return true;
+  }
+  if (LAND_EXACT.has(n)) return true;
+  const parts = n.split(/[\s,]+/).filter(Boolean);
+  const last = parts[parts.length - 1] || "";
+  return LAND_LAST.has(last);
+}
+
 /** Unique non-land-ish names from a mainboard (best-effort without Scryfall). */
 export function distinctiveNames(cards, landNames = null) {
   const out = new Set();
@@ -19,13 +133,7 @@ export function distinctiveNames(cards, landNames = null) {
     const n = normalizeCardName(c.name);
     if (!n) continue;
     if (landNames?.has(n)) continue;
-    // Cheap basic/landish filter when we don't have land flags yet
-    if (
-      !landNames &&
-      /^(plains|island|swamp|mountain|forest|wastes|snow-covered )\b/.test(n)
-    ) {
-      continue;
-    }
+    if (!landNames && looksLikeLandName(n)) continue;
     out.add(n);
   }
   return out;
@@ -63,11 +171,20 @@ export function scoreListForArchetype(candidate, tile, goldfishList = null) {
     gfPool > 0 ? (gfHits / Math.max(gfPool, cand.size)) * 50 + gfHits : 0;
   const score = keyScore + overlapScore;
 
-  // Gates: need either 2+ key hits, or strong list overlap (12+ shared non-basics).
+  // Two of three Goldfish tile keys is not an identity. Formidable Speaker +
+  // Superior Spider-Man are midrange staples; Bringer of the Last Gift is the
+  // 4c Reanimator card. When we have the Goldfish prototype, require real
+  // spell overlap (lands are already stripped). Without a prototype, keep the
+  // old 2-key gate so a Goldfish outage can still assign from keys alone.
+  const allKeys =
+    keyCards.length > 0 &&
+    keyHits >= Math.min(3, keyCards.length) &&
+    keyHits >= 2;
   const ok =
-    (keyCards.length > 0 && keyHits >= 2) ||
-    (gfPool > 0 && gfHits >= 12) ||
-    (keyCards.length === 0 && gfPool > 0 && gfHits >= 14);
+    gfPool > 0
+      ? gfHits >= 10 || (allKeys && gfHits >= 5)
+      : (keyCards.length > 0 && keyHits >= 2) ||
+        (keyCards.length === 0 && gfPool > 0 && gfHits >= 14);
 
   if (!ok || score < 12) return null;
   return {

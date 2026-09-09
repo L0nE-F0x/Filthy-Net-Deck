@@ -69,6 +69,100 @@ describe("scoreListForArchetype", () => {
   });
 });
 
+describe("4c Reanimator identity (2026-09-09 false positive)", () => {
+  const tile = {
+    name: "4c Reanimator",
+    keyCards: [
+      "Formidable Speaker",
+      "Superior Spider-Man",
+      "Bringer of the Last Gift",
+    ],
+  };
+
+  const goldfishMain = [
+    { count: 3, name: "Overlord of the Balemurk" },
+    { count: 2, name: "Bitter Triumph" },
+    { count: 1, name: "Swamp" },
+    { count: 2, name: "Cavern of Souls" },
+    { count: 4, name: "Bringer of the Last Gift" },
+    { count: 4, name: "Breeding Pool" },
+    { count: 3, name: "Wastewood Verge" },
+    { count: 1, name: "Forest" },
+    { count: 4, name: "Superior Spider-Man" },
+    { count: 3, name: "Overgrown Tomb" },
+    { count: 3, name: "Ardyn, the Usurper" },
+    { count: 1, name: "Undercity Sewers" },
+    { count: 2, name: "Watery Grave" },
+    { count: 2, name: "Willowrush Verge" },
+    { count: 4, name: "Formidable Speaker" },
+    { count: 2, name: "Wistfulness" },
+    { count: 4, name: "Oblivious Bookworm" },
+    { count: 2, name: "Awaken the Honored Dead" },
+    { count: 3, name: "Terror of the Peaks" },
+    { count: 4, name: "Town Greeter" },
+    { count: 2, name: "Analyze the Pollen" },
+    { count: 3, name: "Starting Town" },
+    { count: 1, name: "Island" },
+  ];
+
+  // Live 2026-09-09 MTGO Challenge 32 (xfile): 2/3 keys, no Bringer, Elves.
+  const impostorMain = [
+    { count: 4, name: "Wistfulness" },
+    { count: 4, name: "Deceit" },
+    { count: 4, name: "Superior Spider-Man" },
+    { count: 4, name: "Llanowar Elves" },
+    { count: 4, name: "Requiting Hex" },
+    { count: 3, name: "Bitter Triumph" },
+    { count: 2, name: "Emeritus of Ideation // Ancestral Recall" },
+    { count: 3, name: "Formidable Speaker" },
+    { count: 1, name: "Harvester of Misery" },
+    { count: 3, name: "Overgrown Tomb" },
+    { count: 4, name: "Blooming Marsh" },
+    { count: 4, name: "Watery Grave" },
+    { count: 2, name: "Starting Town" },
+    { count: 4, name: "Gloomlake Verge" },
+    { count: 2, name: "Breeding Pool" },
+    { count: 1, name: "Island" },
+    { count: 1, name: "Swamp" },
+    { count: 1, name: "Forest" },
+    { count: 2, name: "Botanical Sanctum" },
+    { count: 3, name: "Awaken the Honored Dead" },
+    { count: 1, name: "Roaming Throne" },
+    { count: 2, name: "Winternight Stories" },
+    { count: 1, name: "Cavern of Souls" },
+  ];
+
+  const goldfishList = { mainboard: goldfishMain };
+
+  it("accepts the Goldfish representative list", () => {
+    const s = scoreListForArchetype({ mainboard: goldfishMain }, tile, goldfishList);
+    expect(s).not.toBeNull();
+    expect(s.keyHits).toBe(3);
+  });
+
+  it("rejects a 2-key midrange pile that does not play Bringer", () => {
+    expect(
+      scoreListForArchetype({ mainboard: impostorMain }, tile, goldfishList),
+    ).toBeNull();
+  });
+
+  it("does not pick the impostor over a real reanimator 60", () => {
+    const pool = [
+      { player: "xfile", mainboard: impostorMain, sideboard: [], sourceUrl: "u1", eventName: "e" },
+      { player: "yukiro", mainboard: goldfishMain, sideboard: [], sourceUrl: "u2", eventName: "e" },
+    ];
+    const hit = pickBestListForTile(pool, tile, goldfishList);
+    expect(hit?.list.player).toBe("yukiro");
+  });
+
+  it("falls through (no match) when the pool is only the impostor", () => {
+    const pool = [
+      { player: "xfile", mainboard: impostorMain, sideboard: [], sourceUrl: "u1", eventName: "e" },
+    ];
+    expect(pickBestListForTile(pool, tile, goldfishList)).toBeNull();
+  });
+});
+
 describe("extractMtgoDecklistsData", () => {
   it("parses embedded JSON", () => {
     const payload = {
