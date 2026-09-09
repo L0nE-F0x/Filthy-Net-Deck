@@ -6,8 +6,8 @@ const SETS_URLS = SITE_ORIGINS.map((o) => `${o}/meta/sets.json`);
 const LOCAL_SETS_PATH = "/meta/sets.json";
 const CACHE_KEY = "bbi.sets.lastGood";
 
-/** In-session cache of lazy per-set galleries (code → cards). */
-const galleryMem = new Map<string, SetPreviewCard[]>();
+/** In-session cache of lazy per-set galleries (code → cards + tokens). */
+const galleryMem = new Map<string, SetGalleryPayload>();
 
 function getSetsUrl(): string {
   // Relative path only on the Vite dev server — see getMetaUrl in metaFeed.ts:
@@ -120,12 +120,23 @@ function galleryUrls(code: string): string[] {
   ];
 }
 
-async function tryFetchGallery(url: string): Promise<SetPreviewCard[] | null> {
+export interface SetGalleryPayload {
+  cards: SetPreviewCard[];
+  tokens: SetPreviewCard[];
+}
+
+async function tryFetchGallery(url: string): Promise<SetGalleryPayload | null> {
   try {
     const res = await fetch(url, { cache: "default" });
     if (!res.ok) return null;
-    const data = (await res.json()) as { cards?: SetPreviewCard[] };
-    return Array.isArray(data?.cards) && data.cards.length ? data.cards : null;
+    const data = (await res.json()) as {
+      cards?: SetPreviewCard[];
+      tokens?: SetPreviewCard[];
+    };
+    const cards = Array.isArray(data?.cards) ? data.cards : [];
+    const tokens = Array.isArray(data?.tokens) ? data.tokens : [];
+    if (!cards.length && !tokens.length) return null;
+    return { cards, tokens };
   } catch {
     return null;
   }
@@ -136,16 +147,16 @@ async function tryFetchGallery(url: string): Promise<SetPreviewCard[] | null> {
  * Live/released Standard-pool sets ship without `cards[]` in sets.json;
  * open the gallery to pull `meta/sets/<code>.json` once per session.
  */
-export async function fetchSetGallery(code: string): Promise<SetPreviewCard[] | null> {
+export async function fetchSetGallery(code: string): Promise<SetGalleryPayload | null> {
   const key = String(code || "").toLowerCase();
   if (!key) return null;
   if (galleryMem.has(key)) return galleryMem.get(key) ?? null;
 
   for (const url of galleryUrls(key)) {
-    const cards = await tryFetchGallery(url);
-    if (cards) {
-      galleryMem.set(key, cards);
-      return cards;
+    const payload = await tryFetchGallery(url);
+    if (payload) {
+      galleryMem.set(key, payload);
+      return payload;
     }
   }
   return null;

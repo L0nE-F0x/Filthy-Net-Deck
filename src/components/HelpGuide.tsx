@@ -188,7 +188,9 @@ const TOPICS: Topic[] = [
       <>
         <p>
           <strong>Sets</strong> is the set radar: spoiler galleries (filter by the day a card was
-          spoiled, click unconfirmed previews to zoom), Arena drop dates (with a
+          spoiled; colour chips are exact identity — W is only white, W then G is
+          Selesnya; Multi is every gold card; Tokens is the set’s token sheet;
+          click unconfirmed previews to zoom), Arena drop dates (with a
           countdown badge on the nav), and what’s new since your last visit.{" "}
           <strong>Format Hub</strong> answers “is this legal?” — rotation timelines and ban lists
           for Standard and Pioneer, with desktop pings when a B&amp;R announcement lands (toggle in

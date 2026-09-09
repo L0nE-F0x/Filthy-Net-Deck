@@ -14,6 +14,7 @@ import { openExternal } from "../services/openExternal";
 import {
   isFormatLegal,
   setGalleryCards,
+  setPlayableCards,
   type FreshSpoilerCard,
   type FutureSet,
   type SetPreviewCard,
@@ -25,27 +26,33 @@ import { TrailerButton, TrailerPlayer } from "../components/TrailerPlayer";
 import { trailerForSet, type SetTrailer } from "../services/setTrailers";
 import { totalNewCount } from "../services/setPulse";
 import {
-  cardHasColor,
+  cardMatchesColorFilter,
   cardMatchesSpoiledFilter,
+  colorFilterIsAny,
   compareSpoiledNewest,
   countdownLabel,
   daysUntil,
+  emptyColorFilter,
   formatSetDate,
   isArenaDropWindow,
+  isTokenCard,
   rarityClass,
   RARITY_RANK,
   spoiledDay,
   statusClass,
   statusLabel,
   todayIso,
+  toggleColorLetter,
+  toggleColorless,
+  toggleMulticolor,
   typeBucket,
   uniqueSpoiledDates,
+  type ColorLetter,
   type SpoiledDateFilter,
   type TypeFilter,
 } from "../services/setDates";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
-type ColorFilter = "all" | "W" | "U" | "B" | "R" | "G" | "C";
 type SortKey = "collector" | "name" | "cmc" | "rarity" | "newest";
 type GalleryFocus =
   | { kind: "card"; card: SetPreviewCard }
@@ -353,7 +360,7 @@ function SetGallery({
   const { t } = useLocale();
   const unreleased = set.status === "spoiling" || set.status === "announced";
   const [rarity, setRarity] = useState<RarityFilter>("all");
-  const [color, setColor] = useState<ColorFilter>("all");
+  const [color, setColor] = useState(emptyColorFilter);
   const [typeF, setTypeF] = useState<TypeFilter>("all");
   const [sort, setSort] = useState<SortKey>(() => (unreleased ? "newest" : "collector"));
   const [query, setQuery] = useState("");
@@ -380,9 +387,15 @@ function SetGallery({
     setGalleryLoading(true);
     void import("../services/setsFeed")
       .then((m) => m.fetchSetGallery(set.code))
-      .then((cards) => {
+      .then((payload) => {
         if (cancelled) return;
-        if (cards?.length) setResolved({ ...set, cards });
+        if (payload && (payload.cards.length || payload.tokens.length)) {
+          setResolved({
+            ...set,
+            cards: payload.cards,
+            ...(payload.tokens.length ? { tokens: payload.tokens } : {}),
+          });
+        }
         setGalleryLoading(false);
       })
       .catch(() => {
@@ -444,8 +457,13 @@ function SetGallery({
           if (["mythic", "rare", "uncommon", "common"].includes(r)) return false;
         } else if (r !== rarity) return false;
       }
-      if (color !== "all" && !cardHasColor(c, color)) return false;
-      if (typeF !== "all" && typeBucket(c.typeLine) !== typeF) return false;
+      if (!cardMatchesColorFilter(c, color)) return false;
+      const bucket = isTokenCard(c) ? "token" : typeBucket(c.typeLine);
+      if (typeF === "all") {
+        if (bucket === "token") return false;
+      } else if (bucket !== typeF) {
+        return false;
+      }
       if (
         q &&
         !c.name.toLowerCase().includes(q) &&
@@ -479,8 +497,21 @@ function SetGallery({
   }, [all, rarity, color, typeF, sort, query, newOnly, newIds, dateFilter, today]);
 
   const counts = useMemo(() => {
-    const m = { all: all.length, mythic: 0, rare: 0, uncommon: 0, common: 0, special: 0 };
+    const m = {
+      all: 0,
+      mythic: 0,
+      rare: 0,
+      uncommon: 0,
+      common: 0,
+      special: 0,
+      token: 0,
+    };
     for (const c of all) {
+      if (isTokenCard(c)) {
+        m.token++;
+        continue;
+      }
+      m.all++;
       const r = (c.rarity || "").toLowerCase();
       if (r === "mythic") m.mythic++;
       else if (r === "rare") m.rare++;
@@ -513,7 +544,10 @@ function SetGallery({
             <span className="ml-2">
               {galleryLoading
                 ? "Loading full gallery…"
-                : `${all.length} card${all.length === 1 ? "" : "s"}`}
+                : `${counts.all} card${counts.all === 1 ? "" : "s"}`}
+              {!galleryLoading && counts.token > 0
+                ? ` · ${counts.token} token${counts.token === 1 ? "" : "s"}`
+                : ""}
               {!galleryLoading &&
                 set.cardCount > 0 &&
                 all.length < set.cardCount
@@ -650,27 +684,50 @@ function SetGallery({
           ))}
         </div>
 
-        <div className="set-rarity-chips" role="group" aria-label="Color">
-          {(
-            [
-              ["all", "Any color"],
-              ["W", "W"],
-              ["U", "U"],
-              ["B", "B"],
-              ["R", "R"],
-              ["G", "G"],
-              ["C", "C"],
-            ] as const
-          ).map(([id, label]) => (
+        <div
+          className="set-rarity-chips"
+          role="group"
+          aria-label="Color"
+          title="Exact colour identity. Click a colour to add or remove it."
+        >
+          <button
+            type="button"
+            className={`set-rarity-chip${colorFilterIsAny(color) ? " active" : ""}`}
+            aria-pressed={colorFilterIsAny(color)}
+            onClick={() => setColor(emptyColorFilter())}
+          >
+            {t("sets.colorAny")}
+          </button>
+          {(["W", "U", "B", "R", "G"] as const).map((id) => (
             <button
               key={id}
               type="button"
-              className={`set-rarity-chip${color === id ? " active" : ""}`}
-              onClick={() => setColor(id)}
+              className={`set-rarity-chip${color.letters.includes(id) ? " active" : ""}`}
+              aria-pressed={color.letters.includes(id)}
+              title={`${id} only — click another colour to pair (W+G = Selesnya)`}
+              onClick={() => setColor((s) => toggleColorLetter(s, id as ColorLetter))}
             >
-              {label}
+              {id}
             </button>
           ))}
+          <button
+            type="button"
+            className={`set-rarity-chip${color.colorless ? " active" : ""}`}
+            aria-pressed={color.colorless}
+            title="Colourless only"
+            onClick={() => setColor((s) => toggleColorless(s))}
+          >
+            C
+          </button>
+          <button
+            type="button"
+            className={`set-rarity-chip${color.multicolor ? " active" : ""}`}
+            aria-pressed={color.multicolor}
+            title="Every card with two or more colours"
+            onClick={() => setColor((s) => toggleMulticolor(s))}
+          >
+            {t("sets.colorMulti")}
+          </button>
         </div>
 
         <div className="set-rarity-chips" role="group" aria-label="Type">
@@ -684,15 +741,21 @@ function SetGallery({
               ["artifact", "Art"],
               ["planeswalker", "PW"],
               ["land", "Land"],
+              ["token", t("sets.typeToken")],
             ] as const
           ).map(([id, label]) => (
             <button
               key={id}
               type="button"
               className={`set-rarity-chip${typeF === id ? " active" : ""}`}
+              aria-pressed={typeF === id}
+              title={id === "token" ? "Tokens printed in this set" : undefined}
               onClick={() => setTypeF(id)}
             >
               {label}
+              {id === "token" ? (
+                <span className="set-rarity-n">{counts.token}</span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -890,7 +953,7 @@ function SetCard({
       ? { youtubeId: set.trailer.youtubeId, title: set.trailer.title || set.name }
       : null,
   });
-  const gallery = setGalleryCards(set);
+  const gallery = setPlayableCards(set);
   const freshCount = set.freshSpoilers?.length ?? 0;
   /** Slim Standard-pool rows ship previews only (no full cards[]) to keep the feed small. */
   const hasFullGallery = Boolean(set.cards?.length);
@@ -1101,7 +1164,7 @@ function LiveSetRow({
   rotationDays?: number | null;
   rotationLabel?: string | null;
 }) {
-  const gallery = setGalleryCards(set);
+  const gallery = setPlayableCards(set);
   const hasFullGallery = Boolean(set.cards?.length);
   const nearRotation =
     rotationDays != null && rotationDays >= 0 && rotationDays <= 45;

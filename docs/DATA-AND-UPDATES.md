@@ -132,7 +132,13 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 | `website/meta/sets.json` (+ `public/meta/`) | **Slim** published index the app downloads (~0.5 MB) |
 | `website/meta/sets/<code>.json` (+ `public/meta/sets/`) | Full card gallery for that set — loaded when the user opens Gallery |
 | App page **Sets** | Countdown, spoiler rail, fresh-spoiler strip; gallery fetches lazy file on open |
-| App `fetchSetGallery` | `src/services/setsFeed.ts` — session-cached fetch of `meta/sets/<code>.json` |
+| App `fetchSetGallery` | `src/services/setsFeed.ts` — session-cached fetch of `meta/sets/<code>.json` (cards + sibling `tokens[]`) |
+
+**Colour chips and tokens (v3.8.1).** Gallery colour filters match **exact**
+identity: W is mono-white, W+G is Selesnya, Multi is every two-or-more-colour
+card. Related token-set cards (e.g. `tfra`) ship on a sibling `tokens[]` field
+so 3.8.0 ignores them; 3.8.1+ shows them under the Tokens type chip. Tokens do
+not count toward `spoiledCount`.
 
 **Fresh spoilers (ahead of Scryfall).** Scryfall usually catalogs new cards within
 hours, but during spoiler season a leaked/previewed card often lands on a visual

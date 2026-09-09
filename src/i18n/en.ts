@@ -371,6 +371,9 @@ export const en = {
     noOracleYet: "Oracle text isn't in the catalog yet — this preview hasn't been confirmed.",
     sortSpoiled: "Spoiled date",
     byDay: "By day",
+    colorAny: "Any color",
+    colorMulti: "Multi",
+    typeToken: "Tokens",
   },
   formats: {
     eyebrow: "Format Hub",

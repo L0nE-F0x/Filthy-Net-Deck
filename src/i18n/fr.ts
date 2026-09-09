@@ -366,6 +366,9 @@ export const fr: Messages = {
     noOracleYet: "Pas encore de texte d’oracle dans le catalogue — ce preview n’est pas confirmé.",
     sortSpoiled: "Date du spoiler",
     byDay: "Par jour",
+    colorAny: "Toutes couleurs",
+    colorMulti: "Multi",
+    typeToken: "Tokens",
   },
   formats: {
     eyebrow: "Formats",

@@ -35,6 +35,28 @@ describe("slim-sets-feed", () => {
     expect(galleries.fdn.code).toBe("fdn");
   });
 
+  it("moves live-set tokens into the gallery file, not the index", () => {
+    const cards = Array.from({ length: 20 }, (_, i) => card(i));
+    const tokens = [{ name: "Illusion", scryfallId: "tok-1", rarity: "common", isToken: true }];
+    const bundle = {
+      date: "2026-08-09",
+      sets: [
+        {
+          code: "woe",
+          name: "Wilds of Eldraine",
+          status: "live_on_arena",
+          cards,
+          tokens,
+        },
+      ],
+    };
+    const { index, galleries } = splitSetsBundle(bundle);
+    expect(index.sets[0].cards).toBeUndefined();
+    expect(index.sets[0].tokens).toBeUndefined();
+    expect(galleries.woe.cards).toHaveLength(20);
+    expect(galleries.woe.tokens).toEqual(tokens);
+  });
+
   it("keeps spoiling sets fully inline and drops redundant previews", () => {
     const cards = [card(1), card(2), card(3)];
     const bundle = {

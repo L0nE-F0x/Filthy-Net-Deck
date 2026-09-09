@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   cardHasColor,
+  cardMatchesColorFilter,
   cardMatchesSpoiledFilter,
   compareSpoiledNewest,
   countdownLabel,
   daysUntil,
+  emptyColorFilter,
   isArenaDropWindow,
+  isTokenCard,
+  toggleColorLetter,
+  toggleColorless,
+  toggleMulticolor,
   typeBucket,
   confidenceHint,
   statusLabel,
@@ -51,6 +57,97 @@ describe("card helpers", () => {
     expect(cardHasColor({ colors: [] }, "C")).toBe(true);
     expect(cardHasColor({ colors: ["U"] }, "C")).toBe(false);
     expect(cardHasColor({ colors: ["U", "R"] }, "U")).toBe(true);
+  });
+
+  it("isTokenCard reads the flag or the type line", () => {
+    expect(isTokenCard({ typeLine: "Token Creature — Illusion", isToken: true })).toBe(true);
+    expect(isTokenCard({ typeLine: "Token Planeswalker — Jace" })).toBe(true);
+    expect(isTokenCard({ typeLine: "Creature — Human" })).toBe(false);
+  });
+});
+
+describe("exact colour-identity filter", () => {
+  const white = { colors: ["W"] };
+  const selesnya = { colors: ["G", "W"] };
+  const bant = { colors: ["G", "W", "U"] };
+  const gold = { colors: ["U", "R"] };
+  const karn = { colors: [] };
+  const plains = { colors: [], colorIdentity: ["W"] };
+
+  it("W is mono-white only, not every card that contains W", () => {
+    const w = toggleColorLetter(emptyColorFilter(), "W");
+    expect(cardMatchesColorFilter(white, w)).toBe(true);
+    expect(cardMatchesColorFilter(selesnya, w)).toBe(false);
+    expect(cardMatchesColorFilter(bant, w)).toBe(false);
+    expect(cardMatchesColorFilter(plains, w)).toBe(true);
+    expect(cardMatchesColorFilter(karn, w)).toBe(false);
+  });
+
+  it("printed colours beat a broader colour identity", () => {
+    const w = toggleColorLetter(emptyColorFilter(), "W");
+    const whiteWithGreenAbility = { colors: ["W"], colorIdentity: ["W", "G"] };
+    expect(cardMatchesColorFilter(whiteWithGreenAbility, w)).toBe(true);
+    const wg = toggleColorLetter(w, "G");
+    expect(cardMatchesColorFilter(whiteWithGreenAbility, wg)).toBe(false);
+  });
+
+  it("W then G is exactly Selesnya", () => {
+    const wg = toggleColorLetter(toggleColorLetter(emptyColorFilter(), "W"), "G");
+    expect(cardMatchesColorFilter(selesnya, wg)).toBe(true);
+    expect(cardMatchesColorFilter(white, wg)).toBe(false);
+    expect(cardMatchesColorFilter(bant, wg)).toBe(false);
+    expect(cardMatchesColorFilter(gold, wg)).toBe(false);
+  });
+
+  it("click order does not matter — G then W is still Selesnya", () => {
+    const gw = toggleColorLetter(toggleColorLetter(emptyColorFilter(), "G"), "W");
+    expect(cardMatchesColorFilter(selesnya, gw)).toBe(true);
+    expect(cardMatchesColorFilter(bant, gw)).toBe(false);
+  });
+
+  it("three letters is that shard/wedge only", () => {
+    const wug = toggleColorLetter(
+      toggleColorLetter(toggleColorLetter(emptyColorFilter(), "W"), "U"),
+      "G",
+    );
+    expect(cardMatchesColorFilter(bant, wug)).toBe(true);
+    expect(cardMatchesColorFilter(selesnya, wug)).toBe(false);
+    expect(cardMatchesColorFilter(white, wug)).toBe(false);
+  });
+
+  it("clicking a letter again unselects it", () => {
+    const off = toggleColorLetter(toggleColorLetter(emptyColorFilter(), "W"), "W");
+    expect(off.letters).toEqual([]);
+    expect(cardMatchesColorFilter(selesnya, off)).toBe(true);
+  });
+
+  it("Multi is every two-or-more-colour card", () => {
+    const m = toggleMulticolor(emptyColorFilter());
+    expect(cardMatchesColorFilter(selesnya, m)).toBe(true);
+    expect(cardMatchesColorFilter(bant, m)).toBe(true);
+    expect(cardMatchesColorFilter(gold, m)).toBe(true);
+    expect(cardMatchesColorFilter(white, m)).toBe(false);
+    expect(cardMatchesColorFilter(karn, m)).toBe(false);
+  });
+
+  it("C is colourless only, and picking W clears it", () => {
+    const c = toggleColorless(emptyColorFilter());
+    expect(cardMatchesColorFilter(karn, c)).toBe(true);
+    expect(cardMatchesColorFilter(white, c)).toBe(false);
+    const w = toggleColorLetter(c, "W");
+    expect(w.colorless).toBe(false);
+    expect(cardMatchesColorFilter(white, w)).toBe(true);
+  });
+
+  it("Multi and letters are exclusive", () => {
+    const w = toggleColorLetter(emptyColorFilter(), "W");
+    const m = toggleMulticolor(w);
+    expect(m.letters).toEqual([]);
+    expect(m.multicolor).toBe(true);
+    expect(toggleMulticolor(m).multicolor).toBe(false);
+    const wAgain = toggleColorLetter(m, "W");
+    expect(wAgain.multicolor).toBe(false);
+    expect(wAgain.letters).toEqual(["W"]);
   });
 });
 

@@ -1,9 +1,9 @@
 {
-  "version": "3.8.0",
+  "version": "3.8.1",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.0.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.0-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.1.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.1-universal.dmg"
   },
-  "notes": "v3.8.0: Set Radar for spoiler season — filter by the day a card dropped, zoom unconfirmed previews, hourly spoilers from MythicSpoiler and Scryfall."
+  "notes": "v3.8.1: Set Radar colour chips are exact identity — W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter."
 }

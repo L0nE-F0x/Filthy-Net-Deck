@@ -40,12 +40,16 @@ export function splitSetsBundle(bundle) {
     }
 
     // Live / released: gallery file + short preview rail on the index.
-    galleries[s.code] = { code: s.code, cards };
+    galleries[s.code] = {
+      code: s.code,
+      cards,
+      ...(Array.isArray(s.tokens) && s.tokens.length ? { tokens: s.tokens } : {}),
+    };
     const previews =
       Array.isArray(s.previews) && s.previews.length
         ? s.previews.slice(0, PREVIEW_RAIL)
         : cards.slice(0, PREVIEW_RAIL);
-    const { cards: _drop, ...rest } = s;
+    const { cards: _drop, tokens: _tok, ...rest } = s;
     return { ...rest, previews };
   });
 
