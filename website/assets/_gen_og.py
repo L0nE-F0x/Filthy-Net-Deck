@@ -134,7 +134,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v3.8.0  {mid}  SET RADAR"
+    badge_text = f"NEW  {mid}  v3.8.1  {mid}  SET RADAR"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -149,9 +149,9 @@ def main() -> None:
     draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
-        "Filter spoilers by the day they dropped",
-        "Unconfirmed previews zoom like confirmed cards",
-        "Hourly Set Radar from MythicSpoiler + Scryfall",
+        "W is only white — W+G is just Selesnya",
+        "Multi chip for every gold card in the set",
+        "Tokens from the set, on their own filter",
     ]
     # v3.4.0's card shipped with a feature line running off the right edge and
     # nobody saw it until the PNG was opened. Fail the build instead: there is

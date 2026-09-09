@@ -1,11 +1,11 @@
 {
-  "version": "3.8.0",
-  "notes": "v3.8.0: Set Radar for spoiler season \u2014 filter by the day a card dropped, zoom unconfirmed previews, hourly spoilers from MythicSpoiler and Scryfall.",
-  "pub_date": "2026-09-09T08:33:11Z",
+  "version": "3.8.1",
+  "notes": "v3.8.1: Set Radar colour chips are exact identity \u2014 W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter.",
+  "pub_date": "2026-09-09T14:08:58Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wjh1Zk1yWms1OTI3b3RJdlJxZUhhZHJtRkVwSWcyNUV4T3k5UFVBUSt3dE9uZ0pueDhKTTgxOTBwaDVkeU8zbzRaeUFOOWYvRHFjZGRZbkhMU1Q5ZXcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4OTQyNzQ4CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOC4wX3g2NC1zZXR1cC5leGUKT2F0NFZDRFM3cDVwVzZoRXJKZnBxeitncmYxMzRSd3BsUExINHlIcjRBNEVWTjErTXRONDdZMC9wdWZ1RU03YmlGU2RYeHNUaFlXbk9LdmhyRWFVQlE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.0.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnp3c0FneHR6cHp4cVRRejZkT1l4alh4TXZHMEVMSHMxSk56WEZGaWlZbVpGTUtEUmFUbWJ1NDFRME0zT21VS2tCT3ZxWU80UXQ0OURBejdaZVBaelF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4OTYyNTU0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOC4xX3g2NC1zZXR1cC5leGUKemwyaXdYQlN0MDFwZ2NFQ0pxUjlPZTdTMDRxemVoL2FyMXJDZ0dGWTd3ZkdwT0pWam1oRENUZG1OR3JpdWd0WXJ4cExaZlhaOFg4L0lURVcvZHNxQ3c9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.1.exe"
     }
   }
 }

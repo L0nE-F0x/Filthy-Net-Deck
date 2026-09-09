@@ -5,5 +5,5 @@
     "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.1.exe",
     "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.1-universal.dmg"
   },
-  "notes": "v3.8.1: Set Radar colour chips are exact identity — W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter."
+  "notes": "v3.8.1: Set Radar colour chips are exact identity \u2014 W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter."
 }
