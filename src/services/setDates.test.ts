@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   cardHasColor,
+  cardMatchesSpoiledFilter,
+  compareSpoiledNewest,
   countdownLabel,
   daysUntil,
   isArenaDropWindow,
   typeBucket,
   confidenceHint,
   statusLabel,
+  uniqueSpoiledDates,
 } from "./setDates";
 
 describe("daysUntil / countdownLabel", () => {
@@ -58,5 +61,39 @@ describe("labels", () => {
     expect(confidenceHint("estimated")).toBe("est.");
     expect(confidenceHint("official")).toBe("official");
     expect(confidenceHint(undefined)).toBe("");
+  });
+});
+
+describe("spoiled-date filter", () => {
+  const today = "2026-09-09";
+
+  it("keeps everything on all, drops undated cards on a day filter", () => {
+    expect(cardMatchesSpoiledFilter("2026-09-08", "all", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter(undefined, "all", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter(undefined, "today", today)).toBe(false);
+  });
+
+  it("matches today / yesterday / last 3 / this week / a pinned day", () => {
+    expect(cardMatchesSpoiledFilter("2026-09-09", "today", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter("2026-09-08", "today", today)).toBe(false);
+    expect(cardMatchesSpoiledFilter("2026-09-08", "yesterday", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter("2026-09-07", "last3", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter("2026-09-06", "last3", today)).toBe(false);
+    expect(cardMatchesSpoiledFilter("2026-09-03", "week", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter("2026-09-02", "week", today)).toBe(false);
+    expect(cardMatchesSpoiledFilter("2026-09-08", "on:2026-09-08", today)).toBe(true);
+    expect(cardMatchesSpoiledFilter("2026-09-09", "on:2026-09-08", today)).toBe(false);
+  });
+
+  it("sorts newest spoiled first and lists unique days newest-first", () => {
+    const cards = [
+      { name: "Old", spoiledAt: "2026-09-01" },
+      { name: "New", spoiledAt: "2026-09-08" },
+      { name: "Undated" },
+      { name: "Also new", spoiledAt: "2026-09-08" },
+    ];
+    const sorted = [...cards].sort(compareSpoiledNewest);
+    expect(sorted.map((c) => c.name)).toEqual(["Also new", "New", "Old", "Undated"]);
+    expect(uniqueSpoiledDates(cards)).toEqual(["2026-09-08", "2026-09-01"]);
   });
 });

@@ -8,7 +8,7 @@
  * Safe to run independently of the deck meta pipeline.
  */
 
-import { writeFileSync, mkdirSync, rmSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync, existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSetsBundle } from "./sources/sets.mjs";
@@ -17,6 +17,39 @@ import { buildArenaNameGap } from "./sources/arena-names.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+/** True when the published index (minus generatedAt) and every gallery file match. */
+function payloadUnchanged(dir, indexJson, galleries) {
+  try {
+    const prev = JSON.parse(readFileSync(join(dir, "sets.json"), "utf8"));
+    const next = JSON.parse(indexJson);
+    delete prev.generatedAt;
+    delete next.generatedAt;
+    if (JSON.stringify(prev) !== JSON.stringify(next)) return false;
+  } catch {
+    return false;
+  }
+  const galDir = join(dir, "sets");
+  const existing = existsSync(galDir)
+    ? readdirSync(galDir).filter((f) => f.endsWith(".json")).sort()
+    : [];
+  const nextKeys = Object.keys(galleries)
+    .map((c) => `${String(c).toLowerCase().replace(/[^a-z0-9_-]/g, "")}.json`)
+    .filter(Boolean)
+    .sort();
+  if (existing.join("\0") !== nextKeys.join("\0")) return false;
+  for (const [code, payload] of Object.entries(galleries)) {
+    const safe = String(code).toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    if (!safe) continue;
+    try {
+      const prev = readFileSync(join(galDir, `${safe}.json`), "utf8");
+      if (prev !== JSON.stringify(payload)) return false;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
 
 function writeTree(dir, indexJson, galleries) {
   mkdirSync(dir, { recursive: true });
@@ -44,16 +77,23 @@ async function main() {
   const indexJson = JSON.stringify(index);
   const galleryCount = Object.keys(galleries).length;
   const indexKb = Math.round(Buffer.byteLength(indexJson) / 1024);
-
-  for (const dir of [join(root, "website", "meta"), join(root, "public", "meta")]) {
-    writeTree(dir, indexJson, galleries);
+  const targets = [join(root, "website", "meta"), join(root, "public", "meta")];
+  const unchanged = targets.every((dir) => payloadUnchanged(dir, indexJson, galleries));
+  if (unchanged) {
+    console.log(
+      `\nsets.json unchanged (ignoring generatedAt) · ${bundle.sets.length} sets · ${bundle.date}` +
+        ` · left website/meta + public/meta in place`,
+    );
+  } else {
+    for (const dir of targets) {
+      writeTree(dir, indexJson, galleries);
+    }
+    console.log(
+      `\nWrote sets.json · ${bundle.sets.length} sets · ${bundle.date}` +
+        ` · index ${indexKb}KB · ${galleryCount} lazy galleries` +
+        ` → website/meta + public/meta`,
+    );
   }
-
-  console.log(
-    `\nWrote sets.json · ${bundle.sets.length} sets · ${bundle.date}` +
-      ` · index ${indexKb}KB · ${galleryCount} lazy galleries` +
-      ` → website/meta + public/meta`,
-  );
 
   // Names for Arena cards Scryfall cannot resolve yet (see arena-names.mjs).
   //

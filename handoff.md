@@ -3,10 +3,9 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.7.4** (Windows signed updater · macOS universal dmg
-rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
-· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
-registration — see START HERE.**
+**Live product version: v3.7.4** — **v3.8.0 in progress** (Set Radar spoiler
+talk). Do not advertise 3.8.0 on the site until the macOS dmg is attached.
+Repo `L0nE-F0x/Filthy-Net-Deck`. AUR still blocked on Arch registration.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -20,6 +19,39 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-09 — v3.8.0 Set Radar spoiler-talk. Source tagged; website held
+until the macOS dmg lands.**
+
+Do not flip `website/` to 3.8.0 until
+`Filthy-Net-Deck-3.8.0-universal.dmg` is on the GitHub Release. The macOS
+button 404s if the site moves first.
+
+**2026-09-09 — Set Radar spoiler-talk pass is in the working tree, not shipped.**
+
+Owner asked for FND as the spoiler source for MTGA Brew Lab / Spoiler Talk
+(Reality Fracture). Three things landed, uncommitted besides the local
+`npm run sets` feed rebuild:
+
+1. Gallery filter by **date spoiled** (Today / Yesterday / Last 3 days /
+   This week / a specific day). Sort "Spoiled date" is real `spoiledAt`,
+   not collector-number reverse. Default for spoiling sets.
+2. **Unconfirmed** cells open the same zoom drawer as confirmed cards
+   (←/→, Escape, source link). They were static images.
+3. Pipeline is actually current: MythicSpoiler date headers + per-set
+   index pages + `mtg/` first-look remap; Scryfall `previewed_at` /
+   image ingest as fallback; CI hourly with no-op commits when unchanged.
+
+Rebuilt feed: Reality Fracture **146/146** confirmed (was 52) + **12**
+fresh (Special Guests Scryfall files under other sets, plus two MS
+filename typos: `campuscriter`, `garrukveildbutcher`). All 146+12 have
+`spoiledAt`.
+
+UI needs a **version bump + full release** (AGENTS.md table). The feed
+alone can go live on a `main` push — existing installs pick up the extra
+cards on refetch, but not the date chips or click-to-zoom.
+
+AUR `filthy-net-deck-bin` is still blocked on Arch registration.
 
 **2026-09-09 — 4c Reanimator was shipping the wrong 60. Matcher tightened,
 live feed republished. No app version bump.**

@@ -32,6 +32,8 @@ export interface FreshSpoilerCard {
   source: string;
   /** Link back to the source page. */
   sourceUrl: string;
+  /** YYYY-MM-DD the card appeared on the aggregator, when known. */
+  spoiledAt?: string | null;
 }
 
 export interface SetPreviewCard {
@@ -52,6 +54,12 @@ export interface SetPreviewCard {
   scryfallUri?: string | null;
   /** Cache-busting stamp from Scryfall's image_uris; some scans 404 without it. */
   imageVersion?: string | null;
+  /**
+   * YYYY-MM-DD the card was spoiled. Official Scryfall `preview.previewed_at`
+   * when present, else the MythicSpoiler date header, else the scan ingest day.
+   * Absent on older feeds / cards with no known spoiler day.
+   */
+  spoiledAt?: string | null;
 }
 
 export interface UpcomingSet {

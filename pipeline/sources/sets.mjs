@@ -12,7 +12,12 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchMythicSpoilerSpoilers, normalizeSlug } from "./mythicspoiler.mjs";
+import {
+  fetchMythicSpoilerSpoilers,
+  isConfirmedSlug,
+  normalizeSlug,
+  normalizeSetName,
+} from "./mythicspoiler.mjs";
 
 const API = "https://api.scryfall.com";
 const HEADERS = {
@@ -108,13 +113,6 @@ function resolveTrailer(trailers, code, name) {
     return trailers.byName[normalizeSetName(name)];
   }
   return null;
-}
-
-function normalizeSetName(name) {
-  return String(name || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
 }
 
 /**
@@ -217,6 +215,18 @@ function imageVersionOf(c) {
   return q >= 0 ? uri.slice(q + 1) : null;
 }
 
+function spoiledAtFromScryfall(c) {
+  const preview = c.preview?.previewed_at;
+  if (typeof preview === "string" && /^\d{4}-\d{2}-\d{2}/.test(preview)) {
+    return preview.slice(0, 10);
+  }
+  const img = c.image_updated_at;
+  if (typeof img === "string" && /^\d{4}-\d{2}-\d{2}/.test(img)) {
+    return img.slice(0, 10);
+  }
+  return null;
+}
+
 function mapCard(c) {
   const face = c.card_faces?.[0];
   const legalities = c.legalities || {};
@@ -227,6 +237,7 @@ function mapCard(c) {
       : Array.isArray(c.color_identity)
         ? c.color_identity
         : [];
+  const spoiledAt = spoiledAtFromScryfall(c);
   return {
     name: c.name,
     scryfallId: c.id,
@@ -243,7 +254,39 @@ function mapCard(c) {
     },
     scryfallUri: c.scryfall_uri || null,
     imageVersion: imageVersionOf(c),
+    ...(spoiledAt ? { spoiledAt } : {}),
   };
+}
+
+function slugKeysForName(name) {
+  const n = String(name || "");
+  const keys = [normalizeSlug(n)];
+  const cut = n.indexOf(" // ");
+  if (cut > -1) keys.push(normalizeSlug(n.slice(0, cut)));
+  return keys.filter(Boolean);
+}
+
+/**
+ * Overlay MythicSpoiler date-header days onto Scryfall gallery cards that
+ * don't already have an official `preview.previewed_at`. The aggregator day
+ * is what a spoiler-talk filter wants; image ingest time is a fallback only.
+ */
+function applyMythicSpoilerDates(galleryCards, mythicCards) {
+  if (!mythicCards?.length || !galleryCards?.length) return galleryCards;
+  const bySlug = new Map();
+  for (const m of mythicCards) {
+    if (m.slug && m.spoiledAt) bySlug.set(m.slug, m.spoiledAt);
+  }
+  if (!bySlug.size) return galleryCards;
+  return galleryCards.map((c) => {
+    const mythicDay = slugKeysForName(c.name)
+      .map((k) => bySlug.get(k))
+      .find(Boolean);
+    // Aggregator date-header is the public spoiler-talk day (a card re-shown
+    // at debut should sort under that debut day, not a July first-look).
+    if (mythicDay) return { ...c, spoiledAt: mythicDay };
+    return c;
+  });
 }
 
 /**
@@ -263,19 +306,17 @@ function buildFreshSpoilers(galleryCards, mythicCards) {
   // face only, so indexing it lets those cards self-heal too.
   const confirmed = new Set();
   for (const c of galleryCards || []) {
-    const name = String(c.name || "");
-    confirmed.add(normalizeSlug(name));
-    const cut = name.indexOf(" // ");
-    if (cut > -1) confirmed.add(normalizeSlug(name.slice(0, cut)));
+    for (const k of slugKeysForName(c.name)) confirmed.add(k);
   }
   return mythicCards
-    .filter((c) => c.slug && !confirmed.has(c.slug))
+    .filter((c) => c.slug && !isConfirmedSlug(c.slug, confirmed))
     .map((c) => ({
       slug: c.slug,
       name: c.name,
       image: c.image,
       source: "mythicspoiler",
-      sourceUrl: "https://mythicspoiler.com/newspoilers.html",
+      sourceUrl: c.sourceUrl || "https://mythicspoiler.com/newspoilers.html",
+      ...(c.spoiledAt ? { spoiledAt: c.spoiledAt } : {}),
     }));
 }
 
@@ -559,16 +600,6 @@ export async function buildSetsBundle() {
   const overrides = loadOverrides();
   const trailers = loadTrailers();
 
-  // Freshest visual spoilers, ahead of Scryfall. Fail-soft: an empty result
-  // just means the radar ships Scryfall-only for this run (never an abort).
-  console.log("Sets radar: fetching MythicSpoiler new spoilers…");
-  const mythic = await fetchMythicSpoilerSpoilers();
-  if (mythic.ok) {
-    console.log(
-      `  mythicspoiler: ${mythic.cardCount} cards across ${Object.keys(mythic.bySetCode).length} sets`,
-    );
-  }
-
   console.log("Sets radar: fetching Scryfall /sets…");
   const list = await scryfallGet("/sets");
   const all = list.data || [];
@@ -612,6 +643,30 @@ export async function buildSetsBundle() {
     `  ${candidates.length} constructed products (recent + Standard pool, no Alchemy)`,
   );
 
+  // Freshest visual spoilers, ahead of Scryfall. Fail-soft: an empty result
+  // just means the radar ships Scryfall-only for this run (never an abort).
+  // Set-page scrape is limited to products that haven't released yet — that's
+  // where "new spoilers" scrolls off during a two-week preview season.
+  const nameToCode = new Map();
+  const spoilingCodes = [];
+  for (const s of candidates) {
+    const code = String(s.code).toLowerCase();
+    if (s.name) nameToCode.set(normalizeSetName(s.name), code);
+    const tabletop = s.released_at || null;
+    if (!tabletop || tabletop > today) spoilingCodes.push(code);
+  }
+  console.log("Sets radar: fetching MythicSpoiler new spoilers…");
+  const mythic = await fetchMythicSpoilerSpoilers({
+    setCodes: spoilingCodes,
+    nameToCode,
+    todayIso: today,
+  });
+  if (mythic.ok || mythic.cardCount) {
+    console.log(
+      `  mythicspoiler: ${mythic.cardCount} cards across ${Object.keys(mythic.bySetCode).length} sets`,
+    );
+  }
+
   const sets = [];
   for (const s of candidates) {
     await sleep(120);
@@ -643,9 +698,10 @@ export async function buildSetsBundle() {
     void isRecent;
     const fullGallery = true;
 
-    const cards = fullGallery
+    let cards = fullGallery
       ? await fetchAllSetCards(code)
       : await fetchAllSetCards(code, { maxCards: 16, order: "rarity", dir: "desc" });
+    cards = applyMythicSpoilerDates(cards, mythic.bySetCode[code]);
 
     // spoiledCount: full gallery uses actual pull; slim uses Scryfall card_count
     // so the meter doesn't read "16 / 286" as if only 16 are spoiled.
@@ -760,7 +816,7 @@ export async function buildSetsBundle() {
   return {
     generatedAt: new Date().toISOString(),
     date: today,
-    version: "1.4.0",
+    version: "1.5.0",
     policy: {
       arenaFirst: true,
       noAlchemy: true,
@@ -770,7 +826,7 @@ export async function buildSetsBundle() {
       futureSets:
         "roadmap-announced sets from curated, source-linked entries (future-sets.json); dropped automatically once Scryfall catalogs the set",
       freshSpoilers:
-        "unconfirmed cards from MythicSpoiler shown ahead of Scryfall; dropped automatically once Scryfall catalogs the card (normalized-name match)",
+        "unconfirmed cards from MythicSpoiler (newspoilers + per-set index) shown ahead of Scryfall; dropped automatically once Scryfall catalogs the card (normalized-name match). Gallery cards carry spoiledAt (Scryfall previewed_at, else MythicSpoiler date header, else image ingest day)",
     },
     sources: [
       "scryfall",

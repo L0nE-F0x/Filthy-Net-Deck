@@ -130,3 +130,69 @@ export function cardHasColor(
   if (col === "C") return cardIsColorless(c);
   return (c.colors || []).includes(col);
 }
+
+/** Gallery spoiler-day filter. `on:YYYY-MM-DD` pins a single calendar day. */
+export type SpoiledDateFilter =
+  | "all"
+  | "today"
+  | "yesterday"
+  | "last3"
+  | "week"
+  | `on:${string}`;
+
+export function todayIso(nowMs = Date.now()): string {
+  return new Date(nowMs).toISOString().slice(0, 10);
+}
+
+export function addDaysIso(iso: string, delta: number): string {
+  const d = new Date(`${iso}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
+}
+
+export function spoiledDay(spoiledAt: string | null | undefined): string | null {
+  if (!spoiledAt) return null;
+  const d = spoiledAt.slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null;
+}
+
+export function cardMatchesSpoiledFilter(
+  spoiledAt: string | null | undefined,
+  filter: SpoiledDateFilter,
+  today: string,
+): boolean {
+  if (filter === "all") return true;
+  const d = spoiledDay(spoiledAt);
+  if (!d) return false;
+  if (filter.startsWith("on:")) return d === filter.slice(3);
+  if (filter === "today") return d === today;
+  if (filter === "yesterday") return d === addDaysIso(today, -1);
+  if (filter === "last3") return d >= addDaysIso(today, -2) && d <= today;
+  if (filter === "week") return d >= addDaysIso(today, -6) && d <= today;
+  return true;
+}
+
+export function compareSpoiledNewest(
+  a: { spoiledAt?: string | null; name: string },
+  b: { spoiledAt?: string | null; name: string },
+): number {
+  const da = spoiledDay(a.spoiledAt) || "";
+  const db = spoiledDay(b.spoiledAt) || "";
+  if (da !== db) {
+    if (!da) return 1;
+    if (!db) return -1;
+    return db.localeCompare(da);
+  }
+  return a.name.localeCompare(b.name);
+}
+
+export function uniqueSpoiledDates(
+  cards: Array<{ spoiledAt?: string | null }>,
+): string[] {
+  const s = new Set<string>();
+  for (const c of cards) {
+    const d = spoiledDay(c.spoiledAt);
+    if (d) s.add(d);
+  }
+  return [...s].sort((a, b) => b.localeCompare(a));
+}

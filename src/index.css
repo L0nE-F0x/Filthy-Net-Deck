@@ -3462,10 +3462,21 @@ html[data-theme="light"] .live-set-icon {
   position: relative;
   display: block;
   padding: 0;
+  width: 100%;
   border: 1px solid color-mix(in srgb, var(--color-gold-500) 30%, transparent);
   border-radius: 10px;
   overflow: hidden;
   background: var(--color-ink-900);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.fresh-spoiler-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px color-mix(in srgb, black 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-gold-500) 45%, transparent);
 }
 .fresh-spoiler-cell img {
   width: 100%;
@@ -3488,6 +3499,18 @@ html[data-theme="light"] .live-set-icon {
   color: #1a1205;
   background: color-mix(in srgb, var(--color-gold-500) 88%, white);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.fresh-spoiler-date {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  z-index: 1;
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--color-foam);
+  background: color-mix(in srgb, black 62%, transparent);
 }
 .set-card-actions {
   display: flex;
@@ -3947,6 +3970,21 @@ html[data-theme="light"] .live-set-icon {
 }
 .set-drawer-oracle p + p {
   margin-top: 0.45rem !important;
+}
+.set-drawer-fresh {
+  grid-template-columns: minmax(220px, 340px) minmax(200px, 1fr);
+}
+@media (max-width: 640px) {
+  .set-drawer-fresh {
+    grid-template-columns: 1fr;
+  }
+}
+.set-drawer-stepper {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
 }
 .legal-badges {
   display: flex;

@@ -26,21 +26,30 @@ import { trailerForSet, type SetTrailer } from "../services/setTrailers";
 import { totalNewCount } from "../services/setPulse";
 import {
   cardHasColor,
+  cardMatchesSpoiledFilter,
+  compareSpoiledNewest,
   countdownLabel,
   daysUntil,
   formatSetDate,
   isArenaDropWindow,
   rarityClass,
   RARITY_RANK,
+  spoiledDay,
   statusClass,
   statusLabel,
+  todayIso,
   typeBucket,
+  uniqueSpoiledDates,
+  type SpoiledDateFilter,
   type TypeFilter,
 } from "../services/setDates";
 
 type RarityFilter = "all" | "mythic" | "rare" | "uncommon" | "common" | "special";
 type ColorFilter = "all" | "W" | "U" | "B" | "R" | "G" | "C";
 type SortKey = "collector" | "name" | "cmc" | "rarity" | "newest";
+type GalleryFocus =
+  | { kind: "card"; card: SetPreviewCard }
+  | { kind: "fresh"; card: FreshSpoilerCard };
 
 /** Local alias so existing JSX keeps calling formatDate. */
 const formatDate = formatSetDate;
@@ -73,25 +82,23 @@ function LegalBadges({ card, unreleased }: { card: SetPreviewCard; unreleased?: 
   );
 }
 
-function CardDetailDrawer({
-  card,
+function DrawerChrome({
+  title,
   onClose,
   onStep,
   position,
-  unreleased,
+  children,
+  className,
 }: {
-  card: SetPreviewCard;
+  title: string;
   onClose: () => void;
-  /** Step to the previous (-1) / next (+1) card in the filtered gallery. */
   onStep?: (dir: -1 | 1) => void;
-  /** "12 / 250" style position label within the filtered gallery. */
   position?: string;
-  /** True when the set hasn't launched — legality reads "at release". */
-  unreleased?: boolean;
+  children: ReactNode;
+  className?: string;
 }): ReactNode {
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  // Modal basics: take focus on open, Escape closes, ←/→ browse, focus back.
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     drawerRef.current?.focus();
@@ -107,101 +114,177 @@ function CardDetailDrawer({
     };
   }, [onClose, onStep]);
 
-  const uri =
-    card.scryfallUri || `https://scryfall.com/card/${card.scryfallId}`;
   return (
     <div
       className="set-drawer-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label={card.name}
+      aria-label={title}
       onClick={onClose}
     >
       <div
-        className="set-drawer"
+        className={`set-drawer${className ? ` ${className}` : ""}`}
         ref={drawerRef}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="set-drawer-art">
-          <ScryfallImg
-            scryfallId={card.scryfallId}
-            imageVersion={card.imageVersion}
-            name={card.name}
-            size="normal"
-          />
-        </div>
-        <div className="set-drawer-body">
-          <div className="flex justify-between items-start gap-2">
-            <div>
-              <h3 className="set-drawer-title m-0">{card.name}</h3>
-              <p className="set-drawer-sub m-0 flex items-center gap-1.5 flex-wrap">
-                #{card.collectorNumber} · {card.rarity}
-                {card.manaCost ? (
-                  <>
-                    {" · "}
-                    <ManaCost cost={card.manaCost} />
-                  </>
-                ) : null}
-                {card.cmc != null ? ` · MV ${card.cmc}` : ""}
-              </p>
-            </div>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
-              Close
+        {children}
+        {onStep ? (
+          <span className="set-drawer-stepper">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              aria-label="Previous card"
+              title="Previous card (←)"
+              onClick={() => onStep(-1)}
+            >
+              ‹
             </button>
+            {position ? (
+              <span className="text-xs text-muted whitespace-nowrap">{position}</span>
+            ) : null}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              aria-label="Next card"
+              title="Next card (→)"
+              onClick={() => onStep(1)}
+            >
+              ›
+            </button>
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function CardDetailDrawer({
+  card,
+  onClose,
+  onStep,
+  position,
+  unreleased,
+}: {
+  card: SetPreviewCard;
+  onClose: () => void;
+  onStep?: (dir: -1 | 1) => void;
+  position?: string;
+  unreleased?: boolean;
+}): ReactNode {
+  const uri = card.scryfallUri || `https://scryfall.com/card/${card.scryfallId}`;
+  const spoiled = spoiledDay(card.spoiledAt);
+  return (
+    <DrawerChrome title={card.name} onClose={onClose} onStep={onStep} position={position}>
+      <div className="set-drawer-art">
+        <ScryfallImg
+          scryfallId={card.scryfallId}
+          imageVersion={card.imageVersion}
+          name={card.name}
+          size="normal"
+        />
+      </div>
+      <div className="set-drawer-body">
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <h3 className="set-drawer-title m-0">{card.name}</h3>
+            <p className="set-drawer-sub m-0 flex items-center gap-1.5 flex-wrap">
+              #{card.collectorNumber} · {card.rarity}
+              {card.manaCost ? (
+                <>
+                  {" · "}
+                  <ManaCost cost={card.manaCost} />
+                </>
+              ) : null}
+              {card.cmc != null ? ` · MV ${card.cmc}` : ""}
+              {spoiled ? ` · spoiled ${formatDate(spoiled)}` : ""}
+            </p>
           </div>
-          {card.typeLine ? (
-            <p className="set-drawer-type m-0">{card.typeLine}</p>
-          ) : null}
-          <LegalBadges card={card} unreleased={unreleased} />
-          {card.oracleText ? (
-            <div className="set-drawer-oracle">
-              {card.oracleText.split("\n").map((line, i) => (
-                <p key={i} className="m-0">
-                  {line}
-                </p>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-muted m-0">No oracle text in feed.</p>
-          )}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        {card.typeLine ? (
+          <p className="set-drawer-type m-0">{card.typeLine}</p>
+        ) : null}
+        <LegalBadges card={card} unreleased={unreleased} />
+        {card.oracleText ? (
+          <div className="set-drawer-oracle">
+            {card.oracleText.split("\n").map((line, i) => (
+              <p key={i} className="m-0">
+                {line}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-muted m-0">No oracle text in feed.</p>
+        )}
+        <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => void openExternal(uri)}
+          >
+            Open on Scryfall
+          </button>
+        </div>
+      </div>
+    </DrawerChrome>
+  );
+}
+
+function FreshDetailDrawer({
+  card,
+  onClose,
+  onStep,
+  position,
+}: {
+  card: FreshSpoilerCard;
+  onClose: () => void;
+  onStep?: (dir: -1 | 1) => void;
+  position?: string;
+}): ReactNode {
+  const { t } = useLocale();
+  const spoiled = spoiledDay(card.spoiledAt);
+  return (
+    <DrawerChrome
+      title={card.name}
+      onClose={onClose}
+      onStep={onStep}
+      position={position}
+      className="set-drawer-fresh"
+    >
+      <div className="set-drawer-art">
+        <img src={card.image} alt={`${card.name} (unverified preview)`} />
+      </div>
+      <div className="set-drawer-body">
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <h3 className="set-drawer-title m-0">{card.name}</h3>
+            <p className="set-drawer-sub m-0">
+              {t("sets.unconfirmed")}
+              {spoiled ? ` · ${formatDate(spoiled)}` : ""}
+              {card.source ? ` · ${card.source}` : ""}
+            </p>
+          </div>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        <p className="text-xs text-muted m-0 leading-relaxed">{t("sets.noOracleYet")}</p>
+        {card.sourceUrl ? (
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => void openExternal(uri)}
+              onClick={() => void openExternal(card.sourceUrl)}
             >
-              Open on Scryfall
+              {t("sets.openSource")}
             </button>
-            {onStep ? (
-              <span className="flex items-center gap-1 ml-auto">
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  aria-label="Previous card"
-                  title="Previous card (←)"
-                  onClick={() => onStep(-1)}
-                >
-                  ‹
-                </button>
-                {position ? (
-                  <span className="text-xs text-muted whitespace-nowrap">{position}</span>
-                ) : null}
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  aria-label="Next card"
-                  title="Next card (→)"
-                  onClick={() => onStep(1)}
-                >
-                  ›
-                </button>
-              </span>
-            ) : null}
           </div>
-        </div>
+        ) : null}
       </div>
-    </div>
+    </DrawerChrome>
   );
 }
 
@@ -210,7 +293,13 @@ function CardDetailDrawer({
  * image (no card id yet) and clearly labeled unverified; each drops out
  * automatically once the card is confirmed in the gallery.
  */
-function FreshSpoilers({ cards }: { cards: FreshSpoilerCard[] }): ReactNode {
+function FreshSpoilers({
+  cards,
+  onOpen,
+}: {
+  cards: FreshSpoilerCard[];
+  onOpen: (card: FreshSpoilerCard) => void;
+}): ReactNode {
   const { t } = useLocale();
   if (!cards.length) return null;
   return (
@@ -221,21 +310,29 @@ function FreshSpoilers({ cards }: { cards: FreshSpoilerCard[] }): ReactNode {
           <p className="text-xs text-muted m-0 leading-relaxed max-w-2xl">
             {cards.length} card{cards.length === 1 ? "" : "s"} not in the official gallery yet.
             These are unverified previews — they drop from here automatically once the card is
-            confirmed.
+            confirmed. Click a card to zoom.
           </p>
         </div>
       </div>
       <div className="fresh-spoilers-grid">
-        {cards.map((c) => (
-          <div
-            key={`${c.source}-${c.slug}`}
-            className="fresh-spoiler-cell"
-            title={`${c.name} — unverified preview`}
-          >
-            <span className="fresh-spoiler-pill">Unconfirmed</span>
-            <img src={c.image} alt={`${c.name} (unverified preview)`} loading="lazy" />
-          </div>
-        ))}
+        {cards.map((c) => {
+          const spoiled = spoiledDay(c.spoiledAt);
+          return (
+            <button
+              key={`${c.source}-${c.slug}`}
+              type="button"
+              className="fresh-spoiler-cell"
+              title={`${c.name} — unverified preview`}
+              onClick={() => onOpen(c)}
+            >
+              <span className="fresh-spoiler-pill">{t("sets.unconfirmed")}</span>
+              <img src={c.image} alt={`${c.name} (unverified preview)`} loading="lazy" />
+              {spoiled ? (
+                <span className="fresh-spoiler-date">{formatDate(spoiled)}</span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
@@ -254,15 +351,17 @@ function SetGallery({
   preferNewFilter?: boolean;
 }): ReactNode {
   const { t } = useLocale();
+  const unreleased = set.status === "spoiling" || set.status === "announced";
   const [rarity, setRarity] = useState<RarityFilter>("all");
   const [color, setColor] = useState<ColorFilter>("all");
   const [typeF, setTypeF] = useState<TypeFilter>("all");
-  const [sort, setSort] = useState<SortKey>("collector");
+  const [sort, setSort] = useState<SortKey>(() => (unreleased ? "newest" : "collector"));
   const [query, setQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState<SpoiledDateFilter>("all");
   const [newOnly, setNewOnly] = useState(
     () => Boolean(preferNewFilter && newIds.size > 0),
   );
-  const [focus, setFocus] = useState<SetPreviewCard | null>(null);
+  const [focus, setFocus] = useState<GalleryFocus | null>(null);
   // Stable ref so the drawer's focus/Escape effect doesn't re-run per render.
   const closeFocus = useCallback(() => setFocus(null), []);
 
@@ -295,23 +394,50 @@ function SetGallery({
   }, [set]);
 
   const all = useMemo(() => setGalleryCards(resolved), [resolved]);
-  const unreleased = set.status === "spoiling" || set.status === "announced";
+  const today = todayIso();
   const filteredRef = useRef<SetPreviewCard[]>([]);
+  const filteredFreshRef = useRef<FreshSpoilerCard[]>([]);
   // ←/→ browse within the CURRENT filter/sort, wrapping at the ends.
   const stepFocus = useCallback((dir: -1 | 1) => {
     setFocus((cur) => {
+      if (!cur) return cur;
+      if (cur.kind === "fresh") {
+        const list = filteredFreshRef.current;
+        if (list.length === 0) return cur;
+        const i = list.findIndex((c) => c.slug === cur.card.slug && c.source === cur.card.source);
+        if (i < 0) return { kind: "fresh", card: list[0] };
+        return { kind: "fresh", card: list[(i + dir + list.length) % list.length] };
+      }
       const list = filteredRef.current;
-      if (!cur || list.length === 0) return cur;
-      const i = list.findIndex((c) => c.scryfallId === cur.scryfallId);
-      if (i < 0) return list[0];
-      return list[(i + dir + list.length) % list.length];
+      if (list.length === 0) return cur;
+      const i = list.findIndex((c) => c.scryfallId === cur.card.scryfallId);
+      if (i < 0) return { kind: "card", card: list[0] };
+      return { kind: "card", card: list[(i + dir + list.length) % list.length] };
     });
   }, []);
+
+  const filteredFresh = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = (resolved.freshSpoilers || []).filter((c) => {
+      if (!cardMatchesSpoiledFilter(c.spoiledAt, dateFilter, today)) return false;
+      if (q && !c.name.toLowerCase().includes(q) && !c.slug.includes(q)) return false;
+      return true;
+    });
+    if (sort === "newest") list = [...list].sort(compareSpoiledNewest);
+    filteredFreshRef.current = list;
+    return list;
+  }, [resolved.freshSpoilers, dateFilter, today, query, sort]);
+
+  const spoiledDates = useMemo(
+    () => uniqueSpoiledDates([...all, ...(resolved.freshSpoilers || [])]),
+    [all, resolved.freshSpoilers],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = all.filter((c) => {
       if (newOnly && !newIds.has(c.scryfallId)) return false;
+      if (!cardMatchesSpoiledFilter(c.spoiledAt, dateFilter, today)) return false;
       if (rarity !== "all") {
         const r = (c.rarity || "").toLowerCase();
         if (rarity === "special") {
@@ -344,13 +470,13 @@ function SetGallery({
           a.name.localeCompare(b.name),
       );
     } else if (sort === "newest") {
-      list.reverse();
+      list.sort(compareSpoiledNewest);
     } else {
       // collector order as shipped
     }
     filteredRef.current = list;
     return list;
-  }, [all, rarity, color, typeF, sort, query, newOnly, newIds]);
+  }, [all, rarity, color, typeF, sort, query, newOnly, newIds, dateFilter, today]);
 
   const counts = useMemo(() => {
     const m = { all: all.length, mythic: 0, rare: 0, uncommon: 0, common: 0, special: 0 };
@@ -417,7 +543,12 @@ function SetGallery({
         </div>
       </div>
 
-      {set.freshSpoilers?.length ? <FreshSpoilers cards={set.freshSpoilers} /> : null}
+      {filteredFresh.length ? (
+        <FreshSpoilers
+          cards={filteredFresh}
+          onOpen={(card) => setFocus({ kind: "fresh", card })}
+        />
+      ) : null}
 
       <div className="set-gallery-toolbar panel !p-3">
         <div className="flex flex-wrap gap-2 items-center">
@@ -436,11 +567,11 @@ function SetGallery({
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
             >
+              <option value="newest">{t("sets.sortSpoiled")}</option>
               <option value="collector">Collector #</option>
               <option value="name">Name</option>
               <option value="cmc">CMC</option>
               <option value="rarity">Rarity</option>
-              <option value="newest">Newest first</option>
             </select>
           </label>
           {newCount > 0 ? (
@@ -454,6 +585,47 @@ function SetGallery({
             </button>
           ) : null}
         </div>
+
+        {spoiledDates.length > 0 ? (
+          <div className="set-rarity-chips" role="group" aria-label={t("sets.sortSpoiled")}>
+            {(
+              [
+                ["all", t("sets.filterAllDates")],
+                ["today", t("sets.filterToday")],
+                ["yesterday", t("sets.filterYesterday")],
+                ["last3", t("sets.filterLast3")],
+                ["week", t("sets.filterThisWeek")],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={`set-rarity-chip${dateFilter === id ? " active" : ""}`}
+                onClick={() => setDateFilter(id)}
+              >
+                {label}
+              </button>
+            ))}
+            <label className="set-sort-label">
+              {t("sets.byDay")}
+              <select
+                className="set-sort-select"
+                value={dateFilter.startsWith("on:") ? dateFilter : ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setDateFilter(v ? (v as SpoiledDateFilter) : "all");
+                }}
+              >
+                <option value="">{t("sets.filterAllDates")}</option>
+                {spoiledDates.map((d) => (
+                  <option key={d} value={`on:${d}`}>
+                    {formatDate(d)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
 
         <div className="set-rarity-chips" role="group" aria-label="Rarity">
           {(
@@ -528,18 +700,23 @@ function SetGallery({
 
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <p className="text-sm text-muted m-0">No cards match this filter.</p>
+          <p className="text-sm text-muted m-0">
+            {filteredFresh.length
+              ? "No confirmed cards match this filter — unconfirmed previews are above."
+              : "No cards match this filter."}
+          </p>
         </div>
       ) : (
         <div className="set-gallery-grid">
           {filtered.map((c) => {
             const isNew = newIds.has(c.scryfallId);
+            const spoiled = spoiledDay(c.spoiledAt);
             return (
               <button
                 key={c.scryfallId}
                 type="button"
                 className={`set-gallery-cell${isNew ? " is-new" : ""}`}
-                onClick={() => setFocus(c)}
+                onClick={() => setFocus({ kind: "card", card: c })}
                 title={c.name}
               >
                 {isNew ? <span className="set-new-pill">New</span> : null}
@@ -555,6 +732,7 @@ function SetGallery({
                   <span className="set-gallery-cn">
                     #{c.collectorNumber}
                     {c.cmc != null ? ` · ${c.cmc}` : ""}
+                    {spoiled ? ` · ${formatDate(spoiled)}` : ""}
                   </span>
                   <span className="set-gallery-name">{c.name}</span>
                   <span className="set-gallery-legal-mini">
@@ -576,15 +754,28 @@ function SetGallery({
         </div>
       )}
 
-      {focus ? (
+      {focus?.kind === "card" ? (
         <CardDetailDrawer
-          card={focus}
+          card={focus.card}
           onClose={closeFocus}
           onStep={stepFocus}
           unreleased={unreleased}
           position={(() => {
-            const i = filtered.findIndex((c) => c.scryfallId === focus.scryfallId);
+            const i = filtered.findIndex((c) => c.scryfallId === focus.card.scryfallId);
             return i >= 0 ? `${i + 1} / ${filtered.length}` : undefined;
+          })()}
+        />
+      ) : null}
+      {focus?.kind === "fresh" ? (
+        <FreshDetailDrawer
+          card={focus.card}
+          onClose={closeFocus}
+          onStep={stepFocus}
+          position={(() => {
+            const i = filteredFresh.findIndex(
+              (c) => c.slug === focus.card.slug && c.source === focus.card.source,
+            );
+            return i >= 0 ? `${i + 1} / ${filteredFresh.length}` : undefined;
           })()}
         />
       ) : null}

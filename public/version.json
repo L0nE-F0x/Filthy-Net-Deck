@@ -1,9 +1,9 @@
 {
-  "version": "3.7.4",
+  "version": "3.8.0",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.7.4.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.7.4-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.0.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.0-universal.dmg"
   },
-  "notes": "v3.7.4: Aetherfield look pass — fly a colour arm, a reprint thread that reads, era ticks, and a newest-set pulse."
+  "notes": "v3.8.0: Set Radar for spoiler season — filter by the day a card dropped, zoom unconfirmed previews, hourly spoilers from MythicSpoiler and Scryfall."
 }

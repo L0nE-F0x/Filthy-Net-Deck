@@ -127,7 +127,7 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 |-------|------|
 | `npm run sets` | `pipeline/build-sets.mjs` → Scryfall `/sets` + spoiled cards → **slim index + per-code galleries** |
 | `pipeline/slim-sets-feed.mjs` | Pure split: live/released galleries out of the index; spoiling stays inline |
-| `pipeline/sources/mythicspoiler.mjs` | Fresh (unconfirmed) spoilers ahead of Scryfall |
+| `pipeline/sources/mythicspoiler.mjs` | Fresh (unconfirmed) spoilers ahead of Scryfall — newspoilers.html **and** per-set index pages, with date-header `spoiledAt` |
 | `pipeline/sources/set-calendar-overrides.json` | Optional official Arena / spoiler dates |
 | `website/meta/sets.json` (+ `public/meta/`) | **Slim** published index the app downloads (~0.5 MB) |
 | `website/meta/sets/<code>.json` (+ `public/meta/sets/`) | Full card gallery for that set — loaded when the user opens Gallery |
@@ -137,20 +137,32 @@ Arena-first upcoming expansions (spoilers + dates). **No Alchemy.**
 **Fresh spoilers (ahead of Scryfall).** Scryfall usually catalogs new cards within
 hours, but during spoiler season a leaked/previewed card often lands on a visual
 aggregator first. `pipeline/sources/mythicspoiler.mjs` scrapes
-`mythicspoiler.com/newspoilers.html` (static HTML — no robots restrictions) and
-groups cards by set-folder code, which matches the Scryfall set code (`hob`,
-`trk`…). Card slugs are the image filenames, which normalize to the same key as a
-lowercased Scryfall name (`Delighted Halfling` → `delightedhalfling`). The build
-attaches, per upcoming/spoiling set, a `freshSpoilers[]` array of the cards
-Scryfall doesn't have yet — filtered against the Scryfall gallery by that
-normalized key (DFC front faces included), so the list is **self-healing**: a
-card drops the instant Scryfall catalogs it. Fresh cards render in the gallery's
-**"Just spoiled · unconfirmed"** strip from the source image URL (no Scryfall id),
-labeled unverified, with a "+N fresh" badge on the set card. Fail-soft: if
-MythicSpoiler is unreachable the build ships Scryfall-only, never aborts. The
-image host (`mythicspoiler.com`) is allowlisted in the Tauri CSP `img-src`. Adding
-another spoiler source later = one more module returning `{ bySetCode }` merged
-the same way.
+`mythicspoiler.com/newspoilers.html` (static HTML — no robots restrictions) **and**
+the per-set index (`/{code}/index.html`) for products that haven't released yet,
+so cards that scrolled off the "new spoilers" grid still attach. It groups cards
+by set-folder code (matches the Scryfall set code: `hob`, `trk`, `fra`…) and
+parses the date headers (`SEPTEMBER 8`) into `spoiledAt`. Early first-looks that
+land in a generic `mtg/` folder are remapped via the header's set name. Card
+slugs are the image filenames, which normalize to the same key as a lowercased
+Scryfall name (`Delighted Halfling` → `delightedhalfling`). The build attaches,
+per upcoming/spoiling set, a `freshSpoilers[]` array of the cards Scryfall
+doesn't have yet — filtered against the Scryfall gallery by that normalized key
+(DFC front faces included), so the list is **self-healing**: a card drops the
+instant Scryfall catalogs it. Fresh cards render in the gallery's **"Just spoiled
+· unconfirmed"** strip from the source image URL (no Scryfall id), labeled
+unverified, clickable (same zoom drawer as confirmed cards), with a "+N fresh"
+badge on the set card. Fail-soft: if MythicSpoiler is unreachable the build ships
+Scryfall-only, never aborts. The image host (`mythicspoiler.com`) is allowlisted
+in the Tauri CSP `img-src`. Adding another spoiler source later = one more module
+returning `{ bySetCode }` merged the same way.
+
+**Spoiled-on dates.** Confirmed gallery cards carry `spoiledAt` (YYYY-MM-DD):
+Scryfall `preview.previewed_at` when present, else the MythicSpoiler date header,
+else the scan ingest day (`image_updated_at`). The gallery toolbar filters by
+Today / Yesterday / Last 3 days / This week / a specific day, and **Spoiled date**
+sort is newest-first on that field (not collector-number reverse). Older feeds
+simply omit the key and the date filter hides undated cards only when a day
+filter is on.
 
 **Slim index + lazy galleries (v2.7.1+).** The radar still ships (1) all
 future/spoiling constructed products and (2) every expansion still legal in
@@ -175,11 +187,13 @@ cardNames }`) — the cards leaving Standard at the next rotation, computed by
 diffing `f:standard` cards in rotating vs staying sets. The app uses it for the
 per-deck rotation impact panel and the B&R pulse diffs the `bans` arrays.
 
-CI refreshes the set radar **7× per day**: the daily meta job (06:00 UTC) plus the
-fast lane `.github/workflows/sets-refresh.yml` every 4h (00/04/08/12/16/20 UTC).
-The fast lane now also pulls MythicSpoiler, so fresh leaks land within a couple of
-hours. Arena dates are `official` when overridden, otherwise `estimated`
-(paper − 3 days) and labeled in the UI.
+CI refreshes the set radar **hourly** (`.github/workflows/sets-refresh.yml`) plus
+the daily meta job at 06:00 UTC. The build is a no-op (no git commit) when the
+payload is unchanged aside from `generatedAt`, so empty hours don't bloat history.
+MythicSpoiler is in the same run, so a card that hits the aggregator or Scryfall
+reaches the app within about an hour + the app's 90-minute refetch. Arena dates
+are `official` when overridden, otherwise `estimated` (paper − 3 days) and labeled
+in the UI.
 
 **New announcements are automatic.** When WotC reveals a set or spoils cards at an
 event, Scryfall catalogs them (usually within hours); the next radar run picks up
