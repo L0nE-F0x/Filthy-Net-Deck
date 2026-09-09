@@ -366,6 +366,9 @@ export const ptBR: Messages = {
     noOracleYet: "O texto oracle ainda não está no catálogo — este preview não foi confirmado.",
     sortSpoiled: "Data do spoiler",
     byDay: "Por dia",
+    colorAny: "Qualquer cor",
+    colorMulti: "Multi",
+    typeToken: "Tokens",
   },
   formats: {
     eyebrow: "Formatos",

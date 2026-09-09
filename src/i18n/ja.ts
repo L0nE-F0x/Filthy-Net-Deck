@@ -366,6 +366,9 @@ export const ja: Messages = {
     noOracleYet: "オラクルテキストはまだカタログにありません。このプレビューは未確認です。",
     sortSpoiled: "スポイラー日",
     byDay: "日付別",
+    colorAny: "すべての色",
+    colorMulti: "多色",
+    typeToken: "トークン",
   },
   formats: {
     eyebrow: "フォーマット",

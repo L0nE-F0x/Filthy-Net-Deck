@@ -2,7 +2,7 @@
  * Local set-radar helpers: new-since-last-visit snapshot + Arena-eve signals.
  */
 import type { SetsBundle, UpcomingSet } from "../types/sets";
-import { setGalleryCards } from "../types/sets";
+import { setPlayableCards } from "../types/sets";
 
 const SNAP_KEY = "bbi.sets.cardSnap";
 const NOTIFY_DAY_KEY = "bbi.sets.arenaNotifyDay";
@@ -23,7 +23,7 @@ export function loadCardSnap(): CardSnap {
 export function saveCardSnap(bundle: SetsBundle): void {
   const snap: CardSnap = {};
   for (const s of bundle.sets) {
-    snap[s.code] = setGalleryCards(s).map((c) => c.scryfallId);
+    snap[s.code] = setPlayableCards(s).map((c) => c.scryfallId);
   }
   try {
     localStorage.setItem(SNAP_KEY, JSON.stringify(snap));
@@ -39,7 +39,7 @@ export function newCardsBySet(bundle: SetsBundle, prev: CardSnap): Record<string
     const prevIds = new Set(prev[s.code] || []);
     // First visit: no "new" flood — treat empty snap as baseline after save
     if (!prev[s.code]) continue;
-    const fresh = setGalleryCards(s)
+    const fresh = setPlayableCards(s)
       .filter((c) => !prevIds.has(c.scryfallId))
       .map((c) => c.scryfallId);
     if (fresh.length) out[s.code] = fresh;

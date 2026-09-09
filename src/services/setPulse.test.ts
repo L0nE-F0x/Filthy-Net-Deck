@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { newCardsBySet, spoilerPulseDismissKey, totalNewCount } from "./setPulse";
-import type { SetsBundle } from "../types/sets";
+import type { SetsBundle, UpcomingSet } from "../types/sets";
+import { setGalleryCards, setPlayableCards } from "../types/sets";
 
 const bundle = {
   date: "2026-07-17",
@@ -26,6 +27,21 @@ describe("newCardsBySet", () => {
 
   it("skips first visit (no prior snap for set)", () => {
     expect(newCardsBySet(bundle, {})).toEqual({});
+  });
+});
+
+describe("setGalleryCards vs playable", () => {
+  it("keeps tokens off the playable rail but in the open gallery", () => {
+    const set = {
+      code: "fra",
+      cards: [
+        { scryfallId: "a", name: "A" },
+        { scryfallId: "b", name: "B" },
+      ],
+      tokens: [{ scryfallId: "t", name: "Illusion", isToken: true }],
+    } as unknown as UpcomingSet;
+    expect(setPlayableCards(set).map((c) => c.scryfallId)).toEqual(["a", "b"]);
+    expect(setGalleryCards(set).map((c) => c.scryfallId)).toEqual(["a", "b", "t"]);
   });
 });
 

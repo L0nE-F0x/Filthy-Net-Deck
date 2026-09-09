@@ -13,7 +13,25 @@ export type TypeFilter =
   | "artifact"
   | "planeswalker"
   | "land"
+  | "token"
   | "other";
+
+export type ColorLetter = "W" | "U" | "B" | "R" | "G";
+
+/** Empty letters + neither flag = any colour. Letters are an exact identity. */
+export interface ColorFilterState {
+  letters: ColorLetter[];
+  colorless: boolean;
+  multicolor: boolean;
+}
+
+export function emptyColorFilter(): ColorFilterState {
+  return { letters: [], colorless: false, multicolor: false };
+}
+
+export function colorFilterIsAny(s: ColorFilterState): boolean {
+  return !s.colorless && !s.multicolor && s.letters.length === 0;
+}
 
 export function statusLabel(s: SetStatus): string {
   switch (s) {
@@ -119,16 +137,90 @@ export function typeBucket(typeLine: string | undefined): TypeFilter {
   return "other";
 }
 
-export function cardIsColorless(c: Pick<SetPreviewCard, "colors">): boolean {
-  return !c.colors?.length;
+export function isTokenCard(
+  c: Pick<SetPreviewCard, "typeLine" | "isToken">,
+): boolean {
+  if (c.isToken) return true;
+  return /\btoken\b/i.test(c.typeLine || "");
+}
+
+const WUBRG: ColorLetter[] = ["W", "U", "B", "R", "G"];
+
+function isColorLetter(x: string): x is ColorLetter {
+  return x === "W" || x === "U" || x === "B" || x === "R" || x === "G";
+}
+
+/**
+ * Printed face colours when the card has any; otherwise colour identity
+ * (so Plains is white, Karn is colourless). WUBRG order.
+ * Prefers printed colours so a white card with a green ability is still W,
+ * not Selesnya.
+ */
+export function cardColorLetters(
+  c: Pick<SetPreviewCard, "colors" | "colorIdentity">,
+): ColorLetter[] {
+  const printed = (c.colors ?? []).filter(isColorLetter);
+  const src = printed.length
+    ? printed
+    : (c.colorIdentity ?? []).filter(isColorLetter);
+  const set = new Set(src);
+  return WUBRG.filter((l) => set.has(l));
+}
+
+export function cardIsColorless(
+  c: Pick<SetPreviewCard, "colors" | "colorIdentity">,
+): boolean {
+  return cardColorLetters(c).length === 0;
 }
 
 export function cardHasColor(
-  c: Pick<SetPreviewCard, "colors">,
+  c: Pick<SetPreviewCard, "colors" | "colorIdentity">,
   col: string,
 ): boolean {
   if (col === "C") return cardIsColorless(c);
-  return (c.colors || []).includes(col);
+  return cardColorLetters(c).includes(col as ColorLetter);
+}
+
+export function toggleColorLetter(
+  state: ColorFilterState,
+  letter: ColorLetter,
+): ColorFilterState {
+  const has = state.letters.includes(letter);
+  const letters = has
+    ? state.letters.filter((l) => l !== letter)
+    : [...state.letters, letter];
+  return { letters, colorless: false, multicolor: false };
+}
+
+export function toggleColorless(state: ColorFilterState): ColorFilterState {
+  return state.colorless
+    ? emptyColorFilter()
+    : { letters: [], colorless: true, multicolor: false };
+}
+
+export function toggleMulticolor(state: ColorFilterState): ColorFilterState {
+  return state.multicolor
+    ? emptyColorFilter()
+    : { letters: [], colorless: false, multicolor: true };
+}
+
+/**
+ * Exact colour-identity match.
+ *  - no selection → any
+ *  - C → colourless only
+ *  - Multi → two or more colours
+ *  - W → mono-white; W+G → Selesnya exactly; etc.
+ */
+export function cardMatchesColorFilter(
+  c: Pick<SetPreviewCard, "colors" | "colorIdentity">,
+  state: ColorFilterState,
+): boolean {
+  const have = cardColorLetters(c);
+  if (state.colorless) return have.length === 0;
+  if (state.multicolor) return have.length >= 2;
+  if (state.letters.length === 0) return true;
+  const want = WUBRG.filter((l) => state.letters.includes(l)).join("");
+  return want === have.join("");
 }
 
 /** Gallery spoiler-day filter. `on:YYYY-MM-DD` pins a single calendar day. */

@@ -44,8 +44,12 @@ export interface SetPreviewCard {
   typeLine?: string;
   manaCost?: string;
   cmc?: number;
-  /** WUBRG color identity / face colors */
+  /** Printed face colours (may be empty on lands). */
   colors?: string[];
+  /** Scryfall colour identity — lands and filter chips prefer this. */
+  colorIdentity?: string[];
+  /** Token from the related token set (or type line). Absent on older feeds. */
+  isToken?: boolean;
   oracleText?: string;
   legalities?: {
     standard?: FormatLegality;
@@ -87,6 +91,12 @@ export interface UpcomingSet {
   previews: SetPreviewCard[];
   /** Full spoiled gallery (collector order). May equal previews on tiny sets. */
   cards?: SetPreviewCard[];
+  /**
+   * Related token-set cards (tfra, twoe, …). Separate from `cards` so older
+   * app builds keep showing the playable gallery only. Absent when the set
+   * has no tokens or the feed predates this field.
+   */
+  tokens?: SetPreviewCard[];
   /**
    * Unconfirmed cards from a visual-spoiler source (MythicSpoiler) that Scryfall
    * hasn't cataloged yet. Absent on older feeds / when nothing is fresh.
@@ -179,10 +189,17 @@ export interface FutureSet {
   trailer?: SetTrailerInfo | null;
 }
 
-/** Prefer full gallery; fall back to previews for older feeds. */
-export function setGalleryCards(set: UpcomingSet): SetPreviewCard[] {
+/** Playable gallery only (no tokens). Prefer full cards; fall back to previews. */
+export function setPlayableCards(set: UpcomingSet): SetPreviewCard[] {
   if (set.cards?.length) return set.cards;
   return set.previews || [];
+}
+
+/** Playable gallery plus related tokens (for the open-set filter). */
+export function setGalleryCards(set: UpcomingSet): SetPreviewCard[] {
+  const cards = setPlayableCards(set);
+  const tokens = set.tokens?.length ? set.tokens : [];
+  return tokens.length ? [...cards, ...tokens] : cards;
 }
 
 export function isFormatLegal(

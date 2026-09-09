@@ -3,10 +3,10 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.8.0** (Windows signed updater · macOS universal dmg
-rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
-· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
-registration.**
+**Live product version: v3.8.0** (site still 3.8.0 until the 3.8.1 macOS dmg
+lands) · app **v3.8.1 tagged, website flip held** · repo `L0nE-F0x/Filthy-Net-Deck`
+· **Next after the dmg: website flip, then AUR `filthy-net-deck-bin` when Arch
+reopens registration.**
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -20,6 +20,17 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-09 — v3.8.1 tagged, website still 3.8.0.**
+
+Set Radar colour chips are exact identity (W = mono-white, W+G = Selesnya).
+Multi = every gold card. Tokens = related token set (`tokens[]` sibling so
+3.8.0 ignores them). App is 3.8.1. Download buttons stay on 3.8.0 until the
+macOS dmg is on the GitHub Release — flipping first 404s the macOS button.
+
+Windows NSIS 12,814,082 bytes + 428-byte updater `.sig`. Linux tarball
+`filthy-net-deck-3.8.1-x86_64.tar.gz`, sha256
+`65b530d2b79a719a20ef5fafabd3a9c47d5c6fd6994a3af7ec6d7b8dec60750d`.
 
 **2026-09-09 — session closed. v3.8.0 is on all three platforms.**
 

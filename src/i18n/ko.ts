@@ -366,6 +366,9 @@ export const ko: Messages = {
     noOracleYet: "오라클 텍스트가 아직 카탈로그에 없습니다. 이 프리뷰는 미확인입니다.",
     sortSpoiled: "스포일러 날짜",
     byDay: "날짜별",
+    colorAny: "모든 색",
+    colorMulti: "다색",
+    typeToken: "토큰",
   },
   formats: {
     eyebrow: "포맷",

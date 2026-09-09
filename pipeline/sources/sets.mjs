@@ -3,7 +3,9 @@
  *
  * Rules:
  *  - No Alchemy (set_type alchemy, Alchemy in name, Y## historic anthologies).
- *  - No tokens / memorabilia / promos / funny / minigame / art series.
+ *  - No memorabilia / promo / funny / minigame / art-series sets as radar rows.
+ *    Token *sets* are also excluded as rows; related token cards are appended
+ *    to the parent gallery (`isToken`) and do not count toward spoiledCount.
  *  - Paper expansion (and similar) only — products that hit Constructed on Arena.
  *  - Arena dates only from overrides when known (never invent without a label).
  *  - Soft estimate (paper − 3 days) is allowed only as confidence:"estimated".
@@ -227,7 +229,7 @@ function spoiledAtFromScryfall(c) {
   return null;
 }
 
-function mapCard(c) {
+export function mapCard(c, opts = {}) {
   const face = c.card_faces?.[0];
   const legalities = c.legalities || {};
   const colors = Array.isArray(c.colors)
@@ -237,6 +239,13 @@ function mapCard(c) {
       : Array.isArray(c.color_identity)
         ? c.color_identity
         : [];
+  const colorIdentity = Array.isArray(c.color_identity)
+    ? c.color_identity.filter((x) => "WUBRG".includes(x))
+    : [];
+  const isToken =
+    Boolean(opts.isToken) ||
+    c.layout === "token" ||
+    /\btoken\b/i.test(c.type_line || "");
   const spoiledAt = spoiledAtFromScryfall(c);
   return {
     name: c.name,
@@ -247,6 +256,8 @@ function mapCard(c) {
     manaCost: c.mana_cost || face?.mana_cost || "",
     cmc: typeof c.cmc === "number" ? c.cmc : undefined,
     colors,
+    ...(colorIdentity.length ? { colorIdentity } : {}),
+    ...(isToken ? { isToken: true } : {}),
     oracleText: c.oracle_text || face?.oracle_text || "",
     legalities: {
       standard: legalities.standard || "not_legal",
@@ -256,6 +267,18 @@ function mapCard(c) {
     imageVersion: imageVersionOf(c),
     ...(spoiledAt ? { spoiledAt } : {}),
   };
+}
+
+/** Token-set codes whose parent is this expansion (e.g. fra → tfra). */
+export function tokenSetCodesFor(code, allSets) {
+  const c = String(code).toLowerCase();
+  return (allSets || [])
+    .filter(
+      (s) =>
+        s.set_type === "token" && String(s.parent_set_code || "").toLowerCase() === c,
+    )
+    .map((s) => String(s.code).toLowerCase())
+    .filter(Boolean);
 }
 
 function slugKeysForName(name) {
@@ -323,9 +346,10 @@ function buildFreshSpoilers(galleryCards, mythicCards) {
 /**
  * Fetch set cards from Scryfall.
  * @param {string} code
- * @param {{ maxCards?: number, order?: string, dir?: string }} [opts]
+ * @param {{ maxCards?: number, order?: string, dir?: string, isToken?: boolean }} [opts]
  *   maxCards — stop after this many (omit for full gallery). Slim samples use
  *   rarity order so the rail/hero still look good without shipping 300+ cards.
+ *   isToken — mark every mapped card as a token (child token-set fetch).
  */
 async function fetchAllSetCards(code, opts = {}) {
   const maxCards = typeof opts.maxCards === "number" ? opts.maxCards : Infinity;
@@ -362,7 +386,7 @@ async function fetchAllSetCards(code, opts = {}) {
         data = await scryfallGet(path);
       }
       for (const c of data.data || []) {
-        cards.push(mapCard(c));
+        cards.push(mapCard(c, opts));
         if (cards.length >= maxCards) break;
       }
       path =
@@ -706,13 +730,26 @@ export async function buildSetsBundle() {
     // spoiledCount: full gallery uses actual pull; slim uses Scryfall card_count
     // so the meter doesn't read "16 / 286" as if only 16 are spoiled.
     const spoiledCount = fullGallery ? cards.length : s.card_count || cards.length;
+
+    const tokenCards = [];
+    for (const tc of tokenSetCodesFor(code, all)) {
+      await sleep(120);
+      const toks = await fetchAllSetCards(tc, { isToken: true });
+      if (toks.length) {
+        tokenCards.push(...toks);
+        console.log(`    +${toks.length} tokens (${tc})`);
+      }
+    }
+
+    const playable = cards.filter((c) => !c.isToken);
     const previews = fullGallery
-      ? [...cards].reverse().slice(0, 14)
-      : cards.slice(0, 14);
+      ? [...playable].reverse().slice(0, 14)
+      : playable.slice(0, 14);
 
     const hero =
-      cards.find((c) => c.rarity === "mythic") ||
-      cards.find((c) => c.rarity === "rare") ||
+      playable.find((c) => c.rarity === "mythic") ||
+      playable.find((c) => c.rarity === "rare") ||
+      playable[0] ||
       cards[0] ||
       null;
 
@@ -744,8 +781,10 @@ export async function buildSetsBundle() {
       status: "announced",
     };
     // Full gallery only when we actually paginated the whole set.
+    // Tokens stay on a sibling field so older app builds ignore them.
     if (fullGallery) {
-      entry.cards = cards;
+      entry.cards = playable;
+      if (tokenCards.length) entry.tokens = tokenCards;
     }
     const trailer = resolveTrailer(trailers, code, s.name);
     if (trailer) entry.trailer = trailer;
@@ -755,7 +794,7 @@ export async function buildSetsBundle() {
     // sets; a released set's cards are all on Scryfall and would fully dedupe.
     let freshCount = 0;
     if (isFuture || entry.status === "spoiling") {
-      const fresh = buildFreshSpoilers(cards, mythic.bySetCode[code]);
+      const fresh = buildFreshSpoilers(playable, mythic.bySetCode[code]);
       if (fresh.length) {
         entry.freshSpoilers = fresh;
         freshCount = fresh.length;
@@ -763,9 +802,10 @@ export async function buildSetsBundle() {
     }
 
     sets.push(entry);
+    const tokenCount = tokenCards.length;
     const galLabel = fullGallery
-      ? `gallery ${cards.length}/${entry.cardCount}`
-      : `slim ${cards.length} (Standard pool)`;
+      ? `gallery ${playable.length}/${entry.cardCount}${tokenCount ? ` +${tokenCount} tokens` : ""}`
+      : `slim ${playable.length} (Standard pool)`;
     const freshLabel = freshCount ? ` · +${freshCount} fresh (mythicspoiler)` : "";
     console.log(
       `  ${code} · ${s.name} · ${entry.status} · ${galLabel}${freshLabel} · arena ${arena || "—"} (${arenaConfidence})`,

@@ -366,6 +366,9 @@ export const de: Messages = {
     noOracleYet: "Noch kein Oracle-Text im Katalog — dieses Preview ist unbestätigt.",
     sortSpoiled: "Spoilerdatum",
     byDay: "Nach Tag",
+    colorAny: "Jede Farbe",
+    colorMulti: "Multi",
+    typeToken: "Token",
   },
   formats: {
     eyebrow: "Formate",
