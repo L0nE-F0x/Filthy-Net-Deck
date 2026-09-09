@@ -21,45 +21,30 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-09 — v3.8.0 shipped: Set Radar for spoiler season.**
+**2026-09-09 — session closed. v3.8.0 is on all three platforms.**
 
-Filter by the day a card was spoiled, zoom unconfirmed previews, hourly
-MythicSpoiler + Scryfall. Windows NSIS 12,789,630 bytes + 428-byte updater
-`.sig` (key id `67FCA9900F523D49`). Linux tarball
-`filthy-net-deck-3.8.0-x86_64.tar.gz` 16,517,712 bytes, sha256
+Owner is recording MTGA Brew Lab / Spoiler Talk off Set Radar (Reality
+Fracture). Do not interrupt that. Product is 3.8.0 everywhere users look.
+
+Windows NSIS 12,789,630 bytes + 428-byte updater `.sig` (key id
+`67FCA9900F523D49`). Linux tarball
+`filthy-net-deck-3.8.0-x86_64.tar.gz`, sha256
 `a32e1a9325fd964a58b7686f1a4ac3d315f175b03357dec00989f20b10eb5f70`.
-macOS dmg 32,603,132 bytes, size-checked against the release asset.
+macOS dmg 32,603,132 bytes, size-checked against the v3.8.0 release asset.
 
-Downloads pruned to 3.7.4 + 3.8.0. AUR still waits on Arch registration.
+Set Radar: filter by spoiler day, unconfirmed zoom, hourly MythicSpoiler
+(date headers + set pages + `mtg/` remap) + Scryfall. FRA at ship:
+**146 confirmed / 12 unconfirmed** (Special Guests under other Scryfall
+sets, plus MS filename typos `campuscriter` / `garrukveildbutcher`).
 
-**2026-09-09 — Set Radar spoiler-talk pass is in the working tree, not shipped.**
+Downloads pruned to 3.7.4 + 3.8.0.
 
-Owner asked for FND as the spoiler source for MTGA Brew Lab / Spoiler Talk
-(Reality Fracture). Three things landed, uncommitted besides the local
-`npm run sets` feed rebuild:
-
-1. Gallery filter by **date spoiled** (Today / Yesterday / Last 3 days /
-   This week / a specific day). Sort "Spoiled date" is real `spoiledAt`,
-   not collector-number reverse. Default for spoiling sets.
-2. **Unconfirmed** cells open the same zoom drawer as confirmed cards
-   (←/→, Escape, source link). They were static images.
-3. Pipeline is actually current: MythicSpoiler date headers + per-set
-   index pages + `mtg/` first-look remap; Scryfall `previewed_at` /
-   image ingest as fallback; CI hourly with no-op commits when unchanged.
-
-Rebuilt feed: Reality Fracture **146/146** confirmed (was 52) + **12**
-fresh (Special Guests Scryfall files under other sets, plus two MS
-filename typos: `campuscriter`, `garrukveildbutcher`). All 146+12 have
-`spoiledAt`.
-
-UI needs a **version bump + full release** (AGENTS.md table). The feed
-alone can go live on a `main` push — existing installs pick up the extra
-cards on refetch, but not the date chips or click-to-zoom.
-
-AUR `filthy-net-deck-bin` is still blocked on Arch registration.
+Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration. Optional leftover from the ship: in-app Check for updates
+on a real Windows box, and a private-window share preview of the OG card.
 
 **2026-09-09 — 4c Reanimator was shipping the wrong 60. Matcher tightened,
-live feed republished. No app version bump.**
+live feed republished. Art-strip skip shipped in v3.8.0.**
 
 Owner opened Standard Bo1 #5 "4c Reanimator" and got a Llanowar Elves
 pile (no Bringer of the Last Gift) while the art strip still showed
@@ -72,13 +57,7 @@ Fix: when a Goldfish prototype exists, require real *spell* overlap
 (lands no longer count). Regression in `pipeline/listMatch.test.mjs`.
 Re-ran `npm run meta`: Bo1 4c Reanimator is now the magic.gg Traditional
 list with 4 Bringer / 0 Elves. Art strip skips key cards that are not
-in the 60 (ships with the next app release; the feed fix is what users
-see today).
-
-Push `origin/main` so Netlify serves the new `latest.json` — the app
-re-fetches on launch / when the loaded copy is >90 minutes old.
-
-Product still v3.7.4. Next remains AUR `filthy-net-deck-bin`.
+in the 60 (shipped in v3.8.0; the feed fix is what users saw that day).
 
 **2026-09-08 — session closed. Meta audit: Bo1 board is correct.**
 
