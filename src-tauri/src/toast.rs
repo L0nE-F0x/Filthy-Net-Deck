@@ -76,7 +76,7 @@ fn set_enabled(app: &AppHandle, enabled: bool) {
         let _ = fs::write(path, if enabled { b"1" as &[u8] } else { b"0" });
     }
     if !enabled {
-        // Windows: drop the renderer. Linux: hide — see drop_secondary_webview.
+        // Drop the renderer — see drop_secondary_webview.
         destroy(app);
     }
 }
@@ -131,8 +131,7 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Drop the toast webview. Windows destroys it (WebView2 RAM); Linux hides
-/// it so WebKitGTK does not abort its GPU process on teardown — see
+/// Drop the toast webview, freeing its renderer process — see
 /// [`crate::drop_secondary_webview`].
 pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(TOAST_LABEL) {
@@ -197,9 +196,8 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
             return;
         }
         let target = app_hide.clone();
-        // Windows: destroy to free WebView2. Linux: hide — destroying a
-        // WebKitGTK webview dumps WebKitWebProcess (NVIDIA EGL/Mesa abort
-        // inside exit()) and Omarchy paints a crash banner over Arena.
+        // Destroy to free the renderer process; the toast is rebuilt on
+        // demand and only appears at match end.
         let _ = app_hide.run_on_main_thread(move || destroy(&target));
     });
 }

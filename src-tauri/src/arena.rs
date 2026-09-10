@@ -70,6 +70,12 @@ fn scan(sys: &mut System) -> bool {
 /// Poll in the background, publishing every transition to the whole app.
 pub fn start(app: AppHandle) {
     std::thread::spawn(move || {
+        // sysinfo keeps a `/proc` file open for every process it indexes, and
+        // defaults that cache to half the system fd limit — over 1300 open
+        // descriptors on an ordinary desktop, held for the life of the app to
+        // answer one yes/no question every `POLL`. Reopen per scan instead; at
+        // this interval the syscalls do not register.
+        sysinfo::set_open_files_limit(0);
         let mut sys = System::new();
         loop {
             let now = scan(&mut sys);
@@ -91,11 +97,10 @@ pub fn start(app: AppHandle) {
                     // for a second renderer all day when the game is closed.
                     crate::overlay::prewarm_if_enabled(&app);
                 } else {
-                    // Drop secondary webviews when Arena quits. Windows
-                    // destroys them (WebView2 RAM). Linux hides them —
-                    // WebKitGTK teardown aborts WebKitWebProcess (NVIDIA
-                    // EGL/Mesa) and Omarchy paints a crash banner over the
-                    // desktop. Teardown/hide is safe on the main thread.
+                    // Drop secondary webviews when Arena quits — every
+                    // platform destroys, reclaiming a renderer process per
+                    // window. See `drop_secondary_webview`. Teardown is safe
+                    // on the main thread.
                     let handle = app.clone();
                     let _ = app.run_on_main_thread(move || {
                         crate::presence::destroy(&handle);

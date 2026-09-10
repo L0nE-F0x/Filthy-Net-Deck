@@ -80,23 +80,27 @@ pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
 
 /// Drop a secondary webview (overlay / toast / presence / presence-menu).
 ///
-/// Windows: `destroy()` — each WebView2 window is a Chromium renderer, and
-/// holding one hidden between rare uses (toasts, Arena-quit) wastes RAM.
+/// Every platform destroys. Each of these windows is a whole renderer process
+/// — a Chromium one under WebView2, a `WebKitWebProcess` under WebKitGTK — so
+/// keeping one alive between rare uses (toasts, Arena-quit) holds hundreds of
+/// megabytes for a window nobody can see. The builders recreate them on
+/// demand, which is already the path taken after the boot prewarm was dropped.
 ///
-/// Linux: `hide()` only. Destroying a WebKitGTK webview tears down
-/// `WebKitWebProcess` through NVIDIA EGL + Mesa TLS destructors, which abort
-/// inside `exit()`. The parent lives; systemd-coredump still records it and
-/// Omarchy posts a "Process crashed: WebKitWebProcess" banner over Arena.
-/// Hide keeps the renderer warm (same as the overlay between matches).
+/// Linux used to `hide()` here instead: destroying a WebKitGTK webview was
+/// observed to abort `WebKitWebProcess` inside NVIDIA EGL + Mesa TLS
+/// destructors, leaving a "Process crashed" banner over Arena. Retested
+/// 2026-09-10 against webkit2gtk-4.1 and NVIDIA 610.57.04 and it no longer
+/// reproduces: six Arena-quit cycles through this exact path produced zero
+/// core dumps, three of them with the webview pinned to the dGPU via
+/// `WEBKIT_WEB_RENDER_DEVICE_FILE` while EGL DMABuf imports were failing. The
+/// historical dumps all correlate with the *parent* dying (SIGTERM, OOM), not
+/// with this call. Measured on the same cycle: hide left 201 MB resident with
+/// Arena closed, destroy left none.
+///
+/// If it ever resurfaces the blast radius is cosmetic — the parent survives
+/// the child abort and the window is rebuilt on the next match.
 pub(crate) fn drop_secondary_webview(win: &tauri::WebviewWindow) {
-    #[cfg(target_os = "linux")]
-    {
-        let _ = win.hide();
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = win.destroy();
-    }
+    let _ = win.destroy();
 }
 
 /// `tao` on Linux resolves this to `gtk_widget_get_window().unwrap()`. A

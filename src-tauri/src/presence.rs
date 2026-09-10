@@ -189,8 +189,8 @@ fn open_menu(app: &AppHandle, width: f64, height: f64) {
     }
     let w = width.clamp(MENU_MIN_W, MENU_MAX_W);
     let h = height.clamp(MENU_MIN_H, MENU_MAX_H);
-    // Linux hides this window instead of destroying it (WebKit teardown
-    // abort). Re-show + re-size the existing one; only build if missing.
+    // The window is destroyed when Arena quits, so it is usually absent
+    // here. Re-show + re-size an existing one; only build if missing.
     if app.get_webview_window(MENU_LABEL).is_none() {
         if let Err(e) = ensure_menu_window(app, w, h) {
             eprintln!("[presence] ensure_menu_window: {e}");
@@ -233,8 +233,7 @@ pub fn show(app: &AppHandle) {
     }
 }
 
-/// Drop the presence webviews. Windows destroys them (WebView2 RAM); Linux
-/// hides them so WebKitGTK does not abort its GPU process on teardown — see
+/// Drop the presence webviews, freeing a renderer process each — see
 /// [`crate::drop_secondary_webview`]. Used when Arena quits or the badge is
 /// turned off.
 pub fn destroy(app: &AppHandle) {

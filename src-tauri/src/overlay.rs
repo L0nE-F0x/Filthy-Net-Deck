@@ -393,8 +393,7 @@ pub fn user_close(app: &AppHandle) {
 }
 
 /// Arena quit: drop the HUD. Companion stays if the user left it open —
-/// that's the "I close it myself" contract. Linux hides rather than
-/// destroying the webview (WebKit teardown abort).
+/// that's the "I close it myself" contract.
 pub fn on_arena_quit(app: &AppHandle) {
     if is_companion() && !USER_CLOSED.load(Ordering::SeqCst) {
         return;
@@ -402,9 +401,9 @@ pub fn on_arena_quit(app: &AppHandle) {
     destroy(app);
 }
 
-/// Drop the overlay webview. Windows destroys it (WebView2 RAM); Linux hides
-/// it so WebKitGTK does not abort its GPU process on teardown — see
-/// [`crate::drop_secondary_webview`]. Match mid-session still uses [`hide`].
+/// Drop the overlay webview, freeing its renderer process — see
+/// [`crate::drop_secondary_webview`]. Match mid-session still uses [`hide`],
+/// which keeps the HUD warm between games.
 pub fn destroy(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
         crate::drop_secondary_webview(&win);
@@ -506,12 +505,20 @@ fn hyprland_force_size(win: &tauri::WebviewWindow, w: f64, h: f64) {
     let expr = format!(
         "hl.dsp.window.resize({{ x = {w}, y = {h}, relative = false, window = \"title:{title}\" }})"
     );
-    let _ = std::process::Command::new("hyprctl")
+    // Dropping the `Child` without waiting leaves a zombie behind, and this
+    // fires on every overlay resize — they accumulate for the whole session.
+    // Reap on a detached thread so the caller never blocks on hyprctl.
+    if let Ok(mut child) = std::process::Command::new("hyprctl")
         .args(["dispatch", &expr])
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
-        .spawn();
+        .spawn()
+    {
+        std::thread::spawn(move || {
+            let _ = child.wait();
+        });
+    }
 }
 
 /// Passive-HUD mode: the overlay window ignores cursor events so clicks fall
