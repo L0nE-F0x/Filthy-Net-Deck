@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.8.1";
+export const APP_VERSION = "3.8.2";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "W is only white — click W then G for just Selesnya",
-  "Multi chip for every gold card in the set",
-  "Tokens printed in the set, on their own filter"
+  "Aetherfield's nebula is rebuilt — no more pixel blocks",
+  "Skip intro no longer covers the layout bar",
+  "Add the galaxy to your phone from filthy-net-deck.com/aetherfield"
 ];

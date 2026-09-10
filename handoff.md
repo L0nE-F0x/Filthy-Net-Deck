@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.8.1** (Windows signed updater · macOS universal dmg
-rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+**Live product version: v3.8.2** (Windows signed updater · macOS universal dmg
+**pending the v3.8.2 tag** · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
@@ -20,6 +20,45 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-10 — v3.8.2: the Aetherfield look pass, and an installable galaxy.**
+
+Aetherfield had a large visual session earlier today (nebula reconstruction,
+colour grade after tone mapping, lit nucleus, star depth, chrome glass). This
+release is that work vendored in, plus two fixes made here:
+
+- **The skip-intro pill sat on the layout bar** — desktop and phone both. It
+  was pinned at a constant offset from the bottom of the window and the bottom
+  chrome is not a constant height. Aetherfield's `hud.ts` now measures the
+  switcher and publishes `--mcu-hud-bottom`.
+- **`filthy-net-deck.com/aetherfield/` installs to a phone home screen**,
+  Android and iOS, as its own app under our domain. That needed the whole PWA
+  surface upstream to stop naming paths from the root (manifest `./`-relative
+  and no `id`; `sw.js` resolved against its own directory and refusing
+  anything above its scope; an explicit narrow `scope` on `register()`; the
+  `Service-Worker-Allowed: /` header dropped), and `website/netlify.toml`
+  here to **proxy** `/aetherfield/sw.js` instead of 404ing it. Verified over
+  CDP at both depths: no installability errors, `beforeinstallprompt` fires,
+  offline reload serves the shell, and a page above the scope is left
+  uncontrolled. Written up in `docs/AETHERFIELD-EMBED.md` — re-check it after
+  any Aetherfield refresh.
+
+The catalogue did not change, so this refresh added ~900 KB to the pack, not
+7.4 MB (`docs/GIT-HISTORY-BLOAT.md`).
+
+Windows NSIS 12,818,689 bytes + 428-byte updater `.sig` (key id
+`67FCA9900F523D49`). Linux tarball
+`filthy-net-deck-3.8.2-x86_64.tar.gz`, sha256
+`24f8c938fa31a7a8c2f5b0ff6a390d625a5a79ae09733083fc1c2ad1a65436a9`.
+Downloads pruned to 3.8.1 + 3.8.2. Tests 826/826, lint clean.
+Aetherfield's own interaction suite 67/67.
+
+**Still open on this release:** tag `v3.8.2` so the macOS CI builds the
+universal dmg, then roll that dmg into `website/downloads/` — the homepage
+already links `Filthy-Net-Deck-3.8.2-universal.dmg`, so macOS visitors 404
+until it lands. Attach the Linux tarball to the same release; the PKGBUILD
+checksums that URL. Also still open: publish `filthy-net-deck-bin` to the AUR
+the day Arch reopens registration.
 
 **2026-09-09 — v3.8.1 is on all three platforms.**
 

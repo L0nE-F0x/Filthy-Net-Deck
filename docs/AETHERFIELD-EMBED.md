@@ -66,6 +66,23 @@ this iframe, and it must not become a second committed `dist/`. Do not 301
 `/aetherfield` → `/aetherfield/`: Netlify normalises those paths to the same
 rule and the 301 loops.
 
+That proxied copy is **installable to a phone home screen** — the same PWA the
+origin is, under our domain and our app identity. Chrome will not offer that
+without a service worker, so `/aetherfield/sw.js` is proxied like everything
+else. It used to be 404'd here, because the origin sent
+`Service-Worker-Allowed: /` and a worker registered from that path could have
+taken it up and put Aetherfield's cache in front of every marketing page. Both
+halves are closed upstream now: the header is gone from Aetherfield's
+`netlify.toml`, and its `main.ts` registers with an explicit relative `scope`,
+so the worker can only ever claim `/aetherfield/`. Its manifest is entirely
+`./`-relative and carries no `id`, which is what gives the install here a
+`start_url` under our path instead of the origin's root. Re-check that after
+any Aetherfield refresh: the whole feature is one absolute path away from
+silently reverting to "installs the other site".
+
+The iframe never registers the worker. `isEmbedded()` is false only in a real
+browser tab, and inside the app there is no home screen to install to.
+
 ## Git size — read before refreshing
 
 `public/aetherfield/` is committed, and 6.5 MB of its 7.4 MB is the generated
