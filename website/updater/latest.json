@@ -1,11 +1,11 @@
 {
-  "version": "3.8.1",
-  "notes": "v3.8.1: Set Radar colour chips are exact identity \u2014 W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter.",
-  "pub_date": "2026-09-09T14:08:58Z",
+  "version": "3.8.2",
+  "notes": "v3.8.2: Aetherfield's nebula is rebuilt \u2014 reconstructed volume, graded colour, a lit core and depth on the far stars. Skip intro no longer sits on the layout bar, and the galaxy installs to a phone home screen from the website.",
+  "pub_date": "2026-09-10T12:55:18Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wnp3c0FneHR6cHp4cVRRejZkT1l4alh4TXZHMEVMSHMxSk56WEZGaWlZbVpGTUtEUmFUbWJ1NDFRME0zT21VS2tCT3ZxWU80UXQ0OURBejdaZVBaelF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4OTYyNTU0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOC4xX3g2NC1zZXR1cC5leGUKemwyaXdYQlN0MDFwZ2NFQ0pxUjlPZTdTMDRxemVoL2FyMXJDZ0dGWTd3ZkdwT0pWam1oRENUZG1OR3JpdWd0WXJ4cExaZlhaOFg4L0lURVcvZHNxQ3c9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.1.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjU2ZGpYeFZCZEFVTzlpQko2ck9panRTUGZjcWE4NmFuQmZHd3hiNkdjVzJsMzQ2NFUrSXgrcUJXWnBWOXA2UTV1WVJCNmsxMnlFNVVNaVZEckZMYUFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg5MDQ0NzA5CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOC4yX3g2NC1zZXR1cC5leGUKdUNHR3h2UU0zVVdVUTZzUkV1b3FRcVQwN0kwUGNHQ2E5MDZDVXNoTityRDlkOVNOeVY1c2sraTdVeGZYdU1RQ2FGbFNEZDZzc1JBMC9PSE1teDAwRGc9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.2.exe"
     }
   }
 }

@@ -1,9 +1,9 @@
 {
-  "version": "3.8.1",
+  "version": "3.8.2",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.1.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.1-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.2.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.2-universal.dmg"
   },
-  "notes": "v3.8.1: Set Radar colour chips are exact identity \u2014 W is mono-white, W+G is Selesnya. Multi shows every gold card. Tokens from the set have their own filter."
+  "notes": "v3.8.2: Aetherfield's nebula is rebuilt — reconstructed volume, graded colour, a lit core and depth on the far stars. Skip intro no longer sits on the layout bar, and the galaxy installs to a phone home screen from the website."
 }

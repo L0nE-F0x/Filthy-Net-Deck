@@ -93,13 +93,16 @@
 # You cannot add or remove a trailing slash with a redirect rule.
 # 200-proxy the exact path (slash-equivalent) and the splat instead.
 #
-# sw.js is excluded: the origin sends Service-Worker-Allowed: /, which would
-# let a worker registered from this path control the whole marketing origin.
-
-[[redirects]]
-  from = "/aetherfield/sw.js"
-  to = "/index.html"
-  status = 404
+# sw.js IS proxied, and that is what makes /aetherfield/ installable to a phone
+# home screen here as well as on the origin. It used to be 404'd, because the
+# origin sent `Service-Worker-Allowed: /` and a worker registered from this
+# path could have taken that up and put Aetherfield's cache in front of every
+# marketing page. Both halves of that are now closed at the origin: the header
+# is gone from its netlify.toml, and its main.ts registers with an explicit
+# relative `scope`, so the worker can only ever claim /aetherfield/.
+#
+# Order matters if you ever narrow this again: put the more specific rule
+# above the splat.
 
 [[redirects]]
   from = "/aetherfield"
