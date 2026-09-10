@@ -61,16 +61,47 @@ serving, both installers answering, and `/aetherfield/` reporting no
 installability errors with its worker scoped to that path and the marketing
 root uncontrolled.
 
-One thing this box could not check, and the shape of it narrowed by the end
-of the session: **the apex `filthy-net-deck.com` never answered TLS from here**
-(handshake dies at client hello), while the `.netlify.app` aliases failed only
-intermittently and always recovered on a retry. The apex resolves here to
-13.215.239.219 / 52.74.6.109 — AWS Singapore, not Netlify, and the aliases
-resolve to Netlify IPv6. General internet from this box is fine (github,
-cloudflare, example all 200 throughout). So the deploy is verified and the
-aliases prove it; what is unverified is the apex specifically, and the
-resolution is the thing to look at first. Check it from another network, and
-check the DNS records for the apex before assuming it is transit.
+`filthy-net-deck.com` was unreachable from this box for the whole session and
+**it was the network, not us.** Recording it because the symptom is alarming
+and the trail is a waste of an evening if you walk it again.
+
+The box was on a Telkomsel mobile hotspot (the fibre was down for
+maintenance). Telkomsel's IPv4 path to the machines Netlify serves sites from
+is dead — those addresses do not answer ICMP either. So *every* Netlify-hosted
+site is unreachable on that connection unless it also offers IPv6:
+`play.netlify.app` and bare `netlify.app` fail exactly the same way, and so
+does `mtg-multiverse.netlify.app` when you force `-4`. `netlify.com` and
+`docs.netlify.com` are on other infrastructure and are fine, as are AWS's own
+Singapore endpoints, which is why it does not look like a carrier outage at
+first glance.
+
+Our `.netlify.app` names publish AAAA and silently take IPv6, so they work.
+The custom domain publishes A only, so it has nowhere to go. That asymmetry is
+the entire reason one address worked and the other did not — it is not DNS
+misconfiguration, and the records are correct and authoritative on Netlify DNS.
+
+The release itself was verified from outside during all of this: SSL Labs
+graded both endpoints **A+**, and a third-party fetcher pulled
+`https://filthy-net-deck.com/version.json` and got 3.8.2.
+
+Dead ends, so nobody re-runs them: it is not SNI or hostname filtering (the
+same address fails with a `.netlify.app` SNI too, and Netlify's own documented
+load balancer `75.2.60.5` answers fine over IPv4 *with* our hostname); not
+MTU (a minimal TLS 1.2 hello fails identically); not IPv4 generally (GitHub,
+Cloudflare, Scryfall, Google all 200 forced to `-4`).
+
+If it happens again on a hotspot, the local workaround is a hosts entry
+pointing the domain at `75.2.60.5` — verified to serve the downloads. Do not
+file a Netlify ticket and do not repoint the site's URLs over it.
+
+**One real trap this exposed.** The Linux install line on the homepage is
+`curl -L https://filthy-net-deck.com/downloads/filthy-net-deck-bin.tar.gz |
+tar xz`, and when that curl fails, `makepkg -si` finds the *previous*
+extracted `filthy-net-deck-bin/` still sitting there and cheerfully reinstalls
+the old version behind a "WARNING: A package has already been built" line that
+is easy to miss. It reinstalled 3.8.1 over 3.8.2 that way. `rm -rf
+filthy-net-deck-bin` before extracting turns a failed download into a loud
+failure.
 
 Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.
