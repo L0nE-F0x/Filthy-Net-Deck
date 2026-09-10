@@ -61,11 +61,16 @@ serving, both installers answering, and `/aetherfield/` reporting no
 installability errors with its worker scoped to that path and the marketing
 root uncontrolled.
 
-One thing this box could not check: the apex `filthy-net-deck.com` stopped
-answering TLS here partway through the roll (handshake dies at client hello;
-it resolved to AWS Singapore addresses, not Netlify's). The `.netlify.app`
-alias serves everything correctly, so this is local transit, not the deploy —
-but the apex is worth one look from another network.
+One thing this box could not check, and the shape of it narrowed by the end
+of the session: **the apex `filthy-net-deck.com` never answered TLS from here**
+(handshake dies at client hello), while the `.netlify.app` aliases failed only
+intermittently and always recovered on a retry. The apex resolves here to
+13.215.239.219 / 52.74.6.109 — AWS Singapore, not Netlify, and the aliases
+resolve to Netlify IPv6. General internet from this box is fine (github,
+cloudflare, example all 200 throughout). So the deploy is verified and the
+aliases prove it; what is unverified is the apex specifically, and the
+resolution is the thing to look at first. Check it from another network, and
+check the DNS records for the apex before assuming it is transit.
 
 Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.
