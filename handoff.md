@@ -4,7 +4,7 @@
 (Claude / Opus / Grok / Kimi).
 
 **Live product version: v3.8.2** (Windows signed updater · macOS universal dmg
-**pending the v3.8.2 tag** · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
@@ -53,12 +53,22 @@ Windows NSIS 12,818,689 bytes + 428-byte updater `.sig` (key id
 Downloads pruned to 3.8.1 + 3.8.2. Tests 826/826, lint clean.
 Aetherfield's own interaction suite 67/67.
 
-**Still open on this release:** tag `v3.8.2` so the macOS CI builds the
-universal dmg, then roll that dmg into `website/downloads/` — the homepage
-already links `Filthy-Net-Deck-3.8.2-universal.dmg`, so macOS visitors 404
-until it lands. Attach the Linux tarball to the same release; the PKGBUILD
-checksums that URL. Also still open: publish `filthy-net-deck-bin` to the AUR
-the day Arch reopens registration.
+macOS dmg 32,649,820 bytes, size-checked against the v3.8.2 release asset.
+The Linux tarball is attached to that release and re-downloaded from the
+published URL to confirm the PKGBUILD checksum. Live and verified: version.json
+3.8.2, updater manifest 3.8.2 pointing at the new exe, `og-image.png?v=3.8.2`
+serving, both installers answering, and `/aetherfield/` reporting no
+installability errors with its worker scoped to that path and the marketing
+root uncontrolled.
+
+One thing this box could not check: the apex `filthy-net-deck.com` stopped
+answering TLS here partway through the roll (handshake dies at client hello;
+it resolved to AWS Singapore addresses, not Netlify's). The `.netlify.app`
+alias serves everything correctly, so this is local transit, not the deploy —
+but the apex is worth one look from another network.
+
+Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration.
 
 **2026-09-09 — v3.8.1 is on all three platforms.**
 
