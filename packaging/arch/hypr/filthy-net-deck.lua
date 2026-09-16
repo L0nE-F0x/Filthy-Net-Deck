@@ -127,6 +127,19 @@ local function fnd_xy(v)
   return tonumber(v.x or v[1]) or 0, tonumber(v.y or v[2]) or 0
 end
 
+-- Omarchy's keybinding menu (`omarchy-menu-keybindings`, Super+K) re-executes
+-- this config under a stub `hl` whose fallback object answers *every* index
+-- with itself. `ipairs` over that stub never reaches a nil, so the scan spins
+-- at 100% CPU forever and Super+K silently stops opening. `rawget` bypasses
+-- the stub's `__index`, so it reports an empty list there while real hyprlua
+-- arrays are returned untouched.
+local function fnd_list(value)
+  if type(value) ~= "table" or rawget(value, 1) == nil then
+    return {}
+  end
+  return value
+end
+
 local function fnd_find()
   local arena, badge, menu, overlay, alert
   local function consider(w)
@@ -146,17 +159,14 @@ local function fnd_find()
       alert = w
     end
   end
-  for _, w in ipairs(hl.get_windows() or {}) do
+  for _, w in ipairs(fnd_list(hl.get_windows())) do
     consider(w)
   end
   if not arena then
-    for _, ws in ipairs(hl.get_workspaces() or {}) do
+    for _, ws in ipairs(fnd_list(hl.get_workspaces())) do
       if ws.special then
-        local wins = hl.get_workspace_windows(ws) or {}
-        if type(wins) == "table" then
-          for _, w in ipairs(wins) do
-            consider(w)
-          end
+        for _, w in ipairs(fnd_list(hl.get_workspace_windows(ws))) do
+          consider(w)
         end
       end
     end
