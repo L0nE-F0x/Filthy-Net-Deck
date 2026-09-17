@@ -21,6 +21,80 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-17 — Linux overlay on wlr-layer-shell. Ready to bump and ship.**
+
+Four commits on `spike/layer-shell`, **committed, not pushed**, awaiting a
+version bump and the deploy pipeline. **Linux only — Windows and macOS are
+deliberately untouched and stay on their current build.** Full detail, with the
+measurements, lives in `SESSION-2026-09-17-layer-shell.md`.
+
+The long-standing complaint was that the match HUD sat over Arena but could not
+be clicked. It was never an FND bug. Under Wayland a client cannot raise itself
+— there is no protocol for it — so `always_on_top` and `skip_taskbar` are
+silent no-ops and Hyprland's `pin` buys stacking without input. The HUD, the
+presence badge, the cog menu and the match alert are now promoted to
+wlr-layer-shell `overlay` surfaces at build time, which is the one thing that
+sits above a fullscreen game *and* takes input — the same mechanism the Omarchy
+bar uses. X11 and `FND_LAYER_SHELL=0` keep the old plain-toplevel path.
+
+**The compositor half is a genuine Hyprland bug and is still unreported.**
+Hyprland 0.56.2 does not deliver `wl_pointer.button` to a layer surface, even
+on the overlay layer, while an XWayland client holds exclusive fullscreen on
+the same workspace. `enter`, `motion` and keyboard focus all arrive, so the
+surfaces highlight and swap to a hand cursor and then swallow every click —
+which is exactly why this read as an app bug for months. Measured with
+`WAYLAND_DEBUG` across four runs: zero button events at `fullscreen=2`
+regardless of `keyboard_interactivity`, 26 the moment the request was refused.
+The trace table in the session notes is the evidence; **file it upstream.**
+
+The workaround — `suppress_event = "fullscreen"` on `^steam_app_2141910$` —
+now **ships** in `packaging/arch/hypr/filthy-net-deck.lua` (owner's call), so
+packaged users get a clickable HUD without hunting for a config file. It means
+installing FND changes how Arena fullscreens: it becomes a window that fills
+the screen. `gtk-layer-shell` is a new hard dependency in the PKGBUILD.
+
+Four bugs fixed along the way that would all have shipped:
+
+- **The badge was eating clicks.** It asked for 158×40, but WebKitGTK will not
+  lay out below ~200×200 unless the size request is cleared first. As an
+  ordinary window a `max_size` rule clipped the excess; a layer surface gets no
+  window rules, so it really was a 200×200 surface with ~160px of transparent,
+  click-swallowing padding over the game. Now 141×32.
+- **The HUD's saved width shrank on every use.** A layer surface is never told
+  its position and `outerSize` answers with the rectangle GTK holds for the
+  toplevel it does not have. That reply was being written to disk, walking the
+  width down to `MIN_W` over a few matches.
+- **The surfaces rode along on every workspace.** A layer surface belongs to an
+  output, not a workspace — that is how a bar stays put. `src-tauri/src/hypr.rs`
+  watches Hyprland's event socket and keeps them with Arena, scratchpad
+  included.
+- **The restore refused on the main thread**, so once hidden the badge could
+  never be rebuilt and presented as visible-but-dead. It is applied from the
+  watcher thread now, where every other caller already shows these windows.
+
+Dragging and edge-resizing the HUD had to be rewritten: both
+`data-tauri-drag-region` and `startResizeDragging` are `xdg_toplevel` requests
+that a layer surface cannot serve. `src/overlay/layerDrag.ts` suppresses
+Tauri's own handler and rewrites anchor margins instead, with 15 tests for the
+arithmetic. No JSX changed, so the other platforms are byte-identical.
+
+**Do not delete** `corner_position`, `menu_position`, `menu_origin`,
+`geometry_reachable`, `monitor_rects` or `hyprland_force_size` — an earlier
+note listed them as dead once promoted. They are not. Every one is still
+reachable on X11, Windows, macOS or with `FND_LAYER_SHELL=0`.
+
+Verified on hardware during a live match with Arena focused and filling the
+screen: badge, HUD and cog menu all take clicks, the menu opens and closes, and
+the owner confirmed resizing and every overlay control. Tests 841/841 frontend,
+71/71 Rust, clippy and fmt clean. **Input is now testable here without a human**
+— `scripts/vmouse.py` drives a real mouse through `/dev/uinput`; read the
+caveats in its header before trusting any result from it.
+
+**Next:** version bump, then the deploy pipeline, Linux only. Then file the
+Hyprland bug.
+
+---
+
 **2026-09-10 — v3.8.2: the Aetherfield look pass, and an installable galaxy.**
 
 Aetherfield had a large visual session earlier today (nebula reconstruction,
