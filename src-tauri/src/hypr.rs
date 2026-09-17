@@ -164,12 +164,20 @@ pub fn refresh(app: &AppHandle) {
         if now { "on" } else { "off" },
         if now { "restoring" } else { "hiding" }
     );
-    let handle = app.clone();
-    let _ = app.run_on_main_thread(move || {
-        crate::presence::apply_surface_visibility(&handle);
-        crate::overlay::apply_surface_visibility(&handle);
-        crate::toast::apply_surface_visibility(&handle);
-    });
+    // Deliberately NOT hopped to the main thread. Restoring a surface can mean
+    // building its webview for the first time -- Arena may have been on another
+    // workspace when it launched, so the ordinary show path was declined and
+    // the window was never created. `refuse_if_main_thread` rejects a webview
+    // build on the main thread (it deadlocks the Windows event loop), so
+    // dispatching there made the badge impossible to ever create: the restore
+    // refused every time and the badge stayed missing for the whole session.
+    //
+    // This is a worker thread, which is exactly where every other caller shows
+    // these windows from -- the arena poll and the tracker both do. Tauri's
+    // `show`/`hide` post to the event loop themselves, so they are safe here.
+    crate::presence::apply_surface_visibility(app);
+    crate::overlay::apply_surface_visibility(app);
+    crate::toast::apply_surface_visibility(app);
 }
 
 /// Events that can change the answer. Deliberately excludes `windowtitle` and
