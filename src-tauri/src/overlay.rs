@@ -38,6 +38,29 @@ static COMPANION: AtomicBool = AtomicBool::new(false);
 /// User closed the companion this match — stay hidden until the next match id.
 static USER_CLOSED: AtomicBool = AtomicBool::new(false);
 static LAST_MATCH: Mutex<String> = Mutex::new(String::new());
+/// Geometry currently applied to the promoted HUD, in logical px. `None` when
+/// the HUD is not a layer surface (X11, Windows, macOS, `FND_LAYER_SHELL=0`),
+/// which is also how the frontend picks its drag and resize mode.
+///
+/// Tracked here rather than read back from the window, because a layer surface
+/// answers neither question honestly: it is never told its own position, and
+/// `outerSize` reports an origin-sized rectangle rather than what was actually
+/// committed. Persisting that reply is what shrank the HUD to `MIN_W` on every
+/// save. These are the values we asked the compositor for, which are the ones
+/// the next launch must be given back.
+#[cfg(target_os = "linux")]
+static LAYER_GEOMETRY: Mutex<Option<LayerGeometry>> = Mutex::new(None);
+
+/// Position *and* size of the promoted HUD — see [`LAYER_GEOMETRY`].
+#[cfg(target_os = "linux")]
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LayerGeometry {
+    pub left: f64,
+    pub top: f64,
+    pub width: f64,
+    pub height: f64,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -317,7 +340,49 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
         _ => builder,
     };
 
-    builder.build().map_err(|e| e.to_string())?;
+    let win = builder.build().map_err(|e| e.to_string())?;
+
+    // The match HUD has to outrank Arena, and on Wayland a toplevel cannot:
+    // `always_on_top` is a no-op and Hyprland refuses to pin this window, so it
+    // ends up behind the game. The overlay layer outranks every window, which is
+    // the only thing that reliably keeps the HUD in front.
+    //
+    // Companion mode is excluded on purpose — that one is meant to be an
+    // ordinary alt-tabbable window, not a HUD.
+    //
+    // Placement: a layer surface is positioned by anchors and margins rather
+    // than absolute coordinates, so the saved x/y is carried over as a top-left
+    // margin. Keyboard stays off so Arena never loses key input mid-match.
+    //
+    // Dragging and resizing move to `src/overlay/layerDrag.ts` from here:
+    // `data-tauri-drag-region` and `startResizeDragging` are both xdg_toplevel
+    // requests, which a layer surface cannot serve, so the frontend rewrites
+    // these margins and calls `overlay_set_extent` instead.
+    #[cfg(target_os = "linux")]
+    if !companion {
+        let (mx, my) = match &geo {
+            Some(g) if pos_ok => (g.x as i32, g.y as i32),
+            _ => (16, 16),
+        };
+        let promoted = crate::layer_shell::promote(
+            &win,
+            crate::layer_shell::Placement::top_left(mx, my, (w, h)),
+        );
+        // Seed from what was actually applied. Note the position is the clamped
+        // pair, not `geo.x/y` — a stranded saved position falls back to (16, 16)
+        // above, and the frontend must drag from where the HUD really is rather
+        // than from the position that was rejected. `w`/`h` are the size this
+        // window was built at, so the frontend has a trustworthy size from the
+        // first render, before anything has called `overlay_set_extent`.
+        *LAYER_GEOMETRY.lock().unwrap() = promoted.then_some(LayerGeometry {
+            left: mx as f64,
+            top: my as f64,
+            width: w,
+            height: h,
+        });
+    }
+    let _ = &win;
+
     Ok(())
 }
 
@@ -466,6 +531,63 @@ pub fn overlay_save_geometry(app: AppHandle, geometry: OverlayGeometry) {
     save_geometry(&app, &g);
 }
 
+/// Where the promoted HUD sits and how big it is, in logical px — or `null`
+/// when it is an ordinary window.
+///
+/// The frontend uses the null-ness to choose its input mode: `null` keeps wry's
+/// `data-tauri-drag-region` and `startResizeDragging`, a value switches to the
+/// margin drag and the extent-based resize. It must be asked rather than
+/// inferred, because promotion can decline at runtime.
+#[tauri::command]
+pub fn overlay_layer_geometry() -> Option<LayerGeometryDto> {
+    #[cfg(target_os = "linux")]
+    {
+        *LAYER_GEOMETRY.lock().unwrap()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        None
+    }
+}
+
+/// `LayerGeometry` only exists on Linux; everywhere else the command still has
+/// to name a type, and it always answers `None`.
+#[cfg(target_os = "linux")]
+pub type LayerGeometryDto = LayerGeometry;
+#[cfg(not(target_os = "linux"))]
+pub type LayerGeometryDto = ();
+
+/// Move the promoted HUD. Returns false when this window is not a layer
+/// surface, so the caller can fall back to `set_position`.
+///
+/// This exists because a layer surface has no move request at all — see
+/// `layer_shell::set_margins`. Edge snapping rides on the same path: the
+/// frontend rounds the margins to the screen edge and calls this again.
+#[tauri::command]
+pub fn overlay_set_margins(app: AppHandle, left: f64, top: f64) -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        let Some(win) = app.get_webview_window(OVERLAY_LABEL) else {
+            return false;
+        };
+        if !crate::layer_shell::set_margins(&win, left, top) {
+            return false;
+        }
+        // Store the clamped values, matching what the compositor was given, so
+        // a later drag does not resume from an off-screen number.
+        if let Some(g) = LAYER_GEOMETRY.lock().unwrap().as_mut() {
+            g.left = left.max(0.0);
+            g.top = top.max(0.0);
+        }
+        true
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (&app, left, top);
+        false
+    }
+}
+
 /// Resize the HUD. `compact` clamps min=max to the bar so GTK cannot keep
 /// the last expanded size. On Hyprland we also dispatch a compositor resize
 /// because Wayland clients cannot rely on `set_size` alone.
@@ -489,7 +611,23 @@ pub fn overlay_set_extent(app: AppHandle, width: f64, height: f64, compact: bool
     }
     let _ = win.set_size(LogicalSize::new(w, h));
     #[cfg(target_os = "linux")]
-    hyprland_force_size(&win, w, h);
+    {
+        // A promoted HUD is a layer surface, which sizes itself from the GTK
+        // window's request rather than an xdg_toplevel configure — so the
+        // hyprctl path below cannot see it (it matches a toplevel by title) and
+        // would silently do nothing. Try the layer-shell resize first and only
+        // fall back when this window is not promoted.
+        if crate::layer_shell::resize(&win, w, h) {
+            // Same reason as the margins: this is the only honest record of the
+            // surface's size, and `persistGeometry` reads it back.
+            if let Some(g) = LAYER_GEOMETRY.lock().unwrap().as_mut() {
+                g.width = w;
+                g.height = h;
+            }
+        } else {
+            hyprland_force_size(&win, w, h);
+        }
+    }
 }
 
 #[cfg(target_os = "linux")]

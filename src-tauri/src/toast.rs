@@ -121,6 +121,20 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     };
 
     let win = builder.build().map_err(|e| e.to_string())?;
+
+    // Same reason as the HUD and the badge: under Wayland this window cannot
+    // raise itself above Arena, and a fullscreen game swallows the frame. The
+    // overlay layer outranks every window. Top-right anchors replace the
+    // `position()` above, which the compositor ignores once promoted.
+    //
+    // Click-through still works here — an empty input region is a property of
+    // the surface, not of the toplevel, so it applies to a layer surface too.
+    #[cfg(target_os = "linux")]
+    crate::layer_shell::promote(
+        &win,
+        crate::layer_shell::Placement::top_right(MARGIN as i32, (W, H)),
+    );
+
     // Never eat a click meant for Arena. Linux cannot do this on a hidden
     // window (tao unwraps a null GdkWindow and aborts) — applied after
     // `show()` in `show_toast`.
@@ -173,8 +187,17 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
         // Re-corner every time: the monitor layout may have changed since the
         // window was built (laptop undocked, resolution switch).
         if let Some(win) = app_show.get_webview_window(TOAST_LABEL) {
-            if let Some((x, y)) = corner_position(&app_show) {
-                let _ = win.set_position(tauri::LogicalPosition::new(x, y));
+            // Skipped once promoted: `set_position` does nothing to a layer
+            // surface, and the top-right anchors already re-corner it on a
+            // monitor change without being asked.
+            #[cfg(target_os = "linux")]
+            let repositionable = !crate::layer_shell::is_promoted(&win);
+            #[cfg(not(target_os = "linux"))]
+            let repositionable = true;
+            if repositionable {
+                if let Some((x, y)) = corner_position(&app_show) {
+                    let _ = win.set_position(tauri::LogicalPosition::new(x, y));
+                }
             }
             let _ = win.show();
             // Re-assert: another top-most window may have taken the layer.

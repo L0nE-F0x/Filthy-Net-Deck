@@ -130,7 +130,24 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
         None => builder,
     };
 
-    builder.build().map_err(|e| e.to_string())?;
+    let win = builder.build().map_err(|e| e.to_string())?;
+
+    // Must happen here: the window is built `.visible(false)`, so it is still
+    // unrealized and layer-shell can claim it. After `show()` it is too late.
+    // The absolute `position()` above is simply ignored once promoted — the
+    // compositor places the surface from the anchors instead.
+    // Keyboard interactivity stays OFF. On-demand made Hyprland consume each
+    // click to hand this surface focus, which Arena then immediately took back
+    // -- so every click went into the focus fight and none reached the webview.
+    // The Omarchy bar is clickable and asks for no keyboard either; buttons go
+    // to the surface under the cursor without any focus change.
+    #[cfg(target_os = "linux")]
+    crate::layer_shell::promote(
+        &win,
+        crate::layer_shell::Placement::bottom_left(MARGIN as i32, (W, H)),
+    );
+    let _ = &win;
+
     Ok(())
 }
 
@@ -160,7 +177,19 @@ fn ensure_menu_window(app: &AppHandle, width: f64, height: f64) -> Result<(), St
         None => builder,
     };
 
-    builder.build().map_err(|e| e.to_string())?;
+    let win = builder.build().map_err(|e| e.to_string())?;
+
+    // Same corner as the badge, lifted clear of it.
+    #[cfg(target_os = "linux")]
+    {
+        // No keyboard here either -- same reason as the badge. The menu is
+        // buttons, not text entry, so it never needs key input.
+        let mut place = crate::layer_shell::Placement::bottom_left(MARGIN as i32, (width, height));
+        place.margin_y = (MARGIN + badge_h() + GAP) as i32;
+        crate::layer_shell::promote(&win, place);
+    }
+    let _ = &win;
+
     Ok(())
 }
 
@@ -288,6 +317,13 @@ pub fn presence_set_size(app: AppHandle, width: f64, height: f64) {
     let Some(win) = app.get_webview_window(PRESENCE_LABEL) else {
         return;
     };
+    // Promoted badge: `set_size` does not reach a layer surface (it sizes from
+    // the GTK size request), and `set_position` is a no-op because the
+    // bottom-left anchors already hold the corner as the badge grows.
+    #[cfg(target_os = "linux")]
+    if crate::layer_shell::resize(&win, w, h) {
+        return;
+    }
     let _ = win.set_size(LogicalSize::new(w, h));
     if let Some((x, y)) = corner_position(&app, h) {
         let _ = win.set_position(LogicalPosition::new(x, y));

@@ -26,6 +26,15 @@ import {
 import { isTauri } from "../services/appUpdater";
 import { overlayClickThroughAvailable } from "../services/platform";
 import {
+  initLayerDrag,
+  layerMargins,
+  layerReady,
+  layerSize,
+  moveLayerTo,
+  noteLayerSize,
+  startLayerResize,
+} from "./layerDrag";
+import {
   drawPct,
   formatClock,
   formatConfidencePct,
@@ -98,6 +107,9 @@ async function applyOverlayExtent(opts: {
 }): Promise<void> {
   const w = Math.min(OVERLAY_MAX_W, Math.max(OVERLAY_MIN_W, opts.width));
   const h = opts.compact ? COLLAPSED_H : Math.max(opts.height, MIN_EXPANDED_H);
+  // `noteLayerSize` below is a no-op until the layer answer is in, and the
+  // first extent is applied on mount — so settle it before recording.
+  await layerReady();
   if (isTauri()) {
     try {
       await invoke("overlay_set_extent", {
@@ -105,6 +117,9 @@ async function applyOverlayExtent(opts: {
         height: h,
         compact: opts.compact,
       });
+      // A layer surface cannot be asked how big it is, so the only record of
+      // its size is what we just asked for. See `layerSize`.
+      noteLayerSize(w, h);
       return;
     } catch {
       /* older builds */
@@ -205,18 +220,27 @@ async function persistGeometry(opts: {
   expanded: boolean;
 }): Promise<void> {
   if (!isTauri()) return;
+  await layerReady();
   try {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
-    const pos = await win.outerPosition();
-    const size = await win.outerSize();
     const factor = await win.scaleFactor();
     const height = Math.max(opts.expandedHeight, MIN_EXPANDED_H);
+    // A layer surface answers neither `outerPosition` nor `outerSize` honestly:
+    // it is never told where it is, and its size comes back as the origin-sized
+    // rectangle GTK holds for a toplevel it does not have. Writing that reply
+    // to disk is what shrank the saved width to MIN_W on every save. The anchor
+    // margins and the last applied extent are the real values, and they are
+    // what `ensure_window` reads back on the next launch.
+    const anchored = layerMargins();
+    const tracked = layerSize();
+    const pos = anchored ? null : await win.outerPosition();
+    const size = tracked ? null : await win.outerSize();
     await invoke("overlay_save_geometry", {
       geometry: {
-        x: pos.x / factor,
-        y: pos.y / factor,
-        width: size.width / factor,
+        x: anchored ? anchored.left : (pos?.x ?? 0) / factor,
+        y: anchored ? anchored.top : (pos?.y ?? 0) / factor,
+        width: tracked ? tracked.width : (size?.width ?? 0) / factor,
         height,
         expanded: opts.expanded,
       } satisfies OverlayGeometry,
@@ -240,6 +264,7 @@ async function snapToEdges(opts: {
   expanded: boolean;
 }) {
   if (!isTauri()) return;
+  await layerReady();
   try {
     const {
       getCurrentWindow,
@@ -249,6 +274,32 @@ async function snapToEdges(opts: {
     } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
     const factor = await win.scaleFactor();
+
+    // Promoted HUD: snap the anchor margins instead of the position. Margins
+    // are already relative to this surface's own output, so the monitor origin
+    // never enters the arithmetic — 0 *is* the left edge of the right screen,
+    // which the absolute path below has to work out from `monitor.position`.
+    const anchored = layerMargins();
+    if (anchored) {
+      const size = await win.outerSize();
+      const monitor = (await currentMonitor()) ?? (await primaryMonitor());
+      if (monitor) {
+        const maxLeft = Math.max(0, monitor.size.width / factor - size.width / factor);
+        const maxTop = Math.max(0, monitor.size.height / factor - size.height / factor);
+        let { left, top } = anchored;
+        if (left <= SNAP_PX) left = 0;
+        else if (Math.abs(left - maxLeft) <= SNAP_PX) left = maxLeft;
+        if (top <= SNAP_PX) top = 0;
+        else if (Math.abs(top - maxTop) <= SNAP_PX) top = maxTop;
+        // Keep it reachable even when a resize has outgrown the screen.
+        left = Math.min(Math.max(0, left), maxLeft);
+        top = Math.min(Math.max(0, top), maxTop);
+        await moveLayerTo(left, top);
+      }
+      await persistGeometry(opts);
+      return;
+    }
+
     const pos = await win.outerPosition();
     const size = await win.outerSize();
     const monitor = (await currentMonitor()) ?? (await primaryMonitor());
@@ -282,6 +333,7 @@ async function snapToEdges(opts: {
 /** Clamp the window fully inside the monitor (used after expanding). */
 async function ensureOnScreen() {
   if (!isTauri()) return;
+  await layerReady();
   try {
     const {
       getCurrentWindow,
@@ -291,9 +343,24 @@ async function ensureOnScreen() {
     } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
     const factor = await win.scaleFactor();
-    const pos = await win.outerPosition();
     const size = await win.outerSize();
-    const monitor = (await currentMonitor()) ?? (await primaryMonitor());
+    const monitor0 = (await currentMonitor()) ?? (await primaryMonitor());
+
+    // Promoted HUD: clamp the margins. Expanding can push the panel's bottom
+    // past the screen edge, and a layer surface will happily sit there.
+    const anchored = layerMargins();
+    if (anchored) {
+      if (!monitor0) return;
+      const maxLeft = Math.max(0, monitor0.size.width / factor - size.width / factor);
+      const maxTop = Math.max(0, monitor0.size.height / factor - size.height / factor);
+      const left = Math.min(Math.max(0, anchored.left), maxLeft);
+      const top = Math.min(Math.max(0, anchored.top), maxTop);
+      await moveLayerTo(left, top);
+      return;
+    }
+
+    const pos = await win.outerPosition();
+    const monitor = monitor0;
     if (!monitor) return;
 
     const maxX = monitor.position.x + monitor.size.width - size.width;
@@ -757,8 +824,13 @@ export function OverlayApp() {
             const geo = await loadGeometry();
             const size = await win.outerSize();
             const factor = await win.scaleFactor();
-            const curW = size.width / factor;
-            const curH = size.height / factor;
+            // On a layer surface `outerSize` is not the surface's size — see
+            // `layerSize`. Only reached on a first run with nothing on disk,
+            // but getting it wrong here seeds every later save.
+            await layerReady();
+            const tracked = layerSize();
+            const curW = tracked ? tracked.width : size.width / factor;
+            const curH = tracked ? tracked.height : size.height / factor;
             if (geo) {
               expandedH.current = Math.max(geo.height, MIN_EXPANDED_H);
               expandedW.current = geo.width;
@@ -946,12 +1018,62 @@ export function OverlayApp() {
     }, 80);
   }, [geometrySnapshot]);
 
+  // Linux/Wayland: take over dragging when the HUD is a layer surface. A layer
+  // surface has no move request, so `data-tauri-drag-region` silently does
+  // nothing on one — `initLayerDrag` suppresses it and drags by anchor margins
+  // instead. It installs nothing anywhere else, and the drag regions in the
+  // markup are left exactly as they are for those platforms.
+  //
+  // `win.onMoved` never fires for a layer surface either, which is why the snap
+  // is driven from here rather than from the move listener above.
+  useEffect(() => {
+    void initLayerDrag({
+      onDragEnd: () => {
+        void snapToEdges(geometrySnapshot());
+      },
+    });
+  }, [geometrySnapshot]);
+
   const startResize = useCallback(
     (edge: "East" | "North" | "South" | "West" | "SouthEast") =>
       (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (!isTauri()) return;
+
+        // Promoted HUD: `startResizeDragging` is an xdg_toplevel request and a
+        // layer surface has no toplevel, so it does nothing. Drive the extent
+        // command directly instead — the same path collapse/expand uses.
+        if (
+          startLayerResize({
+            edge,
+            event: { clientX: e.clientX, clientY: e.clientY },
+            apply: ({ width, height }) => {
+              const compactNow = compactRef.current;
+              expandedW.current = Math.min(
+                OVERLAY_MAX_W,
+                Math.max(OVERLAY_MIN_W, width),
+              );
+              if (!compactNow && height >= MIN_EXPANDED_H) {
+                expandedH.current = Math.min(height, OVERLAY_MAX_H);
+              }
+              void applyOverlayExtent({
+                width,
+                height,
+                compact: compactNow,
+              });
+            },
+            onEnd: () => {
+              void persistGeometry({
+                expandedHeight: expandedH.current,
+                expanded: !compactRef.current,
+              });
+            },
+          })
+        ) {
+          return;
+        }
+
         void (async () => {
           try {
             const { getCurrentWindow } = await import("@tauri-apps/api/window");
@@ -1091,7 +1213,9 @@ export function OverlayApp() {
           const factor = await win.scaleFactor();
           const size = await win.outerSize();
           const geo = await loadGeometry();
-          const w = geo?.width ?? expandedW.current ?? size.width / factor;
+          await layerReady();
+          const fallbackW = layerSize()?.width ?? size.width / factor;
+          const w = geo?.width ?? expandedW.current ?? fallbackW;
           const h = Math.max(
             geo?.height ?? expandedH.current,
             MIN_EXPANDED_H,

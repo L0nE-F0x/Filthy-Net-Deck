@@ -1,10 +1,22 @@
 -- Filthy Net Deck — Hyprland window rules
 --
--- Why this file exists: Wayland does not let a client position its own
+-- Why this file exists: Wayland does not let a client position or raise its own
 -- surfaces. FND asks for all of this itself (presence.rs `corner_position`,
 -- toast.rs `corner_position`, `always_on_top`, `skip_taskbar`), and every one
--- of those calls is a silent no-op under Wayland. Without these rules the
--- match alert and the presence badge open centred over the game.
+-- of those calls is a silent no-op under Wayland.
+--
+-- The Wayland answer is wlr-layer-shell: the HUD, badge, cog menu
+-- and match alert are all promoted to the `overlay` layer at build time
+-- (src-tauri/src/layer_shell.rs), which places them from their own anchors and
+-- puts them above every window. Layer surfaces are not windows, so the rules
+-- and the placement script below never match them on a Wayland session.
+--
+-- Two things here still matter on every session:
+--   * the Arena fullscreen rule immediately below, without which the promoted
+--     surfaces are visible but unclickable;
+--   * everything after it, which is the X11 / `FND_LAYER_SHELL=0` path, where
+--     these really are ordinary windows that would otherwise open centred over
+--     the game.
 --
 -- Source it from ~/.config/hypr/hyprland.lua (or any file it loads):
 --
@@ -27,9 +39,44 @@
 --    macOS draw nothing, so the frame is Linux-only — and on a window sized
 --    larger than what it paints, that frame is very visible over Arena.
 
+-- MTG Arena: refuse its exclusive-fullscreen request.
+--
+-- This is the rule that makes the HUD clickable, and it is worth knowing why it
+-- has to exist. Hyprland 0.56.2 does not deliver `wl_pointer.button` to
+-- wlr-layer-shell surfaces -- not even on the `overlay` layer -- while an
+-- XWayland client holds exclusive fullscreen on the same workspace. `enter`,
+-- `motion` and keyboard focus all arrive, so FND's surfaces render on top,
+-- highlight under the cursor and swap to a hand pointer, and then swallow every
+-- click. It reads exactly like a broken app.
+--
+-- Measured with WAYLAND_DEBUG=1 across four runs: zero button events whenever
+-- Arena's `fullscreen` was 2, at both `keyboard_interactivity` 0 and 2; 26
+-- button events the moment fullscreen was refused. The input region was the
+-- full surface and the layer was confirmed to be `overlay` in both cases.
+--
+-- With the request declined, Arena is an ordinary window that still fills the
+-- screen, buttons are delivered, and FND's surfaces stay above it because the
+-- overlay layer outranks every window. Leave Arena on "Full Screen" in its own
+-- Graphics menu -- the compositor declines and the game still fills the screen.
+-- Run `omarchy toggle bar off` (or hide your bar) to get the fullscreen look
+-- back, since Arena is no longer covering it by being truly fullscreen.
+--
+-- Applied at window-map time, so Arena must be restarted for it to take effect.
+-- If a future Hyprland delivers button events to layer surfaces under
+-- fullscreen, this rule can be dropped.
+hl.window_rule({
+  match = { class = "^steam_app_2141910$" },
+  suppress_event = "fullscreen",
+})
+
 -- Match HUD. Pinned so it rides over Arena on every workspace.
--- Arena must run *borderless windowed*: exclusive fullscreen covers the HUD
--- and no compositor rule can lift a window above it.
+--
+-- Only reached when FND is *not* on the layer shell -- an X11 session, or
+-- `FND_LAYER_SHELL=0`. Under Wayland these four windows are layer surfaces
+-- (src-tauri/src/layer_shell.rs), which no window rule matches and which the
+-- placement script below cannot see either; the compositor positions them from
+-- their own anchors instead. Left in place because it is exactly what those
+-- other sessions still need.
 hl.window_rule({
   match = { title = "^Filthy Net Deck — Overlay$" },
   float = true,

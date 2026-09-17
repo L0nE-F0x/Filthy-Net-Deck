@@ -33,6 +33,13 @@ depends=(
   'libayatana-appindicator'
   'librsvg'
   'gst-plugins-good'
+  # Hard dependency, not optional: the HUD, presence badge, cog menu and match
+  # alert are all promoted to wlr-layer-shell `overlay` surfaces under Wayland
+  # (src-tauri/src/layer_shell.rs). That is the only way a client can sit above
+  # a fullscreen game AND still receive clicks -- Wayland gives a plain toplevel
+  # no way to raise itself, so `always_on_top` is a silent no-op here. The
+  # binary links libgtk-layer-shell directly and will not start without it.
+  'gtk-layer-shell'
 )
 optdepends=(
   'hyprland: window rules for the overlay, match alert and presence badge'

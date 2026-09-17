@@ -33,3 +33,16 @@ tauri-plugin-single-instance = "2"
 # OAuth callback: the system browser hands the app back a `fnd://auth?...` URL.
 # Google refuses OAuth from embedded webviews, so this hop is mandatory.
 tauri-plugin-deep-link = "2"
+
+# Layer-shell spike (Linux/Wayland only). A wlr-layer-shell surface on the
+# `overlay` layer is the only thing that renders above an exclusive-fullscreen
+# XWayland window AND receives pointer input -- Wayland gives a plain toplevel
+# no way to raise itself, which is why `always_on_top` is a no-op here.
+# Must match the gtk-rs generation tao binds (gtk 0.18).
+[target.'cfg(target_os = "linux")'.dependencies]
+# Tauri does not re-export gtk, and this must be the same generation tao binds
+# (0.18) so it resolves to the gtk already in the tree — no second GTK build.
+gtk = "0.18"
+# v0_6 gates `set_keyboard_mode`, which lets the presence menu take focus on
+# demand rather than the all-or-nothing `set_keyboard_interactivity`.
+gtk-layer-shell = { version = "0.8", features = ["v0_6"] }

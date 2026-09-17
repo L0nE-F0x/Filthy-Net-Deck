@@ -1,6 +1,8 @@
 mod arena;
 mod deeplink;
 mod install_id;
+#[cfg(target_os = "linux")]
+mod layer_shell;
 mod overlay;
 mod presence;
 mod toast;
@@ -60,6 +62,17 @@ fn note_os_fullscreen_on_hide(is_fullscreen: bool) {
 /// Call this at the top of any function that builds a webview. It refuses the
 /// build rather than hanging the app, and panics in debug so it is caught in
 /// `tauri:dev` rather than in a user's release build.
+/// Are we on the GTK/event-loop thread? The inverse question to
+/// `refuse_if_main_thread`: some GTK calls *require* the main thread rather
+/// than forbidding it (`gtk_layer_init_for_window` asserts it), so they have to
+/// hop the other way. Unknown before `setup()` runs, which is treated as "no".
+#[cfg(target_os = "linux")]
+pub(crate) fn on_main_thread() -> bool {
+    MAIN_THREAD
+        .get()
+        .is_some_and(|main| *main == std::thread::current().id())
+}
+
 #[must_use]
 pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
     let Some(main) = MAIN_THREAD.get() else {
@@ -284,7 +297,9 @@ pub fn run() {
             overlay::overlay_set_enabled,
             overlay::overlay_is_enabled,
             overlay::overlay_get_geometry,
+            overlay::overlay_layer_geometry,
             overlay::overlay_save_geometry,
+            overlay::overlay_set_margins,
             overlay::overlay_set_click_through,
             overlay::overlay_set_extent,
             overlay::overlay_set_post_match,
