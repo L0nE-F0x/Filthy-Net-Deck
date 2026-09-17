@@ -33,13 +33,18 @@
 hl.window_rule({
   match = { title = "^Filthy Net Deck — Overlay$" },
   float = true,
-  pin = true,
   no_initial_focus = true,
   border_size = 0,
   rounding = 0,
   no_shadow = true,
   no_blur = true,
 })
+-- `pin` must be its own rule, applied *after* the float rule above. Hyprland
+-- refuses to pin a window that is not already floating, and hyprlua hands one
+-- table's keys to the compositor in Lua `pairs()` order, which is undefined --
+-- so `pin` next to `float` can be evaluated first and silently no-op. Observed
+-- as a live HUD reporting `pinned: false` and sinking behind Arena.
+hl.window_rule({ match = { title = "^Filthy Net Deck — Overlay$" }, pin = true })
 
 -- Match-end alert. Top-right with a 16px margin, sized from the window itself
 -- so the rule cannot go stale if the alert's dimensions ever change.
@@ -47,7 +52,6 @@ hl.window_rule({
 hl.window_rule({
   match = { title = "^Filthy Net Deck — Alert$" },
   float = true,
-  pin = true,
   no_initial_focus = true,
   border_size = 0,
   rounding = 0,
@@ -55,6 +59,8 @@ hl.window_rule({
   no_blur = true,
   move = "monitor_w-window_w-16 16",
 })
+-- Separate `pin` rule, for the same reason as the HUD above.
+hl.window_rule({ match = { title = "^Filthy Net Deck — Alert$" }, pin = true })
 
 -- "Running" presence badge. Not pinned, and *not* given a static `move`:
 -- a monitor-corner rule lands it on the Omarchy bar and on whichever
