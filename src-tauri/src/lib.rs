@@ -1,5 +1,7 @@
 mod arena;
 mod deeplink;
+#[cfg(target_os = "linux")]
+mod hypr;
 mod install_id;
 #[cfg(target_os = "linux")]
 mod layer_shell;
@@ -398,6 +400,12 @@ pub fn run() {
             // "Is Arena up?" — drives the corner presence badge. The tracker
             // only ever knew about matches, not the client being open.
             arena::start(app.handle().clone());
+            // "Is Arena *on screen*?" — the promoted surfaces are layer
+            // surfaces, which belong to a monitor rather than a workspace, so
+            // without this the badge and HUD ride along on every desktop.
+            // No-ops off Hyprland and off layer-shell.
+            #[cfg(target_os = "linux")]
+            hypr::start_watch(app.handle().clone());
 
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;

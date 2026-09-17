@@ -38,6 +38,11 @@ static COMPANION: AtomicBool = AtomicBool::new(false);
 /// User closed the companion this match — stay hidden until the next match id.
 static USER_CLOSED: AtomicBool = AtomicBool::new(false);
 static LAST_MATCH: Mutex<String> = Mutex::new(String::new());
+/// Does the app *want* the HUD on screen? Distinct from whether it is actually
+/// shown: on Hyprland the compositor watcher hides it whenever Arena's
+/// workspace is off screen, and this is what says whether to bring it back.
+#[cfg(target_os = "linux")]
+static WANT_VISIBLE: AtomicBool = AtomicBool::new(false);
 /// Geometry currently applied to the promoted HUD, in logical px. `None` when
 /// the HUD is not a layer surface (X11, Windows, macOS, `FND_LAYER_SHELL=0`),
 /// which is also how the frontend picks its drag and resize mode.
@@ -390,6 +395,14 @@ pub fn show(app: &AppHandle) {
     if !is_enabled() {
         return;
     }
+    #[cfg(target_os = "linux")]
+    WANT_VISIBLE.store(true, Ordering::SeqCst);
+    // Arena is on a workspace that is not on screen — see `crate::hypr`. The
+    // intent above is recorded first, so the HUD reappears with the game.
+    #[cfg(target_os = "linux")]
+    if !crate::hypr::surfaces_visible() {
+        return;
+    }
     if let Err(e) = ensure_window(app) {
         eprintln!("[overlay] ensure_window: {e}");
         return;
@@ -442,6 +455,27 @@ pub fn show_for_match(app: &AppHandle, match_id: &str) {
 pub fn hide(app: &AppHandle) {
     // Companion stays up after the match unless the user closed it.
     if is_companion() && !USER_CLOSED.load(Ordering::SeqCst) {
+        return;
+    }
+    #[cfg(target_os = "linux")]
+    WANT_VISIBLE.store(false, Ordering::SeqCst);
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        let _ = win.hide();
+    }
+}
+
+/// Follow Arena on and off screen — see `crate::hypr`. Companion mode is left
+/// alone: it is an ordinary alt-tabbable window that was never promoted, so it
+/// still belongs to a workspace like anything else.
+#[cfg(target_os = "linux")]
+pub fn apply_surface_visibility(app: &AppHandle) {
+    if is_companion() {
+        return;
+    }
+    if crate::hypr::surfaces_visible() {
+        if WANT_VISIBLE.load(Ordering::SeqCst) {
+            show(app);
+        }
         return;
     }
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {

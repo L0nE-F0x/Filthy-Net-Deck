@@ -145,6 +145,19 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// Follow Arena off screen — see `crate::hypr`. One-way on purpose: the alert
+/// owns its own linger timer, and re-showing a match result the user never saw
+/// minutes later would be worse than dropping it.
+#[cfg(target_os = "linux")]
+pub fn apply_surface_visibility(app: &AppHandle) {
+    if crate::hypr::surfaces_visible() {
+        return;
+    }
+    if let Some(win) = app.get_webview_window(TOAST_LABEL) {
+        let _ = win.hide();
+    }
+}
+
 /// Drop the toast webview, freeing its renderer process — see
 /// [`crate::drop_secondary_webview`].
 pub fn destroy(app: &AppHandle) {
@@ -177,6 +190,13 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
     // the toast is never shown *and* every later main-thread task is wedged
     // behind it — including the tray menu's `app.exit(0)`. That is why the
     // first alert of a session silently did nothing and Quit stopped working.
+    // Arena is off screen — see `crate::hypr`. The alert is a transient nudge
+    // about the game, so on another workspace it is pure interruption. Dropped
+    // rather than queued: by the time the user comes back it is stale.
+    #[cfg(target_os = "linux")]
+    if !crate::hypr::surfaces_visible() {
+        return;
+    }
     if let Err(e) = ensure_window(app) {
         eprintln!("[toast] ensure_window: {e}");
         return;

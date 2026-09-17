@@ -246,6 +246,13 @@ pub fn show(app: &AppHandle) {
     if !is_enabled() || !crate::arena::is_running() {
         return;
     }
+    // Arena is running but parked on a workspace that is not on screen. A layer
+    // surface has no workspace of its own, so showing it now would put the
+    // badge over whatever the user is actually looking at — see `crate::hypr`.
+    #[cfg(target_os = "linux")]
+    if !crate::hypr::surfaces_visible() {
+        return;
+    }
     if let Err(e) = ensure_window(app) {
         eprintln!("[presence] ensure_window: {e}");
         return;
@@ -347,6 +354,24 @@ pub fn presence_open_menu(app: AppHandle, width: f64, height: f64) {
 #[tauri::command]
 pub fn presence_close_menu(app: AppHandle) {
     destroy_menu(&app);
+}
+
+/// Follow Arena on and off screen. The badge has no workspace of its own once
+/// it is a layer surface, so this is what keeps it with the game — see
+/// `crate::hypr`. `show` re-checks every other precondition, so coming back is
+/// just a call to it rather than a second copy of that logic.
+#[cfg(target_os = "linux")]
+pub fn apply_surface_visibility(app: &AppHandle) {
+    if crate::hypr::surfaces_visible() {
+        show(app);
+        return;
+    }
+    if let Some(win) = app.get_webview_window(PRESENCE_LABEL) {
+        let _ = win.hide();
+    }
+    // The cog menu goes with it. Dropping rather than hiding matches what a
+    // click-away already does, and it is rebuilt at the right size on reopen.
+    destroy_menu(app);
 }
 
 /// Blur-dismiss. No-op when focus merely moved between the badge and the menu.
