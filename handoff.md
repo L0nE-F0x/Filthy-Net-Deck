@@ -90,6 +90,34 @@ points at.
 Two local safety branches remain, both fully superseded by identical pushed
 patches: `backup/layer-shell-pre-rebase` and `backup/main-pre-release`.
 
+**⚠ OPEN BUG (2026-09-18, after release): the overlay intermittently stops
+taking clicks during a match.** The owner reports it recurring on 3.9.0: the
+badge and HUD work at Arena launch, then at some point in a match neither takes
+a click, and it recovers by itself (seen recovering at match end). Not yet
+reproduced cleanly: every controlled test so far — including three mid-match —
+worked, and the one "reproduction" at 13:22 is untrustworthy because the owner
+was switching workspaces at the time.
+
+Ruled out **with evidence**, so do not re-chase these:
+- FND busy — per-thread CPU sampling showed no FND or WebKit thread near busy.
+- Arena exclusive fullscreen — `fullscreen: 0` at every reading; the rule works.
+- Arena holding the X pointer grab — `XGrabPointer` returns AlreadyGrabbed
+  **even while clicks work**, so it does not discriminate (failed its control).
+- The hidden Omarchy bar sliding up over the badge (`omarchy-bar-peek`) —
+  A/B mid-match: clicks landed with the bar asleep *and* awake.
+- The badge going click-through in a match — it never does (code).
+
+Unexamined lead: `omarchy-notifications`, a **full-screen** (1536×960) surface
+on the same `overlay` layer, appears whenever a notification shows. If one pops
+mid-game it may sit above FND's surfaces. Untested.
+
+What will crack it: a timestamp. A recorder was left running during that
+session (per-second layer/focus/CPU snapshots, Hyprland events, and FND's
+pointer traffic under WAYLAND_DEBUG). Next time it breaks, note the clock
+time, click the badge 2–3 times *before* switching workspace, then compare
+that second in the logs: did FND receive `enter`/`button` or not? Test input
+with `scripts/vmouse.py` — read its header's caveats first.
+
 **Same-day follow-ups:**
 
 - **CI went red on the release commit** — `Rust · linux Proton cfg` could not
