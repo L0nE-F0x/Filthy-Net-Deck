@@ -29,6 +29,37 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-19 morning — raise the corner badge into the 1080p frame.
+Not shipped. Code is in the working tree, not committed.**
+
+Owner records 1920×1080 Arena on this 1920×1200 (16:10) panel. Exclusive
+fullscreen letterboxes ~48 logical px top and bottom. The badge used a
+16px bottom margin, so the whole 32px pill sat in the black bar under
+the game (screenshot with red arrow). OBS/YouTube never see it.
+
+**Done in this tree, not running yet:**
+- `src-tauri/src/presence.rs` — `sixteen_nine_bottom_margin()` adds half
+  the 16:9 letterbox to the bottom margin (1536×960 → **64px**, badge
+  y=864, inside y=48..912 content). Native 16:9 panels stay at 16px.
+- `src-tauri/src/layer_shell.rs` — `reapply()` so `show()` / `presence_set_size`
+  can update an already-promoted surface.
+- Tests pass. `npx tauri build --no-bundle` already produced
+  `src-tauri/target/release/filthy-net-deck` with the change.
+- Did **not** restart FND mid-match. The live process is still
+  **`/usr/bin/filthy-net-deck`** from `filthy-net-deck-bin 3.9.1-1`.
+
+**Tomorrow:**
+1. Owner quits FND from the tray.
+2. Launch the new binary (`src-tauri/target/release/filthy-net-deck`)
+   so they can check the badge in OBS against 1080p.
+3. If it looks right, Linux **3.9.2** (same pipeline as 3.9.1: tarball,
+   GitHub release, PKGBUILD, `linux:recipe`, `meta:site`, homepage
+   Linux labels). Do **not** bump `website/version.json` / updater
+   (Windows/macOS stay 3.8.2). Then `sudo pacman -U` locally.
+4. Do not kill FND while a match is in progress.
+
+---
+
 **2026-09-18 night — v3.9.1 Linux only: overlay clicks over fullscreen
 Arena, including after a workspace switch. Closed.** Owner verified
 on the installed package (`filthy-net-deck-bin 3.9.1-1`, `/usr/bin`).
@@ -38,9 +69,9 @@ buttons all serve 3.9.1.
 
 Windows/macOS stay on 3.8.2. `website/version.json` and
 `updater/latest.json` stay **3.8.2**. Next full release must be
-**higher than 3.9.1**.
+**higher than 3.9.1** (3.9.2 if we ship the badge inset).
 
-**Next product item:** publish `filthy-net-deck-bin` to the AUR the
+**After the badge inset:** publish `filthy-net-deck-bin` to the AUR the
 day Arch reopens registration.
 
 ---
