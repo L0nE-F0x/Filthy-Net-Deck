@@ -126,6 +126,12 @@ jobs:
           workspaces: src-tauri
           key: linux
 
+      # libgtk-layer-shell-dev: the Linux build links gtk-layer-shell to put the
+      # HUD on the Wayland overlay layer (src-tauri/src/layer_shell.rs). Its -sys
+      # crate finds the library with pkg-config at build time, so without the
+      # dev package this job fails before compiling a line of FND. Needs >= 0.6
+      # for the `v0_6` feature; ubuntu-latest (24.04) ships 0.8. Keep in step
+      # with `depends=` in packaging/arch/PKGBUILD.
       - name: Install Tauri GTK/WebKit deps
         run: |
           sudo apt-get update
@@ -134,6 +140,7 @@ jobs:
             libgtk-3-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
+            libgtk-layer-shell-dev \
             patchelf \
             libssl-dev
 
