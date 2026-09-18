@@ -43,7 +43,7 @@
   "features.lede": "Um app nativo para os dois formatos construídos que realmente têm um metagame de papel público. Boards diários, overlay em partida ou janela companheira, e um tracker de winrate que fica neste PC a não ser que você escolha compartilhar.",
   "badge.kicker": "Selo de presença",
   "badge.title": "Você sempre sabe que está rodando.",
-  "badge.body": "O overlay de partida só aparece quando o jogo começa — na tela inicial ou no deck builder você ficava no escuro. Agora um <em>selo pequeno fica no canto inferior esquerdo</em> enquanto o Arena estiver aberto: a marca, um ponto ao vivo e um <em>⚙</em> com as configurações que realmente se mexem entre partidas — overlay ligado/desligado, resumo pós-partida, opacidade, avisos em tela cheia. Ele apaga durante a partida para o HUD continuar sendo o destaque, e acorda assim que você passa o mouse. Clique na marca para voltar direto ao app.",
+  "badge.body": "O overlay de partida só aparece quando o jogo começa — na tela inicial ou no deck builder você ficava no escuro. Agora um <em>selo pequeno fica no canto inferior esquerdo</em> enquanto o Arena estiver aberto: a marca, um ponto ao vivo e um <em>⚙</em> com as configurações que realmente se mexem entre partidas — overlay ligado/desligado, resumo pós-partida, opacidade, avisos em tela cheia. Ele apaga durante a partida para o HUD continuar sendo o destaque, e acorda assim que você passa o mouse. Clique na marca para voltar direto ao app. No Linux ele continua clicável sobre o Arena em tela cheia, inclusive depois de você trocar de área de trabalho.",
   "badge.mockHome": "Tela inicial do Arena",
   "badge.mockSettings": "configurações sem alt-tab",
   "badge.mockRow1": "Overlay de partida, entre os jogos",

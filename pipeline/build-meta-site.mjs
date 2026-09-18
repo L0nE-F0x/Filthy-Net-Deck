@@ -26,11 +26,23 @@ function resolveDownloads() {
   } catch {
     /* keep default */
   }
+  // Linux-only releases bump package.json (and the homepage Linux labels)
+  // without touching version.json, so Windows/macOS in-app checks stay on
+  // the last signed build. Meta-web must advertise that Linux number or
+  // every deck/card page keeps offering the previous Linux package.
+  let linuxVer = ver;
+  try {
+    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+    if (pkg?.version) linuxVer = String(pkg.version);
+  } catch {
+    /* keep version.json */
+  }
   // Meta-web pages are static and nothing regenerates them on release, so a
   // version-pinned binary link rots (and 404s once old installers are pruned).
   // Send visitors to the homepage download section — that is always current.
   return {
     ver,
+    linuxVer,
     win: `../index.html#download`,
     mac: `../index.html#download`,
     lin: `../index.html#download`,
@@ -339,7 +351,7 @@ function downloadBanner(date, nest = 0) {
       <div class="dl-row">
         <a class="btn" href="${win}">Windows</a>
         <a class="btn ghost" href="${mac}">macOS</a>
-        <a class="btn ghost" href="${lin}">Linux</a>
+        <a class="btn ghost" href="${lin}">Linux v${esc(dl.linuxVer)}</a>
       </div>
     </aside>`;
 }
