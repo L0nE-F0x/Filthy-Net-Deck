@@ -30,18 +30,23 @@ that is expected and does not block auto-update.
 # ▶ START HERE — next session
 
 **2026-09-18 night — v3.9.1 Linux only: overlay clicks over fullscreen
-Arena, including after a workspace switch. Owner-verified.**
+Arena, including after a workspace switch. Closed.** Owner verified
+on the installed package (`filthy-net-deck-bin 3.9.1-1`, `/usr/bin`).
+Hyprland dofiles `/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua`.
+Homepage, install recipe, GitHub v3.9.1, and `/meta-web/` Linux
+buttons all serve 3.9.1.
 
 Windows/macOS stay on 3.8.2. `website/version.json` and
 `updater/latest.json` stay **3.8.2**. Next full release must be
 **higher than 3.9.1**.
 
+**Next product item:** publish `filthy-net-deck-bin` to the AUR the
+day Arch reopens registration.
+
 ---
 
 **2026-09-18 night — overlay clicks: Wine pointer grab, not just unmap.**
-Shipped as v3.9.1. Running from
-`src-tauri/target/release/filthy-net-deck` (tauri build --no-bundle)
-until the pacman package is installed.
+Shipped as v3.9.1. Installed and owner-verified.
 
 The owner's real-mouse test (badge + cog unresponsive on first visit
 to Arena *and* after a workspace round-trip) was the tell: conceal/
