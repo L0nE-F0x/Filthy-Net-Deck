@@ -3,17 +3,18 @@ post_install() {
 
   Filthy Net Deck is installed.
 
-  Hyprland users — add the window rules, or the match alert and the
-  presence badge will open centred over Arena. Wayland does not let the
-  app place them itself:
+  Hyprland users — add one line to your config. Without it the overlay
+  still shows over Arena, but cannot be clicked while Arena is fullscreen:
 
       dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")
 
   Put that line in ~/.config/hypr/hyprland.lua (or any file it loads),
-  then run: hyprctl reload
+  run: hyprctl reload — then start (or restart) Arena.
 
-  Arena must run in BORDERLESS WINDOWED mode. Exclusive fullscreen covers
-  the overlay and no compositor rule can lift a window above it.
+  Arena can stay on Full Screen in its own Graphics menu. The rules above
+  stop Hyprland giving it exclusive fullscreen, so it still fills the
+  screen and the overlay sits on top of it. For the full-screen look, hide
+  your bar — on Omarchy: omarchy toggle bar off
 
   Match tracking needs Arena's detailed logs:
       Options -> Account -> Detailed Logs (Plugin Support)
@@ -33,6 +34,29 @@ post_install() {
 MSG
 }
 
+# Printed on every upgrade, including a reinstall of the same version.
+#
+# Step 1 is the one people miss. FND runs a single instance: launching it
+# again while an old copy is up only brings that old window to the front
+# (tauri-plugin-single-instance → show_main_window), so without an explicit
+# quit the upgrade silently does nothing until the next reboot. That is how
+# 3.9.0 was first "installed" on the maintainer's own machine and still
+# reported 3.8.2.
 post_upgrade() {
-  echo "  Filthy Net Deck upgraded. If the overlay misbehaves: hyprctl reload"
+  cat <<'MSG'
+
+  Filthy Net Deck upgraded. To finish:
+
+    1. Quit Filthy Net Deck from its tray icon, then open it again.
+       Only one copy ever runs, so opening it while the old one is still
+       up just brings the old version back to the front.
+    2. hyprctl reload       picks up the updated Hyprland rules
+    3. Restart Arena        the rules apply when Arena's window opens
+
+  Never added the Hyprland line? It is what lets you click the overlay
+  while Arena is fullscreen:
+
+      dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")
+
+MSG
 }

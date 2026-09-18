@@ -90,6 +90,29 @@ points at.
 Two local safety branches remain, both fully superseded by identical pushed
 patches: `backup/layer-shell-pre-rebase` and `backup/main-pre-release`.
 
+**Same-day follow-ups:**
+
+- **CI went red on the release commit** — `Rust · linux Proton cfg` could not
+  find `gtk-layer-shell-0` via pkg-config. The PKGBUILD gained the dependency
+  but CI's apt list did not. Fixed in `c2c07ee8`
+  (`libgtk-layer-shell-dev`, 0.8.2 on ubuntu-latest); all three jobs green, and
+  the Linux job's log shows the 71 Rust tests ran. CI-only: the shipped binary
+  was built and tested locally. **Any new system library the Linux build links
+  must go into both `depends=` and `.github/workflows/ci.yml`.**
+- **Packaging `3.9.0-2`** — text only, same tarball and checksum, no new app
+  version or GitHub release. The pacman messages were wrong for 3.9.0: install
+  still said Arena "must run in BORDERLESS WINDOWED mode" because "no
+  compositor rule can lift a window above it", which is exactly what 3.9.0
+  fixes. And the upgrade message never said to **restart FND** — it runs a
+  single instance, so reopening it while the old copy is up just brings the old
+  version forward (`single_instance` → `show_main_window`). That is how the
+  owner's first install still reported 3.8.2. The upgrade message now says:
+  quit from the tray and reopen, `hyprctl reload`, restart Arena — and repeats
+  the `dofile` line, which is now what makes the overlay clickable.
+- The in-app help still says "switch Arena to borderless windowed" if
+  fullscreen hides the HUD. Left alone deliberately: it is shared by every
+  platform and still true on Windows, and changing it needs an app release.
+
 The original engineering entry follows.
 
 ---

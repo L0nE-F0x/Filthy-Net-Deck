@@ -14,7 +14,7 @@
 pkgname=filthy-net-deck-bin
 _pkgname=filthy-net-deck
 pkgver=3.9.0
-pkgrel=1
+pkgrel=2
 pkgdesc="MTG Arena meta companion and match tracker — Standard & Pioneer"
 arch=('x86_64')
 url="https://filthy-net-deck.com"
