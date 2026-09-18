@@ -3,10 +3,18 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.8.2** (Windows signed updater · macOS universal dmg
-rolled · Linux pacman package) · repo `L0nE-F0x/Filthy-Net-Deck`
+**Live product versions: Linux v3.9.0 · Windows and macOS v3.8.2**
+(Windows signed updater · macOS universal dmg rolled · Linux pacman package)
+· repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
+
+> **The platforms are on different versions on purpose.** v3.9.0 was a
+> Linux-only release, so `website/version.json` and `updater/latest.json` are
+> still **3.8.2** — see the START HERE entry. The next full release must be
+> **higher than 3.9.0** (3.9.1 or 3.10.0). Numbered lower, Linux users on 3.9.0
+> would never be offered it — the in-app check would see an older number — and
+> pacman would treat the package as a downgrade.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -21,12 +29,75 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-17 — Linux overlay on wlr-layer-shell. Ready to bump and ship.**
+**2026-09-18 — v3.9.0, Linux only: the overlay stays on top of Arena and
+takes clicks. Live and verified.**
 
-Four commits on `spike/layer-shell`, **committed, not pushed**, awaiting a
-version bump and the deploy pipeline. **Linux only — Windows and macOS are
-deliberately untouched and stay on their current build.** Full detail, with the
-measurements, lives in `SESSION-2026-09-17-layer-shell.md`.
+**Windows and macOS were deliberately not released** — every change is behind
+`cfg(target_os = "linux")` or inert off a Wayland layer surface, so there was
+nothing for them to install. That shaped what this release did *not* touch:
+
+- **`website/version.json` and `updater/latest.json` stay at 3.8.2.**
+  `version.json` is the single "latest version" number *every* platform's
+  in-app check reads, with links to the Windows `.exe` and macOS `.dmg`;
+  bumping it would have told every Windows and Mac user about an update with no
+  installer for them. `isNewer` was checked against the skew: a 3.9.0 build
+  reading 3.8.2 reports no update, and so does a 3.8.2 build. **Cost:**
+  existing Linux installs get no in-app nudge — they update by re-running the
+  homepage install line. **Consequence for the next release:** it must be
+  numbered above 3.9.0.
+- Windows/macOS download buttons, the page `<title>` and the OG/Twitter card
+  stay at 3.8.2; they market the site-wide release. Only the two "Get it for
+  Linux" labels moved to v3.9.0.
+- `npm run meta:site` was not re-run — `/meta-web/` links every platform to the
+  homepage download section and reads the unchanged `version.json`.
+- `scripts/bump-version.mjs` writes `version.json` unconditionally; for this
+  release it was run and those two files then restored with `git checkout`.
+  A Linux-only release is a manual exception to that script, not a mode of it.
+
+Release facts: GitHub Release `v3.9.0` (marked latest, so the homepage's
+`releases/latest` link resolves to it), commit `8b22b0e5`.
+`filthy-net-deck-3.9.0-x86_64.tar.gz`, 16,965,058 bytes, sha256
+`287d6eb06219d8e9ca29cb1b608bb05097198db41687a4a9c6a7537e369763d7`. Tests
+841/841 frontend, 71/71 Rust, clippy/fmt/tsc/eslint clean. The macOS CI builds
+a 3.9.0 dmg onto the GitHub Release as every tag does; it is **not** rolled to
+the site and must not be.
+
+Verified live after the Netlify deploy (~190s): the site's recipe serves
+pkgver 3.9.0 with the matching sha; the tarball re-downloaded from the exact
+PKGBUILD source URL matches that sha; `version.json` and `latest.json` still
+read 3.8.2; Windows/macOS labels still 3.8.2 and both installers answer 200.
+And the homepage install line itself, run verbatim against the live site,
+fetched the recipe, pulled the tarball from GitHub, validated it and built the
+package.
+
+Also shipped: `a2137e06`, the Super+K fix from 2026-09-16, which had been
+committed on the laptop and **never pushed** — it sat under this branch until
+the rebase. Without it, Super+K silently stops opening on any Omarchy box with
+FND installed.
+
+**A mistake worth not repeating.** The first attempt to tag used
+`git merge --ff-only` in a script without `set -e`. Local `main` still held the
+*un-rebased* copy of that Super+K commit, so the fast-forward failed — and the
+script carried on, tagged `v3.9.0` on the old 3.8.2-era commit and pushed it,
+starting a macOS CI run on the wrong code. Caught within a minute: remote and
+local tag deleted, CI run cancelled, no release had been created and neither
+`main` nor the site had been pushed, so nothing reached a user. The tag was
+then re-created on `8b22b0e5` and **the tagged tree checked** (package.json,
+PKGBUILD pkgver, the checksum, the new code present) before it was pushed.
+Release scripts that push get `set -e` and an explicit check of what a tag
+points at.
+
+Two local safety branches remain, both fully superseded by identical pushed
+patches: `backup/layer-shell-pre-rebase` and `backup/main-pre-release`.
+
+The original engineering entry follows.
+
+---
+
+**2026-09-17 — Linux overlay on wlr-layer-shell.**
+
+Full detail, with the measurements, lives in
+`SESSION-2026-09-17-layer-shell.md`.
 
 The long-standing complaint was that the match HUD sat over Arena but could not
 be clicked. It was never an FND bug. Under Wayland a client cannot raise itself
@@ -90,8 +161,9 @@ the owner confirmed resizing and every overlay control. Tests 841/841 frontend,
 — `scripts/vmouse.py` drives a real mouse through `/dev/uinput`; read the
 caveats in its header before trusting any result from it.
 
-**Next:** version bump, then the deploy pipeline, Linux only. Then file the
-Hyprland bug.
+**Next:** file the Hyprland bug (trace table in the session notes). Publish to
+the AUR when registration reopens — the PKGBUILD already carries the
+`gtk-layer-shell` dependency.
 
 ---
 
