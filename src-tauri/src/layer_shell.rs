@@ -2,11 +2,15 @@
 //!
 //! Why this exists: on Wayland a client cannot raise itself — there is no
 //! protocol for it — so Tauri's `always_on_top` and `skip_taskbar` are no-ops,
-//! and Hyprland's `pin` buys stacking without input. An exclusive-fullscreen
-//! XWayland client (Arena's "Full Screen") then takes the pointer, so the HUD
-//! and badge draw on top but never receive a click. A surface on the layer
-//! shell's `overlay` layer is the one thing that sits above a fullscreen window
-//! *and* accepts input; it is the same mechanism the Omarchy bar uses.
+//! and Hyprland's `pin` buys stacking without input. A surface on the layer
+//! shell's `overlay` layer is the one thing that sits above a fullscreen
+//! window *and* accepts input; it is the same mechanism the Omarchy bar uses.
+//!
+//! Hiding a promoted surface must **not** unmap it. On Hyprland 0.56.2, unmapping
+//! an overlay surface while Arena (XWayland) fills the focused workspace leaves
+//! every overlay client unable to receive `wl_pointer` until something else
+//! resets the seat. The badge and HUD stay mapped and are parked off the output
+//! instead; see `conceal` / `reveal`.
 //!
 //! Hard constraint: `gtk_layer_init_for_window` must run before the GtkWindow
 //! is realized. tao only calls `show_all()` when a window is built visible
@@ -18,7 +22,17 @@
 
 use gtk::prelude::{GtkWindowExt, WidgetExt};
 use gtk_layer_shell::{Edge, KeyboardMode, Layer, LayerShell};
+use std::collections::HashMap;
+use std::sync::Mutex;
 use tauri::Manager;
+
+/// Last placement we asked the compositor for, keyed by window label.
+/// `conceal` parks a surface off-screen without unmapping; `reveal` puts
+/// these values back. Updated on promote / resize / set_margins.
+static PLACEMENTS: Mutex<Option<HashMap<String, Placement>>> = Mutex::new(None);
+
+/// Bigger than any output we will see, so a parked surface cannot be hit.
+const PARK_MARGIN: i32 = 50_000;
 
 /// Where a promoted surface sits on its output, in logical px.
 ///
@@ -138,6 +152,10 @@ pub fn resize(win: &tauri::WebviewWindow, w: f64, h: f64) -> bool {
             return false;
         }
         force_size(&gtk_win, w, h);
+        if let Some(mut place) = remembered(win) {
+            place.size = (w as f64, h as f64);
+            remember(win, place);
+        }
         true
     })
 }
@@ -182,8 +200,26 @@ pub fn set_margins(win: &tauri::WebviewWindow, left: f64, top: f64) -> bool {
         }
         gtk_win.set_layer_shell_margin(Edge::Left, left);
         gtk_win.set_layer_shell_margin(Edge::Top, top);
+        if let Some(mut place) = remembered(win) {
+            place.margin_x = left;
+            place.margin_y = top;
+            remember(win, place);
+        }
         true
     })
+}
+
+/// Try to take the top of the overlay layer.
+///
+/// wlr-layer-shell has no raise request, and `set_layer` back to the same
+/// layer does not restack on Hyprland 0.56.2. The only protocol-legal way up
+/// is unmap/map, and that is exactly what deafens every overlay client while
+/// Arena fills the focused workspace. So this is a deliberate no-op: a
+/// notification may bury the HUD, and that is better than a 19-minute
+/// pointer blackout. Workspace hide/show uses `conceal` / `reveal` instead.
+pub fn remap(win: &tauri::WebviewWindow) -> bool {
+    let _ = win;
+    false
 }
 
 /// Did this window actually become a layer surface? Promotion can decline —
@@ -244,6 +280,38 @@ fn apply(win: &tauri::WebviewWindow, place: Placement) -> bool {
     gtk_win.set_layer(Layer::Overlay);
     gtk_win.set_namespace("filthy-net-deck");
 
+    // See the note on `Placement`: anything but `None` eats every click.
+    gtk_win.set_keyboard_mode(KeyboardMode::None);
+
+    // Never reserve space: an exclusive zone would shove Arena and the Omarchy
+    // bar out of the way, which is the opposite of an overlay.
+    gtk_win.set_exclusive_zone(-1);
+
+    apply_placement(&gtk_win, place);
+    remember(&win, place);
+
+    eprintln!("[layer-shell] {}: promoted to overlay layer", win.label());
+    true
+}
+
+fn remember(win: &tauri::WebviewWindow, place: Placement) {
+    PLACEMENTS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get_or_insert_with(HashMap::new)
+        .insert(win.label().to_string(), place);
+}
+
+fn remembered(win: &tauri::WebviewWindow) -> Option<Placement> {
+    let label = win.label().to_string();
+    PLACEMENTS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .as_ref()
+        .and_then(|m| m.get(&label).copied())
+}
+
+fn apply_placement(gtk_win: &gtk::ApplicationWindow, place: Placement) {
     for (edge, on) in [
         (Edge::Left, place.left),
         (Edge::Right, place.right),
@@ -258,24 +326,73 @@ fn apply(win: &tauri::WebviewWindow, place: Placement) -> bool {
     gtk_win.set_layer_shell_margin(Edge::Right, place.margin_x);
     gtk_win.set_layer_shell_margin(Edge::Top, place.margin_y);
     gtk_win.set_layer_shell_margin(Edge::Bottom, place.margin_y);
-
-    // See the note on `Placement`: anything but `None` eats every click.
-    gtk_win.set_keyboard_mode(KeyboardMode::None);
-
-    // Never reserve space: an exclusive zone would shove Arena and the Omarchy
-    // bar out of the way, which is the opposite of an overlay.
-    gtk_win.set_exclusive_zone(-1);
-
-    // Commit the real size — see `Placement::size`. Without this the surface
-    // keeps WebKitGTK's ~200x200 minimum and the transparent remainder eats
-    // clicks meant for the game.
     let (w, h) = place.size;
     force_size(
-        &gtk_win,
+        gtk_win,
         w.round().clamp(1.0, 8000.0) as i32,
         h.round().clamp(1.0, 8000.0) as i32,
     );
+}
 
-    eprintln!("[layer-shell] {}: promoted to overlay layer", win.label());
-    true
+/// Hide a promoted surface without unmapping it.
+///
+/// `GtkWindow::hide` destroys the layer surface. On Hyprland 0.56.2 that
+/// unmap, done while Arena fills the focused workspace, is what stops *every*
+/// overlay client receiving pointer events — measured 2026-09-18: a fresh
+/// painted probe was deaf on Arena's workspace and immediately clickable the
+/// moment Arena left the screen. Parking with huge margins keeps the same
+/// `wl_surface` alive, so the seat never has to recover from a destroy.
+///
+/// Returns false when this window is not a mapped layer surface, so the
+/// caller can fall back to `hide()`.
+pub fn conceal(win: &tauri::WebviewWindow) -> bool {
+    if !enabled() || !win.is_visible().unwrap_or(false) || !is_promoted(win) {
+        return false;
+    }
+    on_gtk_main(win, |win| {
+        let Ok(gtk_win) = win.gtk_window() else {
+            return false;
+        };
+        if !gtk_win.is_layer_window() {
+            return false;
+        }
+        for edge in [Edge::Left, Edge::Right, Edge::Top, Edge::Bottom] {
+            gtk_win.set_layer_shell_margin(edge, PARK_MARGIN);
+        }
+        true
+    })
+}
+
+/// Put a parked surface back at its last requested placement.
+///
+/// No-op (and returns false) when the window is not a layer surface or we
+/// have no placement to restore. Does not `show()` — the caller owns that.
+pub fn reveal(win: &tauri::WebviewWindow) -> bool {
+    if !enabled() || !is_promoted(win) {
+        return false;
+    }
+    let Some(place) = remembered(win) else {
+        return false;
+    };
+    on_gtk_main(win, move |win| {
+        let Ok(gtk_win) = win.gtk_window() else {
+            return false;
+        };
+        if !gtk_win.is_layer_window() {
+            return false;
+        }
+        apply_placement(&gtk_win, place);
+        true
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn park_margin_clears_even_an_8k_output() {
+        // A parked surface with this margin cannot overlap a 7680×4320 panel.
+        assert!(PARK_MARGIN as i64 > 7680);
+    }
 }

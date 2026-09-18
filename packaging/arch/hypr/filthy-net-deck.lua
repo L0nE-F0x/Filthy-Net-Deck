@@ -12,11 +12,11 @@
 -- and the placement script below never match them on a Wayland session.
 --
 -- Two things here still matter on every session:
---   * the Arena fullscreen rule immediately below, without which the promoted
---     surfaces are visible but unclickable;
---   * everything after it, which is the X11 / `FND_LAYER_SHELL=0` path, where
---     these really are ordinary windows that would otherwise open centred over
---     the game.
+--   * the layer rule immediately below, which keeps FND's own re-stacking
+--     invisible;
+--   * everything after the Arena rule, which is the X11 / `FND_LAYER_SHELL=0`
+--     path, where these really are ordinary windows that would otherwise open
+--     centred over the game.
 --
 -- Source it from ~/.config/hypr/hyprland.lua (or any file it loads):
 --
@@ -39,35 +39,30 @@
 --    macOS draw nothing, so the frame is Linux-only — and on a window sized
 --    larger than what it paints, that frame is very visible over Arena.
 
--- MTG Arena: refuse its exclusive-fullscreen request.
+-- Keep FND's surfaces from animating when they are re-mapped.
 --
--- This is the rule that makes the HUD clickable, and it is worth knowing why it
--- has to exist. Hyprland 0.56.2 does not deliver `wl_pointer.button` to
--- wlr-layer-shell surfaces -- not even on the `overlay` layer -- while an
--- XWayland client holds exclusive fullscreen on the same workspace. `enter`,
--- `motion` and keyboard focus all arrive, so FND's surfaces render on top,
--- highlight under the cursor and swap to a hand pointer, and then swallow every
--- click. It reads exactly like a broken app.
---
--- Measured with WAYLAND_DEBUG=1 across four runs: zero button events whenever
--- Arena's `fullscreen` was 2, at both `keyboard_interactivity` 0 and 2; 26
--- button events the moment fullscreen was refused. The input region was the
--- full surface and the layer was confirmed to be `overlay` in both cases.
---
--- With the request declined, Arena is an ordinary window that still fills the
--- screen, buttons are delivered, and FND's surfaces stay above it because the
--- overlay layer outranks every window. Leave Arena on "Full Screen" in its own
--- Graphics menu -- the compositor declines and the game still fills the screen.
--- Run `omarchy toggle bar off` (or hide your bar) to get the fullscreen look
--- back, since Arena is no longer covering it by being truly fullscreen.
---
--- Applied at window-map time, so Arena must be restarted for it to take effect.
--- If a future Hyprland delivers button events to layer surfaces under
--- fullscreen, this rule can be dropped.
-hl.window_rule({
-  match = { class = "^steam_app_2141910$" },
-  suppress_event = "fullscreen",
+-- FND re-maps its own overlay surfaces to take back the top of the layer when
+-- something else maps over them (src-tauri/src/hypr.rs). wlr-layer-shell has no
+-- raise request and surfaces stack in map order, so an unmap/map is the only
+-- way up. Without this rule Hyprland plays its layer open/close animation on
+-- each one and the re-stack is a visible blink; with it, it is not noticeable.
+hl.layer_rule({
+  match = { namespace = "^filthy-net-deck$" },
+  no_anim = true,
+  animation = "none",
 })
+
+-- MTG Arena: do **not** refuse exclusive fullscreen.
+--
+-- Content recording needs Arena's own 1920×1080 Full Screen mode (OBS/YouTube).
+-- `suppress_event = "fullscreen"` was added on the belief that Hyprland would
+-- not deliver clicks to overlay surfaces under exclusive fullscreen. That was
+-- wrong: overlay is above `IS_LS_UNFOCUSABLE`, and the HUD is clickable with
+-- Arena at `fullscreen: 2`. The rule also blocked the 1080p mode the owner
+-- actually wants, so it is gone. The X11 / `FND_LAYER_SHELL=0` window rules
+-- below still apply to ordinary toplevels.
+--
+-- Applied at window-map time: restart Arena after changing this file.
 
 -- Match HUD. Pinned so it rides over Arena on every workspace.
 --

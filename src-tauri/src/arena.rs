@@ -76,6 +76,8 @@ pub fn start(app: AppHandle) {
         // answer one yes/no question every `POLL`. Reopen per scan instead; at
         // this interval the syscalls do not register.
         sysinfo::set_open_files_limit(0);
+        #[cfg(target_os = "linux")]
+        crate::wine_x11::ensure_no_pointer_grab();
         let mut sys = System::new();
         loop {
             let now = scan(&mut sys);
@@ -84,6 +86,12 @@ pub fn start(app: AppHandle) {
             if let Some(running) = running_transition(previous, now) {
                 let _ = app.emit("arena:running", running);
                 if running {
+                    // Wine/Proton pointer grab makes Hyprland skip overlay
+                    // hit-testing while Arena is focused. The key is read at
+                    // Wine start, so this is for the *next* launch if Arena
+                    // is already up.
+                    #[cfg(target_os = "linux")]
+                    crate::wine_x11::ensure_no_pointer_grab();
                     // Build from THIS thread, never from inside
                     // `run_on_main_thread`: `WebviewWindowBuilder::build()`
                     // called on the event loop deadlocks it on Windows — the

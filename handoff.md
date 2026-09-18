@@ -3,18 +3,18 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product versions: Linux v3.9.0 · Windows and macOS v3.8.2**
+**Live product versions: Linux v3.9.1 · Windows and macOS v3.8.2**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
-> **The platforms are on different versions on purpose.** v3.9.0 was a
-> Linux-only release, so `website/version.json` and `updater/latest.json` are
-> still **3.8.2** — see the START HERE entry. The next full release must be
-> **higher than 3.9.0** (3.9.1 or 3.10.0). Numbered lower, Linux users on 3.9.0
-> would never be offered it — the in-app check would see an older number — and
-> pacman would treat the package as a downgrade.
+> **The platforms are on different versions on purpose.** v3.9.0 and
+> v3.9.1 were Linux-only, so `website/version.json` and `updater/latest.json`
+> are still **3.8.2**. The next full release must be **higher than 3.9.1**.
+> Numbered lower, Linux users on 3.9.1 would never be offered it — the in-app
+> check would see an older number — and pacman would treat the package as a
+> downgrade.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -28,6 +28,77 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-18 night — v3.9.1 Linux only: overlay clicks over fullscreen
+Arena, including after a workspace switch. Owner-verified.**
+
+Windows/macOS stay on 3.8.2. `website/version.json` and
+`updater/latest.json` stay **3.8.2**. Next full release must be
+**higher than 3.9.1**.
+
+---
+
+**2026-09-18 night — overlay clicks: Wine pointer grab, not just unmap.**
+Shipped as v3.9.1. Running from
+`src-tauri/target/release/filthy-net-deck` (tauri build --no-bundle)
+until the pacman package is installed.
+
+The owner's real-mouse test (badge + cog unresponsive on first visit
+to Arena *and* after a workspace round-trip) was the tell: conceal/
+reveal was necessary but not sufficient.
+
+Hyprland 0.56.2 `mouseMoveUnified` **returns before overlay hit-testing**
+when `isConstrained()` is true (a pointer lock/confine owned by the
+focused surface). Wine/Proton translates fullscreen `ClipCursor` /
+XGrabPointer into that constraint, so a focused XWayland Arena swallows
+every overlay click — badge, HUD, and a painted GTK probe. Unfocusing
+Arena (FND focused, `follow_mouse=0`) made the same probe clickable
+(`CLICK 1`). Setting `GrabPointer=N` and `GrabFullscreen=N` in the
+Arena Proton prefix and relaunching the game made the probe clickable
+*while Arena stayed focused*, and the cog menu opened over the home
+screen.
+
+`src-tauri/src/wine_x11.rs` writes those two keys into
+`compatdata/2141910/pfx/user.reg` on FND start / Arena start. Wine
+reads them at process start, so a running Arena must be restarted
+once. MTG Arena is not an FPS; it does not need the grab.
+
+The overlay stops receiving pointer input after a workspace switch
+because `win.hide()` **destroys** the layer surface. On Hyprland 0.56.2,
+that unmap while Arena (XWayland) fills the focused workspace leaves
+*every* overlay client deaf until the seat is reset (new uinput device,
+or minutes of waiting). Measured tonight:
+
+- Same `wl_pointer.leave(serial, nil)` signature as the four traces.
+- A painted GTK overlay probe was deaf on Arena's workspace and
+  immediately clickable the moment Arena left the screen.
+- `scripts/vmouse.py` creating a device per run was healing the seat —
+  that trap still stands.
+- Hover on the badge was the live tell: CSS `:hover` on the cog.
+
+Fix: **do not unmap.** `layer_shell::conceal` parks the surface at
+margin 50_000 (still mapped, off the output); `reveal` puts the last
+`Placement` back. Verified on this box: leaving Arena's workspace
+moves the badge to `xywh: 50000 -49072 142x32`; coming back restores
+`16 912 142x32` on the **same** layer-surface address. Hover still
+works after the round trip.
+
+`remap()` (the stacking restack) is now a deliberate no-op — unmap/map
+is the only way up the overlay layer and is also the blackout. A
+notification may bury the HUD; that is better than 19 minutes deaf.
+
+Exclusive fullscreen: `suppress_event = "fullscreen"` is **removed**
+from `packaging/arch/hypr/filthy-net-deck.lua` and
+`~/.config/hypr/looknfeel.lua`. It was never what made the HUD
+clickable, and it blocked Arena's 1920×1080 Full Screen mode (OBS /
+YouTube). `~/.config/hypr/hyprland.lua` now dofiles the **repo** lua,
+because sudo could not replace `/usr/share/filthy-net-deck/...`.
+**Restart Arena** for the compositor to allow exclusive fullscreen,
+then set 1920×1080 Full Screen in Arena's Graphics menu.
+
+Not done: commit, pkgrel 3 tarball, pacman install, AUR. Owner still
+needs to click the badge with the real mouse (uinput clicks did not
+fire WebKit `onClick` even while hover worked).
 
 **2026-09-18 — v3.9.0, Linux only: the overlay stays on top of Arena and
 takes clicks. Live and verified.**
@@ -90,33 +161,162 @@ points at.
 Two local safety branches remain, both fully superseded by identical pushed
 patches: `backup/layer-shell-pre-rebase` and `backup/main-pre-release`.
 
-**⚠ OPEN BUG (2026-09-18, after release): the overlay intermittently stops
-taking clicks during a match.** The owner reports it recurring on 3.9.0: the
-badge and HUD work at Arena launch, then at some point in a match neither takes
-a click, and it recovers by itself (seen recovering at match end). Not yet
-reproduced cleanly: every controlled test so far — including three mid-match —
-worked, and the one "reproduction" at 13:22 is untrustworthy because the owner
-was switching workspaces at the time.
+**⚠ STILL OPEN (2026-09-18 evening): the overlay stops taking clicks, and it
+is NOT the stacking bug.** A second, unrelated defect was fixed today and is
+described below it — do not confuse the two.
 
-Ruled out **with evidence**, so do not re-chase these:
-- FND busy — per-thread CPU sampling showed no FND or WebKit thread near busy.
-- Arena exclusive fullscreen — `fullscreen: 0` at every reading; the rule works.
-- Arena holding the X pointer grab — `XGrabPointer` returns AlreadyGrabbed
-  **even while clicks work**, so it does not discriminate (failed its control).
-- The hidden Omarchy bar sliding up over the badge (`omarchy-bar-peek`) —
-  A/B mid-match: clicks landed with the bar asleep *and* awake.
-- The badge going click-through in a match — it never does (code).
+### The open bug
 
-Unexamined lead: `omarchy-notifications`, a **full-screen** (1536×960) surface
-on the same `overlay` layer, appears whenever a notification shows. If one pops
-mid-game it may sit above FND's surfaces. Untested.
+FND stops receiving **any** pointer input — no `enter`, no `motion`, no
+`button` — while its surfaces are mapped, topmost, and under the cursor. Hover
+dies with clicks. Arena stays fully clickable throughout. It recovers on its
+own: once after 15s, once after **19 minutes**.
 
-What will crack it: a timestamp. A recorder was left running during that
-session (per-second layer/focus/CPU snapshots, Hyprland events, and FND's
-pointer traffic under WAYLAND_DEBUG). Next time it breaks, note the clock
-time, click the badge 2–3 times *before* switching workspace, then compare
-that second in the logs: did FND receive `enter`/`button` or not? Test input
-with `scripts/vmouse.py` — read its header's caveats first.
+Captured four times with full protocol traces (`scratchpad/rec/*.log`,
+`dead.log`). The signature is always the same: the last thing FND ever receives
+is `wl_pointer.leave(<serial>, nil)` — a leave naming a surface FND had already
+destroyed — and then nothing. Example, 2026-09-18:
+
+    10:16:19.975  enter(wl_surface#32, 1161.58, 16.87)   main window, right edge
+    10:16:20.305  button(272, press)
+    10:16:20.345  button(272, release)
+    10:16:20.347  leave(27632, nil)
+    ---- 1148 seconds, zero pointer events ----
+    10:35:28.461  enter(wl_surface#63, ...)               recovered
+
+It is **client-level, not surface-level**: every surface FND created during the
+blackout (badge re-mapped at 10:18:06, 10:18:27, 10:19:54; HUD at 10:17:28) was
+born deaf. So nothing about a surface's geometry, stacking or input region is
+relevant. The owner reports the trigger as: first match fine, switch workspace
+away and back, dead on the second match.
+
+Ruled out **with evidence** — do not re-chase:
+- Stacking order — nothing above us in any of the four detections.
+- Exclusive fullscreen — `fullscreen: 0` at every reading, and separately
+  disproved outright (see the layer-shell fix below).
+- Input region — correct at map: `add(-10, -10, 162, 52)` for the badge.
+- The webview — nothing reaches the client to ignore.
+- Drag-and-drop refusal in the seat — **0** occurrences of "Refusing pointer
+  focus during an active dnd" in Hyprland's log.
+- A stuck mouse button — libinput debounce showed 2066 presses / 2066 releases,
+  exactly balanced. (A later sample read 2339/2338, a difference of one, which
+  is a click in flight, not a stuck button.)
+- Stale `m_currentSurface` in the seat — **0** occurrences of
+  "sendEnter without sendLeave first".
+- Arena holding a pointer constraint — the wedge persists with Arena unfocused
+  and another window focused. `isConstrained()` requires the constraint owner to
+  be the focused surface.
+- A ghost/stale image — the badge correctly disappears off Arena's workspace.
+
+**Unresolved.** The one verdict that looked decisive ("FND-specific: FND 0
+events, fresh client 372") is **retracted** — see the instrument failures below.
+
+### Three instruments that manufactured their own evidence
+
+This cost most of a day and is the single most important thing to carry forward.
+**Validate every instrument against a known-good control before believing a
+negative result** — §6 of `SESSION-2026-09-17-layer-shell.md` says the same
+thing about the previous session.
+
+1. **`scripts/vmouse.py` creates a new uinput device on every invocation.**
+   Hyprland logged `fnd-test-mouse: device is a pointer` **183 times**. Adding a
+   pointer device makes the compositor re-evaluate its seat, which *repairs* the
+   stuck pointer-focus state. Every probe was healing the bug it was measuring,
+   which is why it never reproduced synthetically and always did under the
+   owner's real mouse. Replaced by `scratchpad/vmoused.py`, a persistent device
+   that is created once — verified: exact pixel convergence, device-creation
+   count stays at 1. **Add this to vmouse.py's header trap list.**
+2. **A witness client that never attached a buffer.** It appeared in
+   `hyprctl layers` and received nothing — indistinguishable from the bug. An
+   empty `GtkWindow` with no child never paints. Give any probe a child widget
+   and confirm `attach(wl_buffer…)` before trusting it.
+3. **A full-screen probe surface leaked and made the whole desktop
+   unclickable.** It is transparent and takes every click; one survived its
+   kill and sat there invisibly. It cost the owner a working session, and every
+   reading taken afterwards was measuring that surface rather than the bug —
+   including the retracted verdict above. `scratchpad/bin/thief.c` now calls
+   `alarm()` before `gtk_init`, so it dies unconditionally; verified by launching
+   one and letting it expire unreaped. **Never run a full-screen input-taking
+   probe on the live desktop without a self-kill.**
+
+### Where to go next
+
+The open question is why the compositor stops delivering to this client. Both
+remaining candidates need a *clean* run: no leaked surfaces, the persistent
+mouse only, and a control verified to have painted.
+
+- Re-run the FND-specific vs compositor-wide discriminator properly. It is the
+  fork in the road: FND-specific means the fix is in FND; compositor-wide means
+  a Hyprland bug plus a workaround.
+- Build the repro off the owner's machine if possible. Every automated probe run
+  on the live desktop has cost more than it returned.
+
+**Workaround for the owner meanwhile:** quit FND from the tray and reopen it.
+
+---
+
+**✅ FIXED, but it was a different bug (2026-09-18): overlay surfaces buried by
+whatever mapped last.** Real, reproduced on demand, fixed and verified — but it
+is *not* what the owner has been hitting, and shipping it will not close the
+report above.
+
+wlr-layer-shell has no raise request, so surfaces stack in **map order**. Anything
+mapping on the `overlay` layer while the badge and HUD are up lands above them
+and takes the click where they overlap, while the buried surface keeps drawing.
+Reproduced with a full-screen overlay surface over the badge: clicks lost, badge
+still visible; clicks back the instant FND re-mapped, with the thief still up.
+
+The fix, in `src-tauri/src/hypr.rs`: the watcher now handles `openlayer`, asks
+`j/layers` (which lists each level bottom-to-top), and re-maps our surfaces if
+anything foreign sits later in the array *and* overlaps. `layer_shell::remap`
+hides and shows each promoted window — the only way up, since `set_layer` back
+to the same layer was measured and does **not** restack on 0.56.2. Rate-limited
+to one re-map per 2s, deferred rather than dropped so a burst cannot leave us
+buried. Hidden surfaces stay hidden. `packaging/.../filthy-net-deck.lua` gained
+a `no_anim` layer rule so the re-map is not a visible blink.
+
+Verified on the installed package: control click delivered; with a click-stealer
+above, 1 re-map and the click lands; 3 more thieves + 3 notifications, 3 re-maps
+total and FND on top of all five; cog menu opens through four thieves and a
+notification; **zero re-maps over 20s idle**; badge and collapsed *and expanded*
+HUD geometry byte-identical across a re-map (`0,0 360x120` + `16,912 141x32`).
+841 frontend / 79 Rust tests (8 new), clippy, fmt, tsc, eslint clean.
+
+**`suppress_event = "fullscreen"` was never what made the HUD clickable.**
+Re-measured with real clicks through `/dev/uinput` against a checked control: an
+`overlay` layer surface receives `wl_pointer.button` normally underneath an
+XWayland client holding exclusive fullscreen, focused, and holding an X pointer
+grab — six runs, every one delivered. Hyprland's `mouseMoveUnified` only diverts
+a layer surface's input under fullscreen when it is *below* the `top` layer
+(`IS_LS_UNFOCUSABLE`), and `overlay` is above it. The original four-run table
+measured a real correlation with a wrong cause; every A/B in it also restarted
+Arena or FND, which re-ordered the layer. **Users may leave Arena truly
+fullscreen and keep their bar on.** The rule is kept (it still matters on the
+X11 / `FND_LAYER_SHELL=0` path) but is no longer load-bearing, and both its
+comment and the pacman install/upgrade messages now say so.
+
+### Release state — decided by the owner, not yet done
+
+Owner wants this shipped as a patch with the version number unchanged. That
+works as a `pkgrel` bump: `pkgver=3.9.0`, `pkgrel=3`. Built and installed on the
+owner's box already (`filthy-net-deck-bin 3.9.0-3`), ships the new Lua, binary
+carries the fix. Two things still open:
+
+- **The tarball.** The new one differs from the published `v3.9.0` asset
+  (`78a83b8d…` vs `287d6eb0…`). Recommended: attach a *second* asset named
+  `filthy-net-deck-3.9.0-3-x86_64.tar.gz` to the existing release and put
+  `${pkgrel}` in the PKGBUILD source URL, so nothing published is overwritten
+  and the sha recorded above stays true. Overwriting the existing asset is the
+  alternative and is not recommended.
+- **`scripts/build-linux-tarball.mjs` hardcodes `pkgrel=1`** on every run and
+  will stomp the bump.
+
+Cost of keeping 3.9.0: the app reports the same version either way, so only
+`pacman -Q` distinguishes a fixed install. No in-app nudge, but that is already
+true (`version.json` stays 3.8.2). The next *full* release must still be above
+3.9.0.
+
+**Nothing is committed.** 8 files in the working tree.
 
 **Same-day follow-ups:**
 

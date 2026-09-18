@@ -21,11 +21,23 @@ use std::io::{Read, Write};
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Duration;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use tauri::AppHandle;
 
 /// Arena's window class under Proton. Must match the packaged Hyprland config.
 const ARENA_CLASS: &str = "steam_app_2141910";
+/// The namespace `layer_shell::apply` gives every promoted surface.
+const OUR_NAMESPACE: &str = "filthy-net-deck";
+/// `j/layers` keys its levels by number; 3 is `overlay`, where we live.
+const OVERLAY_LEVEL: &str = "3";
+/// Let a newly mapped surface finish configuring before reading the stack.
+/// Without this the newcomer is in the list at its pre-configure size and the
+/// overlap test can miss.
+const SETTLE: Duration = Duration::from_millis(150);
+/// Floor on how often the surfaces may be re-mapped. Two clients that both
+/// re-assert would otherwise trade the top of the layer forever.
+const REASSERT_COOLDOWN: Duration = Duration::from_secs(2);
 /// Arena's title before Proton reports a class, seen during startup.
 const ARENA_TITLE: &str = "MTGA";
 
@@ -36,6 +48,8 @@ static ARENA_ON_SCREEN: AtomicBool = AtomicBool::new(true);
 /// Set while the compositor cannot be reached, so the warning is logged once
 /// per outage rather than once per retry.
 static ASK_FAILED: AtomicBool = AtomicBool::new(false);
+/// When the surfaces were last re-mapped, for `REASSERT_COOLDOWN`.
+static LAST_REASSERT: Mutex<Option<Instant>> = Mutex::new(None);
 
 /// Should the promoted surfaces be on screen right now?
 ///
@@ -180,6 +194,127 @@ pub fn refresh(app: &AppHandle) {
     crate::toast::apply_surface_visibility(app);
 }
 
+/// One surface's rectangle out of `j/layers`, in logical px.
+fn rect(surface: &serde_json::Value) -> Option<(i64, i64, i64, i64)> {
+    let get = |k: &str| surface.get(k).and_then(|v| v.as_i64());
+    Some((get("x")?, get("y")?, get("w")?, get("h")?))
+}
+
+fn namespace(surface: &serde_json::Value) -> &str {
+    surface
+        .get("namespace")
+        .and_then(|n| n.as_str())
+        .unwrap_or("")
+}
+
+fn overlaps(a: &serde_json::Value, b: &serde_json::Value) -> bool {
+    let (Some((ax, ay, aw, ah)), Some((bx, by, bw, bh))) = (rect(a), rect(b)) else {
+        // A surface we cannot measure is treated as overlapping: missing
+        // geometry must not be read as "nothing is in the way".
+        return true;
+    };
+    ax < bx + bw && bx < ax + aw && ay < by + bh && by < ay + ah
+}
+
+/// Is one of our overlay surfaces buried under a foreign one?
+///
+/// Layer surfaces on the same layer stack in **map order** — the last to map is
+/// on top, and the compositor hands it the click where they overlap. There is
+/// no raise request in wlr-layer-shell, so anything that maps while the HUD is
+/// up lands above us: a notification, an OSD, a panel from a shell plugin.
+/// Measured on Hyprland 0.56.2 with a full-screen overlay surface mapped over
+/// the badge: the badge stays visible and still draws, and every click goes to
+/// the newcomer instead. That is the whole of the "visible but dead" bug.
+///
+/// `j/layers` lists each level bottom-to-top, so "above us" is simply "later in
+/// the array".
+fn covered(layers: &serde_json::Value) -> bool {
+    for monitor in layers.as_object().into_iter().flatten().map(|(_, v)| v) {
+        let Some(level) = monitor
+            .get("levels")
+            .and_then(|l| l.get(OVERLAY_LEVEL))
+            .and_then(|l| l.as_array())
+        else {
+            continue;
+        };
+        for (i, ours) in level.iter().enumerate() {
+            if namespace(ours) != OUR_NAMESPACE {
+                continue;
+            }
+            if level[i + 1..]
+                .iter()
+                .any(|above| namespace(above) != OUR_NAMESPACE && overlaps(ours, above))
+            {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// How much of the cooldown is left, or `None` when it has elapsed.
+fn cooldown_left() -> Option<Duration> {
+    let last = LAST_REASSERT.lock().unwrap_or_else(|e| e.into_inner());
+    (*last).and_then(|t| REASSERT_COOLDOWN.checked_sub(t.elapsed()))
+}
+
+fn mark_reasserted() {
+    *LAST_REASSERT.lock().unwrap_or_else(|e| e.into_inner()) = Some(Instant::now());
+}
+
+/// Take the top of the overlay layer back.
+///
+/// Only an unmap/map does it: `zwlr_layer_surface_v1.set_layer` was measured on
+/// 0.56.2 and does **not** restack — a surface set back to its own layer stays
+/// exactly where it was. So each promoted window is hidden and shown again,
+/// which destroys its layer surface and creates a new one at the top of the
+/// list. This is the same thing that made the bug look self-healing: the HUD is
+/// hidden and re-shown at match end, and clicks came back with it.
+///
+/// Hidden surfaces are left alone — this is a restack, not a show, and it must
+/// never be able to put a surface on screen that something else has deliberately
+/// hidden (Arena off screen, the HUD between matches, a disabled badge).
+fn reassert(app: &AppHandle) {
+    eprintln!("[hypr] another overlay surface is above ours — re-mapping to take the top back");
+    crate::overlay::remap_promoted(app);
+    crate::presence::remap_promoted(app);
+}
+
+/// A foreign surface just mapped on the overlay layer. Re-map ours if it landed
+/// on top of one of them. Runs on the watch thread, where blocking is fine.
+fn on_foreign_layer(app: &AppHandle) {
+    if !managed() || !surfaces_visible() {
+        return;
+    }
+    std::thread::sleep(SETTLE);
+    if !buried() {
+        return;
+    }
+    // Rate limited, but never *skipped*. Two surfaces mapping a moment apart
+    // would otherwise have the second check thrown away by the cooldown and
+    // leave the HUD buried until something else happened to fire an event —
+    // which is the original bug wearing a shorter timer. Wait the cooldown out
+    // and look again instead; a burst costs one sleep, because the checks after
+    // the first re-map find nothing above us and return.
+    if let Some(left) = cooldown_left() {
+        std::thread::sleep(left);
+        if !buried() {
+            return;
+        }
+    }
+    mark_reasserted();
+    reassert(app);
+}
+
+/// Ask the compositor whether anything is stacked over us right now.
+/// `false` when it cannot be asked: a re-map is visible, so an unanswered
+/// question is not worth one.
+fn buried() -> bool {
+    request("j/layers")
+        .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).ok())
+        .is_some_and(|layers| covered(&layers))
+}
+
 /// Events that can change the answer. Deliberately excludes `windowtitle` and
 /// `activewindow`, which fire continuously — a spinner in another window's
 /// title should not cost two IPC round trips.
@@ -239,7 +374,17 @@ fn watch_once(app: &AppHandle, stream: UnixStream) {
             Ok(0) | Err(_) => return,
             Ok(_) => {}
         }
-        let name = line.split_once(">>").map(|(n, _)| n).unwrap_or("").trim();
+        let (name, payload) = line.split_once(">>").unwrap_or((line.as_str(), ""));
+        let name = name.trim();
+        // A surface mapping on the overlay layer cannot change Arena's
+        // workspace, so it does not belong in `is_interesting` — but it can
+        // bury the HUD, which is a different problem with a different answer.
+        if name == "openlayer" {
+            if payload.trim() != OUR_NAMESPACE {
+                on_foreign_layer(app);
+            }
+            continue;
+        }
         if !is_interesting(name) {
             continue;
         }
@@ -312,6 +457,82 @@ mod tests {
         assert!(!is_arena(
             &json!({ "class": "firefox", "title": "not arena" })
         ));
+    }
+
+    /// Shape copied from `hyprctl -j layers` on 0.56.2. The array for a level
+    /// is ordered bottom-to-top, which is what `covered` reads.
+    fn overlay_level(surfaces: serde_json::Value) -> serde_json::Value {
+        json!({ "eDP-1": { "levels": { "0": [], "2": [], "3": surfaces } } })
+    }
+
+    fn surface(ns: &str, x: i64, y: i64, w: i64, h: i64) -> serde_json::Value {
+        json!({ "namespace": ns, "x": x, "y": y, "w": w, "h": h })
+    }
+
+    /// The badge as it really sits on this box, bottom-left with a 16px margin.
+    fn badge() -> serde_json::Value {
+        surface(OUR_NAMESPACE, 16, 912, 142, 32)
+    }
+
+    #[test]
+    fn alone_on_the_layer_is_not_covered() {
+        assert!(!covered(&overlay_level(json!([badge()]))));
+    }
+
+    #[test]
+    fn a_later_overlapping_surface_covers_us() {
+        // The whole bug: a full-screen overlay surface that maps after the
+        // badge takes every click while the badge stays visible.
+        let full = surface("omarchy-notifications", 0, 0, 1536, 960);
+        assert!(covered(&overlay_level(json!([badge(), full]))));
+    }
+
+    #[test]
+    fn a_later_surface_that_misses_us_does_not() {
+        // The bar's peek strip lives on the overlay layer too, 6px below the
+        // badge. Re-mapping for that would blink the HUD for nothing.
+        let peek = surface("omarchy-bar-peek", 0, 950, 1536, 10);
+        assert!(!covered(&overlay_level(json!([badge(), peek]))));
+    }
+
+    #[test]
+    fn a_surface_mapped_before_us_is_below_us() {
+        // Same rectangle, but earlier in the array means it mapped first and
+        // sits underneath — it cannot take our clicks.
+        let full = surface("click-thief", 0, 0, 1536, 960);
+        assert!(!covered(&overlay_level(json!([full, badge()]))));
+    }
+
+    #[test]
+    fn our_own_surfaces_never_count_as_covering_each_other() {
+        // The cog menu sits above the badge by design.
+        let menu = surface(OUR_NAMESPACE, 16, 649, 246, 255);
+        assert!(!covered(&overlay_level(json!([badge(), menu]))));
+    }
+
+    #[test]
+    fn a_surface_between_two_of_ours_still_covers_the_lower_one() {
+        let thief = surface("click-thief", 0, 0, 1536, 960);
+        let hud = surface(OUR_NAMESPACE, 0, 51, 394, 34);
+        assert!(covered(&overlay_level(json!([badge(), thief, hud]))));
+    }
+
+    #[test]
+    fn unmeasurable_geometry_is_treated_as_in_the_way() {
+        // Better a wasted re-map than a buried HUD: a reply we cannot read
+        // must not be taken as proof that nothing is above us.
+        let odd = json!({ "namespace": "mystery" });
+        assert!(covered(&overlay_level(json!([badge(), odd]))));
+    }
+
+    #[test]
+    fn a_malformed_layers_reply_is_not_covered_and_does_not_panic() {
+        assert!(!covered(&json!({})));
+        assert!(!covered(&json!({ "eDP-1": {} })));
+        assert!(!covered(
+            &json!({ "eDP-1": { "levels": { "3": "nonsense" } } })
+        ));
+        assert!(!covered(&json!([])));
     }
 
     #[test]

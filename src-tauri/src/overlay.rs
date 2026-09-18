@@ -409,6 +409,8 @@ pub fn show(app: &AppHandle) {
     }
     apply_chrome(app);
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        #[cfg(target_os = "linux")]
+        let _ = crate::layer_shell::reveal(&win);
         let _ = win.show();
         // Overlay never steals Arena input. Companion may, so the user can
         // alt-tab to it — but still don't yank focus on auto-show.
@@ -460,6 +462,10 @@ pub fn hide(app: &AppHandle) {
     #[cfg(target_os = "linux")]
     WANT_VISIBLE.store(false, Ordering::SeqCst);
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        #[cfg(target_os = "linux")]
+        if crate::layer_shell::conceal(&win) {
+            return;
+        }
         let _ = win.hide();
     }
 }
@@ -479,7 +485,28 @@ pub fn apply_surface_visibility(app: &AppHandle) {
         return;
     }
     if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
-        let _ = win.hide();
+        if !crate::layer_shell::conceal(&win) {
+            let _ = win.hide();
+        }
+    }
+}
+
+/// Take the HUD back to the top of the overlay layer — see
+/// `crate::hypr::reassert`. Companion mode is an ordinary window that was never
+/// promoted, so it is left alone.
+#[cfg(target_os = "linux")]
+pub fn remap_promoted(app: &AppHandle) {
+    if is_companion() {
+        return;
+    }
+    if let Some(win) = app.get_webview_window(OVERLAY_LABEL) {
+        if crate::layer_shell::remap(&win) {
+            // The re-map went through `show`, so everything `show` does after
+            // it has to happen again — click-through above all, or a HUD the
+            // user asked to click through would start swallowing Arena's
+            // clicks the first time a notification buried it.
+            apply_click_through_after_show(&win);
+        }
     }
 }
 

@@ -234,6 +234,8 @@ fn open_menu(app: &AppHandle, width: f64, height: f64) {
             if let Some((x, y)) = menu_position(&app_show, h, badge_h()) {
                 let _ = win.set_position(LogicalPosition::new(x, y));
             }
+            #[cfg(target_os = "linux")]
+            let _ = crate::layer_shell::reveal(&win);
             let _ = win.show();
             let _ = win.set_always_on_top(true);
         }
@@ -263,6 +265,8 @@ pub fn show(app: &AppHandle) {
         if let Some((x, y)) = corner_position(app, h) {
             let _ = win.set_position(LogicalPosition::new(x, y));
         }
+        #[cfg(target_os = "linux")]
+        let _ = crate::layer_shell::reveal(&win);
         let _ = win.show();
         let _ = win.set_always_on_top(true);
         // Never set_focus — Arena keeps input.
@@ -367,11 +371,37 @@ pub fn apply_surface_visibility(app: &AppHandle) {
         return;
     }
     if let Some(win) = app.get_webview_window(PRESENCE_LABEL) {
-        let _ = win.hide();
+        if !crate::layer_shell::conceal(&win) {
+            let _ = win.hide();
+        }
     }
-    // The cog menu goes with it. Dropping rather than hiding matches what a
-    // click-away already does, and it is rebuilt at the right size on reopen.
-    destroy_menu(app);
+    // Park the cog menu too. Destroying it unmaps a layer surface, which is
+    // the same blackout trigger as hiding the badge. Click-away still
+    // `destroy_menu`s; coming back to Arena does not reopen it.
+    if let Some(win) = app.get_webview_window(MENU_LABEL) {
+        if crate::layer_shell::conceal(&win) {
+            let _ = app.emit(MENU_EVENT, false);
+        } else {
+            destroy_menu(app);
+        }
+    }
+}
+
+/// Take the badge and its cog menu back to the top of the overlay layer — see
+/// `crate::hypr::reassert`. Badge first, menu second, so the menu ends up above
+/// the badge exactly as it does when it is opened normally.
+#[cfg(target_os = "linux")]
+pub fn remap_promoted(app: &AppHandle) {
+    for label in [PRESENCE_LABEL, MENU_LABEL] {
+        let Some(win) = app.get_webview_window(label) else {
+            continue;
+        };
+        if crate::layer_shell::remap(&win) {
+            // Mirrors `show`: inert on a layer surface, but kept so the two
+            // paths cannot drift if this window is ever an ordinary toplevel.
+            let _ = win.set_always_on_top(true);
+        }
+    }
 }
 
 /// Blur-dismiss. No-op when focus merely moved between the badge and the menu.

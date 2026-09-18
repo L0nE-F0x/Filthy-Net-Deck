@@ -154,7 +154,9 @@ pub fn apply_surface_visibility(app: &AppHandle) {
         return;
     }
     if let Some(win) = app.get_webview_window(TOAST_LABEL) {
-        let _ = win.hide();
+        if !crate::layer_shell::conceal(&win) {
+            let _ = win.hide();
+        }
     }
 }
 
@@ -219,6 +221,8 @@ pub fn show_toast(app: &AppHandle, title: &str, body: &str) {
                     let _ = win.set_position(tauri::LogicalPosition::new(x, y));
                 }
             }
+            #[cfg(target_os = "linux")]
+            let _ = crate::layer_shell::reveal(&win);
             let _ = win.show();
             // Re-assert: another top-most window may have taken the layer.
             let _ = win.set_always_on_top(true);

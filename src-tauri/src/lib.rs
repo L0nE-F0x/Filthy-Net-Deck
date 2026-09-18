@@ -9,6 +9,8 @@ mod overlay;
 mod presence;
 mod toast;
 mod tracker;
+#[cfg(target_os = "linux")]
+mod wine_x11;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;

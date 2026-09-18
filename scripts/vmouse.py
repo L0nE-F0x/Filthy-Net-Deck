@@ -26,6 +26,14 @@ Two traps, both of which produced false alarms before they were understood:
     moves, so the click lands nowhere. Always park somewhere else first and
     approach the target — `move` to a far point, then `click` the target.
 
+  * **It creates a new uinput device every run.** That is a third trap, and the
+    worst one: adding a pointer device makes the compositor re-evaluate its
+    seat, which *repairs* a stuck pointer-focus state. On 2026-09-18 this tool
+    was run 183 times chasing an input bug and silently healed it on every
+    probe, so the fault never reproduced under it and always did under the real
+    mouse. For anything that measures whether input is *stuck*, use a
+    persistent device that is created once and held open for the session.
+
 Validate the whole method against a known-good control before trusting a
 negative result: click the Omarchy bar's workspace pips and check the workspace
 actually changed. Note the bar auto-hides to y=<screen height>, i.e. off

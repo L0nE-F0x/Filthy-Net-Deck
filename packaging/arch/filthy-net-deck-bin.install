@@ -3,18 +3,18 @@ post_install() {
 
   Filthy Net Deck is installed.
 
-  Hyprland users — add one line to your config. Without it the overlay
-  still shows over Arena, but cannot be clicked while Arena is fullscreen:
+  Hyprland users — add one line to your config. The overlay works without
+  it; with it, layer animations stay off for FND's surfaces.
 
       dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")
 
   Put that line in ~/.config/hypr/hyprland.lua (or any file it loads),
   run: hyprctl reload — then start (or restart) Arena.
 
-  Arena can stay on Full Screen in its own Graphics menu. The rules above
-  stop Hyprland giving it exclusive fullscreen, so it still fills the
-  screen and the overlay sits on top of it. For the full-screen look, hide
-  your bar — on Omarchy: omarchy toggle bar off
+  Leave Arena on Full Screen in its own Graphics menu, and keep your bar
+  however you like it. Earlier builds asked you to hide the bar and let
+  Hyprland refuse Arena's fullscreen; that turned out not to be what made
+  the overlay clickable, and neither is needed any more.
 
   Match tracking needs Arena's detailed logs:
       Options -> Account -> Detailed Logs (Plugin Support)
@@ -51,10 +51,12 @@ post_upgrade() {
        Only one copy ever runs, so opening it while the old one is still
        up just brings the old version back to the front.
     2. hyprctl reload       picks up the updated Hyprland rules
-    3. Restart Arena        the rules apply when Arena's window opens
+    3. Restart Arena        Proton pointer-grab keys and Hyprland rules
+       apply when Arena's window opens. Skip this and the badge can
+       look fine but ignore clicks until the next Arena launch.
 
-  Never added the Hyprland line? It is what lets you click the overlay
-  while Arena is fullscreen:
+  Never added the Hyprland line? It keeps the HUD from flickering when it
+  re-stacks itself above a notification or a panel:
 
       dofile("/usr/share/filthy-net-deck/hypr/filthy-net-deck.lua")
 
