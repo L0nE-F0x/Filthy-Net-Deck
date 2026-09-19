@@ -1,9 +1,9 @@
 {
-  "version": "3.8.2",
+  "version": "3.9.5",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.8.2.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.8.2-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.5.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.5-universal.dmg"
   },
-  "notes": "v3.8.2: Aetherfield's nebula is rebuilt — reconstructed volume, graded colour, a lit core and depth on the far stars. Skip intro no longer sits on the layout bar, and the galaxy installs to a phone home screen from the website."
+  "notes": "v3.9.5: Aetherfield now holds all of Reality Fracture — the full 461-card set, its 103 Commander cards and 18 tokens, 118,276 printings in all. The galaxy's card panel closes again, and the colour compass flies to the colour you click."
 }
