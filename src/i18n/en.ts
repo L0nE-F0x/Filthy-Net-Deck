@@ -196,6 +196,7 @@ export const en = {
     dragTitle: "Drag to move",
     openTitle: "Filthy Net Deck is running — click to open it",
     cogTitle: "Overlay settings",
+    close: "Close",
   },
   autostart: {
     region: "Start with your PC",

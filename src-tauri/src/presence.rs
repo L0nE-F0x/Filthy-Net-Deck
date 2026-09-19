@@ -37,7 +37,9 @@ const H: f64 = 40.0;
 const MIN_W: f64 = 80.0;
 const MAX_W: f64 = 420.0;
 const MIN_H: f64 = 24.0;
-const MAX_H: f64 = 80.0;
+/// Tall enough for the inline cog menu (bar + gap + panel). 80px was the
+/// pill-only cap from when the menu was a second window.
+const MAX_H: f64 = 700.0;
 const MENU_MIN_W: f64 = 180.0;
 const MENU_MAX_W: f64 = 420.0;
 const MENU_MIN_H: f64 = 80.0;
@@ -503,12 +505,27 @@ pub fn presence_is_enabled() -> bool {
     is_enabled()
 }
 
-/// Match the badge window to the pill it paints. The cog menu is a separate
-/// window — do not grow this one around it.
+/// Keep the bottom edge of the badge still when its height changes, so
+/// opening the cog menu grows *up* instead of shoving the pill down.
+fn keep_bottom(old_y: f64, old_h: f64, new_h: f64) -> f64 {
+    (old_y + old_h - new_h).max(0.0)
+}
+
+/// Match the badge window to the pill it paints, or to the pill + cog menu
+/// when that panel is open in this same webview.
 #[tauri::command]
-pub fn presence_set_size(app: AppHandle, width: f64, height: f64) {
+pub fn presence_set_size(
+    app: AppHandle,
+    width: f64,
+    height: f64,
+    margin_x: Option<f64>,
+    margin_y: Option<f64>,
+) {
     let w = width.clamp(MIN_W, MAX_W);
     let h = height.clamp(MIN_H, MAX_H);
+    let old_h = badge_h();
+    let old_x = LAST_X.lock().ok().and_then(|v| *v);
+    let old_y = LAST_Y.lock().ok().and_then(|v| *v);
     if let Ok(mut last) = LAST_W.lock() {
         *last = w;
     }
@@ -518,10 +535,13 @@ pub fn presence_set_size(app: AppHandle, width: f64, height: f64) {
     let Some(win) = app.get_webview_window(PRESENCE_LABEL) else {
         return;
     };
-    // Unplaced: re-default against the measured height so the first-run
-    // corner stays bottom-left as the pill shrinks from the 40px placeholder
-    // to ~32px. User-placed: keep the top-left they chose.
-    let (x, y) = resolve_position(&app, w, h);
+    let (x, y) = match (margin_x, margin_y) {
+        (Some(mx), Some(my)) => (mx.max(0.0), my.max(0.0)),
+        _ => match (old_x, old_y) {
+            (Some(ox), Some(oy)) => (ox, keep_bottom(oy, old_h, h)),
+            _ => resolve_position(&app, w, h),
+        },
+    };
     remember_xy(x, y);
     #[cfg(target_os = "linux")]
     if crate::layer_shell::reapply(&win, badge_place(x, y, w, h)) {
@@ -675,6 +695,16 @@ mod tests {
         let (x, y) = default_origin(0.0, 0.0, 960.0, 32.0);
         assert_eq!(x, MARGIN);
         assert_eq!(y, 960.0 - 32.0 - MARGIN);
+    }
+
+    #[test]
+    fn growing_the_menu_keeps_the_pill_bottom() {
+        let old_y = 864.0;
+        let old_h = 32.0;
+        let new_h = 360.0;
+        let y = keep_bottom(old_y, old_h, new_h);
+        assert_eq!(y + new_h, old_y + old_h);
+        assert_eq!(y, 536.0);
     }
 
     #[test]

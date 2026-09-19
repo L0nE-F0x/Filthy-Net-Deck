@@ -29,7 +29,19 @@ export function PresenceMenu({
       aria-label={inert ? undefined : t("presence.menuAria")}
       {...(inert ? { inert: true } : {})}
     >
-      <p className="fnd-presence-menu-title">{t("presence.title")}</p>
+      <div className="fnd-presence-menu-head">
+        <p className="fnd-presence-menu-title">{t("presence.title")}</p>
+        {inert ? null : (
+          <button
+            type="button"
+            className="fnd-presence-menu-dismiss"
+            aria-label={t("presence.close")}
+            onClick={onRequestClose}
+          >
+            ×
+          </button>
+        )}
+      </div>
       <label className="fnd-presence-row">
         <input
           type="checkbox"

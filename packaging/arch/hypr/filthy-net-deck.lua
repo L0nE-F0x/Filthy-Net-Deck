@@ -120,7 +120,7 @@ hl.window_rule({
   no_shadow = true,
   no_blur = true,
   min_size = { 80, 24 },
-  max_size = { 420, 80 },
+  max_size = { 420, 700 },
 })
 
 -- Cog menu. Own window so the badge never resizes — a later `set_position`

@@ -195,6 +195,7 @@ export const ko: Messages = {
     dragTitle: "드래그해서 이동",
     openTitle: "Filthy Net Deck이 실행 중 — 클릭해서 열기",
     cogTitle: "오버레이 설정",
+    close: "닫기",
   },
   autostart: {
     region: "PC 켤 때 시작",

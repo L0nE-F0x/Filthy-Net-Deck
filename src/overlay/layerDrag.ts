@@ -100,6 +100,13 @@ export function layerSize(): LayerSize | null {
 }
 
 /** Record a size the app has just applied, so `layerSize` stays truthful. */
+/** Keep the JS copy of the anchor in sync after a resize that also moved it. */
+export function noteLayerPosition(left: number, top: number): void {
+  if (!geometry) return;
+  geometry.left = Math.max(0, left);
+  geometry.top = Math.max(0, top);
+}
+
 export function noteLayerSize(width: number, height: number): void {
   if (!geometry) return;
   geometry.width = width;

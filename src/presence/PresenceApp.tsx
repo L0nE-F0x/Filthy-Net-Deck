@@ -8,16 +8,15 @@
  * HUD's own pill.
  *
  * Default is bottom-left. The user drags it anywhere — same path as the HUD —
- * and Rust remembers the position. Only the dotted grip is the handle; the
- * mark and cog stay clicks. Putting `data-tauri-drag-region` on the whole bar
- * ate cog clicks: WebKitGTK does not hit-test `background: none` padding, so
- * the event landed on the bar, Tauri's drag script `preventDefault`ed it, and
- * the button never saw a click. Hover still worked because :hover uses the
- * border box.
+ * and Rust remembers the position. Only the dotted grip is the handle. Cog
+ * clicks are hit-tested by coordinates as well as onClick (WebKitGTK often
+ * delivers the event to the bar). The badge does not dismiss the menu on its
+ * own blur: mapping the menu window blurs the badge, and a layer surface
+ * never reports focused, which looked like a dead cog after a drag.
  *
- * Rust owns show/hide (driven by the Arena process watcher). The cog menu is
- * a second window (`#/presence-menu`) so this surface stays badge-sized.
- * Browser demo (`/?demo#/presence`) still opens the menu inline.
+ * Rust owns show/hide (driven by the Arena process watcher). The cog menu
+ * is inline in this webview — the same pattern as the HUD ⚙. Layer-shell
+ * grows the surface up so the pill stays put.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
@@ -31,10 +30,12 @@ import {
   layerReady,
   layerSize,
   moveLayerTo,
+  noteLayerPosition,
   noteLayerSize,
 } from "../overlay/layerDrag";
 import { PresenceMenu } from "./PresenceMenu";
 import { presenceCall } from "./presenceCall";
+import { pointInRect } from "./presenceHit";
 import { usePresenceChrome } from "./usePresenceChrome";
 
 const SNAP_PX = 24;
@@ -122,9 +123,11 @@ export function PresenceApp() {
   const [inMatch, setInMatch] = useState(false);
   const [hot, setHot] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const measureRef = useRef<HTMLDivElement | null>(null);
+  const markRef = useRef<HTMLButtonElement | null>(null);
+  const cogRef = useRef<HTMLButtonElement | null>(null);
   const lastSize = useRef("");
   const dragArmed = useRef(false);
+  const pressAt = useRef<{ x: number; y: number } | null>(null);
   const tauri = isTauri();
 
   // Match state only drives the dim — Rust decides whether we're visible.
@@ -156,25 +159,10 @@ export function PresenceApp() {
     };
   }, [tauri]);
 
-  useEffect(() => {
-    if (!tauri) return;
-    let unlisten: (() => void) | undefined;
-    void (async () => {
-      try {
-        unlisten = await listen<boolean>("presence:menu", (e) => {
-          setMenuOpen(!!e.payload);
-        });
-      } catch {
-        /* ignore */
-      }
-    })();
-    return () => unlisten?.();
-  }, [tauri]);
-
   /**
-   * Keep the OS window exactly the size of the badge. Growing it around the
-   * cog menu is what pushed the window off-screen on Wayland — the menu is
-   * its own window now.
+   * Keep the OS window the size of the pill, or the pill + menu when open.
+   * Layer-shell can grow the surface *up* (`presence_set_size` keeps the
+   * bottom edge still); a second webview is how the menu used to never appear.
    */
   useLayoutEffect(() => {
     const el = rootRef.current;
@@ -183,43 +171,47 @@ export function PresenceApp() {
       const bar = el.querySelector(".fnd-presence-bar");
       if (!bar) return;
       const barBox = bar.getBoundingClientRect();
-      const width = Math.ceil(barBox.width);
-      const height = Math.ceil(barBox.height);
+      let width = barBox.width;
+      let height = barBox.height;
+      const menu = el.querySelector(".fnd-presence-menu");
+      if (menu) {
+        const menuBox = menu.getBoundingClientRect();
+        if (menuBox.height > 1) {
+          width = Math.max(width, menuBox.width);
+          height = menuBox.height + 10 + barBox.height;
+        }
+      }
+      width = Math.ceil(width) + 2;
+      height = Math.ceil(height);
       const key = `${width}x${height}`;
       if (key === lastSize.current) return;
       lastSize.current = key;
+      const anchored = layerMargins();
+      const prev = layerSize();
+      const payload: Record<string, unknown> = { width, height };
+      if (anchored && prev) {
+        const marginX = anchored.left;
+        const marginY = Math.max(0, anchored.top + prev.height - height);
+        payload.marginX = marginX;
+        payload.marginY = marginY;
+        noteLayerPosition(marginX, marginY);
+      }
       noteLayerSize(width, height);
-      void presenceCall("presence_set_size", { width, height });
+      void presenceCall("presence_set_size", payload);
     };
     report();
     const ro = new ResizeObserver(report);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [inMatch]);
+  }, [inMatch, menuOpen]);
 
-  const closeMenu = useCallback(
-    (force = true) => {
-      if (!tauri) {
-        setMenuOpen(false);
-        return;
-      }
-      void presenceCall(force ? "presence_close_menu" : "presence_close_menu_if_unfocused");
-    },
-    [tauri],
-  );
+  const closeMenu = useCallback((_force = true) => {
+    setMenuOpen(false);
+  }, []);
 
   const openMenu = useCallback(() => {
-    if (!tauri) {
-      setMenuOpen(true);
-      return;
-    }
-    const menu = measureRef.current?.querySelector(".fnd-presence-menu");
-    const box = menu?.getBoundingClientRect();
-    const width = Math.ceil(box?.width || 264);
-    const height = Math.ceil(box?.height || 320);
     setMenuOpen(true);
-    void presenceCall("presence_open_menu", { width, height });
-  }, [tauri]);
+  }, []);
 
   const toggleMenu = useCallback(() => {
     if (menuOpen) closeMenu(true);
@@ -271,26 +263,16 @@ export function PresenceApp() {
       if (e.key === "Escape") closeMenu(true);
     };
     const onDown = (e: MouseEvent) => {
-      if (tauri) return;
       const target = e.target as HTMLElement | null;
       if (target?.closest(".fnd-presence-menu")) return;
       if (target?.closest(".fnd-presence-cog")) return;
       closeMenu(true);
     };
-    const onBlur = () => {
-      if (!tauri) {
-        closeMenu(true);
-        return;
-      }
-      window.setTimeout(() => closeMenu(false), 100);
-    };
     window.addEventListener("keydown", onKey);
     window.addEventListener("mousedown", onDown);
-    window.addEventListener("blur", onBlur);
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("blur", onBlur);
     };
   }, [menuOpen, tauri, closeMenu]);
 
@@ -303,29 +285,43 @@ export function PresenceApp() {
       onMouseEnter={() => setHot(true)}
       onMouseLeave={() => setHot(false)}
     >
-      {tauri && (
-        <div className="fnd-presence-measure" ref={measureRef} aria-hidden="true">
-          <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => undefined} inert />
-        </div>
-      )}
-      {!tauri && menuOpen && (
+      {menuOpen && (
         <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => closeMenu(true)} />
       )}
 
       <div
         className="fnd-presence-bar"
-        onMouseDown={(e) => {
+        onPointerDown={(e) => {
+          if (e.button !== 0) return;
+          pressAt.current = { x: e.clientX, y: e.clientY };
           const target = e.target as HTMLElement | null;
           if (!target?.closest(".fnd-presence-grip")) return;
           dragArmed.current = true;
           if (menuOpen) closeMenu(true);
         }}
-        onMouseUp={() => {
-          window.setTimeout(() => {
-            if (!dragArmed.current) return;
-            dragArmed.current = false;
-            void snapAndPersist();
-          }, 80);
+        onPointerUp={(e) => {
+          const start = pressAt.current;
+          pressAt.current = null;
+          if (dragArmed.current) {
+            window.setTimeout(() => {
+              dragArmed.current = false;
+              void snapAndPersist();
+            }, 80);
+            return;
+          }
+          if (!start || e.button !== 0) return;
+          if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 5) return;
+          // WebKitGTK delivered this to the button — its onClick will fire.
+          if ((e.target as HTMLElement | null)?.closest("button")) return;
+          // Otherwise the click landed on the bar (transparent padding). Hit
+          // the cog/mark by coordinates so the ⚙ still opens the menu.
+          if (pointInRect(e.clientX, e.clientY, cogRef.current?.getBoundingClientRect())) {
+            toggleMenu();
+            return;
+          }
+          if (pointInRect(e.clientX, e.clientY, markRef.current?.getBoundingClientRect())) {
+            void presenceCall("presence_open_main");
+          }
         }}
       >
         <span
@@ -336,10 +332,10 @@ export function PresenceApp() {
         />
         <button
           type="button"
+          ref={markRef}
           className="fnd-presence-mark"
           data-tauri-drag-region="false"
           title={t("presence.openTitle")}
-          onMouseDown={(e) => e.stopPropagation()}
           onClick={() => void presenceCall("presence_open_main")}
         >
           <img src="/app-icon.png" alt="" width={20} height={20} />
@@ -350,13 +346,17 @@ export function PresenceApp() {
         </button>
         <button
           type="button"
+          ref={cogRef}
           className={`fnd-presence-cog${menuOpen ? " is-open" : ""}`}
           data-tauri-drag-region="false"
           title={t("presence.cogTitle")}
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           onMouseDown={(e) => e.stopPropagation()}
-          onClick={toggleMenu}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMenu();
+          }}
         >
           ⚙
         </button>

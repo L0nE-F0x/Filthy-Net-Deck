@@ -195,6 +195,7 @@ export const ja: Messages = {
     dragTitle: "ドラッグして移動",
     openTitle: "Filthy Net Deck は起動中 — クリックで開く",
     cogTitle: "オーバーレイ設定",
+    close: "閉じる",
   },
   autostart: {
     region: "PC起動時に起動",

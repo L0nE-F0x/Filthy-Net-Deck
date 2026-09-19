@@ -195,6 +195,7 @@ export const ptBR: Messages = {
     dragTitle: "Arraste para mover",
     openTitle: "Filthy Net Deck está rodando — clique para abrir",
     cogTitle: "Ajustes do overlay",
+    close: "Fechar",
   },
   autostart: {
     region: "Iniciar com o PC",

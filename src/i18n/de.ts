@@ -195,6 +195,7 @@ export const de: Messages = {
     dragTitle: "Ziehen zum Verschieben",
     openTitle: "Filthy Net Deck läuft — klicken zum Öffnen",
     cogTitle: "Overlay-Einstellungen",
+    close: "Schließen",
   },
   autostart: {
     region: "Mit dem PC starten",

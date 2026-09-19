@@ -3,17 +3,17 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product versions: Linux v3.9.3 · Windows and macOS v3.8.2**
+**Live product versions: Linux v3.9.4 · Windows and macOS v3.8.2**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
-> **The platforms are on different versions on purpose.** v3.9.0, v3.9.1 and
-> v3.9.3 were Linux-only, so `website/version.json` and `updater/latest.json`
-> are still **3.8.2**. The next full release must be **higher than 3.9.3**.
-> Numbered lower, Linux users on 3.9.3 would never be offered it — the in-app
-> check would see an older number — and pacman would treat the package as a
+> **The platforms are on different versions on purpose.** v3.9.0–v3.9.4 were
+> Linux-only, so `website/version.json` and `updater/latest.json` are still
+> **3.8.2**. The next full release must be **higher than 3.9.4**. Numbered
+> lower, Linux users on 3.9.4 would never be offered it — the in-app check
+> would see an older number — and pacman would treat the package as a
 > downgrade.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
@@ -29,14 +29,15 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-19 — v3.9.3 Linux only: drag the presence badge, cog clicks.
-Closed.** v3.9.2 made the whole pill a drag-region; WebKitGTK then sent
-cog-padding clicks to the bar, Tauri preventDefaulted them, and the ⚙
-hovered but did not open. Only the dotted grip is the handle now.
+**2026-09-19 — v3.9.4 Linux only: drag the presence badge; cog menu
+inline above the pill. Closed.** Owner verified: drag from the dotted
+grip, ⚙ opens overlay settings in the same surface (grows up so the
+pill stays clickable), × / ⚙ / Escape close it. 3.9.2–3.9.3 put the
+menu in a second window that never mapped, then covered the cog.
 
 Windows/macOS stay on 3.8.2. `website/version.json` and
 `updater/latest.json` stay **3.8.2**. Next full release must be
-**higher than 3.9.3**.
+**higher than 3.9.4**.
 
 **Still open:** publish `filthy-net-deck-bin` to the AUR the day Arch
 reopens registration. Local `sudo pacman -U` after this ship — agents
