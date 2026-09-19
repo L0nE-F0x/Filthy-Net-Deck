@@ -1,6 +1,6 @@
 # Aetherfield — the embedded galaxy
 
-Aetherfield renders all 117,621 printed Magic cards as one explorable WebGL
+Aetherfield renders all 118,276 printed Magic cards as one explorable WebGL
 galaxy. It is a **separate product** — repo `L0nE-F0x/MTG-Multiverse`, live at
 <https://mtg-multiverse.netlify.app> — embedded here as a sidebar destination.
 

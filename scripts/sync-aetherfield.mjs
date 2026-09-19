@@ -19,7 +19,7 @@
  * its generated `public/data/`. Refresh it by running this script and
  * committing the result; CI never runs it.
  *
- *   npm run aetherfield                  # build from ../Magic Card Universe
+ *   npm run aetherfield                  # build from ../Magic Card Universe or ../Aetherfield
  *   AETHERFIELD_DIR=/path npm run aetherfield
  *   npm run aetherfield -- --no-build    # copy an existing dist/ as-is
  */
@@ -32,8 +32,14 @@ import process from "node:process";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEST = join(ROOT, "public", "aetherfield");
+// The checkout goes by its old working name on some machines and by the
+// product name on others; the package-name guard below keeps either honest.
 const SOURCE = resolve(
-  process.env.AETHERFIELD_DIR ?? join(ROOT, "..", "Magic Card Universe"),
+  process.env.AETHERFIELD_DIR ??
+    ["Magic Card Universe", "Aetherfield"]
+      .map((dir) => join(ROOT, "..", dir))
+      .find((dir) => existsSync(dir)) ??
+    join(ROOT, "..", "Magic Card Universe"),
 );
 const build = !process.argv.includes("--no-build");
 

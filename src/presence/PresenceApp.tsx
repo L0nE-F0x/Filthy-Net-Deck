@@ -205,7 +205,7 @@ export function PresenceApp() {
     return () => ro.disconnect();
   }, [inMatch, menuOpen]);
 
-  const closeMenu = useCallback((_force = true) => {
+  const closeMenu = useCallback(() => {
     setMenuOpen(false);
   }, []);
 
@@ -214,7 +214,7 @@ export function PresenceApp() {
   }, []);
 
   const toggleMenu = useCallback(() => {
-    if (menuOpen) closeMenu(true);
+    if (menuOpen) closeMenu();
     else openMenu();
   }, [menuOpen, closeMenu, openMenu]);
 
@@ -225,7 +225,7 @@ export function PresenceApp() {
     if (!tauri) return;
     void initLayerDrag({
       onDragEnd: () => {
-        void closeMenu(true);
+        void closeMenu();
         void snapAndPersist();
       },
       geometryCommand: "presence_layer_geometry",
@@ -260,13 +260,13 @@ export function PresenceApp() {
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeMenu(true);
+      if (e.key === "Escape") closeMenu();
     };
     const onDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (target?.closest(".fnd-presence-menu")) return;
       if (target?.closest(".fnd-presence-cog")) return;
-      closeMenu(true);
+      closeMenu();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("mousedown", onDown);
@@ -286,7 +286,7 @@ export function PresenceApp() {
       onMouseLeave={() => setHot(false)}
     >
       {menuOpen && (
-        <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => closeMenu(true)} />
+        <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => closeMenu()} />
       )}
 
       <div
@@ -297,7 +297,7 @@ export function PresenceApp() {
           const target = e.target as HTMLElement | null;
           if (!target?.closest(".fnd-presence-grip")) return;
           dragArmed.current = true;
-          if (menuOpen) closeMenu(true);
+          if (menuOpen) closeMenu();
         }}
         onPointerUp={(e) => {
           const start = pressAt.current;

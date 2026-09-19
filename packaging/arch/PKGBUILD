@@ -13,7 +13,7 @@
 
 pkgname=filthy-net-deck-bin
 _pkgname=filthy-net-deck
-pkgver=3.9.4
+pkgver=3.9.5
 pkgrel=1
 pkgdesc="MTG Arena meta companion and match tracker — Standard & Pioneer"
 arch=('x86_64')
@@ -56,7 +56,7 @@ options=('!strip' '!debug')
 # publishing to the AUR later is a push of this file, not a rewrite.
 _relbase="https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download"
 source=("${_pkgname}-${pkgver}-x86_64.tar.gz::${_relbase}/v${pkgver}/${_pkgname}-${pkgver}-x86_64.tar.gz")
-sha256sums=('2d23aa0707d94f5f25fcebc876f399af1c86049aff56994139e33d4768230e64')
+sha256sums=('4d9304b750956995be10e0e516562387e33a9679609c178e1c5c1e2c98a1a3b3')
 
 package() {
   local _src="${srcdir}/${_pkgname}-${pkgver}"
