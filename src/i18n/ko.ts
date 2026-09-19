@@ -192,6 +192,9 @@ export const ko: Messages = {
     normal: "일반 창",
     postMatch: "경기 후 요약",
     opacity: "불투명도",
+    dragTitle: "드래그해서 이동",
+    openTitle: "Filthy Net Deck이 실행 중 — 클릭해서 열기",
+    cogTitle: "오버레이 설정",
   },
   autostart: {
     region: "PC 켤 때 시작",
@@ -323,6 +326,8 @@ export const ko: Messages = {
     overlayOpt: "오버레이 (아레나 위)",
     companionOpt: "컴패니언 창",
     presence: "아레나가 켜져 있는 동안 구석 뱃지",
+    presenceEm:
+      "홈 화면과 덱 빌더에서도 트래커가 실행 중임을 보여 줍니다 · 원하는 곳으로 드래그 · 경기 사이에 바꿀 설정은 ⚙ · 경기 중에는 흐려집니다",
     soundscape: "소리",
     notifications: "알림",
     account: "계정",

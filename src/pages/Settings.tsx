@@ -625,12 +625,8 @@ export const Settings = memo(function Settings() {
                   onChange={(e) => setPresenceEnabled(e.target.checked)}
                 />
                 <span>
-                  <strong>Corner badge while Arena is open</strong>
-                  <em>
-                    Bottom-left mark so you can see the tracker is running on the
-                    home screen and in the deck builder · ⚙ for the settings worth
-                    changing between matches · dims during a match
-                  </em>
+                  <strong>{t("settings.presence")}</strong>
+                  <em>{t("settings.presenceEm")}</em>
                 </span>
               </label>
               <label className="settings-toggle-row">

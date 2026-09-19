@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.9.1";
+export const APP_VERSION = "3.9.2";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,7 +7,7 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
+  "Drag the presence badge anywhere on the screen — like the match HUD — and the position is remembered",
   "The badge and HUD stay clickable over fullscreen Arena, including after you switch workspaces",
   "Arena can be left on true 1920×1080 Full Screen for OBS / YouTube",
-  "The overlay hides when you leave Arena and comes back working when you return",
 ];

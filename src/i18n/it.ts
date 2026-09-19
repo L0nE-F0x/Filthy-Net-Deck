@@ -192,6 +192,9 @@ export const it: Messages = {
     normal: "Finestra normale",
     postMatch: "Riepilogo post-partita",
     opacity: "Opacità",
+    dragTitle: "Trascina per spostare",
+    openTitle: "Filthy Net Deck è in esecuzione — clicca per aprire",
+    cogTitle: "Impostazioni overlay",
   },
   autostart: {
     region: "Avvia con il PC",
@@ -323,6 +326,8 @@ export const it: Messages = {
     overlayOpt: "Overlay (su Arena)",
     companionOpt: "Finestra companion",
     presence: "Badge in angolo mentre Arena è aperto",
+    presenceEm:
+      "Mostra che il tracker è attivo nella home e nel deck builder · trascinalo dove vuoi · ⚙ per le impostazioni tra una partita e l’altra · si attenua durante una partita",
     soundscape: "Suono",
     notifications: "Notifiche",
     account: "Account",

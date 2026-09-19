@@ -1,10 +1,10 @@
 //! Corner presence badge — "Filthy Net Deck is running", visible the whole
 //! time Arena is open, not just during a match.
 //!
-//! Sits bottom-left of the primary monitor: the FND mark, a live dot, and a
-//! cog for the overlay settings worth changing between matches. Distinct from
-//! the `overlay` HUD on purpose — that one is match-scoped and the user drags
-//! it wherever they like; this is a fixed, predictable anchor.
+//! Default is bottom-left of the primary monitor (16px inset). The user can
+//! drag it anywhere — same contract as the match HUD — and the position is
+//! remembered across launches. Distinct from the HUD on purpose: that one is
+//! match-scoped; this one stays up the whole time Arena is open.
 //!
 //! Not click-through: the cog has to be clickable. The badge window is sized
 //! to exactly what the pill paints (`presence_set_size`). The cog menu is a
@@ -12,6 +12,7 @@
 //! silent no-op to reposition on Wayland, and Hyprland then resizes floating
 //! windows about their centre, which shoved the combined surface off-screen.
 
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -23,6 +24,7 @@ use tauri::{
 const PRESENCE_LABEL: &str = "presence";
 const MENU_LABEL: &str = "presence-menu";
 const ENABLED_FILE: &str = "presence-enabled";
+const GEOMETRY_FILE: &str = "presence-geometry.json";
 const MENU_EVENT: &str = "presence:menu";
 
 /// Starting size, replaced by the webview's own measurement on mount. This
@@ -40,18 +42,60 @@ const MENU_MIN_W: f64 = 180.0;
 const MENU_MAX_W: f64 = 420.0;
 const MENU_MIN_H: f64 = 80.0;
 const MENU_MAX_H: f64 = 620.0;
-/// Gap from the working-area corner.
+/// First-run inset from the working-area corner.
 const MARGIN: f64 = 16.0;
-/// Gap between the badge top and the menu bottom. Matches the old CSS flex gap.
+/// Gap between the badge and the menu. Matches the old CSS flex gap.
 const GAP: f64 = 8.0;
 
 static ENABLED: AtomicBool = AtomicBool::new(true);
-/// Last height the webview asked for — `show()` re-corners against it, and
-/// the menu window sits this many px above the badge.
+/// Last size the webview asked for — `show()` places against it, and the
+/// menu window sits this many px away from the badge.
+static LAST_W: Mutex<f64> = Mutex::new(W);
 static LAST_H: Mutex<f64> = Mutex::new(H);
+/// Last top-left we asked the compositor for, in logical px. `None` until
+/// the first place, so a size report before any drag can still re-default
+/// to the bottom-left corner as the pill measures itself.
+static LAST_X: Mutex<Option<f64>> = Mutex::new(None);
+static LAST_Y: Mutex<Option<f64>> = Mutex::new(None);
+/// True once the user has dragged (or a previous drag was loaded from disk).
+/// Distinct from LAST_X being set: first show writes LAST_X to the default
+/// corner, and a later `presence_set_size` must still be allowed to re-default
+/// against the measured height.
+static USER_PLACED: AtomicBool = AtomicBool::new(false);
+
+/// Geometry currently applied to the promoted badge. `None` when it is not
+/// a layer surface — the frontend uses that to pick native vs margin drag.
+/// Tracked here because a layer surface lies about both its position and
+/// its size; see `overlay::LAYER_GEOMETRY`.
+#[cfg(target_os = "linux")]
+static LAYER_GEOMETRY: Mutex<Option<LayerGeometry>> = Mutex::new(None);
+
+#[cfg(target_os = "linux")]
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LayerGeometry {
+    pub left: f64,
+    pub top: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PresenceGeometry {
+    pub x: f64,
+    pub y: f64,
+}
 
 fn enabled_path(app: &AppHandle) -> Option<PathBuf> {
     app.path().app_data_dir().ok().map(|d| d.join(ENABLED_FILE))
+}
+
+fn geometry_path(app: &AppHandle) -> Option<PathBuf> {
+    app.path()
+        .app_data_dir()
+        .ok()
+        .map(|d| d.join(GEOMETRY_FILE))
 }
 
 /// Load the persisted toggle at startup (default on — matches the UI pref).
@@ -70,34 +114,163 @@ pub fn is_enabled() -> bool {
     ENABLED.load(Ordering::SeqCst)
 }
 
+fn badge_w() -> f64 {
+    LAST_W.lock().map(|w| *w).unwrap_or(W)
+}
+
 fn badge_h() -> f64 {
     LAST_H.lock().map(|h| *h).unwrap_or(H)
 }
 
-/// Bottom-left of the primary monitor, in logical px, for a window `h` tall.
-fn corner_position(app: &AppHandle, h: f64) -> Option<(f64, f64)> {
-    let m = app.primary_monitor().ok().flatten()?;
+fn remember_xy(x: f64, y: f64) {
+    if let Ok(mut v) = LAST_X.lock() {
+        *v = Some(x);
+    }
+    if let Ok(mut v) = LAST_Y.lock() {
+        *v = Some(y);
+    }
+}
+
+fn load_geometry(app: &AppHandle) -> Option<PresenceGeometry> {
+    let path = geometry_path(app)?;
+    let text = fs::read_to_string(path).ok()?;
+    serde_json::from_str(&text).ok()
+}
+
+fn save_geometry(app: &AppHandle, g: &PresenceGeometry) {
+    USER_PLACED.store(true, Ordering::SeqCst);
+    remember_xy(g.x, g.y);
+    if let Some(path) = geometry_path(app) {
+        if let Some(dir) = path.parent() {
+            let _ = fs::create_dir_all(dir);
+        }
+        if let Ok(json) = serde_json::to_string_pretty(g) {
+            let _ = fs::write(path, json);
+        }
+    }
+}
+
+/// Logical monitor rect: (x, y, width, height).
+type MonitorRect = (f64, f64, f64, f64);
+
+/// True when enough of the pill overlaps a monitor to grab it. Saved
+/// geometry from an unplugged display / changed layout fails this and
+/// falls back to the bottom-left default (the size is kept).
+fn geometry_reachable(x: f64, y: f64, w: f64, h: f64, monitors: &[MonitorRect]) -> bool {
+    const GRAB_W: f64 = 24.0;
+    monitors.iter().any(|&(mx, my, mw, mh)| {
+        let overlap_w = (x + w).min(mx + mw) - x.max(mx);
+        let overlap_h = (y + h).min(my + mh) - y.max(my);
+        overlap_w >= GRAB_W && overlap_h >= h / 2.0
+    })
+}
+
+fn monitor_rects(app: &AppHandle) -> Vec<MonitorRect> {
+    app.available_monitors()
+        .map(|monitors| {
+            monitors
+                .iter()
+                .map(|m| {
+                    let f = m.scale_factor().max(0.5);
+                    (
+                        m.position().x as f64 / f,
+                        m.position().y as f64 / f,
+                        m.size().width as f64 / f,
+                        m.size().height as f64 / f,
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// First-run (and stranded-save) position: bottom-left of the primary
+/// monitor, 16px in. The user then drags it wherever they like.
+fn default_origin(mx: f64, my: f64, mh: f64, h: f64) -> (f64, f64) {
+    (mx + MARGIN, my + mh - h - MARGIN)
+}
+
+fn default_xy(app: &AppHandle, h: f64) -> (f64, f64) {
+    let Some(m) = app.primary_monitor().ok().flatten() else {
+        return (MARGIN, MARGIN);
+    };
     let f = m.scale_factor().max(0.5);
     let mx = m.position().x as f64 / f;
     let my = m.position().y as f64 / f;
     let mh = m.size().height as f64 / f;
-    Some((mx + MARGIN, my + mh - h - MARGIN))
+    default_origin(mx, my, mh, h)
 }
 
-/// Menu sits on the same left margin, `GAP` px above the badge.
-fn menu_position(app: &AppHandle, menu_h: f64, badge_h: f64) -> Option<(f64, f64)> {
-    let m = app.primary_monitor().ok().flatten()?;
-    let f = m.scale_factor().max(0.5);
-    let mx = m.position().x as f64 / f;
-    let my = m.position().y as f64 / f;
-    let mh = m.size().height as f64 / f;
-    Some(menu_origin(mx, my, mh, badge_h, menu_h))
+/// Saved / last-dragged position if it still sits on a monitor, else the
+/// bottom-left default.
+fn resolve_position(app: &AppHandle, w: f64, h: f64) -> (f64, f64) {
+    let rects = monitor_rects(app);
+    if let Some(g) = load_geometry(app) {
+        if rects.is_empty() || geometry_reachable(g.x, g.y, w, h, &rects) {
+            USER_PLACED.store(true, Ordering::SeqCst);
+            return (g.x, g.y);
+        }
+    }
+    if USER_PLACED.load(Ordering::SeqCst) {
+        if let (Ok(x), Ok(y)) = (LAST_X.lock(), LAST_Y.lock()) {
+            if let (Some(lx), Some(ly)) = (*x, *y) {
+                if rects.is_empty() || geometry_reachable(lx, ly, w, h, &rects) {
+                    return (lx, ly);
+                }
+            }
+        }
+    }
+    default_xy(app, h)
 }
 
-fn menu_origin(mx: f64, my: f64, mh: f64, badge_h: f64, menu_h: f64) -> (f64, f64) {
-    let x = mx + MARGIN;
-    let y = (my + mh - menu_h - badge_h - GAP - MARGIN).max(my + MARGIN);
+#[cfg(target_os = "linux")]
+fn badge_place(x: f64, y: f64, w: f64, h: f64) -> crate::layer_shell::Placement {
+    crate::layer_shell::Placement::top_left(x as i32, y as i32, (w, h))
+}
+
+#[cfg(target_os = "linux")]
+fn seed_layer_geometry(promoted: bool, x: f64, y: f64, w: f64, h: f64) {
+    *LAYER_GEOMETRY.lock().unwrap() = promoted.then_some(LayerGeometry {
+        left: x.max(0.0),
+        top: y.max(0.0),
+        width: w,
+        height: h,
+    });
+}
+
+/// Menu sits `GAP` px above the badge when there is room, otherwise below
+/// it, and is clamped onto the monitor so a badge at the right edge does
+/// not open the panel off-screen.
+fn menu_origin(
+    (badge_x, badge_y, badge_h): (f64, f64, f64),
+    (menu_w, menu_h): (f64, f64),
+    (mx, my, mw): (f64, f64, f64),
+) -> (f64, f64) {
+    let mut x = badge_x;
+    let mut y = badge_y - GAP - menu_h;
+    if y < my + MARGIN {
+        y = badge_y + badge_h + GAP;
+    }
+    let max_x = (mx + mw - menu_w - MARGIN).max(mx + MARGIN);
+    if x > max_x {
+        x = max_x;
+    }
+    if x < mx + MARGIN {
+        x = mx + MARGIN;
+    }
     (x, y)
+}
+
+fn menu_xy(app: &AppHandle, menu_w: f64, menu_h: f64) -> Option<(f64, f64)> {
+    let m = app.primary_monitor().ok().flatten()?;
+    let f = m.scale_factor().max(0.5);
+    let mx = m.position().x as f64 / f;
+    let my = m.position().y as f64 / f;
+    let mw = m.size().width as f64 / f;
+    let w = badge_w();
+    let h = badge_h();
+    let (bx, by) = resolve_position(app, w, h);
+    Some(menu_origin((bx, by, h), (menu_w, menu_h), (mx, my, mw)))
 }
 
 fn ensure_window(app: &AppHandle) -> Result<(), String> {
@@ -107,6 +280,8 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     if crate::refuse_if_main_thread("presence::ensure_window") {
         return Err("refused: webview build on the main thread".into());
     }
+    let (x, y) = resolve_position(app, W, H);
+    remember_xy(x, y);
     let url = WebviewUrl::App("index.html#/presence".into());
     let builder = WebviewWindowBuilder::new(app, PRESENCE_LABEL, url)
         .title("Filthy Net Deck — Running")
@@ -125,10 +300,7 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     let builder = builder.transparent(true);
 
-    let builder = match corner_position(app, H) {
-        Some((x, y)) => builder.position(x, y),
-        None => builder,
-    };
+    let builder = builder.position(x, y);
 
     let win = builder.build().map_err(|e| e.to_string())?;
 
@@ -141,11 +313,14 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     // -- so every click went into the focus fight and none reached the webview.
     // The Omarchy bar is clickable and asks for no keyboard either; buttons go
     // to the surface under the cursor without any focus change.
+    //
+    // Top-left anchors, matching the HUD: a layer surface has no move request,
+    // so dragging rewrites these margins (see `src/overlay/layerDrag.ts`).
     #[cfg(target_os = "linux")]
-    crate::layer_shell::promote(
-        &win,
-        crate::layer_shell::Placement::bottom_left(MARGIN as i32, (W, H)),
-    );
+    {
+        let promoted = crate::layer_shell::promote(&win, badge_place(x, y, W, H));
+        seed_layer_geometry(promoted, x, y, W, H);
+    }
     let _ = &win;
 
     Ok(())
@@ -172,21 +347,23 @@ fn ensure_menu_window(app: &AppHandle, width: f64, height: f64) -> Result<(), St
     #[cfg(not(target_os = "macos"))]
     let builder = builder.transparent(true);
 
-    let builder = match menu_position(app, height, badge_h()) {
+    let builder = match menu_xy(app, width, height) {
         Some((x, y)) => builder.position(x, y),
         None => builder,
     };
 
     let win = builder.build().map_err(|e| e.to_string())?;
 
-    // Same corner as the badge, lifted clear of it.
     #[cfg(target_os = "linux")]
     {
         // No keyboard here either -- same reason as the badge. The menu is
         // buttons, not text entry, so it never needs key input.
-        let mut place = crate::layer_shell::Placement::bottom_left(MARGIN as i32, (width, height));
-        place.margin_y = (MARGIN + badge_h() + GAP) as i32;
-        crate::layer_shell::promote(&win, place);
+        if let Some((x, y)) = menu_xy(app, width, height) {
+            crate::layer_shell::promote(
+                &win,
+                crate::layer_shell::Placement::top_left(x as i32, y as i32, (width, height)),
+            );
+        }
     }
     let _ = &win;
 
@@ -231,8 +408,13 @@ fn open_menu(app: &AppHandle, width: f64, height: f64) {
     let _ = app.run_on_main_thread(move || {
         if let Some(win) = app_show.get_webview_window(MENU_LABEL) {
             let _ = win.set_size(LogicalSize::new(w, h));
-            if let Some((x, y)) = menu_position(&app_show, h, badge_h()) {
+            if let Some((x, y)) = menu_xy(&app_show, w, h) {
                 let _ = win.set_position(LogicalPosition::new(x, y));
+                #[cfg(target_os = "linux")]
+                {
+                    let place = crate::layer_shell::Placement::top_left(x as i32, y as i32, (w, h));
+                    let _ = crate::layer_shell::reapply(&win, place);
+                }
             }
             #[cfg(target_os = "linux")]
             let _ = crate::layer_shell::reveal(&win);
@@ -260,13 +442,18 @@ pub fn show(app: &AppHandle) {
         return;
     }
     if let Some(win) = app.get_webview_window(PRESENCE_LABEL) {
-        // Re-corner on every show: the monitor layout may have changed.
+        let w = badge_w();
         let h = badge_h();
-        if let Some((x, y)) = corner_position(app, h) {
-            let _ = win.set_position(LogicalPosition::new(x, y));
-        }
+        let (x, y) = resolve_position(app, w, h);
+        remember_xy(x, y);
+        let _ = win.set_position(LogicalPosition::new(x, y));
         #[cfg(target_os = "linux")]
-        let _ = crate::layer_shell::reveal(&win);
+        {
+            if crate::layer_shell::reapply(&win, badge_place(x, y, w, h)) {
+                seed_layer_geometry(true, x, y, w, h);
+            }
+            let _ = crate::layer_shell::reveal(&win);
+        }
         let _ = win.show();
         let _ = win.set_always_on_top(true);
         // Never set_focus — Arena keeps input.
@@ -322,23 +509,89 @@ pub fn presence_is_enabled() -> bool {
 pub fn presence_set_size(app: AppHandle, width: f64, height: f64) {
     let w = width.clamp(MIN_W, MAX_W);
     let h = height.clamp(MIN_H, MAX_H);
+    if let Ok(mut last) = LAST_W.lock() {
+        *last = w;
+    }
     if let Ok(mut last) = LAST_H.lock() {
         *last = h;
     }
     let Some(win) = app.get_webview_window(PRESENCE_LABEL) else {
         return;
     };
-    // Promoted badge: `set_size` does not reach a layer surface (it sizes from
-    // the GTK size request), and `set_position` is a no-op because the
-    // bottom-left anchors already hold the corner as the badge grows.
+    // Unplaced: re-default against the measured height so the first-run
+    // corner stays bottom-left as the pill shrinks from the 40px placeholder
+    // to ~32px. User-placed: keep the top-left they chose.
+    let (x, y) = resolve_position(&app, w, h);
+    remember_xy(x, y);
     #[cfg(target_os = "linux")]
-    if crate::layer_shell::resize(&win, w, h) {
+    if crate::layer_shell::reapply(&win, badge_place(x, y, w, h)) {
+        seed_layer_geometry(true, x, y, w, h);
         return;
     }
     let _ = win.set_size(LogicalSize::new(w, h));
-    if let Some((x, y)) = corner_position(&app, h) {
-        let _ = win.set_position(LogicalPosition::new(x, y));
+    let _ = win.set_position(LogicalPosition::new(x, y));
+}
+
+/// Where the promoted badge sits and how big it is, in logical px — or
+/// `null` when it is an ordinary window. The frontend uses the null-ness
+/// to choose native `data-tauri-drag-region` vs the margin drag.
+#[tauri::command]
+pub fn presence_layer_geometry() -> Option<LayerGeometryDto> {
+    #[cfg(target_os = "linux")]
+    {
+        *LAYER_GEOMETRY.lock().unwrap()
     }
+    #[cfg(not(target_os = "linux"))]
+    {
+        None
+    }
+}
+
+/// `LayerGeometry` only exists on Linux; everywhere else the command still
+/// has to name a type, and it always answers `None`.
+#[cfg(target_os = "linux")]
+pub type LayerGeometryDto = LayerGeometry;
+#[cfg(not(target_os = "linux"))]
+pub type LayerGeometryDto = ();
+
+/// Move the promoted badge. Returns false when this window is not a layer
+/// surface, so the caller can fall back to `set_position`.
+#[tauri::command]
+pub fn presence_set_margins(app: AppHandle, left: f64, top: f64) -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        let Some(win) = app.get_webview_window(PRESENCE_LABEL) else {
+            return false;
+        };
+        if !crate::layer_shell::set_margins(&win, left, top) {
+            return false;
+        }
+        let left = left.max(0.0);
+        let top = top.max(0.0);
+        USER_PLACED.store(true, Ordering::SeqCst);
+        remember_xy(left, top);
+        if let Some(g) = LAYER_GEOMETRY.lock().unwrap().as_mut() {
+            g.left = left;
+            g.top = top;
+        }
+        true
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (&app, left, top);
+        false
+    }
+}
+
+/// Persist the badge's top-left after a drag (layer or native).
+#[tauri::command]
+pub fn presence_save_geometry(app: AppHandle, geometry: PresenceGeometry) {
+    save_geometry(&app, &geometry);
+}
+
+#[tauri::command]
+pub fn presence_get_geometry(app: AppHandle) -> Option<PresenceGeometry> {
+    load_geometry(&app)
 }
 
 /// Badge click — surface the main window (same as the tray "Open" item).
@@ -418,22 +671,67 @@ mod tests {
     use super::*;
 
     #[test]
-    fn menu_sits_gap_above_badge() {
-        let mh = 750.0;
-        let badge_h = 40.0;
-        let menu_h = 330.0;
-        let (x, y) = menu_origin(0.0, 0.0, mh, badge_h, menu_h);
+    fn default_is_bottom_left() {
+        let (x, y) = default_origin(0.0, 0.0, 960.0, 32.0);
         assert_eq!(x, MARGIN);
-        assert_eq!(y, mh - menu_h - badge_h - GAP - MARGIN);
-        let menu_bottom = y + menu_h;
-        let badge_top = mh - MARGIN - badge_h;
-        assert_eq!(badge_top - menu_bottom, GAP);
+        assert_eq!(y, 960.0 - 32.0 - MARGIN);
     }
 
     #[test]
-    fn menu_clamps_to_monitor_top() {
-        let (x, y) = menu_origin(10.0, 20.0, 200.0, 40.0, 400.0);
-        assert_eq!(x, 10.0 + MARGIN);
-        assert_eq!(y, 20.0 + MARGIN);
+    fn default_does_not_special_case_16_10() {
+        // 1536×960 is this laptop; the 16:9 letterbox is the user's to drag
+        // into, not a margin we hardcode for one panel.
+        let (_, y_16_10) = default_origin(0.0, 0.0, 960.0, 32.0);
+        let (_, y_16_9) = default_origin(0.0, 0.0, 864.0, 32.0);
+        assert_eq!(y_16_10, 912.0);
+        assert_eq!(y_16_9, 816.0);
+    }
+
+    #[test]
+    fn menu_sits_gap_above_badge() {
+        let badge_h = 40.0;
+        let menu_h = 330.0;
+        let mh = 750.0;
+        let badge_y = mh - MARGIN - badge_h;
+        let (x, y) = menu_origin(
+            (MARGIN, badge_y, badge_h),
+            (246.0, menu_h),
+            (0.0, 0.0, 1280.0),
+        );
+        assert_eq!(x, MARGIN);
+        assert_eq!(y, badge_y - GAP - menu_h);
+        let menu_bottom = y + menu_h;
+        assert_eq!(badge_y - menu_bottom, GAP);
+    }
+
+    #[test]
+    fn menu_flips_below_when_no_room_above() {
+        let (x, y) = menu_origin((16.0, 20.0, 32.0), (246.0, 330.0), (0.0, 0.0, 1280.0));
+        assert_eq!(x, 16.0);
+        assert_eq!(y, 20.0 + 32.0 + GAP);
+    }
+
+    #[test]
+    fn menu_clamps_off_the_right_edge() {
+        let (x, _) = menu_origin((1200.0, 400.0, 32.0), (246.0, 200.0), (0.0, 0.0, 1280.0));
+        assert_eq!(x, 1280.0 - 246.0 - MARGIN);
+    }
+
+    #[test]
+    fn menu_follows_a_dragged_badge() {
+        let (x, y) = menu_origin((80.0, 400.0, 32.0), (246.0, 200.0), (0.0, 0.0, 1280.0));
+        assert_eq!(x, 80.0);
+        assert_eq!(y, 400.0 - GAP - 200.0);
+    }
+
+    #[test]
+    fn geometry_reachable_detects_stranded_positions() {
+        let one = [(0.0, 0.0, 1920.0, 1080.0)];
+        assert!(geometry_reachable(16.0, 1000.0, 142.0, 32.0, &one));
+        assert!(!geometry_reachable(-2400.0, 50.0, 142.0, 32.0, &one));
+        assert!(geometry_reachable(1880.0, 0.0, 142.0, 32.0, &one));
+        assert!(!geometry_reachable(100.0, -40.0, 142.0, 32.0, &one));
+        let two = [(0.0, 0.0, 1920.0, 1080.0), (-2560.0, 0.0, 2560.0, 1440.0)];
+        assert!(geometry_reachable(-2400.0, 50.0, 142.0, 32.0, &two));
     }
 }

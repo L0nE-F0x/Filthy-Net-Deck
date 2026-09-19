@@ -192,6 +192,9 @@ export const ptBR: Messages = {
     normal: "Janela normal",
     postMatch: "Resumo pós-partida",
     opacity: "Opacidade",
+    dragTitle: "Arraste para mover",
+    openTitle: "Filthy Net Deck está rodando — clique para abrir",
+    cogTitle: "Ajustes do overlay",
   },
   autostart: {
     region: "Iniciar com o PC",
@@ -323,6 +326,8 @@ export const ptBR: Messages = {
     overlayOpt: "Overlay (sobre o Arena)",
     companionOpt: "Janela companion",
     presence: "Badge no canto enquanto o Arena estiver aberto",
+    presenceEm:
+      "Mostra que o tracker está rodando na tela inicial e no construtor de decks · arraste para qualquer lugar · ⚙ para os ajustes entre partidas · escurece durante uma partida",
     soundscape: "Som",
     notifications: "Notificações",
     account: "Conta",

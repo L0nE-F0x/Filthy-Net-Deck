@@ -62,19 +62,6 @@ pub struct Placement {
 }
 
 impl Placement {
-    /// Bottom-left corner, matching `presence::corner_position`.
-    pub fn bottom_left(margin: i32, size: (f64, f64)) -> Self {
-        Self {
-            left: true,
-            right: false,
-            top: false,
-            bottom: true,
-            margin_x: margin,
-            margin_y: margin,
-            size,
-        }
-    }
-
     /// Top-right corner, matching `toast::corner_position` and the
     /// `move = "monitor_w-window_w-16 16"` rule in the packaged Hyprland
     /// config. Anchoring means the compositor re-corners it on a resolution
@@ -288,7 +275,7 @@ fn apply(win: &tauri::WebviewWindow, place: Placement) -> bool {
     gtk_win.set_exclusive_zone(-1);
 
     apply_placement(&gtk_win, place);
-    remember(&win, place);
+    remember(win, place);
 
     eprintln!("[layer-shell] {}: promoted to overlay layer", win.label());
     true
@@ -382,6 +369,24 @@ pub fn reveal(win: &tauri::WebviewWindow) -> bool {
             return false;
         }
         apply_placement(&gtk_win, place);
+        true
+    })
+}
+
+/// Update anchors, margins and size on an already-promoted surface.
+pub fn reapply(win: &tauri::WebviewWindow, place: Placement) -> bool {
+    if !enabled() || !is_promoted(win) {
+        return false;
+    }
+    on_gtk_main(win, move |win| {
+        let Ok(gtk_win) = win.gtk_window() else {
+            return false;
+        };
+        if !gtk_win.is_layer_window() {
+            return false;
+        }
+        apply_placement(&gtk_win, place);
+        remember(win, place);
         true
     })
 }

@@ -469,7 +469,8 @@ mod tests {
         json!({ "namespace": ns, "x": x, "y": y, "w": w, "h": h })
     }
 
-    /// The badge as it really sits on this box, bottom-left with a 16px margin.
+    /// A typical badge rect (first-run bottom-left). Overlap tests care
+    /// about stacking, not that the user left it here.
     fn badge() -> serde_json::Value {
         surface(OUR_NAMESPACE, 16, 912, 142, 32)
     }

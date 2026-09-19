@@ -164,11 +164,12 @@ const TOPICS: Topic[] = [
         </p>
         <p>
           <strong>Is it even running?</strong> The HUD only appears once a game starts, so a
-          small badge sits bottom-left the whole time Arena is open — the mark, a live dot,
-          and a <K>⚙</K> for the overlay settings worth changing between matches (overlay
-          on/off, post-match summary, opacity, fullscreen alerts, click-through). It dims
-          while a match is live, since the HUD is the main event then, and wakes on hover.
-          Click the mark to jump back to the app. Turn it off in Settings → In-game overlay.
+          small badge stays up the whole time Arena is open — the mark, a live dot, and a{" "}
+          <K>⚙</K> for the overlay settings worth changing between matches (overlay on/off,
+          post-match summary, opacity, fullscreen alerts, click-through). Drag it anywhere;
+          the position is remembered. It dims while a match is live, since the HUD is the
+          main event then, and wakes on hover. Click the mark to jump back to the app. Turn
+          it off in Settings → In-game overlay.
         </p>
         <p>
           <strong>Alerts mid-match.</strong> Windows mutes its own notification banners while a

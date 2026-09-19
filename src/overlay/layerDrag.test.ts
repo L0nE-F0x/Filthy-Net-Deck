@@ -61,8 +61,8 @@ function pointer(type: string, x: number, y: number) {
   return e;
 }
 
-function marginCalls() {
-  return invoke.mock.calls.filter(([cmd]) => cmd === "overlay_set_margins");
+function marginCalls(cmd = "overlay_set_margins") {
+  return invoke.mock.calls.filter(([c]) => c === cmd);
 }
 
 describe("layerDrag — when the HUD is an ordinary window", () => {
@@ -288,6 +288,36 @@ describe("layerDrag — resizing a promoted HUD", () => {
         onEnd: () => undefined,
       }),
     ).toBe(false);
+  });
+});
+
+describe("layerDrag — a different window's commands", () => {
+  it("drives presence commands when that window asks", async () => {
+    vi.resetModules();
+    invoke.mockReset();
+    invoke.mockImplementation((cmd: string) => {
+      if (cmd === "presence_layer_geometry") {
+        return Promise.resolve({ left: 16, top: 800, width: 142, height: 32 });
+      }
+      if (cmd === "overlay_layer_geometry") {
+        return Promise.resolve(null);
+      }
+      return Promise.resolve(true);
+    });
+    const mod = await import("./layerDrag");
+    const bar = grabHandle();
+    await mod.initLayerDrag({
+      onDragEnd: () => undefined,
+      geometryCommand: "presence_layer_geometry",
+      setMarginsCommand: "presence_set_margins",
+    });
+
+    bar.dispatchEvent(pointer("pointerdown", 10, 10));
+    window.dispatchEvent(pointer("pointermove", 40, 30));
+    await settle();
+
+    const calls = marginCalls("presence_set_margins");
+    expect(calls[calls.length - 1]?.[1]).toEqual({ left: 46, top: 820 });
   });
 });
 

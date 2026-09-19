@@ -192,6 +192,9 @@ export const ja: Messages = {
     normal: "普通のウィンドウ",
     postMatch: "終了後サマリー",
     opacity: "不透明度",
+    dragTitle: "ドラッグして移動",
+    openTitle: "Filthy Net Deck は起動中 — クリックで開く",
+    cogTitle: "オーバーレイ設定",
   },
   autostart: {
     region: "PC起動時に起動",
@@ -323,6 +326,8 @@ export const ja: Messages = {
     overlayOpt: "オーバーレイ（アリーナの上）",
     companionOpt: "コンパニオンウィンドウ",
     presence: "アリーナ起動中のコーナーバッジ",
+    presenceEm:
+      "ホーム画面とデッキ構築中もトラッカーが動いていることを示す · 好きな位置へドラッグ · 試合の合間に変える設定は ⚙ · 試合中は暗くなる",
     soundscape: "サウンド",
     notifications: "通知",
     account: "アカウント",

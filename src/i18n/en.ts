@@ -193,6 +193,9 @@ export const en = {
     normal: "Normal window",
     postMatch: "Post-match summary",
     opacity: "Opacity",
+    dragTitle: "Drag to move",
+    openTitle: "Filthy Net Deck is running — click to open it",
+    cogTitle: "Overlay settings",
   },
   autostart: {
     region: "Start with your PC",
@@ -324,6 +327,8 @@ export const en = {
     overlayOpt: "Overlay (over Arena)",
     companionOpt: "Companion window",
     presence: "Corner badge while Arena is open",
+    presenceEm:
+      "Shows the tracker is running on the home screen and in the deck builder · drag it anywhere · ⚙ for the settings worth changing between matches · dims during a match",
     soundscape: "Soundscape",
     notifications: "Notifications",
     account: "Account",

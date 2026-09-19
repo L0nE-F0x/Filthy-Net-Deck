@@ -7,6 +7,10 @@
  * settings worth changing *between* matches; the mid-match knobs stay on the
  * HUD's own pill.
  *
+ * Default is bottom-left. The user drags it anywhere — same path as the HUD —
+ * and Rust remembers the position. The grip (and the bar chrome around the
+ * two buttons) is the handle; the mark and cog stay clicks.
+ *
  * Rust owns show/hide (driven by the Arena process watcher). The cog menu is
  * a second window (`#/presence-menu`) so this surface stays badge-sized.
  * Browser demo (`/?demo#/presence`) still opens the menu inline.
@@ -16,18 +20,107 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type { LiveMatch } from "../types/tracker";
 import { isTauri } from "../services/appUpdater";
+import { t as translate } from "../i18n/t";
+import {
+  initLayerDrag,
+  layerMargins,
+  layerReady,
+  layerSize,
+  moveLayerTo,
+  noteLayerSize,
+} from "../overlay/layerDrag";
 import { PresenceMenu } from "./PresenceMenu";
 import { presenceCall } from "./presenceCall";
 import { usePresenceChrome } from "./usePresenceChrome";
 
+const SNAP_PX = 24;
+
+async function snapAndPersist(): Promise<void> {
+  if (!isTauri()) return;
+  await layerReady();
+  try {
+    const {
+      getCurrentWindow,
+      LogicalPosition,
+      currentMonitor,
+      primaryMonitor,
+    } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    const factor = await win.scaleFactor();
+    const anchored = layerMargins();
+    const tracked = layerSize();
+    const logicalW = tracked
+      ? tracked.width
+      : (await win.outerSize()).width / factor;
+    const logicalH = tracked
+      ? tracked.height
+      : (await win.outerSize()).height / factor;
+
+    if (anchored) {
+      const monitor = (await currentMonitor()) ?? (await primaryMonitor());
+      if (monitor) {
+        const maxLeft = Math.max(
+          0,
+          monitor.size.width / factor - logicalW,
+        );
+        const maxTop = Math.max(
+          0,
+          monitor.size.height / factor - logicalH,
+        );
+        let { left, top } = anchored;
+        if (left <= SNAP_PX) left = 0;
+        else if (Math.abs(left - maxLeft) <= SNAP_PX) left = maxLeft;
+        if (top <= SNAP_PX) top = 0;
+        else if (Math.abs(top - maxTop) <= SNAP_PX) top = maxTop;
+        left = Math.min(Math.max(0, left), maxLeft);
+        top = Math.min(Math.max(0, top), maxTop);
+        await moveLayerTo(left, top);
+        await invoke("presence_save_geometry", {
+          geometry: { x: left, y: top },
+        });
+      }
+      return;
+    }
+
+    const pos = await win.outerPosition();
+    const size = await win.outerSize();
+    const monitor = (await currentMonitor()) ?? (await primaryMonitor());
+    if (!monitor) return;
+
+    const mx = monitor.position.x;
+    const my = monitor.position.y;
+    const mw = monitor.size.width;
+    const mh = monitor.size.height;
+    let x = pos.x;
+    let y = pos.y;
+    const right = mx + mw - size.width;
+    const bottom = my + mh - size.height;
+    const thr = SNAP_PX * factor;
+    if (Math.abs(x - mx) <= thr) x = mx;
+    else if (Math.abs(x - right) <= thr) x = right;
+    if (Math.abs(y - my) <= thr) y = my;
+    else if (Math.abs(y - bottom) <= thr) y = bottom;
+    if (x !== pos.x || y !== pos.y) {
+      await win.setPosition(new LogicalPosition(x / factor, y / factor));
+    }
+    await invoke("presence_save_geometry", {
+      geometry: { x: x / factor, y: y / factor },
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
 export function PresenceApp() {
   const { prefs, patch } = usePresenceChrome();
+  const t = translate;
   const [menuOpen, setMenuOpen] = useState(false);
   const [inMatch, setInMatch] = useState(false);
   const [hot, setHot] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const measureRef = useRef<HTMLDivElement | null>(null);
   const lastSize = useRef("");
+  const dragArmed = useRef(false);
   const tauri = isTauri();
 
   // Match state only drives the dim — Rust decides whether we're visible.
@@ -91,6 +184,7 @@ export function PresenceApp() {
       const key = `${width}x${height}`;
       if (key === lastSize.current) return;
       lastSize.current = key;
+      noteLayerSize(width, height);
       void presenceCall("presence_set_size", { width, height });
     };
     report();
@@ -127,6 +221,45 @@ export function PresenceApp() {
     if (menuOpen) closeMenu(true);
     else openMenu();
   }, [menuOpen, closeMenu, openMenu]);
+
+  // Linux/Wayland: a layer surface has no move request, so take over the
+  // drag-region the same way the HUD does. Installs nothing on Windows,
+  // macOS, X11, or `FND_LAYER_SHELL=0`.
+  useEffect(() => {
+    if (!tauri) return;
+    void initLayerDrag({
+      onDragEnd: () => {
+        void closeMenu(true);
+        void snapAndPersist();
+      },
+      geometryCommand: "presence_layer_geometry",
+      setMarginsCommand: "presence_set_margins",
+    });
+  }, [tauri, closeMenu]);
+
+  useEffect(() => {
+    if (!tauri) return;
+    let unlisten: (() => void) | undefined;
+    let snapTimer = 0;
+    void (async () => {
+      try {
+        const { getCurrentWindow } = await import("@tauri-apps/api/window");
+        unlisten = await getCurrentWindow().onMoved(() => {
+          if (!dragArmed.current) return;
+          window.clearTimeout(snapTimer);
+          snapTimer = window.setTimeout(() => {
+            void snapAndPersist();
+          }, 140);
+        });
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      window.clearTimeout(snapTimer);
+      unlisten?.();
+    };
+  }, [tauri]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -175,11 +308,33 @@ export function PresenceApp() {
         <PresenceMenu prefs={prefs} patch={patch} onRequestClose={() => closeMenu(true)} />
       )}
 
-      <div className="fnd-presence-bar">
+      <div
+        className="fnd-presence-bar"
+        data-tauri-drag-region
+        onMouseDown={(e) => {
+          const target = e.target as HTMLElement | null;
+          if (target?.closest("button")) return;
+          dragArmed.current = true;
+          if (menuOpen) closeMenu(true);
+        }}
+        onMouseUp={() => {
+          window.setTimeout(() => {
+            if (!dragArmed.current) return;
+            dragArmed.current = false;
+            void snapAndPersist();
+          }, 80);
+        }}
+      >
+        <span
+          className="fnd-presence-grip"
+          data-tauri-drag-region
+          title={t("presence.dragTitle")}
+          aria-hidden="true"
+        />
         <button
           type="button"
           className="fnd-presence-mark"
-          title="Filthy Net Deck is running — click to open it"
+          title={t("presence.openTitle")}
           onClick={() => void presenceCall("presence_open_main")}
         >
           <img src="/app-icon.png" alt="" width={20} height={20} />
@@ -191,7 +346,7 @@ export function PresenceApp() {
         <button
           type="button"
           className={`fnd-presence-cog${menuOpen ? " is-open" : ""}`}
-          title="Overlay settings"
+          title={t("presence.cogTitle")}
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           onClick={toggleMenu}

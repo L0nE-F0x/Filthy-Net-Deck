@@ -30,6 +30,26 @@ export interface LayerSize {
 
 interface LayerGeometry extends LayerMargins, LayerSize {}
 
+/**
+ * Which window this module is driving. Overlay and presence are separate
+ * webviews, so each instance of this file sees only one of them — pick the
+ * commands from the hash so a presence window never reads the HUD's geometry.
+ */
+function defaultCommands(): { geometry: string; setMargins: string } {
+  if (typeof location !== "undefined" && location.hash.includes("presence")) {
+    return {
+      geometry: "presence_layer_geometry",
+      setMargins: "presence_set_margins",
+    };
+  }
+  return {
+    geometry: "overlay_layer_geometry",
+    setMargins: "overlay_set_margins",
+  };
+}
+
+const commands = defaultCommands();
+
 /** What we last asked the compositor for, or null when not promoted. */
 let geometry: LayerGeometry | null = null;
 let installed = false;
@@ -47,9 +67,7 @@ const ready: Promise<void> = resolveGeometry();
 async function resolveGeometry(): Promise<void> {
   if (!isTauri()) return;
   try {
-    const answer = await invoke<LayerGeometry | null>(
-      "overlay_layer_geometry",
-    );
+    const answer = await invoke<LayerGeometry | null>(commands.geometry);
     // Copy rather than adopt: the drag mutates this in place as it goes, and
     // it must own the object rather than write through to a caller's.
     geometry = answer ? { ...answer } : null;
@@ -107,9 +125,9 @@ export async function moveLayerTo(left: number, top: number): Promise<void> {
   geometry.left = next.left;
   geometry.top = next.top;
   try {
-    await invoke("overlay_set_margins", next);
+    await invoke(commands.setMargins, next);
   } catch {
-    /* older build without the command — the HUD just does not move */
+    /* older build without the command — the surface just does not move */
   }
 }
 
@@ -263,10 +281,22 @@ function suppressNativeDrag(e: MouseEvent) {
  */
 export async function initLayerDrag(opts: {
   onDragEnd: () => void;
+  geometryCommand?: string;
+  setMarginsCommand?: string;
 }): Promise<boolean> {
   notifyDragEnd = opts.onDragEnd;
+  const nextGeo = opts.geometryCommand ?? commands.geometry;
+  const nextMarg = opts.setMarginsCommand ?? commands.setMargins;
+  const rebound =
+    nextGeo !== commands.geometry || nextMarg !== commands.setMargins;
+  commands.geometry = nextGeo;
+  commands.setMargins = nextMarg;
+  if (rebound) {
+    await resolveGeometry();
+  } else {
+    await ready;
+  }
   if (installed) return geometry !== null;
-  await ready;
   if (!geometry) return false;
   installed = true;
   document.addEventListener("mousedown", suppressNativeDrag, true);

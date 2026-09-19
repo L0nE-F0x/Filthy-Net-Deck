@@ -1,9 +1,9 @@
 -- Filthy Net Deck — Hyprland window rules
 --
 -- Why this file exists: Wayland does not let a client position or raise its own
--- surfaces. FND asks for all of this itself (presence.rs `corner_position`,
--- toast.rs `corner_position`, `always_on_top`, `skip_taskbar`), and every one
--- of those calls is a silent no-op under Wayland.
+-- surfaces. FND asks for all of this itself (presence.rs default/saved
+-- geometry, toast.rs `corner_position`, `always_on_top`, `skip_taskbar`), and
+-- every one of those calls is a silent no-op under Wayland.
 --
 -- The Wayland answer is wlr-layer-shell: the HUD, badge, cog menu
 -- and match alert are all promoted to the `overlay` layer at build time
@@ -105,10 +105,9 @@ hl.window_rule({
 hl.window_rule({ match = { title = "^Filthy Net Deck — Alert$" }, pin = true })
 
 -- "Running" presence badge. Not pinned, and *not* given a static `move`:
--- a monitor-corner rule lands it on the Omarchy bar and on whichever
--- workspace was active when the window mapped. Placement is the script
--- below, which parks it in Arena's own bottom-left and follows Arena's
--- workspace. GTK/WebKitGTK often refuses a client size under 200×200;
+-- a monitor-corner rule would fight the user dragging it (same contract
+-- as the HUD). The script below keeps it on Arena's workspace but does
+-- not move it. GTK/WebKitGTK often refuses a client size under 200×200;
 -- max_size lets Hyprland clip that so the transparent remainder cannot
 -- cover the game.
 hl.window_rule({
@@ -263,39 +262,25 @@ local function fnd_place()
     end
 
     dock(badge, function(win)
-      -- Use the real compositor size. GTK often stays at 200×200; pretending
-      -- we resized to 40px parks the *top* of that box in the corner and the
-      -- pill (flex-end, at the bottom) falls off the screen.
-      local bw, bh = fnd_xy(win.size)
-      if bw < 1 then
-        bw = 158
-      end
-      if bh < 1 then
-        bh = 40
-      end
-      local ax, ay = fnd_xy(arena.at)
-      local _, ah = fnd_xy(arena.size)
-      local want_x = ax + FND_MARGIN
-      local want_y = ay + ah - bh - FND_MARGIN
-      local bx, by = fnd_xy(win.at)
-      if math.abs(bx - want_x) > 2 or math.abs(by - want_y) > 2 then
-        hl.dispatch(hl.dsp.window.move({
-          x = want_x,
-          y = want_y,
-          relative = false,
-          window = win,
-        }))
-      end
+      -- Do not move the badge: the user drags it, same as the HUD. Only
+      -- keep it on Arena's workspace (the `dock` wrapper) and park the
+      -- cog menu next to wherever they left it.
       if menu then
         dock(menu, function(mw)
+          local bx, by = fnd_xy(win.at)
+          local _, bh = fnd_xy(win.size)
+          if bh < 1 then
+            bh = 40
+          end
           local _, mh = fnd_xy(mw.size)
           if mh < 1 then
             mh = 320
           end
-          local menu_x = want_x
-          local menu_y = want_y - FND_GAP - mh
+          local _, ay = fnd_xy(arena.at)
+          local menu_x = bx
+          local menu_y = by - FND_GAP - mh
           if menu_y < ay + FND_MARGIN then
-            menu_y = ay + FND_MARGIN
+            menu_y = by + bh + FND_GAP
           end
           local mx, my = fnd_xy(mw.at)
           if math.abs(mx - menu_x) > 2 or math.abs(my - menu_y) > 2 then

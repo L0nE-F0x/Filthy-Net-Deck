@@ -3,16 +3,16 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product versions: Linux v3.9.1 · Windows and macOS v3.8.2**
+**Live product versions: Linux v3.9.2 · Windows and macOS v3.8.2**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
-> **The platforms are on different versions on purpose.** v3.9.0 and
-> v3.9.1 were Linux-only, so `website/version.json` and `updater/latest.json`
-> are still **3.8.2**. The next full release must be **higher than 3.9.1**.
-> Numbered lower, Linux users on 3.9.1 would never be offered it — the in-app
+> **The platforms are on different versions on purpose.** v3.9.0, v3.9.1 and
+> v3.9.2 were Linux-only, so `website/version.json` and `updater/latest.json`
+> are still **3.8.2**. The next full release must be **higher than 3.9.2**.
+> Numbered lower, Linux users on 3.9.2 would never be offered it — the in-app
 > check would see an older number — and pacman would treat the package as a
 > downgrade.
 
@@ -29,34 +29,18 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-19 morning — raise the corner badge into the 1080p frame.
-Not shipped. Code is in the working tree, not committed.**
+**2026-09-19 — v3.9.2 Linux only: drag the presence badge. Closed.**
+Owner verified on the unbundled release binary: the pill moves like the
+HUD and the spot is remembered, so a 16:10 panel can keep it inside a
+1080p recording without a one-machine letterbox margin.
 
-Owner records 1920×1080 Arena on this 1920×1200 (16:10) panel. Exclusive
-fullscreen letterboxes ~48 logical px top and bottom. The badge used a
-16px bottom margin, so the whole 32px pill sat in the black bar under
-the game (screenshot with red arrow). OBS/YouTube never see it.
+Windows/macOS stay on 3.8.2. `website/version.json` and
+`updater/latest.json` stay **3.8.2**. Next full release must be
+**higher than 3.9.2**.
 
-**Done in this tree, not running yet:**
-- `src-tauri/src/presence.rs` — `sixteen_nine_bottom_margin()` adds half
-  the 16:9 letterbox to the bottom margin (1536×960 → **64px**, badge
-  y=864, inside y=48..912 content). Native 16:9 panels stay at 16px.
-- `src-tauri/src/layer_shell.rs` — `reapply()` so `show()` / `presence_set_size`
-  can update an already-promoted surface.
-- Tests pass. `npx tauri build --no-bundle` already produced
-  `src-tauri/target/release/filthy-net-deck` with the change.
-- Did **not** restart FND mid-match. The live process is still
-  **`/usr/bin/filthy-net-deck`** from `filthy-net-deck-bin 3.9.1-1`.
-
-**Tomorrow:**
-1. Owner quits FND from the tray.
-2. Launch the new binary (`src-tauri/target/release/filthy-net-deck`)
-   so they can check the badge in OBS against 1080p.
-3. If it looks right, Linux **3.9.2** (same pipeline as 3.9.1: tarball,
-   GitHub release, PKGBUILD, `linux:recipe`, `meta:site`, homepage
-   Linux labels). Do **not** bump `website/version.json` / updater
-   (Windows/macOS stay 3.8.2). Then `sudo pacman -U` locally.
-4. Do not kill FND while a match is in progress.
+**Still open:** publish `filthy-net-deck-bin` to the AUR the day Arch
+reopens registration. Local `sudo pacman -U` after this ship — agents
+cannot enter the password.
 
 ---
 

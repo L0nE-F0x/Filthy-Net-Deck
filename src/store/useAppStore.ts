@@ -137,7 +137,8 @@ interface Prefs {
   /** Always-on-top match HUD during Arena games (default on). */
   overlayEnabled: boolean;
   /**
-   * Corner badge while Arena is open (default on) — proves the app is running
+   * Presence badge while Arena is open (default on) — proves the app is running.
+   * User-draggable; position is remembered.
    * on the home screen and in the deck builder, where the HUD never shows.
    */
   presenceEnabled: boolean;

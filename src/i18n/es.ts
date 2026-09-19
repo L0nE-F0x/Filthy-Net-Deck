@@ -192,6 +192,9 @@ export const es: Messages = {
     normal: "Ventana normal",
     postMatch: "Resumen post-partida",
     opacity: "Opacidad",
+    dragTitle: "Arrastra para mover",
+    openTitle: "Filthy Net Deck está en marcha — clic para abrir",
+    cogTitle: "Ajustes del overlay",
   },
   autostart: {
     region: "Arrancar con el PC",
@@ -323,6 +326,8 @@ export const es: Messages = {
     overlayOpt: "Overlay (sobre Arena)",
     companionOpt: "Ventana companion",
     presence: "Insignia en esquina mientras Arena está abierto",
+    presenceEm:
+      "Muestra que el tracker está en marcha en la pantalla de inicio y en el constructor de mazos · arrástrala a cualquier sitio · ⚙ para los ajustes entre partidas · se atenúa durante una partida",
     soundscape: "Sonido",
     notifications: "Avisos",
     account: "Cuenta",
