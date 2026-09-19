@@ -3,18 +3,16 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product versions: Linux v3.9.4 · Windows and macOS v3.8.2**
+**Live product version: v3.9.5 on Windows, macOS and Linux**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
-> **The platforms are on different versions on purpose.** v3.9.0–v3.9.4 were
-> Linux-only, so `website/version.json` and `updater/latest.json` are still
-> **3.8.2**. The next full release must be **higher than 3.9.4**. Numbered
-> lower, Linux users on 3.9.4 would never be offered it — the in-app check
-> would see an older number — and pacman would treat the package as a
-> downgrade.
+> The platforms are back on one version. v3.9.0–v3.9.4 were Linux-only and
+> left `version.json` / `updater/latest.json` on 3.8.2; v3.9.5 moved every
+> platform together. A future Linux-only release repeats that exception —
+> see the v3.9.0 entry below for how.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -29,19 +27,73 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+**2026-09-19 — v3.9.5 on all three platforms: Aetherfield holds all of
+Reality Fracture. Live and verified.** The full set is spoiled, so the
+galaxy's catalogue was rebuilt: 118,276 printings (was 117,621). FRA 461
+(was 46), FRC 103 (was 2), TFRA 18 (was 1).
+
+- **Aetherfield** (`../Aetherfield`, commit `95ba26c`, live on
+  mtg-multiverse.netlify.app and `/aetherfield/` here). Scryfall's bulk dump
+  lacked one card (#442 Sphinx's Approach, added after it was cut); it was
+  appended from the search API. See that repo's handoff for the test that
+  the new data broke — a fixed "empty sky" pixel that now has a star on it.
+  PWA checks re-done on the proxy after the refresh: no manifest `id`, `./`
+  scope, no `Service-Worker-Allowed`.
+- **The app also picks up Aetherfield's 2026-09-11 fixes**, never vendored
+  until now: the card panel's close button, and the compass flying to the
+  wrong colour.
+- **Set Radar**: `isConfirmedSlug` now treats MythicSpoiler's alternate
+  printings (`forest1`, `tarmogoyfp`, `gardenizep2`, `tarmogoyff`) as their
+  card once it is in the gallery. FRA unconfirmed 184 → 51. The 51 left are
+  Commander-deck cards (Scryfall: `frc`) and Special Guests, which the
+  matcher only checks against the main set, plus MythicSpoiler misspellings
+  (`campuscriter`, `stingingvirtriol`, `hapatradesertsfrost` vs "Hapatra,
+  the Desert Frost"). Checking against the Commander set too would clear
+  most of them — not done.
+- **CI was red on `main` from the 3.9.4 merge until this release**: an
+  unused `_force` parameter on the presence badge's `closeMenu`. Removed;
+  no behaviour change.
+- `npm run aetherfield` now finds `../Aetherfield` without
+  `AETHERFIELD_DIR`. `website/assets/_gen_og.py` needs Pillow, which this
+  box does not have system-wide: `uv run --no-project --with pillow python
+  website/assets/_gen_og.py`.
+
+Release facts: tag `v3.9.5` on `d2ffda64`, site roll `1e709f8d`. Windows
+NSIS 13,289,565 bytes + 428-byte `.sig`, key id `67FCA9900F523D49`,
+signature verified against the app's pubkey. macOS dmg 33,635,899 bytes,
+size-checked against the release asset. Linux tarball
+`filthy-net-deck-3.9.5-x86_64.tar.gz`, sha256
+`4d9304b750956995be10e0e516562387e33a9679609c178e1c5c1e2c98a1a3b3`,
+re-downloaded from the PKGBUILD URL; its Hyprland lua, `.desktop` and icons
+are byte-identical to 3.9.4's, and no Rust changed. Downloads pruned to
+3.8.2 + 3.9.5. Tests 849/849 frontend, 89 Rust, tsc/eslint/clippy/fmt clean.
+
+Verified live: `version.json` and `updater/latest.json` 3.9.5, both
+installers and the dmg answer 200 at full size, `og-image.png?v=3.9.5`,
+the 8-locale copy, `/meta-web/`, the sitemap, and the homepage recipe
+itself — fetched from the live site, checksum passed, built
+`filthy-net-deck-bin 3.9.5-1`.
+
+**Not done:** installing 3.9.5 on the owner's box (`sudo pacman -U`
+needs their password). In-app Update & restart not exercised on a real
+Windows machine; X share-card cache not checked.
+
+---
+
 **2026-09-19 — v3.9.4 Linux only: drag the presence badge; cog menu
-inline above the pill. Closed.** Owner verified: drag from the dotted
-grip, ⚙ opens overlay settings in the same surface (grows up so the
-pill stays clickable), × / ⚙ / Escape close it. 3.9.2–3.9.3 put the
-menu in a second window that never mapped, then covered the cog.
+inline above the pill. Closed and installed.** Owner verified, then
+`filthy-net-deck-bin 3.9.4-1` is on `/usr/bin` (live process). Drag
+from the dotted grip; ⚙ opens overlay settings in the same surface
+(grows up so the pill stays clickable); × / ⚙ / Escape close it.
+3.9.2–3.9.3 put the menu in a second window that never mapped, then
+covered the cog.
 
 Windows/macOS stay on 3.8.2. `website/version.json` and
 `updater/latest.json` stay **3.8.2**. Next full release must be
 **higher than 3.9.4**.
 
 **Still open:** publish `filthy-net-deck-bin` to the AUR the day Arch
-reopens registration. Local `sudo pacman -U` after this ship — agents
-cannot enter the password.
+reopens registration.
 
 ---
 
