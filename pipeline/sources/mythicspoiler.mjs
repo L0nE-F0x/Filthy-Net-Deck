@@ -78,18 +78,35 @@ export function normalizeSetName(name) {
 const BASIC_LAND_ART = /^(plains|island|swamp|mountain|forest)[tmb]$/;
 
 /**
+ * Suffixes MythicSpoiler puts on an alternate printing of a card it already
+ * has under the plain slug: numbered arts (`forest1`, `emrakul…p3`), showcase
+ * or promo frames (`tarmogoyfp`, `gardenizep2`) and the second frame treatment
+ * (`tarmogoyff`). Each is tried on its own — a single alternation strips the
+ * leftmost match, which turns `swamp1` into `swam` via `p1`.
+ */
+const VARIANT_SUFFIXES = [/\d+$/, /p\d*$/, /f$/];
+
+/**
  * True when a MythicSpoiler slug is already represented in a Scryfall gallery.
  * Besides exact slug match this treats basic-land art variants (`plainst`,
- * `islandm`, `forestb`) as the corresponding basic once that basic is confirmed.
+ * `islandm`, `forestb`) as the corresponding basic once that basic is confirmed,
+ * and an alternate printing (see VARIANT_SUFFIXES) as its card once that card
+ * is. Without the second rule a fully spoiled set kept ~140 "unconfirmed"
+ * duplicates of cards sitting right there in its gallery.
  *
  * @param {string} slug
  * @param {Set<string>} confirmed
  */
 export function isConfirmedSlug(slug, confirmed) {
   if (!slug || !confirmed) return false;
-  if (confirmed.has(slug)) return true;
-  const m = String(slug).match(BASIC_LAND_ART);
-  return Boolean(m && confirmed.has(m[1]));
+  const s = String(slug);
+  if (confirmed.has(s)) return true;
+  const m = s.match(BASIC_LAND_ART);
+  if (m && confirmed.has(m[1])) return true;
+  return VARIANT_SUFFIXES.some((re) => {
+    const base = s.replace(re, "");
+    return base !== s && base.length > 0 && confirmed.has(base);
+  });
 }
 
 export function deslugLabel(slug) {

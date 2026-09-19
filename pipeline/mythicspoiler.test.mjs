@@ -146,6 +146,27 @@ describe("isConfirmedSlug", () => {
     expect(isConfirmedSlug("delightedhalfling", confirmed)).toBe(true);
     expect(isConfirmedSlug("austerecommand", confirmed)).toBe(false);
   });
+
+  it("matches alternate printings once the card itself is confirmed", () => {
+    const confirmed = new Set(["swamp", "forest", "tarmogoyf", "gardenize", "emrakultheexigentdoom"]);
+    expect(isConfirmedSlug("forest1", confirmed)).toBe(true);
+    // Not `swam` + `p1`: each suffix is stripped on its own.
+    expect(isConfirmedSlug("swamp1", confirmed)).toBe(true);
+    expect(isConfirmedSlug("swamp2", confirmed)).toBe(true);
+    expect(isConfirmedSlug("tarmogoyfp", confirmed)).toBe(true);
+    expect(isConfirmedSlug("tarmogoyff", confirmed)).toBe(true);
+    expect(isConfirmedSlug("gardenizep2", confirmed)).toBe(true);
+    expect(isConfirmedSlug("emrakultheexigentdoomp4", confirmed)).toBe(true);
+  });
+
+  it("keeps a variant unconfirmed while its card is not in the gallery", () => {
+    const confirmed = new Set(["tarmogoyf"]);
+    expect(isConfirmedSlug("gardenizep", confirmed)).toBe(false);
+    expect(isConfirmedSlug("gardenizef", confirmed)).toBe(false);
+    expect(isConfirmedSlug("island1", confirmed)).toBe(false);
+    // A suffix that eats the whole slug is not a match against anything.
+    expect(isConfirmedSlug("p", new Set([""]))).toBe(false);
+  });
 });
 
 describe("groupBySet", () => {
