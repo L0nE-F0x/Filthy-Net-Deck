@@ -7655,15 +7655,12 @@ html.overlay-macos .overlay-shell {
   border: 1px solid color-mix(in srgb, var(--color-gold-500) 20%, transparent);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   font-family: var(--font-display);
-  cursor: grab;
-}
-.fnd-presence-bar:active {
-  cursor: grabbing;
 }
 .fnd-presence-grip {
   flex: 0 0 12px;
   width: 12px;
   cursor: grab;
+  user-select: none;
   background-image: radial-gradient(
     circle,
     rgba(232, 234, 240, 0.5) 1px,
@@ -7673,17 +7670,23 @@ html.overlay-macos .overlay-shell {
   background-position: 3px 7px;
   background-repeat: repeat-y;
 }
+.fnd-presence-grip:active {
+  cursor: grabbing;
+}
 .fnd-presence-mark,
 .fnd-presence-cog {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 0 8px;
-  background: none;
+  /* WebKitGTK skips hits on background:none padding, so cog clicks used to
+     land on the bar. A near-invisible fill keeps the whole button clickable. */
+  background: rgba(255, 255, 255, 0.02);
   border: 0;
   color: rgba(232, 234, 240, 0.9);
   font: inherit;
   cursor: pointer;
+  pointer-events: auto;
 }
 .fnd-presence-mark img {
   display: block;

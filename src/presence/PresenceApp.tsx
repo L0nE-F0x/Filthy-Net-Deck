@@ -8,8 +8,12 @@
  * HUD's own pill.
  *
  * Default is bottom-left. The user drags it anywhere — same path as the HUD —
- * and Rust remembers the position. The grip (and the bar chrome around the
- * two buttons) is the handle; the mark and cog stay clicks.
+ * and Rust remembers the position. Only the dotted grip is the handle; the
+ * mark and cog stay clicks. Putting `data-tauri-drag-region` on the whole bar
+ * ate cog clicks: WebKitGTK does not hit-test `background: none` padding, so
+ * the event landed on the bar, Tauri's drag script `preventDefault`ed it, and
+ * the button never saw a click. Hover still worked because :hover uses the
+ * border box.
  *
  * Rust owns show/hide (driven by the Arena process watcher). The cog menu is
  * a second window (`#/presence-menu`) so this surface stays badge-sized.
@@ -310,10 +314,9 @@ export function PresenceApp() {
 
       <div
         className="fnd-presence-bar"
-        data-tauri-drag-region
         onMouseDown={(e) => {
           const target = e.target as HTMLElement | null;
-          if (target?.closest("button")) return;
+          if (!target?.closest(".fnd-presence-grip")) return;
           dragArmed.current = true;
           if (menuOpen) closeMenu(true);
         }}
@@ -334,7 +337,9 @@ export function PresenceApp() {
         <button
           type="button"
           className="fnd-presence-mark"
+          data-tauri-drag-region="false"
           title={t("presence.openTitle")}
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={() => void presenceCall("presence_open_main")}
         >
           <img src="/app-icon.png" alt="" width={20} height={20} />
@@ -346,9 +351,11 @@ export function PresenceApp() {
         <button
           type="button"
           className={`fnd-presence-cog${menuOpen ? " is-open" : ""}`}
+          data-tauri-drag-region="false"
           title={t("presence.cogTitle")}
           aria-expanded={menuOpen}
           aria-haspopup="menu"
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={toggleMenu}
         >
           ⚙

@@ -291,6 +291,24 @@ describe("layerDrag — resizing a promoted HUD", () => {
   });
 });
 
+describe("layerDrag — a click that lands on the drag-region parent", () => {
+  it("starts a drag when the event target is the bar, not the child button", async () => {
+    // The presence cog's padding is background:none; WebKitGTK then reports
+    // the *bar* as the event target. If the bar is the drag region, Tauri
+    // preventDefaults the mousedown and the cog never sees a click.
+    const mod = await load(PROMOTED);
+    document.body.innerHTML =
+      `<header data-tauri-drag-region id="bar"><button id="cog">⚙</button></header>`;
+    await mod.initLayerDrag({ onDragEnd: () => undefined });
+
+    document.getElementById("bar")!.dispatchEvent(pointer("pointerdown", 5, 5));
+    window.dispatchEvent(pointer("pointermove", 20, 10));
+    await settle();
+
+    expect(marginCalls().length).toBeGreaterThan(0);
+  });
+});
+
 describe("layerDrag — a different window's commands", () => {
   it("drives presence commands when that window asks", async () => {
     vi.resetModules();
