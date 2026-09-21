@@ -1,5 +1,6 @@
 import type { MetaBundle } from "../types/meta";
 import { normalizeMetaBundle } from "./deckHelpers";
+import { fetchWithTimeout } from "./http";
 import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
 /** Primary feed URL — official custom domain (legacy Netlify host is fallback). */
@@ -42,9 +43,15 @@ function loadLastGood(): MetaBundle | null {
   }
 }
 
+/** Last successful download, already normalized. Used to paint before network. */
+export function loadCachedMetaBundle(): MetaBundle | null {
+  const cached = loadLastGood();
+  return cached ? normalizeMetaBundle(cached) : null;
+}
+
 async function tryFetch(url: string): Promise<MetaBundle | null> {
   try {
-    const res = await fetch(url, { cache: "no-cache" });
+    const res = await fetchWithTimeout(url, { cache: "no-cache" });
     if (!res.ok) return null;
     const data = (await res.json()) as unknown;
     return isValidBundle(data) ? (data as MetaBundle) : null;

@@ -167,9 +167,25 @@ export default function App() {
     return d != null && d <= 14 ? d : null;
   }, [sets]);
 
+  // Cached meta is enough to leave the splash — don't wait on the network
+  // attempt that `refreshMeta` still runs in the background.
+  useEffect(() => {
+    if (meta) setBootDone(true);
+  }, [meta]);
+
   useEffect(() => {
     void initTracker();
-    void refreshMeta().finally(() => setBootDone(true));
+    let cancelled = false;
+    // Hard ceiling. `refreshMeta` now times out each origin, but a leaked
+    // promise (plugin import, invoke, anything new) must not pin the splash
+    // for the life of the process the way today's hung WebKit fetch did.
+    const watchdog = window.setTimeout(() => {
+      if (!cancelled) setBootDone(true);
+    }, 8_000);
+    void refreshMeta().finally(() => {
+      window.clearTimeout(watchdog);
+      if (!cancelled) setBootDone(true);
+    });
     // Local-only open-day counter (retention; never uploaded).
     void import("./services/localRetention").then((m) => m.recordAppOpen());
     if (useAppStore.getState().prefs.fullscreen) void applyFullscreen(true);
@@ -193,6 +209,10 @@ export default function App() {
         useAppStore.getState().prefs.overlayWindowMode === "companion",
       );
     })();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(watchdog);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

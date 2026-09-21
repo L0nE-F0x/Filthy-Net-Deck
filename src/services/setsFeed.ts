@@ -1,4 +1,5 @@
 import type { SetPreviewCard, SetsBundle } from "../types/sets";
+import { fetchWithTimeout } from "./http";
 import { SITE_ORIGIN, SITE_ORIGINS } from "./site";
 
 const DEFAULT_SETS_URL = `${SITE_ORIGIN}/meta/sets.json`;
@@ -67,7 +68,7 @@ function loadLastGood(): SetsBundle | null {
 
 async function tryFetch(url: string): Promise<SetsBundle | null> {
   try {
-    const res = await fetch(url, { cache: "no-cache" });
+    const res = await fetchWithTimeout(url, { cache: "no-cache" });
     if (!res.ok) return null;
     const data = (await res.json()) as unknown;
     return isValidBundle(data) ? data : null;
@@ -127,7 +128,7 @@ export interface SetGalleryPayload {
 
 async function tryFetchGallery(url: string): Promise<SetGalleryPayload | null> {
   try {
-    const res = await fetch(url, { cache: "default" });
+    const res = await fetchWithTimeout(url, { cache: "default" });
     if (!res.ok) return null;
     const data = (await res.json()) as {
       cards?: SetPreviewCard[];

@@ -3,16 +3,17 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.5 on Windows, macOS and Linux**
+**Live product version: v3.9.6 Linux / v3.9.5 Windows and macOS**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
 
-> The platforms are back on one version. v3.9.0–v3.9.4 were Linux-only and
-> left `version.json` / `updater/latest.json` on 3.8.2; v3.9.5 moved every
-> platform together. A future Linux-only release repeats that exception —
-> see the v3.9.0 entry below for how.
+> v3.9.6 is Linux-only (splash hang on WebKitGTK). `website/version.json`
+> and `updater/latest.json` stay **3.9.5** so Windows/macOS in-app checks
+> do not advertise an update with no installer. The next *full* release
+> must be numbered above 3.9.6. Same exception as v3.9.0–v3.9.4 — see
+> the v3.9.0 entry below for how.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -26,6 +27,36 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-21 — v3.9.6 Linux only: splash cannot hang on boot.**
+WebKitGTK `fetch` of the meta feed stayed pending with no socket
+(NordVPN up, curl 200 in ms). Autostart `--hidden` v3.9.5 sat on
+"Double-checking every card…" all morning; AT-SPI showed the full app
+under the splash. `bootDone` never flipped.
+
+Fix: `fetchWithTimeout` via plugin-http (reqwest) for meta/sets, 8s
+abort; paint `bbi.meta.lastGood` before the network attempt; 8s splash
+watchdog in `App.tsx`. Tests in `http.test.ts` + `metaFeed.test.ts`.
+855 frontend tests.
+
+Linux only. `website/version.json` and `updater/latest.json` stay
+**3.9.5**. Windows/macOS download buttons, `<title>` and OG/Twitter
+stay 3.9.5. Homepage Linux labels, GitHub Linux button, `/meta-web/`
+Linux buttons, PKGBUILD and the recipe tarball are 3.9.6.
+
+Release facts: tag `v3.9.6`. Tarball
+`filthy-net-deck-3.9.6-x86_64.tar.gz`, 17,139,532 bytes, sha256
+`0b4d7f9e850328a6b45592a453f1d5dbf095be1e9f2d6adb8714e9f4a20705d4`.
+macOS CI will attach a 3.9.6 dmg to the GitHub Release as every tag
+does; it is **not** rolled to the site.
+
+**Cost:** existing Linux 3.9.5 installs get no in-app nudge — they
+update by re-running the homepage install line. **Consequence for the
+next full release:** it must be numbered above 3.9.6.
+
+AUR publish of `filthy-net-deck-bin` still waits on Arch registration.
+
+---
 
 **2026-09-19 — v3.9.5 on all three platforms: Aetherfield holds all of
 Reality Fracture. Live and verified.** The full set is spoiled, so the

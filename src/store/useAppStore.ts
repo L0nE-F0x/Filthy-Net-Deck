@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { APP_VERSION } from "../version";
-import { fetchMetaBundle } from "../services/metaFeed";
+import { fetchMetaBundle, loadCachedMetaBundle } from "../services/metaFeed";
 import { fetchSetsBundle } from "../services/setsFeed";
 import { computeDiff, saveSnapshot, type MetaChange } from "../services/metaDiff";
 import {
@@ -1350,7 +1350,24 @@ export const useAppStore = create<AppState>((set, get) => {
     },
 
     refreshMeta: async () => {
-      set({ loading: true, error: null });
+      // Paint yesterday's board immediately so the splash is not gated on a
+      // WebKit `fetch` that can stay pending with no socket (2026-09-21).
+      if (!get().meta) {
+        const cached = loadCachedMetaBundle();
+        if (cached) {
+          set({
+            meta: cached,
+            metaSource: "cache",
+            feedStatus: mapFeedStatus("cache"),
+            loading: false,
+            error: null,
+          });
+        } else {
+          set({ loading: true, error: null });
+        }
+      } else {
+        set({ loading: true, error: null });
+      }
       try {
         const { bundle, from } = await fetchMetaBundle();
         const diff = computeDiff(bundle);
