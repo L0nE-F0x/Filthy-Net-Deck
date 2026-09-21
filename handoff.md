@@ -28,7 +28,10 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-**2026-09-21 — v3.9.6 Linux only: splash cannot hang on boot.**
+**2026-09-21 — session closed. v3.9.6 Linux only is live.** Splash
+cannot hang on boot. Owner installed `filthy-net-deck-bin 3.9.6-1`
+(`/usr/bin`). Autostart and the menu launch that again.
+
 WebKitGTK `fetch` of the meta feed stayed pending with no socket
 (NordVPN up, curl 200 in ms). Autostart `--hidden` v3.9.5 sat on
 "Double-checking every card…" all morning; AT-SPI showed the full app
@@ -37,24 +40,31 @@ under the splash. `bootDone` never flipped.
 Fix: `fetchWithTimeout` via plugin-http (reqwest) for meta/sets, 8s
 abort; paint `bbi.meta.lastGood` before the network attempt; 8s splash
 watchdog in `App.tsx`. Tests in `http.test.ts` + `metaFeed.test.ts`.
-855 frontend tests.
+855 frontend tests. CI on `main` green.
 
 Linux only. `website/version.json` and `updater/latest.json` stay
 **3.9.5**. Windows/macOS download buttons, `<title>` and OG/Twitter
 stay 3.9.5. Homepage Linux labels, GitHub Linux button, `/meta-web/`
 Linux buttons, PKGBUILD and the recipe tarball are 3.9.6.
 
-Release facts: tag `v3.9.6`. Tarball
-`filthy-net-deck-3.9.6-x86_64.tar.gz`, 17,139,532 bytes, sha256
-`0b4d7f9e850328a6b45592a453f1d5dbf095be1e9f2d6adb8714e9f4a20705d4`.
-macOS CI will attach a 3.9.6 dmg to the GitHub Release as every tag
-does; it is **not** rolled to the site.
+Release facts: tag `v3.9.6` on `3436dac0`, GitHub Release marked
+latest. Tarball `filthy-net-deck-3.9.6-x86_64.tar.gz`, 17,139,532
+bytes, sha256
+`0b4d7f9e850328a6b45592a453f1d5dbf095be1e9f2d6adb8714e9f4a20705d4`
+— re-downloaded from the PKGBUILD URL, matched. macOS CI attached
+`Filthy-Net-Deck-3.9.6-universal.dmg` to the same release; it is
+**not** on the site and must not be rolled (Windows/macOS stay 3.9.5).
+
+Verified live: `version.json` / `updater/latest.json` 3.9.5, homepage
+Linux labels + recipe pkgver 3.9.6, `/meta-web/` Linux v3.9.6,
+`og-image.png?v=3.9.5`, both 3.9.5 installers 200.
 
 **Cost:** existing Linux 3.9.5 installs get no in-app nudge — they
 update by re-running the homepage install line. **Consequence for the
 next full release:** it must be numbered above 3.9.6.
 
-AUR publish of `filthy-net-deck-bin` still waits on Arch registration.
+Open: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
+registration. Do not roll the 3.9.6 macOS dmg.
 
 ---
 
