@@ -3,12 +3,20 @@
  *
  * Rust owns show/hide of the window; this only paints the card and runs the
  * fade so the last ~450ms of the linger window isn't a hard cut. Browser demo:
- * `/?demo#/toast`.
+ * `/?demo#/toast` (`/?demo&move#/toast` for the placing card).
+ *
+ * A real alert is click-through, so it cannot be grabbed. `toast_move_mode`
+ * pins a sample (`moving`) that takes the mouse: drag the grip — the same
+ * path as the presence badge — then Done.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { bootThemeFromStorage } from "../services/theme";
 import { isTauri } from "../services/appUpdater";
+import { initLayerDrag, noteLayerPosition } from "../overlay/layerDrag";
+import { snapAndPersist } from "../overlay/snapPersist";
+import { presenceCall } from "../presence/presenceCall";
 import { bodyParts, toneOf } from "./toastModel";
 
 const TOAST_EVENT = "fnd:toast";
@@ -19,11 +27,27 @@ interface ToastPayload {
   title: string;
   body: string;
   lingerMs: number;
+  /** The pinned sample from `toast_move_mode` — takes the mouse, no linger. */
+  moving?: boolean;
+}
+
+const persist = () => snapAndPersist("toast_save_geometry");
+
+/** Back to the top-right corner; keep the margin drag's copy in step. */
+async function resetPosition(): Promise<void> {
+  try {
+    const at = await invoke<{ x: number; y: number } | null>("toast_reset_position");
+    if (at) noteLayerPosition(at.x, at.y);
+  } catch {
+    /* older build */
+  }
 }
 
 export function ToastApp() {
   const [toast, setToast] = useState<ToastPayload | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const dragArmed = useRef(false);
+  const moving = toast?.moving === true;
 
   useEffect(() => {
     bootThemeFromStorage();
@@ -50,6 +74,8 @@ export function ToastApp() {
       window.clearTimeout(fadeTimer);
       setLeaving(false);
       setToast(p);
+      // The placing card stays until Done; Rust closes it, not a timer.
+      if (p.moving) return;
       fadeTimer = window.setTimeout(
         () => setLeaving(true),
         Math.max(FADE_MS, p.lingerMs - FADE_MS),
@@ -58,11 +84,15 @@ export function ToastApp() {
 
     if (!isTauri()) {
       // Browser demo — style the card without Arena or a Tauri event.
-      if (new URLSearchParams(window.location.search).has("demo")) {
+      const q = new URLSearchParams(window.location.search);
+      if (q.has("demo")) {
         push({
           title: "Filthy Net Deck",
-          body: "Win vs Rival · 62% this season · Mythic 95%",
+          body: q.has("move")
+            ? "Drag the grip to place match alerts"
+            : "Win vs Rival · 62% this season · Mythic 95%",
           lingerMs: 60_000,
+          moving: q.has("move"),
         });
       }
     } else {
@@ -92,7 +122,96 @@ export function ToastApp() {
     };
   }, []);
 
+  // Linux/Wayland: a layer surface has no move request, so the grip drives
+  // anchor margins instead. Installs nothing anywhere else.
+  useEffect(() => {
+    if (!moving || !isTauri()) return;
+    void initLayerDrag({
+      onDragEnd: () => void persist(),
+      geometryCommand: "toast_layer_geometry",
+      setMarginsCommand: "toast_set_margins",
+    });
+  }, [moving]);
+
+  // Native drag (Windows, macOS, X11): save once the window stops moving.
+  // Only while the grip is held — Rust's own re-placing on show must not be
+  // recorded as the user's choice.
+  useEffect(() => {
+    if (!moving || !isTauri()) return;
+    let unlisten: (() => void) | undefined;
+    let settle = 0;
+    let gone = false;
+    void (async () => {
+      try {
+        const { getCurrentWindow } = await import("@tauri-apps/api/window");
+        const un = await getCurrentWindow().onMoved(() => {
+          if (!dragArmed.current) return;
+          window.clearTimeout(settle);
+          settle = window.setTimeout(() => void persist(), 140);
+        });
+        if (gone) un();
+        else unlisten = un;
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      gone = true;
+      window.clearTimeout(settle);
+      unlisten?.();
+    };
+  }, [moving]);
+
   if (!toast) return <div className="overlay-empty" />;
+
+  if (moving) {
+    return (
+      <div
+        className="fnd-toast is-neutral is-moving"
+        onPointerDown={(e) => {
+          if (e.button !== 0) return;
+          const target = e.target as HTMLElement | null;
+          dragArmed.current = !!target?.closest(".fnd-toast-grip");
+        }}
+        onPointerUp={() => {
+          if (!dragArmed.current) return;
+          window.setTimeout(() => {
+            dragArmed.current = false;
+            void persist();
+          }, 80);
+        }}
+      >
+        <span
+          className="fnd-toast-grip"
+          data-tauri-drag-region
+          title="Drag to move"
+          aria-hidden="true"
+        />
+        <div className="fnd-toast-body">
+          <strong className="fnd-toast-title">Match alert</strong>
+          <span className="fnd-toast-lead">Drag the grip to place it</span>
+          <span className="fnd-toast-actions">
+            <button
+              type="button"
+              className="fnd-toast-btn"
+              data-tauri-drag-region="false"
+              onClick={() => void resetPosition()}
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              className="fnd-toast-btn is-primary"
+              data-tauri-drag-region="false"
+              onClick={() => void presenceCall("toast_move_mode", { on: false })}
+            >
+              Done
+            </button>
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   const { lead, rest } = bodyParts(toast.body);
   // Prose alerts (tray hint, Set Radar, B&R) have no "·" split — let the line

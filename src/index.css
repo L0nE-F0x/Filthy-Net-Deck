@@ -7617,6 +7617,46 @@ html.overlay-macos .overlay-shell {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Placing the alert (`toast_move_mode`): the one time this card takes the
+   mouse. Dashed edge so it cannot be mistaken for a real result. */
+.fnd-toast.is-moving {
+  border: 1px dashed color-mix(in srgb, var(--color-gold-500) 70%, transparent);
+}
+.fnd-toast-grip {
+  flex: 0 0 22px;
+  cursor: grab;
+  user-select: none;
+  background-color: rgba(232, 234, 240, 0.05);
+  background-image: radial-gradient(circle, rgba(232, 234, 240, 0.55) 1.1px, transparent 1.3px);
+  background-size: 6px 6px;
+  background-position: 5px 4px;
+  border-right: 1px solid rgba(232, 234, 240, 0.08);
+}
+.fnd-toast-grip:active {
+  cursor: grabbing;
+}
+.fnd-toast-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+.fnd-toast-btn {
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid rgba(232, 234, 240, 0.18);
+  /* Opaque — WebKitGTK does not hit-test near-transparent fills well; see
+     .fnd-presence-mark. */
+  background: rgb(22, 25, 36);
+  color: rgba(232, 234, 240, 0.9);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fnd-toast-btn.is-primary {
+  border-color: color-mix(in srgb, var(--color-gold-500) 60%, transparent);
+  color: color-mix(in srgb, var(--color-gold-400) 90%, #fff);
+}
 
 /* -- Corner presence badge (webview #/presence) --
    "FND is running", visible the whole time Arena is open. Defaults to

@@ -62,25 +62,8 @@ pub struct Placement {
 }
 
 impl Placement {
-    /// Top-right corner, matching `toast::corner_position` and the
-    /// `move = "monitor_w-window_w-16 16"` rule in the packaged Hyprland
-    /// config. Anchoring means the compositor re-corners it on a resolution
-    /// change for free, which the old explicit `set_position` had to redo on
-    /// every show.
-    pub fn top_right(margin: i32, size: (f64, f64)) -> Self {
-        Self {
-            left: false,
-            right: true,
-            top: true,
-            bottom: false,
-            margin_x: margin,
-            margin_y: margin,
-            size,
-        }
-    }
-
-    /// Top-left corner with explicit margins — used to honour the HUD's saved
-    /// x/y, since a layer surface is placed by anchors and margins rather than
+    /// Top-left corner with explicit margins — used to honour a saved x/y
+    /// (HUD, badge, alert), since a layer surface is placed by anchors and margins rather than
     /// absolute coordinates.
     pub fn top_left(x: i32, y: i32, size: (f64, f64)) -> Self {
         Self {

@@ -43,3 +43,18 @@ export async function sendTestNotification(): Promise<boolean> {
   );
   return isTauri();
 }
+
+/**
+ * Pin a draggable sample alert (`on`) or put it away. A real alert is
+ * click-through, so this is the only way to place it — Settings and the
+ * badge's ⚙ menu both call it.
+ */
+export async function setAlertMoveMode(on: boolean): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    await invoke("toast_move_mode", { on });
+  } catch {
+    /* command unavailable in browser / older builds */
+  }
+}

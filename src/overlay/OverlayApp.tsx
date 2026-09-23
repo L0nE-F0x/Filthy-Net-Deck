@@ -1395,7 +1395,7 @@ export function OverlayApp() {
         bundle.formats.find((f) => f.featured) ??
         bundle.formats[0];
       if (fmt) {
-        const mode: PlayMode = /Traditional/i.test(hud.eventId) ? "bo3" : "bo1";
+        const mode: PlayMode = hud.bestOf > 1 ? "bo3" : "bo1";
         // Both modes + full format field so Lessons twins don't collapse.
         candidates = inferenceCandidates(bundle.decks, { format: fmt, mode });
         const g = inferOpponentArchetype(

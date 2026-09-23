@@ -76,6 +76,19 @@ export async function subscribeTracker(handlers: {
   return unlisteners;
 }
 
+/** Queue-id segments that only say Bo1/Bo3 — dropped from the label. */
+const BO_TAGS = /^(trad|bo[13]|bestof[13])$/i;
+
+/**
+ * Bo3 queue? Mirrors `best_of_for_event` in `tracker.rs`. Arena does not name
+ * every Bo3 queue `Traditional_*`: Early Access is `Standard_Bo3_EarlyAccess`,
+ * a direct challenge `Constructed_BestOf3`, a Bo3 draft `FRA_Trad_Draft`.
+ */
+export function isBo3Queue(eventId: string): boolean {
+  if (/traditional/i.test(eventId)) return true;
+  return eventId.split("_").some((p) => /^(trad|bo3|bestof3)$/i.test(p));
+}
+
 /** Friendly label for an Arena queue id, e.g. "Traditional_Ladder" → "Standard Ranked · Bo3". */
 export function queueLabel(eventId: string): string {
   const KNOWN: Record<string, string> = {
@@ -87,8 +100,11 @@ export function queueLabel(eventId: string): string {
     Unknown: "Unknown queue",
   };
   if (KNOWN[eventId]) return KNOWN[eventId];
-  const bo3 = eventId.includes("Traditional");
-  let parts = eventId.split("_").filter((p) => p && p !== "Traditional");
+  const bo3 = isBo3Queue(eventId);
+  let parts = eventId
+    .split("_")
+    .filter((p) => p && p !== "Traditional" && !BO_TAGS.test(p))
+    .map((p) => (p === "EarlyAccess" ? "Early Access" : p));
   let kind = "";
   if (parts.includes("Ladder")) {
     kind = "Ranked";

@@ -31,15 +31,21 @@ export interface LayerSize {
 interface LayerGeometry extends LayerMargins, LayerSize {}
 
 /**
- * Which window this module is driving. Overlay and presence are separate
- * webviews, so each instance of this file sees only one of them — pick the
- * commands from the hash so a presence window never reads the HUD's geometry.
+ * Which window this module is driving. Overlay, presence and the match alert
+ * are separate webviews, so each instance of this file sees only one of them —
+ * pick the commands from the hash so no window reads the HUD's geometry.
  */
 function defaultCommands(): { geometry: string; setMargins: string } {
   if (typeof location !== "undefined" && location.hash.includes("presence")) {
     return {
       geometry: "presence_layer_geometry",
       setMargins: "presence_set_margins",
+    };
+  }
+  if (typeof location !== "undefined" && location.hash.includes("toast")) {
+    return {
+      geometry: "toast_layer_geometry",
+      setMargins: "toast_set_margins",
     };
   }
   return {

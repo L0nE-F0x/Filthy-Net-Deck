@@ -20,7 +20,7 @@ import {
   useLocale,
 } from "../i18n";
 import { exportTrackerDiagnostic } from "../services/tracker";
-import { sendTestNotification } from "../services/notify";
+import { sendTestNotification, setAlertMoveMode } from "../services/notify";
 import {
   previewSfx,
   previewSoundPack,
@@ -401,6 +401,29 @@ export const Settings = memo(function Settings() {
   const [autostart, setAutostartState] = useState<boolean | null>(null);
   const markAutostartAsked = useAppStore((s) => s.markAutostartAsked);
   const [testMsg, setTestMsg] = useState<string | null>(null);
+  const [movingAlert, setMovingAlert] = useState(false);
+  // Follow Done pressed on the alert itself, or a real alert ending the mode.
+  useEffect(() => {
+    if (!isTauri()) return;
+    let unlisten: (() => void) | undefined;
+    let gone = false;
+    void import("@tauri-apps/api/event")
+      .then(({ listen }) =>
+        listen<boolean>("toast:moving", (e) => {
+          setMovingAlert(e.payload);
+          if (!e.payload) setTestMsg(null);
+        }),
+      )
+      .then((un) => {
+        if (gone) un();
+        else unlisten = un;
+      })
+      .catch(() => undefined);
+    return () => {
+      gone = true;
+      unlisten?.();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -899,6 +922,19 @@ export const Settings = memo(function Settings() {
                 }}
               >
                 Send test alert
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                title="Real alerts are click-through, so they cannot be grabbed. This pins a sample you can drag — handy when a recording crops the corner."
+                onClick={() => {
+                  const next = !movingAlert;
+                  setMovingAlert(next);
+                  void setAlertMoveMode(next);
+                  setTestMsg(next ? "Drag the alert by its grip, then press Done on it." : null);
+                }}
+              >
+                {movingAlert ? "Done placing alert" : "Move alert"}
               </button>
               {testMsg && (
                 <span className="text-muted text-xs">{testMsg}</span>

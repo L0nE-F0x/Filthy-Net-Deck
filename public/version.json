@@ -1,9 +1,9 @@
 {
-  "version": "3.9.5",
+  "version": "3.9.7",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.5.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.5-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.7.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.7-universal.dmg"
   },
-  "notes": "v3.9.5: Aetherfield now holds all of Reality Fracture — the full 461-card set, its 103 Commander cards and 18 tokens, 118,276 printings in all. The galaxy's card panel closes again, and the colour compass flies to the colour you click."
+  "notes": "v3.9.7: Place the match-end alert anywhere — Settings → Move alert, or Move match alert in the badge's ⚙ menu — so a 1080p recording no longer cuts it off. Reality Fracture Early Access is tracked properly: Bo3 matches record as Bo3 (so do direct challenges and Bo3 drafts) and the queue reads \"Standard Early Access\". Windows and macOS also get 3.9.6's boot fix: the app opens even if the meta download hangs."
 }

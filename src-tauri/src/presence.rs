@@ -153,12 +153,12 @@ fn save_geometry(app: &AppHandle, g: &PresenceGeometry) {
 }
 
 /// Logical monitor rect: (x, y, width, height).
-type MonitorRect = (f64, f64, f64, f64);
+pub(crate) type MonitorRect = (f64, f64, f64, f64);
 
 /// True when enough of the pill overlaps a monitor to grab it. Saved
 /// geometry from an unplugged display / changed layout fails this and
 /// falls back to the bottom-left default (the size is kept).
-fn geometry_reachable(x: f64, y: f64, w: f64, h: f64, monitors: &[MonitorRect]) -> bool {
+pub(crate) fn geometry_reachable(x: f64, y: f64, w: f64, h: f64, monitors: &[MonitorRect]) -> bool {
     const GRAB_W: f64 = 24.0;
     monitors.iter().any(|&(mx, my, mw, mh)| {
         let overlap_w = (x + w).min(mx + mw) - x.max(mx);
@@ -167,7 +167,7 @@ fn geometry_reachable(x: f64, y: f64, w: f64, h: f64, monitors: &[MonitorRect]) 
     })
 }
 
-fn monitor_rects(app: &AppHandle) -> Vec<MonitorRect> {
+pub(crate) fn monitor_rects(app: &AppHandle) -> Vec<MonitorRect> {
     app.available_monitors()
         .map(|monitors| {
             monitors

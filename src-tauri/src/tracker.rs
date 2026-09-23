@@ -1184,11 +1184,7 @@ impl LogParser {
         } else {
             pending.event_id.clone()
         };
-        let best_of = if event_id.contains("Traditional") {
-            3
-        } else {
-            1
-        };
+        let best_of = best_of_for_event(&event_id);
         let (library, library_total) = self.deck_tracker.snapshot();
         let (sideboard, sideboard_total) = sideboard_snapshot(&self.live_sideboard);
         Some(LiveMatch {
@@ -1974,6 +1970,28 @@ fn recount_opponent_seen(tracker: &DeckTracker, pending: &mut PendingMatch) -> b
     changed
 }
 
+/// Bo1 or Bo3, read off the queue id.
+///
+/// Arena names most Bo3 queues `Traditional_*`, but not all of them: the
+/// Early Access events are `Standard_Bo3_EarlyAccess`, a direct challenge is
+/// `Constructed_BestOf3`, and the Bo3 drafts are `<SET>_Trad_Draft`. A
+/// `Traditional`-only check recorded every one of those as Bo1.
+fn best_of_for_event(event_id: &str) -> u8 {
+    // Whole segments for the short tags — "trad" alone would also match
+    // inside unrelated words.
+    let bo3 = event_id.to_ascii_lowercase().contains("traditional")
+        || event_id.split('_').any(|part| {
+            ["trad", "bo3", "bestof3"]
+                .iter()
+                .any(|tag| part.eq_ignore_ascii_case(tag))
+        });
+    if bo3 {
+        3
+    } else {
+        1
+    }
+}
+
 fn finalize_match(
     match_id: String,
     pending: PendingMatch,
@@ -2049,11 +2067,7 @@ fn finalize_match(
     } else {
         pending.event_id
     };
-    let best_of = if event_id.contains("Traditional") {
-        3
-    } else {
-        1
-    };
+    let best_of = best_of_for_event(&event_id);
 
     TrackedMatch {
         match_id,
@@ -3175,6 +3189,41 @@ mod tests {
         assert_eq!(c103.total, 2);
         let c104 = live.sideboard.iter().find(|c| c.grp_id == 104).unwrap();
         assert_eq!(c104.remaining, 1);
+    }
+
+    #[test]
+    fn best_of_reads_every_bo3_queue_arena_names() {
+        // Named `Traditional_*`.
+        assert_eq!(best_of_for_event("Traditional_Ladder"), 3);
+        assert_eq!(best_of_for_event("Traditional_Explorer_Play"), 3);
+        // Not: Early Access (FRA, 2026-09), direct challenge, Bo3 drafts.
+        assert_eq!(best_of_for_event("Standard_Bo3_EarlyAccess"), 3);
+        assert_eq!(best_of_for_event("Constructed_BestOf3"), 3);
+        assert_eq!(best_of_for_event("FRA_Trad_Draft"), 3);
+        assert_eq!(best_of_for_event("Trad_Sealed_FRA"), 3);
+        // Bo1 stays Bo1.
+        assert_eq!(best_of_for_event("Standard_Bo1_EarlyAccess"), 1);
+        assert_eq!(best_of_for_event("Ladder"), 1);
+        assert_eq!(best_of_for_event("FRA_Premier_Draft_EarlyAccess"), 1);
+        assert_eq!(best_of_for_event("Unknown"), 1);
+        // A short tag only counts as a whole segment.
+        assert_eq!(best_of_for_event("Tradewinds_Cube"), 1);
+    }
+
+    #[test]
+    fn early_access_bo3_is_recorded_as_bo3() {
+        let mut p = LogParser::new();
+        p.feed_line(AUTH);
+        p.feed_line(&room_playing("m-ea", "Standard_Bo3_EarlyAccess"));
+        assert_eq!(p.live_match().expect("playing").best_of, 3);
+        let done = p.feed_line(&room_completed(
+            "m-ea",
+            "Standard_Bo3_EarlyAccess",
+            &[(2, "ResultReason_Game"), (2, "ResultReason_Game")],
+            2,
+        ));
+        assert_eq!(done.len(), 1);
+        assert_eq!(done[0].best_of, 3);
     }
 
     #[test]

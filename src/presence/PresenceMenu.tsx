@@ -160,6 +160,22 @@ export function PresenceMenu({
         />
         <span>Show over fullscreen Arena</span>
       </label>
+      <button
+        type="button"
+        className="fnd-presence-open"
+        tabIndex={inert ? -1 : undefined}
+        title="Pins a sample alert you can drag — real alerts are click-through"
+        onClick={
+          inert
+            ? undefined
+            : () => {
+                onRequestClose();
+                void presenceCall("toast_move_mode", { on: true });
+              }
+        }
+      >
+        Move match alert
+      </button>
 
       {overlayClickThroughAvailable() ? (
       <button
