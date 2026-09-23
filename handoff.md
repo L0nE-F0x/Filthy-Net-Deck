@@ -3,17 +3,11 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.6 Linux / v3.9.5 Windows and macOS**
+**Live product version: v3.9.7 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
 · **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
 registration.**
-
-> v3.9.6 is Linux-only (splash hang on WebKitGTK). `website/version.json`
-> and `updater/latest.json` stay **3.9.5** so Windows/macOS in-app checks
-> do not advertise an update with no installer. The next *full* release
-> must be numbered above 3.9.6. Same exception as v3.9.0–v3.9.4 — see
-> the v3.9.0 entry below for how.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -27,6 +21,64 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-24 — v3.9.7 on all three platforms. Live and verified.** Two
+things the owner asked for while playing the Reality Fracture Early Access
+event, plus a data fix that shipped without an app release.
+
+- **Movable match-end alert.** Recording 1080p on the 1920×1200 panel crops
+  60px top and bottom, and the alert sat 16px from the top-right corner.
+  The alert is click-through (it must never take a click mid-match), so it
+  cannot be grabbed; placing it is a mode: Settings → **Move alert**, or
+  **Move match alert** in the badge ⚙ menu (`toast_move_mode`). Drag the
+  grip, Done / Reset. Saved to `toast-geometry.json`, re-checked against the
+  monitors on every show. A real alert arriving ends the mode.
+  `snapAndPersist` moved to `src/overlay/snapPersist.ts`, shared with the badge.
+- **Wayland has no primary monitor** (GDK answers `None`). The old
+  top-right *anchor* hid that; with top-left margins the corner fell back to
+  16,16. `toast::main_monitor` uses the first listed monitor.
+  **`presence::default_xy` has the same bug** — a first-run badge on Wayland
+  with no saved geometry starts top-left, over the HUD. Not fixed; one line.
+- **Early Access Bo3 recorded as Bo1.** Arena names the events
+  `Standard_Bo1_EarlyAccess` / `Standard_Bo3_EarlyAccess` (found in the
+  client's `Raw_ClientLocalization` DB — no EA match in the owner's logs yet).
+  Only "Traditional" counted as Bo3; `Constructed_BestOf3` and `*_Trad_Draft`
+  were wrong too. `tracker::best_of_for_event`, mirrored as `isBo3Queue`.
+  Queue label: "Standard Early Access · Bo3". **Owner decision: Early Access
+  matches stay in the shared Standard stats.**
+- **Reality Fracture card names already worked** via the gap map (Scryfall
+  has 0 `arena_id`s for FRA; mtgajson has all 447 + 20 FRC). Fixed in
+  `2ca36897`, pipeline only: a real card Scryfall mis-tags paper-only
+  (FRA #35 Plan for All Outcomes, MSC Spider-Gwen) gets art from one extra
+  `set:<code> -game:arena` search, only when such a card missed. Live.
+
+Release facts: tag `v3.9.7` on `c109c1f8`, site roll `a7931597`. Windows
+NSIS 13,531,634 bytes + 428-byte `.sig`, key id `67FCA9900F523D49`,
+verified against the app pubkey (control: 3.9.5 exe fails). macOS dmg
+34,154,877 bytes, size-checked. Linux tarball 17,304,513 bytes, sha256
+`480eda5e5e654760405a25400e774cae8f2aa946236cfeb88c47e807bc55c593`,
+re-downloaded from the PKGBUILD URL, matched; the live homepage recipe
+built `filthy-net-deck-bin 3.9.7-1`. Downloads pruned to 3.9.5 + 3.9.7.
+Tests 864 frontend / 91 Rust; CI green on all three jobs.
+
+Verified live: `version.json` + `updater/latest.json` 3.9.7 on both
+hosts (signature byte-identical to the `.sig`; the served exe verifies
+against it), all downloads 200 at full size, `og-image.png?v=3.9.7` equals
+the local file, homepage has no 3.9.5/3.9.6 left, `badge.alert` in all
+eight languages, `/meta-web/` on 3.9.7.
+
+Tested on the owner's box with a dev build, driven through AT-SPI (no
+pointer): default corner 1176,16; saved spot restored after restart;
+Done on the alert and the Settings button stay in sync (`toast:moving`).
+The drag itself was done by a human during the test (saved 62,48 — kept in
+the owner's data dir). One reading showed y=27 instead of 16 and did not
+recur in three retries.
+
+**Not done:** installing 3.9.7 on the owner's box (`sudo pacman -U` needs
+their password). In-app Update & restart not exercised on a real Windows
+machine; X share-card cache not checked.
+
+---
 
 **2026-09-21 — session closed. v3.9.6 Linux only is live.** Splash
 cannot hang on boot. Owner installed `filthy-net-deck-bin 3.9.6-1`
