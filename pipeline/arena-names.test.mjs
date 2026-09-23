@@ -10,6 +10,7 @@ import {
   recentSetCodes,
   scryfallArenaIdsForSet,
   setCodesToSearch,
+  wantsPaperArtRetry,
 } from "./sources/arena-names.mjs";
 
 describe("colorsFromIds", () => {
@@ -622,5 +623,141 @@ describe("buildArenaNameGap — a partial upstream failure must not delete entri
     expect(out["99991"]).toMatchObject({ n: "Swamp", i: "B", l: 1 });
     expect(out["99991"].s).toBeUndefined();
     fetchSpy.mockRestore();
+  });
+});
+
+describe("paper-only art retry — a real card Scryfall mis-tags as paper", () => {
+  it("retries real cards only: not tokens, basics or evergreen dumps", () => {
+    expect(wantsPaperArtRetry("fra", { rarity: 3 }, "Plan for All Outcomes")).toBe(true);
+    // Tokens carry no rarity in Arena's table and live in Scryfall's tfra.
+    expect(wantsPaperArtRetry("fra", { rarity: null }, "Treasure")).toBe(false);
+    expect(wantsPaperArtRetry("fra", {}, "Cadet")).toBe(false);
+    expect(wantsPaperArtRetry("fra", { rarity: 1 }, "Forest")).toBe(false);
+    expect(wantsPaperArtRetry("unf", { rarity: 3 }, "Watery Grave")).toBe(false);
+    expect(wantsPaperArtRetry("ana", { rarity: 1 }, "Zephyr Gull")).toBe(false);
+  });
+
+  // Live 2026-09-23: Reality Fracture #35 is `games: ["paper"]` on Scryfall,
+  // so `set:fra game:arena` never returns it and it published with no art.
+  function mockFra({ paperOnly }) {
+    const queries = [];
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation((u) => {
+      const url = String(u);
+      if (url.includes("/cards.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { grpid: 106226, titleId: 1, set: "FRA", rarity: 2, types: [4] },
+              { grpid: 106261, titleId: 2, set: "FRA", rarity: 3, types: [3] },
+              { grpid: 106565, titleId: 3, set: "FRA", rarity: null, types: [1] },
+            ]),
+        });
+      }
+      if (url.includes("/loc_en.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { id: 1, text: "Academic Ascent" },
+              { id: 2, text: "Plan for All Outcomes" },
+              { id: 3, text: "Treasure" },
+            ]),
+        });
+      }
+      const q = decodeURIComponent((url.match(/q=([^&]+)/) || [])[1] || "");
+      queries.push(q);
+      if (q.includes("-game:arena")) return paperOnly();
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: [
+              {
+                id: "ascent-art",
+                name: "Academic Ascent",
+                type_line: "Instant",
+                arena_id: null,
+                released_at: "2026-10-02",
+              },
+            ],
+            has_more: false,
+          }),
+      });
+    });
+    return { spy, queries };
+  }
+  const sets = [{ code: "fra", released_at: "2026-10-02" }];
+
+  it("gives the mis-tagged card its art from the paper-only prints", async () => {
+    const { spy, queries } = mockFra({
+      paperOnly: () =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              data: [
+                {
+                  id: "plan-art",
+                  name: "Plan for All Outcomes",
+                  type_line: "Sorcery",
+                  arena_id: null,
+                  released_at: "2026-10-02",
+                },
+                // A paper-only variant of a card that already joined must not
+                // steal its art.
+                {
+                  id: "ascent-paper-variant",
+                  name: "Academic Ascent",
+                  type_line: "Instant",
+                  arena_id: null,
+                  released_at: "2026-11-01",
+                },
+              ],
+              has_more: false,
+            }),
+        }),
+    });
+    const out = await buildArenaNameGap({ previous: {}, sets, tries: 1 });
+    expect(out["106261"]).toMatchObject({ n: "Plan for All Outcomes", s: "plan-art", t: "Sorcery" });
+    expect(out["106226"].s).toBe("ascent-art");
+    // The token stays named, without art, and did not cause the extra search.
+    expect(out["106565"]).toMatchObject({ n: "Treasure" });
+    expect(out["106565"].s).toBeUndefined();
+    expect(queries.filter((q) => q.includes("-game:arena"))).toHaveLength(1);
+    spy.mockRestore();
+  });
+
+  it("keeps the entry named when the extra search gets no answer", async () => {
+    const { spy } = mockFra({ paperOnly: () => Promise.reject(new Error("429")) });
+    const out = await buildArenaNameGap({ previous: {}, sets, tries: 1 });
+    expect(out["106261"]).toMatchObject({ n: "Plan for All Outcomes" });
+    expect(out["106261"].s).toBeUndefined();
+    expect(out["106226"].s).toBe("ascent-art");
+    spy.mockRestore();
+  });
+
+  it("makes no extra search when every real card joined", async () => {
+    const { spy, queries } = mockFra({
+      paperOnly: () => Promise.reject(new Error("should not be called")),
+    });
+    // Drop the mis-tagged card: only a joined card and a token remain.
+    const real = spy.getMockImplementation();
+    spy.mockImplementation((u) => {
+      if (String(u).includes("/cards.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              { grpid: 106226, titleId: 1, set: "FRA", rarity: 2, types: [4] },
+              { grpid: 106565, titleId: 3, set: "FRA", rarity: null, types: [1] },
+            ]),
+        });
+      }
+      return real(u);
+    });
+    await buildArenaNameGap({ previous: {}, sets, tries: 1 });
+    expect(queries.some((q) => q.includes("-game:arena"))).toBe(false);
+    spy.mockRestore();
   });
 });

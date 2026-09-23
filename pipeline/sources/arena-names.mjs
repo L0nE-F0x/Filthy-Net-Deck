@@ -428,6 +428,38 @@ export async function scryfallArenaIdsForCodes(codes, tries) {
 }
 
 /**
+ * Should a card that missed the art join get a second look among the set's
+ * paper-only prints?
+ *
+ * Scryfall occasionally tags a real Arena card `games: ["paper"]`, so the
+ * `game:arena` search never sees it. Hit on 2026-09-23 with Reality Fracture
+ * #35 Plan for All Outcomes: named in the overlay, no art, filed under "Other".
+ *
+ * Deliberately narrow, because every yes costs one more Scryfall search:
+ *  - Tokens have no rarity in Arena's table and live in Scryfall's `t<set>`,
+ *    so a paper search of the main set could never find them anyway.
+ *  - Basic lands have their own join rules (artist-keyed, sweep without art).
+ *  - Evergreen dumps already search their paper prints or aliases.
+ */
+export function wantsPaperArtRetry(code, card, name) {
+  if (EVERGREEN_ARENA_SETS.has(String(code || "").toLowerCase())) return false;
+  if (typeof card?.rarity !== "number") return false;
+  return !BASIC_LAND_NAMES.has(name);
+}
+
+/**
+ * A set's prints Scryfall does NOT tag as Arena, indexed like
+ * `scryfallArenaIdsForSet`. Kept apart from the main index on purpose: a
+ * paper-only variant must never displace the art a card already joined to.
+ * Null when the search got no answer.
+ */
+export async function scryfallPaperOnlyIndex(code, tries) {
+  const index = { ids: new Set(), byName: new Map(), byArtist: new Map() };
+  const res = await searchScryfallIndex(`set:${code} -game:arena`, tries, index);
+  return res === null ? null : index;
+}
+
+/**
  * Build `{ [grpId]: { n, c?, i?, m?, l?, s?, t? } }` for Arena cards Scryfall
  * cannot resolve — name, converted mana cost, colour identity, land-ness, and
  * (when the name joins) Scryfall's own card id and type line for art.
@@ -520,6 +552,7 @@ export async function buildArenaNameGap(opts = {}) {
       if (Number.isFinite(grp) && known.has(grp)) delete gap[String(grp)];
     }
     let added = 0;
+    const stragglers = [];
     for (const c of rows) {
       const grp = Number(c?.grpid);
       if (!Number.isFinite(grp) || known.has(grp)) continue;
@@ -549,11 +582,29 @@ export async function buildArenaNameGap(opts = {}) {
         entry.s = sf.id;
         if (sf.typeLine) entry.t = sf.typeLine;
         arted++;
+      } else if (wantsPaperArtRetry(code, c, name)) {
+        stragglers.push({ entry, name, artist: c.artistCredit });
       }
       gap[String(grp)] = entry;
       added++;
     }
     if (added) log(`  arena-names: +${added} from ${code} (Scryfall has no arena_id yet)`);
+    // One extra search, and only for a set where a real card missed its art.
+    // No answer leaves those entries exactly as they were: named, no art.
+    if (stragglers.length) {
+      await new Promise((r) => setTimeout(r, 120));
+      const paper = await scryfallPaperOnlyIndex(code, tries);
+      let rescued = 0;
+      for (const s of stragglers) {
+        const sf = paper && joinScryfall(paper, s.name, s.artist);
+        if (!sf) continue;
+        s.entry.s = sf.id;
+        if (sf.typeLine) s.entry.t = sf.typeLine;
+        arted++;
+        rescued++;
+      }
+      if (rescued) log(`  arena-names: ${rescued} ${code} card(s) got art from paper-only prints`);
+    }
     // Breathe between sets. Each set is several paginated searches, and ten
     // sets back to back is what tripped Scryfall's limiter on 2026-08-12.
     await new Promise((r) => setTimeout(r, 400));
