@@ -44,6 +44,7 @@
   "badge.kicker": "Selo de presença",
   "badge.title": "Você sempre sabe que está rodando.",
   "badge.body": "O overlay de partida só aparece quando o jogo começa — na tela inicial ou no deck builder você ficava no escuro. Agora um <em>selo pequeno fica visível</em> enquanto o Arena estiver aberto: a marca, um ponto ao vivo e um <em>⚙</em> com as configurações que realmente se mexem entre partidas — overlay ligado/desligado, resumo pós-partida, opacidade, avisos em tela cheia. <em>Arraste para onde quiser</em>; a posição é lembrada. Ele apaga durante a partida para o HUD continuar sendo o destaque, e acorda assim que você passa o mouse. Clique na marca para voltar direto ao app. No Linux ele continua clicável sobre o Arena em tela cheia, inclusive depois de você trocar de área de trabalho.",
+  "badge.alert": "O alerta de fim de partida também se move: <em>⚙ → “Move match alert”</em>, arraste para onde quiser e clique em Done. Útil quando uma gravação em 1080p corta o canto; os alertas de verdade continuam deixando todo clique passar para o Arena.",
   "badge.mockHome": "Tela inicial do Arena",
   "badge.mockSettings": "configurações sem alt-tab",
   "badge.mockRow1": "Overlay de partida, entre os jogos",

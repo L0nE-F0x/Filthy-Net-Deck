@@ -44,6 +44,7 @@
   "badge.kicker": "Präsenz-Badge",
   "badge.title": "Du weißt immer, dass es läuft.",
   "badge.body": "Das Match-Overlay taucht erst auf, wenn eine Partie startet — im Hauptmenü oder im Deckbuilder hast du geraten. Jetzt bleibt ein <em>kleines Badge sichtbar</em>, solange Arena offen ist: die Marke, ein Live-Punkt und ein <em>⚙</em> mit genau den Einstellungen, die man zwischen Partien wirklich ändert — Overlay an/aus, Zusammenfassung nach dem Match, Deckkraft, Vollbild-Hinweise. <em>Zieh es wohin du willst</em>; die Position wird gemerkt. Im Match wird es blasser, damit das HUD im Vordergrund bleibt, und wacht auf, sobald du darüberfährst. Klick auf die Marke, um direkt zurück in die App zu springen. Unter Linux bleibt es über Vollbild-Arena klickbar, auch nachdem du die Arbeitsfläche gewechselt hast.",
+  "badge.alert": "Auch der Hinweis nach dem Match lässt sich verschieben: <em>⚙ → „Move match alert“</em>, an die gewünschte Stelle ziehen, Done drücken. Praktisch, wenn eine 1080p-Aufnahme die Ecke abschneidet — echte Hinweise lassen trotzdem jeden Klick zu Arena durch.",
   "badge.mockHome": "Arena-Hauptmenü",
   "badge.mockSettings": "Einstellungen ohne Alt-Tab",
   "badge.mockRow1": "Match-Overlay, zwischen den Partien",
