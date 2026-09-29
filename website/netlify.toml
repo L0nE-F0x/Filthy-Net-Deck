@@ -83,11 +83,16 @@
 # so this response must not switch the policy to same-origin or no-referrer.
 # The HTML is one redirect; the video id is a query string, so the file
 # itself rarely changes.
+#
+# Do NOT set Content-Security-Policy frame-ancestors here. `*` only matches
+# http(s) parents, and WebKit then refuses the tauri:// app with "does not
+# appear in the frame-ancestors directive". No X-Frame-Options either:
+# ALLOWALL is invalid and some clients treat an unknown value as DENY.
+# With neither header, any parent (including tauri://) may frame the page.
 [[headers]]
   for = "/yt-embed.html"
   [headers.values]
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "frame-ancestors *"
     Cache-Control = "public, max-age=300"
 
 # Aetherfield lives on its own Netlify site. Proxy it under this path so
