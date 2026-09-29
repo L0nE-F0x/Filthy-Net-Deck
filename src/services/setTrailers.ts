@@ -63,10 +63,25 @@ export function trailerForSet(opts: {
   return null;
 }
 
+/**
+ * Page that redirects into the embed. YouTube error 153 is a missing
+ * Referer. Linux and macOS production loads the app from `tauri://`, which
+ * sends none, so those builds frame this https page and it steps into the
+ * player. `http:` / `https:` pages (dev server, Windows `tauri.localhost`)
+ * already send one and embed directly.
+ */
+export const YOUTUBE_EMBED_BRIDGE = "https://filthy-net-deck.com/yt-embed.html";
+
 /** Privacy-friendly embed URL (no related videos from other channels). */
-export function youtubeEmbedUrl(youtubeId: string): string {
-  const id = encodeURIComponent(youtubeId);
-  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&autoplay=1`;
+export function youtubeEmbedUrl(youtubeId: string, pageProtocol?: string): string {
+  const id = youtubeId.trim();
+  const direct = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&autoplay=1`;
+  const protocol =
+    pageProtocol ??
+    (typeof location === "undefined" ? "https:" : location.protocol);
+  if (protocol === "http:" || protocol === "https:") return direct;
+  if (!/^[\w-]{11}$/.test(id)) return direct;
+  return `${YOUTUBE_EMBED_BRIDGE}?v=${id}`;
 }
 
 export function youtubeWatchUrl(youtubeId: string): string {

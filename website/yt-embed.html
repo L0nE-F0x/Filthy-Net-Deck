@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>Trailer</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; color: #ddd; font: 14px system-ui, sans-serif; }
+    body { display: grid; place-items: center; }
+    a { color: #fff; }
+  </style>
+</head>
+<body>
+  <p id="msg">Opening the trailer… <a id="watch" href="https://www.youtube.com/">Watch on YouTube</a></p>
+  <script>
+    // YouTube error 153 is a missing Referer. The desktop app is served from
+    // tauri://, which sends none, so the app frames this https page and this
+    // page steps into the embed. Only an 11-character video id is accepted.
+    var id = new URLSearchParams(location.search).get("v") || "";
+    var msg = document.getElementById("msg");
+    if (!/^[\w-]{11}$/.test(id)) {
+      msg.textContent = "This trailer link is not valid.";
+    } else {
+      var embed = "https://www.youtube-nocookie.com/embed/" + id + "?rel=0&autoplay=1";
+      document.getElementById("watch").href = "https://www.youtube.com/watch?v=" + id;
+      location.replace(embed);
+    }
+  </script>
+</body>
+</html>

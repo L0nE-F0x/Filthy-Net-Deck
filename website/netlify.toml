@@ -78,6 +78,18 @@
     Cache-Control = "public, max-age=86400"
     Content-Type = "image/png"
 
+# Sets Radar trailers. The desktop app frames this page, and the page
+# redirects into the YouTube embed. YouTube error 153 is a missing Referer,
+# so this response must not switch the policy to same-origin or no-referrer.
+# The HTML is one redirect; the video id is a query string, so the file
+# itself rarely changes.
+[[headers]]
+  for = "/yt-embed.html"
+  [headers.values]
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "frame-ancestors *"
+    Cache-Control = "public, max-age=300"
+
 # Aetherfield lives on its own Netlify site. Proxy it under this path so
 # filthy-net-deck.com/aetherfield works without a second 7 MB copy in git.
 # `base: './'` in that build makes assets document-relative, so they resolve

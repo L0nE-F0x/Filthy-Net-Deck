@@ -32,11 +32,23 @@ describe("trailerForSet", () => {
 
 describe("youtube urls", () => {
   it("builds embed and watch urls", () => {
-    expect(youtubeEmbedUrl("jPaHUxive30")).toContain(
+    expect(youtubeEmbedUrl("jPaHUxive30", "https:")).toContain(
       "youtube-nocookie.com/embed/jPaHUxive30",
     );
     expect(youtubeWatchUrl("jPaHUxive30")).toBe(
       "https://www.youtube.com/watch?v=jPaHUxive30",
+    );
+  });
+
+  it("sends custom-protocol pages through the site so YouTube gets a Referer", () => {
+    expect(youtubeEmbedUrl("cC6ebvZg-_Q", "tauri:")).toBe(
+      "https://filthy-net-deck.com/yt-embed.html?v=cC6ebvZg-_Q",
+    );
+    expect(youtubeEmbedUrl("cC6ebvZg-_Q", "http:")).toContain(
+      "youtube-nocookie.com/embed/cC6ebvZg-_Q",
+    );
+    expect(youtubeEmbedUrl("not a video", "tauri:")).toContain(
+      "youtube-nocookie.com/embed/",
     );
   });
 });

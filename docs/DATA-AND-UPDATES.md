@@ -221,8 +221,11 @@ an exact-dated entry's day has passed. The app's Sets page renders them as the
 `pipeline/sources/set-trailers.json` (by set code and/or exact name). The sets
 build attaches a `trailer: { youtubeId, title }` field when known; the app also
 keeps a client fallback map so older feeds still show trailers for Nauctis /
-Titanbreach etc. The Sets page plays them in an in-app player
-(youtube-nocookie embed). Never invent video IDs.
+Titanbreach etc. The Sets page plays them in an in-app player. Dev and
+Windows embed `youtube-nocookie` directly. Linux and macOS production are
+`tauri://` pages, which send no Referer, and YouTube answers that with
+error 153 — those builds frame `website/yt-embed.html`, which redirects
+into the same embed. Never invent video IDs.
 
 ---
 
