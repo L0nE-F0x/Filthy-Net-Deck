@@ -6,9 +6,11 @@
 **Live product version: v3.9.7 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
-· **Immediate (2026-09-30):** Sets Radar trailers. The fix is on `main`
-and on the site; `/usr/bin` is still 3.9.7 and still shows YouTube
-error 153. See START HERE. AUR stays the parked product item.
+· **Parked (owner, 2026-09-30, back at the desk):** the Sets Radar
+trailer fix stays on `main` until the next version bump. Do not
+install the local binary and do not cut a release for it alone.
+That bump is all surfaces at once, numbered above 3.9.7, when a
+few more fixes have piled up. AUR stays the other parked item.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -25,11 +27,17 @@ that is expected and does not block auto-update.
 
 **2026-09-30 — Reality Fracture worldwide drop. The set needs no app
 change. Sets Radar trailers are fixed on `main` and on the site; the
-installed binary still shows YouTube error 153.** Owner shut this
-laptop down mid-match to drive to work and asked the next agent to
-finish. Repo is `/home/lonefox/Projects/Filthy-Net-Deck`. The ApexForge
-checkout `~/Projects/ApexForge/Filthy Net Deck` is a stale v3.2.0
-clone — do not edit it.
+installed binary still shows YouTube error 153.** Owner is back and
+**parked the player fix.** Do not tray-quit, do not launch
+`src-tauri/target/release/filthy-net-deck`, do not package it, and
+do not bump the version for this bug alone. The next release is a
+normal all-platform bump, **numbered above 3.9.7**, once a few more
+fixes have piled up: Windows updater, macOS dmg, Linux pacman,
+`version.json`, `updater/latest.json`, homepage, OG card. Signing
+key id `67FCA9900F523D49`; do not rotate. Repo is
+`/home/lonefox/Projects/Filthy-Net-Deck`. The ApexForge checkout
+`~/Projects/ApexForge/Filthy Net Deck` is a stale v3.2.0 clone —
+do not edit it.
 
 ### Reality Fracture — ready, do not rebuild
 
@@ -148,26 +156,30 @@ the build the live process was `/usr/bin/filthy-net-deck --hidden`
 (Proton, appid 2141910). Do not kill Filthy Net Deck mid-match;
 tray-quit first. Agents cannot `sudo pacman -U`.
 
-### What to do at work
+### Held for the next all-platform release
 
-1. Re-check the live headers before trusting the page. A 5-minute cache
-   sat on the bad `frame-ancestors *` response until the second deploy.
-2. Boot autostarts `/usr/bin/filthy-net-deck`, which is pacman 3.9.7-1
-   and still embeds `youtube-nocookie` directly. It will still show
-   error 153.
-3. When they are not in a match: tray-quit, then launch the release
-   binary above. Single-instance — a second launch only raises the old
-   process. The Omarchy launcher and a reboot both start `/usr/bin`
-   again, so this binary is gone on the next boot until it is packaged.
-4. A durable Linux install, and the same fix on macOS, is a release
-   **numbered above 3.9.7**. Do not cut it unless they ask. Signing key
-   id `67FCA9900F523D49`; do not rotate. Windows does not need the
-   bridge (its origin already sends a Referer); the protocol check
-   leaves it on the direct embed. If they do ask for a release, it is
-   the normal all-platform checklist, not a Linux-only version split.
-5. Do not commit `SESSION-2026-09-17-layer-shell.md` or
+Owner, back at the desk on 2026-09-30: leave this bug in the installed
+app until several changes are ready, then bump every surface together.
+Until they ask for that release:
+
+1. Leave `/usr/bin/filthy-net-deck` (pacman 3.9.7-1) running. It still
+   embeds `youtube-nocookie` directly and still shows error 153. The
+   Omarchy launcher starts that binary. The local release binary above
+   is a 3.9.7-versioned build of the fix; launching it would diverge
+   from the package and disappear on the next boot. Do not start it.
+2. The site page can stay. 3.9.7 never requests it. Before the release
+   build, re-check `https://filthy-net-deck.com/yt-embed.html`: 200,
+   `referrer-policy: strict-origin-when-cross-origin`, and **no**
+   `frame-ancestors` header. A 5-minute cache sat on the bad header
+   until `a0bb9d92` deployed.
+3. When they do ask: rebuild (this binary will be stale), number it
+   above 3.9.7, and ship Windows, macOS, and Linux together. Windows
+   does not need the bridge — `http://tauri.localhost` already sends a
+   Referer, and the protocol check leaves it on the direct embed.
+   macOS has the same 153 as Linux.
+4. Do not commit `SESSION-2026-09-17-layer-shell.md` or
    `filthy-net-deck-bin/` (that tree is the old 3.9.6 package).
-6. Still open, not this task: `presence::default_xy` on Wayland (no
+5. Still open, not this task: `presence::default_xy` on Wayland (no
    primary monitor, first-run badge lands top-left). AUR publish when
    Arch reopens registration.
 
