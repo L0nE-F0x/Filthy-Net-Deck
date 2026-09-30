@@ -36,8 +36,9 @@ clone — do not edit it.
 Checked against the live site around 2026-09-29 16:30 UTC (local Sept 30,
 00:30 WITA). Installed package is `filthy-net-deck-bin 3.9.7-1`.
 
-- Sets feed `https://filthy-net-deck.com/meta/sets.json` generatedAt
-  `2026-09-29T12:34:57.688Z`. FRA status `live_on_arena`, dates
+- Sets feed `https://filthy-net-deck.com/meta/sets.json`. The audit
+  read generatedAt `2026-09-29T12:34:57.688Z`; the 19:11 UTC refresh
+  (`eea724c9`) kept the same FRA facts. FRA status `live_on_arena`, dates
   `{tabletop: 2026-10-02, arena: 2026-09-29, prerelease: 2026-09-25}`.
   Arena date is the pipeline estimate (paper minus 3 days), not an
   override — `set-calendar-overrides.json` is still only `msh` and `hob`.
