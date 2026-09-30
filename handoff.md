@@ -6,8 +6,9 @@
 **Live product version: v3.9.7 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck`
-· **Next: publish `filthy-net-deck-bin` to the AUR the day Arch reopens
-registration.**
+· **Immediate (2026-09-30):** Sets Radar trailers. The fix is on `main`
+and on the site; `/usr/bin` is still 3.9.7 and still shows YouTube
+error 153. See START HERE. AUR stays the parked product item.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -21,6 +22,155 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+**2026-09-30 — Reality Fracture worldwide drop. The set needs no app
+change. Sets Radar trailers are fixed on `main` and on the site; the
+installed binary still shows YouTube error 153.** Owner shut this
+laptop down mid-match to drive to work and asked the next agent to
+finish. Repo is `/home/lonefox/Projects/Filthy-Net-Deck`. The ApexForge
+checkout `~/Projects/ApexForge/Filthy Net Deck` is a stale v3.2.0
+clone — do not edit it.
+
+### Reality Fracture — ready, do not rebuild
+
+Checked against the live site around 2026-09-29 16:30 UTC (local Sept 30,
+00:30 WITA). Installed package is `filthy-net-deck-bin 3.9.7-1`.
+
+- Sets feed `https://filthy-net-deck.com/meta/sets.json` generatedAt
+  `2026-09-29T12:34:57.688Z`. FRA status `live_on_arena`, dates
+  `{tabletop: 2026-10-02, arena: 2026-09-29, prerelease: 2026-09-25}`.
+  Arena date is the pipeline estimate (paper minus 3 days), not an
+  override — `set-calendar-overrides.json` is still only `msh` and `hob`.
+  cardCount 461, spoiledCount 461. `formats.standard` includes FRA,
+  enterDate `2026-09-25`. UI label is "On Arena". FRA has no trailer.
+- `freshSpoilers` still 51. Same 3.9.5 leftover: Commander (`frc`),
+  Special Guests, MythicSpoiler misspellings. Not a launch blocker.
+  FRC and TFRA stay off the constructed radar on purpose.
+- Scryfall `fra`: `released_at` 2026-10-02, `card_count` 461.
+  `unique:cards` 285, arena-tagged unique 284, Standard legal.
+  `arena_id` still null, so the gap map is still required.
+- Gap map `https://filthy-net-deck.com/meta/arena-names.json`, 2138
+  entries. mtgajson `cards.json` Last-Modified **Tue, 22 Sep 2026
+  17:33:01 GMT**: FRA 447, FRC 20, TFRA 0. Every one of those grpIds is
+  already in the map (missing: 0). A grpId that exists only in the
+  worldwide client, after that Sept 22 table, shows as `Card #id` until
+  mtgajson updates **and** the hourly sets job republishes
+  `arena-names.json`. Do not invent ids. Alchemy (Y26) is out of scope.
+- Tracker. The match open during the audit was eventId `Ladder` (normal
+  ranked Bo1). 3.9.7 already records `Ladder` / `Traditional_Ladder`
+  and Early Access `Standard_Bo3_EarlyAccess`. No new global-launch
+  event name showed up. Owner decision from 3.9.7 still holds: Early
+  Access matches stay in the shared Standard stats.
+- Meta board `https://filthy-net-deck.com/meta/latest.json` generatedAt
+  `2026-09-29T12:39:25.582Z`, before the public ladder opened. Next
+  cron is 06:00 UTC (`daily-meta.yml`). That lag is the sources, not
+  an app bug. Do not trigger an extra pipeline run unless asked.
+- Aetherfield catalogue `public/aetherfield/data/universe-meta.json`
+  generatedAt `2026-09-19T04:23:41.504Z`, 118,276 printings. FRA 461,
+  FRC 103, TFRA 18 — still matches Scryfall. The bulk dump moved on
+  2026-09-29 (+130 printings, other products). **Do not rebuild the
+  galaxy unprompted.**
+
+### YouTube error 153 — shipped to the site, not to the binary they run
+
+Screenshot was the in-app trailer dialog for **Kamigawa: Titanbreach**
+(`cC6ebvZg-_Q`), "Video player configuration error / Error 153". The
+header "YouTube ↗" is a separate browser open (`openExternal` →
+`youtube.com/watch?v=`). The broken part is the embed.
+
+Cause: Linux and macOS production load from `tauri://localhost`, which
+sends no Referer. YouTube 153 is that missing Referer.
+`referrerpolicy` cannot create one from a non-HTTP parent. Mutating
+the Referer in WebKit `resource-load-started` is too late; it still
+returns 153. Dev (`http://localhost:1420`) and Windows
+(`http://tauri.localhost`) already send one, so they embed
+`youtube-nocookie` directly and were not hitting 153. Do not switch
+the app off `tauri://` (that breaks IPC). Do not use
+`tauri-plugin-localhost`.
+
+Fix, on `origin/main`:
+
+- `3f437996` — `youtubeEmbedUrl` sends non-http(s) pages to
+  `https://filthy-net-deck.com/yt-embed.html?v=ID`. That page accepts
+  only `/^[\w-]{11}$/` and `location.replace`s to
+  `https://www.youtube-nocookie.com/embed/ID?rel=0&autoplay=1`.
+  CSP `frame-src` and `child-src` include `filthy-net-deck.com`,
+  `www.filthy-net-deck.com`, and `filthy-net-deck.netlify.app`.
+- `28c51be4` — merge of the pipeline commits that landed while the
+  fix was local (`0c7ead8f..0502e138`, daily meta + set radar).
+  Merged, not rebased. Do not force-push.
+- `a0bb9d92` — drop `Content-Security-Policy: frame-ancestors *` from
+  `website/netlify.toml`. **`*` only matches http(s) parents.** With
+  that header, WebKit refused the live page from `tauri://`:
+  "does not appear in the frame-ancestors directive." The first deploy
+  had the header; the second removed it. Do not put it back. Do not
+  set `X-Frame-Options: ALLOWALL` (invalid; some clients treat it as
+  DENY). Referrer-Policy stays `strict-origin-when-cross-origin`.
+  Cache-Control `public, max-age=300`.
+
+Known trailer ids, do not invent more: Nauctis `jPaHUxive30`,
+Kamigawa Titanbreach `cC6ebvZg-_Q`, Zhalfir `ZaUhdKIc-yQ`. Map is
+`src/services/setTrailers.ts` and `pipeline/sources/set-trailers.json`.
+
+Verified after `a0bb9d92` deployed (~16:48 UTC):
+
+- `curl -sI https://filthy-net-deck.com/yt-embed.html` → 200,
+  `referrer-policy: strict-origin-when-cross-origin`, **no**
+  `content-security-policy`. `www.` 301s to the apex. The netlify.app
+  host also serves the page.
+- WebKitGTK, secure `tauri://` parent, framing the **live** URL:
+  the embed request's Referer was `https://filthy-net-deck.com/`.
+  Player JS and the thumbnail loaded. The offscreen snapshot said
+  "Your browser can't play this video" — that test has no H.264
+  (`GDK_BACKEND=x11 LIBGL_ALWAYS_SOFTWARE=1
+  WEBKIT_DISABLE_COMPOSITING_MODE=1
+  WEBKIT_DISABLE_DMABUF_RENDERER=1`). That line is not 153. The real
+  app has codecs. Netlify injects an async RUM script after the
+  redirect script; the redirect still ran.
+
+Local binary, built **before** `a0bb9d92` and still the right one
+(that commit is headers only):
+
+```
+src-tauri/target/release/filthy-net-deck
+37780584 bytes, 2026-09-30 00:36 WITA
+sha256 51eea907e4f43821db41fc40268d85a8ce9c7f16488c6eec9e2216b2f7652df5
+```
+
+`npm run tauri:build -- --no-bundle` from this repo. Version string is
+still **3.9.7**. `dist/assets/App-BtAZaA6v.js` contains the bridge URL.
+The executable's CSP `frame-src` includes the site. The JS is compressed
+inside the binary, so `strings` will not show `yt-embed.html`; the asset
+name `App-BtAZaA6v` is there. **Not installed. Not launched.** During
+the build the live process was `/usr/bin/filthy-net-deck --hidden`
+(PID 2098, up since Sep 29 21:03) and Arena was in a Ladder match
+(Proton, appid 2141910). Do not kill Filthy Net Deck mid-match;
+tray-quit first. Agents cannot `sudo pacman -U`.
+
+### What to do at work
+
+1. Re-check the live headers before trusting the page. A 5-minute cache
+   sat on the bad `frame-ancestors *` response until the second deploy.
+2. Boot autostarts `/usr/bin/filthy-net-deck`, which is pacman 3.9.7-1
+   and still embeds `youtube-nocookie` directly. It will still show
+   error 153.
+3. When they are not in a match: tray-quit, then launch the release
+   binary above. Single-instance — a second launch only raises the old
+   process. The Omarchy launcher and a reboot both start `/usr/bin`
+   again, so this binary is gone on the next boot until it is packaged.
+4. A durable Linux install, and the same fix on macOS, is a release
+   **numbered above 3.9.7**. Do not cut it unless they ask. Signing key
+   id `67FCA9900F523D49`; do not rotate. Windows does not need the
+   bridge (its origin already sends a Referer); the protocol check
+   leaves it on the direct embed. If they do ask for a release, it is
+   the normal all-platform checklist, not a Linux-only version split.
+5. Do not commit `SESSION-2026-09-17-layer-shell.md` or
+   `filthy-net-deck-bin/` (that tree is the old 3.9.6 package).
+6. Still open, not this task: `presence::default_xy` on Wayland (no
+   primary monitor, first-run badge lands top-left). AUR publish when
+   Arch reopens registration.
+
+---
 
 **2026-09-24 — v3.9.7 on all three platforms. Live and verified.** Two
 things the owner asked for while playing the Reality Fracture Early Access
