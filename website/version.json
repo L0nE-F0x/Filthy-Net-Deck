@@ -1,9 +1,9 @@
 {
-  "version": "3.9.7",
+  "version": "3.9.8",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.7.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.7-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.8.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.8-universal.dmg"
   },
-  "notes": "v3.9.7: Place the match-end alert anywhere — Settings → Move alert, or Move match alert in the badge's ⚙ menu — so a 1080p recording no longer cuts it off. Reality Fracture Early Access is tracked properly: Bo3 matches record as Bo3 (so do direct challenges and Bo3 drafts) and the queue reads \"Standard Early Access\". Windows and macOS also get 3.9.6's boot fix: the app opens even if the meta download hangs."
+  "notes": "v3.9.8: Set Radar trailers now play inside the app on Linux and macOS — no more YouTube \"Error 153\". Marvel: Darkhold Destiny, announced this week, is on the Set Radar with its official announce trailer."
 }

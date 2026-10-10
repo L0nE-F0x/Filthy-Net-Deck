@@ -3,14 +3,11 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.7 on all three platforms**
+**Live product version: v3.9.8 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
-· repo `L0nE-F0x/Filthy-Net-Deck`
-· **Parked (owner, 2026-09-30, back at the desk):** the Sets Radar
-trailer fix stays on `main` until the next version bump. Do not
-install the local binary and do not cut a release for it alone.
-That bump is all surfaces at once, numbered above 3.9.7, when a
-few more fixes have piled up. AUR stays the other parked item.
+· repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
+`~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
+· **Parked:** AUR publish (Arch registration).
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -24,6 +21,34 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+### 2026-10-10 — v3.9.8 on all three platforms
+
+Owner asked for the bump that ships everything parked. That was the
+trailer player fix (`3f437996`, `a0bb9d92`: Linux/macOS framed
+`yt-embed.html` so YouTube gets a Referer, no more error 153) and MDD
+in the client `BY_CODE` map. Nothing else was waiting: the
+2026-09-01 stash (`-webkit-user-select`) already landed as
+`6bf3628e`; `spike/layer-shell` and both `backup/*` branches are
+patch-equivalent to `main`.
+
+Release facts: tag `v3.9.8` on `03dd8cae`. Windows NSIS 14,258,582
+bytes + 428-byte `.sig`, key `67FCA9900F523D49`, verified against the
+app pubkey with a Python minisign check (control: 3.9.7 exe fails);
+`latest.json` signature byte-identical to the `.sig`. Linux tarball
+18,075,259 bytes, sha256 `0d06ac39…bab3b9`, re-downloaded from the
+PKGBUILD URL, matched. macOS universal dmg 35,748,856 bytes
+(sha256 `c40e0a29…f7e172`), size-checked against the release asset. CI
+green on `03dd8cae`. Homepage: version labels, OG/Twitter copy,
+`og-image.png?v=3.9.8`, Set Radar blurb's trailer example
+Nauctis → Marvel: Darkhold Destiny in all eight languages.
+`/meta-web/` regenerated. Downloads pruned to 3.9.7 + 3.9.8.
+Tests 866 frontend; tsc/eslint clean. Rust unchanged since 3.9.7.
+
+Gotcha found this session: in Claude Code's Bash, `grep` is a shell
+function wrapping ugrep with `--ignore-files`, so it **skips
+gitignored paths like `dist/`** and reports "not found". Use
+`command grep` when inspecting build output.
 
 ### 2026-10-10 — Marvel: Darkhold Destiny (MDD) on the Sets Radar
 
@@ -39,9 +64,31 @@ Announced at NYCC. No app change, no version bump: data-only.
 - Trailer `srkVFoW4t08` (official @mtg announce, checked via oEmbed),
   in `set-trailers.json` `byCode.mdd` (ships through the feed now) and
   in `setTrailers.ts` `BY_CODE` (ships with the next bump).
-- Done by Antigravity in the stale ApexForge clone, then ported here
-  by Claude. That clone still holds those edits plus CRLF noise across
-  ~700 files. Leave it alone; it is not the repo.
+- Done by Antigravity in an old v3.2.0 clone, then ported by Claude.
+
+### 2026-10-10 — the repo lives at `~/Projects/ApexForge/Filthy Net Deck`
+
+That is the owner's chosen home and the only checkout. From about
+September, sessions drifted to `~/Projects/Filthy-Net-Deck` while the
+ApexForge folder sat at v3.2.0; the owner did not know. Consolidated
+2026-10-10: the up-to-date repo (stash, branches, untracked files,
+`filthy-net-deck-bin/`) was moved into the ApexForge path, and
+`~/Projects/Filthy-Net-Deck` no longer exists. The old v3.2.0 clone's
+contents were parked at `~/Projects/ApexForge/Filthy Net Deck.stale-v3.2.0`
+(nothing unique in it: its three local branches are patch-equivalent
+to `origin/main`). **Do not recreate `~/Projects/Filthy-Net-Deck`.**
+
+- `src-tauri/target` was `cargo clean`ed after the move: build-script
+  outputs hold absolute paths, and the first build failed reading
+  `…/Projects/Filthy-Net-Deck/src-tauri/target/…/app_hide.toml`. The
+  path has spaces; cargo-xwin and NSIS built fine with it.
+- `~/.local/share/applications/filthy-net-deck-handler.desktop` (the
+  `fnd://` dev handler) now points at the new path.
+- Orca still has a workspace registered at the old path; re-add it
+  from the app if it is used.
+
+*(Superseded 2026-10-10: the parked trailer fix shipped in v3.9.8.
+The release instructions below are history.)*
 
 **2026-09-30 — Reality Fracture worldwide drop. The set needs no app
 change. Sets Radar trailers are fixed on `main` and on the site; the
@@ -52,10 +99,8 @@ do not bump the version for this bug alone. The next release is a
 normal all-platform bump, **numbered above 3.9.7**, once a few more
 fixes have piled up: Windows updater, macOS dmg, Linux pacman,
 `version.json`, `updater/latest.json`, homepage, OG card. Signing
-key id `67FCA9900F523D49`; do not rotate. Repo is
-`/home/lonefox/Projects/Filthy-Net-Deck`. The ApexForge checkout
-`~/Projects/ApexForge/Filthy Net Deck` is a stale v3.2.0 clone —
-do not edit it.
+key id `67FCA9900F523D49`; do not rotate. (Repo path: see the
+2026-10-10 note above — it is the ApexForge folder now.)
 
 ### Reality Fracture — ready, do not rebuild
 
