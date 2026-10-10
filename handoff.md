@@ -84,8 +84,7 @@ build output), and deleted after v3.9.8 went live. **Do not recreate `~/Projects
   path has spaces; cargo-xwin and NSIS built fine with it.
 - `~/.local/share/applications/filthy-net-deck-handler.desktop` (the
   `fnd://` dev handler) now points at the new path.
-- Orca still has a workspace registered at the old path; re-add it
-  from the app if it is used.
+- Orca is uninstalled; its leftover `~/.config/orca` was removed.
 
 *(Superseded 2026-10-10: the parked trailer fix shipped in v3.9.8.
 The release instructions below are history.)*
