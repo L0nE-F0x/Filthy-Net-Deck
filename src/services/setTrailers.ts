@@ -19,6 +19,11 @@ export interface SetTrailer {
 /** Known official announce trailers (as of 2026-07-18). */
 const BY_CODE: Record<string, SetTrailer> = {
   // Add Scryfall set codes here as trailers ship and we verify them.
+  // Verified 2026-10-10 via YouTube oEmbed: author "Magic: The Gathering" (@mtg).
+  mdd: {
+    youtubeId: "srkVFoW4t08",
+    title: "Marvel: Darkhold Destiny Official Announcement",
+  },
 };
 
 const BY_NAME: Record<string, SetTrailer> = {

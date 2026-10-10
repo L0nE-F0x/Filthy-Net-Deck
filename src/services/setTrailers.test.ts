@@ -15,6 +15,11 @@ describe("trailerForSet", () => {
     expect(z?.youtubeId).toBe("ZaUhdKIc-yQ");
   });
 
+  it("matches Marvel: Darkhold Destiny by Scryfall code", () => {
+    const m = trailerForSet({ code: "MDD", name: "Marvel: Darkhold Destiny" });
+    expect(m?.youtubeId).toBe("srkVFoW4t08");
+  });
+
   it("prefers feed trailer over client map", () => {
     const t = trailerForSet({
       name: "Nauctis: The Sunken Realm",

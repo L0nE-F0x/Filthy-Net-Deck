@@ -25,6 +25,24 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-10-10 — Marvel: Darkhold Destiny (MDD) on the Sets Radar
+
+Announced at NYCC. No app change, no version bump: data-only.
+
+- Scryfall `mdd` (Universes Beyond expansion, Standard). Tabletop
+  `2027-04-09`, Arena estimated `2027-04-06`. The hourly sets job picked
+  it up on its own (`7e14bb10`). The `mdc` Commander companion stays off
+  the radar on purpose.
+- `future-sets.json`: removed the April 2027 "Universes Beyond
+  (unannounced)" row. Name-based self-healing could not match it to MDD,
+  so the radar showed both.
+- Trailer `srkVFoW4t08` (official @mtg announce, checked via oEmbed),
+  in `set-trailers.json` `byCode.mdd` (ships through the feed now) and
+  in `setTrailers.ts` `BY_CODE` (ships with the next bump).
+- Done by Antigravity in the stale ApexForge clone, then ported here
+  by Claude. That clone still holds those edits plus CRLF noise across
+  ~700 files. Leave it alone; it is not the repo.
+
 **2026-09-30 — Reality Fracture worldwide drop. The set needs no app
 change. Sets Radar trailers are fixed on `main` and on the site; the
 installed binary still shows YouTube error 153.** Owner is back and
@@ -118,7 +136,8 @@ Fix, on `origin/main`:
   Cache-Control `public, max-age=300`.
 
 Known trailer ids, do not invent more: Nauctis `jPaHUxive30`,
-Kamigawa Titanbreach `cC6ebvZg-_Q`, Zhalfir `ZaUhdKIc-yQ`. Map is
+Kamigawa Titanbreach `cC6ebvZg-_Q`, Zhalfir `ZaUhdKIc-yQ`,
+Marvel: Darkhold Destiny `srkVFoW4t08`. Map is
 `src/services/setTrailers.ts` and `pipeline/sources/set-trailers.json`.
 
 Verified after `a0bb9d92` deployed (~16:48 UTC):

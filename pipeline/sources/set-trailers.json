@@ -6,7 +6,12 @@
     "Future Standard sets usually only have a byName entry until Scryfall catalogs them.",
     "youtubeId is the 11-char watch?v= value (e.g. jPaHUxive30)."
   ],
-  "byCode": {},
+  "byCode": {
+    "mdd": {
+      "youtubeId": "srkVFoW4t08",
+      "title": "Marvel: Darkhold Destiny Official Announcement"
+    }
+  },
   "byName": {
     "Nauctis: The Sunken Realm": {
       "youtubeId": "jPaHUxive30",
