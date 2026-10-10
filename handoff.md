@@ -74,9 +74,9 @@ ApexForge folder sat at v3.2.0; the owner did not know. Consolidated
 2026-10-10: the up-to-date repo (stash, branches, untracked files,
 `filthy-net-deck-bin/`) was moved into the ApexForge path, and
 `~/Projects/Filthy-Net-Deck` no longer exists. The old v3.2.0 clone's
-contents were parked at `~/Projects/ApexForge/Filthy Net Deck.stale-v3.2.0`
-(nothing unique in it: its three local branches are patch-equivalent
-to `origin/main`). **Do not recreate `~/Projects/Filthy-Net-Deck`.**
+contents were parked, re-checked (its local branches are
+patch-equivalent to `origin/main`, no stash, nothing untracked but
+build output), and deleted after v3.9.8 went live. **Do not recreate `~/Projects/Filthy-Net-Deck`.**
 
 - `src-tauri/target` was `cargo clean`ed after the move: build-script
   outputs hold absolute paths, and the first build failed reading
