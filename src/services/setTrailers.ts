@@ -24,6 +24,16 @@ const BY_CODE: Record<string, SetTrailer> = {
     youtubeId: "srkVFoW4t08",
     title: "Marvel: Darkhold Destiny Official Announcement",
   },
+  // Verified 2026-10-10 via YouTube oEmbed: both posted by @mtg, 16:9, not Shorts.
+  // IGN's "Official Teaser Trailer" (WGHbOJs-sQk) is a mirror of the trk one.
+  trk: {
+    youtubeId: "t2gYfON_-Ng",
+    title: "Magic: The Gathering x Star Trek Official Teaser",
+  },
+  fra: {
+    youtubeId: "oF8ouCqIAiY",
+    title: "I Alone | Reality Fracture Official Trailer",
+  },
 };
 
 const BY_NAME: Record<string, SetTrailer> = {

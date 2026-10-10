@@ -20,6 +20,11 @@ describe("trailerForSet", () => {
     expect(m?.youtubeId).toBe("srkVFoW4t08");
   });
 
+  it("matches Star Trek and Reality Fracture by Scryfall code", () => {
+    expect(trailerForSet({ code: "trk", name: "Star Trek" })?.youtubeId).toBe("t2gYfON_-Ng");
+    expect(trailerForSet({ code: "FRA", name: "Reality Fracture" })?.youtubeId).toBe("oF8ouCqIAiY");
+  });
+
   it("prefers feed trailer over client map", () => {
     const t = trailerForSet({
       name: "Nauctis: The Sunken Realm",

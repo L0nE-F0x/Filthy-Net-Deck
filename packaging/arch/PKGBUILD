@@ -14,7 +14,7 @@
 pkgname=filthy-net-deck-bin
 _pkgname=filthy-net-deck
 pkgver=3.9.8
-pkgrel=1
+pkgrel=2
 pkgdesc="MTG Arena meta companion and match tracker — Standard & Pioneer"
 arch=('x86_64')
 url="https://filthy-net-deck.com"
@@ -33,6 +33,14 @@ depends=(
   'libayatana-appindicator'
   'librsvg'
   'gst-plugins-good'
+  # Set Radar trailers: YouTube streams through Media Source Extensions, and
+  # WebKitGTK only offers MSE an audio codec it can parse *and* decode. Without
+  # these two, AAC is missing (gst-libav) and Opus has no parser (opusparse,
+  # gst-plugins-bad), so YouTube finds no playable audio and shows "Your
+  # browser can't play this video". Video was never the problem. Measured on
+  # the maintainer's box 2026-10-10: the trailer played only with both.
+  'gst-libav'
+  'gst-plugins-bad'
   # Hard dependency, not optional: the HUD, presence badge, cog menu and match
   # alert are all promoted to wlr-layer-shell `overlay` surfaces under Wayland
   # (src-tauri/src/layer_shell.rs). That is the only way a client can sit above
@@ -44,8 +52,6 @@ depends=(
 optdepends=(
   'hyprland: window rules for the overlay, match alert and presence badge'
   'steam: run MTG Arena through Proton'
-  'gst-libav: set trailer playback (H.264 decoding)'
-  'gst-plugins-bad: set trailer playback (additional codecs)'
   'ttf-cascadia-code: HUD clock and decklist monospace (Windows uses Cascadia)'
 )
 install="${pkgname}.install"

@@ -45,6 +45,23 @@ Nauctis → Marvel: Darkhold Destiny in all eight languages.
 `/meta-web/` regenerated. Downloads pruned to 3.9.7 + 3.9.8.
 Tests 866 frontend; tsc/eslint clean. Rust unchanged since 3.9.7.
 
+**After 3.9.8 the trailer still did not play on Linux — fixed in the
+package, `filthy-net-deck-bin 3.9.8-2`.** Error 153 was gone (the
+Referer fix works) but YouTube said "Your browser can't play this
+video". The 2026-09-30 note's assumption that "the real app has codecs"
+was wrong. Measured with a WebKitGTK 2.52 probe on the owner's box:
+every video codec passes `MediaSource.isTypeSupported`, but **no audio
+codec does** — AAC has no decoder (`gst-libav`) and Opus has no parser
+for MSE (`opusparse`, in `gst-plugins-bad`). With both, the real trailer
+played (clock advancing), without them the exact error showed. Both
+moved from `optdepends` to `depends`, `pkgrel=2`, recipe repacked; the
+binary tarball and its sha are unchanged. Installed users get the
+codecs by re-running the homepage install line. Windows (WebView2) and
+macOS (WKWebView) ship their own codecs.
+
+Trailers added the same day, feed now + client map next bump:
+Star Trek `trk` and Reality Fracture `fra` (see known trailer ids).
+
 Gotcha found this session: in Claude Code's Bash, `grep` is a shell
 function wrapping ugrep with `--ignore-files`, so it **skips
 gitignored paths like `dist/`** and reports "not found". Use
@@ -181,7 +198,10 @@ Fix, on `origin/main`:
 
 Known trailer ids, do not invent more: Nauctis `jPaHUxive30`,
 Kamigawa Titanbreach `cC6ebvZg-_Q`, Zhalfir `ZaUhdKIc-yQ`,
-Marvel: Darkhold Destiny `srkVFoW4t08`. Map is
+Marvel: Darkhold Destiny `srkVFoW4t08`, Star Trek `t2gYfON_-Ng`
+(official @mtg teaser; IGN's `WGHbOJs-sQk` is a mirror), Reality Fracture
+`oF8ouCqIAiY`. Check channel via oEmbed (`author_url` must be @mtg) and
+reject Shorts (`/shorts/<id>` answers 200). Map is
 `src/services/setTrailers.ts` and `pipeline/sources/set-trailers.json`.
 
 Verified after `a0bb9d92` deployed (~16:48 UTC):
