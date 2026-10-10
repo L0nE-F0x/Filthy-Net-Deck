@@ -62,6 +62,17 @@ macOS (WKWebView) ship their own codecs.
 Trailers added the same day, feed now + client map next bump:
 Star Trek `trk` and Reality Fracture `fra` (see known trailer ids).
 
+**Open at session close (2026-10-10):**
+1. Owner to re-run the homepage install line (pulls `3.9.8-2` with
+   `gst-libav` + `gst-plugins-bad`), restart FND, and play the MDD or
+   Star Trek trailer. Not yet confirmed in the real app; the probe
+   result is strong but it was a standalone WebKitGTK window.
+2. X post about Darkhold Destiny drafted in chat (three options), not
+   saved to a file; owner posts it. OG card already markets MDD.
+3. The `trk`/`fra` client-map entries ship with the next bump; the feed
+   already carries them, so nothing waits on that.
+4. AUR publish still parked (Arch registration).
+
 Gotcha found this session: in Claude Code's Bash, `grep` is a shell
 function wrapping ugrep with `--ignore-files`, so it **skips
 gitignored paths like `dist/`** and reports "not found". Use
