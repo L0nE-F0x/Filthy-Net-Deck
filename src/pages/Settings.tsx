@@ -101,9 +101,9 @@ function TrackerHealthCard() {
       </div>
       {diagMsg && <p className="text-xs text-muted m-0 mt-2">{diagMsg}</p>}
       <p className="text-[10px] text-muted m-0 mt-2 leading-relaxed">
-        Diagnostic file = parser counters and flags only (no player names, no match
-        data, no file paths). If the tracker breaks after an Arena update, attach it
-        to a GitHub issue so the log parser can be fixed fast.
+        Diagnostic file = tracker and overlay counters and flags only (no player
+        names, no match data, no file paths). If the tracker or the in-game overlay
+        breaks, attach it to a GitHub issue or bug report so it can be fixed fast.
       </p>
     </section>
   );

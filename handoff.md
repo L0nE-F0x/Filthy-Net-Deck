@@ -22,6 +22,25 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-10-11 — overlay diagnostics, committed locally, ships with the next bump
+
+A Windows 11 user on 3.9.8 reported the match HUD never shows ("Show match
+overlay" on, detailed logs on, 17 matches recorded, zero errors). Nothing
+Windows-side changed in the overlay since 3.8.2 (all 3.9.x overlay work is
+`cfg(linux)`), so the leading suspects are Arena in exclusive fullscreen,
+Companion mode, or a stranded saved position. Owner emailed them those three
+checks and told them the next update adds overlay detail to the diagnostic.
+
+That detail is done and **committed but not pushed** — it rides the next
+version bump with whatever else lands; do not ship it alone. "Export
+diagnostic" now carries an `"overlay"` section (`overlay::diagnostic`):
+mode, enabled, closed-by-user, window exists/visible/minimized/on-screen,
+saved position on-screen, monitor count, and show-requested / show-completed /
+build-error counters. Flags and counters only, no coordinates; key set pinned
+by `diagnostic_is_flags_and_counters_only`. The file is local-only (user
+pastes it), so README / index.html / privacy.html are unaffected. Release
+notes for the bump should mention it.
+
 ### 2026-10-10 — v3.9.8 on all three platforms
 
 Owner asked for the bump that ships everything parked. That was the

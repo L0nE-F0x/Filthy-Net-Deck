@@ -5,7 +5,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Mutex;
 use tauri::{AppHandle, LogicalSize, Manager, WebviewUrl, WebviewWindowBuilder};
 
@@ -38,6 +38,12 @@ static COMPANION: AtomicBool = AtomicBool::new(false);
 /// User closed the companion this match — stay hidden until the next match id.
 static USER_CLOSED: AtomicBool = AtomicBool::new(false);
 static LAST_MATCH: Mutex<String> = Mutex::new(String::new());
+/// Diagnostic counters — see [`diagnostic`]. `show` asked (overlay enabled),
+/// `show` reached `win.show()`, and webview builds that failed. Requests with
+/// no completions point at the window; no requests at all point at the tracker.
+static SHOW_REQUESTS: AtomicU32 = AtomicU32::new(0);
+static SHOWS_COMPLETED: AtomicU32 = AtomicU32::new(0);
+static BUILD_ERRORS: AtomicU32 = AtomicU32::new(0);
 /// Does the app *want* the HUD on screen? Distinct from whether it is actually
 /// shown: on Hyprland the compositor watcher hides it whenever Arena's
 /// workspace is off screen, and this is what says whether to bring it back.
@@ -395,6 +401,7 @@ pub fn show(app: &AppHandle) {
     if !is_enabled() {
         return;
     }
+    SHOW_REQUESTS.fetch_add(1, Ordering::Relaxed);
     #[cfg(target_os = "linux")]
     WANT_VISIBLE.store(true, Ordering::SeqCst);
     // Arena is on a workspace that is not on screen — see `crate::hypr`. The
@@ -404,6 +411,7 @@ pub fn show(app: &AppHandle) {
         return;
     }
     if let Err(e) = ensure_window(app) {
+        BUILD_ERRORS.fetch_add(1, Ordering::Relaxed);
         eprintln!("[overlay] ensure_window: {e}");
         return;
     }
@@ -412,6 +420,7 @@ pub fn show(app: &AppHandle) {
         #[cfg(target_os = "linux")]
         let _ = crate::layer_shell::reveal(&win);
         let _ = win.show();
+        SHOWS_COMPLETED.fetch_add(1, Ordering::Relaxed);
         // Overlay never steals Arena input. Companion may, so the user can
         // alt-tab to it — but still don't yank focus on auto-show.
         if is_companion() {
@@ -543,6 +552,7 @@ pub fn prewarm_if_enabled(app: &AppHandle) {
         return;
     }
     if let Err(e) = ensure_window(app) {
+        BUILD_ERRORS.fetch_add(1, Ordering::Relaxed);
         eprintln!("[overlay] prewarm: {e}");
     }
 }
@@ -754,6 +764,84 @@ pub fn overlay_is_companion() -> bool {
     is_companion()
 }
 
+/// The overlay's half of the exported diagnostic. Flags and counters only —
+/// never coordinates, which would describe the user's monitor layout. Every
+/// field answers one "why is the HUD not showing?" question that a bug report
+/// otherwise has to ask by email.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OverlayDiagnostic {
+    enabled: bool,
+    /// "overlay" (always on top) or "companion" (ordinary window).
+    mode: &'static str,
+    /// Companion closed by the user — hidden until the next match.
+    closed_by_user: bool,
+    post_match: bool,
+    click_through: bool,
+    window_exists: bool,
+    window_visible: Option<bool>,
+    window_minimized: Option<bool>,
+    /// `None` when there is no window, no monitor list, or the HUD is a
+    /// layer surface (which cannot report its own position).
+    window_on_screen: Option<bool>,
+    layer_surface: bool,
+    saved_position: bool,
+    saved_position_on_screen: Option<bool>,
+    monitors: usize,
+    show_requests: u32,
+    shows_completed: u32,
+    build_errors: u32,
+}
+
+pub fn diagnostic(app: &AppHandle) -> OverlayDiagnostic {
+    let rects = monitor_rects(app);
+    let reachable =
+        |g: &OverlayGeometry| (!rects.is_empty()).then(|| geometry_reachable(g, &rects));
+
+    #[cfg(target_os = "linux")]
+    let layer_surface = LAYER_GEOMETRY.lock().map(|g| g.is_some()).unwrap_or(false);
+    #[cfg(not(target_os = "linux"))]
+    let layer_surface = false;
+
+    let win = app.get_webview_window(OVERLAY_LABEL);
+    let window_on_screen = win.as_ref().filter(|_| !layer_surface).and_then(|w| {
+        let pos = w.outer_position().ok()?;
+        let size = w.outer_size().ok()?;
+        let f = w.scale_factor().ok()?.max(0.5);
+        reachable(&OverlayGeometry {
+            x: pos.x as f64 / f,
+            y: pos.y as f64 / f,
+            width: size.width as f64 / f,
+            height: size.height as f64 / f,
+            expanded: false,
+        })
+    });
+    let saved = load_geometry(app);
+
+    OverlayDiagnostic {
+        enabled: is_enabled(),
+        mode: if is_companion() {
+            "companion"
+        } else {
+            "overlay"
+        },
+        closed_by_user: USER_CLOSED.load(Ordering::SeqCst),
+        post_match: is_post_match_enabled(),
+        click_through: CLICK_THROUGH.load(Ordering::SeqCst),
+        window_exists: win.is_some(),
+        window_visible: win.as_ref().and_then(|w| w.is_visible().ok()),
+        window_minimized: win.as_ref().and_then(|w| w.is_minimized().ok()),
+        window_on_screen,
+        layer_surface,
+        saved_position: saved.is_some(),
+        saved_position_on_screen: saved.as_ref().and_then(reachable),
+        monitors: rects.len(),
+        show_requests: SHOW_REQUESTS.load(Ordering::Relaxed),
+        shows_completed: SHOWS_COMPLETED.load(Ordering::Relaxed),
+        build_errors: BUILD_ERRORS.load(Ordering::Relaxed),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -781,6 +869,60 @@ mod tests {
         // A second monitor with negative coords rescues the same position.
         let two = [(0.0, 0.0, 1920.0, 1080.0), (-2560.0, 0.0, 2560.0, 1440.0)];
         assert!(geometry_reachable(&geo(-2400.0, 50.0), &two));
+    }
+
+    #[test]
+    fn diagnostic_is_flags_and_counters_only() {
+        // The export promises no coordinates and no paths. Pin the exact key
+        // set so a new field is a deliberate decision, not a drive-by.
+        let d = OverlayDiagnostic {
+            enabled: true,
+            mode: "overlay",
+            closed_by_user: false,
+            post_match: true,
+            click_through: false,
+            window_exists: true,
+            window_visible: Some(true),
+            window_minimized: Some(false),
+            window_on_screen: Some(true),
+            layer_surface: false,
+            saved_position: true,
+            saved_position_on_screen: None,
+            monitors: 2,
+            show_requests: 3,
+            shows_completed: 3,
+            build_errors: 0,
+        };
+        let v = serde_json::to_value(&d).unwrap();
+        let mut keys: Vec<&str> = v.as_object().unwrap().keys().map(String::as_str).collect();
+        keys.sort_unstable();
+        assert_eq!(
+            keys,
+            [
+                "buildErrors",
+                "clickThrough",
+                "closedByUser",
+                "enabled",
+                "layerSurface",
+                "mode",
+                "monitors",
+                "postMatch",
+                "savedPosition",
+                "savedPositionOnScreen",
+                "showRequests",
+                "showsCompleted",
+                "windowExists",
+                "windowMinimized",
+                "windowOnScreen",
+                "windowVisible",
+            ]
+        );
+        for (k, val) in v.as_object().unwrap() {
+            assert!(
+                val.is_boolean() || val.is_number() || val.is_null() || k == "mode",
+                "{k} is not a flag or counter"
+            );
+        }
     }
 
     #[test]

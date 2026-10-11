@@ -488,8 +488,8 @@ pub fn tracker_export_decklists(app: AppHandle, decks: Vec<DeckExport>) -> Resul
     Ok(dir.display().to_string())
 }
 
-/// C6 — write an anonymized parser-health file to Downloads and reveal it.
-/// Contains ONLY counters and flags: no player names, no opponents, no match
+/// C6 — write an anonymized parser + overlay health file to Downloads and
+/// reveal it. Contains ONLY counters and flags: no player names, no opponents, no match
 /// contents, no file paths (the log path embeds the OS username). Safe to
 /// attach to a public GitHub issue when the tracker misbehaves after an
 /// Arena update.
@@ -536,6 +536,9 @@ pub fn tracker_export_diagnostic(
             // the fast path and this is the trail to it.
             "persistRepairs": persist_repair_count(),
         },
+        // "Matches record but the HUD never shows" is otherwise undiagnosable
+        // from this file — the tracker half above is all green in that case.
+        "overlay": crate::overlay::diagnostic(&app),
     });
     let body = serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?;
 
