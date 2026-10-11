@@ -1,9 +1,9 @@
 {
-  "version": "3.9.8",
+  "version": "3.9.9",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.8.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.8-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.9.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.9-universal.dmg"
   },
-  "notes": "v3.9.8: Set Radar trailers now play inside the app on Linux and macOS — no more YouTube \"Error 153\". Marvel: Darkhold Destiny, announced this week, is on the Set Radar with its official announce trailer."
+  "notes": "v3.9.9: Windows — the match overlay, companion window, corner badge and match-end alert open again. They had silently stopped appearing in 3.7.0; tracking and stats were never affected. Export diagnostic (Settings → Tracker health) now includes overlay health too."
 }

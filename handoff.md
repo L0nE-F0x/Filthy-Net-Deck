@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.8 on all three platforms**
+**Live product version: v3.9.9 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -22,24 +22,50 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-### 2026-10-11 — overlay diagnostics, committed locally, ships with the next bump
+### 2026-10-11 — v3.9.9: the Windows overlay was broken since 3.7.0
 
-A Windows 11 user on 3.9.8 reported the match HUD never shows ("Show match
-overlay" on, detailed logs on, 17 matches recorded, zero errors). Nothing
-Windows-side changed in the overlay since 3.8.2 (all 3.9.x overlay work is
-`cfg(linux)`), so the leading suspects are Arena in exclusive fullscreen,
-Companion mode, or a stranded saved position. Owner emailed them those three
-checks and told them the next update adds overlay detail to the diagnostic.
+**Live product version is now v3.9.9 on all three platforms.**
 
-That detail is done and **committed but not pushed** — it rides the next
-version bump with whatever else lands; do not ship it alone. "Export
-diagnostic" now carries an `"overlay"` section (`overlay::diagnostic`):
-mode, enabled, closed-by-user, window exists/visible/minimized/on-screen,
-saved position on-screen, monitor count, and show-requested / show-completed /
-build-error counters. Flags and counters only, no coordinates; key set pinned
-by `diagnostic_is_flags_and_counters_only`. The file is local-only (user
-pastes it), so README / index.html / privacy.html are unaffected. Release
-notes for the bump should mention it.
+A Windows 11 user reported the match HUD never showing on 3.9.8 while
+tracking and stats worked. The follow-up checks found it: the Settings test
+alert, the corner badge **and the opaque companion window** all failed to
+appear too — so no secondary webview was ever being built, not a z-order
+or transparency problem. He dated it to "beginning of September".
+
+**Cause:** `7af5c41a` (2026-09-05, shipped in 3.7.0) gave the main window
+`additionalBrowserArgs` in `tauri.conf.json`. The four secondary builders
+(overlay, presence + menu, toast) set none, so they got wry's defaults.
+WebView2 shares one browser process per data folder and refuses a webview
+whose args differ — Tauri documents it on `additional_browser_args`. Every
+Windows user lost the overlay, companion, badge and alerts from 3.7.0 to
+3.9.8; nobody else reported it. Linux/macOS ignore browser args.
+
+**Fix (`744c54ff`):** `with_main_browser_args()` in `lib.rs` copies the main
+window's args from the config onto every secondary builder; a test reads
+the shipped `tauri.conf.json`. **Rule: any new secondary webview must go
+through that helper.** **Not verified on Windows hardware** — none was
+available; owner chose to ship since the worst case is the status quo.
+
+Also shipped: `4e435258`, an `"overlay"` section in Export diagnostic (mode,
+window exists/visible/on-screen, saved position reachable, show-requested /
+shows-completed / build-error counters). If the fix did not take, a fresh
+diagnostic shows `buildErrors > 0` — that is the next clue.
+
+Release facts: tag `v3.9.9` on `9592607f`. Windows NSIS 14,352,145 bytes,
+`.sig` verified against the app pubkey (key `67FCA9900F523D49`) with a Node
+minisign check — 3.9.8 exe vs 3.9.9 sig fails, 3.9.8's own sig passes;
+`latest.json` signature is the `.sig` byte for byte. Linux tarball
+18,194,101 bytes, sha256 `a13483a0…b6b6b0`, re-downloaded from the release
+and matched; PKGBUILD 3.9.9-1 keeps the gst codec depends. macOS universal dmg
+35,945,826 bytes (sha256 `98619afd…9f5110`), size-checked against the
+release asset; CI green. OG card "WINDOWS OVERLAY FIX". Downloads pruned to 3.9.8 +
+3.9.9. Tests 867 frontend / 93 Rust / 142 pipeline.
+
+**Open:**
+1. Owner emails the reporter that 3.9.9 is out (draft in that session's
+   chat: "should fix it — please let me know"), and asks for a fresh
+   diagnostic if the overlay still does not show.
+2. Real-Windows confirmation of the fix is still outstanding.
 
 ### 2026-10-10 — v3.9.8 on all three platforms
 

@@ -1,11 +1,11 @@
 {
-  "version": "3.9.8",
-  "notes": "v3.9.8: Set Radar trailers now play inside the app on Linux and macOS \u2014 no more YouTube \"Error 153\". Marvel: Darkhold Destiny, announced this week, is on the Set Radar with its official announce trailer.",
-  "pub_date": "2026-10-10T07:48:44Z",
+  "version": "3.9.9",
+  "notes": "v3.9.9: Windows \u2014 the match overlay, companion window, corner badge and match-end alert open again. They had silently stopped appearing in 3.7.0; tracking and stats were never affected. Export diagnostic (Settings \u2192 Tracker health) now includes overlay health too.",
+  "pub_date": "2026-10-11T14:08:41Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244Wit0R0N6SFVJUmZqTGc2YUtXSXNodXpWaE5IWG5zaWliTDVUc3ZKM0FPdEt4ZlprTjRRRm1LVnZveTV6bzRoSW44OW5FUWJ3UnRSbXdzSWtxZm8zMlFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNjE4MzcwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS44X3g2NC1zZXR1cC5leGUKVnlJbjB4UXRBcUVKZE1wbHVDZGV5OVBCUE94cFRxaDVEU2piMWdydlFQZGFFNXBOWVlRbGIzSWJoTEtnblBWdW03bGhUcTRsQlRHU0JvNysxWEQ3QlE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.8.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFSUFhrL21zVngvaDVFb0E2Q0RDQlpTdm5XN3VnM250ak9nT2tWUWg3L2hqOWhCTzRQYnI4bHYvdWJJT0lDRS9Nb2hiaXc2dy9zZzJWcjJ5WkEreUFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI3NDc3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS45X3g2NC1zZXR1cC5leGUKdEtnQzlSaWVESFRuRWF0Vkl3UThYOUUvUm85ZHM4bjFxZ1NiY3JhNjRFdkVRV0Z6Ukdqd3o5WE02MU9scG4yc3FkcDEwQldrRHZhTlp1RnlyTWg0QUE9PQo=",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.9.exe"
     }
   }
 }
