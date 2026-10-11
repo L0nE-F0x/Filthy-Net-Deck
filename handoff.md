@@ -62,10 +62,16 @@ release asset; CI green. OG card "WINDOWS OVERLAY FIX". Downloads pruned to 3.9.
 3.9.9. Tests 867 frontend / 93 Rust / 142 pipeline.
 
 **Open:**
-1. Owner emails the reporter that 3.9.9 is out (draft in that session's
-   chat: "should fix it — please let me know"), and asks for a fresh
-   diagnostic if the overlay still does not show.
-2. Real-Windows confirmation of the fix is still outstanding.
+1. **Waiting on the reporter.** Owner emailed him 2026-10-11 that 3.9.9 is
+   out: update, press Settings → Send test alert, play a game, report back;
+   if nothing shows, send a fresh Export diagnostic. His reply is the first
+   real-Windows test of the fix. Works → close this out. Still broken →
+   read `overlay.buildErrors` / `showRequests` / `showsCompleted` in his
+   diagnostic before touching code.
+2. Live checks done 2026-10-11: updater + version.json at 3.9.9, live exe
+   identical to the build and its signature valid, dmg / sig / recipe /
+   OG image all 200. Not checked: in-app Update & restart on Windows, the
+   X share preview.
 
 ### 2026-10-10 — v3.9.8 on all three platforms
 
