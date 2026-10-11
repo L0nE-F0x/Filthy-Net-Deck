@@ -224,6 +224,7 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
         Some((x, y)) => builder.position(x, y),
         None => builder,
     };
+    let builder = crate::with_main_browser_args(app, builder);
 
     let win = builder.build().map_err(|e| e.to_string())?;
 

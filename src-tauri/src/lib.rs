@@ -95,6 +95,34 @@ pub(crate) fn refuse_if_main_thread(who: &str) -> bool {
     true
 }
 
+/// Give a secondary webview the main window's WebView2 launch flags.
+///
+/// WebView2 runs every webview that shares a data folder in one browser
+/// process, and that process is started with the first webview's flags. A
+/// later webview asking for different flags is refused outright — Tauri's own
+/// warning: "Webview instances with different browser arguments must also have
+/// different data directories." v3.7.0 gave the main window
+/// `additionalBrowserArgs` in `tauri.conf.json` and nothing else, so from then
+/// on every overlay, companion, badge and alert build on Windows failed and
+/// nothing ever appeared. Reading the flags from the config keeps the two in
+/// step whenever they change. A no-op off Windows.
+pub(crate) fn with_main_browser_args<'a>(
+    app: &tauri::AppHandle,
+    builder: tauri::WebviewWindowBuilder<'a, tauri::Wry, tauri::AppHandle>,
+) -> tauri::WebviewWindowBuilder<'a, tauri::Wry, tauri::AppHandle> {
+    match main_browser_args(&app.config().app.windows) {
+        Some(args) => builder.additional_browser_args(&args),
+        None => builder,
+    }
+}
+
+fn main_browser_args(windows: &[tauri::utils::config::WindowConfig]) -> Option<String> {
+    windows
+        .iter()
+        .find(|w| w.label == "main")
+        .and_then(|w| w.additional_browser_args.clone())
+}
+
 /// Drop a secondary webview (overlay / toast / presence / presence-menu).
 ///
 /// Every platform destroys. Each of these windows is a whole renderer process
@@ -505,7 +533,9 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    use super::{note_os_fullscreen_on_hide, remember_fullscreen_pref, wants_fullscreen};
+    use super::{
+        main_browser_args, note_os_fullscreen_on_hide, remember_fullscreen_pref, wants_fullscreen,
+    };
 
     // One test so the process-wide flag cannot race with itself under
     // cargo's default parallel runner.
@@ -530,6 +560,29 @@ mod tests {
         assert!(
             !wants_fullscreen(),
             "F11 / Exit fullscreen must not come back on the next tray show"
+        );
+    }
+
+    #[test]
+    fn secondary_webviews_get_the_main_windows_browser_args() {
+        // The shipped config is what decides it, so test against that file:
+        // if the main window has flags, the helper must hand back exactly
+        // those, or every secondary webview fails to build on Windows.
+        let conf: serde_json::Value =
+            serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+        let windows: Vec<tauri::utils::config::WindowConfig> =
+            serde_json::from_value(conf["app"]["windows"].clone()).unwrap();
+        let configured = conf["app"]["windows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|w| w["label"] == "main")
+            .and_then(|w| w["additionalBrowserArgs"].as_str())
+            .map(str::to_owned);
+        assert_eq!(main_browser_args(&windows), configured);
+        assert!(
+            configured.is_some(),
+            "test is vacuous without main-window args"
         );
     }
 }

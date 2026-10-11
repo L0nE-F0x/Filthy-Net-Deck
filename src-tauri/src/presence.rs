@@ -303,6 +303,7 @@ fn ensure_window(app: &AppHandle) -> Result<(), String> {
     let builder = builder.transparent(true);
 
     let builder = builder.position(x, y);
+    let builder = crate::with_main_browser_args(app, builder);
 
     let win = builder.build().map_err(|e| e.to_string())?;
 
@@ -353,6 +354,7 @@ fn ensure_menu_window(app: &AppHandle, width: f64, height: f64) -> Result<(), St
         Some((x, y)) => builder.position(x, y),
         None => builder,
     };
+    let builder = crate::with_main_browser_args(app, builder);
 
     let win = builder.build().map_err(|e| e.to_string())?;
 

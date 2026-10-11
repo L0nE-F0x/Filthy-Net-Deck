@@ -350,6 +350,7 @@ pub fn ensure_window(app: &AppHandle) -> Result<(), String> {
         Some(g) if pos_ok => builder.position(g.x, g.y),
         _ => builder,
     };
+    let builder = crate::with_main_browser_args(app, builder);
 
     let win = builder.build().map_err(|e| e.to_string())?;
 
