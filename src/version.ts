@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.9.8";
+export const APP_VERSION = "3.9.9";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,6 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Set Radar trailers play inside the app on Linux and macOS — no more YouTube \"Error 153\"",
-  "Marvel: Darkhold Destiny is on the Set Radar with its official announce trailer"
+  "Windows: the match overlay, companion window, corner badge and match-end alert open again — they had silently stopped since 3.7.0",
+  "Export diagnostic now reports overlay health, so a HUD that won't show can be pinned down from one file"
 ];
