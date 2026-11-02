@@ -3,6 +3,7 @@ import {
   deslugLabel,
   groupBySet,
   isConfirmedSlug,
+  withinEdits,
   mergeSpoilerLists,
   normalizeSlug,
   parseMonthDay,
@@ -49,6 +50,9 @@ describe("normalizeSlug", () => {
   it("matches a Scryfall name to its MythicSpoiler slug", () => {
     expect(normalizeSlug("Delighted Halfling")).toBe("delightedhalfling");
     expect(normalizeSlug("Azog, Moria's Ruin")).toBe("azogmoriasruin");
+    // Accents fold rather than vanish — MythicSpoiler slugs "Võx" as "vox".
+    expect(normalizeSlug("Võx, Child of the Collective")).toBe("voxchildofthecollective");
+    expect(normalizeSlug("Lim-Dûl's Vault")).toBe("limdulsvault");
   });
 });
 
@@ -166,6 +170,27 @@ describe("isConfirmedSlug", () => {
     expect(isConfirmedSlug("island1", confirmed)).toBe(false);
     // A suffix that eats the whole slug is not a match against anything.
     expect(isConfirmedSlug("p", new Set([""]))).toBe(false);
+  });
+
+  it("absorbs MythicSpoiler typos on long slugs only", () => {
+    const confirmed = new Set(["subspaceanomaly", "melkotianadjudicator", "jettrenoproblemsolver", "forest"]);
+    expect(isConfirmedSlug("supspaceanomaly", confirmed)).toBe(true); // 1 edit
+    expect(isConfirmedSlug("melkotianadjucator", confirmed)).toBe(true); // 2 edits
+    expect(isConfirmedSlug("jettrenoroblemsolverf", confirmed)).toBe(true); // typo + frame variant
+    // Three edits is a different card, not a typo.
+    expect(isConfirmedSlug("melkotianadjuster", confirmed)).toBe(false);
+    // Short slugs stay exact: "forests" is not "forest".
+    expect(isConfirmedSlug("forests", confirmed)).toBe(false);
+  });
+});
+
+describe("withinEdits", () => {
+  it("bounds Levenshtein distance", () => {
+    expect(withinEdits("kitten", "sitting", 3)).toBe(true);
+    expect(withinEdits("kitten", "sitting", 2)).toBe(false);
+    expect(withinEdits("abc", "abc", 0)).toBe(true);
+    expect(withinEdits("abc", "abcdef", 2)).toBe(false);
+    expect(withinEdits("", "ab", 2)).toBe(true);
   });
 });
 

@@ -281,6 +281,54 @@ export function tokenSetCodesFor(code, allSets) {
     .filter(Boolean);
 }
 
+/**
+ * Products released alongside an expansion that MythicSpoiler files in the same
+ * folder: everything descended from it through `parent_set_code`. For Star Trek
+ * that is the Commander decks (`trc`), the Stardates reprint sheet (`sds`) and
+ * the Commander tokens (`ttrc`). Art-series cards are left out (their names
+ * repeat the main set's), and so are the direct token sets the gallery already
+ * fetched.
+ *
+ * Only used to *confirm* fresh spoilers. These products never join the radar —
+ * Commander stays off the constructed radar on purpose.
+ */
+export function relatedSetCodesFor(code, allSets) {
+  const root = String(code).toLowerCase();
+  const already = new Set(tokenSetCodesFor(root, allSets));
+  const out = [];
+  const seen = new Set([root]);
+  const queue = [root];
+  while (queue.length) {
+    const parent = queue.shift();
+    for (const s of allSets || []) {
+      const c = String(s?.code || "").toLowerCase();
+      if (!c || seen.has(c)) continue;
+      if (String(s.parent_set_code || "").toLowerCase() !== parent) continue;
+      seen.add(c);
+      queue.push(c);
+      if (s.set_type === "memorabilia" || already.has(c)) continue;
+      out.push(c);
+    }
+  }
+  return out;
+}
+
+/**
+ * Names a raw Scryfall card goes by besides `name`: its flavour name (Universes
+ * Beyond reprints — Stardates prints Mogis, God of Slaughter as "Worf, Regent
+ * of Qo'noS", and MythicSpoiler slugs the Worf name) and each face's name and
+ * flavour name.
+ */
+export function altNamesOf(c) {
+  const out = [];
+  if (c?.flavor_name) out.push(c.flavor_name);
+  for (const f of c?.card_faces || []) {
+    if (f?.name) out.push(f.name);
+    if (f?.flavor_name) out.push(f.flavor_name);
+  }
+  return out;
+}
+
 function slugKeysForName(name) {
   const n = String(name || "");
   const keys = [normalizeSlug(n)];
@@ -320,9 +368,12 @@ function applyMythicSpoilerDates(galleryCards, mythicCards) {
  *
  * @param {Array<{name:string}>} galleryCards confirmed Scryfall gallery
  * @param {Array<{slug:string,name:string,image:string}>} mythicCards for this set
+ * @param {string[]} [knownNames] other names Scryfall already has for this
+ *   release: flavour names, tokens, and the sibling products MythicSpoiler
+ *   files under the same set (see `relatedSetCodesFor`)
  * @returns {Array<{slug:string,name:string,image:string,source:string,sourceUrl:string}>}
  */
-function buildFreshSpoilers(galleryCards, mythicCards) {
+export function buildFreshSpoilers(galleryCards, mythicCards, knownNames = []) {
   if (!mythicCards?.length) return [];
   // Confirmed keys: the full normalized name AND, for DFC/split names
   // ("Front // Back"), the front face alone — MythicSpoiler slugs the front
@@ -330,6 +381,9 @@ function buildFreshSpoilers(galleryCards, mythicCards) {
   const confirmed = new Set();
   for (const c of galleryCards || []) {
     for (const k of slugKeysForName(c.name)) confirmed.add(k);
+  }
+  for (const n of knownNames) {
+    for (const k of slugKeysForName(n)) confirmed.add(k);
   }
   return mythicCards
     .filter((c) => c.slug && !isConfirmedSlug(c.slug, confirmed))
@@ -346,10 +400,12 @@ function buildFreshSpoilers(galleryCards, mythicCards) {
 /**
  * Fetch set cards from Scryfall.
  * @param {string} code
- * @param {{ maxCards?: number, order?: string, dir?: string, isToken?: boolean }} [opts]
+ * @param {{ maxCards?: number, order?: string, dir?: string, isToken?: boolean, onRaw?: (c: object) => void }} [opts]
  *   maxCards — stop after this many (omit for full gallery). Slim samples use
  *   rarity order so the rail/hero still look good without shipping 300+ cards.
  *   isToken — mark every mapped card as a token (child token-set fetch).
+ *   onRaw — sees each raw Scryfall card, for fields the published card omits
+ *   (flavour names, for the fresh-spoiler match).
  */
 async function fetchAllSetCards(code, opts = {}) {
   const maxCards = typeof opts.maxCards === "number" ? opts.maxCards : Infinity;
@@ -387,6 +443,7 @@ async function fetchAllSetCards(code, opts = {}) {
       }
       for (const c of data.data || []) {
         cards.push(mapCard(c, opts));
+        opts.onRaw?.(c);
         if (cards.length >= maxCards) break;
       }
       path =
@@ -722,9 +779,16 @@ export async function buildSetsBundle() {
     void isRecent;
     const fullGallery = true;
 
+    const altNames = [];
+    const collectAltNames = (c) => altNames.push(...altNamesOf(c));
     let cards = fullGallery
-      ? await fetchAllSetCards(code)
-      : await fetchAllSetCards(code, { maxCards: 16, order: "rarity", dir: "desc" });
+      ? await fetchAllSetCards(code, { onRaw: collectAltNames })
+      : await fetchAllSetCards(code, {
+          maxCards: 16,
+          order: "rarity",
+          dir: "desc",
+          onRaw: collectAltNames,
+        });
     cards = applyMythicSpoilerDates(cards, mythic.bySetCode[code]);
 
     // spoiledCount: full gallery uses actual pull; slim uses Scryfall card_count
@@ -794,7 +858,22 @@ export async function buildSetsBundle() {
     // sets; a released set's cards are all on Scryfall and would fully dedupe.
     let freshCount = 0;
     if (isFuture || entry.status === "spoiling") {
-      const fresh = buildFreshSpoilers(playable, mythic.bySetCode[code]);
+      const known = [...altNames, ...tokenCards.map((t) => t.name)];
+      let fresh = buildFreshSpoilers(playable, mythic.bySetCode[code], known);
+      // MythicSpoiler files a release's Commander decks and reprint sheets
+      // under the main set. Star Trek kept 231 "unconfirmed" cards a week after
+      // its full gallery — 169 of them Commander. Only fetched when something
+      // is left over, so a set with a clean match costs no extra calls.
+      const related = fresh.length ? relatedSetCodesFor(code, all) : [];
+      for (const rc of related) {
+        await sleep(120);
+        await fetchAllSetCards(rc, {
+          onRaw: (c) => known.push(c.name, ...altNamesOf(c)),
+        });
+      }
+      if (related.length) {
+        fresh = buildFreshSpoilers(playable, mythic.bySetCode[code], known);
+      }
       if (fresh.length) {
         entry.freshSpoilers = fresh;
         freshCount = fresh.length;

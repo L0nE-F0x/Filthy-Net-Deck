@@ -55,9 +55,15 @@ const MONTH_RE = "january|february|march|april|may|june|july|august|september|oc
  *   "Delighted Halfling"  → "delightedhalfling"
  * DFC names ("Front // Back") normalize to "frontback" — a rare mismatch we
  * accept (worst case a card shows unconfirmed a little longer).
+ *
+ * Accents fold to their base letter before the strip: "Võx, Child of the
+ * Collective" is `voxchildofthecollective` on MythicSpoiler, and dropping the
+ * `õ` outright gave `vxchild…`, which could never match.
  */
 export function normalizeSlug(name) {
   return String(name || "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "");
 }
@@ -87,12 +93,49 @@ const BASIC_LAND_ART = /^(plains|island|swamp|mountain|forest)[tmb]$/;
 const VARIANT_SUFFIXES = [/\d+$/, /p\d*$/, /f$/];
 
 /**
+ * MythicSpoiler hand-types its slugs and never corrects them. Star Trek
+ * (2026-10-30) shipped `supspaceanomaly`, `jettrenoroblemsolver`,
+ * `melkotianadjucator` and a dozen more — each one a card sitting in the
+ * Scryfall gallery, held in the "unconfirmed" strip until paper release.
+ *
+ * Two edits on a slug of ten or more letters absorbs those typos. A genuinely
+ * new card would have to land within two letters of a confirmed card in the
+ * same set to be swallowed, which real card names do not do; short slugs stay
+ * exact-only because `forest`/`forests` style near-misses are real there.
+ */
+const TYPO_MIN_LENGTH = 10;
+const TYPO_MAX_EDITS = 2;
+
+/** Levenshtein distance ≤ `max`, bailing out as soon as a row exceeds it. */
+export function withinEdits(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return false;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    let best = i;
+    for (let j = 1; j <= b.length; j++) {
+      const v = Math.min(
+        prev[j] + 1,
+        row[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+      row.push(v);
+      if (v < best) best = v;
+    }
+    if (best > max) return false;
+    prev = row;
+  }
+  return prev[b.length] <= max;
+}
+
+/**
  * True when a MythicSpoiler slug is already represented in a Scryfall gallery.
  * Besides exact slug match this treats basic-land art variants (`plainst`,
  * `islandm`, `forestb`) as the corresponding basic once that basic is confirmed,
  * and an alternate printing (see VARIANT_SUFFIXES) as its card once that card
  * is. Without the second rule a fully spoiled set kept ~140 "unconfirmed"
- * duplicates of cards sitting right there in its gallery.
+ * duplicates of cards sitting right there in its gallery. Last, a long slug
+ * within TYPO_MAX_EDITS of a confirmed name is that card, misspelt.
  *
  * @param {string} slug
  * @param {Set<string>} confirmed
@@ -103,10 +146,17 @@ export function isConfirmedSlug(slug, confirmed) {
   if (confirmed.has(s)) return true;
   const m = s.match(BASIC_LAND_ART);
   if (m && confirmed.has(m[1])) return true;
-  return VARIANT_SUFFIXES.some((re) => {
-    const base = s.replace(re, "");
-    return base !== s && base.length > 0 && confirmed.has(base);
-  });
+  const bases = VARIANT_SUFFIXES.map((re) => s.replace(re, "")).filter(
+    (base) => base !== s && base.length > 0,
+  );
+  if (bases.some((base) => confirmed.has(base))) return true;
+  for (const candidate of [s, ...bases]) {
+    if (candidate.length < TYPO_MIN_LENGTH) continue;
+    for (const key of confirmed) {
+      if (withinEdits(candidate, key, TYPO_MAX_EDITS)) return true;
+    }
+  }
+  return false;
 }
 
 export function deslugLabel(slug) {
