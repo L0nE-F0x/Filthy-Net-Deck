@@ -22,6 +22,18 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-11-02 (evening) — session closed: social trailer + Help wording
+
+- **Marketing trailer made, not posted.** `~/Videos/Filthy-Net-Deck-Trailer/`:
+  50 s 16:9 (1080p60) + 9:16 cut, two thumbnails, the synthesized score, and
+  a re-renderable `source/` (README inside). Real app captures — My Stats /
+  Climb / Matchups use the owner's tracker data with opponent names scrubbed.
+  Footage is the 3.9.11 build (sidebar "v3.9.11", Aetherfield 120,019), so it
+  is best posted after 3.9.11 ships. Kept out of git on purpose (binary bloat).
+- **Help privacy wording** fixed and folded into the parked 3.9.11 — see the
+  next section; tag `83ddc62f`.
+- Nothing pushed; local `main` is ahead of origin until release day.
+
 ### 2026-11-02 (later) — v3.9.11 PARKED: Aetherfield is Star Trek ready
 
 **Live is still 3.9.10.** Owner: "get it started … we'll see whether I'll
