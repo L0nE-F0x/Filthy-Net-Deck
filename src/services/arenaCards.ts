@@ -200,7 +200,7 @@ export async function resolveArenaCards(
   );
   if (unresolved.length === 0) return cache;
 
-  const gap = await loadNameGap();
+  const gap = await loadNameGap(unresolved);
   const partials: Record<number, ArenaCardInfo> = {};
   for (const id of unresolved) {
     const card = gap.get(id);

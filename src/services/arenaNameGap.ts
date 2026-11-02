@@ -71,7 +71,21 @@ export type GapCard = {
   typeLine: string | null;
 };
 
+/**
+ * How long a loaded map counts as complete. After this, asking for an id the
+ * map does not hold refetches it once (shared by every caller) before saying no.
+ *
+ * Until 3.9.9 the map was fetched once per session and kept forever. Scryfall
+ * still had no arena_id for any Reality Fracture card in November 2026, so
+ * almost every running FND had already loaded the map — without Star Trek in
+ * it. The pipeline publishes a new set's names within hours of Arena's patch,
+ * but an app left in the tray kept showing `Card #…` for the whole set until it
+ * was restarted.
+ */
+export const GAP_REFRESH_MS = 10 * 60 * 1000;
+
 let gapMap: Map<number, GapCard> | null = null;
+let gapLoadedAt = 0;
 let gapInflight: Promise<Map<number, GapCard>> | null = null;
 
 export function parseGapEntry(v: unknown): GapCard | null {
@@ -113,38 +127,61 @@ export function parseGapEntry(v: unknown): GapCard | null {
   };
 }
 
-/** The published gap map, fetched once per session and shared by both resolvers. */
-export async function loadNameGap(): Promise<Map<number, GapCard>> {
-  if (gapMap) return gapMap;
+async function fetchGap(): Promise<Map<number, GapCard> | null> {
+  for (const origin of SITE_ORIGINS) {
+    try {
+      const res = await apiFetch(`${origin}${GAP_PATH}`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) continue;
+      const raw = (await res.json()) as Record<string, unknown>;
+      const m = new Map<number, GapCard>();
+      for (const [k, v] of Object.entries(raw ?? {})) {
+        const id = Number(k);
+        const card = parseGapEntry(v);
+        if (Number.isFinite(id) && card) m.set(id, card);
+      }
+      return m;
+    } catch {
+      /* try the legacy origin, then give up */
+    }
+  }
+  return null;
+}
+
+function refreshGap(): Promise<Map<number, GapCard>> {
   if (gapInflight) return gapInflight;
   gapInflight = (async () => {
-    for (const origin of SITE_ORIGINS) {
-      try {
-        const res = await apiFetch(`${origin}${GAP_PATH}`, {
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) continue;
-        const raw = (await res.json()) as Record<string, unknown>;
-        const m = new Map<number, GapCard>();
-        for (const [k, v] of Object.entries(raw ?? {})) {
-          const id = Number(k);
-          const card = parseGapEntry(v);
-          if (Number.isFinite(id) && card) m.set(id, card);
-        }
-        gapMap = m;
-        return m;
-      } catch {
-        /* try the legacy origin, then give up */
-      }
-    }
-    // Empty map, cached: one failed attempt per session, not one per card.
-    gapMap = new Map();
+    const fresh = await fetchGap();
+    // A failed refetch keeps the map we already had — a network blip must not
+    // take names away. With nothing to keep, cache an empty map so a failure
+    // costs one attempt per GAP_REFRESH_MS, not one per card.
+    gapMap = fresh ?? gapMap ?? new Map();
+    gapLoadedAt = Date.now();
     return gapMap;
-  })();
+  })().finally(() => {
+    gapInflight = null;
+  });
   return gapInflight;
 }
 
-/** Look one id up, loading the map on first miss. */
+/**
+ * The published gap map, shared by both resolvers. Pass the ids you are about
+ * to look up: if the map is older than GAP_REFRESH_MS and lacks any of them, it
+ * is refetched first, so a set the pipeline published after this session
+ * loaded the map still gets its names.
+ */
+export async function loadNameGap(wanted?: Iterable<number>): Promise<Map<number, GapCard>> {
+  if (!gapMap) return refreshGap();
+  if (wanted && Date.now() - gapLoadedAt >= GAP_REFRESH_MS) {
+    for (const id of wanted) {
+      if (!gapMap.has(id)) return refreshGap();
+    }
+  }
+  return gapMap;
+}
+
+/** Look one id up, loading (or refreshing a stale) map on a miss. */
 export async function gapCard(grpId: number): Promise<GapCard | null> {
-  return (await loadNameGap()).get(grpId) ?? null;
+  return (await loadNameGap([grpId])).get(grpId) ?? null;
 }

@@ -4,7 +4,7 @@
  */
 import { apiFetch } from "./http";
 import { scryfallCdnUrl } from "./scryfall";
-import { gapCard } from "./arenaNameGap";
+import { GAP_REFRESH_MS, gapCard } from "./arenaNameGap";
 import type { ManaColor } from "../types/meta";
 
 export type ArenaCardMeta = {
@@ -38,6 +38,26 @@ export type ArenaCardMeta = {
 const LS_KEY = "bbi.arenaMeta.v3";
 const mem = new Map<number, ArenaCardMeta | null>();
 const inflight = new Map<number, Promise<ArenaCardMeta | null>>();
+/**
+ * When each `null` in `mem` was recorded. A miss is retried after
+ * GAP_REFRESH_MS instead of lasting the session: a new set's names reach the
+ * gap map hours after Arena's patch, and the overlay of an app left running
+ * across that moment showed `Card #…` for the whole set until restart.
+ */
+const missedAt = new Map<number, number>();
+
+function forgetStaleMiss(grpId: number): void {
+  const at = missedAt.get(grpId);
+  if (at === undefined || Date.now() - at < GAP_REFRESH_MS) return;
+  missedAt.delete(grpId);
+  if (mem.get(grpId) === null) mem.delete(grpId);
+}
+
+function remember(grpId: number, meta: ArenaCardMeta | null): void {
+  mem.set(grpId, meta);
+  if (meta) missedAt.delete(grpId);
+  else missedAt.set(grpId, Date.now());
+}
 
 function loadDisk(): void {
   if (mem.size) return;
@@ -163,6 +183,7 @@ async function nameOnlyFallback(grpId: number): Promise<ArenaCardMeta | null> {
 
 export function peekArenaMeta(grpId: number): ArenaCardMeta | null | undefined {
   loadDisk();
+  forgetStaleMiss(grpId);
   return mem.has(grpId) ? mem.get(grpId) : undefined;
 }
 
@@ -170,6 +191,7 @@ export async function resolveArenaMeta(
   grpId: number,
 ): Promise<ArenaCardMeta | null> {
   loadDisk();
+  forgetStaleMiss(grpId);
   if (mem.has(grpId)) return mem.get(grpId) ?? null;
   const existing = inflight.get(grpId);
   if (existing) return existing;
@@ -186,19 +208,19 @@ export async function resolveArenaMeta(
         // Scryfall has not assigned lands here, and a name is much better than
         // "Card #103529".
         const fallback = await nameOnlyFallback(grpId);
-        mem.set(grpId, fallback);
+        remember(grpId, fallback);
         schedulePersist();
         return fallback;
       }
       const data = (await res.json()) as ScryfallArenaCard;
       const meta = fromScryfall(data);
-      mem.set(grpId, meta);
+      remember(grpId, meta);
       schedulePersist();
       return meta;
     } catch {
-      // Session-only negative cache: null avoids re-hitting this id now, but
-      // schedulePersist() never writes nulls, so the next session retries.
-      mem.set(grpId, null);
+      // Short-lived negative cache: null avoids re-hitting this id for
+      // GAP_REFRESH_MS, and schedulePersist() never writes nulls to disk.
+      remember(grpId, null);
       schedulePersist();
       return null;
     } finally {

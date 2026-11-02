@@ -173,3 +173,32 @@ describe("resolveArenaCards — Scryfall knows the card", () => {
     expect(gapHits).toBe(0);
   });
 });
+
+describe("resolveArenaCards — a set published after the map was loaded", () => {
+  it("refetches the stale map once the window has passed", async () => {
+    let published: Record<string, unknown> = { ...HOBBIT };
+    let gapHits = 0;
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      if (String(u).includes("arena-names.json")) {
+        gapHits++;
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(published) } as Response);
+      }
+      return Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) } as Response);
+    }) as unknown as typeof fetch;
+    let now = 1_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+
+    const m = await freshModule();
+    const { GAP_REFRESH_MS } = await import("./arenaNameGap");
+    expect((await m.resolveArenaCards([103482, 200001]))[200001]).toBeUndefined();
+
+    published = { ...published, "200001": { n: "Star Trek card", c: 2, i: "U" } };
+    now += GAP_REFRESH_MS;
+    expect((await m.resolveArenaCards([103482, 200001]))[200001]?.name).toBe("Star Trek card");
+    expect(gapHits).toBe(2);
+    // Everything known: no further fetch, however much later.
+    now += GAP_REFRESH_MS * 3;
+    await m.resolveArenaCards([103482, 200001]);
+    expect(gapHits).toBe(2);
+  });
+});

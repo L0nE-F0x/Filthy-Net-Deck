@@ -224,3 +224,63 @@ describe("resolveArenaMeta — Scryfall 404s", () => {
     await expect(m.resolveArenaMeta(103529)).resolves.toBeNull();
   });
 });
+
+describe("a set published after this session loaded the gap map", () => {
+  // Star Trek, November 2026: Scryfall had no arena_id for any Reality Fracture
+  // card, so nearly every running FND had loaded the gap map early — before
+  // the pipeline added Star Trek. Until 3.9.9 the overlay then showed
+  // `Card #…` for the whole set until the app was restarted.
+  it("refetches a stale map on a miss and names the new card", async () => {
+    let published: Record<string, unknown> = { "1": "Reality Fracture card" };
+    let gapHits = 0;
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      if (String(u).includes("arena-names.json")) {
+        gapHits++;
+        return Promise.resolve(res(published));
+      }
+      return Promise.resolve(res(null, false));
+    }) as unknown as typeof fetch;
+    let now = 1_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+
+    const m = await freshModule();
+    const { GAP_REFRESH_MS } = await import("./arenaNameGap");
+    expect((await m.resolveArenaMeta(1))?.name).toBe("Reality Fracture card");
+    expect(await m.resolveArenaMeta(2)).toBeNull();
+
+    published = { ...published, "2": "Star Trek card" };
+    // Inside the window the miss stands — no refetch per render.
+    now += GAP_REFRESH_MS - 1;
+    expect(await m.resolveArenaMeta(2)).toBeNull();
+    expect(m.peekArenaMeta(2)).toBeNull();
+    expect(gapHits).toBe(1);
+
+    now += 1;
+    // The batch prefetcher finds it missing again rather than stuck at null.
+    expect(m.peekArenaMeta(2)).toBeUndefined();
+    expect((await m.resolveArenaMeta(2))?.name).toBe("Star Trek card");
+    expect(gapHits).toBe(2);
+  });
+
+  it("keeps the names it had when the refetch fails", async () => {
+    let online = true;
+    globalThis.fetch = vi.fn((u: RequestInfo | URL) => {
+      if (String(u).includes("arena-names.json")) {
+        return online ? Promise.resolve(res({ "1": "Kept" })) : Promise.reject(new Error("offline"));
+      }
+      return Promise.resolve(res(null, false));
+    }) as unknown as typeof fetch;
+    let now = 1_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+
+    const gap = await (async () => {
+      vi.resetModules();
+      return import("./arenaNameGap");
+    })();
+    expect((await gap.gapCard(1))?.name).toBe("Kept");
+    online = false;
+    now += gap.GAP_REFRESH_MS;
+    expect(await gap.gapCard(99)).toBeNull();
+    expect((await gap.gapCard(1))?.name).toBe("Kept");
+  });
+});
