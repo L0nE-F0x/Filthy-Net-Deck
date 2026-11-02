@@ -22,6 +22,54 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-11-02 — Star Trek (`trk`) readiness
+
+Owner plays the **streamer early-access event, Wed 2026-11-04 10 a.m. PST
+= 18:00 UTC = Thu 02:00 WITA**. Arena release **2026-11-10**, paper 11-13,
+prereleases 11-06..12. Sources: WotC
+`/news/mtg-arena/star-trek-event-schedule` (updated 10-30) and
+`/news/mtg-arena/announcements-october-26-2026`. The event's format is not
+published. The tracker records any event id and labels `EarlyAccess`;
+cloud sync files it under the deck's format (owner's 3.9.7 decision stands).
+
+**Shipped through the feed (no app change):** `881a2ec5`. `trk` override
+in `set-calendar-overrides.json` (Arena 11-10, now "official"). The
+fresh-spoiler self-heal now reads the set's Scryfall descendants
+(`trc` Commander, `sds` Stardates, `ttrc`), flavour names, folds accents,
+and allows two edits on 10+ letter slugs. Live strip 231 → 21; the 21 are
+MythicSpoiler pre-reveal names (Neelix "Pillar of Support" = "Moral
+Support"), left alone on purpose.
+
+**Card names — the Nov 4 risk.** On 11-02, mtgajson `cards.json`
+(Last-Modified 2026-10-22) had **0 TRK cards** and Scryfall had **0 trk
+arena_ids**. Same shape as FRA (mtgajson had FRA ~a week before release).
+When Arena's patch adds TRK, mtgajson republishes and the sets job adds the
+names to `arena-names.json` on its own — **if** Arena's code lowercases to
+Scryfall's `trk`. Expected (FRA/HOB/MSH all matched; WotC's preorder link
+tags it `TRK`) but unconfirmed until the patch. `buildArenaNameGap` skips
+any mtgajson set whose code is not a recent Scryfall code, silently; if
+Arena ships another code, count by that code and add the mapping. Do not
+invent ids. Check before the event:
+
+```
+curl -s https://mtgajson.untapped.gg/v1/latest/cards.json | python3 -c \
+ "import json,sys,collections;print(collections.Counter(c['set'] for c in json.load(sys.stdin))['TRK'])"
+```
+
+Non-zero and `arena-names.json` not yet carrying them → `gh workflow run
+sets-refresh.yml`. Then the owner **restarts FND** before playing (3.9.9
+holds the name map for the whole session — see below).
+
+**App fix, `9cb2d555`, NOT released.** Through 3.9.9 the gap map was
+fetched once per session and `arenaMeta` cached a miss for the session.
+Scryfall still has no arena_id for any FRA card, so nearly every running
+FND has the map loaded already, without Star Trek. Anyone who leaves FND
+in the tray across the moment the names publish sees `Card #…` for every
+Star Trek card until restart. Fix: refetch on a miss when the copy is
+older than 10 min; retry `arenaMeta` nulls on the same clock. Tests fail
+with the refresh disabled, pass with it. 876 frontend tests, tsc, eslint
+clean; 148 pipeline tests. Owner decides whether it ships before 11-10.
+
 ### 2026-10-11 — v3.9.9: the Windows overlay was broken since 3.7.0
 
 **Live product version is now v3.9.9 on all three platforms.**
