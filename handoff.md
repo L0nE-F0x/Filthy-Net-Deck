@@ -84,6 +84,25 @@ macOS universal dmg 38,030,667 bytes (sha256 `bf1592e1…3e479e91`), CI run
 TREK READY". Downloads pruned to 3.9.9 + 3.9.10. `/meta-web/` regenerated
 (361 pages). No body copy changed → i18n catalogs untouched.
 
+Verified live 2026-11-02 ~08:45 UTC, both hosts: `version.json` and
+`updater/latest.json` 3.9.10 (signature == `.sig`; the served exe verifies
+against it), dmg / `.sig` / recipe byte-identical to local,
+`og-image.png?v=3.9.10` identical, homepage 3.9.10 ×19 and no 3.9.9,
+`/meta-web/` hub on 3.9.10. Sets feed (manual `sets-refresh` run
+41413792440): `trk` Arena 2026-11-10 **official**, fresh strip **21**.
+
+**Open at session close (2026-11-02):**
+1. Owner updates this box to 3.9.10 (homepage install line; pacman needs
+   their password). On 3.9.10 no restart is needed before the event.
+2. Before Thu 02:00 WITA: run the mtgajson TRK count above. Still 0 → the
+   names are not out yet; tracking still records grpIds, names fill in
+   once published. Do not invent ids.
+3. X post drafted in chat (three options, not saved to a file); owner posts
+   it. OG card already markets "STAR TREK READY".
+4. Not checked: in-app Update & restart on real Windows; X share-card cache.
+5. Still waiting on the 3.9.9 overlay reporter (section below).
+6. AUR publish still parked.
+
 Gotcha: `~/.local/bin/gh` is a mise wrapper that runs `mise use -g gh`
 first and hangs (even `gh auth status`). Call the real binary:
 `~/.local/share/mise/installs/gh/2.102.0/gh_2.102.0_linux_amd64/bin/gh`.
