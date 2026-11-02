@@ -27,8 +27,18 @@ that is expected and does not block auto-update.
 **Live is still 3.9.10.** Owner: "get it started … we'll see whether I'll
 keep that for a couple of days"; likely released around the 2026-11-04
 early access. **Do not push `main` or the tag until the owner says ship.**
-Local `main` is 2 ahead of origin: `7531c332` (vendored Aetherfield) and
-`57f5d91d` (release v3.9.11, untagged). Upload payload unchanged.
+Local `main` is ahead of origin: `7531c332` (vendored Aetherfield),
+`57f5d91d` (release v3.9.11), `1b276292` (this runbook), `83ddc62f` (Help
+privacy wording, folded into 3.9.11 — **tag this one**), plus the docs
+commit after it. Upload payload unchanged.
+
+**Folded in later the same day (`83ddc62f`):** the Help guide's welcome
+("Nothing you play is ever uploaded") and Data & privacy ("never uploaded
+anywhere") were false since v2.7.5 for anyone with Share my matches on. Both
+now say nothing leaves the PC unless you turn sharing on, and Data & privacy
+names the switch and links the field list. One line added to the 3.9.11
+notes. Windows and Linux were rebuilt and re-signed; the table below is the
+rebuild.
 
 **Aetherfield's own site is already live with it** (its repo `ef70646`,
 pushed; Netlify verified): mtg-multiverse.netlify.app and the
@@ -46,17 +56,20 @@ anything differs):**
 
 | File | Bytes | sha256 |
 |---|---|---|
-| `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/Filthy Net Deck_3.9.11_x64-setup.exe` | 15,421,318 | `fb6e7326…f835f894af` |
-| `… _3.9.11_x64-setup.exe.sig` | 428 | `1ae6528c…7057e0aeb` |
-| `dist-linux/filthy-net-deck-3.9.11-x86_64.tar.gz` | 19,291,080 | `ab18b86f…5afef821d1` (= PKGBUILD) |
+| `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/Filthy Net Deck_3.9.11_x64-setup.exe` | 15,424,760 | `52981698…9b30bbf8a8` |
+| `… _3.9.11_x64-setup.exe.sig` | 428 | `293ec822…04cd43c0` |
+| `dist-linux/filthy-net-deck-3.9.11-x86_64.tar.gz` | 19,290,722 | `fac21f81…01c485bc7c` (= PKGBUILD) |
 
-Windows sig verified against the app pubkey, 3.9.10 exe as negative
-control. Bundled frontend carries Aetherfield 120,019 / trk 581; the Linux
-binary embeds `aetherfield/assets/index-DelKVrKU.js` and not the old one.
+The first 3.9.11 build (`fb6e7326…` exe, `ab18b86f…` tarball) is
+superseded — it lacks the Help wording. Windows sig verified against the
+app pubkey, 3.9.10 exe as negative control. Both binaries reference
+`App-BLxmrZah.js` (the chunk with the new wording) and the Linux binary
+still embeds `aetherfield/assets/index-DelKVrKU.js` (120,019 / trk 581);
+its tarball copy is byte-identical to the build.
 
 **Release-day runbook (owner says ship):**
-1. `git tag -a v3.9.11 57f5d91d -m "v3.9.11 — Aetherfield is Star Trek
-   ready"`, then `git fetch && git merge origin/main` (merge, never rebase),
+1. `git tag -a v3.9.11 83ddc62f -m "v3.9.11 — Aetherfield is Star Trek
+   ready"` (**not** `57f5d91d` — that tree lacks the Help fix), then `git fetch && git merge origin/main` (merge, never rebase),
    push `main`, push the tag → macOS CI.
 2. `gh` = `~/.local/share/mise/installs/gh/2.102.0/gh_2.102.0_linux_amd64/bin/gh`
    (the PATH one hangs). Wrap in `timeout`. `release create v3.9.11` with
