@@ -33,7 +33,7 @@ const TOPICS: Topic[] = [
         <p>
           <strong>Filthy Net Deck</strong> is a desktop MTG Arena companion: today’s real ranked
           Standard &amp; Pioneer meta, plus a private match tracker that reads Arena’s own log on
-          this PC. Nothing you play is ever uploaded.
+          this PC. Nothing you play is uploaded unless you choose to share it.
         </p>
         <p className="help-steps-head">Three steps and you’re rolling:</p>
         <ol>
@@ -234,8 +234,16 @@ const TOPICS: Topic[] = [
       <>
         <p>
           The tracker tails Arena’s own <em>Player.log</em> on this PC. Matches, ranks, and
-          opponents are stored locally (<em>tracker-matches.jsonl</em> in the app’s data folder)
-          and never uploaded anywhere. Card names and art are cached locally for offline use.
+          opponents are stored locally (<em>tracker-matches.jsonl</em> in the app’s data folder),
+          and nothing is uploaded unless you turn it on. Card names and art are cached locally
+          for offline use.
+        </p>
+        <p>
+          Sharing is opt-in: sign in, then switch on <strong>Share my matches</strong> in
+          Settings. Your results feed the community matchup data, and your match history and
+          your own decklists are backed up to your account. Opponent names and the cards they
+          revealed never leave this PC, under any setting. Every field that is sent is listed at
+          filthy-net-deck.com/privacy.html.
         </p>
         <p>
           Export everything as CSV from My Stats, or delete per-deck / all history — deletion is
