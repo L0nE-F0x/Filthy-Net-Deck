@@ -34,10 +34,15 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEST = join(ROOT, "public", "aetherfield");
 // The checkout goes by its old working name on some machines and by the
 // product name on others; the package-name guard below keeps either honest.
+// Searched next to this repo and one level up: since 2026-10-10 FND lives in
+// ~/Projects/ApexForge/ while Aetherfield stayed in ~/Projects/, and the
+// sibling-only search stopped finding it.
 const SOURCE = resolve(
   process.env.AETHERFIELD_DIR ??
-    ["Magic Card Universe", "Aetherfield"]
-      .map((dir) => join(ROOT, "..", dir))
+    [join(ROOT, ".."), join(ROOT, "..", "..")]
+      .flatMap((parent) =>
+        ["Magic Card Universe", "Aetherfield"].map((dir) => join(parent, dir)),
+      )
       .find((dir) => existsSync(dir)) ??
     join(ROOT, "..", "Magic Card Universe"),
 );
