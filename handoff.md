@@ -22,6 +22,62 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-11-02 (later) — v3.9.11 PARKED: Aetherfield is Star Trek ready
+
+**Live is still 3.9.10.** Owner: "get it started … we'll see whether I'll
+keep that for a couple of days"; likely released around the 2026-11-04
+early access. **Do not push `main` or the tag until the owner says ship.**
+Local `main` is 2 ahead of origin: `7531c332` (vendored Aetherfield) and
+`57f5d91d` (release v3.9.11, untagged). Upload payload unchanged.
+
+**Aetherfield's own site is already live with it** (its repo `ef70646`,
+pushed; Netlify verified): mtg-multiverse.netlify.app and the
+filthy-net-deck.com/aetherfield/ proxy both serve 120,019 printings, trk
+581 / trc 556 / sds 30, new og.jpg. Only the *in-app* copy waits on
+3.9.11. Same session there: verify-universe's art_series pin (2,650) now
+reads the dump (2,841); the boot pulse moved off a one-card April 2027
+Darkhold Destiny Commander preview onto Star Trek. Suite 71/71.
+
+`npm run aetherfield` now finds `~/Projects/Aetherfield` from the
+ApexForge path (it only searched siblings).
+
+**Prebuilt artifacts (verify sha256 before use; rebuild from the tag if
+anything differs):**
+
+| File | Bytes | sha256 |
+|---|---|---|
+| `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/Filthy Net Deck_3.9.11_x64-setup.exe` | 15,421,318 | `fb6e7326…f835f894af` |
+| `… _3.9.11_x64-setup.exe.sig` | 428 | `1ae6528c…7057e0aeb` |
+| `dist-linux/filthy-net-deck-3.9.11-x86_64.tar.gz` | 19,291,080 | `ab18b86f…5afef821d1` (= PKGBUILD) |
+
+Windows sig verified against the app pubkey, 3.9.10 exe as negative
+control. Bundled frontend carries Aetherfield 120,019 / trk 581; the Linux
+binary embeds `aetherfield/assets/index-DelKVrKU.js` and not the old one.
+
+**Release-day runbook (owner says ship):**
+1. `git tag -a v3.9.11 57f5d91d -m "v3.9.11 — Aetherfield is Star Trek
+   ready"`, then `git fetch && git merge origin/main` (merge, never rebase),
+   push `main`, push the tag → macOS CI.
+2. `gh` = `~/.local/share/mise/installs/gh/2.102.0/gh_2.102.0_linux_amd64/bin/gh`
+   (the PATH one hangs). Wrap in `timeout`. `release create v3.9.11` with
+   the Linux tarball + notes; if it times out it leaves an empty **draft** —
+   `release upload --clobber`, then `release edit --draft=false --latest`
+   **before** CI's attach step (~12 min after the tag push).
+3. After CI: download the dmg into `website/downloads/`, size-check.
+4. Site roll, one commit: exe + `.sig`; `updater/latest.json` (signature =
+   `.sig` bytes, fresh `pub_date`); `website/version.json` =
+   `public/version.json`; `npm run linux:recipe`; prune downloads to 3.9.10 +
+   3.9.11; `index.html` 3.9.10 → 3.9.11 everywhere + new title/OG/Twitter
+   copy; **Aetherfield count 118,276 → 120,019** in `index.html` (×2: body
+   line ~270, `stats-pill` ~288) and `aether.body` in all seven catalogs —
+   `118.276` de/es/it/pt-BR, `118 276` fr (plain space), `118,276` ja/ko;
+   README.md line 5 and `docs/AETHERFIELD-EMBED.md` line 3; `_gen_og.py`
+   badge + lines (`uv run --no-project --with pillow` if Pillow is missing),
+   `?v=3.9.11`; `npm run meta:site`; pipeline tests (`site-i18n`). Push,
+   then verify live like 3.9.10 (both hosts, signature, byte-identical
+   downloads, OG, homepage has no 3.9.10 left).
+5. Owner updates this box (homepage install line).
+
 ### 2026-11-02 — Star Trek (`trk`) readiness
 
 Owner plays the **streamer early-access event, Wed 2026-11-04 10 a.m. PST
