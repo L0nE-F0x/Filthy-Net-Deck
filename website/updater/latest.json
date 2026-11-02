@@ -1,11 +1,11 @@
 {
-  "version": "3.9.9",
-  "notes": "v3.9.9: Windows \u2014 the match overlay, companion window, corner badge and match-end alert open again. They had silently stopped appearing in 3.7.0; tracking and stats were never affected. Export diagnostic (Settings \u2192 Tracker health) now includes overlay health too.",
-  "pub_date": "2026-10-11T14:08:41Z",
+  "version": "3.9.10",
+  "notes": "v3.9.10: Ready for Star Trek (on Arena November 10). Cards from a brand-new set now get their names without restarting FND \u2014 the overlay, My Stats and opponent archetypes stop showing \"Card #\u2026\" once Arena's card list for the set is published, even if FND has been running in the tray since before then.",
+  "pub_date": "2026-11-02T08:12:48Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFSUFhrL21zVngvaDVFb0E2Q0RDQlpTdm5XN3VnM250ak9nT2tWUWg3L2hqOWhCTzRQYnI4bHYvdWJJT0lDRS9Nb2hiaXc2dy9zZzJWcjJ5WkEreUFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI3NDc3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS45X3g2NC1zZXR1cC5leGUKdEtnQzlSaWVESFRuRWF0Vkl3UThYOUUvUm85ZHM4bjFxZ1NiY3JhNjRFdkVRV0Z6Ukdqd3o5WE02MU9scG4yc3FkcDEwQldrRHZhTlp1RnlyTWg0QUE9PQo=",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.9.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnlRdVBNRGlON0hpSVBjK3p6amNsbUZjWWZpcUhLYURiRG43SW5idUJ1bzVpL1hBeWFqU0pkMXdCdDZpY3hiby9aR1JpOVlJSjduem5mb0hmWmxiYXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzNjA2ODQ1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xMF94NjQtc2V0dXAuZXhlCjl2bzdJZlNBVGg3ZXZZc2wyU2xka3YrRG0yNFBXSWlDQXo0ekpMZUJEbEZNM2dMVWFzRUNmNC9nT3FGSFF2bE1Ga0s2UjZjQUN5Y210d0hjQ3BwMENRPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.10.exe"
     }
   }
 }

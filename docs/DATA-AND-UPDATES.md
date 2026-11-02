@@ -264,7 +264,7 @@ not linked it:
 |-------|------|
 | `pipeline/sources/arena-names.mjs` | Builds the gap map |
 | `website/meta/arena-names.json` (+ `public/meta/`) | `{ grpId: {n,c?,i?,l?,s?,t?} }`, fetched after a Scryfall 404 |
-| `src/services/arenaNameGap.ts` | Owns the client-side map — fetched **only after** a Scryfall 404, then refetched when an id misses on a copy older than 10 min. **Ships with the first release after 3.9.9** — through 3.9.9 a running app needs a restart to see a newly published set |
+| `src/services/arenaNameGap.ts` | Owns the client-side map — fetched **only after** a Scryfall 404, then refetched when an id misses on a copy older than 10 min (since 3.9.10 — through 3.9.9 a running app needed a restart to see a newly published set) |
 | `src/services/arenaMeta.ts` | Resolver for the overlay, archetype inference, Matchups, DeckView |
 | `src/services/arenaCards.ts` | Resolver for the My Stats decklist, Brew Lab, deck share |
 

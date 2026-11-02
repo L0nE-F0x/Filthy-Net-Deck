@@ -1,9 +1,9 @@
 {
-  "version": "3.9.9",
+  "version": "3.9.10",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.9.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.9-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.10.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.10-universal.dmg"
   },
-  "notes": "v3.9.9: Windows — the match overlay, companion window, corner badge and match-end alert open again. They had silently stopped appearing in 3.7.0; tracking and stats were never affected. Export diagnostic (Settings → Tracker health) now includes overlay health too."
+  "notes": "v3.9.10: Ready for Star Trek (on Arena November 10). Cards from a brand-new set now get their names without restarting FND — the overlay, My Stats and opponent archetypes stop showing \"Card #…\" once Arena's card list for the set is published, even if FND has been running in the tray since before then."
 }

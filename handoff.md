@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.9 on all three platforms**
+**Live product version: v3.9.10 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -60,15 +60,36 @@ Non-zero and `arena-names.json` not yet carrying them → `gh workflow run
 sets-refresh.yml`. Then the owner **restarts FND** before playing (3.9.9
 holds the name map for the whole session — see below).
 
-**App fix, `9cb2d555`, NOT released.** Through 3.9.9 the gap map was
-fetched once per session and `arenaMeta` cached a miss for the session.
-Scryfall still has no arena_id for any FRA card, so nearly every running
-FND has the map loaded already, without Star Trek. Anyone who leaves FND
-in the tray across the moment the names publish sees `Card #…` for every
-Star Trek card until restart. Fix: refetch on a miss when the copy is
-older than 10 min; retry `arenaMeta` nulls on the same clock. Tests fail
-with the refresh disabled, pass with it. 876 frontend tests, tsc, eslint
-clean; 148 pipeline tests. Owner decides whether it ships before 11-10.
+**v3.9.10 shipped the same day (owner: "ship it") — live version is now
+3.9.10 on all three platforms.** It carries `9cb2d555`: through 3.9.9 the
+gap map was fetched once per session and `arenaMeta` cached a miss for the
+session. Scryfall still has no arena_id for any FRA card, so nearly every
+running FND has the map loaded already, without Star Trek; anyone who left
+FND in the tray across the moment the names publish would see `Card #…`
+for every Star Trek card until restart. Now a miss on a copy older than
+10 min refetches it; `arenaMeta` nulls retry on the same clock. Tests fail
+with the refresh disabled, pass with it. 876 frontend / 148 pipeline;
+tsc, eslint clean; Rust unchanged since 3.9.9. **Owner on 3.9.9 or older
+still needs the restart before the Nov 5 event** unless updated first.
+
+Release facts: tag `v3.9.10` on `037bbf02`. Windows NSIS 15,374,485
+bytes + 428-byte `.sig`, key `67FCA9900F523D49`, verified against the
+app pubkey with a Node minisign check (3.9.9 exe vs 3.9.10 sig fails,
+3.9.9's own pair passes); `latest.json` signature is the `.sig` byte for
+byte. Linux tarball 19,236,132 bytes, sha256 `70255163…a4ef38f8`,
+re-downloaded from the PKGBUILD URL and matched; its binary is
+byte-identical to the build and references the 3.9.10 frontend chunk.
+macOS universal dmg 38,030,667 bytes (sha256 `bf1592e1…3e479e91`), CI run
+41410860914 green, size-checked against the release asset. OG card "STAR
+TREK READY". Downloads pruned to 3.9.9 + 3.9.10. `/meta-web/` regenerated
+(361 pages). No body copy changed → i18n catalogs untouched.
+
+Gotcha: `~/.local/bin/gh` is a mise wrapper that runs `mise use -g gh`
+first and hangs (even `gh auth status`). Call the real binary:
+`~/.local/share/mise/installs/gh/2.102.0/gh_2.102.0_linux_amd64/bin/gh`.
+`git push` is unaffected. api.github.com also dropped one upload with
+"error connecting"; a retry worked — a timed-out `gh release create` leaves
+a **draft** with no assets, invisible to the public API.
 
 ### 2026-10-11 — v3.9.9: the Windows overlay was broken since 3.7.0
 
