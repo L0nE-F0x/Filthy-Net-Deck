@@ -32,9 +32,18 @@
 
 [build]
   publish = "website"
-  # NOTE: no `command` here on purpose. The Netlify UI has a build command set
-  # (`node pipeline/build-meta.mjs`). Setting one in this file would silently
-  # override it, so leave it to the dashboard until the two are reconciled.
+  # NOTE: no `command` here on purpose — the Netlify UI holds it, and one set
+  # here would silently override the UI.
+  #
+  # Since 2026-11-04 the UI command is a no-op `echo`: Netlify publishes the
+  # committed website/ as-is. It used to be `node pipeline/build-meta.mjs`,
+  # i.e. the whole scraper on every deploy. From 2026-11-02 15:29 UTC every
+  # deploy failed in that step ("exit code 2"; the log is only in the
+  # dashboard, so the cause is unconfirmed — the same command passed on a
+  # desktop, and GitHub Actions' 11-03 run got a 403 from MTGGoldfish). For
+  # ~36 h the bot's Star Trek card names sat in git, never served, until the
+  # command was cleared. Scraping belongs in GitHub Actions only, where a
+  # failure keeps the previous data live; do not put it back here.
 
 # Install counting — docs/INSTALL-COUNTING.md. Inert until the base directory
 # moves to the repo root, at which point Netlify bundles these using the

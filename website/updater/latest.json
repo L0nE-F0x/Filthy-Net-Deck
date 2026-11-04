@@ -1,11 +1,11 @@
 {
-  "version": "3.9.10",
-  "notes": "v3.9.10: Ready for Star Trek (on Arena November 10). Cards from a brand-new set now get their names without restarting FND \u2014 the overlay, My Stats and opponent archetypes stop showing \"Card #\u2026\" once Arena's card list for the set is published, even if FND has been running in the tray since before then.",
-  "pub_date": "2026-11-02T08:12:48Z",
+  "version": "3.9.11",
+  "notes": "v3.9.11: Aetherfield is Star Trek ready. The galaxy inside the app now holds all 120,019 printings \u2014 every Star Trek card (581), its Commander decks and the Stardates reprints \u2014 and its newest-set pulse lands on Star Trek instead of a far-off preview. Also: the Help guide now says plainly that nothing you play leaves your PC unless you turn on sharing in Settings.",
+  "pub_date": "2026-11-04T06:53:59Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnlRdVBNRGlON0hpSVBjK3p6amNsbUZjWWZpcUhLYURiRG43SW5idUJ1bzVpL1hBeWFqU0pkMXdCdDZpY3hiby9aR1JpOVlJSjduem5mb0hmWmxiYXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzNjA2ODQ1CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xMF94NjQtc2V0dXAuZXhlCjl2bzdJZlNBVGg3ZXZZc2wyU2xka3YrRG0yNFBXSWlDQXo0ekpMZUJEbEZNM2dMVWFzRUNmNC9nT3FGSFF2bE1Ga0s2UjZjQUN5Y210d0hjQ3BwMENRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.10.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WndOalhjS0w0MFhQaTFBNmpGQ2tzVDVDV0x5QWFTdVE0Qy9KczZRWUNhQmVxMU1pWGVxMmxYUFRTQlBCVHF6Qzc0OXdMUElVbS9jN3NNL3RzK20zMVFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzNjE1OTAxCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xMV94NjQtc2V0dXAuZXhlCjN6ZlQybzI4aGdMWGdidDVUTTAxcGRSUS9MaXhFSmVXUk5nZlJVb0kybDBQWGFadkNCNDhFYkNhUi9vcnhJRXoydnBGbkswRWN0cjRja084NEIrVUJRPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.11.exe"
     }
   }
 }

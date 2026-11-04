@@ -3,11 +3,12 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.10 on all three platforms**
+**Live product version: v3.9.11 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
-· **Parked:** AUR publish (Arch registration).
+· **Parked:** AUR publish — AUR is not accepting new account registrations
+after a security incident (owner, 2026-11-04); nothing to do until it reopens.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
@@ -22,6 +23,57 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-11-04 — v3.9.11 SHIPPED; Netlify deploys were dead for 36 h
+
+**Netlify outage, found and fixed before the release.** Every deploy from
+`3578e4ea` (2026-11-02 15:29 UTC) to `4b7399f4` failed — five in a row,
+"Failed during stage 'building site': Build script returned non-zero exit
+code: 2". The live site sat on the v3.9.10 roll (`c0721694`). Worst effect:
+the sets bot added the 540 Star Trek names to `arena-names.json` at
+2026-11-03 21:42 UTC (mtgajson had 447 TRK cards from 11-03 19:29), but
+both hosts kept serving the old 2,153-entry map, hours before the early
+access. Cause: the Netlify **UI** build command was `node
+pipeline/build-meta.mjs` — the whole scraper on every deploy. It passed on
+this desktop on the same commit; the deploy log is only in the dashboard,
+so the exact error is unconfirmed. Fix (owner OK): UI build command set to
+a no-op `echo` via `netlify api updateSite`; Netlify now publishes the
+committed `website/`. Re-deploy of `4b7399f4` went `ready`; both hosts
+served 2,693 names incl. Star Trek. Root `netlify.toml` comment records
+it. Previous command, for the record: `node pipeline/build-meta.mjs`.
+
+**Still open — meta feed is stale since 11-02.** daily-meta run
+41648428015 (11-03) aborted: `mtggoldfish.com/metagame/standard → 403`
+from GitHub Actions. The pipeline kept the 11-02 data live, as designed.
+`npm run meta` from this box works (verified 11-04, 79 decks). Not fixed:
+dodging a 403 aimed at cloud IPs is not something to automate. Owner to
+decide: run locally and commit until it clears, or wait.
+
+The Netlify CLI on this box is logged in (`netlify api …` with
+`site_id` `9f18b64c-41ec-4439-ba09-428619c7400e`; the folder is not
+linked). `listSiteDeploys` shows deploy state + error per commit — check
+it when "pushed" doesn't mean "live".
+
+**v3.9.11 release facts (owner: "push out the latest version today").**
+Tag `v3.9.11` → `83ddc62f` (annotated `fdee75e3`), checked before push:
+four version files 3.9.11, PKGBUILD pkgver 3.9.11 + `fac21f81…`, old Help
+wording absent. `main` merged origin's five bot commits (`a859b8d7`,
+merge, no rebase) and pushed. GitHub Release created with the Linux
+tarball (19,290,722 bytes) and published as latest; macOS CI run
+41788439292 green, dmg 38,137,705 bytes, sha256 `2b2d1008…c5e5847d` =
+the release asset's digest. Windows NSIS 15,424,760 + 428-byte `.sig`
+(the parked 11-02 build, checksums re-matched), re-verified with a Node
+minisign check against the app pubkey `67FCA9900F523D49`: file + global
+sig pass; 3.9.10 exe vs 3.9.11 sig fails; 3.9.10's own pair passes.
+`latest.json` signature is the `.sig` byte for byte. Downloads: 3.9.10 +
+3.9.11. Aetherfield 118,276 → 120,019 in index.html ×2, seven catalogs,
+README, AETHERFIELD-EMBED. OG card "STAR TREK IN AETHERFIELD", `?v=3.9.11`.
+`/meta-web/` regenerated (369 pages on 3.9.11). Pipeline tests 148/148
+(vitest — `node --test` can't run them and fails at import).
+Not checked: in-app Update & restart on real Windows; X card cache.
+
+`gh` moved: `~/.local/share/mise/installs/gh/2.103.3/gh_2.103.3_linux_amd64/bin/gh`
+(2.102.0 is gone).
+
 ### 2026-11-02 (evening) — session closed: social trailer + Help wording
 
 - **Marketing trailer made, not posted.** `~/Videos/Filthy-Net-Deck-Trailer/`:
@@ -34,7 +86,7 @@ that is expected and does not block auto-update.
   next section; tag `83ddc62f`.
 - Nothing pushed; local `main` is ahead of origin until release day.
 
-### 2026-11-02 (later) — v3.9.11 PARKED: Aetherfield is Star Trek ready
+### 2026-11-02 (later) — v3.9.11 parked (shipped 2026-11-04, see above): Aetherfield is Star Trek ready
 
 **Live is still 3.9.10.** Owner: "get it started … we'll see whether I'll
 keep that for a couple of days"; likely released around the 2026-11-04
