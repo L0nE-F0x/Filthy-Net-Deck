@@ -23,6 +23,35 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
+### 2026-11-06 — Linux renderer leak fixed, PARKED for the next bump
+
+**Parked commit `32f0606c`** (local `main`, not pushed — owner: "commit and
+park"). Ship it with the next version bump; release-notes line: *Linux —
+FND no longer grows in memory over a long session.* Also listed in the
+`pending-next-bump` agent memory.
+
+**The bug (v3.9.x on Linux).** Every secondary webview — match alert,
+overlay HUD, presence badge, presence menu — left its `WebKitWebProcess`
+running after `destroy()`. One ~180 MB renderer per match alert, two per
+Arena launch. The owner's 37-hour session had 92 (73 alerts + 9×2 + main),
+~2.2 GB PSS (the "16 GB" another agent quoted double-counted shared pages).
+
+**Proven, not guessed.** An env-gated probe build cycled the alert and
+counted child renderers: one leaked per cycle with `FND_LAYER_SHELL=0` and
+with layer-shell on, so the overlay layer is *not* the cause. The
+`WebKitWebView`'s destroy signal and finalize both fired — FND, Tauri and
+wry release the view; WebKitGTK 2.54.1 keeps the process. Fix:
+`drop_secondary_webview` calls `terminate_web_process()` before
+`destroy()` on Linux → back to one renderer after every cycle, zero core
+dumps over 15 cycles. The 2026-09-10 "destroy left none" note predates
+this OS install (2026-09-15) and the WebKit 2.54.1 upgrade (2026-10-20),
+the likely trigger — unconfirmed. Windows/macOS untouched.
+
+**Owner's machine.** The leaking instance was quit cleanly and v3.9.11
+relaunched. It will leak again until the fix ships; restarting FND every
+day or two is the stopgap. Clean quit/relaunch recipe is in the
+`restart-fnd-cleanly` agent memory.
+
 ### 2026-11-04 — v3.9.11 SHIPPED; Netlify deploys were dead for 36 h
 
 **Netlify outage, found and fixed before the release.** Every deploy from
