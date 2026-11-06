@@ -144,7 +144,24 @@ fn main_browser_args(windows: &[tauri::utils::config::WindowConfig]) -> Option<S
 ///
 /// If it ever resurfaces the blast radius is cosmetic — the parent survives
 /// the child abort and the window is rebuilt on the next match.
+///
+/// **Destroy alone no longer frees the renderer on Linux.** Under
+/// webkit2gtk-4.1 2.54.1 the GTK window is destroyed and the `WebKitWebView`
+/// is finalized, yet its `WebKitWebProcess` stays alive, page and all — one
+/// ~180 MB process per toast, plus two per Arena launch. A 37-hour session on
+/// 2026-11-06 had 92 of them (2.2 GB PSS). Tauri, wry and FND all release the
+/// view; WebKit keeps the process. So end it explicitly first. Tested over
+/// fifteen alert cycles: back to one renderer after each, zero core dumps,
+/// and nothing in the stack listens for `web-process-terminated`, so nothing
+/// respawns it. Each of these windows has its own renderer (no
+/// `related_view`), so this never touches the main window's.
 pub(crate) fn drop_secondary_webview(win: &tauri::WebviewWindow) {
+    // Queued (or run inline on the main thread) ahead of the destroy below.
+    #[cfg(target_os = "linux")]
+    let _ = win.with_webview(|wv| {
+        use webkit2gtk::WebViewExt;
+        wv.inner().terminate_web_process();
+    });
     let _ = win.destroy();
 }
 
