@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.9.12";
+export const APP_VERSION = "3.9.13";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,6 +7,5 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Linux: no more memory creep over a long session — match alerts no longer leave a process running behind them",
-  "Linux: a window that runs away with memory is now restarted instead of freezing your desktop"
+  "Linux: a window whose memory runs away is now restarted within seconds, before it can slow your PC down"
 ];
