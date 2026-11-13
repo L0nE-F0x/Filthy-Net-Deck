@@ -92,9 +92,26 @@ pkgbuild = pkgbuild.replace(/^pkgrel=.*$/m, "pkgrel=1");
 pkgbuild = pkgbuild.replace(/^sha256sums=\('.*'\)$/m, `sha256sums=('${sha256}')`);
 writeFileSync(pkgbuildPath, pkgbuild);
 
+// The one-line installer pins the same tarball by version and checksum. A
+// stale pin would install the previous release, which then offers to update
+// itself straight away — harmless, but it is the wrong first impression.
+const installShPath = join(ROOT, "website", "install.sh");
+let installSh = readFileSync(installShPath, "utf8");
+const stamped = installSh
+  .replace(/^FND_VERSION=".*"$/m, `FND_VERSION="${VERSION}"`)
+  .replace(/^FND_SHA256=".*"$/m, `FND_SHA256="${sha256}"`);
+if (!stamped.includes(`FND_VERSION="${VERSION}"`) || !stamped.includes(`FND_SHA256="${sha256}"`)) {
+  console.error("\n  website/install.sh lost its FND_VERSION / FND_SHA256 lines\n");
+  process.exit(1);
+}
+installSh = stamped;
+writeFileSync(installShPath, installSh);
+
 console.log(`\n  ${TARBALL}`);
 console.log(`  ${bytes.length.toLocaleString()} bytes`);
 console.log(`  sha256 ${sha256}`);
 console.log(`  PKGBUILD → pkgver=${VERSION} pkgrel=1, sha256sums updated`);
+console.log(`  website/install.sh → FND_VERSION=${VERSION}, FND_SHA256 updated`);
 console.log(`\n  Attach the tarball to the v${VERSION} GitHub release, then`);
-console.log(`  refresh the site recipe: npm run linux:recipe\n`);
+console.log(`  refresh the site recipe: npm run linux:recipe`);
+console.log(`  and sign the self-update binary: npm run linux:update\n`);

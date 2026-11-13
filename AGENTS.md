@@ -16,6 +16,7 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 | **App binary** | Bump `package.json`, `src/version.ts`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json` (and `Cargo.lock` after build). Build a real installer. |
 | **Windows installer** | `npm run tauri:build` with updater signing keys set → copy NSIS setup to `website/downloads/Filthy-Net-Deck-Setup-<ver>.exe` **and** the `.sig` next to it. |
 | **Signed in-app updater** | Update `website/updater/latest.json` with new `version`, `notes`, `pub_date`, `platforms.windows-x86_64.url` + **signature** from the build. Prefer **Update & restart** over browser download. |
+| **Linux self-update** (since 3.9.15) | After `npm run tauri:build -- --no-bundle`: `npm run linux:tarball` (tarball + PKGBUILD **and** `website/install.sh` version/sha256), then — once the Windows entry of `latest.json` is on this version — `npm run linux:update` (signs the raw binary, verifies it against the app's pubkey, writes `platforms["linux-x86_64-local"]`). Upload **both** `dist-linux/filthy-net-deck-<ver>-x86_64.tar.gz` and `dist-linux/filthy-net-deck-<ver>-x86_64` to the GitHub release **before** the site flip — `install.sh` and the updater both download from it. Never publish a plain `linux-x86_64` key: ≤3.9.14 pacman copies look that one up and cannot write `/usr/bin`. |
 | **Soft version channel** | Update `website/version.json` **and** `public/version.json` (`version`, `downloadUrl`, `notes`) so Settings / soft fallback see the new build. |
 | **Marketing site** | `website/index.html` download buttons, version labels, hero/mock version strings, feature copy. **The generated public-meta pages are a second download surface** — `pipeline/build-meta-site.mjs` writes `/meta-web/` (hub, both formats, every deck and card page) with its own platform buttons, footer link and `og-image.png?v=`. Run `npm run meta:site` and commit the result, or those pages keep offering the previous release's platforms. v3.5.0 shipped Linux on the homepage and nowhere else until the owner spotted it. **Marketed copy is translated** — English lives inline in `index.html`, the other seven Arena locales in `website/i18n/*.json`. New or reworded feature copy means a new `data-i18n` key in all eight, or `pipeline/site-i18n.test.mjs` fails CI. Version strings stay out of the catalogs (`{version}` placeholder); bump them in `index.html` only. |
 | **Upload claims (only when the payload changed)** | If this release adds, removes or changes an uploaded field, update **all three**: `README.md`, `website/index.html`, and `website/privacy.html` (bump `PRIVACY_LASTMOD` in `pipeline/build-meta-site.mjs`). Say it in the release notes — existing users installed on the old promise. This was missed for three releases; see `docs/PLATFORM-STRATEGY.md` §1.2 rule 4. |
@@ -31,6 +32,10 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
 [ ] Signed Windows build (TAURI_SIGNING_PRIVATE_KEY + password)
 [ ] website/downloads/Filthy-Net-Deck-Setup-<ver>.exe (+ .sig)
 [ ] website/updater/latest.json → version + signature + url
+[ ] Linux: npm run linux:tarball (stamps website/install.sh) → npm run linux:update
+    (latest.json linux-x86_64-local, signature verified)
+[ ] GitHub release carries the tarball AND the raw filthy-net-deck-<ver>-x86_64
+    before the site flip — install.sh and in-app updates both fetch from it
 [ ] website/version.json + public/version.json
 [ ] website/index.html download links + marketed feature copy
 [ ] npm run meta:site — /meta-web/ platform buttons + og cache-bust
@@ -45,6 +50,8 @@ Before saying “done” / “shipped” / “users can see it”, complete **al
     links updated — v2.8.2's dmg was built but never rolled, leaving macOS
     visitors on 2.8.1
 [ ] Verified: in-app Check for updates offers Update & restart (not only Chrome download)
+[ ] Verified (Linux): live install.sh installs this version; a home-folder copy
+    of the previous version offers Update & restart
 [ ] Verified: link share preview shows new OG card (not a stale X cache)
 ```
 

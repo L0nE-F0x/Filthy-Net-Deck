@@ -22,10 +22,10 @@ export function detectOs(
 }
 
 /**
- * Linux ships as a distro package (an Arch pacman package today), so the app never installs
- * its own updates there: no signed updater target is published, and handing
- * someone a package file to run by hand is the wrong move on a rolling distro.
- * Settings uses this to swap the download button for package-manager wording.
+ * First guess, before Rust has said where this copy lives: on Linux, assume a
+ * package manager owns it. Settings replaces the guess with `update_route` —
+ * a copy from `install.sh` sits in a folder the user owns and updates itself
+ * in-app; one from the pacman recipe sits in `/usr/bin` and cannot.
  */
 export function updatesViaPackageManager(os: OsName = detectOs()): boolean {
   return os === "linux";

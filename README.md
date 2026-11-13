@@ -7,6 +7,7 @@ Desktop meta companion for **Magic: The Gathering** — the daily **Standard** a
 **Data promise:** only real, live, verified lists ship. There is no seed pack, no placeholder decks, and no fuzzy guessing anywhere in the chain. If live data can't be verified, the previously published real data stays up.
 
 **Download:** https://filthy-net-deck.com/  
+**Linux (Arch & Omarchy):** `curl -fsSL https://filthy-net-deck.com/install.sh | bash` — installs into your home folder, no sudo, and updates itself in-app from then on ([`website/install.sh`](website/install.sh)).  
 **Repo:** https://github.com/L0nE-F0x/Filthy-Net-Deck  
 **Suggest a feature / report a bug:** https://filthy-net-deck.com/feedback.html
 
@@ -23,7 +24,7 @@ npm run tauri:dev
 
 ```bash
 npm run meta         # build today's live meta (Standard + Pioneer)
-npm run tauri:build  # Windows/macOS installers (Linux: --no-bundle, then packaging/arch)
+npm run tauri:build  # Windows/macOS installers (Linux: --no-bundle, then linux:tarball + linux:update)
 ```
 
 ### Aetherfield

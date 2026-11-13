@@ -21,7 +21,8 @@
     "meta:site": "node pipeline/build-meta-site.mjs",
     "aetherfield": "node scripts/sync-aetherfield.mjs",
     "linux:tarball": "node scripts/build-linux-tarball.mjs",
-    "linux:recipe": "tar --sort=name --owner=0 --group=0 --numeric-owner -czf website/downloads/filthy-net-deck-bin.tar.gz -C packaging/arch --transform \"s,^,filthy-net-deck-bin/,\" PKGBUILD filthy-net-deck-bin.install"
+    "linux:recipe": "tar --sort=name --owner=0 --group=0 --numeric-owner -czf website/downloads/filthy-net-deck-bin.tar.gz -C packaging/arch --transform \"s,^,filthy-net-deck-bin/,\" PKGBUILD filthy-net-deck-bin.install",
+    "linux:update": "node scripts/sign-linux-update.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",

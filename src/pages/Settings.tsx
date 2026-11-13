@@ -9,7 +9,7 @@ import { APP_VERSION } from "../version";
 import { downloadInstaller, openExternal } from "../services/openExternal";
 import { DONATE_URL, FEEDBACK_URL, PRIVACY_URL, appFeedbackUrl } from "../services/site";
 import { EMAIL_SIGN_IN_ENABLED } from "../services/cloud/config";
-import { isTauri } from "../services/appUpdater";
+import { getUpdateRoute, isTauri } from "../services/appUpdater";
 import { overlayClickThroughAvailable, updatesViaPackageManager } from "../services/platform";
 import { isAutostartEnabled, setAutostart } from "../services/autostart";
 import {
@@ -391,11 +391,23 @@ export const Settings = memo(function Settings() {
   const meta = useAppStore((s) => s.meta);
 
   /**
-   * Linux ships as an Arch pacman package, so the app is not the thing that
-   * installs its own updates there. It still reports what is out, then names
-   * the command that does the work.
+   * A Linux copy owned by pacman (`/usr/bin`) cannot replace itself, so the
+   * app reports what is out and names the route instead. A copy from
+   * `install.sh` lives in a folder the user owns and updates in-app like
+   * Windows. The OS guess holds until Rust answers which one this is.
    */
-  const packageManagedUpdates = updatesViaPackageManager();
+  const [packageManagedUpdates, setPackageManagedUpdates] = useState(() =>
+    updatesViaPackageManager(),
+  );
+  useEffect(() => {
+    let alive = true;
+    void getUpdateRoute().then((r) => {
+      if (alive) setPackageManagedUpdates(r.kind === "package");
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const [updateMsg, setUpdateMsg] = useState<string | null>(null);
   const [autostart, setAutostartState] = useState<boolean | null>(null);
@@ -1333,7 +1345,7 @@ export const Settings = memo(function Settings() {
                     const mode = avail?.canAutoInstall
                       ? "Update & restart ready"
                       : packageManagedUpdates
-                        ? "rebuild the package to install it"
+                        ? "see below to install it"
                         : "download fallback only";
                     setUpdateMsg(`v${result.remote.version} is ready (${mode}).`);
                   } else if (result.status === "latest") {
@@ -1402,15 +1414,17 @@ export const Settings = memo(function Settings() {
                   {updateAvailable.notes}
                 </p>
               )}
-              {/* Until filthy-net-deck-bin is on the AUR, `omarchy update` cannot
-                  see this package — it was built straight from a release, so
-                  nothing tracks it upstream. Point at the recipe that does work,
-                  and swap this for `omarchy update` on the release that publishes
-                  to the AUR. */}
+              {/* A pacman-owned copy (/usr/bin) cannot replace itself. Point at
+                  the one-time switch to the self-updating install rather than
+                  at another package rebuild — after it, every update is the
+                  same one click as Windows. */}
               <p className="text-xs text-muted mt-2 mb-0 leading-relaxed">
-                FND is installed as a pacman package. To update, rebuild it from the current
-                release — the two lines are at{" "}
-                <code className="font-mono text-foam">filthy-net-deck.com/#download</code>
+                This copy is a pacman package, so FND can’t update it from here. Switch once
+                to the self-updating install and every later update is one click: run the
+                line at{" "}
+                <code className="font-mono text-foam">filthy-net-deck.com/#download</code>,
+                then remove the old package with{" "}
+                <code className="font-mono text-foam">sudo pacman -R filthy-net-deck-bin</code>.
               </p>
             </>
           )}

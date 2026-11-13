@@ -328,9 +328,48 @@ back to showing `Card #<grpId>` while `arena-names.json` stops changing.
 
 | Mode | Behavior |
 |------|----------|
-| **Signed (preferred)** | `plugin-updater` reads `updater/latest.json`, verifies minisign against the pubkey in `tauri.conf.json`, then **download + install + relaunch** in one click. |
-| **Silent NSIS (desktop fallback)** | If signed metadata isn’t available but `version.json` has a newer build + `downloadUrl`, the app downloads the official setup to temp, runs ` /S`, and relaunches. **Never opens Chrome.** |
-| **Browser (last resort)** | Vite preview / non-Tauri only: open the installer URL externally. |
+| **Signed (preferred)** | `plugin-updater` reads `updater/latest.json`, verifies minisign against the pubkey in `tauri.conf.json`, then **download + install + relaunch** in one click. Windows, macOS, and Linux copies installed by `install.sh`. |
+| **Browser (fallback)** | The signed check failed, or this copy can't install its own updates (a pacman copy in `/usr/bin`): `version.json` can *say* a version exists, never authorise installing it. The user is sent to the download page. |
+
+There used to be a third, "silent NSIS" mode that downloaded the setup and ran
+it with `/S` **without checking a signature**. It was removed — see the header
+comment in `src/services/appUpdater.ts`. Do not bring it back.
+
+### Linux (since 3.9.15)
+
+Two kinds of Linux install exist, and only one can update itself:
+
+- **`install.sh`** (`curl -fsSL https://filthy-net-deck.com/install.sh | bash`)
+  puts the binary in `~/.local/share/filthy-net-deck/`, a folder the user
+  owns. The updater's Linux path for anything that is not a deb/rpm writes the
+  downloaded, signature-checked file straight over the running executable, so
+  this copy gets the same **Update & restart** as Windows — no password.
+- **The pacman recipe** (≤3.9.14's only route) installs to `/usr/bin`, which
+  root owns. The app reports new versions and Settings names the one-time
+  switch to `install.sh`.
+
+`update_route` (`src-tauri/src/self_update.rs`) tells the frontend which one it
+is running as. Three rules, each learned or measured, not assumed:
+
+1. **The key is `linux-x86_64-local`, never `linux-x86_64`.** Self-install
+   copies pass it as `check({ target })`. Every ≤3.9.14 copy is a pacman copy
+   looking up the plain key; publishing that key would hand them a file they
+   cannot write.
+2. **The payload is the raw binary**, ~40 MB, on the GitHub release — not the
+   tarball (a gzip payload must hold an `.AppImage` entry) and not
+   `website/downloads/` (git history).
+3. **The restart is `relaunch_after_update`, not `relaunch()`.** Autostart runs
+   FND as a systemd user *service*; when its main process exits, systemd kills
+   the rest of the cgroup, so a child spawned by `relaunch()` dies with it
+   (measured: a plain child of a service died, one in its own `systemd-run`
+   unit lived). The new copy also has to wait for the old one to exit, or the
+   single-instance plugin hands its launch to the dying process.
+
+Tested end to end on 2026-11-13: an old build installed by the same layout,
+running as a user service with `--hidden`, updated itself from a local
+manifest to the real 3.9.15 binary; the file was replaced byte-for-byte, the
+old unit stopped, the new copy came up in its own unit as a visible window,
+and the decoy under the plain key was never fetched.
 
 `website/version.json` shape:
 
@@ -358,9 +397,13 @@ Ship steps when releasing a new app build:
 3. Update `website/updater/latest.json` (version, notes, url, **signature** —
    byte-identical to the `.sig`).
 4. Linux: `npm run tauri:build -- --no-bundle`, then `npm run linux:tarball`
-   (builds the release tarball and writes its sha256 into the PKGBUILD), then
-   `npm run linux:recipe` (repacks the site's PKGBUILD + `.install` tarball).
-   Attach the release tarball to the GitHub release.
+   (builds the release tarball and writes its sha256 into the PKGBUILD **and**
+   `website/install.sh`), then `npm run linux:recipe` (repacks the site's
+   PKGBUILD + `.install` tarball). After step 3 has put `latest.json` on this
+   version, `npm run linux:update` signs the raw binary, verifies the signature
+   against the app's pubkey and writes `platforms["linux-x86_64-local"]`.
+   Attach **both** the tarball and `dist-linux/filthy-net-deck-<ver>-x86_64` to
+   the GitHub release before the site goes live.
 5. Update `website/index.html` download links + marketed copy. New or reworded
    marketed copy needs a `data-i18n` key in all seven `website/i18n/*.json`, or
    `pipeline/site-i18n.test.mjs` fails.

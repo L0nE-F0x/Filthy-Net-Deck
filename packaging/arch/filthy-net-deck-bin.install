@@ -20,11 +20,12 @@ post_install() {
       Options -> Account -> Detailed Logs (Plugin Support)
   then restart Arena.
 
-  Updates never come from inside the app. Until filthy-net-deck-bin is on
-  the AUR (Arch has new-account registration paused), rebuild it from the
-  current release — the two lines are at:
+  A pacman package can't update itself from inside the app — root owns
+  its files. For one-click updates (Update & restart, no password), use
+  the home-folder install instead, then remove this package:
 
-      https://filthy-net-deck.com/#download
+      curl -fsSL https://filthy-net-deck.com/install.sh | bash
+      sudo pacman -R filthy-net-deck-bin
 
   Omarchy's crash watcher may pop a "Process crashed: WebKitWebProcess"
   banner when you quit FND. That is WebKitGTK's render process going down

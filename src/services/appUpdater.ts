@@ -3,8 +3,12 @@
  *
  * 1. **Signed (preferred):** Tauri updater plugin checks
  *    `updater/latest.json`, verifies minisign, downloadAndInstall + relaunch.
+ *    Linux joins this path only for a copy in a folder the user owns (the
+ *    `install.sh` install): it looks up its own platform key and restarts
+ *    through `relaunch_after_update` — see `src-tauri/src/self_update.rs`.
  * 2. **Browser:** anything else — open the download page and let the user run
- *    the installer themselves.
+ *    the installer themselves. A pacman-owned Linux copy lands here: the app
+ *    reports the release and Settings names the route.
  *
  * There is deliberately no third path that downloads and executes an installer
  * for you. One used to exist (`install_update_silent`): it fetched the NSIS
@@ -18,6 +22,7 @@
  */
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
+import { invoke } from "@tauri-apps/api/core";
 
 export function isTauri(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -25,6 +30,47 @@ export function isTauri(): boolean {
 
 /** The pending update object must stay out of the store (not serializable). */
 let pendingUpdate: Update | null = null;
+
+/**
+ * Who installs this copy's updates (from `update_route` in Rust).
+ * `self`: the signed updater, in-app. `package`: a package manager owns the
+ * binary (Linux `/usr/bin`), so the app reports and never installs.
+ * `target`: the updater platform key to look up instead of the default.
+ */
+export interface UpdateRoute {
+  kind: "self" | "package";
+  target: string | null;
+}
+
+let routePromise: Promise<UpdateRoute> | null = null;
+
+/** Asked once per run: the install location cannot change under a running app. */
+export function getUpdateRoute(): Promise<UpdateRoute> {
+  routePromise ??= isTauri()
+    ? invoke<UpdateRoute>("update_route").then(
+        (r) => ({ kind: r.kind === "self" ? "self" : "package", target: r.target ?? null }),
+        // A build without the command is a pre-3.9.15 one; the safe answer is
+        // the one that never tries to overwrite a file.
+        () => ({ kind: "package", target: null }),
+      )
+    : Promise.resolve({ kind: "self", target: null });
+  return routePromise;
+}
+
+/** Test hook: forget the cached route. */
+export function resetUpdateRouteForTests(): void {
+  routePromise = null;
+}
+
+/**
+ * What `check()` is asked for this route, or null when the signed updater must
+ * not be consulted at all. Pure, so the rule that a package-managed copy never
+ * reaches the installer is tested rather than inferred.
+ */
+export function checkOptionsFor(route: UpdateRoute): { target?: string } | null {
+  if (route.kind === "package") return null;
+  return route.target ? { target: route.target } : {};
+}
 
 export type UpdateInstallMode = "signed" | "browser";
 
@@ -53,8 +99,10 @@ export type SignedCheck =
  */
 export async function checkAppUpdateSigned(): Promise<SignedCheck> {
   if (!isTauri()) return { ok: false };
+  const options = checkOptionsFor(await getUpdateRoute());
+  if (!options) return { ok: false };
   try {
-    const update = await check();
+    const update = await check(options);
     if (!update) {
       pendingUpdate = null;
       return { ok: true, update: null };
@@ -124,6 +172,14 @@ export async function installPendingUpdate(
       onProgress(100);
     }
   });
+  // A Linux self-install restarts through its own command; `relaunch()` would
+  // start the new copy inside the old one's systemd unit, where it dies with
+  // it, and with `--hidden` still on its command line.
+  const route = await getUpdateRoute();
+  if (route.target) {
+    await invoke("relaunch_after_update");
+    return;
+  }
   await relaunch();
 }
 

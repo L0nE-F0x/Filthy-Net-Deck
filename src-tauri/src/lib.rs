@@ -9,6 +9,7 @@ mod overlay;
 mod presence;
 #[cfg(target_os = "linux")]
 mod renderer_watchdog;
+mod self_update;
 mod toast;
 mod tracker;
 #[cfg(target_os = "linux")]
@@ -272,6 +273,26 @@ fn main_window_set_fullscreen(app: tauri::AppHandle, on: bool) -> Result<(), Str
     win.set_fullscreen(on).map_err(|e| e.to_string())
 }
 
+/// Frontend, Linux self-install only: the signed updater has just written the
+/// new binary over this one. Start it once this process is gone (see
+/// `self_update::spawn_relauncher` for why not `relaunch()`), then quit the
+/// same way the tray's Quit does.
+#[tauri::command]
+fn relaunch_after_update(app: tauri::AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        self_update::spawn_relauncher()?;
+        QUITTING.store(true, Ordering::SeqCst);
+        app.exit(0);
+        Ok(())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app;
+        Err("relaunch_after_update is Linux-only; use relaunch()".into())
+    }
+}
+
 /// Frontend: exit fullscreen (if any) and hide to tray. Same path as the
 /// titlebar ✕, including the one-time "still running in the tray" hint.
 #[tauri::command]
@@ -384,7 +405,9 @@ pub fn run() {
             main_window_hide_to_tray,
             install_id::install_id_get,
             install_id::install_id_ensure,
-            install_id::install_id_clear
+            install_id::install_id_clear,
+            self_update::update_route,
+            relaunch_after_update
         ])
         .setup(|app| {
             // Baseline for `refuse_if_main_thread` — setup runs on the event loop.
