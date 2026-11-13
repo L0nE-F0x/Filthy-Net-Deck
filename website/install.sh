@@ -62,7 +62,13 @@ main() {
 
   printf '\n  Filthy Net Deck %s\n\n' "$FND_VERSION"
   say "Downloading…"
-  curl -fsSL --retry 2 -o "$tmp/fnd.tar.gz" "$url" || die "download failed: $url"
+  # A progress bar, not silence: GitHub's file servers sometimes hand out a
+  # slow connection (2026-11-13: ~35 KB/s, so the 19 MB tarball took ~9 min,
+  # while a fresh connection took 18 s). Seeing it move is the difference
+  # between waiting and giving up. A connection that stalls outright (under
+  # 4 KB/s for 30 s) is dropped and retried; a new one is usually fast.
+  curl -fL --progress-bar --connect-timeout 20 --speed-limit 4096 --speed-time 30 --retry 3 \
+    -o "$tmp/fnd.tar.gz" "$url" || die "download failed: $url"
   echo "$FND_SHA256  $tmp/fnd.tar.gz" | sha256sum --check --status \
     || die "the download does not match this release's checksum, so nothing was installed."
   tar -xzf "$tmp/fnd.tar.gz" -C "$tmp"
