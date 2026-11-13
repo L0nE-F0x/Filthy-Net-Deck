@@ -350,7 +350,10 @@ Ship steps when releasing a new app build:
    `package.json`, `src/version.ts`, `src-tauri/{Cargo.toml,tauri.conf.json}`
    and both `version.json` files in one go.
 2. `npm run tauri:build -- --bundles nsis --runner cargo-xwin --target x86_64-pc-windows-msvc`
-   with `TAURI_SIGNING_PRIVATE_KEY` (+ password) → copy installer + `.sig` into
+   with `TAURI_SIGNING_PRIVATE_KEY` (+ password) — on the Linux box, export the
+   **full** env block from `handoff.md` ("Signed Windows build on this Linux
+   box": `PATH` with `~/bin` + llvm-mingw, `NSISDIR`), or bundling fails with
+   `makensis.exe: No such file or directory` → copy installer + `.sig` into
    `website/downloads/`.
 3. Update `website/updater/latest.json` (version, notes, url, **signature** —
    byte-identical to the `.sig`).

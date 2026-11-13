@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.11 on all three platforms**
+**Live product version: v3.9.12 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -23,10 +23,66 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-### 2026-11-06 — Linux renderer leak fixed, PARKED for the next bump
+### 2026-11-13 — v3.9.12 SHIPPED: runaway renderer watchdog + the 11-06 leak fix
 
-**Parked commit `32f0606c`** (local `main`, not pushed — owner: "commit and
-park"). Ship it with the next version bump; release-notes line: *Linux —
+**What happened.** Owner's FND (v3.9.11, started `--hidden` 10:35) froze on
+a deck-stats click at ~11:12. The **main window's** `WebKitWebProcess` held
+25.7 GB (RSS + swap), growing a steady 22 MB/s; back-extrapolated start
+≈10:57, the first match end of the session. Its main thread sat in
+`futex_wait` at 0 % CPU; compositor, GPU and WebAudio threads ran. The app
+process was healthy (its tray still worked). Owner quit FND before a stack
+could be taken (ptrace is yama scope 1 → `sudo eu-stack -p <pid>` needed).
+
+**Cause: unknown.** Ruled out the same day, each with a check that the test
+actually exercised the thing:
+- WebAudio alone (sfx.ts leaves one `AudioContext` running forever): flat in
+  a bare WebKitGTK 2.54.1 view, visible and never-shown. (First probe never
+  started audio — autoplay policy; fixed with `WebsitePolicies` ALLOW.)
+- "Frozen since 10:57": no — `bbi.cloud.uploadedThrough` was written at
+  11:11:48 by the window's JS, so it ran while it grew. The freeze came last.
+- The match-end flow: a sandboxed release build (fake HOME, copied state
+  without `auth.json`, install-id kept) fed the real Player.log through the
+  10:57 match end, with a GTK window titled `MTGA` so overlay + alert fired:
+  main renderer flat at ~305 MB for 5 min. Recipe: `sandbox-replay` memory.
+
+**Shipped instead (`0acb3ac5`): `renderer_watchdog.rs`, Linux only.** Every
+15 s, each child renderer's RSS + swap; logs each new GB; >4 GB on two checks
+→ logs the 10 busiest threads (state, ticks, wchan) and SIGKILLs it. The main
+window reloads on `web-process-terminated` (≤ once a minute; ignores
+`TerminatedByApi` so `drop_secondary_webview` is unaffected).
+`FND_RENDERER_LIMIT_MB` overrides the limit for testing. Tested at 250 MB:
+kill → working reload (local records rendered) → second kill not reloaded →
+tray Quit clean, no core dumps.
+
+**If it happens again:** `journalctl --user -t filthy-net-deck | grep
+renderer-watchdog` gives the GB milestones (when growth started) and the
+thread dump. If the window is frozen and FND still open, get
+`sudo eu-stack -p <main renderer pid>` before anything is killed.
+
+**v3.9.12 release facts.** Tag `v3.9.12` → `d0e2f67c` (verified: four
+version files, PKGBUILD sha, watchdog + terminate_web_process in tree), then
+merged origin's 10 bot commits (`8d026bea`, app/packaging untouched) and
+pushed. Windows NSIS 15,509,550 bytes, sha256 `4d8ae31e…fdf9705f3`, 428-byte
+`.sig`; minisign check vs app pubkey `67FCA9900F523D49`: pass; 3.9.11 exe vs
+new sig fails; 3.9.11's own pair passes. `latest.json` signature = `.sig`
+bytes. Linux tarball 19,373,566 bytes, `9cf31ac6…5a33db395ef` = PKGBUILD =
+release asset digest; binary byte-identical to the build. macOS CI run
+43365137923, dmg 38,240,547 bytes, sha256 `11a2cee4…c98a1362` = release
+digest. Downloads: 3.9.11 + 3.9.12. OG "STEADIER ON LINUX", `?v=3.9.12`;
+`/meta-web/` 369 pages on 3.9.12. Tests: 876 frontend, 98 Rust, 148
+pipeline; tsc, eslint, clippy clean. Upload payload unchanged.
+
+**Build gotcha:** the NSIS step needs the *full* env block below ("Signed
+Windows build on this Linux box") — `PATH` with `~/bin` (makensis wrapper)
+and `NSISDIR`. The short recipe in DATA-AND-UPDATES.md fails with
+`makensis.exe: No such file or directory`.
+
+**Still open:** the meta feed date on `/meta-web/` is 2026-11-02 (see the
+11-04 note about the goldfish 403).
+
+### 2026-11-06 — Linux renderer leak fixed (shipped in v3.9.12 on 2026-11-13)
+
+**Commit `32f0606c`** — parked 11-06, shipped in v3.9.12. Ship it with the next version bump; release-notes line: *Linux —
 FND no longer grows in memory over a long session.* Also listed in the
 `pending-next-bump` agent memory.
 
