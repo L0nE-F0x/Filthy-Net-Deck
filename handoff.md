@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.14 on all three platforms**
+**Live product version: v3.9.15 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -22,6 +22,53 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+### 2026-11-13 (night) — v3.9.15: Linux updates itself (no password)
+
+**Owner's ask:** stop needing the pacman recipe for every update — "my other
+apps don't need that" (VibeForge, Stones to Stars). Both live in a folder the
+user owns and replace themselves; FND was a pacman package in root-owned
+`/usr/bin`, which nothing can overwrite without sudo.
+
+**What shipped.** `curl -fsSL https://filthy-net-deck.com/install.sh | bash`
+(`website/install.sh`) installs into `~/.local/share/filthy-net-deck/`, pinned
+to the release tarball by sha256, no root. From there Tauri's own signed
+updater replaces the binary in place — its Linux path for a non-deb/rpm build
+writes the signature-checked download over the running executable. Same
+**Update & restart** as Windows. Details and the three rules (own platform key
+`linux-x86_64-local`; raw binary on the GitHub release; `relaunch_after_update`
+instead of `relaunch()`) are in `docs/DATA-AND-UPDATES.md` → "Linux".
+
+**Measured, not assumed:** a child process of a systemd user *service* dies
+when the service's main process exits (KillMode=control-group) — autostart
+runs FND as exactly such a service, so `relaunch()` would have killed the
+updated copy on the owner's box. One started via `systemd-run --user` lives.
+
+**End-to-end test (passed):** debug build compiled as "3.9.14" with
+`TAURI_CONFIG` pointing the updater at a local server, installed in the
+install.sh layout under a scratch HOME, run as a user service with
+`--hidden`; probe ran the real store actions. Result: route self /
+`linux-x86_64-local`, offer signed, `/fnd-b` fetched (decoy under the plain
+key never), file at the install path = the real 3.9.15 binary byte for byte,
+mode 755, old unit inactive, new copy in its own `run-*.service`, visible
+window, no `--hidden`, sandbox HOME kept. The shipped Linux binary is that
+exact file (sha256 `e377989a…`).
+
+**Pacman copies (every ≤3.9.14 Linux install) are untouched:** they look up
+the plain `linux-x86_64` key, which is never published. 3.9.15 pacman copies
+skip the signed check entirely (`update_route` = package) and Settings names
+the switch: run the one line, then `sudo pacman -R filthy-net-deck-bin`.
+The PKGBUILD stays for the AUR.
+
+**Release record.** Tag `v3.9.15` → `3f698ec6` (feature `cb1dd1e0`). Windows
+NSIS signed, sig verified (3.9.14 exe vs new sig fails). Linux tarball
+19,376,185 bytes, `0070c77b…5102ed8db0` = PKGBUILD = install.sh = release
+asset. Linux self-update binary 39,574,720, `e377989a…` = the e2e-tested file
+= release asset; its signature verified twice (script + independent verifier;
+3.9.14 binary fails against it). macOS CI run 43434272867, dmg 38,262,490,
+`5f00d477…958107b8` = release digest. latest.json platforms:
+`windows-x86_64` + `linux-x86_64-local` only. Downloads: 3.9.14 + 3.9.15. OG
+"LINUX UPDATES ITSELF", `?v=3.9.15`; `/meta-web/` 369 pages on 3.9.15.
 
 ### 2026-11-13 (evening) — v3.9.14: the runaway's ROOT CAUSE found and fixed
 

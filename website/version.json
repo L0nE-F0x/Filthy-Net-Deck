@@ -1,9 +1,9 @@
 {
-  "version": "3.9.14",
+  "version": "3.9.15",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.14.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.14-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.15.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.15-universal.dmg"
   },
-  "notes": "v3.9.14: fixes My Stats crashing on Linux. Opening one of your decks could make the window run out of memory and reload before the page appeared, most often on a deck with a long version history. Deck pages open normally now. Windows and macOS: same change, nothing looks different."
+  "notes": "v3.9.15: Linux can now update itself. Install once with the one-line installer on filthy-net-deck.com — after that, every update is Update & restart inside the app, with no password and no package rebuild, the same as on Windows. Already on the pacman package? Settings shows the one-time switch. Windows and macOS: no changes beyond the version number."
 }

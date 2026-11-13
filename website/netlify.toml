@@ -67,6 +67,15 @@
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=60"
 
+# The Linux one-line installer. Plain text so a browser shows it instead of
+# downloading it — people should be able to read a script before piping it
+# into bash. No Cache-Control: Netlify's default revalidates every request,
+# and this file pins the current release by checksum, so stale is wrong.
+[[headers]]
+  for = "/install.sh"
+  [headers.values]
+    Content-Type = "text/plain; charset=UTF-8"
+
 # Ported from the repo-root netlify.toml, which Netlify never reads for headers
 # (see the warning at the top of that file). Social scrapers refetch the OG card
 # constantly and it only changes on release, so a day of caching is free. This
