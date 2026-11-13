@@ -72,9 +72,24 @@ bus broken segfaulted the instrumented FND in atk-bridge
 `NO_AT_BRIDGE=1` as a precaution; a normal restart after re-login drops it.
 How to sandbox safely now: `sandbox-replay` agent memory.
 
+**Next session starts with the owner's report.** Owner is rebooting (clears
+the broken a11y socket; FND autostarts on 3.9.13 without `NO_AT_BRIDGE`) and
+will try to reproduce by hand. Owner's own observation: **it always hangs
+when they click the same thing in the same place** — consistent with 14:49,
+where the store log shows `page` then `page,selectedDeckId` (an `openDeck`)
+in the seconds before the runaway, and with the original report ("clicked
+to see the stats on one of my decks"). Ask exactly which click; my sandbox
+cycles clicked through pages and opened meta decks, but never the owner's
+own tracked-deck stats view. Evidence to read afterwards:
+`journalctl --user -t filthy-net-deck | grep renderer-watchdog` (GB
+milestones, growth per 3 s, thread dump, reload line). Possible outcomes:
+the window reloads within seconds (watchdog caught it — bug still there);
+nothing happens (inconclusive unless they waited 15+ min hidden first); a
+freeze (the watchdog failed — top priority).
+
 **Open:**
 - Root cause. Next experiment: launch hidden, wait 20 min, reopen
-  fullscreen, repeat. If it reproduces, test windowed reopen and
+  fullscreen, click the owner's exact target, repeat. If it reproduces, test windowed reopen and
   `WEBKIT_DISABLE_DMABUF_RENDERER=1`.
 - Each reopen grows the main renderer ~8 MB (425 → 592 MB over 20 opens).
 - An app-process thread uses ~4% CPU at idle (likely the 4 s `arena.rs`
