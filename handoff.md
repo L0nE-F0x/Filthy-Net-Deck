@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.13 on all three platforms**
+**Live product version: v3.9.14 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -22,6 +22,62 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+### 2026-11-13 (evening) — v3.9.14: the runaway's ROOT CAUSE found and fixed
+
+**It was a CSS blur.** `.diff-art-badge` — the +/− badge on every swapped card
+in a deck's *Version history* (My Stats → a deck) — had
+`backdrop-filter: blur(6px)`. Every element with a backdrop filter is its own
+compositor layer, and WebKitGTK 2.54 does not survive many on one page: the
+owner's Azorius Control has 20, and opening it sent the main renderer up at
+~800 MB/s. The badge fill is opaque, so the blur was never even visible. Fix
+`4e52ef4c`: the blur is gone there and on `.set-status` (one pill per set card,
+same pattern), and `src/test/backdropFilter.test.ts` allowlists the selectors
+that may use a backdrop filter (window chrome, full-screen scrims, the three
+Daily hero tiles) — it fails against the old stylesheet naming both.
+
+**This supersedes both entries below.** Fullscreen, time hidden, the reopen
+resize sequence, WebAudio, the match-end flow — none of it was involved. Every
+case today was the same thing: the owner opened FND and clicked that deck. The
+owner said so twice ("it always happens when I click the same thing"); the
+afternoon's sandbox clicked through pages and *meta* decks but never a tracked
+deck's stats, so it never reproduced. The watchdog (3.9.12/3.9.13) stays as a
+safety net; it did its job three more times tonight (18:48, 18:50, 19:02).
+
+**How it was found (≈50 s per trial, recipe in the `sandbox-replay` memory):**
+a debug build loads the Vite dev server, so a temporary probe module could
+click the real deck row and frontend edits needed no rebuild. Sandbox = fake
+HOME with the owner's matches, no `auth.json`, private bus + runtime dir,
+`systemd-run` memory cap. a11y socket untouched on every run (checked).
+- full page, 20 blurred badges → runaway, killed at 2.1–3.4 GB (4 of 4)
+- Version history panel removed → flat ~780 MB
+- blur off, all else on → flat ~840–870 MB (2 of 2)
+- blur on only the newest build's 4 badges → flat ~820 MB
+- blur on, cut cards' image `filter` off → runaway (so it is the blur)
+- the committed stylesheet, four decks (20 / 5 / 2 / 0 badges) → flat
+- Sets page: 2 blurred pills, Daily: 3 tiles — both flat
+Partial page heights gave a ~1.3 GB plateau rather than a runaway, so the
+failure scales with badge count × page size; no symbols, so not understood
+further than that. The rule the test enforces is "never on a repeated element".
+
+**Release record.** Tag `v3.9.14` → `c159c0b0`. Windows NSIS 15,502,076
+bytes, sig verified (3.9.13 exe vs new sig fails). Linux tarball 19,376,726,
+`3a791dc2…e0ce791c` = PKGBUILD = release asset (re-downloaded and hashed).
+macOS CI run 43429052997, dmg 38,251,930 bytes, sha256 `83573a36…41022e05` =
+release digest. Downloads: 3.9.13 + 3.9.14. OG "DECK STATS FIXED ON LINUX",
+`?v=3.9.14`; `/meta-web/` 369 pages on 3.9.14. Upload payload unchanged.
+
+**Owner's machine:** the installed package is still 3.9.13. At 20:59 the
+running FND was tray-quit and replaced by the 3.9.14 release binary run from
+the session scratchpad (`NO_AT_BRIDGE=1`, a11y bus still broken) so the fix
+could be tried at once — that copy disappears at reboot, and autostart then
+runs `/usr/bin` 3.9.13 again until the package is updated with the site's
+pacman recipe (`sudo pacman -U` — agents cannot).
+
+**Still open from the afternoon (unrelated to the runaway, lower priority):**
+each reopen grows the main renderer ~8 MB; an app-process thread uses ~4% CPU
+at idle. The session a11y bus is still broken until the owner re-logs in
+(uptime shows no reboot yet).
 
 ### 2026-11-13 (afternoon) — v3.9.13 SHIPPED: faster watchdog; the trigger found, the cause not
 
