@@ -70,6 +70,29 @@ asset. Linux self-update binary 39,574,720, `e377989a…` = the e2e-tested file
 `windows-x86_64` + `linux-x86_64-local` only. Downloads: 3.9.14 + 3.9.15. OG
 "LINUX UPDATES ITSELF", `?v=3.9.15`; `/meta-web/` 369 pages on 3.9.15.
 
+**Live check after the flip (passed):** the real one-liner from the live site
+into a scratch HOME installed 3.9.15; a build claiming 3.9.14 with the *live*
+update URL found it in the live manifest, pulled the 40 MB binary from the
+GitHub release in 44 s, replaced itself and restarted visible in its own unit.
+
+**Found on the way, fixed (`ea09924d`):** one GitHub file server
+(185.199.110.133) gives this network ~4–65 KB/s while its neighbours give
+~1 MB/s, so the installer sat silent for 9–16 min twice. It now shows a
+progress bar and drops/retries a connection under 4 KB/s for 30 s. If that
+server stays bad, the alternative is to also host the tarball on Netlify
+(costs ~19 MB of git per release, like the exe and dmg) — owner's call.
+
+**Owner's machine, 2026-11-13 22:10:** switched to the home-folder install
+with the live one-liner. Autostart and the launcher point at
+`~/.local/share/filthy-net-deck/filthy-net-deck`; `~/.config/hypr/hyprland.lua`
+line 32 now loads the rules from there (backup `hyprland.lua.bak.1794579336`;
+verified the line loads by showing a missing path *does* raise a config
+error). Running copy swapped via tray quit + `uwsm app -t service`. **Left to
+the owner:** `sudo pacman -R filthy-net-deck-bin`. Left alone, deliberately:
+the stale Sep-21 `~/.local/bin/filthy-net-deck` (shadows the new link on
+PATH), and `fnd://` → `filthy-net-deck-handler.desktop`, a dev override that
+launches the repo's *debug* build for sign-in links.
+
 ### 2026-11-13 (evening) — v3.9.14: the runaway's ROOT CAUSE found and fixed
 
 **It was a CSS blur.** `.diff-art-badge` — the +/− badge on every swapped card
