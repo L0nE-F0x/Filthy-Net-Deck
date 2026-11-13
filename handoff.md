@@ -25,6 +25,15 @@ that is expected and does not block auto-update.
 
 ### 2026-11-13 (night) — v3.9.15: Linux updates itself (no password)
 
+**▶ Next release (3.9.16) is the first real Linux in-app update.** The owner
+will click Update & restart on their own machine and report back. Ship it with
+the AGENTS.md checklist's Linux rows (`linux:tarball` → `linux:update`, upload
+tarball **and** raw binary before the flip). If it fails, read
+`journalctl --user` around the click: the old unit should stop and a
+`run-*.service` "Filthy Net Deck (restarted after an update)" should start.
+Hosting the Linux files on Netlify too is parked as the owner's call — only
+revisit if that update or a user's install is slow (see below).
+
 **Owner's ask:** stop needing the pacman recipe for every update — "my other
 apps don't need that" (VibeForge, Stones to Stars). Both live in a folder the
 user owns and replace themselves; FND was a pacman package in root-owned
@@ -87,8 +96,11 @@ with the live one-liner. Autostart and the launcher point at
 `~/.local/share/filthy-net-deck/filthy-net-deck`; `~/.config/hypr/hyprland.lua`
 line 32 now loads the rules from there (backup `hyprland.lua.bak.1794579336`;
 verified the line loads by showing a missing path *does* raise a config
-error). Running copy swapped via tray quit + `uwsm app -t service`. **Left to
-the owner:** `sudo pacman -R filthy-net-deck-bin`. Left alone, deliberately:
+error). Running copy swapped via tray quit + `uwsm app -t service`. Owner then
+removed the package (`pkexec pacman -R --noconfirm filthy-net-deck-bin` — `!`
+commands have no TTY, so `sudo` can't prompt; Omarchy's shell provides the
+polkit dialog). Verified after: /usr/bin and /usr/share copies gone, FND still
+running from the home folder, Hyprland reload clean. Left alone, deliberately:
 the stale Sep-21 `~/.local/bin/filthy-net-deck` (shadows the new link on
 PATH), and `fnd://` → `filthy-net-deck-handler.desktop`, a dev override that
 launches the repo's *debug* build for sign-in links.
