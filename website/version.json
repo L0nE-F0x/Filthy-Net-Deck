@@ -1,9 +1,9 @@
 {
-  "version": "3.9.12",
+  "version": "3.9.13",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.12.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.12-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.13.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.13-universal.dmg"
   },
-  "notes": "v3.9.12: steadier on Linux. Filthy Net Deck no longer grows in memory over a long session — every match alert used to leave a ~180 MB background process behind. And if a window ever runs away with memory, the app now restarts that window instead of letting it freeze your desktop. Windows and macOS: no changes beyond the version number."
+  "notes": "v3.9.13: faster memory safety net on Linux. If a window's memory ever starts running away, Filthy Net Deck now restarts that window within a few seconds, before it passes about 5 GB (3.9.12 could let it reach 10 GB first). Windows and macOS: no changes beyond the version number."
 }

@@ -3,7 +3,7 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.12 on all three platforms**
+**Live product version: v3.9.13 on all three platforms**
 (Windows signed updater · macOS universal dmg rolled · Linux pacman package)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
@@ -22,6 +22,63 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+### 2026-11-13 (afternoon) — v3.9.13 SHIPPED: faster watchdog; the trigger found, the cause not
+
+**Correction to the morning entry below.** The runaway is not tied to a
+match end or to time hidden alone. All four today came **within seconds of
+reopening the main window from the tray in fullscreen**, after it had sat
+hidden 15–40 min: ~11:12 (25 GB, froze the box, 3.9.11), ~12:52 (21.8 GB,
+found at quit), 13:28 (3.9.12 watchdog killed it at 10.7 GB), 14:49
+(instrumented build, faster watchdog killed it at 4.7 GB in 4 s). The
+morning's "started 10:57" came from extrapolating the 22 MB/s *swap-bound*
+rate; the real rate is ~280 MB/s, so 25 GB is ~90 s after the 11:12 open.
+
+**Mechanism (seen live, 1 s sampling + a core dump):** `ThreadedCompositor`
+pegged at 100% allocating anon memory; the page's main thread blocked in
+`WTF::WorkQueueBase::dispatchSync` (futex); a Mesa iris thread in an ioctl.
+libwebkit2gtk/JSC/gallium are stripped and debuginfod.archlinux.org has no
+entry for their build-ids (404), so no symbols.
+
+**What every reopen does on Wayland:** the hidden window is unmapped, so a
+show maps it fresh: own size (1920x1832 px) → tiled (3152x2000 incl. CSD
+shadow, at 40,40) → fullscreen (3072x1920). Five or six resizes in <100 ms,
+on *every* open. Removing the Windows-only extra `set_fullscreen` calls and
+keeping fullscreen through the hide (tried, not shipped) changes nothing —
+same sequence. 40 quick open/close cycles in a sandbox (owner's data, prefs
+incl. `fullscreen: true`, owner's dconf so dpr is 1.818 from the 0.9091
+text-scaling-factor, plus page clicking) never ran away. Untested: a reopen
+after **15+ minutes hidden** — the one thing all four real cases share. One
+trial per ~20 min, needs the owner's screen.
+
+**Ruled out today:** WebAudio left running; match-end flow; YouTube or any
+other app going fullscreen (the "fullscreen" events that lined up were FND's
+own reopens); a fullscreen window on an invisible workspace; JS refresh
+stress while hidden (rAF/min = 0 when hidden, as it should be).
+
+**Shipped in 3.9.13 (`538fdb0f`):** watchdog checks every 3 s; over the
+limit *and* +512 MB since the last check = kill at once. Tag `v3.9.13` →
+`01bb5b2d`. Windows NSIS 15,491,445 bytes, sig verified (3.9.12 exe vs new
+sig fails). Linux tarball 19,375,426, `b0986140…795ccc98` = PKGBUILD =
+release asset. macOS CI run 43386926679, dmg 38,252,789 bytes, sha256
+`27148bf2…9481cbb0` = release digest. Downloads: 3.9.12 + 3.9.13. OG
+"STEADIER ON LINUX", `?v=3.9.13`; `/meta-web/` 369 pages on 3.9.13.
+
+**Damage I did, owner action needed:** my private-bus sandboxes overwrote
+`/run/user/1000/at-spi/bus_0` three times, leaving the session's a11y bus
+unreachable for new apps until **re-login**. A watchdog reload with that
+bus broken segfaulted the instrumented FND in atk-bridge
+(`spi_register_object_to_path`). The owner's FND was relaunched with
+`NO_AT_BRIDGE=1` as a precaution; a normal restart after re-login drops it.
+How to sandbox safely now: `sandbox-replay` agent memory.
+
+**Open:**
+- Root cause. Next experiment: launch hidden, wait 20 min, reopen
+  fullscreen, repeat. If it reproduces, test windowed reopen and
+  `WEBKIT_DISABLE_DMABUF_RENDERER=1`.
+- Each reopen grows the main renderer ~8 MB (425 → 592 MB over 20 opens).
+- An app-process thread uses ~4% CPU at idle (likely the 4 s `arena.rs`
+  sysinfo scan — unconfirmed).
 
 ### 2026-11-13 — v3.9.12 SHIPPED: runaway renderer watchdog + the 11-06 leak fix
 

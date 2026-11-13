@@ -1,11 +1,11 @@
 {
-  "version": "3.9.12",
-  "notes": "v3.9.12: steadier on Linux. Filthy Net Deck no longer grows in memory over a long session — every match alert used to leave a ~180 MB background process behind. And if a window ever runs away with memory, the app now restarts that window instead of letting it freeze your desktop. Windows and macOS: no changes beyond the version number.",
-  "pub_date": "2026-11-13T04:39:37Z",
+  "version": "3.9.13",
+  "notes": "v3.9.13: faster memory safety net on Linux. If a window's memory ever starts running away, Filthy Net Deck now restarts that window within a few seconds, before it passes about 5 GB (3.9.12 could let it reach 10 GB first). Windows and macOS: no changes beyond the version number.",
+  "pub_date": "2026-11-13T07:49:03Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnozWG9uUWRjWmhrZC9PUlZuR2duSFFreG1lZUV1dTVRVFdzdHE2YjlSNFhoOERReFdPTmRMZkN4cEg4ZnZMTFRDRmRnYUhrZnlydXZuK1BteEs3SHdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NTQzNjUwCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xMl94NjQtc2V0dXAuZXhlCkw2MjRSTW92eWVzenF3cTlYZWhTQkhJNisweFdmUkRDeEpHeE42YklNOVBkdS9ZdE93YU8xQWVSR3NhcC9JRWdIZENJdjVBcVAwaGFiL1RIcUR0OERRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.12.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjY3MUc4emFjQzVOSDRoeXVEZCtLTVJVTnUyWmY2MWR4Y2p2MmFCVU56dDFjeFVHdW9mRGxSVFczeG8yL3MzVlVuUTF4L1dsUkNqZ3VBYWNmdWhCR0EwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NTU1MjgyCWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xM194NjQtc2V0dXAuZXhlCjRrRDhheE9kYUdOeENtZ0l5R1ZGR3pTbDhDeXNhdnZObXRMcWIvVy9taW5ML3BJdWtyUjBkM3c3OW5pUEpRaThja3BZMElLY0VERzFtMzZpM3U1NERBPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.13.exe"
     }
   }
 }
