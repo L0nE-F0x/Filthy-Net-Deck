@@ -2094,7 +2094,10 @@ select.filter-chip {
   padding: 0.08rem 0.28rem;
   border-radius: 5px;
   line-height: 1.1;
-  backdrop-filter: blur(6px);
+  /* No backdrop-filter here. The badge fill is opaque, so a blur behind it was
+     never visible — but each one is its own compositor layer, and a deck with
+     ~20 swaps in its version history sent WebKitGTK's compositor past 4 GB in
+     seconds (2026-11-13). `src/test/backdropFilter.test.ts` holds the line. */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 .diff-art-card.add .diff-art-badge {
@@ -3238,7 +3241,8 @@ select.filter-chip {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  backdrop-filter: blur(8px);
+  /* No backdrop-filter: one pill per set card, and every fill below is opaque
+     or near it. Same hazard as `.diff-art-badge` — see that rule. */
   border: 1px solid transparent;
 }
 .set-status-spoiling {
