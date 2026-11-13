@@ -1,12 +1,17 @@
 //! Linux: stop a runaway `WebKitWebProcess` from taking the whole machine down.
 //!
-//! On 2026-11-13 the main window's renderer grew at ~22 MB/s for about twenty
-//! minutes, to 25 GB of RAM + swap, then froze; the owner had to kill FND to
-//! get the desktop back. The trigger is unknown. A same-day replay of that
-//! session's match end (overlay, alert, chime, hidden main window — all of
-//! it) stayed flat at ~305 MB, and the renderer could not be traced without
-//! root. So this does not fix a cause. It bounds the damage, whatever the
-//! cause, and leaves evidence for next time:
+//! On 2026-11-13 the main window's renderer ran away four times on the
+//! owner's machine (WebKitGTK 2.54.1, Hyprland, Intel iGPU, 0.9091 text
+//! scaling): 25 GB (froze the desktop), 21.8 GB, 10.7 GB and 4.7 GB. Each time
+//! within seconds of reopening the main window from the tray in fullscreen,
+//! after it had sat hidden for 15–40 minutes. The compositor thread
+//! (`ThreadedCompositor`) ran at 100% allocating ~280 MB/s while the page's
+//! main thread waited on it in `WorkQueue::dispatchSync`. Every reopen on
+//! Wayland maps the window fresh and resizes it five or six times (own size,
+//! tiled, fullscreen), but 40 quick reopens in a sandbox never reproduced it,
+//! and libwebkit2gtk is stripped with no debuginfod entry. So this does not
+//! fix the cause. It bounds the damage, whatever the cause, and leaves
+//! evidence for next time:
 //!
 //! * every renderer FND owns is measured (RSS + swap) every [`CHECK_EVERY`];
 //! * each new whole gigabyte past the first is logged, so the journal says
@@ -25,11 +30,18 @@ use std::collections::HashMap;
 use std::fs;
 use std::time::Duration;
 
-const CHECK_EVERY: Duration = Duration::from_secs(15);
-/// Renderers normally sit at 200–350 MB. Ten times that is not a heavy page.
+/// Short, because the runaway is fast: the second one on 2026-11-13 grew
+/// ~280 MB/s, and at the 15 s this started with it reached 10.7 GB before it
+/// was killed. Reading two small `/proc` files per renderer is nothing.
+const CHECK_EVERY: Duration = Duration::from_secs(3);
+/// Renderers normally sit at 200–700 MB. Several times that is not a heavy page.
 const DEFAULT_LIMIT_MB: u64 = 4096;
 /// Consecutive over-limit checks before acting, so a brief spike is left alone.
 const STRIKES: u32 = 2;
+/// Over the limit *and* this much bigger than one check ago is a runaway, not
+/// a spike: kill at once instead of waiting for the second strike. (170 MB/s
+/// sustained; no page FND shows grows like that.)
+const RUNAWAY_MB_PER_CHECK: u64 = 512;
 /// `comm` is truncated to 15 bytes by the kernel.
 const RENDERER_COMM: &str = "WebKitWebProces";
 
@@ -60,10 +72,11 @@ pub fn start() {
                         Action::Milestone { pid, gb } => eprintln!(
                             "[renderer-watchdog] renderer {pid} passed {gb} GB (limit {limit} MB)"
                         ),
-                        Action::Kill { pid, mb } => {
+                        Action::Kill { pid, mb, grew_mb } => {
                             eprintln!(
-                                "[renderer-watchdog] renderer {pid} at {mb} MB, over {limit} MB \
-                                 for {STRIKES} checks — killing it. {}",
+                                "[renderer-watchdog] renderer {pid} at {mb} MB (limit {limit} MB, \
+                                 +{grew_mb} MB in {}s) — killing it. {}",
+                                CHECK_EVERY.as_secs(),
                                 describe(pid)
                             );
                             kill(pid);
@@ -78,7 +91,7 @@ pub fn start() {
 #[derive(Debug, PartialEq)]
 enum Action {
     Milestone { pid: u32, gb: u64 },
-    Kill { pid: u32, mb: u64 },
+    Kill { pid: u32, mb: u64, grew_mb: u64 },
 }
 
 /// The decision logic, kept free of `/proc` so it can be tested.
@@ -87,18 +100,21 @@ struct Watch {
     /// Highest whole GB already logged, per pid.
     logged_gb: HashMap<u32, u64>,
     strikes: HashMap<u32, u32>,
+    /// Size at the previous check, per pid.
+    last_mb: HashMap<u32, u64>,
 }
 
 impl Watch {
     fn observe(&mut self, seen: &[(u32, u64)], limit_mb: u64) -> Vec<Action> {
         // Forget pids that have gone, so a reused pid starts clean.
-        self.logged_gb
-            .retain(|pid, _| seen.iter().any(|(p, _)| p == pid));
-        self.strikes
-            .retain(|pid, _| seen.iter().any(|(p, _)| p == pid));
+        let alive = |pid: &u32| seen.iter().any(|(p, _)| p == pid);
+        self.logged_gb.retain(|pid, _| alive(pid));
+        self.strikes.retain(|pid, _| alive(pid));
+        self.last_mb.retain(|pid, _| alive(pid));
 
         let mut out = Vec::new();
         for &(pid, mb) in seen {
+            let grew_mb = mb.saturating_sub(self.last_mb.insert(pid, mb).unwrap_or(mb));
             let gb = mb / 1024;
             let logged = self.logged_gb.entry(pid).or_insert(0);
             if gb > *logged {
@@ -108,9 +124,9 @@ impl Watch {
             if mb > limit_mb {
                 let s = self.strikes.entry(pid).or_insert(0);
                 *s += 1;
-                if *s >= STRIKES {
+                if *s >= STRIKES || grew_mb >= RUNAWAY_MB_PER_CHECK {
                     self.strikes.remove(&pid);
-                    out.push(Action::Kill { pid, mb });
+                    out.push(Action::Kill { pid, mb, grew_mb });
                 }
             } else {
                 self.strikes.remove(&pid);
@@ -281,19 +297,55 @@ mod tests {
     }
 
     #[test]
-    fn kills_only_after_consecutive_strikes() {
+    fn slow_growth_needs_consecutive_strikes() {
         let mut w = Watch::default();
-        assert_eq!(w.observe(&[(9, 300)], 4096), vec![]);
+        assert_eq!(
+            w.observe(&[(9, 3900)], 4096),
+            vec![Action::Milestone { pid: 9, gb: 3 }]
+        );
         // Over once, then back under: the strike resets.
         assert_eq!(
-            w.observe(&[(9, 5000)], 4096),
+            w.observe(&[(9, 4200)], 4096),
             vec![Action::Milestone { pid: 9, gb: 4 }]
         );
-        assert_eq!(w.observe(&[(9, 3000)], 4096), vec![]);
-        assert_eq!(w.observe(&[(9, 5000)], 4096), vec![]);
+        assert_eq!(w.observe(&[(9, 4000)], 4096), vec![]);
+        assert_eq!(w.observe(&[(9, 4300)], 4096), vec![]);
         assert_eq!(
-            w.observe(&[(9, 5100)], 4096),
-            vec![Action::Kill { pid: 9, mb: 5100 }]
+            w.observe(&[(9, 4400)], 4096),
+            vec![Action::Kill {
+                pid: 9,
+                mb: 4400,
+                grew_mb: 100
+            }]
+        );
+    }
+
+    #[test]
+    fn a_runaway_over_the_limit_is_killed_at_once() {
+        let mut w = Watch::default();
+        w.observe(&[(4, 3800)], 4096);
+        // The 2026-11-13 shape: hundreds of MB per check, straight through.
+        assert_eq!(
+            w.observe(&[(4, 4700)], 4096),
+            vec![
+                Action::Milestone { pid: 4, gb: 4 },
+                Action::Kill {
+                    pid: 4,
+                    mb: 4700,
+                    grew_mb: 900
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn fast_growth_under_the_limit_is_left_alone() {
+        let mut w = Watch::default();
+        w.observe(&[(6, 300)], 4096);
+        // A heavy page loading: big jump, but nowhere near the limit.
+        assert_eq!(
+            w.observe(&[(6, 2100)], 4096),
+            vec![Action::Milestone { pid: 6, gb: 2 }]
         );
     }
 
