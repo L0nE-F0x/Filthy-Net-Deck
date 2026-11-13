@@ -7,6 +7,8 @@ mod install_id;
 mod layer_shell;
 mod overlay;
 mod presence;
+#[cfg(target_os = "linux")]
+mod renderer_watchdog;
 mod toast;
 mod tracker;
 #[cfg(target_os = "linux")]
@@ -152,9 +154,11 @@ fn main_browser_args(windows: &[tauri::utils::config::WindowConfig]) -> Option<S
 /// 2026-11-06 had 92 of them (2.2 GB PSS). Tauri, wry and FND all release the
 /// view; WebKit keeps the process. So end it explicitly first. Tested over
 /// fifteen alert cycles: back to one renderer after each, zero core dumps,
-/// and nothing in the stack listens for `web-process-terminated`, so nothing
-/// respawns it. Each of these windows has its own renderer (no
-/// `related_view`), so this never touches the main window's.
+/// and nothing listens for `web-process-terminated` on these windows, so
+/// nothing respawns it (only the main window reloads on it — see
+/// `renderer_watchdog::reload_main_on_renderer_exit`). Each of these windows
+/// has its own renderer (no `related_view`), so this never touches the main
+/// window's.
 pub(crate) fn drop_secondary_webview(win: &tauri::WebviewWindow) {
     // Queued (or run inline on the main thread) ahead of the destroy below.
     #[cfg(target_os = "linux")]
@@ -462,6 +466,15 @@ pub fn run() {
             // No-ops off Hyprland and off layer-shell.
             #[cfg(target_os = "linux")]
             hypr::start_watch(app.handle().clone());
+            // A runaway renderer must not take the desktop down with it — see
+            // `renderer_watchdog` (2026-11-13: 25 GB, then a frozen window).
+            #[cfg(target_os = "linux")]
+            {
+                if let Some(window) = app.get_webview_window("main") {
+                    renderer_watchdog::reload_main_on_renderer_exit(&window);
+                }
+                renderer_watchdog::start();
+            }
 
             let show_i =
                 MenuItem::with_id(app, "show", "Open Filthy Net Deck", true, None::<&str>)?;
