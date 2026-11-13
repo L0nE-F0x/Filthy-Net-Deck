@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.9.11";
+export const APP_VERSION = "3.9.12";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,5 +7,6 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Aetherfield is Star Trek ready: the galaxy now holds all 120,019 printings, including every Star Trek card, its Commander decks and the Stardates reprints — and its newest-set pulse lands on Star Trek"
+  "Linux: no more memory creep over a long session — match alerts no longer leave a process running behind them",
+  "Linux: a window that runs away with memory is now restarted instead of freezing your desktop"
 ];
