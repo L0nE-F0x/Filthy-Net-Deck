@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.9.14";
+export const APP_VERSION = "3.9.15";
 export const APP_NAME = "Filthy Net Deck";
 export const APP_SLUG = "filthy-net-deck";
 
@@ -7,5 +7,5 @@ export const APP_SLUG = "filthy-net-deck";
  * installs (see WhatsNew in StatusBanners). Update alongside APP_VERSION.
  */
 export const WHATS_NEW: string[] = [
-  "Linux: opening a deck in My Stats no longer crashes and reloads the window"
+  "Linux: install once with the one-line installer, and from then on FND updates itself — Update & restart, no password"
 ];
