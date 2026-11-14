@@ -13,6 +13,7 @@ import { Settings } from "./pages/Settings";
 import { Sets } from "./pages/Sets";
 import { FormatHubPage } from "./pages/FormatHub";
 import { Aetherfield } from "./pages/Aetherfield";
+import { Spotlight } from "./pages/Spotlight";
 import { BoModeToggle } from "./components/BoModeToggle";
 import { CommandPalette } from "./components/CommandPalette";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -42,6 +43,9 @@ import { setOverlayWindowMode, syncOverlayPrefFromStore } from "./services/overl
 import { HelpGuide } from "./components/HelpGuide";
 import { listen } from "@tauri-apps/api/event";
 import { useLocale, type MessageKey } from "./i18n";
+import { spotlightPhase } from "./services/spotlight";
+import { startSpotlightSync } from "./services/spotlightFeed";
+import { useSpotlight } from "./services/useSpotlight";
 
 /*
  * Pages are imported statically on purpose.
@@ -94,6 +98,8 @@ const LOCAL_PAGES: Page[] = [
   "formats",
   // Ships its own catalogue in the bundle; never touches the meta feed.
   "aether",
+  // Own feed (spotlight.json). Visible only while a premier event is on.
+  "spotlight",
 ];
 
 function pageTitleKey(page: Page): MessageKey {
@@ -118,6 +124,8 @@ function pageTitleKey(page: Page): MessageKey {
       return "page.formats";
     case "aether":
       return "aether.title";
+    case "spotlight":
+      return "spotlight.nav";
     case "settings":
       return "page.settings";
     default:
@@ -146,6 +154,8 @@ export default function App() {
   const initTracker = useAppStore((s) => s.initTracker);
   const sets = useAppStore((s) => s.sets);
   const [bootDone, setBootDone] = useState(false);
+  const spotlight = useSpotlight();
+  const spotlightOn = spotlightPhase(spotlight.feed?.event);
   const fullscreen = useAppStore((s) => s.prefs.fullscreen);
   const contentRef = useRef<HTMLElement>(null);
 
@@ -160,6 +170,8 @@ export default function App() {
     void el.offsetWidth;
     el.classList.add("content-enter");
   }, [page]);
+
+  useEffect(() => startSpotlightSync(), []);
 
   // Small countdown chip on the Sets nav item (14-day window, like the pulse).
   const arenaDropIn = useMemo(() => {
@@ -472,6 +484,21 @@ export default function App() {
             <small>MTG Arena · v{APP_VERSION}</small>
           </div>
         </div>
+        {spotlightOn !== "hidden" && spotlight.feed?.event && (
+          <button
+            type="button"
+            className={`spotlight-launch${page === "spotlight" ? " active" : ""}`}
+            aria-current={page === "spotlight" ? "page" : undefined}
+            onClick={() => navigateTo("spotlight")}
+          >
+            <span className="spotlight-launch-text">
+              <strong>{spotlight.feed.event.name}</strong>
+              <small>
+                {spotlightOn === "live" ? t("spotlight.live") : t("spotlight.showcase")}
+              </small>
+            </span>
+          </button>
+        )}
         {NAV.map((item) => {
           const active =
             (item.id === "daily" &&
@@ -689,6 +716,7 @@ export default function App() {
               {page === "climb" && <Climb />}
               {page === "formats" && <FormatHubPage />}
               {page === "aether" && <Aetherfield />}
+              {page === "spotlight" && <Spotlight />}
               {page === "settings" && <Settings />}
             </>
           )}

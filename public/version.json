@@ -1,9 +1,8 @@
 {
-  "version": "3.9.15",
+  "version": "3.9.16",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.15.exe",
-    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.15-universal.dmg"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.16.exe"
   },
-  "notes": "v3.9.15: Linux can now update itself. Install once with the one-line installer on filthy-net-deck.com — after that, every update is Update & restart inside the app, with no password and no package rebuild, the same as on Windows. Already on the pacman package? Settings shows the one-time switch. Windows and macOS: no changes beyond the version number."
+  "notes": "Spotlight for World Championship 32: standings and decklists while the event is on, the top 8 for a week after, then the chip goes away. Refreshes about hourly from the published round articles."
 }

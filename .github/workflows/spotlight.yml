@@ -1,0 +1,153 @@
+# Hourly while a premier event is on. The calendar in
+# pipeline/sources/spotlight.mjs is the gate: outside `starts` through the
+# UTC day after `ends` this job checks out and exits before npm ci. Inside
+# the window the build no-ops (no commit) when standings and lists are
+# unchanged aside from generatedAt. A thin fetch (under 40 lists) fails
+# without touching the published file. The showcase week is not hourly —
+# the last live file is what the top 8 keep. workflow_dispatch during that
+# week still refreshes (--force).
+name: Premier spotlight refresh
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  spotlight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Live window?
+        id: gate
+        run: |
+          node --input-type=module <<'EOF'
+          import { appendFileSync } from "node:fs";
+          import {
+            selectCalendarEntry,
+            selectLiveEntry,
+            SPOTLIGHT_CALENDAR,
+            utcDay,
+          } from "./pipeline/sources/spotlight.mjs";
+
+          const day = utcDay();
+          const live = selectLiveEntry(SPOTLIGHT_CALENDAR, day);
+          const open = selectCalendarEntry(SPOTLIGHT_CALENDAR, day);
+          const dispatch = process.env.GITHUB_EVENT_NAME === "workflow_dispatch";
+          let mode = "skip";
+          if (live) mode = "live";
+          else if (dispatch && open) mode = "force";
+          const entry = live || open;
+          const line = mode === "skip"
+            ? `spotlight: no live event on ${day}`
+            : `spotlight: ${mode} ${entry.id} on ${day}`;
+          console.log(line);
+          appendFileSync(process.env.GITHUB_OUTPUT, `mode=${mode}\n`);
+          EOF
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.mode != 'skip'
+        with:
+          node-version: "22"
+
+      - name: Install deps
+        if: steps.gate.outputs.mode != 'skip'
+        run: npm ci
+
+      # Under 40 lists exits 1 and leaves the previous spotlight.json in place.
+      - name: Refresh spotlight
+        id: build_spotlight
+        if: steps.gate.outputs.mode != 'skip'
+        run: |
+          if [ "${{ steps.gate.outputs.mode }}" = "force" ]; then
+            npm run spotlight -- --force
+          else
+            npm run spotlight
+          fi
+        continue-on-error: true
+
+      - name: Commit spotlight.json if changed
+        if: steps.gate.outputs.mode != 'skip' && steps.build_spotlight.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # These two paths are the whole output. Do not stage a directory:
+          # the builder must not sweep unrelated meta files into the commit.
+          git add public/spotlight.json website/spotlight.json
+          if git diff --staged --quiet; then
+            echo "No spotlight changes"
+            exit 0
+          fi
+          git commit -m "chore: spotlight refresh $(date -u +%Y-%m-%dT%H:%M)"
+
+          # Same rebase-and-rebuild as sets-refresh.yml. The JSON is one line
+          # per field of a pure function of today's articles, so a conflict
+          # is resolved by taking origin/main and building again.
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Rebase/push failed (attempt $attempt) — rebuilding on top of origin/main"
+            git rebase --abort 2>/dev/null || true
+            git reset --hard origin/main
+            git fetch origin main
+            git reset --hard origin/main
+            if [ "${{ steps.gate.outputs.mode }}" = "force" ]; then
+              npm run spotlight -- --force || { echo "Rebuild failed"; exit 1; }
+            else
+              npm run spotlight || { echo "Rebuild failed"; exit 1; }
+            fi
+            git add public/spotlight.json website/spotlight.json
+            if git diff --staged --quiet; then
+              echo "Nothing left to commit after rebuild — upstream already current"
+              exit 0
+            fi
+            git commit -m "chore: spotlight refresh $(date -u +%Y-%m-%dT%H:%M)"
+          done
+          echo "Could not push after 3 attempts"
+          exit 1
+
+      - name: Open/update failure issue when the spotlight build fails
+        if: steps.build_spotlight.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Premier spotlight refresh failure';
+            const body = [
+              '## Premier spotlight refresh reported a failure',
+              '',
+              `- run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              `- when: ${new Date().toISOString()}`,
+              '',
+              '- `npm run spotlight` failed (previous spotlight.json left untouched if the list count was too low).',
+              '',
+              '_Auto-opened so a silent stale event feed is impossible. Close when fixed._',
+            ].join('\n');
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 30,
+            });
+            const existing = issues.data.find((i) => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+              });
+            }

@@ -1,7 +1,7 @@
 {
   "name": "filthy-net-deck",
   "private": true,
-  "version": "3.9.15",
+  "version": "3.9.16",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
     "tauri:build": "tauri build",
     "pipeline": "node pipeline/build-meta.mjs",
     "meta": "node pipeline/build-meta.mjs",
+    "spotlight": "node pipeline/build-spotlight.mjs",
     "sets": "node pipeline/build-sets.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

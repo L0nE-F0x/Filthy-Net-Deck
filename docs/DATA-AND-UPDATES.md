@@ -117,6 +117,14 @@ Articles (e.g. Traditional Standard Ranked) embed **structured** deck blocks:
 
 These often live inside the Nuxt SSR payload (`\u003Cdeck-list…`). Parser: `pipeline/sources/magic-gg.mjs` (`parseMagicGgDecklists` / `fetchMagicGgListPool`). Only boards with ≥55 mainboard cards are candidates; assignment still requires `listMatch` + Scryfall.
 
+### Premier-event spotlight
+
+`npm run spotlight` (`pipeline/build-spotlight.mjs`) writes `public/spotlight.json` and `website/spotlight.json`. The calendar is `SPOTLIGHT_CALENDAR` in `pipeline/sources/spotlight.mjs` — one row per Wizards event whose constructed format is Standard or Pioneer (name, dates, `showcaseUntil`, event URL). The script reads that event page, the newest `round-N-standings` article, and the structured `<deck-list>` pages. It does not scrape the flattened card-run articles.
+
+The app polls `/spotlight.json` (dev) or `https://filthy-net-deck.com/spotlight.json` (installed). A sidebar chip shows while the viewer's local date is inside `starts`–`ends`, keeps the top 8 through `showcaseUntil`, then disappears. No app release per event.
+
+`.github/workflows/spotlight.yml` runs the script hourly. It fetches only while a calendar row is live (`starts` through the UTC day after `ends`, so a final article posted just after midnight UTC still lands) and commits only when standings or lists changed. `generatedAt` alone is not a commit. The showcase week keeps the last live file; a manual run in that week is `npm run spotlight -- --force` (or the workflow's "Run workflow" button). Outside the window the script exits without fetching and without replacing the file with an empty event. The chip says the file is behind once it is more than 3 hours old during the live days (two missed hourly runs). A fetch under 40 lists fails and leaves the previous file in place.
+
 ---
 
 ## Set radar (`sets.json` + lazy galleries)

@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.15 on all three platforms**
-(Windows signed updater · macOS universal dmg rolled · Linux pacman package)
+**Live product version: v3.9.16**
+(Windows signed updater · Linux home-folder self-update · macOS dmg still 3.9.15 until the tag's CI image is rolled into `website/downloads/`)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
 · **Parked:** AUR publish — AUR is not accepting new account registrations
@@ -12,8 +12,9 @@ after a security incident (owner, 2026-11-04); nothing to do until it reopens.
 
 Windows signed updater is the ship path. macOS is a homepage dmg roll from
 the GitHub Release — do not leave visitors on the previous dmg after CI
-attaches the new one. Linux is a pacman package built from the release
-tarball; it is never a `.pkg.tar.zst` download button.
+attaches the new one. Linux since 3.9.15 is the home-folder installer
+(`website/install.sh`) plus signed `linux-x86_64-local` updates. Never
+publish a plain `linux-x86_64` updater key. The PKGBUILD stays for the AUR.
 
 This Omarchy box **can** produce the signed NSIS + updater `.sig` (key in
 `~/.tauri`, cargo-xwin, local NSIS). Authenticode is skipped on Linux;
@@ -22,6 +23,16 @@ that is expected and does not block auto-update.
 ---
 
 # ▶ START HERE — next session
+
+### 2026-11-14 — v3.9.16 Worlds spotlight. macOS dmg roll still open
+
+**▶ Remaining:** when the `v3.9.16` macOS workflow attaches `Filthy-Net-Deck-3.9.16-universal.dmg` to the GitHub release, copy it to `website/downloads/`, point both homepage macOS buttons at it, and put `downloads.macos` back in `website/version.json` and `public/version.json`. Until that commit, the macOS button correctly serves the 3.9.15 image. Do not publish a 3.9.16 dmg URL before the file is in the repo.
+
+Windows NSIS is signed (key `67FCA9900F523D49`, signature verified). Linux tarball sha256 `b8709e7d307a6e8c73882a3c8930339b1e2b2ddd399d7349b0d4652210bddf13` matches `website/install.sh` and the PKGBUILD. `latest.json` has `windows-x86_64` and `linux-x86_64-local` only. The raw binary and the tarball must be on the GitHub release before this commit is what Netlify serves.
+
+Do not kill the home-folder process. Do not launch `tauri:dev` while it is running. A 3.9.15 Linux copy updates itself to this build with Update & restart. That click is the first real Linux in-app update — if it fails, read `journalctl --user` around the click.
+
+`npm run spotlight` writes `public/spotlight.json` and `website/spotlight.json` from `SPOTLIGHT_CALENDAR` in `pipeline/sources/spotlight.mjs`. World Championship 32 (Standard, Nov 13–15, top 8 through Nov 22) is the only row. Day-one round 7: 128 lists, 128/128 names matched, Yuuki Ichikawa on 19. The app polls that file, shows a chip above the 1–8 nav while the local date is inside the window, and keeps rank ≤ 8 for the showcase week. `.github/workflows/spotlight.yml` runs it hourly from `starts` through the UTC day after `ends` and commits only when standings or lists change. The panel says the file is behind after 3 hours. Dev preview was checked in Chrome against `npm run dev` on port 1420 (chip, Yuuki's 60+15, search, Boros Pixie filter of 24). Do not launch `tauri:dev` while the home-folder copy is running — same single-instance id, it would surface the old window.
 
 ### 2026-11-13 (night) — v3.9.15: Linux updates itself (no password)
 

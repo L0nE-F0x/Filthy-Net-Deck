@@ -50,6 +50,16 @@
     Access-Control-Allow-Headers = "Content-Type, Accept"
     Cache-Control = "public, max-age=60"
 
+# Premier-event standings. The app polls this during a Worlds / Pro Tour
+# window. A long cache would keep yesterday's round on screen.
+[[headers]]
+  for = "/spotlight.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Accept"
+    Cache-Control = "public, max-age=60"
+
 [[headers]]
   for = "/downloads/*"
   [headers.values]

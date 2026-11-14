@@ -17,6 +17,8 @@ export type Page =
   | "formats"
   /** Embedded Aetherfield galaxy. Reached from the sidebar, not the 1–8 keys. */
   | "aether"
+  /** Premier-event chip. Absent from the 1–8 keys; hidden when no event is on. */
+  | "spotlight"
   | "settings";
 
 export interface CardEntry {

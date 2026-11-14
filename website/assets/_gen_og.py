@@ -134,7 +134,7 @@ def main() -> None:
     draw.text((tx, ty + 128), "Netdeck dirty. Climb clean.", font=tag_font, fill=ACID_BRIGHT)
 
     # Feature callout badge — bump with each marketed release
-    badge_text = f"NEW  {mid}  v3.9.15  {mid}  LINUX UPDATES ITSELF"
+    badge_text = f"NEW  {mid}  v3.9.16  {mid}  WORLDS IN THE APP"
     badge_pad_x, badge_pad_y = 14, 8
     bb = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw, bh = bb[2] - bb[0], bb[3] - bb[1]
@@ -149,9 +149,9 @@ def main() -> None:
     draw.text((bx + badge_pad_x, by + badge_pad_y - 1), badge_text, font=badge_font, fill=ACID_BRIGHT)
 
     lines = [
+        "Worlds standings and lists, hourly",
+        "Top 8 stays for a week, then it's gone",
         "Linux: one-line install, updates itself",
-        "Deck stats open again on Linux",
-        "All 581 Star Trek cards in the galaxy",
     ]
     # v3.4.0's card shipped with a feature line running off the right edge and
     # nobody saw it until the PNG was opened. Fail the build instead: there is
@@ -171,7 +171,7 @@ def main() -> None:
     # Bottom bar
     draw.rectangle([0, H - 56, W, H], fill=(10, 11, 8, 245))
     draw.rectangle([0, H - 56, W, H - 54], fill=(*ACID, 200))
-    draw.text((70, H - 40), "v3.9.15  ·  Win + macOS + Linux", font=small_font, fill=MUTED)
+    draw.text((70, H - 40), "v3.9.16  ·  Win + macOS + Linux", font=small_font, fill=MUTED)
     draw.text((tx, H - 40), "filthy-net-deck.com", font=small_font, fill=GOLD_LIGHT)
 
     final = img.convert("RGB")

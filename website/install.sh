@@ -13,8 +13,8 @@
 # The download is checked against the checksum below before anything is
 # installed. The two lines below are written by scripts/build-linux-tarball.mjs
 # on every release; do not edit them by hand.
-FND_VERSION="3.9.15"
-FND_SHA256="0070c77b6d6863f9dac2ad644f3dd47fbf697c8e91e55a7d9351975102ed8db0"
+FND_VERSION="3.9.16"
+FND_SHA256="b8709e7d307a6e8c73882a3c8930339b1e2b2ddd399d7349b0d4652210bddf13"
 
 # Everything runs inside main(), called on the last line, so a download cut
 # off halfway through `curl | bash` runs nothing at all.

@@ -1,15 +1,15 @@
 {
-  "version": "3.9.15",
-  "notes": "v3.9.15: Linux can now update itself. Install once with the one-line installer on filthy-net-deck.com — after that, every update is Update & restart inside the app, with no password and no package rebuild, the same as on Windows. Already on the pacman package? Settings shows the one-time switch. Windows and macOS: no changes beyond the version number.",
-  "pub_date": "2026-11-13T13:31:33Z",
+  "version": "3.9.16",
+  "notes": "v3.9.16: Spotlight for World Championship 32: standings and decklists while the event is on, the top 8 for a week after, then the chip goes away. Refreshes about hourly from the published round articles.",
+  "pub_date": "2026-11-14T03:05:26Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WnpKbXA5Sng2MGtMT0JBZXpoQ214TXJJeU9zWGtLOS9GcUZCTVhEMlhNRWJReVEvYmRINHc3bmlYN0V2N0Jadyt6VTdyV0lhTGpMazkvSTZVdk53endzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NTc2Njc0CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xNV94NjQtc2V0dXAuZXhlCnpuSWl3NTllMHNmTzZMa3FvTCs2UnQzZ2FzNmtUdkpDRjQ1Y24wRGYvdHpuSlNLVzdwYm1UemlaZldJaW4zdE1xQ3k2YVoxaExFa2wyWjkvd1R6L0FRPT0K",
-      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.15.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjIyUGdzbGhPeUhMcWdPTXpKLzBaSFB1SUw3eVFzNVZCMDVXLzdUcTl6SGVtdDFaOXNkbW4yZ080Nm1oRndwamlmYjZzWStXaVBiQzJyTUk4cmJIQ0E4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NjI1NDQ3CWZpbGU6RmlsdGh5IE5ldCBEZWNrXzMuOS4xNl94NjQtc2V0dXAuZXhlCnhiKzV6RzI3dFRTWjl3YUZzTmhrNEhoeU0zbzgrd0lXMlBybEgzU09xZEY3KzNJTTdTY1pDY013MDFjTForQXRJTm04QzFld0JOQjNPVTN5OEo2VURBPT0K",
+      "url": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.16.exe"
     },
     "linux-x86_64-local": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WitPbGNxaE5UZUg1dnpBcGRhYWhLRDVya2ptSlVMV0dKMERvbElFakFNLzlnOE14YXJvWFByWWVOd2tHWDk5TWtEZkF2endDelBXRlo0cWJNREs4a1FvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NTc2NjkzCWZpbGU6ZmlsdGh5LW5ldC1kZWNrLTMuOS4xNS14ODZfNjQKS0pHVXZXdi8xOUNtNTFTK3hVOFpLTEFHajFxaE9WRm5XSnVFV2xwMHhmRG5jV2NhN29uUFYyQ0V6NU5JQnpYUUlBYWlyK0x3d1doZ3lYaStDN0ZQQVE9PQo=",
-      "url": "https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.9.15/filthy-net-deck-3.9.15-x86_64"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSSlBWSVBrS244WjFCeFdJYks1bU40QWJpSWZvaDJ5U3ovVlJtUERwUmdPYS81TXFJZ2c3NnBuTFU0VGgxODlwOTEweHVyMzJWQVplclZ6SzI2V3cwRzBZelRHODR1ZkE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0NjI1NjA2CWZpbGU6ZmlsdGh5LW5ldC1kZWNrLTMuOS4xNi14ODZfNjQKajkwdkJFNFpQUGdFanZEUXh0Tlk4aFQ0VXhMZDhZMHVYZVV4Yy84YTBqUUx2ajIwaUhtellWMHZPNGtZN2RnUHRCbnNyUnhyUGJGaVVCc1dRRWxSRGc9PQo=",
+      "url": "https://github.com/L0nE-F0x/Filthy-Net-Deck/releases/download/v3.9.16/filthy-net-deck-3.9.16-x86_64"
     }
   }
 }

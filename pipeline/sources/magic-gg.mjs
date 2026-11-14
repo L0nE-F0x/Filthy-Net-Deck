@@ -112,6 +112,7 @@ export function parseMagicGgDecklists(html, meta = {}) {
 
     lists.push({
       player: attr(attrs, "deck-title") || attr(attrs, "subtitle") || "magic.gg pilot",
+      archetype: attr(attrs, "subtitle") || "",
       eventName:
         attr(attrs, "event-name") ||
         meta.eventName ||

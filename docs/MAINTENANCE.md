@@ -10,6 +10,7 @@ This page says exactly which parts run themselves and which need a human.
 | New sets & spoiled cards (incl. panel first-looks) | Scryfall catalogs official spoilers → `sets-refresh.yml` (**hourly**; no-op commit when unchanged) + daily meta job (06:00 UTC) rebuild **slim** `sets.json` + `meta/sets/<code>.json` galleries → Netlify → apps auto-sync (gallery files load on demand in-app) | Hours (Scryfall) + ≤1h (CI) + ≤90min (app) |
 | **Fresh spoilers (ahead of Scryfall)** | `pipeline/sources/mythicspoiler.mjs` scrapes MythicSpoiler new-spoilers **and** per-set index pages → cards Scryfall hasn't cataloged attach as `freshSpoilers[]` (with `spoiledAt`) on upcoming/spoiling sets → gallery "Just spoiled · unconfirmed" strip, click-to-zoom. Self-heals: each card drops the moment Scryfall catalogs it — normalized name (accents folded), flavour name, a two-edit typo allowance on long slugs, and the set's Scryfall descendants (Commander decks, reprint sheets like Star Trek's Stardates), which MythicSpoiler files in the same folder. Cards MythicSpoiler named before the official reveal cannot be linked and stay until paper release. Fail-soft | ≤1h (CI) + ≤90min (app) |
 | Deck meta (Standard + Pioneer 8×8) | `daily-meta.yml` scrapes magic.gg / MTGO / Goldfish / Melee / Untapped, Scryfall-validates, commits `latest.json` | ≤24h |
+| **Premier-event spotlight** | `spotlight.yml` hourly, only while a `SPOTLIGHT_CALENDAR` row is live (`starts` through the UTC day after `ends`). Commits `spotlight.json` when standings or lists change; a quiet hour does not. Showcase week keeps the last file. Adding the next Pro Tour / Worlds is one calendar row, not an app release | ≤1h (CI) + ≤5 min (app) |
 | **Public meta-web deck pages** | Same daily cron runs `npm run meta:site` after `npm run meta`, regenerating every static page under `website/meta-web/` from the fresh feed, then commits `website/meta-web/` + sitemap. Without this step the HTML was staged but never rebuilt (audit 2026-07-22). | ≤24h |
 | **Names for brand-new Arena cards** | A set can be live on Arena before Scryfall assigns its `arena_id`s — during that window `/cards/arena/<id>` 404s and cards show as `Card #103529`. Same gap for old cosmetic basics (Unfinity 81181, Green Game Jam ANA). The sets build diffs Arena's own card table (mtgajson) against Scryfall per recent + evergreen set and publishes `meta/arena-names.json`. Self-healing: entries drop as Scryfall catches up. Details in `docs/DATA-AND-UPDATES.md` | ≤1h (CI) + ≤90 min (app) |
 | Bans / restrictions | Scryfall `banned:` searches in the sets build — the moment Scryfall applies a B&R update, the next radar run ships it | Hours–1 day |
@@ -17,7 +18,7 @@ This page says exactly which parts run themselves and which need a human.
 | **Rotation impact** (0.21) | The sets build computes which Standard cards leave at the next rotation (Scryfall `f:standard` set-diff + whatsinstandard exit dates). Every Standard deck shows what it loses; the card list refreshes itself as sets rotate in/out | Automatic |
 | Standard rotation calendar | whatsinstandard.com v6 API | Automatic |
 | New-card legality in decklists | Scryfall `/cards/collection` at pipeline time — new cards are on Scryfall well before they're tournament-playable, so validation never lags reality | None |
-| Pipeline failures | Both workflows auto-open/refresh a GitHub issue on failure (**"Daily meta pipeline failure"** / **"Set radar refresh failure"**) — silent rot is impossible | Immediate |
+| Pipeline failures | The workflows auto-open/refresh a GitHub issue on failure (**"Daily meta pipeline failure"** / **"Set radar refresh failure"** / **"Premier spotlight refresh failure"**) — silent rot is impossible | Immediate |
 | App-side freshness | No refresh button: re-sync on launch, on regained connectivity, on focus/hourly when >90 min stale | ≤90 min |
 
 Fail-safe everywhere: every builder **aborts without writing** when live data is
@@ -27,7 +28,7 @@ never silently stale-as-fresh).
 ## Monthly hands-on checklist (~15 min)
 
 1. **GitHub issues** — open the repo's Issues tab. If "Daily meta pipeline
-   failure" or "Set radar refresh failure" is open, that's the priority: open the
+   failure", "Set radar refresh failure", or "Premier spotlight refresh failure" is open, that's the priority: open the
    linked run, fix the source module in `pipeline/sources/`, close the issue.
    (Turn on GitHub email notifications for the repo so you hear about these the
    day they happen, not at month-end.)
