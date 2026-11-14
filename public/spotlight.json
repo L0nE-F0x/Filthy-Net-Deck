@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T02:41:13.344Z",
+  "generatedAt": "2026-11-14T21:50:29.109Z",
   "event": {
     "id": "wc32",
     "name": "World Championship 32",
@@ -8,8 +8,8 @@
     "ends": "2026-11-15",
     "showcaseUntil": "2026-11-22",
     "eventUrl": "https://magic.gg/events/magic-world-championship-32",
-    "standingsRound": 7,
-    "standingsUrl": "https://magic.gg/news/magic-world-championship-32-round-7-standings",
+    "standingsRound": 11,
+    "standingsUrl": "https://magic.gg/news/magic-world-championship-32-round-11-standings",
     "decks": [
       {
         "id": "january-adams",
@@ -16491,895 +16491,888 @@
     "standings": [
       {
         "rank": 1,
-        "player": "Ichikawa, Yuuki",
-        "points": 19,
-        "omw": 0.6939,
-        "deckId": "yuuki-ichikawa"
-      },
-      {
-        "rank": 2,
-        "player": "Zhi, Yimin",
-        "points": 18,
-        "omw": 0.6599,
-        "deckId": "yimin-zhi"
-      },
-      {
-        "rank": 3,
         "player": "Huschenbeth, Arne",
-        "points": 18,
-        "omw": 0.6463,
+        "points": 28,
+        "omw": 0.6749,
         "deckId": "arne-huschenbeth"
       },
       {
-        "rank": 4,
+        "rank": 2,
         "player": "Kikidis, Charis",
-        "points": 18,
-        "omw": 0.6259,
+        "points": 27,
+        "omw": 0.612,
         "deckId": "charis-kikidis"
       },
       {
-        "rank": 5,
-        "player": "Peral, Marc",
-        "points": 18,
-        "omw": 0.5442,
-        "deckId": "marc-peral"
-      },
-      {
-        "rank": 6,
-        "player": "Kans, Alex",
-        "points": 18,
-        "omw": 0.4762,
-        "deckId": "alex-kans"
-      },
-      {
-        "rank": 7,
+        "rank": 3,
         "player": "Pastore, Kellen",
-        "points": 16,
-        "omw": 0.6667,
+        "points": 25,
+        "omw": 0.6336,
         "deckId": "kellen-pastore"
       },
       {
-        "rank": 8,
-        "player": "Edelson, Adam",
-        "points": 16,
-        "omw": 0.585,
-        "deckId": "adam-edelson"
-      },
-      {
-        "rank": 9,
+        "rank": 4,
         "player": "Schnake, Abe",
-        "points": 16,
-        "omw": 0.5578,
+        "points": 25,
+        "omw": 0.6072,
         "deckId": "abe-schnake"
       },
       {
-        "rank": 10,
-        "player": "Kurtzman, Etai",
-        "points": 16,
-        "omw": 0.5306,
-        "deckId": "etai-kurtzman"
-      },
-      {
-        "rank": 11,
-        "player": "Henry, Shaun",
-        "points": 15,
-        "omw": 0.6327,
-        "deckId": "shaun-henry"
-      },
-      {
-        "rank": 12,
-        "player": "Fauquenoi, Noé",
-        "points": 15,
-        "omw": 0.619,
-        "deckId": "noe-fauquenoi"
-      },
-      {
-        "rank": 13,
-        "player": "Nakayama, Satoshi",
-        "points": 15,
-        "omw": 0.6122,
-        "deckId": "satoshi-nakayama"
-      },
-      {
-        "rank": 14,
-        "player": "Faust, Zevin",
-        "points": 15,
-        "omw": 0.6122,
-        "deckId": "zevin-faust"
-      },
-      {
-        "rank": 15,
-        "player": "Cavalcante, Marcelo",
-        "points": 15,
-        "omw": 0.5918,
-        "deckId": "marcelo-cavalcante"
-      },
-      {
-        "rank": 16,
-        "player": "Davis, Derrick",
-        "points": 15,
-        "omw": 0.5714,
-        "deckId": "derrick-davis"
-      },
-      {
-        "rank": 17,
-        "player": "Oneto, Mattia",
-        "points": 15,
-        "omw": 0.5714,
-        "deckId": "mattia-oneto"
-      },
-      {
-        "rank": 18,
-        "player": "Sajgalik, Eduardo",
-        "points": 15,
-        "omw": 0.5374,
-        "deckId": "eduardo-sajgalik"
-      },
-      {
-        "rank": 19,
-        "player": "Nakamura, Shuhei",
-        "points": 15,
-        "omw": 0.5238,
-        "deckId": "shuhei-nakamura"
-      },
-      {
-        "rank": 20,
-        "player": "Torres, Bernardo",
-        "points": 15,
-        "omw": 0.5238,
-        "deckId": "bernardo-torres"
-      },
-      {
-        "rank": 21,
-        "player": "Goldberg, Nathan",
-        "points": 15,
-        "omw": 0.5102,
-        "deckId": "nathan-goldberg"
-      },
-      {
-        "rank": 22,
-        "player": "Schütz, Stefan",
-        "points": 15,
-        "omw": 0.483,
-        "deckId": "stefan-schutz"
-      },
-      {
-        "rank": 23,
-        "player": "Odenheimer, Nicholas",
-        "points": 15,
-        "omw": 0.4626,
-        "deckId": "nicholas-odenheimer"
-      },
-      {
-        "rank": 24,
-        "player": "Shibata, Akira",
-        "points": 15,
-        "omw": 0.4286,
-        "deckId": "akira-shibata"
-      },
-      {
-        "rank": 25,
-        "player": "Dias, Ricardo",
-        "points": 15,
-        "omw": 0.4286,
-        "deckId": "ricardo-dias"
-      },
-      {
-        "rank": 26,
-        "player": "Moriyama, Masahide",
-        "points": 15,
-        "omw": 0.4218,
-        "deckId": "masahide-moriyama"
-      },
-      {
-        "rank": 27,
+        "rank": 5,
         "player": "Nass, Matt",
-        "points": 13,
-        "omw": 0.6531,
+        "points": 25,
+        "omw": 0.5872,
         "deckId": "matt-nass"
       },
       {
-        "rank": 28,
-        "player": "Noah, Ma",
-        "points": 13,
-        "omw": 0.6327,
-        "deckId": "ma-noah"
+        "rank": 6,
+        "player": "Nakamura, Shuhei",
+        "points": 25,
+        "omw": 0.5848,
+        "deckId": "shuhei-nakamura"
       },
       {
-        "rank": 29,
-        "player": "Elenbogen, Andrew",
-        "points": 13,
-        "omw": 0.551,
-        "deckId": "andrew-elenbogen"
+        "rank": 7,
+        "player": "Zhi, Yimin",
+        "points": 24,
+        "omw": 0.6135,
+        "deckId": "yimin-zhi"
       },
       {
-        "rank": 30,
-        "player": "Wylde-LaRue, Tristan",
-        "points": 13,
-        "omw": 0.5442,
-        "deckId": "tristan-wylde-larue"
+        "rank": 8,
+        "player": "Sajgalik, Eduardo",
+        "points": 24,
+        "omw": 0.5824,
+        "deckId": "eduardo-sajgalik"
       },
       {
-        "rank": 31,
-        "player": "Belacca, Marco",
-        "points": 13,
-        "omw": 0.5306,
-        "deckId": "marco-belacca"
+        "rank": 9,
+        "player": "Nakayama, Satoshi",
+        "points": 24,
+        "omw": 0.5817,
+        "deckId": "satoshi-nakayama"
       },
       {
-        "rank": 32,
-        "player": "Garcia-Romo, Andy",
-        "points": 13,
-        "omw": 0.4762,
-        "deckId": "andy-garcia-romo"
-      },
-      {
-        "rank": 33,
-        "player": "Nishiyama, Rafael",
-        "points": 13,
-        "omw": 0.4218,
-        "deckId": "rafael-nishiyama"
-      },
-      {
-        "rank": 34,
-        "player": "Bishara, Mikey",
-        "points": 12,
-        "omw": 0.6735,
-        "deckId": "mikey-bishara"
-      },
-      {
-        "rank": 35,
-        "player": "Chamora, Winston",
-        "points": 12,
-        "omw": 0.6463,
-        "deckId": "winston-chamora"
-      },
-      {
-        "rank": 36,
-        "player": "Mora, Alejandro",
-        "points": 12,
-        "omw": 0.6395,
-        "deckId": "alejandro-mora"
-      },
-      {
-        "rank": 37,
+        "rank": 10,
         "player": "Sochurek, Petr",
-        "points": 12,
-        "omw": 0.6259,
+        "points": 24,
+        "omw": 0.5817,
         "deckId": "petr-sochurek"
       },
       {
-        "rank": 38,
-        "player": "Gruppi, Lorenzo",
-        "points": 12,
-        "omw": 0.6054,
-        "deckId": "lorenzo-gruppi"
+        "rank": 11,
+        "player": "Kans, Alex",
+        "points": 24,
+        "omw": 0.5805,
+        "deckId": "alex-kans"
       },
       {
-        "rank": 39,
-        "player": "Wu, Allen",
-        "points": 12,
-        "omw": 0.5986,
-        "deckId": "allen-wu"
+        "rank": 12,
+        "player": "Schütz, Stefan",
+        "points": 24,
+        "omw": 0.5321,
+        "deckId": "stefan-schutz"
       },
       {
-        "rank": 40,
-        "player": "Tonole, Quinn",
-        "points": 12,
-        "omw": 0.5782,
-        "deckId": "quinn-tonole"
-      },
-      {
-        "rank": 41,
-        "player": "Horie, Toru",
-        "points": 12,
-        "omw": 0.5782,
-        "deckId": "horie-toru"
-      },
-      {
-        "rank": 42,
-        "player": "Drake, James",
-        "points": 12,
-        "omw": 0.551,
-        "deckId": "james-drake"
-      },
-      {
-        "rank": 43,
-        "player": "Mitchell-Rabaey, Jacob",
-        "points": 12,
-        "omw": 0.551,
-        "deckId": "jacob-mitchell-rabaey"
-      },
-      {
-        "rank": 44,
-        "player": "Rohan, Alex",
-        "points": 12,
-        "omw": 0.5442,
-        "deckId": "alex-rohan"
-      },
-      {
-        "rank": 45,
-        "player": "Dota, Arch",
-        "points": 12,
-        "omw": 0.5442,
-        "deckId": "arch-dota"
-      },
-      {
-        "rank": 46,
-        "player": "Portolan, Toni",
-        "points": 12,
-        "omw": 0.5374,
-        "deckId": "toni-portolan"
-      },
-      {
-        "rank": 47,
-        "player": "Xu, Matt",
-        "points": 12,
-        "omw": 0.5374,
-        "deckId": "matt-xu"
-      },
-      {
-        "rank": 48,
-        "player": "Pardee, Sam",
-        "points": 12,
-        "omw": 0.517,
-        "deckId": "samuel-pardee"
-      },
-      {
-        "rank": 49,
-        "player": "Keith, Jody",
-        "points": 12,
-        "omw": 0.517,
-        "deckId": "jody-keith"
-      },
-      {
-        "rank": 50,
-        "player": "Fino, Vinnie",
-        "points": 12,
-        "omw": 0.517,
-        "deckId": "vinnie-fino"
-      },
-      {
-        "rank": 51,
-        "player": "Robb, Ian",
-        "points": 12,
-        "omw": 0.517,
-        "deckId": "ian-robb"
-      },
-      {
-        "rank": 52,
-        "player": "Dominguez, Javier",
-        "points": 12,
-        "omw": 0.5102,
-        "deckId": "javier-dominguez"
-      },
-      {
-        "rank": 53,
-        "player": "Enegren, Rasmus",
-        "points": 12,
-        "omw": 0.5034,
-        "deckId": "rasmus-enegren"
-      },
-      {
-        "rank": 54,
-        "player": "Salvatto, Luis",
-        "points": 12,
-        "omw": 0.4898,
-        "deckId": "luis-salvatto"
-      },
-      {
-        "rank": 55,
-        "player": "Rayvich, Maxime",
-        "points": 12,
-        "omw": 0.4898,
-        "deckId": "maxime-rayvich"
-      },
-      {
-        "rank": 56,
-        "player": "Fortunati, Andrea",
-        "points": 12,
-        "omw": 0.483,
-        "deckId": "andrea-fortunati"
-      },
-      {
-        "rank": 57,
-        "player": "Yukuhiro, Ken",
-        "points": 12,
-        "omw": 0.4762,
-        "deckId": "ken-yukuhiro"
-      },
-      {
-        "rank": 58,
+        "rank": 13,
         "player": "Chin, Justin",
-        "points": 12,
-        "omw": 0.4626,
+        "points": 24,
+        "omw": 0.5018,
         "deckId": "justin-chin"
       },
       {
-        "rank": 59,
-        "player": "Quege, Joao",
-        "points": 12,
-        "omw": 0.4422,
-        "deckId": "joao-quege"
+        "rank": 14,
+        "player": "Ichikawa, Yuuki",
+        "points": 22,
+        "omw": 0.6478,
+        "deckId": "yuuki-ichikawa"
       },
       {
-        "rank": 60,
-        "player": "Del Pivo, Marco",
-        "points": 12,
-        "omw": 0.4354,
-        "deckId": "marco-del-pivo"
+        "rank": 15,
+        "player": "Kurtzman, Etai",
+        "points": 22,
+        "omw": 0.5785,
+        "deckId": "etai-kurtzman"
       },
       {
-        "rank": 61,
+        "rank": 16,
+        "player": "Wylde-LaRue, Tristan",
+        "points": 22,
+        "omw": 0.5128,
+        "deckId": "tristan-wylde-larue"
+      },
+      {
+        "rank": 17,
+        "player": "Nishiyama, Rafael",
+        "points": 22,
+        "omw": 0.4797,
+        "deckId": "rafael-nishiyama"
+      },
+      {
+        "rank": 18,
+        "player": "Cavalcante, Marcelo",
+        "points": 21,
+        "omw": 0.5954,
+        "deckId": "marcelo-cavalcante"
+      },
+      {
+        "rank": 19,
+        "player": "Peral, Marc",
+        "points": 21,
+        "omw": 0.5844,
+        "deckId": "marc-peral"
+      },
+      {
+        "rank": 20,
+        "player": "Davis, Derrick",
+        "points": 21,
+        "omw": 0.5769,
+        "deckId": "derrick-davis"
+      },
+      {
+        "rank": 21,
+        "player": "Henry, Shaun",
+        "points": 21,
+        "omw": 0.5765,
+        "deckId": "shaun-henry"
+      },
+      {
+        "rank": 22,
+        "player": "Faust, Zevin",
+        "points": 21,
+        "omw": 0.5632,
+        "deckId": "zevin-faust"
+      },
+      {
+        "rank": 23,
+        "player": "Xu, Matt",
+        "points": 21,
+        "omw": 0.5439,
+        "deckId": "matt-xu"
+      },
+      {
+        "rank": 24,
+        "player": "Portolan, Toni",
+        "points": 21,
+        "omw": 0.5435,
+        "deckId": "toni-portolan"
+      },
+      {
+        "rank": 25,
+        "player": "Gruppi, Lorenzo",
+        "points": 21,
+        "omw": 0.5431,
+        "deckId": "lorenzo-gruppi"
+      },
+      {
+        "rank": 26,
+        "player": "Torres, Bernardo",
+        "points": 21,
+        "omw": 0.5427,
+        "deckId": "bernardo-torres"
+      },
+      {
+        "rank": 27,
+        "player": "Drake, James",
+        "points": 21,
+        "omw": 0.5297,
+        "deckId": "james-drake"
+      },
+      {
+        "rank": 28,
+        "player": "Moriyama, Masahide",
+        "points": 21,
+        "omw": 0.4852,
+        "deckId": "masahide-moriyama"
+      },
+      {
+        "rank": 29,
         "player": "Larsen, Christoffer",
-        "points": 12,
-        "omw": 0.4286,
+        "points": 21,
+        "omw": 0.4829,
         "deckId": "christoffer-larsen"
       },
       {
-        "rank": 62,
+        "rank": 30,
+        "player": "Garcia-Romo, Andy",
+        "points": 20,
+        "omw": 0.5061,
+        "deckId": "andy-garcia-romo"
+      },
+      {
+        "rank": 31,
+        "player": "Edelson, Adam",
+        "points": 19,
+        "omw": 0.6092,
+        "deckId": "adam-edelson"
+      },
+      {
+        "rank": 32,
+        "player": "Noah, Ma",
+        "points": 19,
+        "omw": 0.5982,
+        "deckId": "ma-noah"
+      },
+      {
+        "rank": 33,
+        "player": "Mitchell-Rabaey, Jacob",
+        "points": 19,
+        "omw": 0.5569,
+        "deckId": "jacob-mitchell-rabaey"
+      },
+      {
+        "rank": 34,
+        "player": "Fortunati, Andrea",
+        "points": 19,
+        "omw": 0.4967,
+        "deckId": "andrea-fortunati"
+      },
+      {
+        "rank": 35,
+        "player": "Oneto, Mattia",
+        "points": 18,
+        "omw": 0.5872,
+        "deckId": "mattia-oneto"
+      },
+      {
+        "rank": 36,
+        "player": "Wu, Allen",
+        "points": 18,
+        "omw": 0.56,
+        "deckId": "allen-wu"
+      },
+      {
+        "rank": 37,
+        "player": "Horie, Toru",
+        "points": 18,
+        "omw": 0.5596,
+        "deckId": "horie-toru"
+      },
+      {
+        "rank": 38,
+        "player": "Mora, Alejandro",
+        "points": 18,
+        "omw": 0.5427,
+        "deckId": "alejandro-mora"
+      },
+      {
+        "rank": 39,
+        "player": "Bishara, Mikey",
+        "points": 18,
+        "omw": 0.5344,
+        "deckId": "mikey-bishara"
+      },
+      {
+        "rank": 40,
+        "player": "Odenheimer, Nicholas",
+        "points": 18,
+        "omw": 0.5297,
+        "deckId": "nicholas-odenheimer"
+      },
+      {
+        "rank": 41,
+        "player": "Rayvich, Maxime",
+        "points": 18,
+        "omw": 0.5159,
+        "deckId": "maxime-rayvich"
+      },
+      {
+        "rank": 42,
+        "player": "Robb, Ian",
+        "points": 18,
+        "omw": 0.5159,
+        "deckId": "ian-robb"
+      },
+      {
+        "rank": 43,
+        "player": "Pardee, Sam",
+        "points": 18,
+        "omw": 0.5104,
+        "deckId": "samuel-pardee"
+      },
+      {
+        "rank": 44,
+        "player": "Goldberg, Nathan",
+        "points": 18,
+        "omw": 0.5045,
+        "deckId": "nathan-goldberg"
+      },
+      {
+        "rank": 45,
+        "player": "Shibata, Akira",
+        "points": 18,
+        "omw": 0.5022,
+        "deckId": "akira-shibata"
+      },
+      {
+        "rank": 46,
+        "player": "Fino, Vinnie",
+        "points": 18,
+        "omw": 0.4994,
+        "deckId": "vinnie-fino"
+      },
+      {
+        "rank": 47,
+        "player": "Del Pivo, Marco",
+        "points": 18,
+        "omw": 0.4918,
+        "deckId": "marco-del-pivo"
+      },
+      {
+        "rank": 48,
+        "player": "Yukuhiro, Ken",
+        "points": 18,
+        "omw": 0.4911,
+        "deckId": "ken-yukuhiro"
+      },
+      {
+        "rank": 49,
+        "player": "Salvatto, Luis",
+        "points": 18,
+        "omw": 0.4801,
+        "deckId": "luis-salvatto"
+      },
+      {
+        "rank": 50,
         "player": "Aymie, Zach",
-        "points": 12,
-        "omw": 0.4082,
+        "points": 18,
+        "omw": 0.4557,
         "deckId": "zach-aymie"
       },
       {
-        "rank": 63,
+        "rank": 51,
+        "player": "Elenbogen, Andrew",
+        "points": 16,
+        "omw": 0.5329,
+        "deckId": "andrew-elenbogen"
+      },
+      {
+        "rank": 52,
+        "player": "Dias, Ricardo",
+        "points": 16,
+        "omw": 0.4852,
+        "deckId": "ricardo-dias"
+      },
+      {
+        "rank": 53,
+        "player": "Fauquenoi, Noé",
+        "points": 15,
+        "omw": 0.6033,
+        "deckId": "noe-fauquenoi"
+      },
+      {
+        "rank": 54,
+        "player": "Rohan, Alex",
+        "points": 15,
+        "omw": 0.5293,
+        "deckId": "alex-rohan"
+      },
+      {
+        "rank": 55,
+        "player": "Dota, Arch",
+        "points": 15,
+        "omw": 0.5221,
+        "deckId": "arch-dota"
+      },
+      {
+        "rank": 56,
+        "player": "Dominguez, Javier",
+        "points": 15,
+        "omw": 0.5073,
+        "deckId": "javier-dominguez"
+      },
+      {
+        "rank": 57,
+        "player": "Chamora, Winston",
+        "points": 15,
+        "omw": 0.5045,
+        "deckId": "winston-chamora"
+      },
+      {
+        "rank": 58,
+        "player": "Quege, Joao",
+        "points": 15,
+        "omw": 0.5043,
+        "deckId": "joao-quege"
+      },
+      {
+        "rank": 59,
+        "player": "Enegren, Rasmus",
+        "points": 15,
+        "omw": 0.4856,
+        "deckId": "rasmus-enegren"
+      },
+      {
+        "rank": 60,
         "player": "Tase, Yuya",
-        "points": 12,
-        "omw": 0.3741,
+        "points": 15,
+        "omw": 0.4255,
         "deckId": "yuya-tase"
       },
       {
-        "rank": 64,
+        "rank": 61,
+        "player": "Belacca, Marco",
+        "points": 13,
+        "omw": 0.534,
+        "deckId": "marco-belacca"
+      },
+      {
+        "rank": 62,
+        "player": "Tonole, Quinn",
+        "points": 12,
+        "omw": 0.5352,
+        "deckId": "quinn-tonole"
+      },
+      {
+        "rank": 63,
         "player": "Branis, Antonín",
         "points": 10,
         "omw": 0.6803,
         "deckId": "antonin-branis"
       },
       {
-        "rank": 65,
+        "rank": 64,
         "player": "Kral, Chris",
         "points": 10,
         "omw": 0.483,
         "deckId": "chris-kral"
       },
       {
-        "rank": 66,
+        "rank": 65,
         "player": "Tron, Cyprien",
         "points": 9,
         "omw": 0.619,
         "deckId": "cyprien-tron"
       },
       {
-        "rank": 67,
+        "rank": 66,
         "player": "Plummer, Michael",
         "points": 9,
         "omw": 0.6054,
         "deckId": "michael-plummer"
       },
       {
-        "rank": 68,
+        "rank": 67,
         "player": "Lee, Anthony",
         "points": 9,
         "omw": 0.5782,
         "deckId": "anthony-lee"
       },
       {
-        "rank": 69,
+        "rank": 68,
         "player": "Herr, Elijah",
         "points": 9,
         "omw": 0.5646,
         "deckId": "elijah-herr"
       },
       {
-        "rank": 70,
+        "rank": 69,
         "player": "Deriu, Nick",
         "points": 9,
         "omw": 0.5646,
         "deckId": "nick-deriu"
       },
       {
-        "rank": 71,
+        "rank": 70,
         "player": "Depraz, Jean-Emmanuel",
         "points": 9,
         "omw": 0.5646,
         "deckId": "jean-emmanuel-depraz"
       },
       {
-        "rank": 72,
+        "rank": 71,
         "player": "Zhang, Neilson",
         "points": 9,
         "omw": 0.551,
         "deckId": "neilson-zhang"
       },
       {
-        "rank": 73,
+        "rank": 72,
         "player": "White, Tom",
         "points": 9,
         "omw": 0.551,
         "deckId": "tom-white"
       },
       {
-        "rank": 74,
+        "rank": 73,
         "player": "Dang, Nam",
         "points": 9,
         "omw": 0.551,
         "deckId": "nam-dang"
       },
       {
-        "rank": 75,
+        "rank": 74,
         "player": "Estratti, Samuele",
         "points": 9,
         "omw": 0.5306,
         "deckId": "samuele-estratti"
       },
       {
-        "rank": 76,
+        "rank": 75,
         "player": "Zhang, Rui",
         "points": 9,
         "omw": 0.5238,
         "deckId": "rui-zhang"
       },
       {
-        "rank": 77,
+        "rank": 76,
         "player": "Turcotte, Owen",
         "points": 9,
         "omw": 0.517,
         "deckId": "owen-turcotte"
       },
       {
-        "rank": 78,
+        "rank": 77,
         "player": "Detecnik, Davor",
         "points": 9,
         "omw": 0.5102,
         "deckId": "davor-detecnik"
       },
       {
-        "rank": 79,
+        "rank": 78,
         "player": "Mirabelli, Aidan",
         "points": 9,
         "omw": 0.5034,
         "deckId": "aidan-mirabelli"
       },
       {
-        "rank": 80,
+        "rank": 79,
         "player": "Yasooka, Shota",
         "points": 9,
         "omw": 0.4966,
         "deckId": "shota-yasooka"
       },
       {
-        "rank": 81,
+        "rank": 80,
         "player": "Hori, Yuta",
         "points": 9,
         "omw": 0.4898,
         "deckId": "yuta-hori"
       },
       {
-        "rank": 82,
+        "rank": 81,
         "player": "Beck, Riley",
         "points": 9,
         "omw": 0.483,
         "deckId": "riley-beck"
       },
       {
-        "rank": 83,
+        "rank": 82,
         "player": "Linabury, Simon",
         "points": 9,
         "omw": 0.483,
         "deckId": "simon-linabury"
       },
       {
-        "rank": 84,
+        "rank": 83,
         "player": "Sánchez, Francisco",
         "points": 9,
         "omw": 0.483,
         "deckId": "francisco-sanchez"
       },
       {
-        "rank": 85,
+        "rank": 84,
         "player": "Ferreira, Mateo",
         "points": 9,
         "omw": 0.483,
         "deckId": "mateo-ferreira"
       },
       {
-        "rank": 86,
+        "rank": 85,
         "player": "Bertram, Timo",
         "points": 9,
         "omw": 0.4762,
         "deckId": "timo-bertram"
       },
       {
-        "rank": 87,
+        "rank": 86,
         "player": "Sanfeliu, Josep",
         "points": 9,
         "omw": 0.4694,
         "deckId": "josep-sanfeliu"
       },
       {
-        "rank": 88,
+        "rank": 87,
         "player": "Munroe, Brady",
         "points": 9,
         "omw": 0.4286,
         "deckId": "brady-munroe"
       },
       {
-        "rank": 89,
+        "rank": 88,
         "player": "Chang, Samuel",
         "points": 9,
         "omw": 0.4286,
         "deckId": "samuel-chang"
       },
       {
-        "rank": 90,
+        "rank": 89,
         "player": "Puglisi Clark, John",
         "points": 9,
         "omw": 0.4286,
         "deckId": "john-puglisi-clark"
       },
       {
-        "rank": 91,
+        "rank": 90,
         "player": "Khóo, Se?k-un",
         "points": 9,
         "omw": 0.415,
         "deckId": "sek-un-kho"
       },
       {
-        "rank": 92,
+        "rank": 91,
         "player": "Ramboa, Thierry",
         "points": 9,
         "omw": 0.415,
         "deckId": "thierry-ramboa"
       },
       {
-        "rank": 93,
+        "rank": 92,
         "player": "Yu, Muhan",
         "points": 9,
         "omw": 0.3741,
         "deckId": "muhan-yu"
       },
       {
-        "rank": 94,
+        "rank": 93,
         "player": "Sales Junior, João Jorge",
         "points": 6,
         "omw": 0.619,
         "deckId": "joao-jorge-sales-junior"
       },
       {
-        "rank": 95,
+        "rank": 94,
         "player": "Toledo, Daniel",
         "points": 6,
         "omw": 0.5714,
         "deckId": "daniel-toledo"
       },
       {
-        "rank": 96,
+        "rank": 95,
         "player": "Shi Tian, Lee",
         "points": 6,
         "omw": 0.5306,
         "deckId": "lee-shi-tian"
       },
       {
-        "rank": 97,
+        "rank": 96,
         "player": "Puglisi Clark, Joseph",
         "points": 6,
         "omw": 0.5238,
         "deckId": "joseph-puglisi"
       },
       {
-        "rank": 98,
+        "rank": 97,
         "player": "Krueger, Will",
         "points": 6,
         "omw": 0.5238,
         "deckId": "will-krueger"
       },
       {
-        "rank": 99,
+        "rank": 98,
         "player": "Bejarano Espejo, Julio",
         "points": 6,
         "omw": 0.5159,
         "deckId": "julio-bejarano-espejo"
       },
       {
-        "rank": 100,
+        "rank": 99,
         "player": "Steuer, Nathan",
         "points": 6,
         "omw": 0.5159,
         "deckId": "nathan-steuer"
       },
       {
-        "rank": 101,
+        "rank": 100,
         "player": "Manfield, Seth",
         "points": 6,
         "omw": 0.5079,
         "deckId": "seth-manfield"
       },
       {
-        "rank": 102,
+        "rank": 101,
         "player": "Michaud, Noah",
         "points": 6,
         "omw": 0.483,
         "deckId": "noah-michaud"
       },
       {
-        "rank": 103,
+        "rank": 102,
         "player": "Weiss, Daniel",
         "points": 6,
         "omw": 0.4762,
         "deckId": "daniel-weiss"
       },
       {
-        "rank": 104,
+        "rank": 103,
         "player": "Condon, Ryan",
         "points": 6,
         "omw": 0.4694,
         "deckId": "ryan-condon"
       },
       {
-        "rank": 105,
+        "rank": 104,
         "player": "Adams, January",
         "points": 6,
         "omw": 0.4694,
         "deckId": "january-adams"
       },
       {
-        "rank": 106,
+        "rank": 105,
         "player": "Feitosa, Isael",
         "points": 6,
         "omw": 0.4683,
         "deckId": "isael-feitosa"
       },
       {
-        "rank": 107,
+        "rank": 106,
         "player": "Liebsch, Pierre",
         "points": 6,
         "omw": 0.4626,
         "deckId": "pierre-liebsch"
       },
       {
-        "rank": 108,
+        "rank": 107,
         "player": "Strasky, Ondrej",
         "points": 6,
         "omw": 0.4626,
         "deckId": "ondrej-strasky"
       },
       {
-        "rank": 109,
+        "rank": 108,
         "player": "Wright, Matthew",
         "points": 6,
         "omw": 0.4524,
         "deckId": "matthew-wright"
       },
       {
-        "rank": 110,
+        "rank": 109,
         "player": "Lupi, Guglielmo",
         "points": 6,
         "omw": 0.4354,
         "deckId": "guglielmo-lupi"
       },
       {
-        "rank": 111,
+        "rank": 110,
         "player": "Nollen, Dylan",
         "points": 6,
         "omw": 0.4286,
         "deckId": "dylan-nollen"
       },
       {
-        "rank": 112,
+        "rank": 111,
         "player": "Kominowski, Maxx",
         "points": 6,
         "omw": 0.415,
         "deckId": "maxx-kominowski"
       },
       {
-        "rank": 113,
+        "rank": 112,
         "player": "Martín, Adrià",
         "points": 3,
         "omw": 0.6381,
         "deckId": "adria-martin"
       },
       {
-        "rank": 114,
+        "rank": 113,
         "player": "Liu, Yuchen",
         "points": 3,
         "omw": 0.5619,
         "deckId": "yuchen-liu"
       },
       {
-        "rank": 115,
+        "rank": 114,
         "player": "Courson, Dawson",
         "points": 3,
         "omw": 0.5238,
         "deckId": "dawson-courson"
       },
       {
-        "rank": 116,
+        "rank": 115,
         "player": "Wagner-Krankel, Robert",
         "points": 3,
         "omw": 0.5238,
         "deckId": "robert-wagner-krankel"
       },
       {
-        "rank": 117,
+        "rank": 116,
         "player": "Stefansson, Matthew",
         "points": 3,
         "omw": 0.5143,
         "deckId": "matthew-stefans"
       },
       {
-        "rank": 118,
+        "rank": 117,
         "player": "Matsumoto, Keiichiro",
         "points": 3,
         "omw": 0.5034,
         "deckId": "keiichiro-matsumoto"
       },
       {
-        "rank": 119,
+        "rank": 118,
         "player": "Kassis, Eli",
         "points": 3,
         "omw": 0.5,
         "deckId": "eli-kassis"
       },
       {
-        "rank": 120,
+        "rank": 119,
         "player": "Avila, Francisco",
         "points": 3,
         "omw": 0.4952,
         "deckId": "francisco-avila"
       },
       {
-        "rank": 121,
+        "rank": 120,
         "player": "Paulot, Alexey",
         "points": 3,
         "omw": 0.4952,
         "deckId": "alexey-paulot"
       },
       {
-        "rank": 122,
+        "rank": 121,
         "player": "Selesnick, Jordan",
         "points": 3,
         "omw": 0.4841,
         "deckId": "jordan-selesnick"
       },
       {
-        "rank": 123,
+        "rank": 122,
         "player": "Talbot, Nicholas",
         "points": 3,
         "omw": 0.4524,
         "deckId": "nicholas-talbot"
       },
       {
-        "rank": 124,
+        "rank": 123,
         "player": "Buonadonna, Mason",
         "points": 3,
         "omw": 0.4381,
         "deckId": "mason-buonadonna"
       },
       {
-        "rank": 125,
+        "rank": 124,
         "player": "Lopez, Jorge",
         "points": 3,
         "omw": 0.4286,
         "deckId": "jorge-lopez"
       },
       {
-        "rank": 126,
+        "rank": 125,
         "player": "Kane, Liam",
         "points": 0,
         "omw": 0.5,
         "deckId": "liam-kane"
       },
       {
-        "rank": 127,
+        "rank": 126,
         "player": "Cammilluzzi, Marco",
         "points": 0,
         "omw": 0.4286,
         "deckId": "marco-cammilluzzi"
       },
       {
-        "rank": 128,
+        "rank": 127,
         "player": "Tan, Richmond",
         "points": 0,
         "omw": 0.4286,
