@@ -2,7 +2,8 @@
   "version": "3.9.16",
   "downloadUrl": "https://filthy-net-deck.com/#download",
   "downloads": {
-    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.16.exe"
+    "windows": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-Setup-3.9.16.exe",
+    "macos": "https://filthy-net-deck.netlify.app/downloads/Filthy-Net-Deck-3.9.16-universal.dmg"
   },
   "notes": "Spotlight for World Championship 32: standings and decklists while the event is on, the top 8 for a week after, then the chip goes away. Refreshes about hourly from the published round articles."
 }

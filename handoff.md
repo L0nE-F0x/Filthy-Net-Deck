@@ -3,8 +3,8 @@
 **Read this first.** Live top-of-todo across model/agent handoffs
 (Claude / Opus / Grok / Kimi).
 
-**Live product version: v3.9.16**
-(Windows signed updater · Linux home-folder self-update · macOS dmg still 3.9.15 until the tag's CI image is rolled into `website/downloads/`)
+**Live product version: v3.9.16 on all three platforms**
+(Windows signed updater · macOS universal dmg rolled · Linux home-folder self-update)
 · repo `L0nE-F0x/Filthy-Net-Deck` · local checkout
 `~/Projects/ApexForge/Filthy Net Deck` (the only one — see 2026-10-10)
 · **Parked:** AUR publish — AUR is not accepting new account registrations
@@ -24,9 +24,9 @@ that is expected and does not block auto-update.
 
 # ▶ START HERE — next session
 
-### 2026-11-14 — v3.9.16 Worlds spotlight. macOS dmg roll still open
+### 2026-11-14 — v3.9.16 Worlds spotlight is shipped
 
-**▶ Remaining:** when the `v3.9.16` macOS workflow attaches `Filthy-Net-Deck-3.9.16-universal.dmg` to the GitHub release, copy it to `website/downloads/`, point both homepage macOS buttons at it, and put `downloads.macos` back in `website/version.json` and `public/version.json`. Until that commit, the macOS button correctly serves the 3.9.15 image. Do not publish a 3.9.16 dmg URL before the file is in the repo.
+macOS `Filthy-Net-Deck-3.9.16-universal.dmg` (38,315,662 bytes, from the `v3.9.16` GitHub Release) is in `website/downloads/`. Both homepage Mac buttons and `downloads.macos` in both `version.json` files point at it.
 
 Windows NSIS is signed (key `67FCA9900F523D49`, signature verified). Linux tarball sha256 `b8709e7d307a6e8c73882a3c8930339b1e2b2ddd399d7349b0d4652210bddf13` matches `website/install.sh` and the PKGBUILD. `latest.json` has `windows-x86_64` and `linux-x86_64-local` only. The raw binary and the tarball must be on the GitHub release before this commit is what Netlify serves.
 
